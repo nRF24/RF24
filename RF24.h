@@ -138,7 +138,7 @@ protected:
   /**
    * Decode and print the given 'observe_tx' value to stdout
    *
-   * @param Value The observe_tx value to print
+   * @param value The observe_tx value to print
    *
    * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
    */
@@ -149,6 +149,9 @@ protected:
 public:
   /**
    * Constructor
+   *
+   * Creates a new instance of this driver.  Before using, you create an instance
+   * and send in the unique pins that this chip is connected to.
    * 
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
@@ -258,11 +261,12 @@ public:
    * Remember to stopListening() first.
    *
    * Addresses are 40-bit hex values, e.g.:
+   *
    * @code
    *   openWritingPipe(0xF0F0F0F0F0);
    * @endcode
    *
-   * @param value The 40-bit address of the pipe to open.  This can be
+   * @param address The 40-bit address of the pipe to open.  This can be
    * any value whatsoever, as long as you are the only one writing to it
    * and only one other radio is listening to it.  Coordinate these pipe
    * addresses amongst nodes on the network.
@@ -279,6 +283,7 @@ public:
    *
    * @warning all 5 reading pipes should share the first 32 bits.
    * Only the least significant byte should be unique, e.g.
+   * 
    * @code
    *   openReadingPipe(0xF0F0F0F0AA);
    *   openReadingPipe(0xF0F0F0F066);
