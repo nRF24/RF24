@@ -209,7 +209,7 @@ uint8_t RF24::getPayloadSize(void)
 
 /******************************************************************/
 
-void RF24::print_details(void) 
+void RF24::printDetails(void) 
 {
   uint8_t buffer[5];
   uint8_t status = read_register(RX_ADDR_P0,buffer,5);

@@ -198,7 +198,7 @@ public:
    *
    * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
    */
-  void print_details(void) ;
+  void printDetails(void) ;
 
   /**
    * Start listening on the pipes opened for reading.  

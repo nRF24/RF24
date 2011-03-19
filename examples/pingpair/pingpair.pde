@@ -133,7 +133,7 @@ void setup(void)
   // Dump the configuration of the rf unit for debugging
   //
   
-  radio.print_details();
+  radio.printDetails();
 }
 
 void loop(void)
