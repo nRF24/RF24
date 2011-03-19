@@ -1,0 +1,42 @@
+#
+# Jamfile for generating the documentation
+#
+
+DOXYGEN = doxygen ;
+XSLT = xsltproc ;
+
+DOCSOURCES = Doxyfile RF24.h ;
+
+rule Doxygen
+{
+	Depends $(<) : $(>) ;
+	Clean clean : $(<) ;
+	Depends docs : $(<) ;
+}
+
+actions Doxygen
+{
+	$(DOXYGEN)	
+}
+
+rule Xslt
+{
+	Depends $(<) : $(>) ;
+	Clean clean : $(<) ;
+}
+
+actions Xslt 
+{
+	$(XSLT) $(STYLESHEET) $(>) > $(<)
+}
+
+Doxygen docs/xml/index.xml : $(DOCSOURCES) ;
+
+Xslt docs/xml/combined.xml : docs/xml/index.xml ;
+STYLESHEET on docs/xml/combined.xml = docs/xml/combine.xslt ;
+Depends combined : docs/xml/combined.xml ;
+
+Xslt docs/xml/wikidocs.txt : docs/xml/combined.xml ;
+STYLESHEET on docs/xml/wikidocs.txt = wikidoc.xslt ;
+Depends docs/xml/combined.xml : wikidoc.xslt ;
+Depends wiki : docs/xml/wikidocs.txt ;
