@@ -14,16 +14,20 @@
 /**
  * Driver for nRF24L01 2.4GHz Wireless Transceiver
  *
- * See <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Datasheet</a>
+ * Please refer to:
+ *
+ * @li <a href="http://maniacbug.github.com/RF24/classRF24.html">Detailed Documentation</a>
+ * @li <a href="https://github.com/maniacbug/RF24/">Source Code</a>
+ * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
  *
  * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
  * the SPI hardware will go into 'slave' mode.
  *
  * Design Goals: This library is designed to be...
- *   * Maximally compliant with the intended operation of the chip
- *   * Easy for beginners to use
- *   * Consumed with a public interface that's similiar to other Arduino standard libraries
- *   * Built against the standard SPI library. 
+ * @li Maximally compliant with the intended operation of the chip
+ * @li Easy for beginners to use
+ * @li Consumed with a public interface that's similiar to other Arduino standard libraries
+ * @li Built against the standard SPI library. 
  */
  
 class RF24
@@ -91,9 +95,10 @@ protected:
    * The size of data written is the fixed payload size, see getPayloadSize()
    * 
    * @param buf Where to get the data
+   * @param len Number of bytes to be sent
    * @return Current value of status register
    */
-  uint8_t write_payload(const void* buf);
+  uint8_t write_payload(const void* buf, uint8_t len);
 
   /**
    * Read the receive payload
@@ -101,9 +106,10 @@ protected:
    * The size of data read is the fixed payload size, see getPayloadSize()
    * 
    * @param buf Where to put the data
+   * @param len Maximum number of bytes to read
    * @return Current value of status register
    */
-  uint8_t read_payload(void* buf) ;
+  uint8_t read_payload(void* buf, uint8_t len) ;
 
   /**
    * Empty the receive buffer
@@ -222,12 +228,15 @@ public:
    * the receiver or the timeout/retransmit maxima are reached.  In
    * the current configuration, the max delay here is 60ms.
    *
-   * The size of data written is the fixed payload size, see getPayloadSize()
+   * The maximum size of data written is the fixed payload size, see 
+   * getPayloadSize().  However, you can write less, and the remainder
+   * will just be filled with zeroes.
    * 
    * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
    * @return True if the payload was delivered successfully false if not
    */
-  boolean write( const void* buf );
+  boolean write( const void* buf, uint8_t len );
 
   /**
    * Test whether there are bytes available to be read
@@ -249,9 +258,10 @@ public:
    * for beginners to use.  No casting needed.
    *
    * @param buf Pointer to a buffer where the data should be written
+   * @param len Maximum number of bytes to read into the buffer
    * @return True if the payload was delivered successfully false if not
    */
-  boolean read( void* buf ) ;
+  boolean read( void* buf, uint8_t len ) ;
 
   /**
    * Open a pipe for writing
@@ -296,6 +306,21 @@ public:
    */
   void openReadingPipe(uint8_t number, uint64_t address);
 
-}; 
+};
+
+/**
+ * @example pingpair.pde
+ * 
+ * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
+ * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
+ * which responds by sending the value back.
+ */
+
+/**
+ * @mainpage Driver Library for nRF24L01
+ *
+ * See the RF24 class for details on how to drive this chip.
+ */
+
 #endif // __RF24_H__
 

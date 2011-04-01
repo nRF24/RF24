@@ -80,7 +80,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
 /******************************************************************/
 
-uint8_t RF24::write_payload(const void* buf)
+uint8_t RF24::write_payload(const void* buf, uint8_t len)
 {
   uint8_t status;
 
@@ -88,9 +88,12 @@ uint8_t RF24::write_payload(const void* buf)
 
   csn(LOW);
   status = SPI.transfer( W_TX_PAYLOAD );
-  uint8_t len = payload_size;
-  while ( len-- )
+  uint8_t data_len = min(len,payload_size);
+  uint8_t blank_len = payload_size - data_len;
+  while ( data_len-- )
     SPI.transfer(*current++);
+  while ( blank_len-- )
+    SPI.transfer(0);
 
   csn(HIGH);
 
@@ -99,16 +102,19 @@ uint8_t RF24::write_payload(const void* buf)
 
 /******************************************************************/
 
-uint8_t RF24::read_payload(void* buf) 
+uint8_t RF24::read_payload(void* buf, uint8_t len) 
 {
   uint8_t status;
   uint8_t* current = (uint8_t*)buf;
 
   csn(LOW);
   status = SPI.transfer( R_RX_PAYLOAD );
-  uint8_t len = payload_size;
-  while ( len-- )
+  uint8_t data_len = min(len,payload_size);
+  uint8_t blank_len = payload_size - data_len;
+  while ( data_len-- )
     *current++ = SPI.transfer(0xff);
+  while ( blank_len-- )
+    SPI.transfer(0xff);
   csn(HIGH);
 
   return status;
@@ -181,7 +187,7 @@ void RF24::print_observe_tx(uint8_t value)
 /******************************************************************/
 
 RF24::RF24(int _cepin, int _cspin): 
-  ce_pin(_cepin), csn_pin(_cspin)
+  ce_pin(_cepin), csn_pin(_cspin), payload_size(32)
 {
 }
 
@@ -197,7 +203,6 @@ void RF24::setChannel(int channel)
 void RF24::setPayloadSize(uint8_t size)
 {
   payload_size = min(size,32);
-  write_register(RX_PW_P0,min(size,32));
 }
 
 /******************************************************************/
@@ -300,7 +305,7 @@ void RF24::stopListening(void)
 
 /******************************************************************/
 
-boolean RF24::write( const void* buf )
+boolean RF24::write( const void* buf, uint8_t len )
 {
   boolean result = false;
 
@@ -308,7 +313,7 @@ boolean RF24::write( const void* buf )
   write_register(CONFIG, _BV(EN_CRC) | _BV(PWR_UP));
 
   // Send the payload
-  write_payload( buf );
+  write_payload( buf, len );
 
   // Allons!
   ce(HIGH);
@@ -366,13 +371,13 @@ boolean RF24::available(void)
 
 /******************************************************************/
 
-boolean RF24::read( void* buf ) 
+boolean RF24::read( void* buf, uint8_t len ) 
 {
   // was this the last of the data available?
   boolean result = false;
 
   // Fetch the payload
-  read_payload( buf );
+  read_payload( buf, len );
 
   uint8_t fifo_status;
   read_register(FIFO_STATUS,&fifo_status,1);
@@ -391,6 +396,7 @@ void RF24::openWritingPipe(uint64_t value)
   
   write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), 5);
   write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), 5);  
+  write_register(RX_PW_P0,min(payload_size,32));
 }
 
 /******************************************************************/
