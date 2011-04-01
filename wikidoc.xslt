@@ -5,7 +5,7 @@
   </xsl:template>
   <xsl:template match="memberdef">
   		<!-- xsl:text>&#xA;=== </xsl:text><xsl:value-of select="definition"/> <xsl:value-of select="argsstring"/><xsl:text> ===&#xA;</xsl:text -->
-  		<xsl:text>&#xA;=== </xsl:text><xsl:value-of select="name"/><xsl:text> ===&#xA;</xsl:text>
+  		<xsl:text>&#xA;=== </xsl:text><xsl:value-of select="name"/><xsl:text> ===&#xA;&#xA;</xsl:text>
   		<xsl:apply-templates select="briefdescription"/>
   		<xsl:if test="count(detaileddescription/para[not(./*)]) &lt; 1"><xsl:text>&#xA;</xsl:text></xsl:if>
   		<xsl:apply-templates select="detaileddescription"/>
@@ -13,6 +13,7 @@
   <xsl:template match="briefdescription/para">''<xsl:value-of select="."/>'' </xsl:template>
   <xsl:template match="detaileddescription/para/parameterlist">
 Parameters:
+
 <xsl:apply-templates select="parameteritem"/>
   </xsl:template>
   <xsl:template match="parameteritem">* ''<xsl:value-of select="parameternamelist/parametername"/>'': <xsl:value-of select="parameterdescription/para"/><xsl:text>&#xA;</xsl:text>
@@ -22,9 +23,11 @@ Parameters:
   </xsl:template>
   <xsl:template match="detaileddescription/para/simplesect[@kind='return']/para">
 Returns:
+
 * <xsl:value-of select="."/><xsl:text>&#xA;</xsl:text>
   </xsl:template>
-  <xsl:template match="detaileddescription/para/simplesect[@kind='warning']/para">Warning: <xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
+  <xsl:template match="detaileddescription/para/simplesect[@kind='warning']/para">
+Warning: <xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
 
   </xsl:template>
   <xsl:template match="detaileddescription/para/programlisting">
@@ -36,19 +39,3 @@ Returns:
   <xsl:template match="text()"/>
 </xsl:stylesheet>
 
-<!--
-
-//compounddef[kind=class]
-	//sectiondef[kind=public-func]
-		type
-		definition
-		argsstring
-		briefdescription/para
-		detaileddescription/para
-		parameterlist
-			parametername
-			parameterdescription
-		simplesect[kind=return]
-		simplesect[kind=warning]
-
--->
