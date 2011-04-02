@@ -57,17 +57,29 @@ AVRDUDE_PROTOCOL = stk500v1
 COM 			= 33
 endif
 
-ARDUINO_VERSION	= 22
-PROJECT_NAME 	= $(notdir $(PWD))
-PROJECT_DIR 	= . 
+UNAME := $(shell uname)
+
+ifeq ($(UNAME),Darwin)
+ARDUINO_VERSION	= 21
 ARDUINO_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
-ARDUINO_CORE 	= $(ARDUINO_DIR)/hardware/arduino/cores/arduino
-ARDUINO_AVR 	= $(ARDUINO_DIR)/hardware/tools/avr/avr/include/avr
-ARDUINO_LIB 	= $(ARDUINO_DIR)/libraries
+AVR_TOOLS_PATH 	= $(ARDUINO_DIR)/hardware/tools/avr/bin
+AVRDUDECONFIG_PATH = $(ARDUINO_DIR)/hardware/tools/avr/etc
+PORT                    = /dev/tty.usbserial-A600eHIs 
+PORT2                   = /dev/tty.usbserial-A9007LmI
+else
+ARDUINO_VERSION	= 22
+ARDUINO_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
 AVR_TOOLS_PATH 	= /usr/bin
 AVRDUDECONFIG_PATH = $(ARDUINO_DIR)/hardware/tools
 PORT 			= /dev/ttyUSB0
 PORT2 			= /dev/ttyUSB1
+endif
+
+PROJECT_NAME 	= $(notdir $(PWD))
+PROJECT_DIR 	= . 
+ARDUINO_CORE 	= $(ARDUINO_DIR)/hardware/arduino/cores/arduino
+ARDUINO_AVR 	= $(ARDUINO_DIR)/hardware/tools/avr/avr/include/avr
+ARDUINO_LIB 	= $(ARDUINO_DIR)/libraries
 F_CPU 			= 16000000
 
 ##########################################################
