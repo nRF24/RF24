@@ -29,8 +29,8 @@
 
 RF24 radio(8,9);
 
-// sets the role of this unit in hardware.  Connect to GND to be the 'ping' sender.
-// Connect to +5V to be the 'pong' receiver.
+// sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
+// Leave open to be the 'pong' receiver.
 const int role_pin = 7;
 
 //
@@ -72,9 +72,9 @@ void setup(void)
   
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
-    role = role_pong_back;
-  else
     role = role_ping_out;
+  else
+    role = role_pong_back;
 
   //
   // Print preamble
