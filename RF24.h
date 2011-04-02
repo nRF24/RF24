@@ -246,14 +246,20 @@ public:
   boolean available(void) ;
 
   /**
+   * Test whether there are bytes available to be read
+   *
+   * @param[out] pipe_num Which pipe has the payload available
+   * @return True if there is a payload available, false if none is
+   */
+  boolean available(uint8_t* pipe_num);
+
+  /**
    * Read the payload
    *
    * Return the last payload received
    *
    * The size of data read is the fixed payload size, see getPayloadSize()
    * 
-   * @todo Indicate which pipe it came from
-   *
    * @note I specifically chose 'void*' as a data type to make it easier
    * for beginners to use.  No casting needed.
    *
@@ -323,4 +329,5 @@ public:
  */
 
 #endif // __RF24_H__
+// vim:ai sts=2 sw=2 ft=cpp
 

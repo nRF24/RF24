@@ -232,6 +232,14 @@ void RF24::printDetails(void)
     printf("%02x",*bufptr);
   printf("\n\r");
 
+  status = read_register(RX_ADDR_P2,buffer,1);
+  printf("RX_ADDR_P2 = 0x%02x",*buffer);
+  printf("\n\r");
+
+  status = read_register(RX_ADDR_P3,buffer,1);
+  printf("RX_ADDR_P3 = 0x%02x",*buffer);
+  printf("\n\r");
+
   status = read_register(TX_ADDR,buffer,5);
   printf("TX_ADDR = 0x",buffer);
   bufptr = buffer + 5;
@@ -350,10 +358,16 @@ boolean RF24::write( const void* buf, uint8_t len )
 
   return result;
 }
-
 /******************************************************************/
 
 boolean RF24::available(void) 
+{
+  return available(NULL);
+}
+
+/******************************************************************/
+
+boolean RF24::available(uint8_t* pipe_num) 
 {
   uint8_t status = get_status();
   boolean result = ( status & _BV(RX_DR) );
@@ -362,7 +376,15 @@ boolean RF24::available(void)
   {
     IF_SERIAL_DEBUG(print_status(status));
 
+    // If the caller wants the pipe number, include that
+    if ( pipe_num )
+      *pipe_num = ( status >> RX_P_NO ) & B111;
+
     // Clear the status bit
+
+    // ??? Should this REALLY be cleared now?  Or wait until we
+    // actually READ the payload?
+
     write_register(STATUS,_BV(RX_DR) );
   }
 
@@ -408,18 +430,25 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
   const uint8_t child_payload_size[] = { 
     RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5   };
   const uint8_t child_pipe_enable[] = { 
-    ENAA_P1, ENAA_P2, ENAA_P3, ENAA_P4, ENAA_P5   };
+    ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5 };
 
   if (--child < 5)
   {
-    write_register(child_pipe[child], reinterpret_cast<uint8_t*>(&value), 5);    
+    // For pipes 2-5, only write the LSB
+    if ( !child )
+      write_register(child_pipe[child], reinterpret_cast<uint8_t*>(&value), 5);    
+    else  
+      write_register(child_pipe[child], reinterpret_cast<uint8_t*>(&value), 1);    
+    
     write_register(child_payload_size[child],payload_size);  
 
     // Note this is kind of an inefficient way to set up these enable bits, bit I thought it made
     // the calling code more simple
-    uint8_t en_aa;
-    read_register(EN_AA,&en_aa,1);
-    en_aa |= _BV(child_pipe_enable[child]);
-    write_register(EN_AA,en_aa);
+    uint8_t en_rx;
+    read_register(EN_RXADDR,&en_rx,1);
+    en_rx |= _BV(child_pipe_enable[child]);
+    write_register(EN_RXADDR,en_rx);
   }
 }
+// vim:ai sts=2 sw=2 ft=cpp
+
