@@ -1,6 +1,7 @@
 # Arduino driver for nRF24L01 2.4GHz Wireless Transceiver
 
 Design Goals: This library is designed to be...
+
 * Maximally compliant with the intended operation of the chip
 * Easy for beginners to use
 * Consumed with a public interface that's similiar to other Arduino standard libraries
