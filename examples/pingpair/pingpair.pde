@@ -9,11 +9,10 @@
 /**
  * Example RF Radio Ping Pair
  *
- * This sketch is an example of using the RF24 library for Arduino.  Deploy this on
- * two nodes, set one as the 'trasmit' and the other the 'receive' unit.  The transmit
- * unit will send out the value of millis() once a second.  The receive unit will respond
- * back with a copy of the value.  The transmit unit can get that 'ping' back, and
- * determine how long the whole cycle took.
+ * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
+ * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
+ * which responds by sending the value back.  The ping node can then see how long the whole cycle
+ * took.
  */
  
 #include <SPI.h>

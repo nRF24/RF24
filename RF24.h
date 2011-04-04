@@ -13,21 +13,6 @@
 
 /**
  * Driver for nRF24L01 2.4GHz Wireless Transceiver
- *
- * Please refer to:
- *
- * @li <a href="http://maniacbug.github.com/RF24/classRF24.html">Detailed Documentation</a>
- * @li <a href="https://github.com/maniacbug/RF24/">Source Code</a>
- * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
- *
- * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
- * the SPI hardware will go into 'slave' mode.
- *
- * Design Goals: This library is designed to be...
- * @li Maximally compliant with the intended operation of the chip
- * @li Easy for beginners to use
- * @li Consumed with a public interface that's similiar to other Arduino standard libraries
- * @li Built against the standard SPI library. 
  */
  
 class RF24
@@ -182,7 +167,9 @@ public:
    * Set Payload Size
    * 
    * This implementation uses a pre-stablished fixed payload size for all
-   * transmissions.
+   * transmissions.  If this method is never called, the driver will always
+   * transmit the maximum payload size (32 bytes), no matter how much
+   * was sent to write().
    *
    * @todo Implement variable-sized payloads feature
    * 
@@ -197,7 +184,7 @@ public:
    *
    * @return The number of bytes in the payload
    */
-   uint8_t getPayloadSize(void) ;
+  uint8_t getPayloadSize(void) ;
 
   /**
    * Print a giant block of debugging information to stdout
@@ -301,8 +288,8 @@ public:
    * Only the least significant byte should be unique, e.g.
    * 
    * @code
-   *   openReadingPipe(0xF0F0F0F0AA);
-   *   openReadingPipe(0xF0F0F0F066);
+   *   openReadingPipe(1,0xF0F0F0F0AA);
+   *   openReadingPipe(2,0xF0F0F0F066);
    * @endcode
    * 
    * @todo Enforce the restriction that all pipes must share the top 32 bits
@@ -319,13 +306,44 @@ public:
  * 
  * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
  * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
- * which responds by sending the value back.
+ * which responds by sending the value back.  The ping node can then see how long the whole cycle
+ * took.
  */
 
 /**
- * @mainpage Driver Library for nRF24L01
+ * @example starping.pde
  *
- * See the RF24 class for details on how to drive this chip.
+ * This sketch is a more complex example of using the RF24 library for Arduino.  
+ * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the 
+ * role_pin low, and the others will be 'ping transmit' units.  The ping units
+ * unit will send out the value of millis() once a second.  The pong unit will 
+ * respond back with a copy of the value.  Each ping unit can get that response
+ * back, and determine how long the whole cycle took.
+ *
+ * This example requires a bit more complexity to determine which unit is which.
+ * The pong receiver is identified by having its role_pin tied to ground.
+ * The ping senders are further differentiated by a byte in eeprom.
+ */
+
+/**
+ * @mainpage Driver for nRF24L01 2.4GHz Wireless Transceiver
+ *
+ * Design Goals: This library is designed to be...
+ * @li Maximally compliant with the intended operation of the chip
+ * @li Easy for beginners to use
+ * @li Consumed with a public interface that's similiar to other Arduino standard libraries
+ * @li Built against the standard SPI library.
+ *
+ * Please refer to:
+ *
+ * @li <a href="http://maniacbug.github.com/RF24/">Documentation Main Page</a>
+ * @li <a href="http://maniacbug.github.com/RF24/classRF24.html">RF24 Class Documentation</a>
+ * @li <a href="https://github.com/maniacbug/RF24/">Source Code</a>
+ * @li <a href="https://github.com/maniacbug/RF24/archives/master">Downloads Page</a>
+ * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
+ *
+ * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
+ * the SPI hardware will go into 'slave' mode.
  */
 
 #endif // __RF24_H__

@@ -10,14 +10,14 @@
  * Example RF Radio Ping Star Group 
  *
  * This sketch is a more complex example of using the RF24 library for Arduino.  
- * Deploy this on up to six nodes.  Set one as the 'pong receiver' and the others
- * as 'ping transmit' units.  The ping units unit will send out the value of millis() 
- * once a second.  The pong unit will respond back with a copy of the value.  
- * The ping unit can get that response back, and
- * determine how long the whole cycle took.
+ * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the 
+ * role_pin low, and the others will be 'ping transmit' units.  The ping units
+ * unit will send out the value of millis() once a second.  The pong unit will 
+ * respond back with a copy of the value.  Each ping unit can get that response
+ * back, and determine how long the whole cycle took.
  *
- * This example requires a bit more complexity to determine which unit is
- * which.  The pong receiver is identified by having its role_pin tied to ground.
+ * This example requires a bit more complexity to determine which unit is which.
+ * The pong receiver is identified by having its role_pin tied to ground.
  * The ping senders are further differentiated by a byte in eeprom.
  */
  
@@ -26,8 +26,6 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
-
-extern EEPROMClass EEPROM;
 
 //
 // Hardware configuration
@@ -45,9 +43,14 @@ const int role_pin = 7;
 // Topology
 //
 
-// Radio pipe addresses for the 6 nodes to communicate
-const uint64_t talking_pipes[6] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL, 0xF0F0F0F0C3LL, 0xF0F0F0F0B4LL, 0xF0F0F0F0A5LL, 0xF0F0F0F096LL };
-const uint64_t listening_pipes[6] = { 0x3A3A3A3AE1LL, 0x3A3A3A3AD2LL, 0x3A3A3A3AC3LL, 0x3A3A3A3AB4LL, 0x3A3A3A3AA5LL, 0x3A3A3A3A96LL };
+// Radio pipe addresses for the nodes to communicate.  Only ping nodes need
+// dedicated pipes in this topology.  Each ping node has a talking pipe
+// that it will ping into, and a listening pipe that it will listen for
+// the pong.  The pong node listens on all the ping node talking pipes
+// and sends the pong back on the sending node's specific listening pipe.
+
+const uint64_t talking_pipes[5] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0C3LL, 0xF0F0F0F0B4LL, 0xF0F0F0F0A5LL, 0xF0F0F0F096LL };
+const uint64_t listening_pipes[5] = { 0x3A3A3A3AD2LL, 0x3A3A3A3AC3LL, 0x3A3A3A3AB4LL, 0x3A3A3A3AA5LL, 0x3A3A3A3A96LL };
 
 //
 // Role management
@@ -76,7 +79,8 @@ role_e role;
 const uint8_t address_at_eeprom_location = 0;
 
 // What is our address (SRAM cache of the address from EEPROM)
-// Note that zero is an INVALID address
+// Note that zero is an INVALID address.  The pong back unit takes address
+// 1, and the rest are 2-6
 uint8_t node_address;
 
 void setup(void)
@@ -139,26 +143,26 @@ void setup(void)
   //
   // Open pipes to other nodes for communication
   //
-  
-  // Open 'our' pipe for writing
-  // ping nodes open the parent's pipe for reading
-  // pong node opens all children's pipes for reading
-  
+
+  // The pong node listens on all the ping node talking pipes
+  // and sends the pong back on the sending node's specific listening pipe.
   if ( role == role_pong_back )
   {
-    // Listen to all ping nodes' talking pipes 
-    radio.openReadingPipe(1,talking_pipes[1]);
-    radio.openReadingPipe(2,talking_pipes[2]);
-    radio.openReadingPipe(3,talking_pipes[3]);
-    radio.openReadingPipe(4,talking_pipes[4]);
-    radio.openReadingPipe(5,talking_pipes[5]);
+    radio.openReadingPipe(1,talking_pipes[0]);
+    radio.openReadingPipe(2,talking_pipes[1]);
+    radio.openReadingPipe(3,talking_pipes[2]);
+    radio.openReadingPipe(4,talking_pipes[3]);
+    radio.openReadingPipe(5,talking_pipes[4]);
   }
+  
+  // Each ping node has a talking pipe that it will ping into, and a listening 
+  // pipe that it will listen for the pong.  
   if ( role == role_ping_out )
   {
     // Write on our talking pipe
-    radio.openWritingPipe(talking_pipes[node_address-1]);
+    radio.openWritingPipe(talking_pipes[node_address-2]);
     // Listen on our listening pipe 
-    radio.openReadingPipe(1,listening_pipes[node_address-1]);
+    radio.openReadingPipe(1,listening_pipes[node_address-2]);
   }
 
   //
@@ -172,6 +176,15 @@ void setup(void)
   //
   
   radio.printDetails();
+
+  //
+  // Prompt the user to assign a node address if we don't have one
+  //
+
+  if ( role == role_invalid )
+  {
+    printf("\n\r*** NO NODE ADDRESS ASSIGNED *** Send 1 through 6 to assign an address\n\r");
+  }
 }
 
 void loop(void)
@@ -238,7 +251,7 @@ void loop(void)
         done = radio.read( &got_time, sizeof(unsigned long) );
   
         // Spew it
-        printf("Got payload %lu from %i...",got_time,pipe_num);
+        printf("Got payload %lu from node %i...",got_time,pipe_num+1);
       }
       
       // First, stop listening so we can talk
@@ -277,4 +290,4 @@ void loop(void)
     }
   }
 }
-// vim:ai sts=2 sw=2 ft=cpp
+// vim:ai:ci sts=2 sw=2 ft=cpp
