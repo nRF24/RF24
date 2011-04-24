@@ -22,6 +22,7 @@
 
 void RF24::csn(int mode) 
 {
+  SPI.setDataMode(SPI_MODE0);
   digitalWrite(csn_pin,mode);
 }
 
