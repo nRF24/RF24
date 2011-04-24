@@ -140,8 +140,8 @@ CXXINCS = -I$(ARDUINO_CORE) -I$(ARDUINO_LIB)
 #CSTANDARD = -std=gnu99
 CDEBUG 		= -g$(DEBUG)
 #CWARN 		= -Wall -Wstrict-prototypes
-#CWARN 		= -Wall   # show all warnings
-CWARN 		= -w      # suppress all warnings
+CWARN 		= -Wall   # show all warnings
+#CWARN 		= -w      # suppress all warnings
 CMAP		= -Wl,-Map,output.map 
 ####CTUNING = -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CTUNING = -ffunction-sections -fdata-sections

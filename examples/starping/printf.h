@@ -21,6 +21,8 @@
 int serial_putc( char c, FILE *t ) 
 {
   Serial.write( c );
+
+  return c;
 } 
 
 void printf_begin(void)

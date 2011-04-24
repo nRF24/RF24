@@ -201,7 +201,7 @@ void loop(void)
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...",time);
-    bool ok = radio.write( &time, sizeof(unsigned long) );  
+    radio.write( &time, sizeof(unsigned long) );  
     
     // Now, continue listening
     radio.startListening();

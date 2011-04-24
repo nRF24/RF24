@@ -139,8 +139,8 @@ CXXINCS = -I$(ARDUINO_CORE) -I$(ARDUINO_LIB)
 #CSTANDARD = -std=gnu99
 CDEBUG 		= -g$(DEBUG)
 #CWARN 		= -Wall -Wstrict-prototypes
-#CWARN 		= -Wall   # show all warnings
-CWARN 		= -w      # suppress all warnings
+CWARN 		= -Wall   # show all warnings
+#CWARN 		= -w      # suppress all warnings
 CMAP		= -Wl,-Map,output.map 
 ####CTUNING = -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CTUNING = -ffunction-sections -fdata-sections
@@ -198,6 +198,7 @@ build: elf hex
 output/$(PROJECT_NAME).cpp: $(PROJECT_NAME).pde
 	test -d output || mkdir output
 	echo "#include <WProgram.h>" > $@ 
+	echo "#line 1 \"$<\"" >> $@ 
 	cat $< >> $@ 
 
 elf: output/$(PROJECT_NAME).elf
