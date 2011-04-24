@@ -220,14 +220,14 @@ void RF24::printDetails(void)
   uint8_t buffer[5];
   uint8_t status = read_register(RX_ADDR_P0,buffer,5);
   print_status(status);
-  printf("RX_ADDR_P0 = 0x",buffer);
+  printf("RX_ADDR_P0 = 0x");
   uint8_t *bufptr = buffer + 5;
   while( bufptr-- > buffer )
     printf("%02x",*bufptr);
   printf("\n\r");
 
   status = read_register(RX_ADDR_P1,buffer,5);
-  printf("RX_ADDR_P1 = 0x",buffer);
+  printf("RX_ADDR_P1 = 0x");
   bufptr = buffer + 5;
   while( bufptr-- > buffer )
     printf("%02x",*bufptr);
@@ -242,7 +242,7 @@ void RF24::printDetails(void)
   printf("\n\r");
 
   status = read_register(TX_ADDR,buffer,5);
-  printf("TX_ADDR = 0x",buffer);
+  printf("TX_ADDR = 0x");
   bufptr = buffer + 5;
   while( bufptr-- > buffer )
     printf("%02x",*bufptr);
@@ -451,5 +451,5 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
     write_register(EN_RXADDR,en_rx);
   }
 }
-// vim:ai sts=2 sw=2 ft=cpp
+// vim:ai:cin:sts=2 sw=2 ft=cpp
 

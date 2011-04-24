@@ -29,7 +29,7 @@
 RF24 radio(8,9);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
-// Leave open to be the 'pong' receiver.
+// Leave open to be the 'ping' transmitter 
 const int role_pin = 7;
 
 //
@@ -137,7 +137,7 @@ void loop(void)
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...",time);
-    bool ok = radio.write( &time, sizeof(unsigned long) );  
+    radio.write( &time, sizeof(unsigned long) );  
     
     // Now, continue listening
     radio.startListening();
