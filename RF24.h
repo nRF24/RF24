@@ -347,5 +347,5 @@ public:
  */
 
 #endif // __RF24_H__
-// vim:ai sts=2 sw=2 ft=cpp
+// vim:ai:cin:sts=2 sw=2 ft=cpp
 

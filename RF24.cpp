@@ -450,5 +450,5 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
     write_register(EN_RXADDR,en_rx);
   }
 }
-// vim:ai sts=2 sw=2 ft=cpp
+// vim:ai:cin:sts=2 sw=2 ft=cpp
 
