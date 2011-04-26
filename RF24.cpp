@@ -71,6 +71,8 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 {
   uint8_t status;
 
+  IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\n\r"),reg,value));
+
   csn(LOW);
   status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   SPI.transfer(value);
@@ -187,14 +189,14 @@ void RF24::print_observe_tx(uint8_t value)
 
 /******************************************************************/
 
-RF24::RF24(int _cepin, int _cspin): 
+RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
   ce_pin(_cepin), csn_pin(_cspin), payload_size(32)
 {
 }
 
 /******************************************************************/
 
-void RF24::setChannel(int channel)
+void RF24::setChannel(uint8_t channel)
 {
   write_register(RF_CH,min(channel,127));  
 }
@@ -247,6 +249,12 @@ void RF24::printDetails(void)
   while( bufptr-- > buffer )
     printf("%02x",*bufptr);
   printf("\n\r");
+  
+  status = read_register(RX_PW_P0,buffer,1);
+  printf("RX_PW_P0 = 0x%02x\n\r",*buffer);
+
+  status = read_register(RX_PW_P1,buffer,1);
+  printf("RX_PW_P1 = 0x%02x\n\r",*buffer);
 
   read_register(EN_AA,buffer,1);
   printf("EN_AA = %02x\n\r",*buffer);
@@ -285,7 +293,6 @@ void RF24::begin(void)
 
   // Set up default configuration.  Callers can always change it later.
   setChannel(1);
-  setPayloadSize(8);
 }
 
 /******************************************************************/
