@@ -22,6 +22,7 @@
 
 void RF24::csn(int mode) 
 {
+  SPI.setDataMode(SPI_MODE0);
   digitalWrite(csn_pin,mode);
 }
 
@@ -69,6 +70,8 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 {
   uint8_t status;
+
+  IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\n\r"),reg,value));
 
   csn(LOW);
   status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
@@ -163,7 +166,7 @@ uint8_t RF24::get_status(void)
 
 void RF24::print_status(uint8_t status)
 {
-  printf("STATUS=%02x: RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\n\r",
+  printf_P(PSTR("STATUS=%02x: RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\n\r"),
   status,
   (status & _BV(RX_DR))?1:0,
   (status & _BV(TX_DS))?1:0,
@@ -177,7 +180,7 @@ void RF24::print_status(uint8_t status)
 
 void RF24::print_observe_tx(uint8_t value) 
 {
-  printf("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\n\r",
+  printf_P(PSTR("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\n\r"),
   value,
   (value >> PLOS_CNT) & B1111,
   (value >> ARC_CNT) & B1111
@@ -186,14 +189,14 @@ void RF24::print_observe_tx(uint8_t value)
 
 /******************************************************************/
 
-RF24::RF24(int _cepin, int _cspin): 
+RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
   ce_pin(_cepin), csn_pin(_cspin), payload_size(32)
 {
 }
 
 /******************************************************************/
 
-void RF24::setChannel(int channel)
+void RF24::setChannel(uint8_t channel)
 {
   write_register(RF_CH,min(channel,127));  
 }
@@ -219,42 +222,48 @@ void RF24::printDetails(void)
   uint8_t buffer[5];
   uint8_t status = read_register(RX_ADDR_P0,buffer,5);
   print_status(status);
-  printf("RX_ADDR_P0 = 0x");
+  printf_P(PSTR("RX_ADDR_P0 = 0x"));
   uint8_t *bufptr = buffer + 5;
   while( bufptr-- > buffer )
-    printf("%02x",*bufptr);
-  printf("\n\r");
+    printf_P(PSTR("%02x"),*bufptr);
+  printf_P(PSTR("\n\r"));
 
   status = read_register(RX_ADDR_P1,buffer,5);
-  printf("RX_ADDR_P1 = 0x");
+  printf_P(PSTR("RX_ADDR_P1 = 0x"));
   bufptr = buffer + 5;
   while( bufptr-- > buffer )
-    printf("%02x",*bufptr);
-  printf("\n\r");
+    printf_P(PSTR("%02x"),*bufptr);
+  printf_P(PSTR("\n\r"));
 
   status = read_register(RX_ADDR_P2,buffer,1);
-  printf("RX_ADDR_P2 = 0x%02x",*buffer);
-  printf("\n\r");
+  printf_P(PSTR("RX_ADDR_P2 = 0x%02x"),*buffer);
+  printf_P(PSTR("\n\r"));
 
   status = read_register(RX_ADDR_P3,buffer,1);
-  printf("RX_ADDR_P3 = 0x%02x",*buffer);
-  printf("\n\r");
+  printf_P(PSTR("RX_ADDR_P3 = 0x%02x"),*buffer);
+  printf_P(PSTR("\n\r"));
 
   status = read_register(TX_ADDR,buffer,5);
-  printf("TX_ADDR = 0x");
+  printf_P(PSTR("TX_ADDR = 0x"));
   bufptr = buffer + 5;
   while( bufptr-- > buffer )
-    printf("%02x",*bufptr);
-  printf("\n\r");
+    printf_P(PSTR("%02x"),*bufptr);
+  printf_P(PSTR("\n\r"));
+  
+  status = read_register(RX_PW_P0,buffer,1);
+  printf_P(PSTR("RX_PW_P0 = 0x%02x\n\r"),*buffer);
+
+  status = read_register(RX_PW_P1,buffer,1);
+  printf_P(PSTR("RX_PW_P1 = 0x%02x\n\r"),*buffer);
 
   read_register(EN_AA,buffer,1);
-  printf("EN_AA = %02x\n\r",*buffer);
+  printf_P(PSTR("EN_AA = %02x\n\r"),*buffer);
 
   read_register(EN_RXADDR,buffer,1);
-  printf("EN_RXADDR = %02x\n\r",*buffer);
+  printf_P(PSTR("EN_RXADDR = %02x\n\r"),*buffer);
 
   read_register(RF_CH,buffer,1);
-  printf("RF_CH = %02x\n\r",*buffer);  
+  printf_P(PSTR("RF_CH = %02x\n\r"),*buffer);  
 }
 
 /******************************************************************/
@@ -284,7 +293,6 @@ void RF24::begin(void)
 
   // Set up default configuration.  Callers can always change it later.
   setChannel(1);
-  setPayloadSize(8);
 }
 
 /******************************************************************/

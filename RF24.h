@@ -18,9 +18,9 @@
 class RF24
 {
 private:
-  int ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-  int csn_pin; /**< SPI Chip select */
-  int payload_size; /**< Fixed size of payloads */
+  uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
+  uint8_t csn_pin; /**< SPI Chip select */
+  uint8_t payload_size; /**< Fixed size of payloads */
 
 protected:  
   /**
@@ -147,7 +147,7 @@ public:
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
    */
-  RF24(int _cepin, int _cspin);
+  RF24(uint8_t _cepin, uint8_t _cspin);
 
   /**
    * Begin operation of the chip
@@ -161,7 +161,7 @@ public:
    * 
    * @param channel Which RF channel to communicate on, 0-127
    */
-  void setChannel(int channel);
+  void setChannel(uint8_t channel);
 
   /**
    * Set Payload Size
