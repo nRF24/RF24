@@ -21,6 +21,7 @@ private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
   uint8_t payload_size; /**< Fixed size of payloads */
+  boolean ack_packet_available; /**< Whether there is an ack packet waiting */
 
 protected:  
   /**
@@ -54,6 +55,8 @@ protected:
    * @return Current value of status register
    */
   uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) ;
+  
+  uint8_t read_register(uint8_t reg) ;
 
   /**
    * Write a chunk of data to a register
@@ -95,7 +98,7 @@ protected:
    * @return Current value of status register
    */
   uint8_t read_payload(void* buf, uint8_t len) ;
-
+public:
   /**
    * Empty the receive buffer
    *
@@ -109,7 +112,7 @@ protected:
    * @return Current value of status register
    */
   uint8_t flush_tx(void);
-
+protected:
   /**
    * Retrieve the current status of the chip
    *
@@ -135,6 +138,7 @@ protected:
    */
   void print_observe_tx(uint8_t value) ;
 
+  void toggle_features(void);
   /**@}*/
 
 public:
@@ -299,6 +303,11 @@ public:
    */
   void openReadingPipe(uint8_t number, uint64_t address);
 
+  void enableAckPayload(void);
+
+  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+
+  boolean isAckPayloadAvailable(void);
 };
 
 /**
