@@ -136,9 +136,6 @@ void loop(void)
   
   if (role == role_ping_out)
   {
-    // First, stop listening so we can talk.
-    radio.stopListening();
-    
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...",time);
@@ -149,45 +146,8 @@ void loop(void)
       static char response[32];
       radio.read(response,32);
       printf("Ack: [%s]",response);
-
-      // try flushing the rx buffer to get the ack packet out of the system ...
-      radio.flush_rx();
-    }  
-    
-    // Now, continue listening
-    radio.startListening();
-    
-    // Wait here until we get a response, or timeout (250ms)
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
-    while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 500 )
-        timeout = true;
-    
-    // Describe the results
-    if ( timeout )
-    {
-      printf("Failed, response timed out.\n\r");
-    }
-    else
-    {
-      // Stop listening while we are clocking out the data
-      radio.stopListening();
-
-      // Dump the payloads until we've gotten everything
-      unsigned long got_time;
-      boolean done = false;
-      while (!done)
-      {
-        // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
-  
-	// Spew it
-	printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
-      }
-      // Begin listening again 
-      radio.startListening();
-    }
+    } 
+    printf(" OK\n\r");
     
     // Try again later
     digitalWrite(led_pin,HIGH);
@@ -196,7 +156,7 @@ void loop(void)
   }
   
   //
-  // Pong back role.  Receive each packet, dump it out, and send it back
+  // Pong back role.  Receive each packet, dump it out, add ack payload for next time
   //
   
   if ( role == role_pong_back )
@@ -213,28 +173,9 @@ void loop(void)
         done = radio.read( &got_time, sizeof(unsigned long) );
   
         // Spew it
-        printf("Got payload %lu...",got_time);
+        printf("Got payload %lu\n",got_time);
       }
       
-      // First, stop listening so we can talk
-      radio.stopListening();
-  
-      //delay(250);
-      
-      // necessary to flush the ack packet out
-      // but kills the entire tx queue, which I might not
-      // want in the future!!
-      radio.flush_tx();
-            
-      // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );  
-      printf("Sent response.\n\r");
-      
-      // Now, resume listening so we catch the next packets.
-      radio.startListening();
-     
-      //delay(250);
-
       // Add an ack packet for the next time around
       static unsigned id = 0;
       static char pl_buffer[10];
@@ -242,7 +183,6 @@ void loop(void)
       pl_buffer[9] = 0;
       snprintf(pl_buffer,10,"id %04x",id++);
       radio.writeAckPayload( 1, pl_buffer, 10 );
-
     }
   }
 }
