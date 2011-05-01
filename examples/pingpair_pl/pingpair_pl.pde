@@ -32,14 +32,12 @@ RF24 radio(8,9);
 // Leave open to be the 'ping' transmitter 
 const short role_pin = 7;
 
-const short led_pin = 13; // flash the led when a packet has been sent
-
 //
 // Topology
 //
 
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xE8E8F0F0E1LL, 0xE8E8F0F0D2LL };
+// Radio pipe address for the 2 nodes to communicate.
+const uint64_t pipe = 0xE8E8F0F0E1LL;
 
 //
 // Role management
@@ -99,27 +97,24 @@ void setup(void)
   // Open pipes to other nodes for communication
   //
   
-  // This simple sketch opens two pipes for these two nodes to communicate
-  // back and forth.
-  // Open 'our' pipe for writing
-  // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
+  // This simple sketch opens a single pipes for these two nodes to communicate
+  // back and forth.  One listens on it, the other talks to it.
   
   if ( role == role_ping_out )
   {
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
+    radio.openWritingPipe(pipe);
   }
   else
   {
-    radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1,pipes[0]);
+    radio.openReadingPipe(1,pipe);
   }
 
   //
   // Start listening
   //
   
-  radio.startListening();
+  if ( role == role_pong_back )
+    radio.startListening();
 
   //
   // Dump the configuration of the rf unit for debugging
@@ -130,6 +125,8 @@ void setup(void)
 
 void loop(void)
 {
+  static uint32_t id = 0;
+  
   //
   // Ping out role.  Repeatedly send the current time
   //
@@ -143,16 +140,13 @@ void loop(void)
 
     if ( radio.isAckPayloadAvailable() )
     {
-      static char response[32];
-      radio.read(response,32);
-      printf("Ack: [%s]",response);
+      radio.read(&id,sizeof(id));
+      printf("Ack: [%lu] ",id);
     } 
-    printf(" OK\n\r");
+    printf("OK\n\r");
     
-    // Try again later
-    digitalWrite(led_pin,HIGH);
-    delay(3000);
-    digitalWrite(led_pin,LOW);
+    // Try again soon 
+    delay(2000);
   }
   
   //
@@ -165,7 +159,7 @@ void loop(void)
     if ( radio.available() )
     {
       // Dump the payloads until we've gotten everything
-      unsigned long got_time;
+      static unsigned long got_time;
       boolean done = false;
       while (!done)
       {
@@ -176,13 +170,10 @@ void loop(void)
         printf("Got payload %lu\n",got_time);
       }
       
-      // Add an ack packet for the next time around
-      static unsigned id = 0;
-      static char pl_buffer[10];
-      memset(pl_buffer,' ',10);
-      pl_buffer[9] = 0;
-      snprintf(pl_buffer,10,"id %04x",id++);
-      radio.writeAckPayload( 1, pl_buffer, 10 );
+      // Add an ack packet for the next time around.  This is a simple
+      // packet counter
+      radio.writeAckPayload( 1, &id, sizeof(id) );
+      ++id;
     }
   }
 }
