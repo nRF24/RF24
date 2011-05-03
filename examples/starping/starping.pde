@@ -258,10 +258,10 @@ void loop(void)
       radio.stopListening();
 
       // Open the correct pipe for writing
-      radio.openWritingPipe(listening_pipes[pipe_num]);
+      radio.openWritingPipe(listening_pipes[pipe_num-1]);
 
       // Retain the low 2 bytes to identify the pipe for the spew
-      uint16_t pipe_id = listening_pipes[pipe_num] & 0xffff;
+      uint16_t pipe_id = listening_pipes[pipe_num-1] & 0xffff;
             
       // Send the final one back.
       radio.write( &got_time, sizeof(unsigned long) );  
