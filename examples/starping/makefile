@@ -209,8 +209,12 @@ lss: output/$(PROJECT_NAME).lss
 #sym: output/$(PROJECT_NAME).sym
 
 # Upload HEX file to Arduino
-upload: output/$(PROJECT_NAME).hex
+upload: upload1 upload2
+
+upload1: output/$(PROJECT_NAME).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT) $(AVRDUDE_WRITE_FLASH)
+
+upload2: output/$(PROJECT_NAME).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT2) $(AVRDUDE_WRITE_FLASH)
 
 sym:
