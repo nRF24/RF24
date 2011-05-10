@@ -11,7 +11,7 @@
 #include "RF24.h"
 #include "nRF24L01.h"
 
-#undef SERIAL_DEBUG
+#define SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
 #define IF_SERIAL_DEBUG(x) (x)
 #else
@@ -47,6 +47,18 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   csn(HIGH);
 
   return status;
+}
+
+/******************************************************************/
+
+uint8_t RF24::read_register(uint8_t reg) 
+{
+  csn(LOW);
+  SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  uint8_t result = SPI.transfer(0xff);
+
+  csn(HIGH);
+  return result;
 }
 
 /******************************************************************/
@@ -190,7 +202,7 @@ void RF24::print_observe_tx(uint8_t value)
 /******************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
-  ce_pin(_cepin), csn_pin(_cspin), payload_size(32)
+  ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false)
 {
 }
 
@@ -321,12 +333,20 @@ void RF24::stopListening(void)
 
 /******************************************************************/
 
+void RF24::powerDown(void)
+{
+  write_register(CONFIG,0);
+}
+
+/******************************************************************/
+
 boolean RF24::write( const void* buf, uint8_t len )
 {
   boolean result = false;
 
   // Transmitter power-up
   write_register(CONFIG, _BV(EN_CRC) | _BV(PWR_UP));
+  delay(2);
 
   // Send the payload
   write_payload( buf, len );
@@ -339,18 +359,33 @@ boolean RF24::write( const void* buf, uint8_t len )
   // Monitor the send
   uint8_t observe_tx;
   uint8_t status;
+  uint8_t retries = 255;
   do
   {
     status = read_register(OBSERVE_TX,&observe_tx,1);
     IF_SERIAL_DEBUG(Serial.print(status,HEX));
     IF_SERIAL_DEBUG(Serial.print(observe_tx,HEX));
+    if ( ! retries-- )
+    {
+      IF_SERIAL_DEBUG(printf("ABORTED: too many retries\n\r"));
+      break;
+    }
   }
   while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) );
 
   if ( status & _BV(TX_DS) )
     result = true;
-
-  IF_SERIAL_DEBUG(Serial.println(result?"...OK.":"...Failed"));
+  
+  IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
+  
+  ack_payload_available = ( status & _BV(RX_DR) );
+  if ( ack_payload_available )
+  {
+    write_register(STATUS,_BV(RX_DR) );
+    ack_payload_length = read_payload_length();
+    IF_SERIAL_DEBUG(Serial.print("[AckPacket]/"));
+    IF_SERIAL_DEBUG(Serial.println(ack_payload_length,DEC));
+  }
 
   // Yay, we are done.
   ce(LOW);
@@ -366,6 +401,21 @@ boolean RF24::write( const void* buf, uint8_t len )
 
   return result;
 }
+
+/******************************************************************/
+
+uint8_t RF24::read_payload_length(void)
+{
+  uint8_t result = 0;
+
+  csn(LOW);
+  SPI.transfer( R_RX_PL_WID );
+  result = SPI.transfer(0xff);
+  csn(HIGH);
+
+  return result;
+}
+
 /******************************************************************/
 
 boolean RF24::available(void) 
@@ -378,12 +428,11 @@ boolean RF24::available(void)
 boolean RF24::available(uint8_t* pipe_num) 
 {
   uint8_t status = get_status();
+  IF_SERIAL_DEBUG(print_status(status));
   boolean result = ( status & _BV(RX_DR) );
 
   if (result)
   {
-    IF_SERIAL_DEBUG(print_status(status));
-
     // If the caller wants the pipe number, include that
     if ( pipe_num )
       *pipe_num = ( status >> RX_P_NO ) & B111;
@@ -394,6 +443,12 @@ boolean RF24::available(uint8_t* pipe_num)
     // actually READ the payload?
 
     write_register(STATUS,_BV(RX_DR) );
+
+    // Handle ack payload receipt
+    if ( status & _BV(TX_DS) )
+    {
+      write_register(STATUS,_BV(TX_DS));
+    }
   }
 
   return result;
@@ -458,5 +513,67 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
     write_register(EN_RXADDR,en_rx);
   }
 }
+
+/******************************************************************/
+  
+void RF24::toggle_features(void)
+{
+  csn(LOW);
+  SPI.transfer( ACTIVATE );
+  SPI.transfer( 0x73 );
+  csn(HIGH);
+}
+
+/******************************************************************/
+
+void RF24::enableAckPayload(void)
+{
+  //
+  // enable ack payload and dynamic payload features
+  //
+
+  write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
+
+  // If it didn't work, the features are not enabled
+  if ( ! read_register(FEATURE) )
+  {
+    // So enable them and try again
+    toggle_features();
+    write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
+  }
+
+  IF_SERIAL_DEBUG(printf("FEATURE=%i\n\r",read_register(FEATURE)));
+
+  //
+  // Enable dynamic payload on pipe 0
+  //
+
+  write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
+}
+
+/******************************************************************/
+
+void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
+{
+  const uint8_t* current = (const uint8_t*)buf;
+
+  csn(LOW);
+  SPI.transfer( W_ACK_PAYLOAD | ( pipe & B111 ) );
+  uint8_t data_len = min(len,32);
+  while ( data_len-- )
+    SPI.transfer(*current++);
+
+  csn(HIGH);
+}
+
+/******************************************************************/
+
+boolean RF24::isAckPayloadAvailable(void)
+{
+  boolean result = ack_payload_available;
+  ack_payload_available = false;
+  return result;
+}
+
 // vim:ai:cin:sts=2 sw=2 ft=cpp
 

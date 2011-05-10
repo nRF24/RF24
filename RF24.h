@@ -21,6 +21,8 @@ private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
   uint8_t payload_size; /**< Fixed size of payloads */
+  boolean ack_payload_available; /**< Whether there is an ack payload waiting */
+  uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. Note: not used. */
 
 protected:  
   /**
@@ -54,6 +56,8 @@ protected:
    * @return Current value of status register
    */
   uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) ;
+  
+  uint8_t read_register(uint8_t reg) ;
 
   /**
    * Write a chunk of data to a register
@@ -97,6 +101,16 @@ protected:
   uint8_t read_payload(void* buf, uint8_t len) ;
 
   /**
+   * Read the payload length
+   *
+   * For dynamic payloads, this pulls the size of the payload off
+   * the chip
+   *
+   * @return Payload length of last-received dynamic payload
+   */
+  uint8_t read_payload_length(void);
+
+  /**
    * Empty the receive buffer
    *
    * @return Current value of status register
@@ -135,6 +149,7 @@ protected:
    */
   void print_observe_tx(uint8_t value) ;
 
+  void toggle_features(void);
   /**@}*/
 
 public:
@@ -207,6 +222,14 @@ public:
    * Necessary to do this before writing.
    */
   void stopListening(void);
+
+  /**
+   * Enter low-power mode
+   *
+   * To return to normal power mode, either write() some data or
+   * startListening().
+   */
+  void powerDown(void);
 
   /**
    * Write to the open writing pipe
@@ -299,6 +322,11 @@ public:
    */
   void openReadingPipe(uint8_t number, uint64_t address);
 
+  void enableAckPayload(void);
+
+  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+
+  boolean isAckPayloadAvailable(void);
 };
 
 /**
