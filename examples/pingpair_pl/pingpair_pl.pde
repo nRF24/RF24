@@ -7,12 +7,12 @@
  */
 
 /**
- * Example RF Radio Ping Pair
+ * Example of using Ack Payloads
  *
- * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
- * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
- * which responds by sending the value back.  The ping node can then see how long the whole cycle
- * took.
+ * This is an example of how to do two-way communication without changing 
+ * transmit/receive modes.  Here, a payload is set to the transmitter within 
+ * the Ack packet of each transmission.  Note that the payload is set BEFORE
+ * the sender's message arrives.
  */
  
 #include <SPI.h>
@@ -36,24 +36,24 @@ const short role_pin = 7;
 // Topology
 //
 
-// Radio pipe address for the 2 nodes to communicate.
+// Single radio pipe address for the 2 nodes to communicate.
 const uint64_t pipe = 0xE8E8F0F0E1LL;
 
 //
 // Role management
 //
-// Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.  The hardware itself specifies
+// Set up role.  This sketch uses the same software for all the nodes in this
+// system.  Doing so greatly simplifies testing.  The hardware itself specifies
 // which node it is.
 //
 // This is done through the role_pin
 //
 
 // The various roles supported by this sketch
-typedef enum { role_ping_out = 1, role_pong_back } role_e;
+typedef enum { role_sender = 1, role_receiver } role_e;
 
 // The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
+const char* role_friendly_name[] = { "invalid", "Sender", "Receiver"};
 
 // The role of the current running sketch
 role_e role;
@@ -71,9 +71,9 @@ void setup(void)
   
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
-    role = role_ping_out;
+    role = role_sender;
   else
-    role = role_pong_back;
+    role = role_receiver;
 
   //
   // Print preamble
@@ -100,7 +100,7 @@ void setup(void)
   // This simple sketch opens a single pipes for these two nodes to communicate
   // back and forth.  One listens on it, the other talks to it.
   
-  if ( role == role_ping_out )
+  if ( role == role_sender )
   {
     radio.openWritingPipe(pipe);
   }
@@ -113,7 +113,7 @@ void setup(void)
   // Start listening
   //
   
-  if ( role == role_pong_back )
+  if ( role == role_receiver )
     radio.startListening();
 
   //
@@ -125,13 +125,13 @@ void setup(void)
 
 void loop(void)
 {
-  static uint32_t id = 0;
+  static uint32_t message_count = 0;
   
   //
-  // Ping out role.  Repeatedly send the current time
+  // Sender role.  Repeatedly send the current time
   //
   
-  if (role == role_ping_out)
+  if (role == role_sender)
   {
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
@@ -140,8 +140,8 @@ void loop(void)
 
     if ( radio.isAckPayloadAvailable() )
     {
-      radio.read(&id,sizeof(id));
-      printf("Ack: [%lu] ",id);
+      radio.read(&message_count,sizeof(message_count));
+      printf("Ack: [%lu] ",message_count);
     } 
     printf("OK\n\r");
     
@@ -150,10 +150,10 @@ void loop(void)
   }
   
   //
-  // Pong back role.  Receive each packet, dump it out, add ack payload for next time
+  // Receiver role.  Receive each packet, dump it out, add ack payload for next time
   //
   
-  if ( role == role_pong_back )
+  if ( role == role_receiver )
   {
     // if there is data ready
     if ( radio.available() )
@@ -172,8 +172,8 @@ void loop(void)
       
       // Add an ack packet for the next time around.  This is a simple
       // packet counter
-      radio.writeAckPayload( 1, &id, sizeof(id) );
-      ++id;
+      radio.writeAckPayload( 1, &message_count, sizeof(message_count) );
+      ++message_count;
     }
   }
 }
