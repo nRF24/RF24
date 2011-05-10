@@ -17,6 +17,7 @@
  */
  
 #include <SPI.h>
+#include <avr/sleep.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
@@ -59,6 +60,19 @@ const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 // The role of the current running sketch
 role_e role;
 
+//
+// Sleep declarations
+//
+
+typedef enum { wdt_16ms = 0, wdt_32ms, wdt_64ms, wdt_128ms, wdt_250ms, wdt_500ms, wdt_1s, wdt_2s, wdt_4s, wdt_8s } wdt_prescalar_e;
+
+void setup_watchdog(uint8_t prescalar);
+void do_sleep(void);
+
+//
+// Normal operation
+//
+
 void setup(void)
 {
   //
@@ -84,6 +98,14 @@ void setup(void)
   printf_begin();
   printf("\n\rRF24/examples/pingpair_sleepy/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
+
+  //
+  // Prepare sleep parameters
+  //
+
+  // Only the ping out role sleeps.  Wake up every 2s to send a ping
+  if ( role == role_ping_out )
+    setup_watchdog(wdt_2s);
 
   //
   // Setup and configure rf radio
@@ -164,13 +186,24 @@ void loop(void)
       // Spew it
       printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
     }
-    
-    // Try again 1s later
-    delay(1000);
+  
+    //
+    // Shut down the system
+    //
+
+    // Power down the radio.  Note that the radio will get powered back up
+    // on the next write() call.
+    radio.powerDown();
+
+    // Sleep the MCU.  The watchdog timer will awaken in a short while, and
+    // continue execution here.
+    do_sleep();
   }
   
   //
   // Pong back role.  Receive each packet, dump it out, and send it back
+  //
+  // This is untouched from the pingpair example.
   //
   
   if ( role == role_pong_back )
@@ -202,4 +235,39 @@ void loop(void)
     }
   }
 }
-// vim:ci sts=2 sw=2 ft=cpp
+
+//
+// Sleep helpers 
+//
+
+// 0=16ms, 1=32ms,2=64ms,3=128ms,4=250ms,5=500ms
+// 6=1 sec,7=2 sec, 8=4 sec, 9= 8sec
+
+
+void setup_watchdog(uint8_t prescalar) 
+{
+    prescalar = min(9,prescalar);
+    uint8_t wdtcsr = prescalar & 7;
+    if ( prescalar & 8 )
+	wdtcsr |= _BV(WDP3);
+
+    MCUSR &= ~_BV(WDRF);
+    WDTCSR = _BV(WDCE) | _BV(WDE);
+    WDTCSR = _BV(WDCE) | wdtcsr | _BV(WDIE);
+}
+
+// Even though it does nothing, it's necessary to have a WDT ISR
+ISR(WDT_vect) {
+}
+
+void do_sleep(void)
+{
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN); // sleep mode is set here
+    sleep_enable();
+
+    sleep_mode();                        // System sleeps here
+
+    sleep_disable();                     // System continues execution here when watchdog timed out 
+}
+
+// vim:ai:cin:sts=2 sw=2 ft=cpp
