@@ -202,7 +202,7 @@ void RF24::print_observe_tx(uint8_t value)
 /******************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
-  ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_packet_available(false)
+  ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false)
 {
 }
 
@@ -371,17 +371,13 @@ boolean RF24::write( const void* buf, uint8_t len )
   
   IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
   
-  ack_packet_available = ( status & _BV(RX_DR) );
-  uint8_t pl_len = 0; 
-  if ( ack_packet_available )
+  ack_payload_available = ( status & _BV(RX_DR) );
+  if ( ack_payload_available )
   {
     write_register(STATUS,_BV(RX_DR) );
-    csn(LOW);
-    SPI.transfer( R_RX_PL_WID );
-    pl_len = SPI.transfer(0xff);
-    csn(HIGH);
+    ack_payload_length = read_payload_length();
     IF_SERIAL_DEBUG(Serial.print("[AckPacket]/"));
-    IF_SERIAL_DEBUG(Serial.println(pl_len,DEC));
+    IF_SERIAL_DEBUG(Serial.println(ack_payload_length,DEC));
   }
 
   // Yay, we are done.
@@ -398,6 +394,21 @@ boolean RF24::write( const void* buf, uint8_t len )
 
   return result;
 }
+
+/******************************************************************/
+
+uint8_t RF24::read_payload_length(void)
+{
+  uint8_t result = 0;
+
+  csn(LOW);
+  SPI.transfer( R_RX_PL_WID );
+  result = SPI.transfer(0xff);
+  csn(HIGH);
+
+  return result;
+}
+
 /******************************************************************/
 
 boolean RF24::available(void) 
@@ -552,8 +563,8 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
 boolean RF24::isAckPayloadAvailable(void)
 {
-  boolean result = ack_packet_available;
-  ack_packet_available = false;
+  boolean result = ack_payload_available;
+  ack_payload_available = false;
   return result;
 }
 
