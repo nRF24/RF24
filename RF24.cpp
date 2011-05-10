@@ -333,6 +333,13 @@ void RF24::stopListening(void)
 
 /******************************************************************/
 
+void RF24::powerDown(void)
+{
+  write_register(CONFIG,0);
+}
+
+/******************************************************************/
+
 boolean RF24::write( const void* buf, uint8_t len )
 {
   boolean result = false;

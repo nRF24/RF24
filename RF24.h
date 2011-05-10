@@ -224,6 +224,14 @@ public:
   void stopListening(void);
 
   /**
+   * Enter low-power mode
+   *
+   * To return to normal power mode, either write() some data or
+   * startListening().
+   */
+  void powerDown(void);
+
+  /**
    * Write to the open writing pipe
    *
    * This blocks until the message is successfully acknowledged by
