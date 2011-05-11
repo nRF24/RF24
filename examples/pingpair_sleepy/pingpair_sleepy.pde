@@ -18,6 +18,7 @@
  
 #include <SPI.h>
 #include <avr/sleep.h>
+#include <avr/power.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
@@ -103,9 +104,9 @@ void setup(void)
   // Prepare sleep parameters
   //
 
-  // Only the ping out role sleeps.  Wake up every 2s to send a ping
+  // Only the ping out role sleeps.  Wake up every 4s to send a ping
   if ( role == role_ping_out )
-    setup_watchdog(wdt_2s);
+    setup_watchdog(wdt_4s);
 
   //
   // Setup and configure rf radio
@@ -219,8 +220,9 @@ void loop(void)
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &got_time, sizeof(unsigned long) );
   
-        // Spew it
-        printf("Got payload %lu...",got_time);
+        // Spew it.  Include our time, because the ping_out millis counter is unreliable
+	// due to it sleeping
+        printf("Got payload %lu @ %lu...",got_time,millis());
       }
       
       // First, stop listening so we can talk
@@ -265,9 +267,12 @@ void do_sleep(void)
     set_sleep_mode(SLEEP_MODE_PWR_DOWN); // sleep mode is set here
     sleep_enable();
 
+    power_all_disable();
     sleep_mode();                        // System sleeps here
 
     sleep_disable();                     // System continues execution here when watchdog timed out 
+    power_all_enable();
 }
+
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp
