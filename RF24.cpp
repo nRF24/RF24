@@ -11,7 +11,7 @@
 #include "RF24.h"
 #include "nRF24L01.h"
 
-#define SERIAL_DEBUG
+#undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
 #define IF_SERIAL_DEBUG(x) (x)
 #else
