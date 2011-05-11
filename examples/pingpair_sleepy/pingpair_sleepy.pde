@@ -9,11 +9,15 @@
 /**
  * Example RF Radio Ping Pair which Sleeps between Sends
  *
- * This is an example of how to use the RF24 class to create a battery-efficient system.
- * Write this sketch to two different nodes,
- * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
- * which responds by sending the value back.  The ping node can then see how long the whole cycle
- * took.
+ * This is an example of how to use the RF24 class to create a battery-
+ * efficient system.  It is just like the pingpair.pde example, but the
+ * ping node powers down the radio and sleeps the MCU after every
+ * ping/pong cycle.
+ *
+ * As with the pingpair.pde example, write this sketch to two different nodes,
+ * connect the role_pin to ground on one.  The ping node sends the current 
+ * time to the pong node, which responds by sending the value back.  The ping
+ * node can then see how long the whole cycle took.
  */
  
 #include <SPI.h>

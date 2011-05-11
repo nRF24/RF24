@@ -57,7 +57,13 @@ protected:
    */
   uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) ;
   
-  uint8_t read_register(uint8_t reg) ;
+  /**
+   * Read single byte from a register
+   *
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @return Current value of register @p reg
+   */
+  uint8_t read_register(uint8_t reg);
 
   /**
    * Write a chunk of data to a register
@@ -149,6 +155,12 @@ protected:
    */
   void print_observe_tx(uint8_t value) ;
 
+  /**
+   * Turn on or off the special features of the chip
+   *
+   * The chip has certain 'features' which are only available when the 'features'
+   * are enabled.  See the datasheet for details.
+   */
   void toggle_features(void);
   /**@}*/
 
@@ -322,20 +334,54 @@ public:
    */
   void openReadingPipe(uint8_t number, uint64_t address);
 
+  /**
+   * Enable custom payloads on the acknowledge packets
+   *
+   * Ack payloads are a handy way to return data back to senders without
+   * manually changing the radio modes on both units.  See the
+   * pingpair_pl.pde example.
+   */
   void enableAckPayload(void);
 
+  /**
+   * Write an ack payload for the specified pipe
+   *
+   * The next time a message is received on @p pipe, the data in @p buf will
+   * be sent back in the acknowledgement.
+   *
+   * @warning According to the data sheet, only three of these can be pending
+   * at any time.  I have not tested this.
+   *
+   * @param pipe Which pipe# (typically 1-5) will get this response.
+   * @param buf Pointer to data that is sent
+   * @param len Length of the data to send, up to 32 bytes max.  Not affected
+   * by the static payload set by setPayloadSize().
+   */
   void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
+  /**
+   * Determine if an ack payload was received in the most recent call to
+   * write().
+   *
+   * Call read() to retrieve the ack payload.
+   *
+   * @warning Calling this function clears the internal flag which indicates
+   * a payload is available.  If it returns true, you must read the packet
+   * out as the very next interaction with the radio, or the results are
+   * undefined.
+   *
+   * @return True if an ack payload is available.
+   */
   boolean isAckPayloadAvailable(void);
 };
 
 /**
  * @example pingpair.pde
  * 
- * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
- * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
- * which responds by sending the value back.  The ping node can then see how long the whole cycle
- * took.
+ * This is an example of how to use the RF24 class.  Write this sketch to two 
+ * different nodes, connect the role_pin to ground on one.  The ping node sends
+ * the current time to the pong node, which responds by sending the value back.
+ * The ping node can then see how long the whole cycle took.
  */
 
 /**
@@ -347,10 +393,31 @@ public:
  * unit will send out the value of millis() once a second.  The pong unit will 
  * respond back with a copy of the value.  Each ping unit can get that response
  * back, and determine how long the whole cycle took.
- *
+ Warning:
+    Calling this function clears the internal flag which indicates a payload is available. If it returns true, you must read the packet out as the very next interaction with the radio, or the results are undefined.
+
+*
  * This example requires a bit more complexity to determine which unit is which.
  * The pong receiver is identified by having its role_pin tied to ground.
  * The ping senders are further differentiated by a byte in eeprom.
+ */
+
+/**
+ * @example pingpair_pl.pde 
+ *
+ * This is an example of how to do two-way communication without changing 
+ * transmit/receive modes.  Here, a payload is set to the transmitter within 
+ * the Ack packet of each transmission.  Note that the payload is set BEFORE
+ * the sender's message arrives.
+ */
+
+/**
+ * @example pingpair_sleepy.pde 
+ *
+ * This is an example of how to use the RF24 class to create a battery-
+ * efficient system.  It is just like the pingpair.pde example, but the
+ * ping node powers down the radio and sleeps the MCU after every
+ * ping/pong cycle.
  */
 
 /**
