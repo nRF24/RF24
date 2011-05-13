@@ -67,6 +67,41 @@ const node_info topology[] =
 };
 const short num_nodes = sizeof(topology)/sizeof(node_info);
 
+/**
+ * Find where to send a message to reach the target node
+ *
+ * Given the @p target_node, find the child or parent of
+ * the @p current_node which will relay messages for the target.
+ *
+ * This is needed in a multi-hop system where the @p current_node
+ * is not adjacent to the @p target_node in the topology
+ */
+uint8_t find_node( uint8_t current_node, uint8_t target_node )
+{
+  uint8_t out_node = target_node;
+  bool found_target = false;
+  while ( ! found_target )
+  {
+    if ( topology[out_node].parent_node == current_node )
+    {
+      found_target = true; 
+    }
+    else
+    {
+      out_node = topology[out_node].parent_node;
+
+      // If we've made it all the way back to the base without finding
+      // common lineage with the to_node, we will just send it to our parent
+      if ( out_node == 0 || out_node == -1 )
+      {
+	out_node = topology[current_node].parent_node;
+	found_target = true;
+      }
+    }
+  }
+  return out_node;
+}
+
 //
 // Role management
 //
@@ -189,24 +224,30 @@ void setup(void)
   // Open pipes to other nodes for communication
   //
   
-  // First listening pipe is #1
-  uint8_t current_pipe = 1;
-  
   // Each leaf node has a talking pipe that it will ping into, and a listening 
   // pipe that it will listen for the pong.  Relay nodes also do this.
   if ( role == role_leaf || role == role_relay )
   {
     // Write on our talking pipe
     radio.openWritingPipe(topology[node_address].talking_pipe);
-
+  }
+ 
+  // Relay nodes have a special function.  They open their listening pipe on pipe
+  // #0.  This will get over-written every time we open a writing pipe.  So
+  // Remember to re-open the reading pipe whenever we start to listen again.
+  if ( role == role_relay )
+  { 
     // Listen on our listening pipe 
-    radio.openReadingPipe(current_pipe++,topology[node_address].listening_pipe);
+    radio.openReadingPipe(0,topology[node_address].listening_pipe);
   }
 
   // The base and relay nodes listens on all their children node's talking pipes
   // and sends the pong back on the child node's specific listening pipe.
   if ( role == role_base || role == role_relay )
   {
+    // First child listening pipe is #1
+    uint8_t current_pipe = 1;
+  
     // The topology table tells us who our children are
     int i = num_nodes;
     while (i--)
@@ -234,7 +275,7 @@ void setup(void)
 
   if ( role == role_invalid )
   {
-    printf("\n\r*** NO NODE ADDRESS ASSIGNED *** Send 1 through 6 to assign an address\n\r");
+    printf("\n\r*** NO NODE ADDRESS ASSIGNED *** Send 0 through 5 to assign an address\n\r");
   }
 }
 
@@ -313,11 +354,16 @@ void loop(void)
       // Construct the return payload (pong)
       payload_t pong(node_address,ping.from_node,ping.time);
 
+      // Find the correct pipe for writing.  We can only talk on one of our
+      // direct children's listening pipes.  If the to_node is further out,
+      // it will get relayed.
+      uint8_t out_node = find_node(node_address,pong.to_node);
+
       // Open the correct pipe for writing
-      radio.openWritingPipe(topology[pong.to_node].listening_pipe);
+      radio.openWritingPipe(topology[out_node].listening_pipe);
 
       // Retain the low 2 bytes to identify the pipe for the spew
-      uint16_t pipe_id = topology[pong.to_node].listening_pipe & 0xffff;
+      uint16_t pipe_id = topology[out_node].listening_pipe & 0xffff;
             
       // Send the final one back.
       radio.write( &pong, sizeof(payload_t) );  
@@ -325,6 +371,76 @@ void loop(void)
       printf(" on pipe %04x.\n\r",pipe_id);
       
       // Now, resume listening so we catch the next packets.
+      radio.startListening();
+    }
+  }
+  
+  //
+  // Relay role.  Forward packets to the appropriate destination
+  //
+
+  if ( role == role_relay )
+  {
+    // if there is data ready
+    uint8_t pipe_num;
+    if ( radio.available(&pipe_num) )
+    {
+      // Dump the payloads until we've gotten everything
+      payload_t payload;
+      boolean done = false;
+      while (!done)
+      {
+        // Fetch the payload, and see if this was the last one.
+        done = radio.read( &payload, sizeof(payload_t) );
+
+        // Is this for us?
+        if ( payload.to_node == node_address )
+	{
+	  // Treat it as a PONG
+	  payload_printf(" ...PONG",payload);
+	  printf(" Round-trip delay: %lu\n\r",millis()-payload.time);
+	}
+	else
+	{
+	  // Relay it
+	  
+	  // Spew it
+	  payload_printf("RELAY IN",payload);
+	  printf(" on pipe %u. ",pipe_num);
+
+	  // Which pipe should we use to get the message to the "to_node"?
+	  // We need to find a node who is OUR CHILD that either IS the to_node
+	  // or has the to_node as one of ITS children.  Failing that, we'll just
+	  // send it back to the parent to deal with.
+	  uint8_t out_node = find_node(node_address,payload.to_node);
+
+	  // First, stop listening so we can talk
+	  radio.stopListening();
+
+	  // If this node is our child, we talk on it's listening pipe.
+	  uint64_t out_pipe;
+	  if ( topology[out_node].parent_node == node_address )
+	    out_pipe = topology[out_node].listening_pipe;
+	  
+	  // Otherwise, it's our parent so we talk on OUR talking pipe
+	  else
+	    out_pipe = topology[node_address].talking_pipe;
+	  
+	  // Open the correct pipe for writing.  
+	  radio.openWritingPipe(out_pipe);
+      
+      	  // Send the payload back out 
+	  radio.write( &payload, sizeof(payload_t) );  
+      
+      	  // Debug spew 
+	  uint16_t pipe_id = out_pipe & 0xffff;
+	  printf("OUT on pipe %04x.\n\r",pipe_id);
+	  
+	}
+      }
+      
+      // Now, resume listening so we catch the next packets.
+      radio.openReadingPipe(0,topology[node_address].listening_pipe);
       radio.startListening();
     }
   }
