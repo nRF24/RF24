@@ -143,15 +143,28 @@ struct payload_t
 {
   uint8_t from_node;
   uint8_t to_node;
+  uint16_t id;
   unsigned long time;
+  
+  static uint16_t next_id;
+  
   payload_t(void) {}
-  payload_t(uint8_t _from, uint8_t _to, const unsigned long& _time): from_node(_from), to_node(_to), time(_time) {}
+  payload_t(uint8_t _from, uint8_t _to, const unsigned long& _time): from_node(_from), to_node(_to), id(next_id++), time(_time) {}
 };
+
+uint16_t payload_t::next_id;
 
 void payload_printf(const char* name, const payload_t& pl)
 {
-  printf("%s Payload from:%u to:%u time:%lu",name,pl.from_node,pl.to_node,pl.time);
+  printf("%s Payload from:%u to:%u id:%u time:%lu",name,pl.from_node,pl.to_node,pl.id,pl.time);
 }
+
+//
+// Setup/loop shared statics
+//
+
+static unsigned long last_ping_time;
+const unsigned long ping_delay = 2000;
 
 void setup(void)
 {
@@ -230,6 +243,9 @@ void setup(void)
   {
     // Write on our talking pipe
     radio.openWritingPipe(topology[node_address].talking_pipe);
+    
+    // Listen on our listening pipe 
+    radio.openReadingPipe(1,topology[node_address].listening_pipe);
   }
  
   // Relay nodes have a special function.  They open their listening pipe on pipe
@@ -287,43 +303,52 @@ void loop(void)
   
   if ( role == role_leaf ) 
   {
-    // First, stop listening so we can talk.
-    radio.stopListening();
-    
-    // Take the time, and send it to the base.  This will block until complete
-    payload_t ping(node_address,0,millis());
+    // Is it time to ping again?
+    unsigned long now = millis();
+    if ( now - last_ping_time >= ping_delay )
+    {
+      last_ping_time = now;
 
-    payload_printf("PING",ping);
-    radio.write( &ping, sizeof(payload_t) );  
+      // First, stop listening so we can talk.
+      radio.stopListening();
+      
+      // Take the time, and send it to the base.  This will block until complete
+      payload_t ping(node_address,0,millis());
+
+      printf("%lu ",millis());
+      payload_printf("PING",ping);
+      bool ok = radio.write( &ping, sizeof(payload_t) );  
+      if (ok)
+	printf(" ok ");
+      else
+	printf(" failed ");
+
+      // Now, continue listening
+      radio.startListening();
+      
+      // Wait here until we get a response, or timeout (250ms)
+      unsigned long started_waiting_at = millis();
+      bool timeout = false;
+      while ( ! radio.available() && ! timeout )
+	if (millis() - started_waiting_at > 250 )
+	  timeout = true;
+      
+      // Describe the results
+      if ( timeout )
+      {
+	printf("Failed, response timed out.\n\r");
+      }
+      else
+      {
+	// Grab the response, compare, and send to debugging spew
+	payload_t pong;
+	radio.read( &pong, sizeof(payload_t) );
     
-    // Now, continue listening
-    radio.startListening();
-    
-    // Wait here until we get a response, or timeout (250ms)
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
-    while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 250 )
-        timeout = true;
-    
-    // Describe the results
-    if ( timeout )
-    {
-      printf("Failed, response timed out.\n\r");
+	// Spew it
+	payload_printf(" ...PONG",pong);
+	printf(" Round-trip delay: %lu\n\r",millis()-pong.time);
+      }
     }
-    else
-    {
-      // Grab the response, compare, and send to debugging spew
-      payload_t pong;
-      radio.read( &pong, sizeof(payload_t) );
-  
-      // Spew it
-      payload_printf(" ...PONG",pong);
-      printf(" Round-trip delay: %lu\n\r",millis()-pong.time);
-    }
-    
-    // Try again 1s later
-    delay(1000);
   }
   
   //
@@ -345,7 +370,9 @@ void loop(void)
         done = radio.read( &ping, sizeof(payload_t) );
   
         // Spew it
+	printf("%lu ",millis());
 	payload_printf("PING",ping);
+	printf(" on pipe %u. ",pipe_num);
       }
       
       // First, stop listening so we can talk
@@ -366,9 +393,9 @@ void loop(void)
       uint16_t pipe_id = topology[out_node].listening_pipe & 0xffff;
             
       // Send the final one back.
-      radio.write( &pong, sizeof(payload_t) );  
+      bool ok = radio.write( &pong, sizeof(payload_t) );  
       payload_printf(" ...PONG",pong);
-      printf(" on pipe %04x.\n\r",pipe_id);
+      printf(" on pipe %04x %s.\n\r",pipe_id,ok?"ok":"failed");
       
       // Now, resume listening so we catch the next packets.
       radio.startListening();
@@ -381,6 +408,38 @@ void loop(void)
 
   if ( role == role_relay )
   {
+#if 1    
+    // Relay role is ALSO a ping sender!!
+    
+    // Is it time to ping again?
+    unsigned long now = millis();
+    if ( now - last_ping_time >= ping_delay )
+    {
+      last_ping_time = now; 
+    
+      // First, stop listening so we can talk.
+      radio.stopListening();
+      
+      // Write on our talking pipe.  The relay has to do this every time, because
+      // we ALSO use pipe 0 as a listening pipe.
+      radio.openWritingPipe(topology[node_address].talking_pipe);
+      
+      // Take the time, and send it to the base.  This will block until complete
+      payload_t ping(node_address,0,millis());
+
+      printf("%lu ",millis());
+      payload_printf(">PING",ping);
+      bool ok = radio.write( &ping, sizeof(payload_t) );  
+      if (ok) 
+      	printf(" ok.\n\r");
+      else
+      	printf(" failed.\n\r");
+
+      // Now, continue listening
+      radio.openReadingPipe(0,topology[node_address].listening_pipe);
+      radio.startListening();
+    }
+#endif
     // if there is data ready
     uint8_t pipe_num;
     if ( radio.available(&pipe_num) )
@@ -397,7 +456,8 @@ void loop(void)
         if ( payload.to_node == node_address )
 	{
 	  // Treat it as a PONG
-	  payload_printf(" ...PONG",payload);
+	  printf("%lu ",millis());
+	  payload_printf(">PONG",payload);
 	  printf(" Round-trip delay: %lu\n\r",millis()-payload.time);
 	}
 	else
@@ -405,7 +465,8 @@ void loop(void)
 	  // Relay it
 	  
 	  // Spew it
-	  payload_printf("RELAY IN",payload);
+	  printf("%lu ",millis());
+	  payload_printf("RELAY",payload);
 	  printf(" on pipe %u. ",pipe_num);
 
 	  // Which pipe should we use to get the message to the "to_node"?
@@ -430,11 +491,11 @@ void loop(void)
 	  radio.openWritingPipe(out_pipe);
       
       	  // Send the payload back out 
-	  radio.write( &payload, sizeof(payload_t) );  
+	  bool ok = radio.write( &payload, sizeof(payload_t) );
       
       	  // Debug spew 
 	  uint16_t pipe_id = out_pipe & 0xffff;
-	  printf("OUT on pipe %04x.\n\r",pipe_id);
+	  printf("OUT on pipe %04x %s.\n\r",pipe_id,ok?"ok":"failed");
 	  
 	}
       }
