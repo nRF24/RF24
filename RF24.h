@@ -307,7 +307,7 @@ public:
    *
    * @see openWritingPipe
    *
-   * @warning all 5 reading pipes should share the first 32 bits.
+   * @warning Pipes 1-5 should share the first 32 bits.
    * Only the least significant byte should be unique, e.g.
    * 
    * @code
@@ -315,9 +315,9 @@ public:
    *   openReadingPipe(2,0xF0F0F0F066);
    * @endcode
    * 
-   * @todo Enforce the restriction that all pipes must share the top 32 bits
+   * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
    *
-   * @param number Which pipe# to open, 1-5.
+   * @param number Which pipe# to open, 0-5.
    * @param address The 40-bit address of the pipe to open.
    */
   void openReadingPipe(uint8_t number, uint64_t address);
