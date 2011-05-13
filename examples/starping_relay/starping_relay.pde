@@ -7,7 +7,7 @@
  */
 
 /**
- * Example RF Radio Ping Star Group 
+ * Example RF Radio Ping Star Group with Relay 
  *
  * This sketch is a more complex example of using the RF24 library for Arduino.  
  * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the 
@@ -15,6 +15,10 @@
  * unit will send out the value of millis() once a second.  The pong unit will 
  * respond back with a copy of the value.  Each ping unit can get that response
  * back, and determine how long the whole cycle took.
+ *
+ * This example introduces a new role, the 'relay', which can relay pings or
+ * pongs from one host to another.  This is needed in larger meshes because
+ * each radio can only listen to 5-6 others.
  *
  * This example requires a bit more complexity to determine which unit is which.
  * The pong receiver is identified by having its role_pin tied to ground.
@@ -35,10 +39,6 @@
 
 RF24 radio(8,9);
 
-// sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
-// Leave open to be the 'pong' receiver.
-const int role_pin = 7;
-
 //
 // Topology
 //
@@ -49,8 +49,23 @@ const int role_pin = 7;
 // the pong.  The pong node listens on all the ping node talking pipes
 // and sends the pong back on the sending node's specific listening pipe.
 
-const uint64_t talking_pipes[5] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0C3LL, 0xF0F0F0F0B4LL, 0xF0F0F0F0A5LL, 0xF0F0F0F096LL };
-const uint64_t listening_pipes[5] = { 0x3A3A3A3AD2LL, 0x3A3A3A3AC3LL, 0x3A3A3A3AB4LL, 0x3A3A3A3AA5LL, 0x3A3A3A3A96LL };
+struct node_info
+{
+  uint64_t talking_pipe; // Pipe used to talk to parent node
+  uint64_t listening_pipe; // Pipe used to listen to parent node
+  uint8_t parent_node; // Number of parent node
+};
+
+const node_info topology[] =
+{
+  { 0x0000000000LL, 0x0000000000LL,-1 }, // Base
+  { 0xF0F0F0F0E1LL, 0x3A3A3A3AE1LL, 0 }, // Relay
+  { 0xF0F0F0F0D2LL, 0x3A3A3A3AD2LL, 1 }, // Leaf
+  { 0xF0F0F0F0C3LL, 0x3A3A3A3AC3LL, 1 }, // Leaf
+  { 0xF0F0F0F0B4LL, 0x3A3A3A3AB4LL, 1 }, // Leaf
+  { 0xF0F0F0F0A5LL, 0x3A3A3A3AA5LL, 0 }, // Leaf, direct to Base
+};
+const short num_nodes = sizeof(topology)/sizeof(node_info);
 
 //
 // Role management
@@ -63,10 +78,10 @@ const uint64_t listening_pipes[5] = { 0x3A3A3A3AD2LL, 0x3A3A3A3AC3LL, 0x3A3A3A3A
 //
 
 // The various roles supported by this sketch
-typedef enum { role_invalid = 0, role_ping_out, role_pong_back } role_e;
+typedef enum { role_invalid = 0, role_base, role_relay, role_leaf } role_e;
 
 // The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
+const char* role_friendly_name[] = { "invalid", "Base", "Relay", "Leaf" };
 
 // The role of the current running sketch
 role_e role;
@@ -78,49 +93,77 @@ role_e role;
 // Where in EEPROM is the address stored?
 const uint8_t address_at_eeprom_location = 0;
 
+// What flag value is stored there so we know the value is valid?
+const uint8_t valid_eeprom_flag = 0xdf;
+
 // What is our address (SRAM cache of the address from EEPROM)
-// Note that zero is an INVALID address.  The pong back unit takes address
-// 1, and the rest are 2-6
-uint8_t node_address;
+// This is an index into the topology[] table above
+uint8_t node_address = role_invalid;;
+
+//
+// Payload
+//
+
+struct payload_t
+{
+  uint8_t from_node;
+  uint8_t to_node;
+  unsigned long time;
+};
+
+void payload_printf(const char* name, const payload_t& pl)
+{
+  printf("%s Payload from:%u to:%u time:%lu",name,pl.from_node,pl.to_node,pl.time);
+}
 
 void setup(void)
 {
   //
-  // Role
-  //
-  
-  // set up the role pin
-  pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,HIGH);
-  delay(20); // Just to get a solid reading on the role pin
-  
-  // read the address pin, establish our role
-  if ( digitalRead(role_pin) )
-    role = role_ping_out;
-  else
-    role = role_pong_back;
-
-  //
   // Address
   //
 
-  if ( role == role_pong_back )
-    node_address = 1;
-  else
+  // Unless we find reasonable values in the EEPROM, these are the defaults
+  node_address = -1;
+
+  // Look for the token in EEPROM to indicate the following value is
+  // a validly set node address 
+  if ( EEPROM.read(address_at_eeprom_location) == valid_eeprom_flag )
   {
     // Read the address from EEPROM
-    uint8_t reading = EEPROM.read(address_at_eeprom_location);
+    uint8_t reading = EEPROM.read(address_at_eeprom_location+1);
 
     // If it is in a valid range for node addresses, it is our
     // address.
-    if ( reading >= 2 && reading <= 6 )
+    if ( reading <= 5 )
       node_address = reading;
-    
-    // Otherwise, it is invalid, so set our address AND ROLE to 'invalid'
+  } 
+  
+  //
+  // Role
+  //
+
+  // Role is determined by address.
+  if ( node_address != -1 )
+  {
+    // Node #0 is the base, by definition
+    if ( node_address == 0 )
+      role = role_base;
     else
     {
-      node_address = 0;
-      role = role_invalid;
+      // Otherwise, it is probably a leaf node
+      role = role_leaf;
+
+      // If there are any nodes in the topology table which consider this
+      // a parent, then we are a relay.
+      int i = num_nodes;
+      while (i--)
+      {
+      	if ( topology[i].parent_node == node_address )
+	{
+	  role = role_relay;
+	  break;
+	}
+      }
     }
   }
 
@@ -130,7 +173,7 @@ void setup(void)
   
   Serial.begin(9600);
   printf_begin();
-  printf("\n\rRF24/examples/starping/\n\r");
+  printf("\n\rRF24/examples/starping_relay/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
   printf("ADDRESS: %i\n\r",node_address);
 
@@ -143,28 +186,34 @@ void setup(void)
   //
   // Open pipes to other nodes for communication
   //
-
-  // The pong node listens on all the ping node talking pipes
-  // and sends the pong back on the sending node's specific listening pipe.
-  if ( role == role_pong_back )
-  {
-    radio.openReadingPipe(1,talking_pipes[0]);
-    radio.openReadingPipe(2,talking_pipes[1]);
-    radio.openReadingPipe(3,talking_pipes[2]);
-    radio.openReadingPipe(4,talking_pipes[3]);
-    radio.openReadingPipe(5,talking_pipes[4]);
-  }
   
-  // Each ping node has a talking pipe that it will ping into, and a listening 
-  // pipe that it will listen for the pong.  
-  if ( role == role_ping_out )
+  // First listening pipe is #1
+  uint8_t current_pipe = 1;
+  
+  // Each leaf node has a talking pipe that it will ping into, and a listening 
+  // pipe that it will listen for the pong.  Relay nodes also do this.
+  if ( role == role_leaf || role == role_relay )
   {
     // Write on our talking pipe
-    radio.openWritingPipe(talking_pipes[node_address-2]);
+    radio.openWritingPipe(topology[node_address].talking_pipe);
+
     // Listen on our listening pipe 
-    radio.openReadingPipe(1,listening_pipes[node_address-2]);
+    radio.openReadingPipe(current_pipe++,topology[node_address].listening_pipe);
   }
 
+  // The base and relay nodes listens on all their children node's talking pipes
+  // and sends the pong back on the child node's specific listening pipe.
+  if ( role == role_base || role == role_relay )
+  {
+    // The topology table tells us who our children are
+    int i = num_nodes;
+    while (i--)
+    {
+      if ( topology[i].parent_node == node_address )
+	radio.openReadingPipe(current_pipe++,topology[i].talking_pipe);
+    }
+  }
+  
   //
   // Start listening
   //
@@ -190,18 +239,22 @@ void setup(void)
 void loop(void)
 {
   //
-  // Ping out role.  Repeatedly send the current time
+  // Leaf role.  Repeatedly send the current time
   //
   
-  if (role == role_ping_out)
+  if ( role == role_leaf ) 
   {
     // First, stop listening so we can talk.
     radio.stopListening();
     
     // Take the time, and send it.  This will block until complete
-    unsigned long time = millis();
-    printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );  
+    payload_t ping;
+    ping.time = millis();
+    ping.from_node = node_address;
+    ping.to_node = 0; // All pings go to the base
+
+    payload_printf("PING",ping);
+    radio.write( &ping, sizeof(payload_t) );  
     
     // Now, continue listening
     radio.startListening();
@@ -221,11 +274,12 @@ void loop(void)
     else
     {
       // Grab the response, compare, and send to debugging spew
-      unsigned long got_time;
-      radio.read( &got_time, sizeof(unsigned long) );
+      payload_t pong;
+      radio.read( &pong, sizeof(payload_t) );
   
       // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+      payload_printf(" ...PONG",pong);
+      printf(" Round-trip delay: %lu\n\r",millis()-pong.time);
     }
     
     // Try again 1s later
@@ -233,39 +287,46 @@ void loop(void)
   }
   
   //
-  // Pong back role.  Receive each packet, dump it out, and send it back
+  // Base role.  Receive each packet, dump it out, and send it back
   //
   
-  if ( role == role_pong_back )
+  if ( role == role_base )
   {
     // if there is data ready
     uint8_t pipe_num;
     if ( radio.available(&pipe_num) )
     {
       // Dump the payloads until we've gotten everything
-      unsigned long got_time;
+      payload_t ping;
       boolean done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+        done = radio.read( &ping, sizeof(payload_t) );
   
         // Spew it
-        printf("Got payload %lu from node %i...",got_time,pipe_num+1);
+	payload_printf("PING",ping);
       }
       
       // First, stop listening so we can talk
       radio.stopListening();
+      
+      // Construct the return payload (pong)
+      payload_t pong;
+      pong.time = ping.time;
+      pong.from_node = node_address;
+      pong.to_node = ping.from_node;
 
       // Open the correct pipe for writing
-      radio.openWritingPipe(listening_pipes[pipe_num-1]);
+      radio.openWritingPipe(topology[pong.to_node].listening_pipe);
 
       // Retain the low 2 bytes to identify the pipe for the spew
-      uint16_t pipe_id = listening_pipes[pipe_num-1] & 0xffff;
+      uint16_t pipe_id = topology[pong.to_node].listening_pipe & 0xffff;
             
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );  
-      printf("Sent response to %04x.\n\r",pipe_id);
+      radio.write( &pong, sizeof(payload_t) );  
+      payload_printf(" ...PONG",pong);
+      printf(" on pipe %04x.\n\r",pipe_id);
       
       // Now, resume listening so we catch the next packets.
       radio.startListening();
@@ -279,10 +340,11 @@ void loop(void)
   {
     // If the character on serial input is in a valid range...
     char c = Serial.read();
-    if ( c >= '1' && c <= '6' )
+    if ( c >= '0' && c <= '5' )
     {
       // It is our address
-      EEPROM.write(address_at_eeprom_location,c-'0');
+      EEPROM.write(address_at_eeprom_location,valid_eeprom_flag);
+      EEPROM.write(address_at_eeprom_location+1,c-'0');
 
       // And we are done right now (no easy way to soft reset)
       printf("\n\rManually reset address to: %c\n\rPress RESET to continue!",c);
@@ -290,4 +352,4 @@ void loop(void)
     }
   }
 }
-// vim:ai:ci sts=2 sw=2 ft=cpp
+// vim:ai:cin:sts=2 sw=2 ft=cpp
