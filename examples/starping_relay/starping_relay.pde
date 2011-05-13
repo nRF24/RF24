@@ -109,6 +109,8 @@ struct payload_t
   uint8_t from_node;
   uint8_t to_node;
   unsigned long time;
+  payload_t(void) {}
+  payload_t(uint8_t _from, uint8_t _to, const unsigned long& _time): from_node(_from), to_node(_to), time(_time) {}
 };
 
 void payload_printf(const char* name, const payload_t& pl)
@@ -247,11 +249,8 @@ void loop(void)
     // First, stop listening so we can talk.
     radio.stopListening();
     
-    // Take the time, and send it.  This will block until complete
-    payload_t ping;
-    ping.time = millis();
-    ping.from_node = node_address;
-    ping.to_node = 0; // All pings go to the base
+    // Take the time, and send it to the base.  This will block until complete
+    payload_t ping(node_address,0,millis());
 
     payload_printf("PING",ping);
     radio.write( &ping, sizeof(payload_t) );  
@@ -312,10 +311,7 @@ void loop(void)
       radio.stopListening();
       
       // Construct the return payload (pong)
-      payload_t pong;
-      pong.time = ping.time;
-      pong.from_node = node_address;
-      pong.to_node = ping.from_node;
+      payload_t pong(node_address,ping.from_node,ping.time);
 
       // Open the correct pipe for writing
       radio.openWritingPipe(topology[pong.to_node].listening_pipe);
