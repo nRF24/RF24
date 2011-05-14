@@ -371,57 +371,6 @@ void loop(void)
   }
   
   //
-  // Base role.  Receive each packet, dump it out, and send it back
-  //
-  
-  if ( role == role_base )
-  {
-    // if there is data ready
-    uint8_t pipe_num;
-    if ( radio.available(&pipe_num) )
-    {
-      // Dump the payloads until we've gotten everything
-      payload_t ping;
-      boolean done = false;
-      while (!done)
-      {
-        // Fetch the payload, and see if this was the last one.
-        done = radio.read( &ping, sizeof(payload_t) );
-  
-        // Spew it
-	printf("%lu ",millis());
-	payload_printf("PING",ping);
-	printf(" on pipe %u. ",pipe_num);
-      }
-      
-      // First, stop listening so we can talk
-      radio.stopListening();
-      
-      // Construct the return payload (pong)
-      payload_t pong(node_address,ping.from_node,ping.time);
-
-      // Find the correct pipe for writing.  We can only talk on one of our
-      // direct children's listening pipes.  If the to_node is further out,
-      // it will get relayed.
-      uint8_t out_node = find_node(node_address,pong.to_node);
-
-      // Open the correct pipe for writing
-      radio.openWritingPipe(topology[out_node].listening_pipe);
-
-      // Retain the low 2 bytes to identify the pipe for the spew
-      uint16_t pipe_id = topology[out_node].listening_pipe & 0xffff;
-            
-      // Send the final one back.
-      bool ok = radio.write( &pong, sizeof(payload_t) );  
-      payload_printf(" ...PONG",pong);
-      printf(" on pipe %04x %s.\n\r",pipe_id,ok?"ok":"failed");
-      
-      // Now, resume listening so we catch the next packets.
-      radio.startListening();
-    }
-  }
-  
-  //
   // Relay role.  Forward packets to the appropriate destination
   //
 
@@ -524,6 +473,58 @@ void loop(void)
       radio.startListening();
     }
   }
+  
+  //
+  // Base role.  Receive each packet, dump it out, and send it back
+  //
+  
+  if ( role == role_base )
+  {
+    // if there is data ready
+    uint8_t pipe_num;
+    if ( radio.available(&pipe_num) )
+    {
+      // Dump the payloads until we've gotten everything
+      payload_t ping;
+      boolean done = false;
+      while (!done)
+      {
+        // Fetch the payload, and see if this was the last one.
+        done = radio.read( &ping, sizeof(payload_t) );
+  
+        // Spew it
+	printf("%lu ",millis());
+	payload_printf("PING",ping);
+	printf(" on pipe %u. ",pipe_num);
+      }
+      
+      // First, stop listening so we can talk
+      radio.stopListening();
+      
+      // Construct the return payload (pong)
+      payload_t pong(node_address,ping.from_node,ping.time);
+
+      // Find the correct pipe for writing.  We can only talk on one of our
+      // direct children's listening pipes.  If the to_node is further out,
+      // it will get relayed.
+      uint8_t out_node = find_node(node_address,pong.to_node);
+
+      // Open the correct pipe for writing
+      radio.openWritingPipe(topology[out_node].listening_pipe);
+
+      // Retain the low 2 bytes to identify the pipe for the spew
+      uint16_t pipe_id = topology[out_node].listening_pipe & 0xffff;
+            
+      // Send the final one back.
+      bool ok = radio.write( &pong, sizeof(payload_t) );  
+      payload_printf(" ...PONG",pong);
+      printf(" on pipe %04x %s.\n\r",pipe_id,ok?"ok":"failed");
+      
+      // Now, resume listening so we catch the next packets.
+      radio.startListening();
+    }
+  }
+  
 
   //
   // Listen for serial input, which is how we set the address
