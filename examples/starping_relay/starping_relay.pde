@@ -165,9 +165,11 @@ void payload_printf(const char* name, const payload_t& pl)
 
 static unsigned long last_ping_sent_at;
 static bool waiting_for_pong = false;
+static short consecutive_timeouts;
 const unsigned long ping_delay = 2000; // ms
 const unsigned long pong_timeout = 250; // ms
 const unsigned long ping_phase_shift = 100; // ms
+const short timeout_shift_threshold = 3;
 
 void setup(void)
 {
@@ -337,6 +339,7 @@ void loop(void)
     {
       // Not waiting anymore, got one.
       waiting_for_pong = false;
+      consecutive_timeouts = 0;
 
       // Dump the payloads until we've gotten everything
       payload_t payload;
@@ -363,7 +366,11 @@ void loop(void)
       // getting a pong just as we are trying to get a ping.  The best thing
       // to do right now is offset our ping timing to search for a slot
       // that's not occupied.
-      last_ping_sent_at += ping_phase_shift; 
+      //
+      // Only do this after getting a few timeouts, so we aren't always skittishly
+      // moving around the cycle.
+      if ( ++consecutive_timeouts > timeout_shift_threshold )
+	last_ping_sent_at += ping_phase_shift; 
 
       // Print details
       printf("TIMED OUT.\n\r");
