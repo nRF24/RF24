@@ -163,8 +163,11 @@ void payload_printf(const char* name, const payload_t& pl)
 // Setup/loop shared statics
 //
 
-static unsigned long last_ping_time;
-const unsigned long ping_delay = 2000;
+static unsigned long last_ping_sent_at;
+static bool waiting_for_pong = false;
+const unsigned long ping_delay = 2000; // ms
+const unsigned long pong_timeout = 250; // ms
+const unsigned long ping_phase_shift = 100; // ms
 
 void setup(void)
 {
@@ -305,9 +308,10 @@ void loop(void)
   {
     // Is it time to ping again?
     unsigned long now = millis();
-    if ( now - last_ping_time >= ping_delay )
+    if ( now - last_ping_sent_at >= ping_delay )
     {
-      last_ping_time = now;
+      last_ping_sent_at = now;
+      waiting_for_pong = true;
 
       // First, stop listening so we can talk.
       radio.stopListening();
@@ -315,39 +319,54 @@ void loop(void)
       // Take the time, and send it to the base.  This will block until complete
       payload_t ping(node_address,0,millis());
 
+      // Print details.
       printf("%lu ",millis());
-      payload_printf("PING",ping);
+      payload_printf(">PING",ping);
       bool ok = radio.write( &ping, sizeof(payload_t) );  
       if (ok)
-	printf(" ok ");
+	printf(" ok\n\r");
       else
-	printf(" failed ");
+	printf(" failed\n\r");
 
       // Now, continue listening
       radio.startListening();
-      
-      // Wait here until we get a response, or timeout (250ms)
-      unsigned long started_waiting_at = millis();
-      bool timeout = false;
-      while ( ! radio.available() && ! timeout )
-	if (millis() - started_waiting_at > 250 )
-	  timeout = true;
-      
-      // Describe the results
-      if ( timeout )
+    }
+
+    // Did we get a pong?
+    if ( radio.available() )
+    {
+      // Not waiting anymore, got one.
+      waiting_for_pong = false;
+
+      // Dump the payloads until we've gotten everything
+      payload_t payload;
+      boolean done = false;
+      while (!done)
       {
-	printf("Failed, response timed out.\n\r");
-      }
-      else
-      {
-	// Grab the response, compare, and send to debugging spew
-	payload_t pong;
-	radio.read( &pong, sizeof(payload_t) );
-    
-	// Spew it
-	payload_printf(" ...PONG",pong);
-	printf(" Round-trip delay: %lu\n\r",millis()-pong.time);
-      }
+        // Fetch the payload, and see if this was the last one.
+        done = radio.read( &payload, sizeof(payload_t) );
+
+	// Print details.
+	printf("%lu ",millis());
+	payload_printf(">PONG",payload);
+	printf(" Round-trip delay: %lu\n\r",millis()-payload.time);
+      }  
+    }
+
+    // Have we timed out waiting for our pong?
+    if ( waiting_for_pong && ( millis() - last_ping_sent_at > pong_timeout ) )
+    {
+      // Not waiting anymore, timed out.
+      waiting_for_pong = false;
+
+      // Timeouts usually happen because of collisions with other nodes
+      // getting a pong just as we are trying to get a ping.  The best thing
+      // to do right now is offset our ping timing to search for a slot
+      // that's not occupied.
+      last_ping_sent_at += ping_phase_shift; 
+
+      // Print details
+      printf("TIMED OUT.\n\r");
     }
   }
   
@@ -413,9 +432,9 @@ void loop(void)
     
     // Is it time to ping again?
     unsigned long now = millis();
-    if ( now - last_ping_time >= ping_delay )
+    if ( now - last_ping_sent_at >= ping_delay )
     {
-      last_ping_time = now; 
+      last_ping_sent_at = now; 
     
       // First, stop listening so we can talk.
       radio.stopListening();
