@@ -313,6 +313,9 @@ void RF24::startListening(void)
 {
   write_register(CONFIG, _BV(EN_CRC) | _BV(PWR_UP) | _BV(PRIM_RX));
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+  
+  // Restore the pipe0 adddress
+  write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&pipe0_reading_address), 5);
 
   // Flush buffers
   flush_rx();
@@ -494,6 +497,12 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
     RX_PW_P0, RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5   };
   const uint8_t child_pipe_enable[] = { 
     ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5 };
+
+  // If this is pipe 0, cache the address.  This is needed because
+  // openWritingPipe() will overwrite the pipe 0 address, so
+  // startListening() will have to restore it.
+  if (child == 0)
+    pipe0_reading_address = value;
 
   if (child < 5)
   {

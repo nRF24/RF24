@@ -23,6 +23,7 @@ private:
   uint8_t payload_size; /**< Fixed size of payloads */
   boolean ack_payload_available; /**< Whether there is an ack payload waiting */
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. Note: not used. */
+  uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
 
 protected:  
   /**
