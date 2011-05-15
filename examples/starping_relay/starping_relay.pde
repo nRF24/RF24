@@ -24,7 +24,7 @@
  * @li Base.  One node is the base station, which receives pings, and sends
  * a pong back out.
  *
- * The address of each node is a number from 1 to n (the # of known nodes).
+ * The address of each node is a number from 0 to n (the # of known nodes).
  * It is set in EEPROM.  To change a nodes address, send the character code
  * for that address.  e.g. send the character '5' to set address 5.
  *
