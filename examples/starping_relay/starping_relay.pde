@@ -11,7 +11,9 @@
  *
  * This sketch is a very complex example of using the RF24 library for Arduino.  
  * Deploy this on any number of nodes to create a basic mesh network.  I have
- * tested this on 6 nodes, but it should work on many more.
+ * tested this on 6 nodes, but it should work on many more.  Although if there
+ * are a lot more nodes, increase the ping_interval, or the base will be
+ * overwhelmed!
  *
  * There are three different roles a node can be:
  *
@@ -25,7 +27,7 @@
  * a pong back out.
  *
  * The address of each node is a number from 0 to n (the # of known nodes).
- * It is set in EEPROM.  To change a nodes address, send the character code
+ * It is set in EEPROM.  To change a node's address, send the character code
  * for that address.  e.g. send the character '5' to set address 5.
  *
  * The role is determined from the topology table.  Leafs have no children.
@@ -165,7 +167,7 @@ void payload_printf(const char* name, const payload_t& pl)
 static unsigned long last_ping_sent_at;
 static bool waiting_for_pong = false;
 static short consecutive_timeouts;
-const unsigned long ping_delay = 2000; // ms
+const unsigned long ping_interval = 2000; // ms
 const unsigned long pong_timeout = 250; // ms
 const unsigned long ping_phase_shift = 100; // ms
 const short timeout_shift_threshold = 3;
@@ -493,7 +495,7 @@ void ping_if_ready(void)
 {
   // Is it time to ping again?
   unsigned long now = millis();
-  if ( now - last_ping_sent_at >= ping_delay )
+  if ( now - last_ping_sent_at >= ping_interval )
   {
     last_ping_sent_at = now;
     waiting_for_pong = true;
