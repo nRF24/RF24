@@ -9,20 +9,27 @@
 /**
  * Example RF Radio Ping Star Group with Relay 
  *
- * This sketch is a more complex example of using the RF24 library for Arduino.  
- * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the 
- * role_pin low, and the others will be 'ping transmit' units.  The ping units
- * unit will send out the value of millis() once a second.  The pong unit will 
- * respond back with a copy of the value.  Each ping unit can get that response
- * back, and determine how long the whole cycle took.
+ * This sketch is a very complex example of using the RF24 library for Arduino.  
+ * Deploy this on any number of nodes to create a basic mesh network.  I have
+ * tested this on 6 nodes, but it should work on many more.
  *
- * This example introduces a new role, the 'relay', which can relay pings or
- * pongs from one host to another.  This is needed in larger meshes because
- * each radio can only listen to 5-6 others.
+ * There are three different roles a node can be:
  *
- * This example requires a bit more complexity to determine which unit is which.
- * The pong receiver is identified by having its role_pin tied to ground.
- * The ping senders are further differentiated by a byte in eeprom.
+ * @li Leaf.  Leaf nodes send a ping to the base unit, and wait for a pong in 
+ * return
+ * 
+ * @li Relay.  Relay nodes do the same as a leaf node, AND they relay pings
+ * from leaf nodes toward the base, and relay pongs toward the leaves.
+ *
+ * @li Base.  One node is the base station, which receives pings, and sends
+ * a pong back out.
+ *
+ * The address of each node is a number from 1 to n (the # of known nodes).
+ * It is set in EEPROM.  To change a nodes address, send the character code
+ * for that address.  e.g. send the character '5' to set address 5.
+ *
+ * The role is determined from the topology table.  Leafs have no children.
+ * The base node has no parent.  Relays have parents and children.
  */
  
 #include <SPI.h>
@@ -43,17 +50,11 @@ RF24 radio(8,9);
 // Topology
 //
 
-// Radio pipe addresses for the nodes to communicate.  Only ping nodes need
-// dedicated pipes in this topology.  Each ping node has a talking pipe
-// that it will ping into, and a listening pipe that it will listen for
-// the pong.  The pong node listens on all the ping node talking pipes
-// and sends the pong back on the sending node's specific listening pipe.
-
 struct node_info
 {
   uint64_t talking_pipe; // Pipe used to talk to parent node
   uint64_t listening_pipe; // Pipe used to listen to parent node
-  uint8_t parent_node; // Number of parent node
+  uint8_t parent_node; // Address of parent node
 };
 
 const node_info topology[] =
@@ -106,10 +107,8 @@ uint8_t find_node( uint8_t current_node, uint8_t target_node )
 // Role management
 //
 // Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.  The hardware itself specifies
-// which node it is.
-//
-// This is done through the role_pin
+// in this system.  Doing so greatly simplifies testing.  Role is
+// determined by the topology table.
 //
 
 // The various roles supported by this sketch
@@ -133,7 +132,7 @@ const uint8_t valid_eeprom_flag = 0xdf;
 
 // What is our address (SRAM cache of the address from EEPROM)
 // This is an index into the topology[] table above
-uint8_t node_address = role_invalid;;
+uint8_t node_address = -1;
 
 //
 // Payload
@@ -171,14 +170,15 @@ const unsigned long pong_timeout = 250; // ms
 const unsigned long ping_phase_shift = 100; // ms
 const short timeout_shift_threshold = 3;
 
+// Space to track the last packet we received from each node, useful
+// for tracking lost packets
+static uint16_t last_id_received[num_nodes];
+
 void setup(void)
 {
   //
   // Address
   //
-
-  // Unless we find reasonable values in the EEPROM, these are the defaults
-  node_address = -1;
 
   // Look for the token in EEPROM to indicate the following value is
   // a validly set node address 
@@ -244,7 +244,7 @@ void setup(void)
   
   // Each leaf node has a talking pipe that it will ping into, and a listening 
   // pipe that it will listen for the pong.  Relay nodes also do this.
-  if ( role == role_leaf || role == role_relay )
+  if ( role == role_leaf )
   {
     // Write on our talking pipe
     radio.openWritingPipe(topology[node_address].talking_pipe);
@@ -258,11 +258,14 @@ void setup(void)
   // Remember to re-open the reading pipe whenever we start to listen again.
   if ( role == role_relay )
   { 
+    // Write on our talking pipe
+    radio.openWritingPipe(topology[node_address].talking_pipe);
+    
     // Listen on our listening pipe 
     radio.openReadingPipe(0,topology[node_address].listening_pipe);
   }
 
-  // The base and relay nodes listens on all their children node's talking pipes
+  // The base and relay nodes listen on all their children node's talking pipes
   // and sends the pong back on the child node's specific listening pipe.
   if ( role == role_base || role == role_relay )
   {
@@ -300,6 +303,10 @@ void setup(void)
   }
 }
 
+void ping_if_ready(void);
+void handle_pong(const payload_t& payload);
+void check_pong_timeout(void);
+
 void loop(void)
 {
   //
@@ -308,39 +315,12 @@ void loop(void)
   
   if ( role == role_leaf ) 
   {
-    // Is it time to ping again?
-    unsigned long now = millis();
-    if ( now - last_ping_sent_at >= ping_delay )
-    {
-      last_ping_sent_at = now;
-      waiting_for_pong = true;
-
-      // First, stop listening so we can talk.
-      radio.stopListening();
-      
-      // Take the time, and send it to the base.  This will block until complete
-      payload_t ping(node_address,0,millis());
-
-      // Print details.
-      printf("%lu ",millis());
-      payload_printf(">PING",ping);
-      bool ok = radio.write( &ping, sizeof(payload_t) );  
-      if (ok)
-	printf(" ok\n\r");
-      else
-	printf(" failed\n\r");
-
-      // Now, continue listening
-      radio.startListening();
-    }
+    ping_if_ready();
+    check_pong_timeout();
 
     // Did we get a pong?
     if ( radio.available() )
     {
-      // Not waiting anymore, got one.
-      waiting_for_pong = false;
-      consecutive_timeouts = 0;
-
       // Dump the payloads until we've gotten everything
       payload_t payload;
       boolean done = false;
@@ -349,31 +329,8 @@ void loop(void)
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &payload, sizeof(payload_t) );
 
-	// Print details.
-	printf("%lu ",millis());
-	payload_printf(">PONG",payload);
-	printf(" Round-trip delay: %lu\n\r",millis()-payload.time);
+	handle_pong(payload);
       }  
-    }
-
-    // Have we timed out waiting for our pong?
-    if ( waiting_for_pong && ( millis() - last_ping_sent_at > pong_timeout ) )
-    {
-      // Not waiting anymore, timed out.
-      waiting_for_pong = false;
-
-      // Timeouts usually happen because of collisions with other nodes
-      // getting a pong just as we are trying to get a ping.  The best thing
-      // to do right now is offset our ping timing to search for a slot
-      // that's not occupied.
-      //
-      // Only do this after getting a few timeouts, so we aren't always skittishly
-      // moving around the cycle.
-      if ( ++consecutive_timeouts > timeout_shift_threshold )
-	last_ping_sent_at += ping_phase_shift; 
-
-      // Print details
-      printf("TIMED OUT.\n\r");
     }
   }
   
@@ -385,35 +342,8 @@ void loop(void)
   {
 #if 1    
     // Relay role is ALSO a ping sender!!
-    
-    // Is it time to ping again?
-    unsigned long now = millis();
-    if ( now - last_ping_sent_at >= ping_delay )
-    {
-      last_ping_sent_at = now; 
-    
-      // First, stop listening so we can talk.
-      radio.stopListening();
-      
-      // Write on our talking pipe.  The relay has to do this every time, because
-      // we ALSO use pipe 0 as a listening pipe.
-      radio.openWritingPipe(topology[node_address].talking_pipe);
-      
-      // Take the time, and send it to the base.  This will block until complete
-      payload_t ping(node_address,0,millis());
-
-      printf("%lu ",millis());
-      payload_printf(">PING",ping);
-      bool ok = radio.write( &ping, sizeof(payload_t) );  
-      if (ok) 
-      	printf(" ok.\n\r");
-      else
-      	printf(" failed.\n\r");
-
-      // Now, continue listening
-      radio.openReadingPipe(0,topology[node_address].listening_pipe);
-      radio.startListening();
-    }
+    ping_if_ready();    
+    check_pong_timeout();
 #endif
     // if there is data ready
     uint8_t pipe_num;
@@ -430,10 +360,7 @@ void loop(void)
         // Is this for us?
         if ( payload.to_node == node_address )
 	{
-	  // Treat it as a PONG
-	  printf("%lu ",millis());
-	  payload_printf(">PONG",payload);
-	  printf(" Round-trip delay: %lu\n\r",millis()-payload.time);
+	  handle_pong(payload);
 	}
 	else
 	{
@@ -472,12 +399,10 @@ void loop(void)
 	  uint16_t pipe_id = out_pipe & 0xffff;
 	  printf("OUT on pipe %04x %s.\n\r",pipe_id,ok?"ok":"failed");
 	  
+	  // Now, resume listening so we catch the next packets.
+	  radio.startListening();
 	}
       }
-      
-      // Now, resume listening so we catch the next packets.
-      radio.openReadingPipe(0,topology[node_address].listening_pipe);
-      radio.startListening();
     }
   }
   
@@ -503,6 +428,17 @@ void loop(void)
 	printf("%lu ",millis());
 	payload_printf("PING",ping);
 	printf(" on pipe %u. ",pipe_num);
+
+	// Track the packets lost since we last heard from this node
+	// Packet loss is generally a sign of poor system health
+	uint16_t* last_id_ptr = &last_id_received[ping.from_node];
+	if ( *last_id_ptr && ping.id > *last_id_ptr )
+	{
+	  uint16_t lost = ping.id - *last_id_ptr - 1;
+	  if ( lost )
+	    printf(" lost %u",lost);
+	}
+	*last_id_ptr = ping.id;
       }
       
       // First, stop listening so we can talk
@@ -550,6 +486,74 @@ void loop(void)
       printf("\n\rManually reset address to: %c\n\rPress RESET to continue!",c);
       while(1);
     }
+  }
+}
+
+void ping_if_ready(void)
+{
+  // Is it time to ping again?
+  unsigned long now = millis();
+  if ( now - last_ping_sent_at >= ping_delay )
+  {
+    last_ping_sent_at = now;
+    waiting_for_pong = true;
+
+    // First, stop listening so we can talk.
+    radio.stopListening();
+
+    // Write on our talking pipe.  The relay has to do this every time, because
+    // we ALSO use pipe 0 as a listening pipe.
+    radio.openWritingPipe(topology[node_address].talking_pipe);
+    
+    // Take the time, and send it to the base.  This will block until complete
+    payload_t ping(node_address,0,millis());
+
+    // Print details.
+    printf("%lu ",millis());
+    payload_printf(">PING",ping);
+    bool ok = radio.write( &ping, sizeof(payload_t) );  
+    if (ok)
+      printf(" ok\n\r");
+    else
+      printf(" failed\n\r");
+
+    // Now, continue listening
+    radio.startListening();
+  }
+}
+
+void handle_pong(const payload_t& payload)
+{
+  // Not waiting anymore, got one.
+  waiting_for_pong = false;
+  consecutive_timeouts = 0;
+
+  // Print details.
+  printf("%lu ",millis());
+  payload_printf(">PONG",payload);
+  printf(" Round-trip delay: %lu\n\r",millis()-payload.time);
+}
+
+void check_pong_timeout(void)
+{
+  // Have we timed out waiting for our pong?
+  if ( waiting_for_pong && ( millis() - last_ping_sent_at > pong_timeout ) )
+  {
+    // Not waiting anymore, timed out.
+    waiting_for_pong = false;
+
+    // Timeouts usually happen because of collisions with other nodes
+    // getting a pong just as we are trying to send a ping.  The best thing
+    // to do right now is offset our ping timing to search for a slot
+    // that's not occupied.
+    //
+    // Only do this after getting a few timeouts, so we aren't always skittishly
+    // moving around the cycle.
+    if ( ++consecutive_timeouts > timeout_shift_threshold )
+      last_ping_sent_at += ping_phase_shift; 
+
+    // Print details
+    printf("TIMED OUT.\n\r");
   }
 }
 // vim:ai:cin:sts=2 sw=2 ft=cpp
