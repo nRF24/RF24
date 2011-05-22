@@ -23,6 +23,7 @@
 void RF24::csn(int mode) 
 {
   SPI.setDataMode(SPI_MODE0);
+  SPI.setClockDivider(SPI_CLOCK_DIV8);
   digitalWrite(csn_pin,mode);
 }
 
