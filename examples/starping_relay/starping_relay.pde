@@ -555,6 +555,7 @@ void check_pong_timeout(void)
       last_ping_sent_at += ping_phase_shift; 
 
     // Print details
+    printf("%lu ",millis());
     printf("TIMED OUT.\n\r");
   }
 }
