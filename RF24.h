@@ -399,6 +399,27 @@ public:
    * @return True if an ack payload is available.
    */
   boolean isAckPayloadAvailable(void);
+
+  /**
+   * Enable or disable auto-acknowlede packets
+   *
+   * This is enabled by default, so it's only needed if you want to turn
+   * it off for some reason.
+   *
+   * @param enable Whether to enable (true) or disable (false) auto-acks
+   */
+  void setAutoAck(bool enable);
+
+  /**
+   * Test whether there was a carrier on the line for the
+   * previous listening period.
+   *
+   * Useful to check for interference on the current channel.
+   *
+   * @return true if was carrier, false if not
+   */
+
+  boolean testCarrier(void);
   
   /**@}*/
 };

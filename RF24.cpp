@@ -331,7 +331,7 @@ void RF24::startListening(void)
   ce(HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-  delay(1);
+  delayMicroseconds(130);
 }
 
 /******************************************************************/
@@ -589,6 +589,23 @@ boolean RF24::isAckPayloadAvailable(void)
   boolean result = ack_payload_available;
   ack_payload_available = false;
   return result;
+}
+
+/******************************************************************/
+
+void RF24::setAutoAck(bool enable)
+{
+  if ( enable )
+    write_register(EN_AA, B111111);
+  else
+    write_register(EN_AA, 0);
+}
+
+/******************************************************************/
+
+boolean RF24::testCarrier(void)
+{
+  return ( read_register(CD) & 1 );
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp
