@@ -29,7 +29,9 @@ protected:
   /**
    * @name Low-level internal interface.
    * 
-   *  Protected methods that address the chip directly.
+   *  Protected methods that address the chip directly.  Regular users cannot
+   *  ever call these.  They are documented for completeness and for developers who
+   *  may want to extend this class.
    */
   /**@{*/
 
@@ -116,14 +118,14 @@ protected:
    * @return Payload length of last-received dynamic payload
    */
   uint8_t read_payload_length(void);
-
+  
   /**
    * Empty the receive buffer
    *
    * @return Current value of status register
    */
   uint8_t flush_rx(void);
-
+  
   /**
    * Empty the transmit buffer
    *
@@ -167,6 +169,13 @@ protected:
 
 public:
   /**
+   * @name Primary public interface 
+   * 
+   *  These are the main methods you need to operate the chip 
+   */
+  /**@{*/
+
+  /**
    * Constructor
    *
    * Creates a new instance of this driver.  Before using, you create an instance
@@ -185,67 +194,26 @@ public:
   void begin(void);
 
   /**
-   * Set RF communication channel
-   * 
-   * @param channel Which RF channel to communicate on, 0-127
-   */
-  void setChannel(uint8_t channel);
-
-  /**
-   * Set Payload Size
-   * 
-   * This implementation uses a pre-stablished fixed payload size for all
-   * transmissions.  If this method is never called, the driver will always
-   * transmit the maximum payload size (32 bytes), no matter how much
-   * was sent to write().
-   *
-   * @todo Implement variable-sized payloads feature
-   * 
-   * @param size The number of bytes in the payload
-   */
-  void setPayloadSize(uint8_t size);
-
-  /**
-   * Get Payload Size
-   * 
-   * @see setPayloadSize()
-   *
-   * @return The number of bytes in the payload
-   */
-  uint8_t getPayloadSize(void) ;
-
-  /**
-   * Print a giant block of debugging information to stdout
-   *
-   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
-   */
-  void printDetails(void) ;
-
-  /**
    * Start listening on the pipes opened for reading.  
    *
-   * Be sure to open some pipes for reading first.  Do not call 'write'
-   * while in this mode, without first calling 'stopListening'.
+   * Be sure to call openReadingPipe() first.  Do not call write() while
+   * in this mode, without first calling stopListening().  Call
+   * isAvailable() to check for incoming traffic, and read() to get it. 
    */
   void startListening(void);
 
   /**
    * Stop listening for incoming messages
    *
-   * Necessary to do this before writing.
+   * Do this before calling write(). 
    */
   void stopListening(void);
 
   /**
-   * Enter low-power mode
-   *
-   * To return to normal power mode, either write() some data or
-   * startListening().
-   */
-  void powerDown(void);
-
-  /**
    * Write to the open writing pipe
+   *
+   * Be sure to call openWritingPipe() first to set the destination
+   * of where to write to.
    *
    * This blocks until the message is successfully acknowledged by
    * the receiver or the timeout/retransmit maxima are reached.  In
@@ -267,14 +235,6 @@ public:
    * @return True if there is a payload available, false if none is
    */
   boolean available(void) ;
-
-  /**
-   * Test whether there are bytes available to be read
-   *
-   * @param[out] pipe_num Which pipe has the payload available
-   * @return True if there is a payload available, false if none is
-   */
-  boolean available(uint8_t* pipe_num);
 
   /**
    * Read the payload
@@ -335,12 +295,77 @@ public:
    */
   void openReadingPipe(uint8_t number, uint64_t address);
 
+  /**@}*/
+  /**
+   * @name Optional public interface 
+   * 
+   *  Methods you may want to use but are not needed for regular operation 
+   */
+  /**@{*/
+
+  /**
+   * Set RF communication channel
+   * 
+   * @param channel Which RF channel to communicate on, 0-127
+   */
+  void setChannel(uint8_t channel);
+
+  /**
+   * Set Payload Size
+   * 
+   * This implementation uses a pre-stablished fixed payload size for all
+   * transmissions.  If this method is never called, the driver will always
+   * transmit the maximum payload size (32 bytes), no matter how much
+   * was sent to write().
+   *
+   * @todo Implement variable-sized payloads feature
+   * 
+   * @param size The number of bytes in the payload
+   */
+  void setPayloadSize(uint8_t size);
+
+  /**
+   * Get Payload Size
+   * 
+   * @see setPayloadSize()
+   *
+   * @return The number of bytes in the payload
+   */
+  uint8_t getPayloadSize(void) ;
+
+  /**
+   * Print a giant block of debugging information to stdout
+   *
+   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+   */
+  void printDetails(void) ;
+  
+  /**
+   * Enter low-power mode
+   *
+   * To return to normal power mode, either write() some data or
+   * startListening().
+   */
+  void powerDown(void);
+
+  /**
+   * Test whether there are bytes available to be read
+   *
+   * Use this version to discover on which pipe the message
+   * arrived.
+   *
+   * @param[out] pipe_num Which pipe has the payload available
+   * @return True if there is a payload available, false if none is
+   */
+  boolean available(uint8_t* pipe_num);
+
   /**
    * Enable custom payloads on the acknowledge packets
    *
    * Ack payloads are a handy way to return data back to senders without
-   * manually changing the radio modes on both units.  See the
-   * pingpair_pl.pde example.
+   * manually changing the radio modes on both units.  
+   *
+   * @see examples/pingpair_pl/pingpair_pl.pde
    */
   void enableAckPayload(void);
 
@@ -374,6 +399,8 @@ public:
    * @return True if an ack payload is available.
    */
   boolean isAckPayloadAvailable(void);
+  
+  /**@}*/
 };
 
 /**
@@ -394,10 +421,7 @@ public:
  * unit will send out the value of millis() once a second.  The pong unit will 
  * respond back with a copy of the value.  Each ping unit can get that response
  * back, and determine how long the whole cycle took.
- Warning:
-    Calling this function clears the internal flag which indicates a payload is available. If it returns true, you must read the packet out as the very next interaction with the radio, or the results are undefined.
-
-*
+ *
  * This example requires a bit more complexity to determine which unit is which.
  * The pong receiver is identified by having its role_pin tied to ground.
  * The ping senders are further differentiated by a byte in eeprom.
