@@ -12,7 +12,7 @@
 #include <inttypes.h>
 
 /**
- * Driver for nRF24L01 2.4GHz Wireless Transceiver
+ * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
  
 class RF24
@@ -446,7 +446,17 @@ public:
  */
 
 /**
- * @mainpage Driver for nRF24L01 2.4GHz Wireless Transceiver
+ * @example starping_relay.pde
+ *
+ * This sketch is a very complex example of using the RF24 library for Arduino.  
+ * Deploy this on any number of nodes to create a basic mesh network.  I have
+ * tested this on 6 nodes, but it should work on many more.  'Leaf' nodes attempt
+ * to send a ping every 2 seconds to the 'Base' node.  Optional 'Relay' nodes
+ * will relay these transmissions.
+ */
+
+/**
+ * @mainpage Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  *
  * Design Goals: This library is designed to be...
  * @li Maximally compliant with the intended operation of the chip
