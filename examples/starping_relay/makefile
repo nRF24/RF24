@@ -64,8 +64,9 @@ ARDUINO_VERSION	= 21
 ARDUINO_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
 AVR_TOOLS_PATH 	= $(ARDUINO_DIR)/hardware/tools/avr/bin
 AVRDUDECONFIG_PATH = $(ARDUINO_DIR)/hardware/tools/avr/etc
-PORT                    = /dev/tty.usbserial-A600eHIs 
+PORT                    = /dev/tty.usbserial-A600eHIs
 PORT2                   = /dev/tty.usbserial-A9007LmI
+PORT3                   = /dev/tty.usbserial-A40081RP
 else
 ARDUINO_VERSION	= 22
 ARDUINO_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
@@ -74,6 +75,12 @@ AVRDUDECONFIG_PATH = $(ARDUINO_DIR)/hardware/tools
 PORT 			= /dev/ttyUSB0
 PORT2 			= /dev/ttyUSB1
 endif
+
+# Temporary testing of github Arduino environment
+OLD_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
+AVR_TOOLS_PATH 	= $(OLD_DIR)/hardware/tools/avr/bin
+AVRDUDECONFIG_PATH = $(OLD_DIR)/hardware/tools/avr/etc
+ARDUINO_DIR 	= /opt/Arduino
 
 PROJECT_NAME 	= $(notdir $(PWD))
 PROJECT_DIR 	= . 
@@ -216,6 +223,9 @@ upload1: output/$(PROJECT_NAME).hex
 
 upload2: output/$(PROJECT_NAME).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT2) $(AVRDUDE_WRITE_FLASH)
+
+upload3: output/$(PROJECT_NAME).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT3) $(AVRDUDE_WRITE_FLASH)
 
 sym:
 	$(NM) -n -C --format=posix output/$(PROJECT_NAME).elf > output/$(PROJECT_NAME).sym
