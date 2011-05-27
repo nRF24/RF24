@@ -608,5 +608,15 @@ boolean RF24::testCarrier(void)
   return ( read_register(CD) & 1 );
 }
 
+/******************************************************************/
+
+void RF24::setDataRate(rf24_datarate_e speed)
+{
+  uint8_t setup = read_register(RF_SETUP) & RF_DR;
+  if (speed == RF24_2MBPS)
+    setup |= RF_DR;
+  write_register(RF_SETUP,setup);
+}
+
 // vim:ai:cin:sts=2 sw=2 ft=cpp
 

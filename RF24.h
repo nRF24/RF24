@@ -11,6 +11,8 @@
 
 #include <inttypes.h>
 
+typedef enum { RF24_1MBPS = 0, RF24_2MBPS } rf24_datarate_e;
+
 /**
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
@@ -420,6 +422,13 @@ public:
    */
 
   boolean testCarrier(void);
+
+  /**
+   * Set the transmission data rate
+   *
+   * @param speed RF24_1MBPS for 1Mbps or RF24_2MBPS for 2Mbps
+   */
+  void setDataRate(rf24_datarate_e speed);
   
   /**@}*/
 };
