@@ -12,6 +12,7 @@
 #include <inttypes.h>
 
 typedef enum { RF24_1MBPS = 0, RF24_2MBPS } rf24_datarate_e;
+typedef enum { RF24_CRC_8 = 0, RF24_CRC_16 } rf24_crclength_e;
 
 /**
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
@@ -420,7 +421,6 @@ public:
    *
    * @return true if was carrier, false if not
    */
-
   boolean testCarrier(void);
 
   /**
@@ -429,6 +429,13 @@ public:
    * @param speed RF24_1MBPS for 1Mbps or RF24_2MBPS for 2Mbps
    */
   void setDataRate(rf24_datarate_e speed);
+ 
+  /**
+   * Set the CRC length 
+   *
+   * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
+   */
+  void setCRCLength(rf24_crclength_e length);
   
   /**@}*/
 };

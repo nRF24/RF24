@@ -619,6 +619,17 @@ void RF24::setDataRate(rf24_datarate_e speed)
   if (speed == RF24_2MBPS)
     setup |= RF_DR;
   write_register(RF_SETUP,setup);
+
+}
+
+/******************************************************************/
+
+void RF24::setCRCLength(rf24_crclength_e length)
+{
+  uint8_t config = read_register(CONFIG) & _BV(CRCO);
+  if (length == RF24_CRC_16)
+    config |= _BV(CRCO);
+  write_register(CONFIG,config);
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp
