@@ -305,6 +305,9 @@ void RF24::begin(void)
 
   // Reset current status
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+ 
+  // Initialize CRC
+  write_register(CONFIG, _BV(EN_CRC) );
 
   // Flush buffers
   flush_rx();
@@ -318,7 +321,7 @@ void RF24::begin(void)
 
 void RF24::startListening(void)
 {
-  write_register(CONFIG, _BV(EN_CRC) | _BV(PWR_UP) | _BV(PRIM_RX));
+  write_register(CONFIG, read_register(CONFIG) | _BV(PWR_UP) | _BV(PRIM_RX));
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
   
   // Restore the pipe0 adddress
@@ -345,7 +348,7 @@ void RF24::stopListening(void)
 
 void RF24::powerDown(void)
 {
-  write_register(CONFIG,0);
+  write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
 }
 
 /******************************************************************/
@@ -355,7 +358,7 @@ boolean RF24::write( const void* buf, uint8_t len )
   boolean result = false;
 
   // Transmitter power-up
-  write_register(CONFIG, _BV(EN_CRC) | _BV(PWR_UP));
+  write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
   delay(2);
 
   // Send the payload
@@ -401,7 +404,7 @@ boolean RF24::write( const void* buf, uint8_t len )
   ce(LOW);
 
   // Power down
-  write_register(CONFIG, _BV(EN_CRC) );
+  write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
 
   // Reset current status
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
