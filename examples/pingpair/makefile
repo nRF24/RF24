@@ -64,8 +64,9 @@ ARDUINO_VERSION	= 21
 ARDUINO_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
 AVR_TOOLS_PATH 	= $(ARDUINO_DIR)/hardware/tools/avr/bin
 AVRDUDECONFIG_PATH = $(ARDUINO_DIR)/hardware/tools/avr/etc
-PORT                    = /dev/tty.usbserial-A600eHIs 
+PORT                    = /dev/tty.usbserial-A600eHIs
 PORT2                   = /dev/tty.usbserial-A9007LmI
+PORT3                   = /dev/tty.usbserial-A40081RP
 else
 ARDUINO_VERSION	= 22
 ARDUINO_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
@@ -74,6 +75,12 @@ AVRDUDECONFIG_PATH = $(ARDUINO_DIR)/hardware/tools
 PORT 			= /dev/ttyUSB0
 PORT2 			= /dev/ttyUSB1
 endif
+
+# Temporary testing of github Arduino environment
+OLD_DIR 	= /opt/arduino-00$(ARDUINO_VERSION)
+AVR_TOOLS_PATH 	= $(OLD_DIR)/hardware/tools/avr/bin
+AVRDUDECONFIG_PATH = $(OLD_DIR)/hardware/tools/avr/etc
+ARDUINO_DIR 	= /opt/Arduino
 
 PROJECT_NAME 	= $(notdir $(PWD))
 PROJECT_DIR 	= . 
@@ -103,6 +110,7 @@ $(ARDUINO_CORE)/WMath.cpp \
 $(ARDUINO_CORE)/Print.cpp \
 $(ARDUINO_CORE)/HardwareSerial.cpp \
 $(ARDUINO_LIB)/SPI/SPI.cpp \
+$(ARDUINO_LIB)/EEPROM/EEPROM.cpp \
 ../../RF24.cpp
 
 CXX_APP 	= output/$(PROJECT_NAME).cpp
@@ -127,7 +135,7 @@ CDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(ARDUINO_VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(ARDUINO_VERSION)
 
 # Place -I options here
-CINCS = -I$(ARDUINO_CORE) -I$(ARDUINO_LIB) -I$(PROJECT_DIR) -I$(ARDUINO_AVR) -I$(ARDUINO_LIB)/SPI -I../..
+CINCS =  -I$(ARDUINO_LIB)/EEPROM -I$(ARDUINO_CORE) -I$(ARDUINO_LIB) -I$(PROJECT_DIR) -I$(ARDUINO_AVR) -I$(ARDUINO_LIB)/SPI -I../..
 
 CXXINCS = -I$(ARDUINO_CORE) -I$(ARDUINO_LIB)
 
@@ -208,9 +216,16 @@ lss: output/$(PROJECT_NAME).lss
 #sym: output/$(PROJECT_NAME).sym
 
 # Upload HEX file to Arduino
-upload: output/$(PROJECT_NAME).hex
+upload: upload1 upload2
+
+upload1: output/$(PROJECT_NAME).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT) $(AVRDUDE_WRITE_FLASH)
+
+upload2: output/$(PROJECT_NAME).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT2) $(AVRDUDE_WRITE_FLASH)
+
+upload3: output/$(PROJECT_NAME).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(PORT3) $(AVRDUDE_WRITE_FLASH)
 
 sym:
 	$(NM) -n -C --format=posix output/$(PROJECT_NAME).elf > output/$(PROJECT_NAME).sym
