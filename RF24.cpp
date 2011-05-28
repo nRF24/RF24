@@ -617,7 +617,7 @@ void RF24::setDataRate(rf24_datarate_e speed)
 {
   uint8_t setup = read_register(RF_SETUP) & RF_DR;
   if (speed == RF24_2MBPS)
-    setup |= RF_DR;
+    setup |= _BV(RF_DR);
   write_register(RF_SETUP,setup);
 
 }
