@@ -441,7 +441,7 @@ public:
 };
 
 /**
- * @example led_remote
+ * @example led_remote.pde
  *
  * This is an example of how to use the RF24 class to control a remote
  * bank of LED's using buttons on a remote control.
