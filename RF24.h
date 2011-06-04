@@ -441,6 +441,16 @@ public:
 };
 
 /**
+ * @example led_remote
+ *
+ * This is an example of how to use the RF24 class to control a remote
+ * bank of LED's using buttons on a remote control.
+ *
+ * Every time the buttons change on the remote, the entire state of
+ * buttons is send to the led board, which displays the state.
+ */
+
+/**
  * @example pingpair.pde
  * 
  * This is an example of how to use the RF24 class.  Write this sketch to two 
