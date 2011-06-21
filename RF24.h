@@ -22,6 +22,7 @@ typedef enum { RF24_CRC_8 = 0, RF24_CRC_16 } rf24_crclength_e;
 class RF24
 {
 private:
+    boolean wide_band; /* 2Mbs data rate in use? */
     uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
     uint8_t csn_pin; /**< SPI Chip select */
     uint8_t payload_size; /**< Fixed size of payloads */
@@ -44,7 +45,7 @@ protected:
      *
      * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
      */
-    void csn(int mode) ;
+    void csn(const int mode) const ;
 
     /**
      * Set chip enable
@@ -52,7 +53,7 @@ protected:
      * @param mode HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
      * for a much more detailed description of this pin.
      */
-    void ce(int mode);
+    void ce(const int mode) const ;
 
     /**
      * Read a chunk of data in from a register
@@ -62,7 +63,7 @@ protected:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) ;
+    uint8_t read_register(const uint8_t reg, uint8_t* buf, uint8_t len) const ;
 
     /**
      * Read single byte from a register
@@ -70,7 +71,7 @@ protected:
      * @param reg Which register. Use constants from nRF24L01.h
      * @return Current value of register @p reg
      */
-    uint8_t read_register(uint8_t reg);
+    uint8_t read_register(const uint8_t reg) const ;
 
     /**
      * Write a chunk of data to a register
@@ -80,7 +81,7 @@ protected:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
+    uint8_t write_register(const uint8_t reg, const uint8_t* buf, uint8_t len) const ;
 
     /**
      * Write a single byte to a register
@@ -89,7 +90,7 @@ protected:
      * @param value The new value to write
      * @return Current value of status register
      */
-    uint8_t write_register(uint8_t reg, uint8_t value);
+    uint8_t write_register(const uint8_t reg, const uint8_t value) const ;
 
     /**
      * Write the transmit payload
@@ -128,21 +129,21 @@ protected:
      *
      * @return Current value of status register
      */
-    uint8_t flush_rx(void);
+    uint8_t flush_rx(void) const ;
 
     /**
      * Empty the transmit buffer
      *
      * @return Current value of status register
      */
-    uint8_t flush_tx(void);
+    uint8_t flush_tx(void) const ;
 
     /**
      * Retrieve the current status of the chip
      *
      * @return Current value of status register
      */
-    uint8_t get_status(void) ;
+    uint8_t get_status(void) const ;
 
     /**
      * Decode and print the given status to stdout
@@ -151,7 +152,7 @@ protected:
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      */
-    void print_status(uint8_t status) ;
+    void print_status(uint8_t status) const ;
 
     /**
      * Decode and print the given 'observe_tx' value to stdout
@@ -160,7 +161,7 @@ protected:
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      */
-    void print_observe_tx(uint8_t value) ;
+    void print_observe_tx(uint8_t value) const ;
 
     /**
      * Turn on or off the special features of the chip
@@ -168,7 +169,7 @@ protected:
      * The chip has certain 'features' which are only available when the 'features'
      * are enabled.  See the datasheet for details.
      */
-    void toggle_features(void);
+    void toggle_features(void) const ;
     /**@}*/
 
 public:
@@ -204,14 +205,14 @@ public:
      * in this mode, without first calling stopListening().  Call
      * isAvailable() to check for incoming traffic, and read() to get it.
      */
-    void startListening(void);
+    void startListening(void) const ;
 
     /**
      * Stop listening for incoming messages
      *
      * Do this before calling write().
      */
-    void stopListening(void);
+    void stopListening(void) const ;
 
     /**
      * Write to the open writing pipe
@@ -238,7 +239,7 @@ public:
      *
      * @return True if there is a payload available, false if none is
      */
-    boolean available(void) ;
+    boolean available(void) const ;
 
     /**
      * Read the payload
@@ -297,7 +298,7 @@ public:
      * @param number Which pipe# to open, 0-5.
      * @param address The 40-bit address of the pipe to open.
      */
-    void openReadingPipe(uint8_t number, uint64_t address);
+    void openReadingPipe(const uint8_t number, const uint64_t address);
 
     /**@}*/
     /**
@@ -310,7 +311,9 @@ public:
     /**
      * Set RF communication channel
      *
-     * @param channel Which RF channel to communicate on, 0-127
+     * @param channel Which RF channel to communicate on, 0-127 in narrow band
+     * and 0 - 63 in wide band. Narrow and wideband is determined by data rate.
+     * A 2Mbs data rate automatically forces wide band mode.
      */
     void setChannel(uint8_t channel);
 
@@ -326,7 +329,7 @@ public:
      *
      * @param size The number of bytes in the payload
      */
-    void setPayloadSize(uint8_t size);
+    void setPayloadSize(const uint8_t size);
 
     /**
      * Get Payload Size
@@ -342,7 +345,7 @@ public:
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      */
-    void printDetails(void) ;
+    void printDetails(void) const ;
 
     /**
      * Enter low-power mode
@@ -350,7 +353,7 @@ public:
      * To return to normal power mode, either write() some data or
      * startListening().
      */
-    void powerDown(void);
+    void powerDown(void) const ;
 
     /**
      * Test whether there are bytes available to be read
@@ -361,7 +364,7 @@ public:
      * @param[out] pipe_num Which pipe has the payload available
      * @return True if there is a payload available, false if none is
      */
-    boolean available(uint8_t* pipe_num);
+    boolean available(uint8_t* pipe_num) const ;
 
     /**
      * Enable custom payloads on the acknowledge packets
@@ -371,7 +374,7 @@ public:
      *
      * @see examples/pingpair_pl/pingpair_pl.pde
      */
-    void enableAckPayload(void);
+    void enableAckPayload(void) const;
 
     /**
      * Write an ack payload for the specified pipe
@@ -387,7 +390,7 @@ public:
      * @param len Length of the data to send, up to 32 bytes max.  Not affected
      * by the static payload set by setPayloadSize().
      */
-    void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+    void writeAckPayload(const uint8_t pipe, const void* buf, uint8_t len) const ;
 
     /**
      * Determine if an ack payload was received in the most recent call to
@@ -412,7 +415,18 @@ public:
      *
      * @param enable Whether to enable (true) or disable (false) auto-acks
      */
-    void setAutoAck(bool enable);
+    void setAutoAck(const bool enable) const ;
+
+    /**
+     * Enable or disable auto-acknowlede packets on a per pipeline basis.
+     *
+     * AA is enabled by default, so it's only needed if you want to turn
+     * it off/on for some reason on a per pipeline basis.
+     *
+     * @param which pipeline to modify
+     * @param enable Whether to enable (true) or disable (false) auto-acks
+     */
+    void setAutoAck( const uint8_t pipe, const bool enable ) const ;
 
     /**
      * Test whether there was a carrier on the line for the
@@ -422,7 +436,7 @@ public:
      *
      * @return true if was carrier, false if not
      */
-    boolean testCarrier(void);
+    boolean testCarrier(void) const ;
 
     /**
      * Test whether a signal (carrier or otherwise) greater than
@@ -434,7 +448,7 @@ public:
      *
      * @return true if signal => -64dBm, false if not
      */
-    boolean testRPD(void);
+    boolean testRPD(void) const ;
 
     /**
      * Set Power Amplifier (PA) level to one of four levels.
@@ -445,27 +459,27 @@ public:
      *
      * @param Desired PA level.
      */
-    void setPALevel( rf24_pa_dbm_e level ) ;
+    void setPALevel( const rf24_pa_dbm_e level ) const ;
 
     /**
      * Fetches the current PA level. See setPALevel for
      * return value definitions.
      */
-    rf24_pa_dbm_e getPALevel( void ) ;
+    rf24_pa_dbm_e getPALevel( void ) const ;
 
     /**
      * Set the transmission data rate
      *
      * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
      */
-    void setDataRate(rf24_datarate_e speed);
+    void setDataRate(const rf24_datarate_e speed);
 
     /**
      * Set the CRC length
      *
      * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
      */
-    void setCRCLength(rf24_crclength_e length);
+    void setCRCLength(const rf24_crclength_e length) const ;
 
     /**@}*/
 };
