@@ -210,7 +210,7 @@ void RF24::print_observe_tx(uint8_t value) const
 
 RF24::RF24(const uint8_t _cepin, const uint8_t _cspin,
 	   const rf24_datarate_e speed, const uint8_t channel): 
-    wide_band(true), ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false)
+    ce_pin(_cepin), csn_pin(_cspin), wide_band(true), payload_size(32), ack_payload_available(false)
 {
     setDataRate( speed ) ;
     setChannel( channel ) ;

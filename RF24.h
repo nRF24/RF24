@@ -22,9 +22,9 @@ typedef enum { RF24_CRC_8 = 0, RF24_CRC_16 } rf24_crclength_e;
 class RF24
 {
 private:
-    boolean wide_band; /* 2Mbs data rate in use? */
     uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
     uint8_t csn_pin; /**< SPI Chip select */
+    boolean wide_band; /* 2Mbs data rate in use? */
     uint8_t payload_size; /**< Fixed size of payloads */
     boolean ack_payload_available; /**< Whether there is an ack payload waiting */
     uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. Note: not used. */
