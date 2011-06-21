@@ -11,7 +11,8 @@
 
 #include <inttypes.h>
 
-typedef enum { RF24_1MBPS = 0, RF24_2MBPS } rf24_datarate_e;
+typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
+typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
 typedef enum { RF24_CRC_8 = 0, RF24_CRC_16 } rf24_crclength_e;
 
 /**
@@ -424,9 +425,38 @@ public:
     boolean testCarrier(void);
 
     /**
+     * Test whether a signal (carrier or otherwise) greater than
+     * or equal to -64dBm is present on the channel. Valid only
+     * on nRF24L01P (+) hardware. On nRF24L01, use testCarrier().
+     *
+     * Useful to check for interference on the current channel and
+     * channel hopping strategies.
+     *
+     * @return true if signal => -64dBm, false if not
+     */
+    boolean testRPD(void);
+
+    /**
+     * Set Power Amplifier (PA) level to one of four levels.
+     * Relative mnemonics have been used to allow for future PA level
+     * changes. According to 6.5 of the nRF24L01+ specification sheet,
+     * they translate to: RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm,
+     * RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+     *
+     * @param Desired PA level.
+     */
+    void setPALevel( rf24_pa_dbm_e level ) ;
+
+    /**
+     * Fetches the current PA level. See setPALevel for
+     * return value definitions.
+     */
+    rf24_pa_dbm_e getPALevel( void ) ;
+
+    /**
      * Set the transmission data rate
      *
-     * @param speed RF24_1MBPS for 1Mbps or RF24_2MBPS for 2Mbps
+     * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
      */
     void setDataRate(rf24_datarate_e speed);
 

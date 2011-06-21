@@ -514,7 +514,7 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
   if (child == 0)
     pipe0_reading_address = value;
 
-  if (child < 5)
+  if (child < 6)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
@@ -524,7 +524,7 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
     
     write_register(child_payload_size[child],payload_size);  
 
-    // Note this is kind of an inefficient way to set up these enable bits, bit I thought it made
+    // Note this is kind of an inefficient way to set up these enable bits, but I thought it made
     // the calling code more simple
     uint8_t en_rx;
     read_register(EN_RXADDR,&en_rx,1);
@@ -613,13 +613,95 @@ boolean RF24::testCarrier(void)
 
 /******************************************************************/
 
+boolean RF24::testRPD(void)
+{
+  return ( read_register(RPD) & 1 ) ;
+}
+
+/******************************************************************/
+
+void RF24::setPALevel(rf24_pa_dbm_e level)
+{
+  uint8_t setup = read_register(RF_SETUP) ;
+  setup &= ~(_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
+
+  switch( level )
+  {
+  case RF24_PA_MAX:
+      setup |= RF_PWR_0DB ;
+      break ;
+
+  case RF24_PA_HIGH:
+      setup |= RF_PWR_6DB ;
+      break ;
+
+  case RF24_PA_LOW:
+      setup |= RF_PWR_12DB ;
+      break ;
+
+  case RF24_PA_MIN:
+      setup |= RF_PWR_18DB ;
+      break ;
+  }
+
+  write_register( RF_SETUP, setup ) ;
+}
+
+/******************************************************************/
+
+rf24_pa_dbm_e RF24::getPALevel(void)
+{
+  rf24_pa_dbm_e result = RF24_PA_ERROR ;
+  uint8_t power = read_register(RF_SETUP) & RF_PWR ;
+
+  switch( power )
+  {
+  case RF_PWR_0DB:
+      result = RF24_PA_MAX ;
+      break ;
+
+  case RF_PWR_6DB:
+      result = RF24_PA_HIGH ;
+      break ;
+
+  case RF_PWR_12DB:
+      result = RF24_PA_LOW ;
+      break ;
+
+  case RF_PWR_18DB:
+      result = RF24_PA_MIN ;
+      break ;
+  }
+
+  return result ;
+}
+
+/******************************************************************/
+
 void RF24::setDataRate(rf24_datarate_e speed)
 {
-  uint8_t setup = read_register(RF_SETUP) & RF_DR;
-  if (speed == RF24_2MBPS)
-    setup |= _BV(RF_DR);
-  write_register(RF_SETUP,setup);
+  uint8_t setup = read_register(RF_SETUP) ;
 
+  // HIGH and LOW '00' is 1Mbs - our default
+  setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ;
+  if( speed == RF24_250KBPS )
+  {
+      // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
+      // Making it '10'.
+      setup |= _BV( RF_DR_LOW ) ;
+  }
+  else
+  {
+      // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
+      // Making it '01'
+      if ( speed == RF24_2MBPS )
+      {
+	  setup |= _BV(RF_DR_HIGH);
+      }
+
+  }
+
+  write_register(RF_SETUP,setup);
 }
 
 /******************************************************************/
