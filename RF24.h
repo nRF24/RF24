@@ -188,8 +188,17 @@ public:
      *
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select
+     * @param speed The desired data rate of this network; default is 2Mbs
+     * @param channel The channel to use for this network; default is 64
+     *
+     * @warning Addition features enabled/set in the begin method should be
+     * migrated into our constructor. Basically features which are network
+     * specific should be variable and assignable here; including timeouts,
+     * retries, and CRC length.
      */
-    RF24(uint8_t _cepin, uint8_t _cspin);
+    RF24(const uint8_t _cepin, const uint8_t _cspin,
+	 const rf24_datarate_e speed=RF24_2MBPS,
+	 const uint8_t channel=64 ) ;
 
     /**
      * Begin operation of the chip

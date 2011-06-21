@@ -208,14 +208,17 @@ void RF24::print_observe_tx(uint8_t value) const
 
 /******************************************************************/
 
-RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
+RF24::RF24(const uint8_t _cepin, const uint8_t _cspin,
+	   const rf24_datarate_e speed, const uint8_t channel): 
     wide_band(true), ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false)
 {
+    setDataRate( speed ) ;
+    setChannel( channel ) ;
 }
 
 /******************************************************************/
 
-void RF24::setChannel(uint8_t channel)
+void RF24::setChannel(const uint8_t channel)
 {
     if( wide_band ) {
 	write_register(RF_CH,min(channel,127));
@@ -316,10 +319,6 @@ void RF24::begin(void)
   // Flush buffers
   flush_rx();
   flush_tx();    
-
-  // Set up default configuration.  Callers can always change it later.
-  // Hardware default is channel 2 - even spacing implied.
-  setChannel(64);
 }
 
 /******************************************************************/
