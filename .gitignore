@@ -1,3 +1,7 @@
 *.o
 .*.swp
 docs/
+output/
+ojam/
+version.h
+Session.vim
