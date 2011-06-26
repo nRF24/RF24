@@ -106,7 +106,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
 {
   uint8_t status;
 
-  const uint8_t* current = (const uint8_t*)buf;
+  const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
   csn(LOW);
   status = SPI.transfer( W_TX_PAYLOAD );
@@ -127,7 +127,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
 uint8_t RF24::read_payload(void* buf, uint8_t len) 
 {
   uint8_t status;
-  uint8_t* current = (uint8_t*)buf;
+  uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
   csn(LOW);
   status = SPI.transfer( R_RX_PAYLOAD );
@@ -577,7 +577,7 @@ void RF24::enableAckPayload(void)
 
 void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
-  const uint8_t* current = (const uint8_t*)buf;
+  const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
   csn(LOW);
   SPI.transfer( W_ACK_PAYLOAD | ( pipe & B111 ) );
