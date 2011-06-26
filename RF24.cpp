@@ -282,7 +282,10 @@ void RF24::printDetails(void)
   printf_P(PSTR("EN_RXADDR = %02x\n\r"),*buffer);
 
   read_register(RF_CH,buffer,1);
-  printf_P(PSTR("RF_CH = %02x\n\r"),*buffer);  
+  printf_P(PSTR("RF_CH = %02x\n\r"),*buffer); 
+
+  read_register(RF_SETUP,buffer,1);
+  printf_P(PSTR("RF_SETUP = %02x\n\r"),*buffer); 
 }
 
 /******************************************************************/
