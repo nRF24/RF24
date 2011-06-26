@@ -81,6 +81,7 @@ role_e role;
 //
 
 uint8_t button_states[num_button_pins];
+uint8_t led_states[num_led_pins];
 
 //
 // Setup 
@@ -165,11 +166,12 @@ void setup(void)
   // Turn LED's ON until we start getting keys
   if ( role == role_led )
   {
-    int i = num_button_pins;
+    int i = num_led_pins;
     while(i--)
     {
       pinMode(button_pins[i],OUTPUT);
-      digitalWrite(button_pins[i],HIGH);
+      led_states[i] = HIGH;
+      digitalWrite(led_pins[i],led_states[i]);
     }
   }
 
@@ -236,10 +238,16 @@ void loop(void)
         // Spew it
         printf("Got buttons\n\r");
 
-	// Set all the LED's according to the buttons
+	// For each button, if the button now on, then toggle the LED
 	int i = num_led_pins;
 	while(i--)
-	  digitalWrite(led_pins[i],button_states[i]);
+	{
+	  if ( button_states[i] )
+	  {
+	    led_states[i] ^= HIGH;
+	    digitalWrite(led_pins[i],led_states[i]);
+	  }
+	}
       }
     }
   }
