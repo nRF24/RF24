@@ -517,7 +517,7 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
   if (child == 0)
     pipe0_reading_address = value;
 
-  if (child < 5)
+  if (child <= 5)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
