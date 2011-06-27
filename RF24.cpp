@@ -208,6 +208,27 @@ void RF24::print_observe_tx(uint8_t value)
 
 /******************************************************************/
 
+void RF24::print_byte_register(prog_char* name, uint8_t reg) 
+{
+  printf_P(PSTR("%S\t = 0x%02x\n\r"),read_register(reg));
+}
+
+/******************************************************************/
+
+void RF24::print_address_register(prog_char* name, uint8_t reg) 
+{
+  uint8_t buffer[5];
+  read_register(reg,buffer,sizeof buffer);
+  printf_P(PSTR("%S\t = 0x"),name);
+ 
+  uint8_t* bufptr = buffer + sizeof buffer;
+  while( bufptr-- > buffer )
+    printf_P(PSTR("%02x"),*bufptr);
+  printf_P(PSTR("\n\r"));
+}
+
+/******************************************************************/
+
 RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
   ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false)
 {
@@ -238,54 +259,22 @@ uint8_t RF24::getPayloadSize(void)
 
 void RF24::printDetails(void) 
 {
-  uint8_t buffer[5];
-  uint8_t status = read_register(RX_ADDR_P0,buffer,5);
-  print_status(status);
-  printf_P(PSTR("RX_ADDR_P0 = 0x"));
-  uint8_t *bufptr = buffer + 5;
-  while( bufptr-- > buffer )
-    printf_P(PSTR("%02x"),*bufptr);
-  printf_P(PSTR("\n\r"));
+  print_status(get_status());
 
-  status = read_register(RX_ADDR_P1,buffer,5);
-  printf_P(PSTR("RX_ADDR_P1 = 0x"));
-  bufptr = buffer + 5;
-  while( bufptr-- > buffer )
-    printf_P(PSTR("%02x"),*bufptr);
-  printf_P(PSTR("\n\r"));
+  print_address_register(PSTR("RX_ADDR_P0"),RX_ADDR_P0);
+  print_address_register(PSTR("RX_ADDR_P1"),RX_ADDR_P1);
+  print_byte_register(PSTR("RX_ADDR_P2"),RX_ADDR_P2);
+  print_byte_register(PSTR("RX_ADDR_P3"),RX_ADDR_P3);
+  print_byte_register(PSTR("RX_ADDR_P4"),RX_ADDR_P4);
+  print_byte_register(PSTR("RX_ADDR_P5"),RX_ADDR_P5);
+  print_address_register(PSTR("TX_ADDR"),TX_ADDR);
 
-  status = read_register(RX_ADDR_P2,buffer,1);
-  printf_P(PSTR("RX_ADDR_P2 = 0x%02x"),*buffer);
-  printf_P(PSTR("\n\r"));
-
-  status = read_register(RX_ADDR_P3,buffer,1);
-  printf_P(PSTR("RX_ADDR_P3 = 0x%02x"),*buffer);
-  printf_P(PSTR("\n\r"));
-
-  status = read_register(TX_ADDR,buffer,5);
-  printf_P(PSTR("TX_ADDR = 0x"));
-  bufptr = buffer + 5;
-  while( bufptr-- > buffer )
-    printf_P(PSTR("%02x"),*bufptr);
-  printf_P(PSTR("\n\r"));
-  
-  status = read_register(RX_PW_P0,buffer,1);
-  printf_P(PSTR("RX_PW_P0 = 0x%02x\n\r"),*buffer);
-
-  status = read_register(RX_PW_P1,buffer,1);
-  printf_P(PSTR("RX_PW_P1 = 0x%02x\n\r"),*buffer);
-
-  read_register(EN_AA,buffer,1);
-  printf_P(PSTR("EN_AA = %02x\n\r"),*buffer);
-
-  read_register(EN_RXADDR,buffer,1);
-  printf_P(PSTR("EN_RXADDR = %02x\n\r"),*buffer);
-
-  read_register(RF_CH,buffer,1);
-  printf_P(PSTR("RF_CH = %02x\n\r"),*buffer); 
-
-  read_register(RF_SETUP,buffer,1);
-  printf_P(PSTR("RF_SETUP = %02x\n\r"),*buffer); 
+  print_byte_register(PSTR("RX_PW_P0"),RX_PW_P0);
+  print_byte_register(PSTR("RX_PW_P1"),RX_PW_P1);
+  print_byte_register(PSTR("EN_AA"),EN_AA);
+  print_byte_register(PSTR("EN_RXADDR"),EN_RXADDR);
+  print_byte_register(PSTR("RF_CH"),RF_CH);
+  print_byte_register(PSTR("RF_SETUP"),RF_SETUP);
 }
 
 /******************************************************************/

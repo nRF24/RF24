@@ -162,6 +162,22 @@ protected:
     void print_observe_tx(uint8_t value) ;
 
     /**
+     * Print the name and value of an 8-bit register to stdout
+     *
+     * @param name Name of the register
+     * @param reg Which register. Use constants from nRF24L01.h
+     */
+    void print_byte_register(prog_char* name, uint8_t reg);
+    
+      /**
+     * Print the name and value of a 40-bit address register to stdout
+     *
+     * @param name Name of the register
+     * @param reg Which register. Use constants from nRF24L01.h
+     */
+    void print_address_register(prog_char* name, uint8_t reg);
+    
+    /**
      * Turn on or off the special features of the chip
      *
      * The chip has certain 'features' which are only available when the 'features'
