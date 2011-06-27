@@ -25,6 +25,7 @@ private:
     uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
     uint8_t csn_pin; /**< SPI Chip select */
     boolean wide_band; /* 2Mbs data rate in use? */
+    boolean p_variant; /* False for RF24L01 and true for RF24L01P */
     uint8_t payload_size; /**< Fixed size of payloads */
     boolean ack_payload_available; /**< Whether there is an ack payload waiting */
     uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. Note: not used. */
@@ -42,6 +43,10 @@ protected:
 
     /**
      * Set chip select pin
+     * Running SPI bus at PI_CLOCK_DIV2 so we don't waist time transferring data
+     * and best of all, we make use of the radio's FIFO buffers. A lower speed
+     * means we're less likely to effectively leverage our FIFOs and pay a higher
+     * AVR runtime cost as toll.
      *
      * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
      */
@@ -417,6 +422,12 @@ public:
     boolean isAckPayloadAvailable(void);
 
     /**
+     * @return Returns true if the hardware is RF24L01P (or compatible) and false
+     * if its not.
+     */
+    boolean isPVariant(void) const ;
+
+    /**
      * Enable or disable auto-acknowlede packets
      *
      * This is enabled by default, so it's only needed if you want to turn
@@ -471,8 +482,12 @@ public:
     void setPALevel( const rf24_pa_dbm_e level ) const ;
 
     /**
-     * Fetches the current PA level. See setPALevel for
-     * return value definitions.
+     * Fetches the current PA level. 
+     *
+     * @return Returns a value from the rf24_pa_dbm_e enum describing
+     * the current PA setting. Please remember, all values represented
+     * by the enum mnemonics are negative dBm. See setPALevel for
+     * return value descriptions.
      */
     rf24_pa_dbm_e getPALevel( void ) const ;
 
@@ -481,7 +496,16 @@ public:
      *
      * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
      */
-    void setDataRate(const rf24_datarate_e speed);
+    boolean setDataRate(const rf24_datarate_e speed);
+
+    /**
+     * Set the transmission data rate
+     *
+     * @return Returns the hardware's currently configured datarate. The value
+     * is one of 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS, as defined in the
+     * rf24_datarate_e enum.
+     */
+    rf24_datarate_e getDataRate( void ) const ;
 
     /**
      * Set the CRC length

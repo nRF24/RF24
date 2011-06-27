@@ -8,8 +8,8 @@
 
 #include <WProgram.h>
 #include <SPI.h>
-#include "RF24.h"
 #include "nRF24L01.h"
+#include "RF24.h"
 
 #undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
@@ -29,7 +29,7 @@
 void RF24::csn(const int mode) const
 {
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV8);
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
   digitalWrite(csn_pin,mode);
 }
 
@@ -210,8 +210,10 @@ void RF24::print_observe_tx(uint8_t value) const
 
 RF24::RF24(const uint8_t _cepin, const uint8_t _cspin,
 	   const rf24_datarate_e speed, const uint8_t channel): 
-    ce_pin(_cepin), csn_pin(_cspin), wide_band(true), payload_size(32), ack_payload_available(false)
+    ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
+    payload_size(32), ack_payload_available(false)
 {
+    begin() ;
     setDataRate( speed ) ;
     setChannel( channel ) ;
 }
@@ -283,13 +285,17 @@ void RF24::printDetails(void) const
   printf_P(PSTR("RX_PW_P1 = 0x%02x\n\r"),*buffer);
 
   read_register(EN_AA,buffer,1);
-  printf_P(PSTR("EN_AA = %02x\n\r"),*buffer);
+  printf_P(PSTR("EN_AA = 0x%02x\n\r"),*buffer);
 
   read_register(EN_RXADDR,buffer,1);
-  printf_P(PSTR("EN_RXADDR = %02x\n\r"),*buffer);
+  printf_P(PSTR("EN_RXADDR = 0x%02x\n\r"),*buffer);
 
   read_register(RF_CH,buffer,1);
-  printf_P(PSTR("RF_CH = %02x\n\r"),*buffer);  
+  printf_P(PSTR("RF_CH = 0x%02x\n\r"),*buffer);  
+
+  read_register(RF_SETUP,buffer,1);
+  printf_P(PSTR("RF_SETUP = 0x%02x (data rate: %d)\n\r"),*buffer,getDataRate());  
+  printf_P(PSTR("Hardware; isPVariant: %d\n\r"),isPVariant());
 }
 
 /******************************************************************/
@@ -307,8 +313,10 @@ void RF24::begin(void)
   SPI.setDataMode(SPI_MODE0);
   SPI.setClockDivider(SPI_CLOCK_DIV8);
 
-  // Set generous timeouts, to make testing a little easier
-  write_register(SETUP_RETR,(B1111 << ARD) | (B1111 << ARC));
+  // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
+  // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
+  // sizes must never be used. See documentation for a more complete explanation.
+  write_register(SETUP_RETR,(B0100 << ARD) | (B1111 << ARC));
 
   // Reset current status
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
@@ -318,7 +326,16 @@ void RF24::begin(void)
 
   // Flush buffers
   flush_rx();
-  flush_tx();    
+  flush_tx();
+
+  // Determine if this is a p or non-p RF24 module and then
+  // reset our data rate back to default value. This works
+  // because a non-P variant won't allow the data rate to
+  // be set to 250KBS.
+  if( setDataRate( RF24_250KBPS ) ) {
+      p_variant = true ;
+  }
+  setDataRate( RF24_2MBPS ) ;
 }
 
 /******************************************************************/
@@ -372,7 +389,7 @@ boolean RF24::write( const void* buf, uint8_t len )
   ce(HIGH);
 
   // IN the end, the send should be blocking.  It comes back in 60ms worst case, or much faster
-  // if I tighted up the retry logic.  (Default settings will be 750us.
+  // if I tighted up the retry logic.  (Default settings will be 1500us.
   // Monitor the send
   uint8_t observe_tx;
   uint8_t status;
@@ -600,6 +617,12 @@ boolean RF24::isAckPayloadAvailable(void)
 
 /******************************************************************/
 
+boolean RF24::isPVariant(void) const {
+    return p_variant ;
+}
+
+/******************************************************************/
+
 void RF24::setAutoAck(const bool enable) const
 {
   if ( enable )
@@ -613,7 +636,7 @@ void RF24::setAutoAck(const bool enable) const
 void RF24::setAutoAck( const uint8_t pipe, const bool enable ) const
 {
     uint8_t en_aa = read_register( EN_AA ) ;
-    en_aa &= ~((enable?0:1)<<pipe) ;
+    en_aa &= ~((enable?0:1)<<pipe) ;// inverted logic here (1=off, 0=on)
     write_register( EN_AA, en_aa ) ;
 }
 
@@ -641,24 +664,23 @@ void RF24::setPALevel(const rf24_pa_dbm_e level) const
   switch( level )
   {
   case RF24_PA_MAX:
-      setup |= RF_PWR_0DB ;
+      setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
       break ;
 
   case RF24_PA_HIGH:
-      setup |= RF_PWR_6DB ;
+      setup |= _BV(RF_PWR_HIGH) ;
       break ;
 
   case RF24_PA_LOW:
-      setup |= RF_PWR_12DB ;
+      setup |= _BV(RF_PWR_LOW) ;
       break ;
 
   case RF24_PA_MIN:
-      setup |= RF_PWR_18DB ;
       break ;
 
   case RF24_PA_ERROR:
       // On error, go to maximum PA
-      setup |= RF_PWR_0DB ;
+      setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
       break ;
   }
 
@@ -670,23 +692,23 @@ void RF24::setPALevel(const rf24_pa_dbm_e level) const
 rf24_pa_dbm_e RF24::getPALevel(void) const
 {
   rf24_pa_dbm_e result = RF24_PA_ERROR ;
-  uint8_t power = read_register(RF_SETUP) & RF_PWR ;
+  uint8_t power = read_register(RF_SETUP) & (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
 
   switch( power )
   {
-  case RF_PWR_0DB:
+  case (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)):
       result = RF24_PA_MAX ;
       break ;
 
-  case RF_PWR_6DB:
+  case _BV(RF_PWR_HIGH):
       result = RF24_PA_HIGH ;
       break ;
 
-  case RF_PWR_12DB:
+  case _BV(RF_PWR_LOW):
       result = RF24_PA_LOW ;
       break ;
 
-  case RF_PWR_18DB:
+  default:
       result = RF24_PA_MIN ;
       break ;
   }
@@ -696,7 +718,7 @@ rf24_pa_dbm_e RF24::getPALevel(void) const
 
 /******************************************************************/
 
-void RF24::setDataRate(const rf24_datarate_e speed)
+boolean RF24::setDataRate(const rf24_datarate_e speed)
 {
   uint8_t setup = read_register(RF_SETUP) ;
 
@@ -707,6 +729,7 @@ void RF24::setDataRate(const rf24_datarate_e speed)
   {
       // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
       // Making it '10'.
+      wide_band = false ;
       setup |= _BV( RF_DR_LOW ) ;
   }
   else
@@ -715,13 +738,50 @@ void RF24::setDataRate(const rf24_datarate_e speed)
       // Making it '01'
       if ( speed == RF24_2MBPS )
       {
-	  wide_band = true ;
-	  setup |= _BV(RF_DR_HIGH);
+  	  wide_band = true ;
+  	  setup |= _BV(RF_DR_HIGH);
+      } else {
+	  // 1Mbs
+	  wide_band = false ;
       }
+  }
+  write_register(RF_SETUP,setup);
 
+  // Verify our result
+  setup = read_register(RF_SETUP) ;
+  if( setup == setup ) {
+      return true ;
   }
 
-  write_register(RF_SETUP,setup);
+  wide_band = false ;
+  return false ;
+}
+
+/******************************************************************/
+
+rf24_datarate_e RF24::getDataRate( void ) const {
+  rf24_datarate_e result ;
+  uint8_t setup = read_register(RF_SETUP) ;
+
+  // Order matters in our case below
+  switch( setup & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ) {
+  case _BV(RF_DR_LOW):
+      // '10' = 250KBPS
+      result = RF24_250KBPS ;
+      break ;
+
+  case _BV(RF_DR_HIGH):
+      // '01' = 2MBPS
+      result = RF24_2MBPS ;
+      break ;
+
+  default:
+      // '00' = 1MBPS
+      result = RF24_1MBPS ;
+      break ;
+  }
+
+  return result ;
 }
 
 /******************************************************************/
