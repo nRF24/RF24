@@ -108,7 +108,7 @@ void setup(void)
   // Print preamble
   //
   
-  Serial.begin(9600);
+  Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/led_remote/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
