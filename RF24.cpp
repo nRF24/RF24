@@ -631,5 +631,12 @@ void RF24::setCRCLength(rf24_crclength_e length)
   write_register(CONFIG,config);
 }
 
+/******************************************************************/
+
+void RF24::setRetries(uint8_t delay, uint8_t count)
+{
+  write_register(SETUP_RETR,(delay&0xf)<<ARD | (count&0xf)<<ARC);
+}
+
 // vim:ai:cin:sts=2 sw=2 ft=cpp
 

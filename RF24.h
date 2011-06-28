@@ -333,6 +333,15 @@ public:
     /**@{*/
 
     /**
+     * Set the number and delay of retries upon failed submit
+     *
+     * @param delay How long to wait between each retry, in multiples of 250us,
+     * max is 15.  0 means 250us, 15 means 4000us.
+     * @param count How many retries before giving up, max 15
+     */
+    void setRetries(uint8_t delay, uint8_t count);
+
+    /**
      * Set RF communication channel
      *
      * @param channel Which RF channel to communicate on, 0-127

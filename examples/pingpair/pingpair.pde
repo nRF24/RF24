@@ -90,6 +90,12 @@ void setup(void)
   
   radio.begin();
 
+  // optionally, increase the delay between retries & # of retries
+  radio.setRetries(15,15); 
+
+  // optionally, use a high channel to avoid WiFi chatter
+  radio.setChannel(110);
+
   //
   // Open pipes to other nodes for communication
   //
@@ -201,4 +207,4 @@ void loop(void)
     }
   }
 }
-// vim:ci sts=2 sw=2 ft=cpp
+// vim:cin:ai:sts=2 sw=2 ft=cpp
