@@ -185,7 +185,7 @@ uint8_t RF24::get_status(void)
 
 void RF24::print_status(uint8_t status)
 {
-  printf_P(PSTR("STATUS=%02x: RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\n\r"),
+  printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\n\r"),
   status,
   (status & _BV(RX_DR))?1:0,
   (status & _BV(TX_DS))?1:0,
@@ -208,25 +208,33 @@ void RF24::print_observe_tx(uint8_t value)
 
 /******************************************************************/
 
-void RF24::print_byte_register(prog_char* name, uint8_t reg) 
+void RF24::print_byte_register(prog_char* name, uint8_t reg, uint8_t qty) 
 {
   char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-  printf_P(PSTR("%S\t%c = 0x%02x\n\r"),name,extra_tab,read_register(reg));
+  printf_P(PSTR("%S\t%c ="),name,extra_tab);
+  while (qty--)
+    printf_P(PSTR(" 0x%02x"),read_register(reg++));
+  printf_P(PSTR("\n\r"));
 }
 
 /******************************************************************/
 
-void RF24::print_address_register(prog_char* name, uint8_t reg) 
+void RF24::print_address_register(prog_char* name, uint8_t reg, uint8_t qty) 
 {
-  uint8_t buffer[5];
-  read_register(reg,buffer,sizeof buffer);
-
   char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-  printf_P(PSTR("%S\t%c = 0x"),name,extra_tab);
+  printf_P(PSTR("%S\t%c ="),name,extra_tab);
  
-  uint8_t* bufptr = buffer + sizeof buffer;
-  while( bufptr-- > buffer )
+  while (qty--)
+  {
+    uint8_t buffer[5];
+    read_register(reg++,buffer,sizeof buffer);
+
+    printf_P(PSTR(" 0x"));
+    uint8_t* bufptr = buffer + sizeof buffer;
+    while( --bufptr >= buffer )
     printf_P(PSTR("%02x"),*bufptr);
+  }
+
   printf_P(PSTR("\n\r"));
 }
 
@@ -264,16 +272,11 @@ void RF24::printDetails(void)
 {
   print_status(get_status());
 
-  print_address_register(PSTR("RX_ADDR_P0"),RX_ADDR_P0);
-  print_address_register(PSTR("RX_ADDR_P1"),RX_ADDR_P1);
-  print_byte_register(PSTR("RX_ADDR_P2"),RX_ADDR_P2);
-  print_byte_register(PSTR("RX_ADDR_P3"),RX_ADDR_P3);
-  print_byte_register(PSTR("RX_ADDR_P4"),RX_ADDR_P4);
-  print_byte_register(PSTR("RX_ADDR_P5"),RX_ADDR_P5);
+  print_address_register(PSTR("RX_ADDR_P0-1"),RX_ADDR_P0,2);
+  print_byte_register(PSTR("RX_ADDR_P2-5"),RX_ADDR_P2,4);
   print_address_register(PSTR("TX_ADDR"),TX_ADDR);
 
-  print_byte_register(PSTR("RX_PW_P0"),RX_PW_P0);
-  print_byte_register(PSTR("RX_PW_P1"),RX_PW_P1);
+  print_byte_register(PSTR("RX_PW_P0-6"),RX_PW_P0,6);
   print_byte_register(PSTR("EN_AA"),EN_AA);
   print_byte_register(PSTR("EN_RXADDR"),EN_RXADDR);
   print_byte_register(PSTR("RF_CH"),RF_CH);

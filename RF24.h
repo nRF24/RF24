@@ -164,18 +164,28 @@ protected:
     /**
      * Print the name and value of an 8-bit register to stdout
      *
-     * @param name Name of the register
-     * @param reg Which register. Use constants from nRF24L01.h
-     */
-    void print_byte_register(prog_char* name, uint8_t reg);
-    
-      /**
-     * Print the name and value of a 40-bit address register to stdout
+     * Optionally it can print some quantity of successive
+     * registers on the same line.  This is useful for printing a group
+     * of related registers on one line.
      *
      * @param name Name of the register
      * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
      */
-    void print_address_register(prog_char* name, uint8_t reg);
+    void print_byte_register(prog_char* name, uint8_t reg, uint8_t qty = 1);
+    
+    /**
+     * Print the name and value of a 40-bit address register to stdout
+     *
+     * Optionally it can print some quantity of successive
+     * registers on the same line.  This is useful for printing a group
+     * of related registers on one line.
+     *
+     * @param name Name of the register
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
+     */
+    void print_address_register(prog_char* name, uint8_t reg, uint8_t qty = 1);
     
     /**
      * Turn on or off the special features of the chip
