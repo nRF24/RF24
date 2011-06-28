@@ -614,7 +614,7 @@ boolean RF24::testCarrier(void)
 
 void RF24::setDataRate(rf24_datarate_e speed)
 {
-  uint8_t setup = read_register(RF_SETUP) & RF_DR;
+  uint8_t setup = read_register(RF_SETUP) & _BV(RF_DR);
   if (speed == RF24_2MBPS)
     setup |= _BV(RF_DR);
   write_register(RF_SETUP,setup);
