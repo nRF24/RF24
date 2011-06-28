@@ -523,12 +523,10 @@ void RF24::openReadingPipe(uint8_t child, uint64_t value)
     
     write_register(child_payload_size[child],payload_size);  
 
-    // Note this is kind of an inefficient way to set up these enable bits, bit I thought it made
-    // the calling code more simple
-    uint8_t en_rx;
-    read_register(EN_RXADDR,&en_rx,1);
-    en_rx |= _BV(child_pipe_enable[child]);
-    write_register(EN_RXADDR,en_rx);
+    // Note it would be more efficient to set all of the bits for all open
+    // pipes at once.  However, I thought it would make the calling code
+    // more simple to do it this way.
+    write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(child_pipe_enable[child]));
   }
 }
 
