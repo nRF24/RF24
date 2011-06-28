@@ -519,16 +519,6 @@ public:
  */
 
 /**
- * @example starping_relay.pde
- *
- * This sketch is a very complex example of using the RF24 library for Arduino.
- * Deploy this on any number of nodes to create a basic mesh network.  I have
- * tested this on 6 nodes, but it should work on many more.  'Leaf' nodes attempt
- * to send a ping every 2 seconds to the 'Base' node.  Optional 'Relay' nodes
- * will relay these transmissions.
- */
-
-/**
  * @example scanner.pde
  *
  * Example to detect interference on the various channels available.
