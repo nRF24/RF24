@@ -210,7 +210,8 @@ void RF24::print_observe_tx(uint8_t value)
 
 void RF24::print_byte_register(prog_char* name, uint8_t reg) 
 {
-  printf_P(PSTR("%S\t = 0x%02x\n\r"),read_register(reg));
+  char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
+  printf_P(PSTR("%S\t%c = 0x%02x\n\r"),name,extra_tab,read_register(reg));
 }
 
 /******************************************************************/
@@ -219,7 +220,9 @@ void RF24::print_address_register(prog_char* name, uint8_t reg)
 {
   uint8_t buffer[5];
   read_register(reg,buffer,sizeof buffer);
-  printf_P(PSTR("%S\t = 0x"),name);
+
+  char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
+  printf_P(PSTR("%S\t%c = 0x"),name,extra_tab);
  
   uint8_t* bufptr = buffer + sizeof buffer;
   while( bufptr-- > buffer )
