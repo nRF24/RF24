@@ -252,6 +252,9 @@ public:
      * getPayloadSize().  However, you can write less, and the remainder
      * will just be filled with zeroes.
      *
+     * @todo Write a non-blocking write to support users who want to 
+     * check on progress separately or use an interrupt.
+     *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @return True if the payload was delivered successfully false if not
@@ -304,18 +307,21 @@ public:
     /**
      * Open a pipe for reading
      *
-     * Up to 5 pipes can be open for reading at once.  Open all the
+     * Up to 6 pipes can be open for reading at once.  Open all the
      * reading pipes, and then call startListening().
      *
      * @see openWritingPipe
      *
      * @warning Pipes 1-5 should share the first 32 bits.
      * Only the least significant byte should be unique, e.g.
-     *
      * @code
      *   openReadingPipe(1,0xF0F0F0F0AA);
      *   openReadingPipe(2,0xF0F0F0F066);
      * @endcode
+     *
+     * @warning Pipe 0 is also used by the writing pipe.  So if you open
+     * pipe 0 for reading, and then startListening(), it will overwrite the
+     * writing pipe.  Ergo, do an openWritingPipe() again before write().
      *
      * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
      *

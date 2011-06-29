@@ -1,7 +1,5 @@
 # Arduino driver for nRF24L01 2.4GHz Wireless Transceiver
 
-CLEANUPS BRANCH: Bits and pieces of cleanup that I haven't tested on the radios yet.
-
 Design Goals: This library is designed to be...
 
 * Maximally compliant with the intended operation of the chip
