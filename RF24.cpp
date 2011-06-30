@@ -387,12 +387,28 @@ boolean RF24::write( const void* buf, uint8_t len )
   }
   while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( millis() - sent_at < timeout ) );
 
+  // The part above is what you could recreate with your own interrupt handler,
+  // and then call this when you got an interrupt
+  // ------------
+
+  // Read the status
+  status = get_status();
+
+  // Reset the status
+  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+
+  // The status tells us three things
+  // * The send was successful (TX_DS)
+  // * The send failed, too many retries (MAX_RT)
+  // * There is an ack packet waiting (RX_DR)
+
   // What was the result of the send?
   if ( status & _BV(TX_DS) )
     result = true;
   
   IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"); if ( status & _BV(MAX_RT) ) Serial.print(" too many retries"));
 
+  // Handle the ack packet
   ack_payload_available = ( status & _BV(RX_DR) );
   if ( ack_payload_available )
   {
@@ -405,12 +421,9 @@ boolean RF24::write( const void* buf, uint8_t len )
   // Yay, we are done.
 
   // Power down
-  write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
+  powerDown();
 
-  // Reset current status
-  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
-
-  // Flush buffers
+  // Flush buffers (Is this a relic of past experimentation, and not needed anymore??)
   flush_tx();  
 
   return result;
