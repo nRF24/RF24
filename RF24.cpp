@@ -13,7 +13,7 @@
 
 #undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) (x)
+#define IF_SERIAL_DEBUG(x) ({x;})
 #else
 #define IF_SERIAL_DEBUG(x)
 #endif
@@ -365,31 +365,34 @@ boolean RF24::write( const void* buf, uint8_t len )
 
   // Allons!
   ce(HIGH);
+  delayMicroseconds(15);
+  ce(LOW);
 
-  // IN the end, the send should be blocking.  It comes back in 60ms worst case, or much faster
-  // if I tighted up the retry logic.  (Default settings will be 750us.
-  // Monitor the send
+  // ------------
+  // At this point we could return from a non-blocking write, and then call
+  // the rest after an interrupt
+
+  // Instead, we are going to block here until we get TX_DS (transmission completed and ack'd)
+  // or MAX_RT (maximum retries, transmission failed).  Also, we'll timeout in case the radio
+  // is flaky and we get neither.
+
   uint8_t observe_tx;
   uint8_t status;
-  uint8_t retries = 255;
+  uint32_t sent_at = millis();
+  const uint32_t timeout = 100; //ms to wait for timeout  
   do
   {
     status = read_register(OBSERVE_TX,&observe_tx,1);
-    IF_SERIAL_DEBUG(Serial.print(status,HEX));
     IF_SERIAL_DEBUG(Serial.print(observe_tx,HEX));
-    if ( ! retries-- )
-    {
-      IF_SERIAL_DEBUG(printf("ABORTED: too many retries\n\r"));
-      break;
-    }
   }
-  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) );
+  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( millis() - sent_at < timeout ) );
 
+  // What was the result of the send?
   if ( status & _BV(TX_DS) )
     result = true;
   
-  IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
-  
+  IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"); if ( status & _BV(MAX_RT) ) Serial.print(" too many retries"));
+
   ack_payload_available = ( status & _BV(RX_DR) );
   if ( ack_payload_available )
   {
@@ -400,7 +403,6 @@ boolean RF24::write( const void* buf, uint8_t len )
   }
 
   // Yay, we are done.
-  ce(LOW);
 
   // Power down
   write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
@@ -440,7 +442,9 @@ boolean RF24::available(void)
 boolean RF24::available(uint8_t* pipe_num) 
 {
   uint8_t status = get_status();
-  IF_SERIAL_DEBUG(print_status(status));
+
+  // Too noisy, enable if you really want lots o data!! IF_SERIAL_DEBUG(print_status(status));
+  
   boolean result = ( status & _BV(RX_DR) );
 
   if (result)

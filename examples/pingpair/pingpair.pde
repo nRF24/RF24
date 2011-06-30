@@ -96,6 +96,9 @@ void setup(void)
   // optionally, use a high channel to avoid WiFi chatter
   radio.setChannel(110);
 
+  // optionally, increase the CRC length for improved reliability
+  radio.setCRCLength(RF24_CRC_16);
+
   //
   // Open pipes to other nodes for communication
   //
