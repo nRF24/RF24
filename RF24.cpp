@@ -391,28 +391,20 @@ boolean RF24::write( const void* buf, uint8_t len )
   // and then call this when you got an interrupt
   // ------------
 
-  // Read the status
-  status = get_status();
-
-  // Reset the status
-  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
-
+  // Call this when you get an interrupt
   // The status tells us three things
   // * The send was successful (TX_DS)
   // * The send failed, too many retries (MAX_RT)
   // * There is an ack packet waiting (RX_DR)
+  bool tx_ok, tx_fail, ack_payload_available;
+  whatHappened(tx_ok,tx_fail,ack_payload_available);
 
-  // What was the result of the send?
-  if ( status & _BV(TX_DS) )
-    result = true;
-  
-  IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"); if ( status & _BV(MAX_RT) ) Serial.print(" too many retries"));
+  result = tx_ok;
+  IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
 
   // Handle the ack packet
-  ack_payload_available = ( status & _BV(RX_DR) );
   if ( ack_payload_available )
   {
-    write_register(STATUS,_BV(RX_DR) );
     ack_payload_length = read_payload_length();
     IF_SERIAL_DEBUG(Serial.print("[AckPacket]/"));
     IF_SERIAL_DEBUG(Serial.println(ack_payload_length,DEC));
@@ -499,6 +491,22 @@ boolean RF24::read( void* buf, uint8_t len )
     result = true;
 
   return result;
+}
+
+/******************************************************************/
+
+void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
+{
+  // Read the status
+  uint8_t status = get_status();
+
+  // Reset the status
+  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+
+  // Report to the user what happened
+  tx_ok = status & _BV(TX_DS);
+  tx_fail = status & _BV(MAX_RT);
+  rx_ready = status & _BV(RX_DR);
 }
 
 /******************************************************************/

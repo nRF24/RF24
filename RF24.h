@@ -445,6 +445,18 @@ public:
     boolean isAckPayloadAvailable(void);
 
     /**
+     * Call this when you get an interrupt to find out why
+     *
+     * Tells you what caused the interrupt, and clears the state of
+     * interrupts.
+     *
+     * @param[out] tx_ok The send was successful (TX_DS)
+     * @param[out] tx_fail The send failed, too many retries (MAX_RT)
+     * @param[out] rx_ready There is a message waiting to be read (RX_DS) 
+     */
+    void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx);
+
+    /**
      * Enable or disable auto-acknowlede packets
      *
      * This is enabled by default, so it's only needed if you want to turn
