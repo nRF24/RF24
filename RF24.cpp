@@ -356,17 +356,8 @@ boolean RF24::write( const void* buf, uint8_t len )
 {
   boolean result = false;
 
-  // Transmitter power-up
-  write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
-  delay(2);
-
-  // Send the payload
-  write_payload( buf, len );
-
-  // Allons!
-  ce(HIGH);
-  delayMicroseconds(15);
-  ce(LOW);
+  // Begin the write
+  startWrite(buf,len);
 
   // ------------
   // At this point we could return from a non-blocking write, and then call
@@ -379,7 +370,7 @@ boolean RF24::write( const void* buf, uint8_t len )
   uint8_t observe_tx;
   uint8_t status;
   uint32_t sent_at = millis();
-  const uint32_t timeout = 100; //ms to wait for timeout  
+  const uint32_t timeout = 500; //ms to wait for timeout  
   do
   {
     status = read_register(OBSERVE_TX,&observe_tx,1);
@@ -419,6 +410,22 @@ boolean RF24::write( const void* buf, uint8_t len )
   flush_tx();  
 
   return result;
+}
+/******************************************************************/
+
+void RF24::startWrite( const void* buf, uint8_t len )
+{
+  // Transmitter power-up
+  write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
+  delay(2);
+
+  // Send the payload
+  write_payload( buf, len );
+
+  // Allons!
+  ce(HIGH);
+  delayMicroseconds(15);
+  ce(LOW);
 }
 
 /******************************************************************/
@@ -507,6 +514,8 @@ void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
   tx_ok = status & _BV(TX_DS);
   tx_fail = status & _BV(MAX_RT);
   rx_ready = status & _BV(RX_DR);
+
+  //print_status(status);
 }
 
 /******************************************************************/

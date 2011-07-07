@@ -7,12 +7,10 @@
  */
 
 /**
- * Example of using Ack Payloads
+ * Example of using interrupts
  *
- * This is an example of how to do two-way communication without changing 
- * transmit/receive modes.  Here, a payload is set to the transmitter within 
- * the Ack packet of each transmission.  Note that the payload is set BEFORE
- * the sender's message arrives.
+ * This is an example of how to user interrupts to interact with the radio.
+ * It builds on the pingpair_pl example, and uses ack payloads.
  */
  
 #include <SPI.h>
@@ -58,6 +56,13 @@ const char* role_friendly_name[] = { "invalid", "Sender", "Receiver"};
 // The role of the current running sketch
 role_e role;
 
+// Message buffer to allow interrupt handler to print messages
+bool message_ready;
+char message[100];
+
+// Interrupt handler, check the radio because we got an IRQ
+void check_radio(void);
+
 void setup(void)
 {
   //
@@ -81,8 +86,14 @@ void setup(void)
   
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/pingpair_pl/\n\r");
+  printf("\n\rRF24/examples/pingpair_irq/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
+
+  //
+  // Attach interrupt handler to interrupt #0 (using pin 2)
+  //
+
+  attachInterrupt(0, check_radio, FALLING);
 
   //
   // Setup and configure rf radio
@@ -92,6 +103,9 @@ void setup(void)
   
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
+
+  // Pick a high channel
+  radio.setChannel(110);
 
   //
   // Open pipes to other nodes for communication
@@ -123,9 +137,10 @@ void setup(void)
   radio.printDetails();
 }
 
+static uint32_t message_count = 0;
+
 void loop(void)
 {
-  static uint32_t message_count = 0;
   
   //
   // Sender role.  Repeatedly send the current time
@@ -133,17 +148,10 @@ void loop(void)
   
   if (role == role_sender)
   {
-    // Take the time, and send it.  This will block until complete
+    // Take the time, and send it.
     unsigned long time = millis();
     printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );
-
-    if ( radio.isAckPayloadAvailable() )
-    {
-      radio.read(&message_count,sizeof(message_count));
-      printf("Ack: [%lu] ",message_count);
-    } 
-    printf("OK\n\r");
+    radio.startWrite( &time, sizeof(unsigned long) );
     
     // Try again soon 
     delay(2000);
@@ -176,5 +184,47 @@ void loop(void)
       ++message_count;
     }
   }
+
+  //
+  // Message handler.  Display messages from the interrupt
+  //
+  if ( message_ready )
+  {
+    message_ready = false;
+    Serial.println(message);
+  }
 }
+
+void check_radio(void)
+{
+  // What happened?
+  bool tx,fail,rx;
+  radio.whatHappened(tx,fail,rx);
+ 
+  char *messageptr = message;
+  message_ready = true;
+  sprintf(message,"Unknown");
+  
+  if ( tx )
+  {
+    radio.powerDown();
+    sprintf(messageptr,"Send:OK ");
+    messageptr += strlen(messageptr);
+  }
+
+  if ( fail )
+  {
+    radio.powerDown();
+    sprintf(messageptr,"Send:Failed ");
+    messageptr += strlen(messageptr);
+  }
+
+  if ( rx )
+  {
+    radio.read(&message_count,sizeof(message_count));
+    sprintf(messageptr,"Ack:%lu ",message_count);
+    messageptr += strlen(messageptr);
+  }
+}
+
 // vim:ai:cin:sts=2 sw=2 ft=cpp

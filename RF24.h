@@ -252,9 +252,6 @@ public:
      * getPayloadSize().  However, you can write less, and the remainder
      * will just be filled with zeroes.
      *
-     * @todo Write a non-blocking write to support users who want to 
-     * check on progress separately or use an interrupt.
-     *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @return True if the payload was delivered successfully false if not
@@ -402,6 +399,21 @@ public:
      * @return True if there is a payload available, false if none is
      */
     boolean available(uint8_t* pipe_num);
+
+    /**
+     * Non-blocking write to the open writing pipe
+     *
+     * Just like write(), but it returns immediately. To find out what happened
+     * to the send, catch the IRQ and then call whatHappened().
+     *
+     * @see write()
+     * @see whatHappened()
+     *
+     * @param buf Pointer to the data to be sent
+     * @param len Number of bytes to be sent
+     * @return True if the payload was delivered successfully false if not
+     */
+    void startWrite( const void* buf, uint8_t len );
 
     /**
      * Enable custom payloads on the acknowledge packets
