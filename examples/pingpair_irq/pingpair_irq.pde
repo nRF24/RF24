@@ -56,10 +56,6 @@ const char* role_friendly_name[] = { "invalid", "Sender", "Receiver"};
 // The role of the current running sketch
 role_e role;
 
-// Message buffer to allow interrupt handler to print messages
-bool message_ready;
-char message[100];
-
 // Interrupt handler, check the radio because we got an IRQ
 void check_radio(void);
 
@@ -150,7 +146,7 @@ void loop(void)
   {
     // Take the time, and send it.
     unsigned long time = millis();
-    printf("Now sending %lu...",time);
+    printf("Now sending %lu\n\r",time);
     radio.startWrite( &time, sizeof(unsigned long) );
     
     // Try again soon 
@@ -185,14 +181,6 @@ void loop(void)
     }
   }
 
-  //
-  // Message handler.  Display messages from the interrupt
-  //
-  if ( message_ready )
-  {
-    message_ready = false;
-    Serial.println(message);
-  }
 }
 
 void check_radio(void)
@@ -201,29 +189,22 @@ void check_radio(void)
   bool tx,fail,rx;
   radio.whatHappened(tx,fail,rx);
  
-  char *messageptr = message;
-  message_ready = true;
-  sprintf(message,"Unknown");
-  
   if ( tx )
   {
     radio.powerDown();
-    sprintf(messageptr,"Send:OK ");
-    messageptr += strlen(messageptr);
+    printf("Send:OK\n\r");
   }
 
   if ( fail )
   {
     radio.powerDown();
-    sprintf(messageptr,"Send:Failed ");
-    messageptr += strlen(messageptr);
+    printf("Send:Failed\n\r");
   }
 
   if ( rx )
   {
     radio.read(&message_count,sizeof(message_count));
-    sprintf(messageptr,"Ack:%lu ",message_count);
-    messageptr += strlen(messageptr);
+    printf("Ack:%lu\n\r",message_count);
   }
 }
 
