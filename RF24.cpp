@@ -504,18 +504,13 @@ boolean RF24::read( void* buf, uint8_t len )
 
 void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
 {
-  // Read the status
-  uint8_t status = get_status();
-
-  // Reset the status
-  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+  // Read the status & reset the status in one easy call 
+  uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Report to the user what happened
   tx_ok = status & _BV(TX_DS);
   tx_fail = status & _BV(MAX_RT);
   rx_ready = status & _BV(RX_DR);
-
-  //print_status(status);
 }
 
 /******************************************************************/
