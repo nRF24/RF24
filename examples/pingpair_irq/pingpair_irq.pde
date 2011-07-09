@@ -86,12 +86,6 @@ void setup(void)
   printf("ROLE: %s\n\r",role_friendly_name[role]);
 
   //
-  // Attach interrupt handler to interrupt #0 (using pin 2)
-  //
-
-  attachInterrupt(0, check_radio, FALLING);
-
-  //
   // Setup and configure rf radio
   //
   
@@ -100,14 +94,17 @@ void setup(void)
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
 
-  // Pick a high channel
+  // Optional: Increase CRC length for improved reliability
+  radio.setCRCLength(RF24_CRC_16);
+
+  // Optional: Pick a high channel
   radio.setChannel(110);
 
   //
   // Open pipes to other nodes for communication
   //
   
-  // This simple sketch opens a single pipes for these two nodes to communicate
+  // This simple sketch opens a single pipe for these two nodes to communicate
   // back and forth.  One listens on it, the other talks to it.
   
   if ( role == role_sender )
@@ -131,13 +128,19 @@ void setup(void)
   //
   
   radio.printDetails();
+  
+  //
+  // Attach interrupt handler to interrupt #0 (using pin 2)
+  // on BOTH the sender and receiver
+  //
+
+  attachInterrupt(0, check_radio, FALLING);
 }
 
 static uint32_t message_count = 0;
 
 void loop(void)
 {
-  
   //
   // Sender role.  Repeatedly send the current time
   //
@@ -152,34 +155,10 @@ void loop(void)
     // Try again soon 
     delay(2000);
   }
-  
+
   //
-  // Receiver role.  Receive each packet, dump it out, add ack payload for next time
+  // Receiver role: Does nothing!  All the work is in IRQ
   //
-  
-  if ( role == role_receiver )
-  {
-    // if there is data ready
-    if ( radio.available() )
-    {
-      // Dump the payloads until we've gotten everything
-      static unsigned long got_time;
-      boolean done = false;
-      while (!done)
-      {
-        // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
-  
-        // Spew it
-        printf("Got payload %lu\n",got_time);
-      }
-      
-      // Add an ack packet for the next time around.  This is a simple
-      // packet counter
-      radio.writeAckPayload( 1, &message_count, sizeof(message_count) );
-      ++message_count;
-    }
-  }
 
 }
 
@@ -188,23 +167,55 @@ void check_radio(void)
   // What happened?
   bool tx,fail,rx;
   radio.whatHappened(tx,fail,rx);
- 
+
+  // Have we successfully transmitted?
   if ( tx )
   {
-    radio.powerDown();
-    printf("Send:OK\n\r");
+    if ( role == role_sender )
+      printf("Send:OK\n\r");
+
+    if ( role == role_receiver )
+      printf("Ack Payload:Sent\n\r");
   }
 
+  // Have we failed to transmit?
   if ( fail )
   {
-    radio.powerDown();
-    printf("Send:Failed\n\r");
+    if ( role == role_sender )
+      printf("Send:Failed\n\r");
+
+    if ( role == role_receiver )
+      printf("Ack Payload:Failed\n\r");
   }
 
+  // Transmitter can power down for now, because
+  // the transmission is done.
+  if ( ( tx || fail ) && ( role == role_sender ) )
+    radio.powerDown();
+
+  // Did we receive a message?
   if ( rx )
   {
-    radio.read(&message_count,sizeof(message_count));
-    printf("Ack:%lu\n\r",message_count);
+    // If we're the sender, we've received an ack payload
+    if ( role == role_sender )
+    {
+      radio.read(&message_count,sizeof(message_count));
+      printf("Ack:%lu\n\r",message_count);
+    }
+
+    // If we're the receiver, we've received a time message
+    if ( role == role_receiver )
+    {
+      // Get this payload and dump it 
+      static unsigned long got_time;
+      radio.read( &got_time, sizeof(got_time) );
+      printf("Got payload %lu\n\r",got_time);
+
+      // Add an ack packet for the next time around.  This is a simple
+      // packet counter
+      radio.writeAckPayload( 1, &message_count, sizeof(message_count) );
+      ++message_count;
+    }
   }
 }
 
