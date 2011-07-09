@@ -466,7 +466,7 @@ public:
      * @param[out] tx_fail The send failed, too many retries (MAX_RT)
      * @param[out] rx_ready There is a message waiting to be read (RX_DS) 
      */
-    void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx);
+    void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready);
 
     /**
      * Enable or disable auto-acknowlede packets
@@ -546,6 +546,13 @@ public:
  * transmit/receive modes.  Here, a payload is set to the transmitter within
  * the Ack packet of each transmission.  Note that the payload is set BEFORE
  * the sender's message arrives.
+ */
+
+/**
+ * @example pingpair_irq.pde
+ *
+ * This is an example of how to user interrupts to interact with the radio.
+ * It builds on the pingpair_pl example, and uses ack payloads.
  */
 
 /**
