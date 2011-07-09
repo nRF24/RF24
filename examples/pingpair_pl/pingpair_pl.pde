@@ -1,6 +1,6 @@
 /*
  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -9,12 +9,12 @@
 /**
  * Example of using Ack Payloads
  *
- * This is an example of how to do two-way communication without changing 
- * transmit/receive modes.  Here, a payload is set to the transmitter within 
+ * This is an example of how to do two-way communication without changing
+ * transmit/receive modes.  Here, a payload is set to the transmitter within
  * the Ack packet of each transmission.  Note that the payload is set BEFORE
  * the sender's message arrives.
  */
- 
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -29,7 +29,7 @@
 RF24 radio(8,9);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
-// Leave open to be the 'ping' transmitter 
+// Leave open to be the 'ping' transmitter
 const short role_pin = 7;
 
 //
@@ -63,12 +63,12 @@ void setup(void)
   //
   // Role
   //
-  
+
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
   delay(20); // Just to get a solid reading on the role pin
-  
+
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
     role = role_sender;
@@ -78,7 +78,7 @@ void setup(void)
   //
   // Print preamble
   //
-  
+
   Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/pingpair_pl/\n\r");
@@ -87,19 +87,19 @@ void setup(void)
   //
   // Setup and configure rf radio
   //
-  
+
   radio.begin();
-  
+
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
 
   //
   // Open pipes to other nodes for communication
   //
-  
+
   // This simple sketch opens a single pipes for these two nodes to communicate
   // back and forth.  One listens on it, the other talks to it.
-  
+
   if ( role == role_sender )
   {
     radio.openWritingPipe(pipe);
@@ -112,25 +112,25 @@ void setup(void)
   //
   // Start listening
   //
-  
+
   if ( role == role_receiver )
     radio.startListening();
 
   //
   // Dump the configuration of the rf unit for debugging
   //
-  
+
   radio.printDetails();
 }
 
 void loop(void)
 {
   static uint32_t message_count = 0;
-  
+
   //
   // Sender role.  Repeatedly send the current time
   //
-  
+
   if (role == role_sender)
   {
     // Take the time, and send it.  This will block until complete
@@ -142,17 +142,17 @@ void loop(void)
     {
       radio.read(&message_count,sizeof(message_count));
       printf("Ack: [%lu] ",message_count);
-    } 
+    }
     printf("OK\n\r");
-    
-    // Try again soon 
+
+    // Try again soon
     delay(2000);
   }
-  
+
   //
   // Receiver role.  Receive each packet, dump it out, add ack payload for next time
   //
-  
+
   if ( role == role_receiver )
   {
     // if there is data ready
@@ -165,11 +165,11 @@ void loop(void)
       {
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &got_time, sizeof(unsigned long) );
-  
+
         // Spew it
         printf("Got payload %lu\n",got_time);
       }
-      
+
       // Add an ack packet for the next time around.  This is a simple
       // packet counter
       radio.writeAckPayload( 1, &message_count, sizeof(message_count) );

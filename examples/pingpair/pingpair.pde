@@ -1,6 +1,6 @@
 /*
  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -14,7 +14,7 @@
  * which responds by sending the value back.  The ping node can then see how long the whole cycle
  * took.
  */
- 
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -29,7 +29,7 @@
 RF24 radio(8,9);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
-// Leave open to be the 'ping' transmitter 
+// Leave open to be the 'ping' transmitter
 const int role_pin = 7;
 
 //
@@ -63,12 +63,12 @@ void setup(void)
   //
   // Role
   //
-  
+
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
   delay(20); // Just to get a solid reading on the role pin
-  
+
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
     role = role_ping_out;
@@ -78,7 +78,7 @@ void setup(void)
   //
   // Print preamble
   //
-  
+
   Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/pingpair/\n\r");
@@ -87,11 +87,11 @@ void setup(void)
   //
   // Setup and configure rf radio
   //
-  
+
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15); 
+  radio.setRetries(15,15);
 
   // optionally, use a high channel to avoid WiFi chatter
   radio.setChannel(110);
@@ -102,12 +102,12 @@ void setup(void)
   //
   // Open pipes to other nodes for communication
   //
-  
+
   // This simple sketch opens two pipes for these two nodes to communicate
   // back and forth.
   // Open 'our' pipe for writing
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
-  
+
   if ( role == role_ping_out )
   {
     radio.openWritingPipe(pipes[0]);
@@ -122,13 +122,13 @@ void setup(void)
   //
   // Start listening
   //
-  
+
   radio.startListening();
-  
+
   //
   // Dump the configuration of the rf unit for debugging
   //
-  
+
   radio.printDetails();
 }
 
@@ -137,27 +137,27 @@ void loop(void)
   //
   // Ping out role.  Repeatedly send the current time
   //
-  
+
   if (role == role_ping_out)
   {
     // First, stop listening so we can talk.
     radio.stopListening();
-    
+
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );  
-    
+    radio.write( &time, sizeof(unsigned long) );
+
     // Now, continue listening
     radio.startListening();
-    
+
     // Wait here until we get a response, or timeout (250ms)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
       if (millis() - started_waiting_at > 250 )
         timeout = true;
-    
+
     // Describe the results
     if ( timeout )
     {
@@ -168,19 +168,19 @@ void loop(void)
       // Grab the response, compare, and send to debugging spew
       unsigned long got_time;
       radio.read( &got_time, sizeof(unsigned long) );
-  
+
       // Spew it
       printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
     }
-    
+
     // Try again 1s later
     delay(1000);
   }
-  
+
   //
   // Pong back role.  Receive each packet, dump it out, and send it back
   //
-  
+
   if ( role == role_pong_back )
   {
     // if there is data ready
@@ -193,18 +193,18 @@ void loop(void)
       {
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &got_time, sizeof(unsigned long) );
-  
+
         // Spew it
         printf("Got payload %lu...",got_time);
       }
-      
+
       // First, stop listening so we can talk
       radio.stopListening();
-            
+
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );  
+      radio.write( &got_time, sizeof(unsigned long) );
       printf("Sent response.\n\r");
-      
+
       // Now, resume listening so we catch the next packets.
       radio.startListening();
     }

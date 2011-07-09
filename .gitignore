@@ -1,5 +1,6 @@
 *.o
 .*.swp
+*.orig
 docs/
 output/
 ojam/

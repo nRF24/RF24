@@ -1,6 +1,6 @@
 /*
  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -12,7 +12,7 @@
  * This is an example of how to user interrupts to interact with the radio.
  * It builds on the pingpair_pl example, and uses ack payloads.
  */
- 
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -27,7 +27,7 @@
 RF24 radio(8,9);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
-// Leave open to be the 'ping' transmitter 
+// Leave open to be the 'ping' transmitter
 const short role_pin = 7;
 
 //
@@ -64,12 +64,12 @@ void setup(void)
   //
   // Role
   //
-  
+
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
   delay(20); // Just to get a solid reading on the role pin
-  
+
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
     role = role_sender;
@@ -79,7 +79,7 @@ void setup(void)
   //
   // Print preamble
   //
-  
+
   Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/pingpair_irq/\n\r");
@@ -88,9 +88,9 @@ void setup(void)
   //
   // Setup and configure rf radio
   //
-  
+
   radio.begin();
-  
+
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
 
@@ -103,10 +103,10 @@ void setup(void)
   //
   // Open pipes to other nodes for communication
   //
-  
+
   // This simple sketch opens a single pipe for these two nodes to communicate
   // back and forth.  One listens on it, the other talks to it.
-  
+
   if ( role == role_sender )
   {
     radio.openWritingPipe(pipe);
@@ -119,16 +119,16 @@ void setup(void)
   //
   // Start listening
   //
-  
+
   if ( role == role_receiver )
     radio.startListening();
 
   //
   // Dump the configuration of the rf unit for debugging
   //
-  
+
   radio.printDetails();
-  
+
   //
   // Attach interrupt handler to interrupt #0 (using pin 2)
   // on BOTH the sender and receiver
@@ -144,15 +144,15 @@ void loop(void)
   //
   // Sender role.  Repeatedly send the current time
   //
-  
+
   if (role == role_sender)
   {
     // Take the time, and send it.
     unsigned long time = millis();
     printf("Now sending %lu\n\r",time);
     radio.startWrite( &time, sizeof(unsigned long) );
-    
-    // Try again soon 
+
+    // Try again soon
     delay(2000);
   }
 
@@ -206,7 +206,7 @@ void check_radio(void)
     // If we're the receiver, we've received a time message
     if ( role == role_receiver )
     {
-      // Get this payload and dump it 
+      // Get this payload and dump it
       static unsigned long got_time;
       radio.read( &got_time, sizeof(got_time) );
       printf("Got payload %lu\n\r",got_time);
