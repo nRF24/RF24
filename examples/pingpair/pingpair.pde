@@ -99,6 +99,10 @@ void setup(void)
   // optionally, increase the CRC length for improved reliability
   radio.setCRCLength(RF24_CRC_16);
 
+  // optionally, reduce the payload size.  seems to
+  // improve reliability
+  radio.setPayloadSize(8);
+
   //
   // Open pipes to other nodes for communication
   //
