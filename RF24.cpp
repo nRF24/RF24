@@ -486,18 +486,11 @@ boolean RF24::available(uint8_t* pipe_num)
 
 boolean RF24::read( void* buf, uint8_t len )
 {
-  // was this the last of the data available?
-  boolean result = false;
-
   // Fetch the payload
   read_payload( buf, len );
 
-  uint8_t fifo_status;
-  read_register(FIFO_STATUS,&fifo_status,1);
-  if ( fifo_status & _BV(RX_EMPTY) )
-    result = true;
-
-  return result;
+  // was this the last of the data available?
+  return read_register(FIFO_STATUS) & _BV(RX_EMPTY);
 }
 
 /******************************************************************/
