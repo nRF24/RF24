@@ -192,7 +192,7 @@ void loop(void)
     {
       // Dump the payloads until we've gotten everything
       unsigned long got_time;
-      boolean done = false;
+      bool done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.

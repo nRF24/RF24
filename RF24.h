@@ -24,7 +24,7 @@ private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
   uint8_t payload_size; /**< Fixed size of payloads */
-  boolean ack_payload_available; /**< Whether there is an ack payload waiting */
+  bool ack_payload_available; /**< Whether there is an ack payload waiting */
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. Note: not used. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
 
@@ -246,14 +246,14 @@ public:
    * @param len Number of bytes to be sent
    * @return True if the payload was delivered successfully false if not
    */
-  boolean write( const void* buf, uint8_t len );
+  bool write( const void* buf, uint8_t len );
 
   /**
    * Test whether there are bytes available to be read
    *
    * @return True if there is a payload available, false if none is
    */
-  boolean available(void);
+  bool available(void);
 
   /**
    * Read the payload
@@ -269,7 +269,7 @@ public:
    * @param len Maximum number of bytes to read into the buffer
    * @return True if the payload was delivered successfully false if not
    */
-  boolean read( void* buf, uint8_t len );
+  bool read( void* buf, uint8_t len );
 
   /**
    * Open a pipe for writing
@@ -398,7 +398,7 @@ public:
    * @param[out] pipe_num Which pipe has the payload available
    * @return True if there is a payload available, false if none is
    */
-  boolean available(uint8_t* pipe_num);
+  bool available(uint8_t* pipe_num);
 
   /**
    * Non-blocking write to the open writing pipe
@@ -464,7 +464,7 @@ public:
    *
    * @return True if an ack payload is available.
    */
-  boolean isAckPayloadAvailable(void);
+  bool isAckPayloadAvailable(void);
 
   /**
    * Call this when you get an interrupt to find out why
@@ -496,7 +496,7 @@ public:
    *
    * @return true if was carrier, false if not
    */
-  boolean testCarrier(void);
+  bool testCarrier(void);
 
   /**
    * Set the transmission data rate

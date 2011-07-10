@@ -229,7 +229,7 @@ void loop(void)
     if ( radio.available() )
     {
       // Dump the payloads until we've gotten everything
-      boolean done = false;
+      bool done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.

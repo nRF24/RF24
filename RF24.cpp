@@ -364,9 +364,9 @@ void RF24::powerDown(void)
 
 /******************************************************************/
 
-boolean RF24::write( const void* buf, uint8_t len )
+bool RF24::write( const void* buf, uint8_t len )
 {
-  boolean result = false;
+  bool result = false;
 
   // Begin the write
   startWrite(buf,len);
@@ -456,20 +456,20 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
 /******************************************************************/
 
-boolean RF24::available(void)
+bool RF24::available(void)
 {
   return available(NULL);
 }
 
 /******************************************************************/
 
-boolean RF24::available(uint8_t* pipe_num)
+bool RF24::available(uint8_t* pipe_num)
 {
   uint8_t status = get_status();
 
   // Too noisy, enable if you really want lots o data!! IF_SERIAL_DEBUG(print_status(status));
 
-  boolean result = ( status & _BV(RX_DR) );
+  bool result = ( status & _BV(RX_DR) );
 
   if (result)
   {
@@ -496,7 +496,7 @@ boolean RF24::available(uint8_t* pipe_num)
 
 /******************************************************************/
 
-boolean RF24::read( void* buf, uint8_t len )
+bool RF24::read( void* buf, uint8_t len )
 {
   // Fetch the payload
   read_payload( buf, len );
@@ -648,9 +648,9 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
 /******************************************************************/
 
-boolean RF24::isAckPayloadAvailable(void)
+bool RF24::isAckPayloadAvailable(void)
 {
-  boolean result = ack_payload_available;
+  bool result = ack_payload_available;
   ack_payload_available = false;
   return result;
 }
@@ -667,7 +667,7 @@ void RF24::setAutoAck(bool enable)
 
 /******************************************************************/
 
-boolean RF24::testCarrier(void)
+bool RF24::testCarrier(void)
 {
   return ( read_register(CD) & 1 );
 }

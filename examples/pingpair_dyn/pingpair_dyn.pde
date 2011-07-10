@@ -209,7 +209,7 @@ void loop(void)
     {
       // Dump the payloads until we've gotten everything
       uint8_t len;
-      boolean done = false;
+      bool done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.

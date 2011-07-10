@@ -1,3 +1,4 @@
+*.bak
 *.o
 .*.swp
 *.orig
