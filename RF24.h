@@ -113,16 +113,6 @@ protected:
   uint8_t read_payload(void* buf, uint8_t len);
 
   /**
-   * Read the payload length
-   *
-   * For dynamic payloads, this pulls the size of the payload off
-   * the chip
-   *
-   * @return Payload length of last-received dynamic payload
-   */
-  uint8_t read_payload_length(void);
-
-  /**
    * Empty the receive buffer
    *
    * @return Current value of status register
@@ -352,7 +342,7 @@ public:
   void setChannel(uint8_t channel);
 
   /**
-   * Set Payload Size
+   * Set Static Payload Size
    *
    * This implementation uses a pre-stablished fixed payload size for all
    * transmissions.  If this method is never called, the driver will always
@@ -366,13 +356,23 @@ public:
   void setPayloadSize(uint8_t size);
 
   /**
-   * Get Payload Size
+   * Get Static Payload Size
    *
    * @see setPayloadSize()
    *
    * @return The number of bytes in the payload
    */
   uint8_t getPayloadSize(void);
+
+  /**
+   * Get Dynamic Payload Size 
+   *
+   * For dynamic payloads, this pulls the size of the payload off
+   * the chip
+   *
+   * @return Payload length of last-received dynamic payload
+   */
+  uint8_t getDynamicPayloadSize(void);
 
   /**
    * Print a giant block of debugging information to stdout
@@ -424,6 +424,16 @@ public:
    * @see examples/pingpair_pl/pingpair_pl.pde
    */
   void enableAckPayload(void);
+
+  /**
+   * Enable dynamically-sized payloads
+   *
+   * This way you don't always have to send large packets just to send them
+   * once in a while.  This enables dynamic payloads on ALL pipes.
+   *
+   * @see examples/pingpair_pl/pingpair_dyn.pde
+   */
+  void enableDynamicPayloads(void);
 
   /**
    * Write an ack payload for the specified pipe

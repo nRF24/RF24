@@ -55,6 +55,17 @@ const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 // The role of the current running sketch
 role_e role;
 
+//
+// Payload
+//
+
+const int min_payload_size = 4;
+const int max_payload_size = 32;
+const int payload_size_increments_by = 2;
+int next_payload_size = min_payload_size;
+
+char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
+
 void setup(void)
 {
   //
@@ -86,6 +97,9 @@ void setup(void)
   //
 
   radio.begin();
+
+  // enable dynamic payloads
+  radio.enableDynamicPayloads();
 
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(15,15);
@@ -137,22 +151,24 @@ void loop(void)
 
   if (role == role_ping_out)
   {
+    // The payload will always be the same, what will change is how much of it we send.
+    static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
+
     // First, stop listening so we can talk.
     radio.stopListening();
 
     // Take the time, and send it.  This will block until complete
-    unsigned long time = millis();
-    printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );
+    printf("Now sending length %i...",next_payload_size);
+    radio.write( send_payload, next_payload_size );
 
     // Now, continue listening
     radio.startListening();
 
-    // Wait here until we get a response, or timeout (250ms)
+    // Wait here until we get a response, or timeout
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 250 )
+      if (millis() - started_waiting_at > 500 )
         timeout = true;
 
     // Describe the results
@@ -163,12 +179,20 @@ void loop(void)
     else
     {
       // Grab the response, compare, and send to debugging spew
-      unsigned long got_time;
-      radio.read( &got_time, sizeof(unsigned long) );
+      uint8_t len = radio.getDynamicPayloadSize();
+      radio.read( receive_payload, len );
+
+      // Put a zero at the end for easy printing
+      receive_payload[len] = 0;
 
       // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+      printf("Got response size=%i value=%s\n\r",len,receive_payload);
     }
+    
+    // Update size for next time.
+    next_payload_size += payload_size_increments_by;
+    if ( next_payload_size > max_payload_size )
+      next_payload_size = min_payload_size;
 
     // Try again 1s later
     delay(1000);
@@ -184,22 +208,26 @@ void loop(void)
     if ( radio.available() )
     {
       // Dump the payloads until we've gotten everything
-      unsigned long got_time;
+      uint8_t len;
       boolean done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+	len = radio.getDynamicPayloadSize();
+	done = radio.read( receive_payload, len );
 
-        // Spew it
-        printf("Got payload %lu...",got_time);
+	// Put a zero at the end for easy printing
+	receive_payload[len] = 0;
+
+	// Spew it
+	printf("Got payload size=%i value=%s\n\r",len,receive_payload);
       }
 
       // First, stop listening so we can talk
       radio.stopListening();
 
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );
+      radio.write( receive_payload, len );
       printf("Sent response.\n\r");
 
       // Now, resume listening so we catch the next packets.

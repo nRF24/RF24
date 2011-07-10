@@ -111,11 +111,11 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
   csn(LOW);
   status = SPI.transfer( W_TX_PAYLOAD );
   uint8_t data_len = min(len,payload_size);
-  uint8_t blank_len = payload_size - data_len;
+  //uint8_t blank_len = payload_size - data_len;
   while ( data_len-- )
     SPI.transfer(*current++);
-  while ( blank_len-- )
-    SPI.transfer(0);
+  //while ( blank_len-- )
+  //  SPI.transfer(0);
 
   csn(HIGH);
 
@@ -132,11 +132,11 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   csn(LOW);
   status = SPI.transfer( R_RX_PAYLOAD );
   uint8_t data_len = min(len,payload_size);
-  uint8_t blank_len = payload_size - data_len;
+  //uint8_t blank_len = payload_size - data_len;
   while ( data_len-- )
     *current++ = SPI.transfer(0xff);
-  while ( blank_len-- )
-    SPI.transfer(0xff);
+  //while ( blank_len-- )
+  //  SPI.transfer(0xff);
   csn(HIGH);
 
   return status;
@@ -396,7 +396,7 @@ boolean RF24::write( const void* buf, uint8_t len )
   // Handle the ack packet
   if ( ack_payload_available )
   {
-    ack_payload_length = read_payload_length();
+    ack_payload_length = getDynamicPayloadSize();
     IF_SERIAL_DEBUG(Serial.print("[AckPacket]/"));
     IF_SERIAL_DEBUG(Serial.println(ack_payload_length,DEC));
   }
@@ -430,7 +430,7 @@ void RF24::startWrite( const void* buf, uint8_t len )
 
 /******************************************************************/
 
-uint8_t RF24::read_payload_length(void)
+uint8_t RF24::getDynamicPayloadSize(void)
 {
   uint8_t result = 0;
 
@@ -577,6 +577,30 @@ void RF24::toggle_features(void)
 
 /******************************************************************/
 
+void RF24::enableDynamicPayloads(void)
+{
+  // Enable dynamic payload throughout the system
+  write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
+
+  // If it didn't work, the features are not enabled
+  if ( ! read_register(FEATURE) )
+  {
+    // So enable them and try again
+    toggle_features();
+    write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
+  }
+
+  IF_SERIAL_DEBUG(printf("FEATURE=%i\n\r",read_register(FEATURE)));
+
+  // Enable dynamic payload on all pipes
+  //
+  // Not sure the use case of only having dynamic payload on certain
+  // pipes, so the library does not support it.
+  write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P5) | _BV(DPL_P4) | _BV(DPL_P3) | _BV(DPL_P2) | _BV(DPL_P1) | _BV(DPL_P0));
+}
+
+/******************************************************************/
+
 void RF24::enableAckPayload(void)
 {
   //
@@ -596,7 +620,7 @@ void RF24::enableAckPayload(void)
   IF_SERIAL_DEBUG(printf("FEATURE=%i\n\r",read_register(FEATURE)));
 
   //
-  // Enable dynamic payload on pipe 0
+  // Enable dynamic payload on pipes 0 & 1
   //
 
   write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
