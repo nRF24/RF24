@@ -9,7 +9,8 @@
 #ifndef __RF24_H__
 #define __RF24_H__
 
-#include <inttypes.h>
+#include <stddef.h>
+#include <avr/pgmspace.h>
 
 typedef enum { RF24_1MBPS = 0, RF24_2MBPS } rf24_datarate_e;
 typedef enum { RF24_CRC_8 = 0, RF24_CRC_16 } rf24_crclength_e;
