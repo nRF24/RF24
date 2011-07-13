@@ -7,10 +7,15 @@
  */
 
 /**
- * Example of using interrupts
+ * Full test on single RF pair
  *
- * This is an example of how to user interrupts to interact with the radio.
- * It builds on the pingpair_pl example, and uses ack payloads.
+ * This sketches uses as many RF24 methods as possible in a single test.
+ *
+ * To operate:
+ *  Upload this sketch on two nodes, each with IRQ -> pin 2
+ *  One node needs pin 7 -> GND, the other NC.  That's the receiving node
+ *  Monitor the sending node's serial output
+ *  Look for "+OK PASS" or "+OK FAIL"
  */
 
 #include <SPI.h>
@@ -59,6 +64,48 @@ role_e role;
 // Interrupt handler, check the radio because we got an IRQ
 void check_radio(void);
 
+//
+// Payload
+//
+
+const int min_payload_size = 4;
+const int max_payload_size = 32;
+const int payload_size_increments_by = 2;
+int next_payload_size = min_payload_size;
+
+char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
+
+//
+// Test state
+//
+
+bool done; //*< Are we done with the test? */
+bool passed; //*< Have we passed the test? */
+const int num_needed = 10; //*< How many success/failures until we're done? */
+int receives_remaining = num_needed; //*< How many ack packets until we declare victory? */
+int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
+const int interval = 100; //*< ms to wait between sends */
+
+void one_ok(void)
+{
+  // Have we received enough yet?
+  if ( ! --receives_remaining )
+  {
+    done = true;
+    passed = true;
+  }
+}
+
+void one_failed(void)
+{
+  // Have we failed enough yet?
+  if ( ! --failures_remaining )
+  {
+    done = true;
+    passed = false;
+  }
+}
+
 void setup(void)
 {
   //
@@ -82,8 +129,15 @@ void setup(void)
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/pingpair_irq/\n\r");
+  printf("\n\rRF24/tests/pingpair_test/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
+
+  //
+  // TODO: Read configuration from serial
+  //
+  // It would be a much better test if this program could accept configuration
+  // from the serial port.  Then it would be possible to run the same test under
+  // lots of different circumstances.
 
   //
   // Setup and configure rf radio
@@ -93,12 +147,18 @@ void setup(void)
 
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
+  
+  // enable dynamic payloads
+  radio.enableDynamicPayloads();
 
   // Optional: Increase CRC length for improved reliability
   radio.setCRCLength(RF24_CRC_16);
 
+  // Optional: Decrease data rate for improved reliability
+  radio.setDataRate(RF24_1MBPS);
+
   // Optional: Pick a high channel
-  radio.setChannel(110);
+  radio.setChannel(90);
 
   //
   // Open pipes to other nodes for communication
@@ -138,6 +198,7 @@ void setup(void)
 }
 
 static uint32_t message_count = 0;
+static uint32_t last_message_count = 0;
 
 void loop(void)
 {
@@ -147,18 +208,44 @@ void loop(void)
 
   if (role == role_sender)
   {
-    // Take the time, and send it.
-    unsigned long time = millis();
-    printf("Now sending %lu\n\r",time);
-    radio.startWrite( &time, sizeof(unsigned long) );
+    // The payload will always be the same, what will change is how much of it we send.
+    static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
 
+    // First, stop listening so we can talk.
+    radio.stopListening();
+
+    // Send it.  This will block until complete
+    printf("\n\rNow sending length %i...",next_payload_size);
+    radio.startWrite( send_payload, next_payload_size );
+
+    // Update size for next time.
+    next_payload_size += payload_size_increments_by;
+    if ( next_payload_size > max_payload_size )
+      next_payload_size = min_payload_size;
+    
     // Try again soon
-    delay(2000);
+    delay(interval);
   }
 
   //
   // Receiver role: Does nothing!  All the work is in IRQ
   //
+
+  //
+  // Stop the test if we're done and report results
+  //
+  if ( done )
+  {
+    detachInterrupt(0);
+    printf("\n\r+OK ");
+    if ( passed )
+      printf("PASS\n\r");
+    else
+      printf("FAIL\n\r");
+
+    // Wait here
+    while(1) {}
+  }
 
 }
 
@@ -172,7 +259,7 @@ void check_radio(void)
   if ( tx )
   {
     if ( role == role_sender )
-      printf("Send:OK\n\r");
+      printf("Send:OK ");
 
     if ( role == role_receiver )
       printf("Ack Payload:Sent\n\r");
@@ -182,7 +269,12 @@ void check_radio(void)
   if ( fail )
   {
     if ( role == role_sender )
-      printf("Send:Failed\n\r");
+    {
+      printf("Send:Failed ");
+
+      // log status of this line
+      one_failed();
+    }
 
     if ( role == role_receiver )
       printf("Ack Payload:Failed\n\r");
@@ -200,20 +292,39 @@ void check_radio(void)
     if ( role == role_sender )
     {
       radio.read(&message_count,sizeof(message_count));
-      printf("Ack:%lu\n\r",message_count);
+      printf("Ack:%lu ",message_count);
+     
+      // is this ack what we were expecting?  to account
+      // for failures, we simply want to make sure we get a
+      // DIFFERENT ack every time.
+      if ( message_count != last_message_count )
+      {
+	printf("OK ");
+	one_ok();
+      }
+      else
+      {
+	printf("FAILED ");
+	one_failed();
+      }
     }
 
     // If we're the receiver, we've received a time message
     if ( role == role_receiver )
     {
       // Get this payload and dump it
-      static unsigned long got_time;
-      radio.read( &got_time, sizeof(got_time) );
-      printf("Got payload %lu\n\r",got_time);
+      size_t len = radio.getDynamicPayloadSize();
+      radio.read( receive_payload, len );
+      
+      // Put a zero at the end for easy printing
+      receive_payload[len] = 0;
 
-      // Add an ack packet for the next time around.  This is a simple
-      // packet counter
-      radio.writeAckPayload( 1, &message_count, sizeof(message_count) );
+      // Spew it
+      printf("Got payload size=%i value=%s\n\r",len,receive_payload);
+
+      // Add an ack packet for the next time around.
+      // Here we will report back how many bytes we got this time.
+      radio.writeAckPayload( 1, &len, sizeof(len) );
       ++message_count;
     }
   }
