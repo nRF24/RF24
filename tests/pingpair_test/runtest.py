@@ -12,8 +12,13 @@ def read_until(token):
 	return line
 
 
-ser = serial.Serial(sys.argv[1], 57600, timeout=5)
+ser = serial.Serial(sys.argv[1], 57600, timeout=5, dsrdtr=False, rtscts=False)
+
+read_until("+READY")
+ser.write(" ")
+
 line = read_until("+OK")
+ser.close()
 if (line.find("PASS") != -1):
 	sys.exit(0)
 else:

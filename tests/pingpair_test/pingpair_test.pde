@@ -81,6 +81,7 @@ char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating 
 
 bool done; //*< Are we done with the test? */
 bool passed; //*< Have we passed the test? */
+bool notified; //*< Have we notified the user we're done? */
 const int num_needed = 10; //*< How many success/failures until we're done? */
 int receives_remaining = num_needed; //*< How many ack packets until we declare victory? */
 int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
@@ -147,6 +148,11 @@ void setup(void)
   // the test on the sender.
   //
 
+  printf("+READY press any key to start\n\r\n\r");
+
+  while (! Serial.available() ) {}
+  Serial.read();
+
   //
   // Setup and configure rf radio
   //
@@ -203,15 +209,8 @@ void setup(void)
   //
 
   attachInterrupt(0, check_radio, FALLING);
-
-  //
-  // Receiver node automatically "passes" the test
-  //
-  if ( role == role_receiver )
-  {
-    done = passed = true;
-  }
 }
+
 
 static uint32_t message_count = 0;
 static uint32_t last_message_count = 0;
@@ -246,12 +245,14 @@ void loop(void)
   //
   // Receiver role: Does nothing!  All the work is in IRQ
   //
-
+  
   //
   // Stop the test if we're done and report results
   //
-  if ( done )
+  if ( done && ! notified )
   {
+    notified = true;
+
     printf("\n\r+OK ");
     if ( passed )
       printf("PASS\n\r\n\r");
