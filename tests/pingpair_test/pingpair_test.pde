@@ -138,6 +138,14 @@ void setup(void)
   // It would be a much better test if this program could accept configuration
   // from the serial port.  Then it would be possible to run the same test under
   // lots of different circumstances.
+  //
+  // The idea is that we will print "+READY" at this point.  The python script
+  // will wait for it, and then send down a configuration script that we
+  // execute here and then run with.
+  //
+  // The test controller will need to configure the receiver first, then go run
+  // the test on the sender.
+  //
 
   //
   // Setup and configure rf radio
@@ -195,6 +203,14 @@ void setup(void)
   //
 
   attachInterrupt(0, check_radio, FALLING);
+
+  //
+  // Receiver node automatically "passes" the test
+  //
+  if ( role == role_receiver )
+  {
+    done = passed = true;
+  }
 }
 
 static uint32_t message_count = 0;
@@ -206,7 +222,7 @@ void loop(void)
   // Sender role.  Repeatedly send the current time
   //
 
-  if (role == role_sender)
+  if (role == role_sender && !done)
   {
     // The payload will always be the same, what will change is how much of it we send.
     static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
@@ -236,17 +252,12 @@ void loop(void)
   //
   if ( done )
   {
-    detachInterrupt(0);
     printf("\n\r+OK ");
     if ( passed )
       printf("PASS\n\r\n\r");
     else
       printf("FAIL\n\r\n\r");
-
-    // Wait here
-    while(1) {}
   }
-
 }
 
 void check_radio(void)
