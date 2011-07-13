@@ -239,9 +239,9 @@ void loop(void)
     detachInterrupt(0);
     printf("\n\r+OK ");
     if ( passed )
-      printf("PASS\n\r");
+      printf("PASS\n\r\n\r");
     else
-      printf("FAIL\n\r");
+      printf("FAIL\n\r\n\r");
 
     // Wait here
     while(1) {}

@@ -1,2 +1,10 @@
 The sketches in this directory are intended to be checkin tests.
 No code should be pushed to github without these tests passing.
+
+The way I run each test is from within the sketch dir, doing this:
+jam p4 p6 && ./runtest.py /dev/tty.usbserial-A40081RP
+
+runtest.py will exit with code 0 on pass code 1 on fail
+
+Note that this requires python and py-serial
+
