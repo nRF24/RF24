@@ -7,7 +7,7 @@ def read_until(token):
 		line = ser.readline(None,"\r")
 		sys.stdout.write(line)
 
-		if (line.startswith("+OK")):
+		if (line.startswith(token)):
 			break
 	return line
 
