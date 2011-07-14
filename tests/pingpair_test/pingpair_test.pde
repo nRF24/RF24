@@ -70,7 +70,7 @@ void check_radio(void);
 
 const int min_payload_size = 4;
 const int max_payload_size = 32;
-const int payload_size_increments_by = 2;
+int payload_size_increments_by = 2;
 int next_payload_size = min_payload_size;
 
 char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
@@ -169,9 +169,9 @@ void setup(void)
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
 
+  // Config 2 is special radio config
   if (configuration=='2')
   {
-    // Config 2 is special radio config
     radio.setCRCLength(RF24_CRC_8);
     radio.setDataRate(RF24_2MBPS);
     radio.setChannel(10);
@@ -189,9 +189,19 @@ void setup(void)
     // Optional: Pick a high channel
     radio.setChannel(90);
   }
- 
-  // enable dynamic payloads
-  radio.enableDynamicPayloads();
+
+  // Config 3 is static payloads only
+  if (configuration == '3')
+  {
+    next_payload_size = max_payload_size;
+    payload_size_increments_by = 0;
+    radio.setPayloadSize(16);
+  }
+  else
+  {
+    // enable dynamic payloads
+    radio.enableDynamicPayloads();
+  }
 
   //
   // Open pipes to other nodes for communication
@@ -331,7 +341,7 @@ void check_radio(void)
       // is this ack what we were expecting?  to account
       // for failures, we simply want to make sure we get a
       // DIFFERENT ack every time.
-      if ( message_count != last_message_count )
+      if ( ( message_count != last_message_count ) || ( configuration=='3' && message_count == 16 ) )
       {
 	printf("OK ");
 	one_ok();
@@ -347,13 +357,19 @@ void check_radio(void)
     if ( role == role_receiver )
     {
       // Get this payload and dump it
-      size_t len = radio.getDynamicPayloadSize();
+      size_t len = max_payload_size;
+      memset(receive_payload,0,max_payload_size);
+      
+      if ( configuration != '3' )
+	len = radio.getDynamicPayloadSize();
+      
       radio.read( receive_payload, len );
       
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
 
       // Spew it
+      len = strlen(receive_payload); // How much did we REALLY get?
       printf("Got payload size=%i value=%s\n\r",len,receive_payload);
 
       // Add an ack packet for the next time around.
