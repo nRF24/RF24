@@ -87,7 +87,7 @@ int receives_remaining = num_needed; //*< How many ack packets until we declare 
 int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
 const int interval = 100; //*< ms to wait between sends */
 
-char configuration = ' '; //*< Configuration key, one char sent in by the test framework to tell us how to configure, ' ' is default */
+char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
 
 void one_ok(void)
 {
@@ -108,6 +108,10 @@ void one_failed(void)
     passed = false;
   }
 }
+
+//
+// Setup 
+//
 
 void setup(void)
 {
@@ -165,32 +169,26 @@ void setup(void)
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
 
-  switch(configuration)
+  if (configuration=='2')
   {
-    case ' ':
-    case '1':
-      // Optional: Increase CRC length for improved reliability
-      radio.setCRCLength(RF24_CRC_16);
+    // Config 2 is special radio config
+    radio.setCRCLength(RF24_CRC_8);
+    radio.setDataRate(RF24_2MBPS);
+    radio.setChannel(10);
+  }
+  else
+  {
+    //Otherwise, default radio config
+    
+    // Optional: Increase CRC length for improved reliability
+    radio.setCRCLength(RF24_CRC_16);
 
-      // Optional: Decrease data rate for improved reliability
-      radio.setDataRate(RF24_1MBPS);
+    // Optional: Decrease data rate for improved reliability
+    radio.setDataRate(RF24_1MBPS);
 
-      // Optional: Pick a high channel
-      radio.setChannel(90);
-
-      break;
-    case '2':
-      // Optional: Increase CRC length for improved reliability
-      radio.setCRCLength(RF24_CRC_8);
-      radio.setDataRate(RF24_2MBPS);
-      radio.setChannel(10);
-      break;
-    default:
-      printf("ERROR Unknown configuration %c\n\r",configuration);
-      done = true;
-      passed = false;
-      break;
-  } 
+    // Optional: Pick a high channel
+    radio.setChannel(90);
+  }
  
   // enable dynamic payloads
   radio.enableDynamicPayloads();
@@ -232,6 +230,9 @@ void setup(void)
   attachInterrupt(0, check_radio, FALLING);
 }
 
+//
+// Loop 
+//
 
 static uint32_t message_count = 0;
 static uint32_t last_message_count = 0;
