@@ -87,6 +87,8 @@ int receives_remaining = num_needed; //*< How many ack packets until we declare 
 int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
 const int interval = 100; //*< ms to wait between sends */
 
+char configuration = ' '; //*< Configuration key, one char sent in by the test framework to tell us how to configure, ' ' is default */
+
 void one_ok(void)
 {
   // Have we received enough yet?
@@ -134,7 +136,7 @@ void setup(void)
   printf("ROLE: %s\n\r",role_friendly_name[role]);
 
   //
-  // TODO: Read configuration from serial
+  // Read configuration from serial
   //
   // It would be a much better test if this program could accept configuration
   // from the serial port.  Then it would be possible to run the same test under
@@ -151,7 +153,8 @@ void setup(void)
   printf("+READY press any key to start\n\r\n\r");
 
   while (! Serial.available() ) {}
-  Serial.read();
+  configuration = Serial.read();
+  printf("Configuration\t = %c\n\r",configuration);
 
   //
   // Setup and configure rf radio
@@ -161,18 +164,36 @@ void setup(void)
 
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
-  
+
+  switch(configuration)
+  {
+    case ' ':
+    case '1':
+      // Optional: Increase CRC length for improved reliability
+      radio.setCRCLength(RF24_CRC_16);
+
+      // Optional: Decrease data rate for improved reliability
+      radio.setDataRate(RF24_1MBPS);
+
+      // Optional: Pick a high channel
+      radio.setChannel(90);
+
+      break;
+    case '2':
+      // Optional: Increase CRC length for improved reliability
+      radio.setCRCLength(RF24_CRC_8);
+      radio.setDataRate(RF24_2MBPS);
+      radio.setChannel(10);
+      break;
+    default:
+      printf("ERROR Unknown configuration %c\n\r",configuration);
+      done = true;
+      passed = false;
+      break;
+  } 
+ 
   // enable dynamic payloads
   radio.enableDynamicPayloads();
-
-  // Optional: Increase CRC length for improved reliability
-  radio.setCRCLength(RF24_CRC_16);
-
-  // Optional: Decrease data rate for improved reliability
-  radio.setDataRate(RF24_1MBPS);
-
-  // Optional: Pick a high channel
-  radio.setChannel(90);
 
   //
   // Open pipes to other nodes for communication
