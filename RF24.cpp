@@ -677,7 +677,7 @@ bool RF24::testCarrier(void)
 
 void RF24::setDataRate(rf24_datarate_e speed)
 {
-  uint8_t setup = read_register(RF_SETUP) & _BV(RF_DR);
+  uint8_t setup = read_register(RF_SETUP) & ~_BV(RF_DR);
   if (speed == RF24_2MBPS)
     setup |= _BV(RF_DR);
   write_register(RF_SETUP,setup);
@@ -688,7 +688,7 @@ void RF24::setDataRate(rf24_datarate_e speed)
 
 void RF24::setCRCLength(rf24_crclength_e length)
 {
-  uint8_t config = read_register(CONFIG) & _BV(CRCO);
+  uint8_t config = read_register(CONFIG) & ~_BV(CRCO);
   if (length == RF24_CRC_16)
     config |= _BV(CRCO);
   write_register(CONFIG,config);
