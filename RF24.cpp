@@ -26,7 +26,7 @@
 
 /******************************************************************/
 
-void RF24::csn(const int mode) const
+void RF24::csn(int mode) const
 {
   SPI.setDataMode(SPI_MODE0);
   SPI.setClockDivider(SPI_CLOCK_DIV2);
@@ -35,14 +35,14 @@ void RF24::csn(const int mode) const
 
 /******************************************************************/
 
-void RF24::ce(const int level) const
+void RF24::ce(int level) const
 {
   digitalWrite(ce_pin,level);
 }
 
 /******************************************************************/
 
-uint8_t RF24::read_register(const uint8_t reg, uint8_t* buf, uint8_t len) const
+uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len) const
 {
   uint8_t status;
 
@@ -58,7 +58,7 @@ uint8_t RF24::read_register(const uint8_t reg, uint8_t* buf, uint8_t len) const
 
 /******************************************************************/
 
-uint8_t RF24::read_register(const uint8_t reg) const
+uint8_t RF24::read_register(uint8_t reg) const
 {
   csn(LOW);
   SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
@@ -70,7 +70,7 @@ uint8_t RF24::read_register(const uint8_t reg) const
 
 /******************************************************************/
 
-uint8_t RF24::write_register(const uint8_t reg, const uint8_t* buf, uint8_t len) const
+uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len) const
 {
   uint8_t status;
 
@@ -86,7 +86,7 @@ uint8_t RF24::write_register(const uint8_t reg, const uint8_t* buf, uint8_t len)
 
 /******************************************************************/
 
-uint8_t RF24::write_register(const uint8_t reg, const uint8_t value) const
+uint8_t RF24::write_register(uint8_t reg, uint8_t value) const
 {
   uint8_t status;
 
@@ -208,7 +208,7 @@ void RF24::print_observe_tx(uint8_t value) const
 
 /******************************************************************/
 
-RF24::RF24(const uint8_t _cepin, const uint8_t _cspin): 
+RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
     ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
     payload_size(32), ack_payload_available(false)
 {
@@ -217,7 +217,7 @@ RF24::RF24(const uint8_t _cepin, const uint8_t _cspin):
 
 /******************************************************************/
 
-void RF24::setChannel(const uint8_t channel)
+void RF24::setChannel(uint8_t channel)
 {
     if( wide_band ) {
 	write_register(RF_CH,min(channel,127));
@@ -228,7 +228,7 @@ void RF24::setChannel(const uint8_t channel)
 
 /******************************************************************/
 
-void RF24::setPayloadSize(const uint8_t size)
+void RF24::setPayloadSize(uint8_t size)
 {
   payload_size = min(size,32);
 }
@@ -516,7 +516,7 @@ void RF24::openWritingPipe(uint64_t value)
 
 /******************************************************************/
 
-void RF24::openReadingPipe(const uint8_t child, const uint64_t address)
+void RF24::openReadingPipe(uint8_t child, uint64_t address)
 {
   const uint8_t child_pipe[] = { 
     RX_ADDR_P0, RX_ADDR_P1, RX_ADDR_P2, RX_ADDR_P3, RX_ADDR_P4, RX_ADDR_P5   };
@@ -589,7 +589,7 @@ void RF24::enableAckPayload(void) const
 
 /******************************************************************/
 
-void RF24::writeAckPayload(const uint8_t pipe, const void* buf, uint8_t len) const
+void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len) const
 {
   const uint8_t* current = (const uint8_t*)buf;
 
@@ -619,7 +619,7 @@ boolean RF24::isPVariant(void) const {
 
 /******************************************************************/
 
-void RF24::setAutoAck(const bool enable) const
+void RF24::setAutoAck(bool enable) const
 {
   if ( enable )
     write_register(EN_AA, B111111);
@@ -629,7 +629,7 @@ void RF24::setAutoAck(const bool enable) const
 
 /******************************************************************/
 
-void RF24::setAutoAck( const uint8_t pipe, const bool enable ) const
+void RF24::setAutoAck( uint8_t pipe, bool enable ) const
 {
     uint8_t en_aa = read_register( EN_AA ) ;
     if( enable ) {
@@ -656,7 +656,7 @@ boolean RF24::testRPD(void) const
 
 /******************************************************************/
 
-void RF24::setPALevel(const rf24_pa_dbm_e level) const
+void RF24::setPALevel(rf24_pa_dbm_e level) const
 {
   uint8_t setup = read_register(RF_SETUP) ;
   setup &= ~(_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
@@ -718,7 +718,7 @@ rf24_pa_dbm_e RF24::getPALevel(void) const
 
 /******************************************************************/
 
-boolean RF24::setDataRate(const rf24_datarate_e speed)
+boolean RF24::setDataRate(rf24_datarate_e speed)
 {
   uint8_t setup = read_register(RF_SETUP) ;
 
@@ -786,7 +786,7 @@ rf24_datarate_e RF24::getDataRate( void ) const {
 
 /******************************************************************/
 
-void RF24::setCRCLength(const rf24_crclength_e length) const
+void RF24::setCRCLength(rf24_crclength_e length) const
 {
   uint8_t config = read_register(CONFIG) & _BV(CRCO);
   if (length == RF24_CRC_16)

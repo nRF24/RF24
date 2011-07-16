@@ -50,7 +50,7 @@ protected:
      *
      * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
      */
-    void csn(const int mode) const ;
+    void csn(int mode) const ;
 
     /**
      * Set chip enable
@@ -58,7 +58,7 @@ protected:
      * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
      * for a much more detailed description of this pin.
      */
-    void ce(const int level) const ;
+    void ce(int level) const ;
 
     /**
      * Read a chunk of data in from a register
@@ -68,7 +68,7 @@ protected:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t read_register(const uint8_t reg, uint8_t* buf, uint8_t len) const ;
+    uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) const ;
 
     /**
      * Read single byte from a register
@@ -76,7 +76,7 @@ protected:
      * @param reg Which register. Use constants from nRF24L01.h
      * @return Current value of register @p reg
      */
-    uint8_t read_register(const uint8_t reg) const ;
+    uint8_t read_register(uint8_t reg) const ;
 
     /**
      * Write a chunk of data to a register
@@ -86,7 +86,7 @@ protected:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t write_register(const uint8_t reg, const uint8_t* buf, uint8_t len) const ;
+    uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len) const ;
 
     /**
      * Write a single byte to a register
@@ -95,7 +95,7 @@ protected:
      * @param value The new value to write
      * @return Current value of status register
      */
-    uint8_t write_register(const uint8_t reg, const uint8_t value) const ;
+    uint8_t write_register(uint8_t reg, uint8_t value) const ;
 
     /**
      * Write the transmit payload
@@ -195,7 +195,7 @@ public:
      * @param _cspin The pin attached to Chip Select
      *
      */
-    RF24(const uint8_t _cepin, const uint8_t _cspin) ;
+    RF24(uint8_t _cepin, uint8_t _cspin) ;
 
     /**
      * Begin operation of the chip
@@ -304,7 +304,7 @@ public:
      * @param number Which pipe# to open, 0-5.
      * @param address The 40-bit address of the pipe to open.
      */
-    void openReadingPipe(const uint8_t number, const uint64_t address);
+    void openReadingPipe(uint8_t number, uint64_t address);
 
     /**@}*/
     /**
@@ -335,7 +335,7 @@ public:
      *
      * @param size The number of bytes in the payload
      */
-    void setPayloadSize(const uint8_t size);
+    void setPayloadSize(uint8_t size);
 
     /**
      * Get Payload Size
@@ -396,7 +396,7 @@ public:
      * @param len Length of the data to send, up to 32 bytes max.  Not affected
      * by the static payload set by setPayloadSize().
      */
-    void writeAckPayload(const uint8_t pipe, const void* buf, uint8_t len) const ;
+    void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len) const ;
 
     /**
      * Determine if an ack payload was received in the most recent call to
@@ -427,7 +427,7 @@ public:
      *
      * @param enable Whether to enable (true) or disable (false) auto-acks
      */
-    void setAutoAck(const bool enable) const ;
+    void setAutoAck(bool enable) const ;
 
     /**
      * Enable or disable auto-acknowlede packets on a per pipeline basis.
@@ -438,7 +438,7 @@ public:
      * @param which pipeline to modify
      * @param enable Whether to enable (true) or disable (false) auto-acks
      */
-    void setAutoAck( const uint8_t pipe, const bool enable ) const ;
+    void setAutoAck( uint8_t pipe, bool enable ) const ;
 
     /**
      * Test whether there was a carrier on the line for the
@@ -471,7 +471,7 @@ public:
      *
      * @param Desired PA level.
      */
-    void setPALevel( const rf24_pa_dbm_e level ) const ;
+    void setPALevel( rf24_pa_dbm_e level ) const ;
 
     /**
      * Fetches the current PA level. 
@@ -488,7 +488,7 @@ public:
      *
      * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
      */
-    boolean setDataRate(const rf24_datarate_e speed);
+    boolean setDataRate(rf24_datarate_e speed);
 
     /**
      * Set the transmission data rate
@@ -504,7 +504,7 @@ public:
      *
      * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
      */
-    void setCRCLength(const rf24_crclength_e length) const ;
+    void setCRCLength(rf24_crclength_e length) const ;
 
     /**@}*/
 };
