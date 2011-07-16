@@ -43,7 +43,7 @@ protected:
 
     /**
      * Set chip select pin
-     * Running SPI bus at PI_CLOCK_DIV2 so we don't waist time transferring data
+     * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
      * and best of all, we make use of the radio's FIFO buffers. A lower speed
      * means we're less likely to effectively leverage our FIFOs and pay a higher
      * AVR runtime cost as toll.
@@ -55,10 +55,10 @@ protected:
     /**
      * Set chip enable
      *
-     * @param mode HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
+     * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
      * for a much more detailed description of this pin.
      */
-    void ce(const int mode) const ;
+    void ce(const int level) const ;
 
     /**
      * Read a chunk of data in from a register
@@ -193,17 +193,9 @@ public:
      *
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select
-     * @param speed The desired data rate of this network; default is 2Mbs
-     * @param channel The channel to use for this network; default is 64
      *
-     * @warning Addition features enabled/set in the begin method should be
-     * migrated into our constructor. Basically features which are network
-     * specific should be variable and assignable here; including timeouts,
-     * retries, and CRC length.
      */
-    RF24(const uint8_t _cepin, const uint8_t _cspin,
-	 const rf24_datarate_e speed=RF24_2MBPS,
-	 const uint8_t channel=64 ) ;
+    RF24(const uint8_t _cepin, const uint8_t _cspin) ;
 
     /**
      * Begin operation of the chip

@@ -35,9 +35,9 @@ void RF24::csn(const int mode) const
 
 /******************************************************************/
 
-void RF24::ce(const int mode) const
+void RF24::ce(const int level) const
 {
-  digitalWrite(ce_pin,mode);
+  digitalWrite(ce_pin,level);
 }
 
 /******************************************************************/
@@ -208,14 +208,11 @@ void RF24::print_observe_tx(uint8_t value) const
 
 /******************************************************************/
 
-RF24::RF24(const uint8_t _cepin, const uint8_t _cspin,
-	   const rf24_datarate_e speed, const uint8_t channel): 
+RF24::RF24(const uint8_t _cepin, const uint8_t _cspin): 
     ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
     payload_size(32), ack_payload_available(false)
 {
     begin() ;
-    setDataRate( speed ) ;
-    setChannel( channel ) ;
 }
 
 /******************************************************************/
@@ -305,13 +302,12 @@ void RF24::begin(void)
   pinMode(ce_pin,OUTPUT);
   pinMode(csn_pin,OUTPUT);
 
+  SPI.begin();
   ce(LOW);
   csn(HIGH);
-
-  SPI.begin();
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV8);
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
 
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
@@ -331,7 +327,7 @@ void RF24::begin(void)
   // Determine if this is a p or non-p RF24 module and then
   // reset our data rate back to default value. This works
   // because a non-P variant won't allow the data rate to
-  // be set to 250KBS.
+  // be set to 250Kbps.
   if( setDataRate( RF24_250KBPS ) ) {
       p_variant = true ;
   }
@@ -636,7 +632,11 @@ void RF24::setAutoAck(const bool enable) const
 void RF24::setAutoAck( const uint8_t pipe, const bool enable ) const
 {
     uint8_t en_aa = read_register( EN_AA ) ;
-    en_aa &= ~((enable?0:1)<<pipe) ;// inverted logic here (1=off, 0=on)
+    if( enable ) {
+	en_aa |= _BV(pipe) ;
+    } else {
+	en_aa &= ~_BV(pipe) ;
+    }
     write_register( EN_AA, en_aa ) ;
 }
 
