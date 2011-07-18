@@ -506,6 +506,12 @@ public:
      */
     void setCRCLength(rf24_crclength_e length) const ;
 
+    /**
+     * Disable CRC validation
+     *
+     */
+    void disableCRC( void ) const ;
+
     /**@}*/
 };
 

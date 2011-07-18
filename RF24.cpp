@@ -28,8 +28,9 @@
 
 void RF24::csn(int mode) const
 {
+  SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);
+  SPI.setClockDivider(SPI_CLOCK_DIV2); 
   digitalWrite(csn_pin,mode);
 }
 
@@ -212,7 +213,6 @@ RF24::RF24(uint8_t _cepin, uint8_t _cspin):
     ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
     payload_size(32), ack_payload_available(false)
 {
-    begin() ;
 }
 
 /******************************************************************/
@@ -268,6 +268,14 @@ void RF24::printDetails(void) const
   printf_P(PSTR("RX_ADDR_P3 = 0x%02x"),*buffer);
   printf_P(PSTR("\n\r"));
 
+  status = read_register(RX_ADDR_P4,buffer,1);
+  printf_P(PSTR("RX_ADDR_P4 = 0x%02x"),*buffer);
+  printf_P(PSTR("\n\r"));
+
+  status = read_register(RX_ADDR_P5,buffer,1);
+  printf_P(PSTR("RX_ADDR_P5 = 0x%02x"),*buffer);
+  printf_P(PSTR("\n\r"));
+
   status = read_register(TX_ADDR,buffer,5);
   printf_P(PSTR("TX_ADDR = 0x"));
   bufptr = buffer + 5;
@@ -293,36 +301,52 @@ void RF24::printDetails(void) const
   read_register(RF_SETUP,buffer,1);
   printf_P(PSTR("RF_SETUP = 0x%02x (data rate: %d)\n\r"),*buffer,getDataRate());  
   printf_P(PSTR("Hardware; isPVariant: %d\n\r"),isPVariant());
+
+  read_register(CONFIG,buffer,1);
+  printf_P(PSTR("CONFIG = 0x%02x (CRC enable: %d; CRC16: %d)\n\r"),
+	   *buffer,(*buffer)&_BV(EN_CRC)?1:0,
+	   (*buffer)&_BV(CRCO)?1:0);  
 }
 
 /******************************************************************/
 
 void RF24::begin(void)
 {
+  // Initialize pins
   pinMode(ce_pin,OUTPUT);
   pinMode(csn_pin,OUTPUT);
 
+  // Initialize SPI bus
+  // Minimum ideal SPI bus speed is 2x data rate
+  // If we assume 2Mbs data rate and 16Mhz clock, a
+  // divider of 4 is the minimum we want.
+  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+  // We'll use a divider of 2 which will work up to
+  // MCU speeds of 20Mhz.
+  // CLK:BUS 8Mhz:4Mhz, 16Mhz:8Mhz, or 20Mhz:10Mhz (max)
   SPI.begin();
-  ce(LOW);
-  csn(HIGH);
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);
+  SPI.setClockDivider(SPI_CLOCK_DIV2); 
+
+  ce(LOW);
+  csn(HIGH);
+
+  // Must allow the radio time to settle else configuration bits will not necessarily stick.
+  // This is actually only required following power up but some settling time also appears to
+  // be required after resets too. For full coverage, we'll always assume the worst.
+  // Enabling 16b CRC is by far the most obvious case if the wrong timing is used - or skipped.
+  // Technically we require 4.5ms + 14us as a worst case. We'll just call it 5ms for good measure.
+  // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
+  delay( 5 ) ;
 
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
   // sizes must never be used. See documentation for a more complete explanation.
   write_register(SETUP_RETR,(B0100 << ARD) | (B1111 << ARC));
 
-  // Reset current status
-  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
- 
-  // Initialize CRC
-  write_register(CONFIG, _BV(EN_CRC) );
-
-  // Flush buffers
-  flush_rx();
-  flush_tx();
+  // Restore our default PA level
+  setPALevel( RF24_PA_MAX ) ;
 
   // Determine if this is a p or non-p RF24 module and then
   // reset our data rate back to default value. This works
@@ -332,6 +356,17 @@ void RF24::begin(void)
       p_variant = true ;
   }
   setDataRate( RF24_2MBPS ) ;
+
+  // Initialize CRC and request 2-byte (16bit) CRC
+  setCRCLength( RF24_CRC_16 ) ;
+
+  // Reset current status
+  // Notice reset and flush is the last thing we do
+  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+ 
+  // Flush buffers
+  flush_rx();
+  flush_tx();
 }
 
 /******************************************************************/
@@ -788,11 +823,26 @@ rf24_datarate_e RF24::getDataRate( void ) const {
 
 void RF24::setCRCLength(rf24_crclength_e length) const
 {
-  uint8_t config = read_register(CONFIG) & _BV(CRCO);
-  if (length == RF24_CRC_16)
-    config |= _BV(CRCO);
-  write_register(CONFIG,config);
+  uint8_t config = read_register(CONFIG) & ~_BV(CRCO) ;
+
+  // Always make sure CRC hardware validation is actually on
+  config |= _BV(EN_CRC) ;
+
+  // Now config 8 or 16 bit CRCs - only 16bit need be turned on
+  // 8b is the default.
+  if( length == RF24_CRC_16 ) {
+      config |= _BV( CRCO ) ;
+  }
+
+  write_register( CONFIG, config ) ;
 }
 
+/******************************************************************/
+
+void RF24::disableCRC( void ) const
+{
+  uint8_t disable = read_register(CONFIG) & ~_BV(EN_CRC) ;
+  write_register( CONFIG, disable ) ;
+}
 // vim:ai:cin:sts=2 sw=2 ft=cpp
 
