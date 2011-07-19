@@ -50,7 +50,7 @@ protected:
      *
      * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
      */
-    void csn(int mode) const ;
+    void csn(int mode) ;
 
     /**
      * Set chip enable
@@ -58,7 +58,7 @@ protected:
      * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
      * for a much more detailed description of this pin.
      */
-    void ce(int level) const ;
+    void ce(int level) ;
 
     /**
      * Read a chunk of data in from a register
@@ -68,7 +68,7 @@ protected:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) const ;
+    uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len) ;
 
     /**
      * Read single byte from a register
@@ -76,7 +76,7 @@ protected:
      * @param reg Which register. Use constants from nRF24L01.h
      * @return Current value of register @p reg
      */
-    uint8_t read_register(uint8_t reg) const ;
+    uint8_t read_register(uint8_t reg) ;
 
     /**
      * Write a chunk of data to a register
@@ -86,7 +86,7 @@ protected:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len) const ;
+    uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len) ;
 
     /**
      * Write a single byte to a register
@@ -95,7 +95,7 @@ protected:
      * @param value The new value to write
      * @return Current value of status register
      */
-    uint8_t write_register(uint8_t reg, uint8_t value) const ;
+    uint8_t write_register(uint8_t reg, uint8_t value) ;
 
     /**
      * Write the transmit payload
@@ -134,21 +134,21 @@ protected:
      *
      * @return Current value of status register
      */
-    uint8_t flush_rx(void) const ;
+    uint8_t flush_rx(void) ;
 
     /**
      * Empty the transmit buffer
      *
      * @return Current value of status register
      */
-    uint8_t flush_tx(void) const ;
+    uint8_t flush_tx(void) ;
 
     /**
      * Retrieve the current status of the chip
      *
      * @return Current value of status register
      */
-    uint8_t get_status(void) const ;
+    uint8_t get_status(void) ;
 
     /**
      * Decode and print the given status to stdout
@@ -157,7 +157,7 @@ protected:
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      */
-    void print_status(uint8_t status) const ;
+    void print_status(uint8_t status) ;
 
     /**
      * Decode and print the given 'observe_tx' value to stdout
@@ -166,7 +166,7 @@ protected:
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      */
-    void print_observe_tx(uint8_t value) const ;
+    void print_observe_tx(uint8_t value) ;
 
     /**
      * Turn on or off the special features of the chip
@@ -174,7 +174,7 @@ protected:
      * The chip has certain 'features' which are only available when the 'features'
      * are enabled.  See the datasheet for details.
      */
-    void toggle_features(void) const ;
+    void toggle_features(void) ;
     /**@}*/
 
 public:
@@ -211,14 +211,14 @@ public:
      * in this mode, without first calling stopListening().  Call
      * isAvailable() to check for incoming traffic, and read() to get it.
      */
-    void startListening(void) const ;
+    void startListening(void) ;
 
     /**
      * Stop listening for incoming messages
      *
      * Do this before calling write().
      */
-    void stopListening(void) const ;
+    void stopListening(void) ;
 
     /**
      * Write to the open writing pipe
@@ -245,7 +245,7 @@ public:
      *
      * @return True if there is a payload available, false if none is
      */
-    boolean available(void) const ;
+    boolean available(void) ;
 
     /**
      * Read the payload
@@ -351,15 +351,22 @@ public:
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      */
-    void printDetails(void) const ;
+    void printDetails(void) ;
 
     /**
      * Enter low-power mode
      *
-     * To return to normal power mode, either write() some data or
-     * startListening().
+     * To return to normal power mode, either write() some data,
+     * startListening(), or powerUp().
      */
-    void powerDown(void) const ;
+    void powerDown(void) ;
+
+    /**
+     * Leave low-power mode - making radio more responsive
+     *
+     * To return to low power mode, call powerDown().
+     */
+    void powerUp(void) ;
 
     /**
      * Test whether there are bytes available to be read
@@ -370,7 +377,7 @@ public:
      * @param[out] pipe_num Which pipe has the payload available
      * @return True if there is a payload available, false if none is
      */
-    boolean available(uint8_t* pipe_num) const ;
+    boolean available(uint8_t* pipe_num) ;
 
     /**
      * Enable custom payloads on the acknowledge packets
@@ -380,7 +387,7 @@ public:
      *
      * @see examples/pingpair_pl/pingpair_pl.pde
      */
-    void enableAckPayload(void) const;
+    void enableAckPayload(void) ;
 
     /**
      * Write an ack payload for the specified pipe
@@ -396,7 +403,7 @@ public:
      * @param len Length of the data to send, up to 32 bytes max.  Not affected
      * by the static payload set by setPayloadSize().
      */
-    void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len) const ;
+    void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len) ;
 
     /**
      * Determine if an ack payload was received in the most recent call to
@@ -417,7 +424,7 @@ public:
      * @return Returns true if the hardware is RF24L01P (or compatible) and false
      * if its not.
      */
-    boolean isPVariant(void) const ;
+    boolean isPVariant(void) ;
 
     /**
      * Enable or disable auto-acknowlede packets
@@ -427,7 +434,7 @@ public:
      *
      * @param enable Whether to enable (true) or disable (false) auto-acks
      */
-    void setAutoAck(bool enable) const ;
+    void setAutoAck(bool enable) ;
 
     /**
      * Enable or disable auto-acknowlede packets on a per pipeline basis.
@@ -438,7 +445,7 @@ public:
      * @param which pipeline to modify
      * @param enable Whether to enable (true) or disable (false) auto-acks
      */
-    void setAutoAck( uint8_t pipe, bool enable ) const ;
+    void setAutoAck( uint8_t pipe, bool enable ) ;
 
     /**
      * Test whether there was a carrier on the line for the
@@ -448,7 +455,7 @@ public:
      *
      * @return true if was carrier, false if not
      */
-    boolean testCarrier(void) const ;
+    boolean testCarrier(void) ;
 
     /**
      * Test whether a signal (carrier or otherwise) greater than
@@ -460,7 +467,7 @@ public:
      *
      * @return true if signal => -64dBm, false if not
      */
-    boolean testRPD(void) const ;
+    boolean testRPD(void) ;
 
     /**
      * Set Power Amplifier (PA) level to one of four levels.
@@ -471,7 +478,7 @@ public:
      *
      * @param Desired PA level.
      */
-    void setPALevel( rf24_pa_dbm_e level ) const ;
+    void setPALevel( rf24_pa_dbm_e level ) ;
 
     /**
      * Fetches the current PA level. 
@@ -481,7 +488,7 @@ public:
      * by the enum mnemonics are negative dBm. See setPALevel for
      * return value descriptions.
      */
-    rf24_pa_dbm_e getPALevel( void ) const ;
+    rf24_pa_dbm_e getPALevel( void ) ;
 
     /**
      * Set the transmission data rate
@@ -497,20 +504,20 @@ public:
      * is one of 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS, as defined in the
      * rf24_datarate_e enum.
      */
-    rf24_datarate_e getDataRate( void ) const ;
+    rf24_datarate_e getDataRate( void ) ;
 
     /**
      * Set the CRC length
      *
      * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
      */
-    void setCRCLength(rf24_crclength_e length) const ;
+    void setCRCLength(rf24_crclength_e length) ;
 
     /**
      * Disable CRC validation
      *
      */
-    void disableCRC( void ) const ;
+    void disableCRC( void ) ;
 
     /**@}*/
 };
