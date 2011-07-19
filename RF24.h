@@ -61,6 +61,14 @@ protected:
     void ce(int level) ;
 
     /**
+     *
+     * Setup the SPI bus. This centralizes its configuration. Use insures proper
+     * SPI operation whereby multiple SPI devices, having a different SPI configuration,
+     * are in use.
+     */
+    void configSPIBus(void) ;
+
+    /**
      * Read a chunk of data in from a register
      *
      * @param reg Which register. Use constants from nRF24L01.h

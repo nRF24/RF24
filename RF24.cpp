@@ -28,9 +28,6 @@
 
 void RF24::csn(int mode)
 {
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2); 
   digitalWrite(csn_pin,mode);
 }
 
@@ -43,11 +40,21 @@ void RF24::ce(int level)
 
 /******************************************************************/
 
+void RF24::configSPIBus(void)
+{
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE0);
+  SPI.setClockDivider(SPI_CLOCK_DIV2); 
+}
+
+/******************************************************************/
+
 uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
   uint8_t status;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
     *buf++ = SPI.transfer(0xff);
@@ -62,6 +69,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 uint8_t RF24::read_register(uint8_t reg)
 {
   csn(LOW);
+  configSPIBus() ;
   SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   uint8_t result = SPI.transfer(0xff);
 
@@ -76,6 +84,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   uint8_t status;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
     SPI.transfer(*buf++);
@@ -94,6 +103,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\n\r"),reg,value));
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   SPI.transfer(value);
   csn(HIGH);
@@ -110,6 +120,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
   const uint8_t* current = (const uint8_t*)buf;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( W_TX_PAYLOAD );
   uint8_t data_len = min(len,payload_size);
   uint8_t blank_len = payload_size - data_len;
@@ -131,6 +142,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   uint8_t* current = (uint8_t*)buf;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( R_RX_PAYLOAD );
   uint8_t data_len = min(len,payload_size);
   uint8_t blank_len = payload_size - data_len;
@@ -150,6 +162,7 @@ uint8_t RF24::flush_rx(void)
   uint8_t status;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( FLUSH_RX );  
   csn(HIGH);
 
@@ -163,6 +176,7 @@ uint8_t RF24::flush_tx(void)
   uint8_t status;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( FLUSH_TX );  
   csn(HIGH);
 
@@ -176,6 +190,7 @@ uint8_t RF24::get_status(void)
   uint8_t status;
 
   csn(LOW);
+  configSPIBus() ;
   status = SPI.transfer( NOP );
   csn(HIGH);
 
@@ -324,10 +339,8 @@ void RF24::begin(void)
   // We'll use a divider of 2 which will work up to
   // MCU speeds of 20Mhz.
   // CLK:BUS 8Mhz:4Mhz, 16Mhz:8Mhz, or 20Mhz:10Mhz (max)
+  configSPIBus() ;
   SPI.begin();
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2); 
 
   ce(LOW);
   csn(HIGH);
@@ -481,6 +494,7 @@ uint8_t RF24::read_payload_length(void)
   uint8_t result = 0;
 
   csn(LOW);
+  configSPIBus() ;
   SPI.transfer( R_RX_PL_WID );
   result = SPI.transfer(0xff);
   csn(HIGH);
@@ -597,6 +611,7 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
 void RF24::toggle_features(void)
 {
   csn(LOW);
+  configSPIBus() ;
   SPI.transfer( ACTIVATE );
   SPI.transfer( 0x73 );
   csn(HIGH);
@@ -636,6 +651,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   const uint8_t* current = (const uint8_t*)buf;
 
   csn(LOW);
+  configSPIBus() ;
   SPI.transfer( W_ACK_PAYLOAD | ( pipe & B111 ) );
   uint8_t data_len = min(len,32);
   while ( data_len-- )
