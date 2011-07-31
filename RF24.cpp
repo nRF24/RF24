@@ -30,7 +30,7 @@ void RF24::csn(int mode)
 {
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2); 
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
   digitalWrite(csn_pin,mode);
 }
 
@@ -118,7 +118,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
   // This does not seem to be needed.  Keeping it here in case
   // removing it does cause problems for static payloads
   //
-  // Send blanks out to the chip to finish off the payload 
+  // Send blanks out to the chip to finish off the payload
   //uint8_t blank_len = payload_size - data_len;
   //while ( blank_len-- )
   //  SPI.transfer(0);
@@ -140,7 +140,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   uint8_t data_len = min(len,payload_size);
   while ( data_len-- )
     *current++ = SPI.transfer(0xff);
-  
+
   // This does not seem to be needed.  Keeping it here in case
   // removing it does cause problems for static payloads
   //
@@ -149,7 +149,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   //uint8_t blank_len = payload_size - data_len;
   //while ( blank_len-- )
   //  SPI.transfer(0xff);
-  
+
   csn(HIGH);
 
   return status;
@@ -253,9 +253,9 @@ void RF24::print_address_register(prog_char* name, uint8_t reg, uint8_t qty)
 
 /****************************************************************************/
 
-RF24::RF24(uint8_t _cepin, uint8_t _cspin): 
-    ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
-    payload_size(32), ack_payload_available(false)
+RF24::RF24(uint8_t _cepin, uint8_t _cspin):
+  ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
+  payload_size(32), ack_payload_available(false)
 {
 }
 
@@ -298,16 +298,16 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  // These need to be merged in with the register printing scheme 
+  // These need to be merged in with the register printing scheme
 #if 0
   read_register(RF_SETUP,buffer,1);
-  printf_P(PSTR("RF_SETUP = 0x%02x (data rate: %d)\n\r"),*buffer,getDataRate());  
+  printf_P(PSTR("RF_SETUP = 0x%02x (data rate: %d)\n\r"),*buffer,getDataRate());
   printf_P(PSTR("Hardware; isPVariant: %d\n\r"),isPVariant());
 
   read_register(CONFIG,buffer,1);
   printf_P(PSTR("CONFIG = 0x%02x (CRC enable: %d; CRC16: %d)\n\r"),
-	   *buffer,(*buffer)&_BV(EN_CRC)?1:0,
-	   (*buffer)&_BV(CRCO)?1:0); 
+           *buffer,(*buffer)&_BV(EN_CRC)?1:0,
+           (*buffer)&_BV(CRCO)?1:0);
 #endif
 }
 
@@ -330,7 +330,7 @@ void RF24::begin(void)
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2); 
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
 
   ce(LOW);
   csn(HIGH);
@@ -355,8 +355,9 @@ void RF24::begin(void)
   // reset our data rate back to default value. This works
   // because a non-P variant won't allow the data rate to
   // be set to 250Kbps.
-  if( setDataRate( RF24_250KBPS ) ) {
-      p_variant = true ;
+  if( setDataRate( RF24_250KBPS ) )
+  {
+    p_variant = true ;
   }
   setDataRate( RF24_2MBPS ) ;
 
@@ -369,7 +370,7 @@ void RF24::begin(void)
 
   // Set up default configuration.  Callers can always change it later.
   setChannel(1);
- 
+
   // Flush buffers
   flush_rx();
   flush_tx();
@@ -524,7 +525,7 @@ bool RF24::available(uint8_t* pipe_num)
 {
   uint8_t status = get_status();
 
-  // Too noisy, enable if you really want lots o data!! 
+  // Too noisy, enable if you really want lots o data!!
   //IF_SERIAL_DEBUG(print_status(status));
 
   bool result = ( status & _BV(RX_DR) );
@@ -581,8 +582,8 @@ void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
 void RF24::openWritingPipe(uint64_t value)
 {
   // Note that AVR 8-bit uC's store this LSB first, and the NRF24L01(+)
-  // expects it LSB first too, so we're good.  
-  
+  // expects it LSB first too, so we're good.
+
   write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), 5);
   write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), 5);
   write_register(RX_PW_P0,min(payload_size,32));
@@ -715,8 +716,9 @@ bool RF24::isAckPayloadAvailable(void)
 
 /****************************************************************************/
 
-boolean RF24::isPVariant(void) {
-    return p_variant ;
+boolean RF24::isPVariant(void)
+{
+  return p_variant ;
 }
 
 /******************************************************************/
@@ -736,10 +738,13 @@ void RF24::setAutoAck( uint8_t pipe, bool enable )
   if ( pipe <= 6 )
   {
     uint8_t en_aa = read_register( EN_AA ) ;
-    if( enable ) {
-	en_aa |= _BV(pipe) ;
-    } else {
-	en_aa &= ~_BV(pipe) ;
+    if( enable )
+    {
+      en_aa |= _BV(pipe) ;
+    }
+    else
+    {
+      en_aa &= ~_BV(pipe) ;
     }
     write_register( EN_AA, en_aa ) ;
   }
@@ -769,24 +774,24 @@ void RF24::setPALevel(rf24_pa_dbm_e level)
   switch( level )
   {
   case RF24_PA_MAX:
-      setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
-      break ;
+    setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
+    break ;
 
   case RF24_PA_HIGH:
-      setup |= _BV(RF_PWR_HIGH) ;
-      break ;
+    setup |= _BV(RF_PWR_HIGH) ;
+    break ;
 
   case RF24_PA_LOW:
-      setup |= _BV(RF_PWR_LOW) ;
-      break ;
+    setup |= _BV(RF_PWR_LOW) ;
+    break ;
 
   case RF24_PA_MIN:
-      break ;
+    break ;
 
   case RF24_PA_ERROR:
-      // On error, go to maximum PA
-      setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
-      break ;
+    // On error, go to maximum PA
+    setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
+    break ;
   }
 
   write_register( RF_SETUP, setup ) ;
@@ -802,20 +807,20 @@ rf24_pa_dbm_e RF24::getPALevel(void)
   switch( power )
   {
   case (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)):
-      result = RF24_PA_MAX ;
-      break ;
+    result = RF24_PA_MAX ;
+    break ;
 
   case _BV(RF_PWR_HIGH):
-      result = RF24_PA_HIGH ;
-      break ;
+    result = RF24_PA_HIGH ;
+    break ;
 
   case _BV(RF_PWR_LOW):
-      result = RF24_PA_LOW ;
-      break ;
+    result = RF24_PA_LOW ;
+    break ;
 
   default:
-      result = RF24_PA_MIN ;
-      break ;
+    result = RF24_PA_MIN ;
+    break ;
   }
 
   return result ;
@@ -845,8 +850,8 @@ boolean RF24::setDataRate(rf24_datarate_e speed)
     {
       wide_band = true ;
       setup |= _BV(RF_DR_HIGH);
-    } 
-    else 
+    }
+    else
     {
       // 1Mbs
       wide_band = false ;
@@ -856,8 +861,9 @@ boolean RF24::setDataRate(rf24_datarate_e speed)
 
   // Verify our result
   setup = read_register(RF_SETUP) ;
-  if( setup == setup ) {
-      return true ;
+  if( setup == setup )
+  {
+    return true ;
   }
 
   wide_band = false ;
@@ -866,26 +872,28 @@ boolean RF24::setDataRate(rf24_datarate_e speed)
 
 /******************************************************************/
 
-rf24_datarate_e RF24::getDataRate( void ) {
+rf24_datarate_e RF24::getDataRate( void )
+{
   rf24_datarate_e result ;
   uint8_t setup = read_register(RF_SETUP) ;
 
   // Order matters in our case below
-  switch( setup & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ) {
+  switch( setup & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) )
+  {
   case _BV(RF_DR_LOW):
-      // '10' = 250KBPS
-      result = RF24_250KBPS ;
-      break ;
+    // '10' = 250KBPS
+    result = RF24_250KBPS ;
+    break ;
 
   case _BV(RF_DR_HIGH):
-      // '01' = 2MBPS
-      result = RF24_2MBPS ;
-      break ;
+    // '01' = 2MBPS
+    result = RF24_2MBPS ;
+    break ;
 
   default:
-      // '00' = 1MBPS
-      result = RF24_1MBPS ;
-      break ;
+    // '00' = 1MBPS
+    result = RF24_1MBPS ;
+    break ;
   }
 
   return result ;
@@ -902,7 +910,8 @@ void RF24::setCRCLength(rf24_crclength_e length)
 
   // Now config 8 or 16 bit CRCs - only 16bit need be turned on
   // 8b is the default.
-  if( length == RF24_CRC_16 ) {
+  if( length == RF24_CRC_16 )
+  {
     config |= _BV( CRCO ) ;
   }
 

@@ -374,7 +374,7 @@ public:
   uint8_t getPayloadSize(void);
 
   /**
-   * Get Dynamic Payload Size 
+   * Get Dynamic Payload Size
    *
    * For dynamic payloads, this pulls the size of the payload off
    * the chip
@@ -557,7 +557,7 @@ public:
   void setPALevel( rf24_pa_dbm_e level ) ;
 
   /**
-   * Fetches the current PA level. 
+   * Fetches the current PA level.
    *
    * @return Returns a value from the rf24_pa_dbm_e enum describing
    * the current PA setting. Please remember, all values represented
