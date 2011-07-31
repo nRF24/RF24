@@ -419,7 +419,7 @@ void RF24::powerUp(void)
 
 /******************************************************************/
 
-boolean RF24::write( const void* buf, uint8_t len )
+bool RF24::write( const void* buf, uint8_t len )
 {
   bool result = false;
 
@@ -716,7 +716,7 @@ bool RF24::isAckPayloadAvailable(void)
 
 /****************************************************************************/
 
-boolean RF24::isPVariant(void)
+bool RF24::isPVariant(void)
 {
   return p_variant ;
 }
@@ -752,14 +752,14 @@ void RF24::setAutoAck( uint8_t pipe, bool enable )
 
 /******************************************************************/
 
-boolean RF24::testCarrier(void)
+bool RF24::testCarrier(void)
 {
   return ( read_register(CD) & 1 );
 }
 
 /****************************************************************************/
 
-boolean RF24::testRPD(void)
+bool RF24::testRPD(void)
 {
   return ( read_register(RPD) & 1 ) ;
 }
@@ -828,8 +828,9 @@ rf24_pa_dbm_e RF24::getPALevel(void)
 
 /******************************************************************/
 
-boolean RF24::setDataRate(rf24_datarate_e speed)
+bool RF24::setDataRate(rf24_datarate_e speed)
 {
+  bool result = false;
   uint8_t setup = read_register(RF_SETUP) ;
 
   // HIGH and LOW '00' is 1Mbs - our default

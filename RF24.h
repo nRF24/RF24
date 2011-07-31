@@ -488,7 +488,7 @@ public:
    * @return true if the hardware is nRF24L01+ (or compatible) and false
    * if its not.
    */
-  boolean isPVariant(void) ;
+  bool isPVariant(void) ;
 
   /**
    * Call this when you get an interrupt to find out why
@@ -543,7 +543,7 @@ public:
    *
    * @return true if signal => -64dBm, false if not
    */
-  boolean testRPD(void) ;
+  bool testRPD(void) ;
 
   /**
    * Set Power Amplifier (PA) level to one of four levels.
