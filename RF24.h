@@ -12,7 +12,8 @@
 #include <stddef.h>
 #include <avr/pgmspace.h>
 
-typedef enum { RF24_1MBPS = 0, RF24_2MBPS } rf24_datarate_e;
+typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
+typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
 typedef enum { RF24_CRC_8 = 0, RF24_CRC_16 } rf24_crclength_e;
 
 /**
@@ -24,6 +25,8 @@ class RF24
 private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
+  bool wide_band; /* 2Mbs data rate in use? */
+  bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool ack_payload_available; /**< Whether there is an ack payload waiting */
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. Note: not used. */
@@ -42,6 +45,11 @@ protected:
   /**
    * Set chip select pin
    *
+   * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
+   * and best of all, we make use of the radio's FIFO buffers. A lower speed
+   * means we're less likely to effectively leverage our FIFOs and pay a higher
+   * AVR runtime cost as toll.
+   *
    * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
    */
   void csn(int mode);
@@ -49,10 +57,10 @@ protected:
   /**
    * Set chip enable
    *
-   * @param mode HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
+   * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
    * for a much more detailed description of this pin.
    */
-  void ce(int mode);
+  void ce(int level);
 
   /**
    * Read a chunk of data in from a register
@@ -391,6 +399,13 @@ public:
   void powerDown(void);
 
   /**
+   * Leave low-power mode - making radio more responsive
+   *
+   * To return to low power mode, call powerDown().
+   */
+  void powerUp(void) ;
+
+  /**
    * Test whether there are bytes available to be read
    *
    * Use this version to discover on which pipe the message
@@ -468,6 +483,14 @@ public:
   bool isAckPayloadAvailable(void);
 
   /**
+   * Determine whether the hardware is an nRF24L01+ or not.
+   *
+   * @return true if the hardware is nRF24L01+ (or compatible) and false
+   * if its not.
+   */
+  boolean isPVariant(void) ;
+
+  /**
    * Call this when you get an interrupt to find out why
    *
    * Tells you what caused the interrupt, and clears the state of
@@ -490,6 +513,17 @@ public:
   void setAutoAck(bool enable);
 
   /**
+   * Enable or disable auto-acknowlede packets on a per pipeline basis.
+   *
+   * AA is enabled by default, so it's only needed if you want to turn
+   * it off/on for some reason on a per pipeline basis.
+   *
+   * @param which pipeline to modify
+   * @param enable Whether to enable (true) or disable (false) auto-acks
+   */
+  void setAutoAck( uint8_t pipe, bool enable ) ;
+
+  /**
    * Test whether there was a carrier on the line for the
    * previous listening period.
    *
@@ -500,9 +534,42 @@ public:
   bool testCarrier(void);
 
   /**
+   * Test whether a signal (carrier or otherwise) greater than
+   * or equal to -64dBm is present on the channel. Valid only
+   * on nRF24L01P (+) hardware. On nRF24L01, use testCarrier().
+   *
+   * Useful to check for interference on the current channel and
+   * channel hopping strategies.
+   *
+   * @return true if signal => -64dBm, false if not
+   */
+  boolean testRPD(void) ;
+
+  /**
+   * Set Power Amplifier (PA) level to one of four levels.
+   * Relative mnemonics have been used to allow for future PA level
+   * changes. According to 6.5 of the nRF24L01+ specification sheet,
+   * they translate to: RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm,
+   * RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+   *
+   * @param Desired PA level.
+   */
+  void setPALevel( rf24_pa_dbm_e level ) ;
+
+  /**
+   * Fetches the current PA level. 
+   *
+   * @return Returns a value from the rf24_pa_dbm_e enum describing
+   * the current PA setting. Please remember, all values represented
+   * by the enum mnemonics are negative dBm. See setPALevel for
+   * return value descriptions.
+   */
+  rf24_pa_dbm_e getPALevel( void ) ;
+
+  /**
    * Set the transmission data rate
    *
-   * @param speed RF24_1MBPS for 1Mbps or RF24_2MBPS for 2Mbps
+   * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
    */
   void setDataRate(rf24_datarate_e speed);
 
@@ -512,6 +579,12 @@ public:
    * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
   void setCRCLength(rf24_crclength_e length);
+
+  /**
+   * Disable CRC validation
+   *
+   */
+  void disableCRC( void ) ;
 
   /**@}*/
 };

@@ -75,8 +75,7 @@
 #define ARC         0
 #define PLL_LOCK    4
 #define RF_DR       3
-#define RF_PWR      1
-#define LNA_HCURR   0        
+#define RF_PWR      6
 #define RX_DR       6
 #define TX_DS       5
 #define MAX_RT      4
@@ -112,3 +111,15 @@
 #define FLUSH_RX      0xE2
 #define REUSE_TX_PL   0xE3
 #define NOP           0xFF
+
+/* Non-P omissions */
+#define LNA_HCURR   0
+
+/* P model memory Map */
+#define RPD         0x09
+
+/* P model bit Mnemonics */
+#define RF_DR_LOW   5
+#define RF_DR_HIGH  3
+#define RF_PWR_LOW  1
+#define RF_PWR_HIGH 2
