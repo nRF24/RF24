@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Connect p6 to receiver, p4 to sender
+# WARNING: Test config 2 only works with PLUS units.
 
 jam p4 p6 || exit 1
 ./runtest.py /dev/tty.usbserial-A600eHIs 3 & 

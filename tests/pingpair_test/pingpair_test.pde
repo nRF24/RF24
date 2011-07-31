@@ -173,7 +173,7 @@ void setup(void)
   if (configuration=='2')
   {
     radio.setCRCLength(RF24_CRC_8);
-    radio.setDataRate(RF24_2MBPS);
+    radio.setDataRate(RF24_250KBPS);
     radio.setChannel(10);
   }
   else
