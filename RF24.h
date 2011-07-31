@@ -569,9 +569,21 @@ public:
   /**
    * Set the transmission data rate
    *
+   * @warning setting RF24_250KBPS will fail for non-P units
+   *
    * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+   * @return true if the change was successful
    */
-  void setDataRate(rf24_datarate_e speed);
+  bool setDataRate(rf24_datarate_e speed);
+  
+  /**
+   * Fetches the transmission data rate
+   *
+   * @return Returns the hardware's currently configured datarate. The value
+   * is one of 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS, as defined in the
+   * rf24_datarate_e enum.
+   */
+  rf24_datarate_e getDataRate( void ) ;
 
   /**
    * Set the CRC length

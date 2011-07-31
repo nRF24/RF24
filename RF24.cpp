@@ -616,9 +616,9 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&value), 5);
+      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&address), 5);
     else
-      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&value), 1);
+      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&address), 1);
 
     write_register(child_payload_size[child],payload_size);
 
@@ -861,14 +861,16 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   write_register(RF_SETUP,setup);
 
   // Verify our result
-  setup = read_register(RF_SETUP) ;
-  if( setup == setup )
+  if ( read_register(RF_SETUP) == setup )
   {
-    return true ;
+    result = true;
+  }
+  else
+  {
+    wide_band = false;
   }
 
-  wide_band = false ;
-  return false ;
+  return result;
 }
 
 /******************************************************************/
