@@ -518,7 +518,7 @@ public:
    * AA is enabled by default, so it's only needed if you want to turn
    * it off/on for some reason on a per pipeline basis.
    *
-   * @param which pipeline to modify
+   * @param pipe Which pipeline to modify
    * @param enable Whether to enable (true) or disable (false) auto-acks
    */
   void setAutoAck( uint8_t pipe, bool enable ) ;
@@ -552,7 +552,7 @@ public:
    * they translate to: RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm,
    * RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
    *
-   * @param Desired PA level.
+   * @param level Desired PA level.
    */
   void setPALevel( rf24_pa_dbm_e level ) ;
 
