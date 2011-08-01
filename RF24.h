@@ -394,7 +394,7 @@ public:
    * Enter low-power mode
    *
    * To return to normal power mode, either write() some data or
-   * startListening().
+   * startListening, or powerUp().
    */
   void powerDown(void);
 
@@ -569,7 +569,7 @@ public:
   /**
    * Set the transmission data rate
    *
-   * @warning setting RF24_250KBPS will fail for non-P units
+   * @warning setting RF24_250KBPS will fail for non-plus units
    *
    * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
    * @return true if the change was successful
