@@ -111,11 +111,11 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
   csn(LOW);
   status = SPI.transfer( W_TX_PAYLOAD );
   uint8_t data_len = min(len,payload_size);
-  //uint8_t blank_len = payload_size - data_len;
+  uint8_t blank_len = payload_size - data_len;
   while ( data_len-- )
     SPI.transfer(*current++);
-  //while ( blank_len-- )
-  //  SPI.transfer(0);
+  while ( blank_len-- )
+    SPI.transfer(0);
 
   csn(HIGH);
 
@@ -132,11 +132,11 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   csn(LOW);
   status = SPI.transfer( R_RX_PAYLOAD );
   uint8_t data_len = min(len,payload_size);
-  //uint8_t blank_len = payload_size - data_len;
+  uint8_t blank_len = payload_size - data_len;
   while ( data_len-- )
     *current++ = SPI.transfer(0xff);
-  //while ( blank_len-- )
-  //  SPI.transfer(0xff);
+  while ( blank_len-- )
+    SPI.transfer(0xff);
   csn(HIGH);
 
   return status;
