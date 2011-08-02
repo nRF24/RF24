@@ -108,10 +108,13 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
 
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
+  uint8_t data_len = min(len,payload_size);
+  uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
+  
+  //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
+  
   csn(LOW);
   status = SPI.transfer( W_TX_PAYLOAD );
-  uint8_t data_len = min(len,payload_size);
-  uint8_t blank_len = payload_size - data_len;
   while ( data_len-- )
     SPI.transfer(*current++);
   while ( blank_len-- )
@@ -129,10 +132,13 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   uint8_t status;
   uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
+  uint8_t data_len = min(len,payload_size);
+  uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
+  
+  //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
+  
   csn(LOW);
   status = SPI.transfer( R_RX_PAYLOAD );
-  uint8_t data_len = min(len,payload_size);
-  uint8_t blank_len = payload_size - data_len;
   while ( data_len-- )
     *current++ = SPI.transfer(0xff);
   while ( blank_len-- )
@@ -241,7 +247,8 @@ void RF24::print_address_register(prog_char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
-  ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false)
+  ce_pin(_cepin), csn_pin(_cspin), payload_size(32), ack_payload_available(false), 
+  dynamic_payloads_enabled(false)
 {
 }
 
@@ -299,6 +306,9 @@ void RF24::begin(void)
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   SPI.setClockDivider(SPI_CLOCK_DIV8);
+
+  // Disable dynamic payloads, to match dynamic_payloads_enabled setting
+  write_register(DYNPD,0);
 
   // Set generous timeouts, to make testing a little easier
   write_register(SETUP_RETR,(B1111 << ARD) | (B1111 << ARC));
@@ -592,6 +602,8 @@ void RF24::enableDynamicPayloads(void)
   // Not sure the use case of only having dynamic payload on certain
   // pipes, so the library does not support it.
   write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P5) | _BV(DPL_P4) | _BV(DPL_P3) | _BV(DPL_P2) | _BV(DPL_P1) | _BV(DPL_P0));
+
+  dynamic_payloads_enabled = true;
 }
 
 /****************************************************************************/
