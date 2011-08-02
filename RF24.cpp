@@ -457,7 +457,7 @@ bool RF24::write( const void* buf, uint8_t len )
   // * The send was successful (TX_DS)
   // * The send failed, too many retries (MAX_RT)
   // * There is an ack packet waiting (RX_DR)
-  bool tx_ok, tx_fail, ack_payload_available;
+  bool tx_ok, tx_fail;
   whatHappened(tx_ok,tx_fail,ack_payload_available);
 
   result = tx_ok;
@@ -928,5 +928,12 @@ void RF24::disableCRC( void )
   uint8_t disable = read_register(CONFIG) & ~_BV(EN_CRC) ;
   write_register( CONFIG, disable ) ;
 }
+
+/****************************************************************************/
+void RF24::setRetries(uint8_t delay, uint8_t count)
+{
+ write_register(SETUP_RETR,(delay&0xf)<<ARD | (count&0xf)<<ARC);
+}
+
 // vim:ai:cin:sts=2 sw=2 ft=cpp
 
