@@ -159,7 +159,7 @@ void loop(void)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 250 )
+      if (millis() - started_waiting_at > 200 )
         timeout = true;
 
     // Describe the results
@@ -200,6 +200,10 @@ void loop(void)
 
         // Spew it
         printf("Got payload %lu...",got_time);
+
+	// Delay just a little bit to let the other unit
+	// make the transition to receiver
+	delay(20);
       }
 
       // First, stop listening so we can talk
