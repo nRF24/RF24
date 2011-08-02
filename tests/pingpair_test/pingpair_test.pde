@@ -193,9 +193,9 @@ void setup(void)
   // Config 3 is static payloads only
   if (configuration == '3')
   {
-    next_payload_size = max_payload_size;
+    next_payload_size = 16;
     payload_size_increments_by = 0;
-    radio.setPayloadSize(16);
+    radio.setPayloadSize(next_payload_size);
   }
   else
   {
@@ -351,6 +351,7 @@ void check_radio(void)
 	printf("FAILED ");
 	one_failed();
       }
+      last_message_count = message_count;
     }
 
     // If we're the receiver, we've received a time message
@@ -360,7 +361,9 @@ void check_radio(void)
       size_t len = max_payload_size;
       memset(receive_payload,0,max_payload_size);
       
-      if ( configuration != '3' )
+      if ( configuration == '3' )
+	len = next_payload_size;
+      else
 	len = radio.getDynamicPayloadSize();
       
       radio.read( receive_payload, len );
@@ -369,8 +372,7 @@ void check_radio(void)
       receive_payload[len] = 0;
 
       // Spew it
-      len = strlen(receive_payload); // How much did we REALLY get?
-      printf("Got payload size=%i value=%s\n\r",len,receive_payload);
+      printf("Got payload size=%i value=%s strlen=%u\n\r",len,receive_payload,strlen(receive_payload));
 
       // Add an ack packet for the next time around.
       // Here we will report back how many bytes we got this time.

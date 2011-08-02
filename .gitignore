@@ -2,6 +2,7 @@
 *.o
 .*.swp
 *.orig
+.swp
 docs/
 output/
 ojam/
