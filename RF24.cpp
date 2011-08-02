@@ -459,6 +459,7 @@ bool RF24::write( const void* buf, uint8_t len )
   // * There is an ack packet waiting (RX_DR)
   bool tx_ok, tx_fail;
   whatHappened(tx_ok,tx_fail,ack_payload_available);
+  printf("%u%u%u\n\r",tx_ok,tx_fail,ack_payload_available);
 
   result = tx_ok;
   IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
@@ -495,6 +496,7 @@ void RF24::startWrite( const void* buf, uint8_t len )
   // Allons!
   ce(HIGH);
   delayMicroseconds(15);
+  delay(2);
   ce(LOW);
 }
 
@@ -569,6 +571,7 @@ bool RF24::read( void* buf, uint8_t len )
 void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
 {
   // Read the status & reset the status in one easy call
+  // Or is that such a good idea?
   uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Report to the user what happened
