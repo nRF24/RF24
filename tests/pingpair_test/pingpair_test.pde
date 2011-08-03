@@ -272,6 +272,13 @@ void loop(void)
     
     // Try again soon
     delay(interval);
+    
+    // Timeout if we have not received anything back ever
+    if ( ! last_message_count && millis() > interval * 10 )
+    {
+      printf("No responses received.  Are interrupts connected??\n\r");
+      done = true;
+    }
   }
 
   //
@@ -291,6 +298,9 @@ void loop(void)
     else
       printf("FAIL\n\r\n\r");
   }
+
+  //
+  //
 }
 
 void check_radio(void)
