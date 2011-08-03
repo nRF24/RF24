@@ -329,12 +329,13 @@ public:
 
   /**@}*/
   /**
-   * @name Optional public interface
+   * @name Optional Configurators 
    *
-   *  Methods you may want to use but are not needed for regular operation
+   *  Methods you can use to get or set the configuration of the chip.
+   *  None are required.  Calling begin() sets up a reasonable set of
+   *  defaults.
    */
   /**@{*/
-
   /**
    * Set the number and delay of retries upon failed submit
    *
@@ -383,55 +384,7 @@ public:
    * @return Payload length of last-received dynamic payload
    */
   uint8_t getDynamicPayloadSize(void);
-
-  /**
-   * Print a giant block of debugging information to stdout
-   *
-   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
-   */
-  void printDetails(void);
-
-  /**
-   * Enter low-power mode
-   *
-   * To return to normal power mode, either write() some data or
-   * startListening, or powerUp().
-   */
-  void powerDown(void);
-
-  /**
-   * Leave low-power mode - making radio more responsive
-   *
-   * To return to low power mode, call powerDown().
-   */
-  void powerUp(void) ;
-
-  /**
-   * Test whether there are bytes available to be read
-   *
-   * Use this version to discover on which pipe the message
-   * arrived.
-   *
-   * @param[out] pipe_num Which pipe has the payload available
-   * @return True if there is a payload available, false if none is
-   */
-  bool available(uint8_t* pipe_num);
-
-  /**
-   * Non-blocking write to the open writing pipe
-   *
-   * Just like write(), but it returns immediately. To find out what happened
-   * to the send, catch the IRQ and then call whatHappened().
-   *
-   * @see write()
-   * @see whatHappened()
-   *
-   * @param buf Pointer to the data to be sent
-   * @param len Number of bytes to be sent
-   * @return True if the payload was delivered successfully false if not
-   */
-  void startWrite( const void* buf, uint8_t len );
-
+  
   /**
    * Enable custom payloads on the acknowledge packets
    *
@@ -453,55 +406,12 @@ public:
   void enableDynamicPayloads(void);
 
   /**
-   * Write an ack payload for the specified pipe
-   *
-   * The next time a message is received on @p pipe, the data in @p buf will
-   * be sent back in the acknowledgement.
-   *
-   * @warning According to the data sheet, only three of these can be pending
-   * at any time.  I have not tested this.
-   *
-   * @param pipe Which pipe# (typically 1-5) will get this response.
-   * @param buf Pointer to data that is sent
-   * @param len Length of the data to send, up to 32 bytes max.  Not affected
-   * by the static payload set by setPayloadSize().
-   */
-  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
-
-  /**
-   * Determine if an ack payload was received in the most recent call to
-   * write().
-   *
-   * Call read() to retrieve the ack payload.
-   *
-   * @warning Calling this function clears the internal flag which indicates
-   * a payload is available.  If it returns true, you must read the packet
-   * out as the very next interaction with the radio, or the results are
-   * undefined.
-   *
-   * @return True if an ack payload is available.
-   */
-  bool isAckPayloadAvailable(void);
-
-  /**
    * Determine whether the hardware is an nRF24L01+ or not.
    *
    * @return true if the hardware is nRF24L01+ (or compatible) and false
    * if its not.
    */
   bool isPVariant(void) ;
-
-  /**
-   * Call this when you get an interrupt to find out why
-   *
-   * Tells you what caused the interrupt, and clears the state of
-   * interrupts.
-   *
-   * @param[out] tx_ok The send was successful (TX_DS)
-   * @param[out] tx_fail The send failed, too many retries (MAX_RT)
-   * @param[out] rx_ready There is a message waiting to be read (RX_DS)
-   */
-  void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready);
 
   /**
    * Enable or disable auto-acknowlede packets
@@ -523,28 +433,6 @@ public:
    * @param enable Whether to enable (true) or disable (false) auto-acks
    */
   void setAutoAck( uint8_t pipe, bool enable ) ;
-
-  /**
-   * Test whether there was a carrier on the line for the
-   * previous listening period.
-   *
-   * Useful to check for interference on the current channel.
-   *
-   * @return true if was carrier, false if not
-   */
-  bool testCarrier(void);
-
-  /**
-   * Test whether a signal (carrier or otherwise) greater than
-   * or equal to -64dBm is present on the channel. Valid only
-   * on nRF24L01P (+) hardware. On nRF24L01, use testCarrier().
-   *
-   * Useful to check for interference on the current channel and
-   * channel hopping strategies.
-   *
-   * @return true if signal => -64dBm, false if not
-   */
-  bool testRPD(void) ;
 
   /**
    * Set Power Amplifier (PA) level to one of four levels.
@@ -598,6 +486,127 @@ public:
    *
    */
   void disableCRC( void ) ;
+
+  /**@}*/
+  /**
+   * @name Advanced Operation 
+   *
+   *  Methods you can use to drive the chip in more advanced ways 
+   */
+  /**@{*/
+
+  /**
+   * Print a giant block of debugging information to stdout
+   *
+   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+   */
+  void printDetails(void);
+
+  /**
+   * Enter low-power mode
+   *
+   * To return to normal power mode, either write() some data or
+   * startListening, or powerUp().
+   */
+  void powerDown(void);
+
+  /**
+   * Leave low-power mode - making radio more responsive
+   *
+   * To return to low power mode, call powerDown().
+   */
+  void powerUp(void) ;
+
+  /**
+   * Test whether there are bytes available to be read
+   *
+   * Use this version to discover on which pipe the message
+   * arrived.
+   *
+   * @param[out] pipe_num Which pipe has the payload available
+   * @return True if there is a payload available, false if none is
+   */
+  bool available(uint8_t* pipe_num);
+
+  /**
+   * Non-blocking write to the open writing pipe
+   *
+   * Just like write(), but it returns immediately. To find out what happened
+   * to the send, catch the IRQ and then call whatHappened().
+   *
+   * @see write()
+   * @see whatHappened()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  void startWrite( const void* buf, uint8_t len );
+
+  /**
+   * Write an ack payload for the specified pipe
+   *
+   * The next time a message is received on @p pipe, the data in @p buf will
+   * be sent back in the acknowledgement.
+   *
+   * @warning According to the data sheet, only three of these can be pending
+   * at any time.  I have not tested this.
+   *
+   * @param pipe Which pipe# (typically 1-5) will get this response.
+   * @param buf Pointer to data that is sent
+   * @param len Length of the data to send, up to 32 bytes max.  Not affected
+   * by the static payload set by setPayloadSize().
+   */
+  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+
+  /**
+   * Determine if an ack payload was received in the most recent call to
+   * write().
+   *
+   * Call read() to retrieve the ack payload.
+   *
+   * @warning Calling this function clears the internal flag which indicates
+   * a payload is available.  If it returns true, you must read the packet
+   * out as the very next interaction with the radio, or the results are
+   * undefined.
+   *
+   * @return True if an ack payload is available.
+   */
+  bool isAckPayloadAvailable(void);
+
+  /**
+   * Call this when you get an interrupt to find out why
+   *
+   * Tells you what caused the interrupt, and clears the state of
+   * interrupts.
+   *
+   * @param[out] tx_ok The send was successful (TX_DS)
+   * @param[out] tx_fail The send failed, too many retries (MAX_RT)
+   * @param[out] rx_ready There is a message waiting to be read (RX_DS)
+   */
+  void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready);
+
+  /**
+   * Test whether there was a carrier on the line for the
+   * previous listening period.
+   *
+   * Useful to check for interference on the current channel.
+   *
+   * @return true if was carrier, false if not
+   */
+  bool testCarrier(void);
+
+  /**
+   * Test whether a signal (carrier or otherwise) greater than
+   * or equal to -64dBm is present on the channel. Valid only
+   * on nRF24L01P (+) hardware. On nRF24L01, use testCarrier().
+   *
+   * Useful to check for interference on the current channel and
+   * channel hopping strategies.
+   *
+   * @return true if signal => -64dBm, false if not
+   */
+  bool testRPD(void) ;
 
   /**@}*/
 };
