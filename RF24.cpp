@@ -256,6 +256,9 @@ RF24::RF24(uint8_t _cepin, uint8_t _cspin):
 
 void RF24::setChannel(uint8_t channel)
 {
+  // TODO: This method could take advantage of the 'wide_band' calculation
+  // done in setChannel() to require certain channel spacing.
+
   write_register(RF_CH,min(channel,127));
 }
 
@@ -723,7 +726,7 @@ bool RF24::isPVariant(void)
   return p_variant ;
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 void RF24::setAutoAck(bool enable)
 {
@@ -752,7 +755,7 @@ void RF24::setAutoAck( uint8_t pipe, bool enable )
   }
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 bool RF24::testCarrier(void)
 {
@@ -766,7 +769,7 @@ bool RF24::testRPD(void)
   return ( read_register(RPD) & 1 ) ;
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 void RF24::setPALevel(rf24_pa_dbm_e level)
 {
@@ -799,7 +802,7 @@ void RF24::setPALevel(rf24_pa_dbm_e level)
   write_register( RF_SETUP, setup ) ;
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 rf24_pa_dbm_e RF24::getPALevel(void)
 {
@@ -828,7 +831,7 @@ rf24_pa_dbm_e RF24::getPALevel(void)
   return result ;
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 bool RF24::setDataRate(rf24_datarate_e speed)
 {
@@ -875,7 +878,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   return result;
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 rf24_datarate_e RF24::getDataRate( void )
 {
@@ -923,7 +926,7 @@ void RF24::setCRCLength(rf24_crclength_e length)
   write_register( CONFIG, config ) ;
 }
 
-/******************************************************************/
+/****************************************************************************/
 
 void RF24::disableCRC( void )
 {
