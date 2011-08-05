@@ -1,0 +1,56 @@
+/**
+ * @page FAQ Frequently Asked Questions
+ *
+ * @ref starting
+ *
+ * @ref hardware
+ *
+ * @ref range
+ *
+ * @ref tests
+ *
+ * @section starting Where do I start?
+ *
+ * Start with the pingpair example.  Follow the instructions in the comments
+ * of that sketch.
+ *
+ * @section hardware Where can I buy some hardware?
+ *
+ * I've been using modules from mdfly.com.
+ *
+ * Mostly these units as the workhorse of the system:
+ *
+ * @li 2.4Ghz Wireless nRF24L01 Transceiver Module $6.95
+ * http://www.mdfly.com/index.php?main_page=product_info&cPath=8_52&products_id=82
+ *
+ * And then also experimenting with these for greater range
+ *
+ * @li nRF24L01 2.4GHz Transceiver Module w/ Power Amplifier $12.95
+ * http://www.mdfly.com/index.php?main_page=product_info&cPath=8_52&products_id=394
+ * @li 2.4GHz Transceiver Module w/ Power Amplifier $19.95
+ * http://www.mdfly.com/index.php?main_page=product_info&cPath=8_52&products_id=583
+ *
+ * However, I also noticed that iTeadStudio has nRF24L01+ units for $4!
+ *
+ * @section range What is the range of these units?
+ *
+ * Here are some results from measurements I have taken.  I recommend that everyone
+ * take their own measurements in their particular circumstances.
+ *
+ * @li non-plus unit, 2MBps (worst case), 41+ ft line of sight indoors, immediate dropoff with any deviation from LOS.  (41 ft is as far as I can go in my house without turning a corner)
+ * @li Plus unit, 250kbps (best case), 46 ft around two corners indoors, 49 ft around one corner.  More importantly, at 250k, packet loss is almost negligible through almost all of that range.
+ * @li Both units at 1MBps, plus unit gets about 10% range improvement over non-plus in almost all situations.
+ *  
+ * @section tests Why are the examples in the 'tests' directory failing?
+ *
+ * The sketches in the 'tests' directory are not for general use.
+ * Please use the examples in the 'examples' directory instead.  
+ *
+ * The 'tests' directory is only for people making changes to the library
+ * to ensure that their changes do not break anything.
+ *
+ *
+ *
+ *
+ *
+ */

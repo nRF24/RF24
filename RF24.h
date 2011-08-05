@@ -707,6 +707,10 @@ public:
  *
  * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
  * the SPI hardware will go into 'slave' mode.
+ *
+ * @section More More Information
+ *
+ * @subpage FAQ
  */
 
 #endif // __RF24_H__
