@@ -93,12 +93,6 @@ void setup(void)
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(15,15);
 
-  // optionally, use a high channel to avoid WiFi chatter
-  radio.setChannel(110);
-
-  // optionally, increase the CRC length for improved reliability
-  radio.setCRCLength(RF24_CRC_16);
-
   // optionally, reduce the payload size.  seems to
   // improve reliability
   radio.setPayloadSize(8);

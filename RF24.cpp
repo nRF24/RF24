@@ -351,7 +351,10 @@ void RF24::begin(void)
   {
     p_variant = true ;
   }
-  setDataRate( RF24_2MBPS ) ;
+  
+  // Then set the data rate to the slowest (and most reliable) speed supported by all
+  // hardware.
+  setDataRate( RF24_1MBPS ) ;
 
   // Initialize CRC and request 2-byte (16bit) CRC
   setCRCLength( RF24_CRC_16 ) ;
@@ -364,7 +367,7 @@ void RF24::begin(void)
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Set up default configuration.  Callers can always change it later.
-  setChannel(1);
+  setChannel(100);
 
   // Flush buffers
   flush_rx();

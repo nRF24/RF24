@@ -104,12 +104,6 @@ void setup(void)
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(15,15);
 
-  // optionally, use a high channel to avoid WiFi chatter
-  radio.setChannel(110);
-
-  // optionally, increase the CRC length for improved reliability
-  radio.setCRCLength(RF24_CRC_16);
-
   //
   // Open pipes to other nodes for communication
   //

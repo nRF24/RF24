@@ -94,12 +94,6 @@ void setup(void)
   // We will be using the Ack Payload feature, so please enable it
   radio.enableAckPayload();
 
-  // Optional: Increase CRC length for improved reliability
-  radio.setCRCLength(RF24_CRC_16);
-
-  // Optional: Pick a high channel
-  radio.setChannel(110);
-
   //
   // Open pipes to other nodes for communication
   //
