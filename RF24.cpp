@@ -911,19 +911,43 @@ rf24_datarate_e RF24::getDataRate( void )
 
 void RF24::setCRCLength(rf24_crclength_e length)
 {
-  uint8_t config = read_register(CONFIG) & ~_BV(CRCO) ;
+  uint8_t config = read_register(CONFIG) & ~( _BV(CRCO) | _BV(EN_CRC)) ;
 
-  // Always make sure CRC hardware validation is actually on
-  config |= _BV(EN_CRC) ;
-
-  // Now config 8 or 16 bit CRCs - only 16bit need be turned on
-  // 8b is the default.
-  if( length == RF24_CRC_16 )
+  switch (length)
   {
-    config |= _BV( CRCO ) ;
+    case RF24_CRC_DISABLED:
+      break;
+
+    case RF24_CRC_8:
+      config |= _BV(EN_CRC);
+      break;
+
+    case RF24_CRC_16:
+    default:
+      config |= _BV(EN_CRC);
+      config |= _BV( CRCO );
+      break;
   }
 
   write_register( CONFIG, config ) ;
+}
+
+/****************************************************************************/
+
+rf24_crclength_e RF24::getCRCLength(void)
+{
+  rf24_crclength_e result = RF24_CRC_DISABLED;
+  uint8_t config = read_register(CONFIG) & ( _BV(CRCO) | _BV(EN_CRC)) ;
+
+  if ( config & _BV(EN_CRC ) )
+  {
+    if ( config & _BV(CRCO) )
+      result = RF24_CRC_16;
+    else
+      result = RF24_CRC_8;
+  }
+
+  return result;
 }
 
 /****************************************************************************/
