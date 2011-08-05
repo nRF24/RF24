@@ -294,17 +294,13 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  // These need to be merged in with the register printing scheme
-#if 0
-  read_register(RF_SETUP,buffer,1);
-  printf_P(PSTR("RF_SETUP = 0x%02x (data rate: %d)\n\r"),*buffer,getDataRate());
-  printf_P(PSTR("Hardware; isPVariant: %d\n\r"),isPVariant());
-
-  read_register(CONFIG,buffer,1);
-  printf_P(PSTR("CONFIG = 0x%02x (CRC enable: %d; CRC16: %d)\n\r"),
-           *buffer,(*buffer)&_BV(EN_CRC)?1:0,
-           (*buffer)&_BV(CRCO)?1:0);
-#endif
+  const char * rf24_datarate_e_str[] = { "1MBPS", "2MBPS", "250KBPS" };
+  const char * rf24_model_e_str[] = { "nRF24L01", "nRF24L01+" } ;
+  const char * rf24_crclength_e_str[] = { "Disabled", "8 bits", "16 bits" } ;
+  
+  printf_P(PSTR("Data Rate\t = %s\n\r"),rf24_datarate_e_str[getDataRate()]);
+  printf_P(PSTR("Model\t\t = %s\n\r"),rf24_model_e_str[isPVariant()]);
+  printf_P(PSTR("CRC Length\t = %s\n\r"),rf24_crclength_e_str[getCRCLength()]);
 }
 
 /****************************************************************************/
