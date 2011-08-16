@@ -42,9 +42,16 @@ void RF24::ce(int level)
 
 void RF24::configSPIBus(void)
 {
+  // Minimum ideal SPI bus speed is 2x data rate
+  // If we assume 2Mbs data rate and 16Mhz clock, a
+  // divider of 4 is the minimum we want.
+  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+  // We'll use a divider of 2 which will work up to
+  // MCU speeds of 20Mhz.
+  // CLK:BUS 8Mhz:4Mhz, 16Mhz:8Mhz, or 20Mhz:10Mhz (max)
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2); 
+  SPI.setClockDivider(SPI_CLOCK_DIV4); 
 }
 
 /******************************************************************/
@@ -332,15 +339,8 @@ void RF24::begin(void)
   pinMode(csn_pin,OUTPUT);
 
   // Initialize SPI bus
-  // Minimum ideal SPI bus speed is 2x data rate
-  // If we assume 2Mbs data rate and 16Mhz clock, a
-  // divider of 4 is the minimum we want.
-  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-  // We'll use a divider of 2 which will work up to
-  // MCU speeds of 20Mhz.
-  // CLK:BUS 8Mhz:4Mhz, 16Mhz:8Mhz, or 20Mhz:10Mhz (max)
-  configSPIBus() ;
   SPI.begin();
+  configSPIBus() ;
 
   ce(LOW);
   csn(HIGH);
@@ -440,23 +440,28 @@ boolean RF24::write( const void* buf, uint8_t len )
   ce(HIGH);
 
   // IN the end, the send should be blocking.  It comes back in 60ms worst case, or much faster
-  // if I tighted up the retry logic.  (Default settings will be 1500us.
-  // Monitor the send
-  uint8_t observe_tx;
+  // if I tighted up the retry logic.  (Default settings will be 1500us). The imposed delay
+  // works out to be 255*ARD*ARC. This defaults to 255*1500us*15 retries = 5,737.5ms,
+  // or 5.7 seconds. Seems like this should be tweaked - that's a really long time.
   uint8_t status;
+  // uint8_t observe_tx;
   uint8_t retries = 255;
+  uint32_t sent_at = millis();
+  const uint32_t timeout = 1500; //ms to wait for timeout
+
   do
   {
-    status = read_register(OBSERVE_TX,&observe_tx,1);
+    status = read_register(STATUS);
+    // status = read_register(OBSERVE_TX,&observe_tx,1);
     IF_SERIAL_DEBUG(Serial.print(status,HEX));
-    IF_SERIAL_DEBUG(Serial.print(observe_tx,HEX));
+    Serial.print( status, HEX ) ;
     if ( ! retries-- )
     {
-      IF_SERIAL_DEBUG(printf("ABORTED: too many retries\n\r"));
+      IF_SERIAL_DEBUG(printf_P(PSTR("ABORTED: too many retries\n\r")));
       break;
     }
   }
-  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) );
+  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( millis() - sent_at < timeout ) );
 
   if ( status & _BV(TX_DS) )
     result = true;
@@ -635,7 +640,7 @@ void RF24::enableAckPayload(void)
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
   }
 
-  IF_SERIAL_DEBUG(printf("FEATURE=%i\n\r",read_register(FEATURE)));
+  IF_SERIAL_DEBUG(printf_P(PSTR(("FEATURE=%i\n\r"),read_register(FEATURE))));
 
   //
   // Enable dynamic payload on pipe 0
