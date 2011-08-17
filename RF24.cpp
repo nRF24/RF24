@@ -46,9 +46,6 @@ void RF24::configSPIBus(void)
   // If we assume 2Mbs data rate and 16Mhz clock, a
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-  // We'll use a divider of 2 which will work up to
-  // MCU speeds of 20Mhz.
-  // CLK:BUS 8Mhz:4Mhz, 16Mhz:8Mhz, or 20Mhz:10Mhz (max)
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   SPI.setClockDivider(SPI_CLOCK_DIV4); 
