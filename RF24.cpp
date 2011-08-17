@@ -370,7 +370,9 @@ void RF24::begin(void)
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Set up default configuration.  Callers can always change it later.
-  setChannel(100);
+  // This channel should be universally safe and not bleed over into adjacent
+  // spectrum.
+  setChannel(76);
 
   // Flush buffers
   flush_rx();
