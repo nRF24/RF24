@@ -204,7 +204,6 @@ protected:
    */
   void toggle_features(void);
   /**@}*/
->>>>>>> 5344c5fe8cefaafa1a267267e7edefec631603d9
 
 public:
   /**
