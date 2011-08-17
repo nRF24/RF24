@@ -27,6 +27,7 @@
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
 RF24 radio(8,9);
+// RF24 radio(22,23);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -91,11 +92,11 @@ void setup(void)
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15);
+  // radio.setRetries(15,15);
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
-  radio.setPayloadSize(8);
+  // radio.setPayloadSize(8);
 
   //
   // Open pipes to other nodes for communication
@@ -120,7 +121,15 @@ void setup(void)
   //
   // Start listening
   //
-
+  // if( radio.setDataRate( RF24_250KBPS ) ) {
+  //     printf( "Data rate 250KBPS set!\n\r" ) ;
+  // } else {
+  //     printf( "Data rate 250KBPS set FAILED!!\n\r" ) ;
+  // }
+  // radio.setDataRate( RF24_2MBPS ) ;
+  // radio.setPALevel( RF24_PA_MIN ) ;
+  // radio.enableDynamicPayloads() ;
+  // radio.setAutoAck( true ) ;
   radio.startListening();
 
   //
@@ -153,7 +162,7 @@ void loop(void)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 200 )
+      if (millis() - started_waiting_at > 250 )
         timeout = true;
 
     // Describe the results
