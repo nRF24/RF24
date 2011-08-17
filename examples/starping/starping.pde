@@ -1,18 +1,18 @@
 /*
  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  */
 
 /**
- * Example RF Radio Ping Star Group 
+ * Example RF Radio Ping Star Group
  *
- * This sketch is a more complex example of using the RF24 library for Arduino.  
- * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the 
+ * This sketch is a more complex example of using the RF24 library for Arduino.
+ * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the
  * role_pin low, and the others will be 'ping transmit' units.  The ping units
- * unit will send out the value of millis() once a second.  The pong unit will 
+ * unit will send out the value of millis() once a second.  The pong unit will
  * respond back with a copy of the value.  Each ping unit can get that response
  * back, and determine how long the whole cycle took.
  *
@@ -20,7 +20,7 @@
  * The pong receiver is identified by having its role_pin tied to ground.
  * The ping senders are further differentiated by a byte in eeprom.
  */
- 
+
 #include <SPI.h>
 #include <EEPROM.h>
 #include "nRF24L01.h"
@@ -88,12 +88,12 @@ void setup(void)
   //
   // Role
   //
-  
+
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
   delay(20); // Just to get a solid reading on the role pin
-  
+
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
     role = role_ping_out;
@@ -115,7 +115,7 @@ void setup(void)
     // address.
     if ( reading >= 2 && reading <= 6 )
       node_address = reading;
-    
+
     // Otherwise, it is invalid, so set our address AND ROLE to 'invalid'
     else
     {
@@ -127,8 +127,8 @@ void setup(void)
   //
   // Print preamble
   //
-  
-  Serial.begin(9600);
+
+  Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/starping/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
@@ -137,7 +137,7 @@ void setup(void)
   //
   // Setup and configure rf radio
   //
-  
+
   radio.begin();
 
   //
@@ -154,27 +154,27 @@ void setup(void)
     radio.openReadingPipe(4,talking_pipes[3]);
     radio.openReadingPipe(5,talking_pipes[4]);
   }
-  
-  // Each ping node has a talking pipe that it will ping into, and a listening 
-  // pipe that it will listen for the pong.  
+
+  // Each ping node has a talking pipe that it will ping into, and a listening
+  // pipe that it will listen for the pong.
   if ( role == role_ping_out )
   {
     // Write on our talking pipe
     radio.openWritingPipe(talking_pipes[node_address-2]);
-    // Listen on our listening pipe 
+    // Listen on our listening pipe
     radio.openReadingPipe(1,listening_pipes[node_address-2]);
   }
 
   //
   // Start listening
   //
-  
+
   radio.startListening();
-  
+
   //
   // Dump the configuration of the rf unit for debugging
   //
-  
+
   radio.printDetails();
 
   //
@@ -192,27 +192,27 @@ void loop(void)
   //
   // Ping out role.  Repeatedly send the current time
   //
-  
+
   if (role == role_ping_out)
   {
     // First, stop listening so we can talk.
     radio.stopListening();
-    
+
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );  
-    
+    radio.write( &time, sizeof(unsigned long) );
+
     // Now, continue listening
     radio.startListening();
-    
+
     // Wait here until we get a response, or timeout (250ms)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
       if (millis() - started_waiting_at > 250 )
         timeout = true;
-    
+
     // Describe the results
     if ( timeout )
     {
@@ -223,19 +223,19 @@ void loop(void)
       // Grab the response, compare, and send to debugging spew
       unsigned long got_time;
       radio.read( &got_time, sizeof(unsigned long) );
-  
+
       // Spew it
       printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
     }
-    
+
     // Try again 1s later
     delay(1000);
   }
-  
+
   //
   // Pong back role.  Receive each packet, dump it out, and send it back
   //
-  
+
   if ( role == role_pong_back )
   {
     // if there is data ready
@@ -244,16 +244,16 @@ void loop(void)
     {
       // Dump the payloads until we've gotten everything
       unsigned long got_time;
-      boolean done = false;
+      bool done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &got_time, sizeof(unsigned long) );
-  
+
         // Spew it
         printf("Got payload %lu from node %i...",got_time,pipe_num+1);
       }
-      
+
       // First, stop listening so we can talk
       radio.stopListening();
 
@@ -262,11 +262,11 @@ void loop(void)
 
       // Retain the low 2 bytes to identify the pipe for the spew
       uint16_t pipe_id = listening_pipes[pipe_num-1] & 0xffff;
-            
+
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );  
+      radio.write( &got_time, sizeof(unsigned long) );
       printf("Sent response to %04x.\n\r",pipe_id);
-      
+
       // Now, resume listening so we catch the next packets.
       radio.startListening();
     }
@@ -286,7 +286,7 @@ void loop(void)
 
       // And we are done right now (no easy way to soft reset)
       printf("\n\rManually reset address to: %c\n\rPress RESET to continue!",c);
-      while(1);
+      while(1) ;
     }
   }
 }

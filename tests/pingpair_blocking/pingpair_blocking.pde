@@ -6,19 +6,20 @@
  version 2 as published by the Free Software Foundation.
  */
 
-/**
- * Example RF Radio Ping Pair
- *
- * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
- * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
- * which responds by sending the value back.  The ping node can then see how long the whole cycle
- * took.
- */
-
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
+
+//
+// Test version of RF24, exposes some protected interface
+//
+
+class RF24Test: public RF24
+{
+public: RF24Test(int a, int b): RF24(a,b) {}
+};
+
 
 //
 // Hardware configuration
@@ -26,7 +27,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
-RF24 radio(8,9);
+RF24Test radio(8,9);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -58,6 +59,40 @@ const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 // The role of the current running sketch
 role_e role;
 
+//
+// Test state
+//
+
+bool done; //*< Are we done with the test? */
+bool passed; //*< Have we passed the test? */
+bool notified; //*< Have we notified the user we're done? */
+const int num_needed = 10; //*< How many success/failures until we're done? */
+int receives_remaining = num_needed; //*< How many ack packets until we declare victory? */
+int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
+const int interval = 100; //*< ms to wait between sends */
+
+char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
+
+void one_ok(void)
+{
+  // Have we received enough yet?
+  if ( ! --receives_remaining )
+  {
+    done = true;
+    passed = true;
+  }
+}
+
+void one_failed(void)
+{
+  // Have we failed enough yet?
+  if ( ! --failures_remaining )
+  {
+    done = true;
+    passed = false;
+  }
+}
+
 void setup(void)
 {
   //
@@ -81,21 +116,24 @@ void setup(void)
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/pingpair/\n\r");
+  printf("\n\rRF24/tests/pingpair_blocking/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
 
+  //
+  // get test config
+  //
+
+  printf("+READY press any key to start\n\r\n\r");
+
+  while (! Serial.available() ) {}
+  configuration = Serial.read();
+  printf("Configuration\t = %c\n\r",configuration);
+   
   //
   // Setup and configure rf radio
   //
 
   radio.begin();
-
-  // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15);
-
-  // optionally, reduce the payload size.  seems to
-  // improve reliability
-  radio.setPayloadSize(8);
 
   //
   // Open pipes to other nodes for communication
@@ -160,6 +198,7 @@ void loop(void)
     if ( timeout )
     {
       printf("Failed, response timed out.\n\r");
+      one_failed();
     }
     else
     {
@@ -169,10 +208,11 @@ void loop(void)
 
       // Spew it
       printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+      one_ok();
     }
 
-    // Try again 1s later
-    delay(1000);
+    // Try again  later
+    delay(250);
   }
 
   //
@@ -209,7 +249,22 @@ void loop(void)
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
+
     }
+  }
+  
+  //
+  // Stop the test if we're done and report results
+  //
+  if ( done && ! notified )
+  {
+    notified = true;
+
+    printf("\n\r+OK ");
+    if ( passed )
+      printf("PASS\n\r\n\r");
+    else
+      printf("FAIL\n\r\n\r");
   }
 }
 // vim:cin:ai:sts=2 sw=2 ft=cpp

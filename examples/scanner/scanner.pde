@@ -1,7 +1,7 @@
 
 /*
  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -47,15 +47,15 @@ void setup(void)
   //
   // Print preamble
   //
-  
+
   Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/scanner/\n\r");
-  
+
   //
   // Setup and configure rf radio
   //
-  
+
   radio.begin();
   radio.setAutoAck(false);
 
@@ -63,7 +63,7 @@ void setup(void)
   radio.startListening();
   radio.stopListening();
 
-  // Print out header, high then low digit 
+  // Print out header, high then low digit
   int i = 0;
   while ( i < num_channels )
   {
@@ -88,7 +88,7 @@ const short num_reps = 100;
 
 void loop(void)
 {
-  // Clear measurement values 
+  // Clear measurement values
   memset(values,0,num_channels);
 
   // Scan all channels num_reps times
@@ -108,11 +108,11 @@ void loop(void)
 
       // Did we get a carrier?
       if ( radio.testCarrier() )
-	++values[i];
+        ++values[i];
     }
   }
 
-  // Print out channel measurements, clamped to a single hex digit 
+  // Print out channel measurements, clamped to a single hex digit
   int i = 0;
   while ( i < num_channels )
   {

@@ -18,7 +18,7 @@
 
 #include "WProgram.h"
 
-int serial_putc( char c, FILE *t ) 
+int serial_putc( char c, FILE * ) 
 {
   Serial.write( c );
 
