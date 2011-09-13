@@ -144,7 +144,12 @@ void loop(void)
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );
+    bool ok = radio.write( &time, sizeof(unsigned long) );
+    
+    if (ok)
+      printf("ok...");
+    else
+      printf("failed.\n\r");
 
     // Now, continue listening
     radio.startListening();
