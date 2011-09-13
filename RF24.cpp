@@ -298,10 +298,12 @@ void RF24::printDetails(void)
   const char * rf24_datarate_e_str[] = { "1MBPS", "2MBPS", "250KBPS" };
   const char * rf24_model_e_str[] = { "nRF24L01", "nRF24L01+" } ;
   const char * rf24_crclength_e_str[] = { "Disabled", "8 bits", "16 bits" } ;
+  const char * rf24_pa_dbm_e_str[] = { "PA_MIN", "PA_LOW", "LA_MED", "PA_HIGH"} ;
   
   printf_P(PSTR("Data Rate\t = %s\n\r"),rf24_datarate_e_str[getDataRate()]);
   printf_P(PSTR("Model\t\t = %s\n\r"),rf24_model_e_str[isPVariant()]);
   printf_P(PSTR("CRC Length\t = %s\n\r"),rf24_crclength_e_str[getCRCLength()]);
+  printf_P(PSTR("PA Power\t = %s\n\r"),rf24_pa_dbm_e_str[getPALevel()]);
 }
 
 /****************************************************************************/
