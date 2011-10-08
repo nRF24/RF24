@@ -261,14 +261,16 @@ void RF24::setChannel(uint8_t channel)
   // TODO: This method could take advantage of the 'wide_band' calculation
   // done in setChannel() to require certain channel spacing.
 
-  write_register(RF_CH,min(channel,127));
+  const uint8_t max_channel = 127;
+  write_register(RF_CH,min(channel,max_channel));
 }
 
 /****************************************************************************/
 
 void RF24::setPayloadSize(uint8_t size)
 {
-  payload_size = min(size,32);
+  const uint8_t max_payload_size = 32;
+  payload_size = min(size,max_payload_size);
 }
 
 /****************************************************************************/
@@ -590,7 +592,9 @@ void RF24::openWritingPipe(uint64_t value)
 
   write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), 5);
   write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), 5);
-  write_register(RX_PW_P0,min(payload_size,32));
+
+  const uint8_t max_payload_size = 32;
+  write_register(RX_PW_P0,min(payload_size,max_payload_size));
 }
 
 /****************************************************************************/
@@ -704,7 +708,8 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
   csn(LOW);
   SPI.transfer( W_ACK_PAYLOAD | ( pipe & B111 ) );
-  uint8_t data_len = min(len,32);
+  const uint8_t max_payload_size = 32;
+  uint8_t data_len = min(len,max_payload_size);
   while ( data_len-- )
     SPI.transfer(*current++);
 
