@@ -30,9 +30,13 @@
 
 void RF24::csn(int mode)
 {
+  // Minimum ideal SPI bus speed is 2x data rate
+  // If we assume 2Mbs data rate and 16Mhz clock, a
+  // divider of 4 is the minimum we want.
+  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);
+  SPI.setClockDivider(SPI_CLOCK_DIV4);
   digitalWrite(csn_pin,mode);
 }
 
@@ -249,8 +253,9 @@ void RF24::print_address_register(prog_char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
-  ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false), payload_size(32), 
-  ack_payload_available(false), dynamic_payloads_enabled(false)
+  ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false), 
+  payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
+  pipe0_reading_address(0)
 {
 }
 
@@ -301,10 +306,12 @@ void RF24::printDetails(void)
   const char * rf24_datarate_e_str[] = { "1MBPS", "2MBPS", "250KBPS" };
   const char * rf24_model_e_str[] = { "nRF24L01", "nRF24L01+" } ;
   const char * rf24_crclength_e_str[] = { "Disabled", "8 bits", "16 bits" } ;
+  const char * rf24_pa_dbm_e_str[] = { "PA_MIN", "PA_LOW", "LA_MED", "PA_HIGH"} ;
   
   printf_P(PSTR("Data Rate\t = %s\n\r"),rf24_datarate_e_str[getDataRate()]);
   printf_P(PSTR("Model\t\t = %s\n\r"),rf24_model_e_str[isPVariant()]);
   printf_P(PSTR("CRC Length\t = %s\n\r"),rf24_crclength_e_str[getCRCLength()]);
+  printf_P(PSTR("PA Power\t = %s\n\r"),rf24_pa_dbm_e_str[getPALevel()]);
 }
 
 /****************************************************************************/
@@ -316,17 +323,7 @@ void RF24::begin(void)
   pinMode(csn_pin,OUTPUT);
 
   // Initialize SPI bus
-  // Minimum ideal SPI bus speed is 2x data rate
-  // If we assume 2Mbs data rate and 16Mhz clock, a
-  // divider of 4 is the minimum we want.
-  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-  // We'll use a divider of 2 which will work up to
-  // MCU speeds of 20Mhz.
-  // CLK:BUS 8Mhz:4Mhz, 16Mhz:8Mhz, or 20Mhz:10Mhz (max)
   SPI.begin();
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);
 
   ce(LOW);
   csn(HIGH);
@@ -371,7 +368,9 @@ void RF24::begin(void)
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Set up default configuration.  Callers can always change it later.
-  setChannel(100);
+  // This channel should be universally safe and not bleed over into adjacent
+  // spectrum.
+  setChannel(76);
 
   // Flush buffers
   flush_rx();
@@ -385,8 +384,9 @@ void RF24::startListening(void)
   write_register(CONFIG, read_register(CONFIG) | _BV(PWR_UP) | _BV(PRIM_RX));
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
-  // Restore the pipe0 adddress
-  write_register(RX_ADDR_P0, reinterpret_cast<const uint8_t*>(&pipe0_reading_address), 5);
+  // Restore the pipe0 adddress, if exists
+  if (pipe0_reading_address)
+    write_register(RX_ADDR_P0, reinterpret_cast<const uint8_t*>(&pipe0_reading_address), 5);
 
   // Flush buffers
   flush_rx();
