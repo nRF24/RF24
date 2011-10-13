@@ -388,6 +388,7 @@ void RF24::startListening(void)
 
   // Flush buffers
   flush_rx();
+  flush_tx();
 
   // Go!
   ce(HIGH);
@@ -401,6 +402,8 @@ void RF24::startListening(void)
 void RF24::stopListening(void)
 {
   ce(LOW);
+  flush_tx();
+  flush_rx();
 }
 
 /****************************************************************************/
