@@ -6,6 +6,9 @@
 docs/
 output/
 ojam/
+out/
+16000000/
+8000000/
 out_native/
 version.h
 Session.vim

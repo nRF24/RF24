@@ -695,7 +695,10 @@ public:
  * @li Maximally compliant with the intended operation of the chip
  * @li Easy for beginners to use
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
- * @li Built against the standard SPI library.
+ *
+ * NOW COMPATIBLE WITH ARDUINO 1.0 - Please use the 
+ * <a href="https://github.com/maniacbug/RF24/tree/arduino-1.0">'arduino-1.0' branch</a>
+ * for use with Arduino 1.0.  This will be merged into master when Arduino 1.0 is released.
  *
  * Please refer to:
  *
