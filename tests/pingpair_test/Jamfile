@@ -18,7 +18,8 @@ ARDUINO_VERSION	= 22 ;
 OLD_DIR 	= /opt/arduino-0021 ;
 AVR_TOOLS_PATH 	= $(OLD_DIR)/hardware/tools/avr/bin ;
 AVRDUDECONFIG_PATH = $(OLD_DIR)/hardware/tools/avr/etc ;
-ARDUINO_DIR 	= /opt/Arduino ;
+#ARDUINO_DIR 	= /opt/Arduino ;
+ARDUINO_DIR	= $(OLD_DIR) ;
 ARDUINO_AVR 	= /usr/lib/avr/include ;
 }
 
@@ -40,7 +41,7 @@ AVRDUDE 	= $(AVR_TOOLS_PATH)/avrdude ;
 DEFINES  	= F_CPU=$(F_CPU)L ARDUINO=$(ARDUINO_VERSION) VERSION_H ;
 CTUNING  	= -ffunction-sections -fdata-sections ;
 CXXTUNING  	= -fno-exceptions -fno-strict-aliasing ; 
-CFLAGS  	= -Os -Werror -Wall -Wextra -mmcu=$(MCU) $(CTUNING) ;
+CFLAGS  	= -Os -Wall -Wextra -mmcu=$(MCU) $(CTUNING) ;
 CXXFLAGS  	= $(CFLAGS) $(CXXTUNING) ;
 LDFLAGS  	= -Os -lm -Wl,--gc-sections -mmcu=atmega328p ;
 
