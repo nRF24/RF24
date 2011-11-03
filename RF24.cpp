@@ -6,7 +6,12 @@
  version 2 as published by the Free Software Foundation.
  */
 
+#if ARDUINO < 100
 #include <WProgram.h>
+#else
+#include <Arduino.h>
+#endif
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
