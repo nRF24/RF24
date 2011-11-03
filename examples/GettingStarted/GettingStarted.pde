@@ -60,7 +60,7 @@ void setup(void)
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/pingpair/\n\r");
+  printf("\n\rRF24/examples/GettingStarted/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
   printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
 
