@@ -619,6 +619,19 @@ public:
 };
 
 /**
+ * @example GettingStarted.pde
+ *
+ * This is an example which corresponds to my "Getting Started" blog post
+ * for Getting Started with nRF24L01+ radios. 
+ *
+ * It is an example of how to use the RF24 class.  Write this sketch to two 
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting 
+ * with the serial monitor and sending a 'T'.  The ping node sends the current 
+ * time to the pong node, which responds by sending the value back.  The ping 
+ * node can then see how long the whole cycle took.
+ */
+
+/**
  * @example led_remote.pde
  *
  * This is an example of how to use the RF24 class to control a remote

@@ -1,11 +1,11 @@
 PROJECT_NAME 	= $(PWD:B) ;
 PROJECT_DIR 	= . ;
-PROJECT_LIBS = SPI RF24 ; 
+PROJECT_LIBS 	= SPI RF24 ; 
 
-OUT_DIR = ojam ;
-F_CPU 		= 16000000 ;
+F_CPU 		?= 16000000 ;
 MCU             = atmega328p ;
 PORTS           = /dev/tty.usbserial-A600eHIs /dev/tty.usbserial-A40081RP /dev/tty.usbserial-A9007LmI ;
+OUT_DIR		= $(F_CPU) ;
 
 UPLOAD_RATE 	= 57600 ;
 AVRDUDE_PROTOCOL = stk500v1 ;
@@ -14,22 +14,21 @@ COM 		= 33 ;
 # Host-specific overrides for locations 
 if $(OS) = MACOSX 
 {
-ARDUINO_VERSION	= 22 ;
+ARDUINO_VERSION	= 100 ;
 OLD_DIR 	= /opt/arduino-0021 ;
 AVR_TOOLS_PATH 	= $(OLD_DIR)/hardware/tools/avr/bin ;
 AVRDUDECONFIG_PATH = $(OLD_DIR)/hardware/tools/avr/etc ;
-#ARDUINO_DIR 	= /opt/Arduino ;
-ARDUINO_DIR	= $(OLD_DIR) ;
+ARDUINO_DIR 	= /opt/Arduino ;
 ARDUINO_AVR 	= /usr/lib/avr/include ;
 }
 
 # Where is everything?
-ARDUINO_VERSION	?= 22 ;
+ARDUINO_VERSION	?= 100 ;
 AVR_TOOLS_PATH 	?= /usr/bin ;
 ARDUINO_DIR 	?= /opt/arduino-00$(ARDUINO_VERSION) ;
 ARDUINO_AVR 	?= $(ARDUINO_DIR)/hardware/tools/avr/avr/include/avr ;
 AVRDUDECONFIG_PATH ?= $(ARDUINO_DIR)/hardware/tools ;
-ARDUINO_CORE 	= $(ARDUINO_DIR)/hardware/arduino/cores/arduino ;
+ARDUINO_CORE 	= $(ARDUINO_DIR)/hardware/arduino/cores/arduino $(ARDUINO_DIR)/hardware/arduino/variants/standard ;
 ARDUINO_LIB 	= $(ARDUINO_DIR)/libraries ;
 SKETCH_LIB      = $(HOME)/Source/Arduino/libraries ;
 AVR_CC  	= $(AVR_TOOLS_PATH)/avr-gcc ;
@@ -118,11 +117,23 @@ rule Pde
 
 }
 
-actions Pde
+if ( $(ARDUINO_VERSION) < 100 )
 {
-  echo "#include <WProgram.h>" > $(<) 
-  echo "#line 1 \"$(>)\"" >> $(<)
-  cat $(>) >> $(<) 
+	actions Pde
+	{
+	  echo "#include <WProgram.h>" > $(<) 
+	  echo "#line 1 \"$(>)\"" >> $(<)
+	  cat $(>) >> $(<) 
+	}
+}
+else
+{
+	actions Pde
+	{
+	  echo "#include <Arduino.h>" > $(<) 
+	  echo "#line 1 \"$(>)\"" >> $(<)
+	  cat $(>) >> $(<) 
+	}
 }
 
 rule AvrPde
@@ -139,6 +150,7 @@ rule AvrObject
     case .c :   AvrCc $(<) : $(>) ;
     case .cpp : AvrC++ $(<) : $(>) ;
     case .pde : AvrPde $(<) : $(>) ;
+    case .ino : AvrPde $(<) : $(>) ;
   }
 }
 

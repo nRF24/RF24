@@ -6,7 +6,12 @@
  version 2 as published by the Free Software Foundation.
  */
 
+#if ARDUINO < 100
 #include <WProgram.h>
+#else
+#include <Arduino.h>
+#endif
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -390,6 +395,7 @@ void RF24::startListening(void)
 
   // Flush buffers
   flush_rx();
+  flush_tx();
 
   // Go!
   ce(HIGH);
@@ -403,6 +409,8 @@ void RF24::startListening(void)
 void RF24::stopListening(void)
 {
   ce(LOW);
+  flush_tx();
+  flush_rx();
 }
 
 /****************************************************************************/
