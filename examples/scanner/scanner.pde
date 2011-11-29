@@ -29,14 +29,14 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
-RF24 radio(8,9);
+RF24 radio(9,10);
 
 //
 // Channel info
 //
 
-const short num_channels = 128;
-short values[num_channels];
+const uint8_t num_channels = 128;
+uint8_t values[num_channels];
 
 //
 // Setup
@@ -84,12 +84,12 @@ void setup(void)
 // Loop
 //
 
-const short num_reps = 100;
+const int num_reps = 100;
 
 void loop(void)
 {
   // Clear measurement values
-  memset(values,0,num_channels);
+  memset(values,0,sizeof(values));
 
   // Scan all channels num_reps times
   int rep_counter = num_reps;
