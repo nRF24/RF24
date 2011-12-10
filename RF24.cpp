@@ -24,11 +24,17 @@
 #endif
 
 // Avoid spurious warnings
-#ifndef NATIVE
+#if ! defined( NATIVE ) && defined( ARDUINO )
 #undef PROGMEM
 #define PROGMEM __attribute__(( section(".progmem.data") ))
 #undef PSTR
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];}))
+#endif
+
+#ifdef ARDUINO
+#define PRIPSTR "%S"
+#else
+#define PRIPSTR "%s"
 #endif
 
 /****************************************************************************/
@@ -39,9 +45,11 @@ void RF24::csn(int mode)
   // If we assume 2Mbs data rate and 16Mhz clock, a
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+#ifdef ARDUINO
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   SPI.setClockDivider(SPI_CLOCK_DIV4);
+#endif
   digitalWrite(csn_pin,mode);
 }
 
@@ -102,7 +110,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 {
   uint8_t status;
 
-  IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\n\r"),reg,value));
+  IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
   csn(LOW);
   status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
@@ -202,7 +210,7 @@ uint8_t RF24::get_status(void)
 
 void RF24::print_status(uint8_t status)
 {
-  printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\n\r"),
+  printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n"),
            status,
            (status & _BV(RX_DR))?1:0,
            (status & _BV(TX_DS))?1:0,
@@ -216,7 +224,7 @@ void RF24::print_status(uint8_t status)
 
 void RF24::print_observe_tx(uint8_t value)
 {
-  printf_P(PSTR("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\n\r"),
+  printf_P(PSTR("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\r\n"),
            value,
            (value >> PLOS_CNT) & B1111,
            (value >> ARC_CNT) & B1111
@@ -228,10 +236,10 @@ void RF24::print_observe_tx(uint8_t value)
 void RF24::print_byte_register(prog_char* name, uint8_t reg, uint8_t qty)
 {
   char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-  printf_P(PSTR("%S\t%c ="),name,extra_tab);
+  printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
   while (qty--)
     printf_P(PSTR(" 0x%02x"),read_register(reg++));
-  printf_P(PSTR("\n\r"));
+  printf_P(PSTR("\r\n"));
 }
 
 /****************************************************************************/
@@ -239,7 +247,7 @@ void RF24::print_byte_register(prog_char* name, uint8_t reg, uint8_t qty)
 void RF24::print_address_register(prog_char* name, uint8_t reg, uint8_t qty)
 {
   char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-  printf_P(PSTR("%S\t%c ="),name,extra_tab);
+  printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
 
   while (qty--)
   {
@@ -252,7 +260,7 @@ void RF24::print_address_register(prog_char* name, uint8_t reg, uint8_t qty)
       printf_P(PSTR("%02x"),*bufptr);
   }
 
-  printf_P(PSTR("\n\r"));
+  printf_P(PSTR("\r\n"));
 }
 
 /****************************************************************************/
@@ -313,10 +321,10 @@ void RF24::printDetails(void)
   const char * rf24_crclength_e_str[] = { "Disabled", "8 bits", "16 bits" } ;
   const char * rf24_pa_dbm_e_str[] = { "PA_MIN", "PA_LOW", "LA_MED", "PA_HIGH"} ;
   
-  printf_P(PSTR("Data Rate\t = %s\n\r"),rf24_datarate_e_str[getDataRate()]);
-  printf_P(PSTR("Model\t\t = %s\n\r"),rf24_model_e_str[isPVariant()]);
-  printf_P(PSTR("CRC Length\t = %s\n\r"),rf24_crclength_e_str[getCRCLength()]);
-  printf_P(PSTR("PA Power\t = %s\n\r"),rf24_pa_dbm_e_str[getPALevel()]);
+  printf_P(PSTR("Data Rate\t = %s\r\n"),rf24_datarate_e_str[getDataRate()]);
+  printf_P(PSTR("Model\t\t = %s\r\n"),rf24_model_e_str[isPVariant()]);
+  printf_P(PSTR("CRC Length\t = %s\r\n"),rf24_crclength_e_str[getCRCLength()]);
+  printf_P(PSTR("PA Power\t = %s\r\n"),rf24_pa_dbm_e_str[getPALevel()]);
 }
 
 /****************************************************************************/
@@ -470,7 +478,7 @@ bool RF24::write( const void* buf, uint8_t len )
   bool tx_ok, tx_fail;
   whatHappened(tx_ok,tx_fail,ack_payload_available);
   
-  //printf("%u%u%u\n\r",tx_ok,tx_fail,ack_payload_available);
+  //printf("%u%u%u\r\n",tx_ok,tx_fail,ack_payload_available);
 
   result = tx_ok;
   IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
@@ -670,7 +678,7 @@ void RF24::enableDynamicPayloads(void)
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
   }
 
-  IF_SERIAL_DEBUG(printf("FEATURE=%i\n\r",read_register(FEATURE)));
+  IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
 
   // Enable dynamic payload on all pipes
   //
@@ -699,7 +707,7 @@ void RF24::enableAckPayload(void)
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
   }
 
-  IF_SERIAL_DEBUG(printf("FEATURE=%i\n\r",read_register(FEATURE)));
+  IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
 
   //
   // Enable dynamic payload on pipes 0 & 1
