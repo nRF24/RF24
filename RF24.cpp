@@ -6,36 +6,10 @@
  version 2 as published by the Free Software Foundation.
  */
 
-#if ARDUINO < 100
-#include <WProgram.h>
-#else
-#include <Arduino.h>
-#endif
-
 #include <SPI.h>
 #include "nRF24L01.h"
+#include "RF24_config.h"
 #include "RF24.h"
-
-#undef SERIAL_DEBUG
-#ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) ({x;})
-#else
-#define IF_SERIAL_DEBUG(x)
-#endif
-
-// Avoid spurious warnings
-#if ! defined( NATIVE ) && defined( ARDUINO )
-#undef PROGMEM
-#define PROGMEM __attribute__(( section(".progmem.data") ))
-#undef PSTR
-#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];}))
-#endif
-
-#ifdef ARDUINO
-#define PRIPSTR "%S"
-#else
-#define PRIPSTR "%s"
-#endif
 
 /****************************************************************************/
 
