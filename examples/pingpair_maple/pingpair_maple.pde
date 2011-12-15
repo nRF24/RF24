@@ -42,13 +42,15 @@ HardwareSPI SPI(2);
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 8 & 9
+// Set up nRF24L01 radio on SPI bus plus pins 7 & 6
+// (This works for the Getting Started board plugged into the
+// Maple Native backwards.)
 
 RF24 radio(7,6);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 7;
+const int role_pin = 10;
 
 //
 // Topology
