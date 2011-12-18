@@ -70,7 +70,7 @@ void setup(void)
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
-  if ( digitalRead(role_pin) )
+  if ( ! digitalRead(role_pin) )
     role = role_ping_out;
   else
     role = role_pong_back;
