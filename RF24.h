@@ -9,8 +9,7 @@
 #ifndef __RF24_H__
 #define __RF24_H__
 
-#include <stddef.h>
-#include <avr/pgmspace.h>
+#include <RF24_config.h>
 
 typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
 typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;

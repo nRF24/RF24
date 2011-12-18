@@ -7,7 +7,7 @@
  */
 
 /**
- * Example RF Radio Ping Pair
+ * Example RF Radio Ping Pair ... for Maple
  *
  * This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
  * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
@@ -15,22 +15,42 @@
  * took.
  */
 
+#include "WProgram.h"
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-#include "printf.h"
+
+//
+// Maple specific setup.  Other than this section, the sketch is the same on Maple as on
+// Arduino
+//
+
+#ifdef MAPLE_IDE
+
+// External startup function
+extern void board_start(const char* program_name);
+
+// Use SPI #2.
+HardwareSPI SPI(2);
+
+#else
+#define board_startup printf
+#define toggleLED(x) (x)
+#endif
 
 //
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 8 & 9
+// Set up nRF24L01 radio on SPI bus plus pins 7 & 6
+// (This works for the Getting Started board plugged into the
+// Maple Native backwards.)
 
-RF24 radio(9,10);
+RF24 radio(7,6);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 7;
+const int role_pin = 10;
 
 //
 // Topology
@@ -70,7 +90,7 @@ void setup(void)
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
-  if ( ! digitalRead(role_pin) )
+  if ( digitalRead(role_pin) )
     role = role_ping_out;
   else
     role = role_pong_back;
@@ -79,9 +99,7 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(57600);
-  printf_begin();
-  printf("\n\rRF24/examples/pingpair/\n\r");
+  board_start("\n\rRF24/examples/pingpair/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
 
   //
@@ -138,6 +156,8 @@ void loop(void)
 
   if (role == role_ping_out)
   {
+    toggleLED();
+
     // First, stop listening so we can talk.
     radio.stopListening();
 
@@ -145,11 +165,11 @@ void loop(void)
     unsigned long time = millis();
     printf("Now sending %lu...",time);
     bool ok = radio.write( &time, sizeof(unsigned long) );
-    
+
     if (ok)
-      printf("ok...");
+      printf("ok...\r\n");
     else
-      printf("failed.\n\r");
+      printf("failed.\r\n");
 
     // Now, continue listening
     radio.startListening();
@@ -164,7 +184,7 @@ void loop(void)
     // Describe the results
     if ( timeout )
     {
-      printf("Failed, response timed out.\n\r");
+      printf("Failed, response timed out.\r\n");
     }
     else
     {
@@ -173,8 +193,10 @@ void loop(void)
       radio.read( &got_time, sizeof(unsigned long) );
 
       // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+      printf("Got response %lu, round-trip delay: %lu\r\n",got_time,millis()-got_time);
     }
+
+    toggleLED();
 
     // Try again 1s later
     delay(1000);
@@ -200,9 +222,9 @@ void loop(void)
         // Spew it
         printf("Got payload %lu...",got_time);
 
-	// Delay just a little bit to let the other unit
-	// make the transition to receiver
-	delay(20);
+        // Delay just a little bit to let the other unit
+        // make the transition to receiver
+        delay(20);
       }
 
       // First, stop listening so we can talk
@@ -210,7 +232,7 @@ void loop(void)
 
       // Send the final one back.
       radio.write( &got_time, sizeof(unsigned long) );
-      printf("Sent response.\n\r");
+      printf("Sent response.\r\n");
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
