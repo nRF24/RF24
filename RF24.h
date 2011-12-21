@@ -620,8 +620,8 @@ public:
 /**
  * @example GettingStarted.pde
  *
- * This is an example which corresponds to my "Getting Started" blog post
- * for Getting Started with nRF24L01+ radios. 
+ * This is an example which corresponds to my "Getting Started" blog post:
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>. 
  *
  * It is an example of how to use the RF24 class.  Write this sketch to two 
  * different nodes.  Put one of the nodes into 'transmit' mode by connecting 
@@ -647,6 +647,21 @@ public:
  * different nodes, connect the role_pin to ground on one.  The ping node sends
  * the current time to the pong node, which responds by sending the value back.
  * The ping node can then see how long the whole cycle took.
+ */
+
+/**
+ * @example pingpair_maple.pde 
+ *
+ * This is an example of how to use the RF24 class on the Maple.  For a more
+ * detailed explanation, see my blog post:
+ * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
+ *
+ * It will communicate well to an Arduino-based unit as well, so it's not for only Maple-to-Maple communication.
+ * 
+ * Write this sketch to two different nodes,
+ * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
+ * which responds by sending the value back.  The ping node can then see how long the whole cycle
+ * took.
  */
 
 /**
@@ -703,15 +718,26 @@ public:
 /**
  * @mainpage Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  *
- * Design Goals: This library is designed to be...
+ * @section Goals Design Goals
+ * 
+ * This library is designed to be...
  * @li Maximally compliant with the intended operation of the chip
  * @li Easy for beginners to use
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
  *
- * NOW COMPATIBLE WITH ARDUINO 1.0 - Please use the 
- * <a href="https://github.com/maniacbug/RF24/tree/arduino-1.0">'arduino-1.0' branch</a>
- * for use with Arduino 1.0.  This will be merged into master when Arduino 1.0 is released.
+ * @section News News
+ * 
+ * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.  
+ * Please <a href="https://github.com/maniacbug/RF24/issues/new">open an issue</a> if you find any problems using it with any version of Arduino.
  *
+ * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the 
+ * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>, 
+ * and should work with any Maple board.  See the pingpair_maple example.
+ * Note that only the pingpair_maple example has been tested on Maple, although
+ * the others can certainly be adapted.
+ *
+ * @section Useful Useful References
+ * 
  * Please refer to:
  *
  * @li <a href="http://maniacbug.github.com/RF24/">Documentation Main Page</a>
@@ -726,6 +752,23 @@ public:
  * @section More More Information
  *
  * @subpage FAQ
+ *
+ * @section Projects Projects
+ *
+ * Stuff I have built with RF24
+ *
+ *
+ * <img src="http://farm7.staticflickr.com/6044/6307669179_a8d19298a6_m.jpg" width="240" height="160" alt="RF24 Getting Started - Finished Product">
+ *
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a> 
+ *
+ * <img src="http://farm7.staticflickr.com/6097/6224308836_b9b3b421a3_m.jpg" width="240" height="160" alt="RF Duinode V3 (2V4)">
+ *
+ * <a href="http://maniacbug.wordpress.com/2011/10/19/sensor-node/">Low-Power Wireless Sensor Node</a>
+ *
+ * <img src="http://farm8.staticflickr.com/7012/6489477865_b56edb629b_m.jpg" width="240" height="161" alt="nRF24L01+ connected to Leaf Labs Maple Native">
+ *
+ * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
  */
 
 #endif // __RF24_H__
