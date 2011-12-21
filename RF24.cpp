@@ -6,7 +6,6 @@
  version 2 as published by the Free Software Foundation.
  */
 
-#include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24_config.h"
 #include "RF24.h"

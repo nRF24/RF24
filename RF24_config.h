@@ -19,7 +19,9 @@
 #include <stddef.h>
 
 // Stuff that is normally provided by Arduino
-#ifndef ARDUINO
+#ifdef ARDUINO
+#include <SPI.h>
+#else
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
