@@ -5,7 +5,7 @@ PROJECT_LIBS 	= SPI RF24 ;
 # (2) Board Information
 
 UPLOAD_PROTOCOL ?= stk500v1 ;
-UPLOAD_SPEED 	?= 115200 ;;
+UPLOAD_SPEED 	?= 115200 ;
 MCU		= atmega328p ;
 F_CPU 		?= 16000000 ;
 CORE		?= arduino ;
