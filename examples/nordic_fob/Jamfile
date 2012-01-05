@@ -67,7 +67,7 @@ AVRDUDE 	= $(AVR_BIN)/avrdude ;
 
 DEFINES  	+= F_CPU=$(F_CPU)L ARDUINO=$(ARDUINO_VERSION) VERSION_H ;
 OPTIM		= -Os ;
-CCFLAGS  	= -Wall -Wextra -Wno-strict-aliasing -mmcu=$(MCU) -ffunction-sections -fdata-sections ;
+CCFLAGS  	= -Wall -Wextra -Wno-strict-aliasing -mmcu=$(MCU) -ffunction-sections -fdata-sections ; 
 C++FLAGS  	= $(CCFLAGS) -fno-exceptions -fno-strict-aliasing ;
 LINKFLAGS  	= $(OPTIM) -lm -Wl,--gc-sections -mmcu=$(MCU) ;
 AVRDUDEFLAGS	= -V -F -D -C $(AVR_ETC)/avrdude.conf -p $(MCU) -c $(UPLOAD_PROTOCOL) -b $(UPLOAD_SPEED) ;
@@ -196,7 +196,7 @@ rule Arduino
 {
 	LINKFLAGS on $(<) = $(LINKFLAGS) -Wl,-Map=$(LOCATE_TARGET)/$(<:B).map ;
 	Main $(<) : $(>) ;
-	LinkLibraries $(<) : core libs ;
+	LinkLibraries $(<) : libs core ;
 	Hex $(<:B).hex : $(<) ;
 	for _p in $(PORTS)
 	{
