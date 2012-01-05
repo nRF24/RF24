@@ -6,13 +6,36 @@
  version 2 as published by the Free Software Foundation.
  */
 
+/**
+ * @file RF24.h
+ *
+ * Class declaration for RF24 and helper enums
+ */
+
 #ifndef __RF24_H__
 #define __RF24_H__
 
 #include <RF24_config.h>
 
+/**
+ * Power Amplifier level.
+ *
+ * For use with setPALevel()
+ */
 typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
+
+/**
+ * Data rate.  How fast data moves through the air.
+ *
+ * For use with setDataRate()
+ */
 typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
+
+/**
+ * CRC Length.  How big (if any) of a CRC is included.
+ *
+ * For use with setCRCLength()
+ */
 typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e;
 
 /**
@@ -628,6 +651,14 @@ public:
  * with the serial monitor and sending a 'T'.  The ping node sends the current 
  * time to the pong node, which responds by sending the value back.  The ping 
  * node can then see how long the whole cycle took.
+ */
+
+/**
+ * @example nordic_fob.pde
+ *
+ * This is an example of how to use the RF24 class to receive signals from the
+ * Sparkfun Nordic FOB.  See http://www.sparkfun.com/products/8602 .
+ * Thanks to Kirk Mower for providing test hardware.
  */
 
 /**
