@@ -788,10 +788,13 @@ public:
  *
  * Stuff I have built with RF24
  *
- *
  * <img src="http://farm7.staticflickr.com/6044/6307669179_a8d19298a6_m.jpg" width="240" height="160" alt="RF24 Getting Started - Finished Product">
  *
  * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a> 
+ *
+ * <img src="http://farm8.staticflickr.com/7159/6645514331_38eb2bdeaa_m.jpg" width="240" height="160" alt="Nordic FOB and nRF24L01+">
+ *
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a> 
  *
  * <img src="http://farm7.staticflickr.com/6097/6224308836_b9b3b421a3_m.jpg" width="240" height="160" alt="RF Duinode V3 (2V4)">
  *

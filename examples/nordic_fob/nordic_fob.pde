@@ -10,8 +10,9 @@
  * Example Nordic FOB Receiver 
  *
  * This is an example of how to use the RF24 class to receive signals from the
- * Sparkfun Nordic FOB.  See http://www.sparkfun.com/products/8602 .
- * Thanks to Kirk Mower for providing test hardware.
+ * Sparkfun Nordic FOB.  Thanks to Kirk Mower for providing test hardware.
+ *
+ * See blog post at http://maniacbug.wordpress.com/2012/01/08/nordic-fob/
  */
 
 #include <SPI.h>
