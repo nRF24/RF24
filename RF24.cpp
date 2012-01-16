@@ -273,6 +273,39 @@ uint8_t RF24::getPayloadSize(void)
 
 /****************************************************************************/
 
+static const char rf24_datarate_e_str_0[] PROGMEM = "1MBPS";
+static const char rf24_datarate_e_str_1[] PROGMEM = "2MBPS";
+static const char rf24_datarate_e_str_2[] PROGMEM = "250KBPS";
+static const char * const rf24_datarate_e_str_P[] PROGMEM = {
+  rf24_datarate_e_str_0,
+  rf24_datarate_e_str_1,
+  rf24_datarate_e_str_2,
+};
+static const char rf24_model_e_str_0[] PROGMEM = "nRF24L01";
+static const char rf24_model_e_str_1[] PROGMEM = "nRF24L01+";
+static const char * const rf24_model_e_str_P[] PROGMEM = {
+  rf24_model_e_str_0,
+  rf24_model_e_str_1,
+};
+static const char rf24_crclength_e_str_0[] PROGMEM = "Disabled";
+static const char rf24_crclength_e_str_1[] PROGMEM = "8 bits";
+static const char rf24_crclength_e_str_2[] PROGMEM = "16 bits" ;
+static const char * const rf24_crclength_e_str_P[] PROGMEM = {
+  rf24_crclength_e_str_0,
+  rf24_crclength_e_str_1,
+  rf24_crclength_e_str_2,
+};
+static const char rf24_pa_dbm_e_str_0[] PROGMEM = "PA_MIN";
+static const char rf24_pa_dbm_e_str_1[] PROGMEM = "PA_LOW";
+static const char rf24_pa_dbm_e_str_2[] PROGMEM = "LA_MED";
+static const char rf24_pa_dbm_e_str_3[] PROGMEM = "PA_HIGH";
+static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = { 
+  rf24_pa_dbm_e_str_0,
+  rf24_pa_dbm_e_str_1,
+  rf24_pa_dbm_e_str_2,
+  rf24_pa_dbm_e_str_3,
+};
+
 void RF24::printDetails(void)
 {
   print_status(get_status());
@@ -289,15 +322,10 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  const char * rf24_datarate_e_str[] = { "1MBPS", "2MBPS", "250KBPS" };
-  const char * rf24_model_e_str[] = { "nRF24L01", "nRF24L01+" } ;
-  const char * rf24_crclength_e_str[] = { "Disabled", "8 bits", "16 bits" } ;
-  const char * rf24_pa_dbm_e_str[] = { "PA_MIN", "PA_LOW", "LA_MED", "PA_HIGH"} ;
-  
-  printf_P(PSTR("Data Rate\t = %s\r\n"),rf24_datarate_e_str[getDataRate()]);
-  printf_P(PSTR("Model\t\t = %s\r\n"),rf24_model_e_str[isPVariant()]);
-  printf_P(PSTR("CRC Length\t = %s\r\n"),rf24_crclength_e_str[getCRCLength()]);
-  printf_P(PSTR("PA Power\t = %s\r\n"),rf24_pa_dbm_e_str[getPALevel()]);
+  printf_P(PSTR("Data Rate\t = %S\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
+  printf_P(PSTR("Model\t\t = %S\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
+  printf_P(PSTR("CRC Length\t = %S\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
+  printf_P(PSTR("PA Power\t = %S\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 }
 
 /****************************************************************************/
@@ -587,21 +615,21 @@ void RF24::openWritingPipe(uint64_t value)
 
 /****************************************************************************/
 
+static const uint8_t child_pipe[] PROGMEM =
+{
+  RX_ADDR_P0, RX_ADDR_P1, RX_ADDR_P2, RX_ADDR_P3, RX_ADDR_P4, RX_ADDR_P5
+};
+static const uint8_t child_payload_size[] PROGMEM =
+{
+  RX_PW_P0, RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5
+};
+static const uint8_t child_pipe_enable[] PROGMEM =
+{
+  ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
+};
+
 void RF24::openReadingPipe(uint8_t child, uint64_t address)
 {
-  const uint8_t child_pipe[] =
-  {
-    RX_ADDR_P0, RX_ADDR_P1, RX_ADDR_P2, RX_ADDR_P3, RX_ADDR_P4, RX_ADDR_P5
-  };
-  const uint8_t child_payload_size[] =
-  {
-    RX_PW_P0, RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5
-  };
-  const uint8_t child_pipe_enable[] =
-  {
-    ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
-  };
-
   // If this is pipe 0, cache the address.  This is needed because
   // openWritingPipe() will overwrite the pipe 0 address, so
   // startListening() will have to restore it.
@@ -612,11 +640,11 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&address), 5);
+      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 5);
     else
-      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&address), 1);
+      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
 
-    write_register(child_payload_size[child],payload_size);
+    write_register(pgm_read_byte(&child_payload_size[child]),payload_size);
 
     // Note it would be more efficient to set all of the bits for all open
     // pipes at once.  However, I thought it would make the calling code
@@ -770,27 +798,27 @@ void RF24::setPALevel(rf24_pa_dbm_e level)
   uint8_t setup = read_register(RF_SETUP) ;
   setup &= ~(_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
 
-  switch( level )
+  // switch uses RAM (evil!)
+  if ( level == RF24_PA_MAX )
   {
-  case RF24_PA_MAX:
     setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
-    break ;
-
-  case RF24_PA_HIGH:
+  }
+  else if ( level == RF24_PA_HIGH )
+  {
     setup |= _BV(RF_PWR_HIGH) ;
-    break ;
-
-  case RF24_PA_LOW:
-    setup |= _BV(RF_PWR_LOW) ;
-    break ;
-
-  case RF24_PA_MIN:
-    break ;
-
-  case RF24_PA_ERROR:
+  }
+  else if ( level == RF24_PA_LOW )
+  {
+    setup |= _BV(RF_PWR_LOW);
+  }
+  else if ( level == RF24_PA_MIN )
+  {
+    // nothing
+  }
+  else if ( level == RF24_PA_ERROR )
+  {
     // On error, go to maximum PA
     setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
-    break ;
   }
 
   write_register( RF_SETUP, setup ) ;
@@ -803,23 +831,22 @@ rf24_pa_dbm_e RF24::getPALevel(void)
   rf24_pa_dbm_e result = RF24_PA_ERROR ;
   uint8_t power = read_register(RF_SETUP) & (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
 
-  switch( power )
+  // switch uses RAM (evil!)
+  if ( power == (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) )
   {
-  case (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)):
     result = RF24_PA_MAX ;
-    break ;
-
-  case _BV(RF_PWR_HIGH):
+  }
+  else if ( power == _BV(RF_PWR_HIGH) )
+  {
     result = RF24_PA_HIGH ;
-    break ;
-
-  case _BV(RF_PWR_LOW):
+  }
+  else if ( power == _BV(RF_PWR_LOW) )
+  {
     result = RF24_PA_LOW ;
-    break ;
-
-  default:
+  }
+  else
+  {
     result = RF24_PA_MIN ;
-    break ;
   }
 
   return result ;
@@ -877,27 +904,25 @@ bool RF24::setDataRate(rf24_datarate_e speed)
 rf24_datarate_e RF24::getDataRate( void )
 {
   rf24_datarate_e result ;
-  uint8_t setup = read_register(RF_SETUP) ;
-
+  uint8_t dr = read_register(RF_SETUP) & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH));
+  
+  // switch uses RAM (evil!)
   // Order matters in our case below
-  switch( setup & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) )
+  if ( dr == _BV(RF_DR_LOW) )
   {
-  case _BV(RF_DR_LOW):
     // '10' = 250KBPS
     result = RF24_250KBPS ;
-    break ;
-
-  case _BV(RF_DR_HIGH):
+  }
+  else if ( dr == _BV(RF_DR_HIGH) )
+  {
     // '01' = 2MBPS
     result = RF24_2MBPS ;
-    break ;
-
-  default:
+  }
+  else
+  {
     // '00' = 1MBPS
     result = RF24_1MBPS ;
-    break ;
   }
-
   return result ;
 }
 
@@ -906,23 +931,21 @@ rf24_datarate_e RF24::getDataRate( void )
 void RF24::setCRCLength(rf24_crclength_e length)
 {
   uint8_t config = read_register(CONFIG) & ~( _BV(CRCO) | _BV(EN_CRC)) ;
-
-  switch (length)
+  
+  // switch uses RAM (evil!)
+  if ( length == RF24_CRC_DISABLED )
   {
-    case RF24_CRC_DISABLED:
-      break;
-
-    case RF24_CRC_8:
-      config |= _BV(EN_CRC);
-      break;
-
-    case RF24_CRC_16:
-    default:
-      config |= _BV(EN_CRC);
-      config |= _BV( CRCO );
-      break;
+    // Do nothing, we turned it off above. 
   }
-
+  else if ( length == RF24_CRC_8 )
+  {
+    config |= _BV(EN_CRC);
+  }
+  else
+  {
+    config |= _BV(EN_CRC);
+    config |= _BV( CRCO );
+  }
   write_register( CONFIG, config ) ;
 }
 
