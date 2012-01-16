@@ -166,6 +166,9 @@ void setup(void)
   //
 
   radio.printDetails();
+  
+  if ( role == role_pong_back )
+    printf("\n\r+OK ");
 }
 
 void loop(void)

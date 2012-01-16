@@ -1,10 +1,10 @@
-#!/opt/local/bin/python
+#!/usr/bin/python
 
 import sys,serial
 
 def read_until(token):
 	while 1: 
-		line = ser.readline(None,"\r")
+		line = ser.readline(None)
 		sys.stdout.write(line)
 
 		if (line.startswith(token)):
