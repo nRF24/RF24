@@ -1,12 +1,13 @@
 # (1) Project Information
 
 PROJECT_LIBS 	= SPI RF24 ; 
+PROJECT_DIRS	= $(PWD) ;
 
 # (2) Board Information
 
-UPLOAD_PROTOCOL ?= stk500v1 ;
+UPLOAD_PROTOCOL ?= arduino ;
 UPLOAD_SPEED 	?= 115200 ;
-MCU		= atmega328p ;
+MCU		?= atmega328p ;
 F_CPU 		?= 16000000 ;
 CORE		?= arduino ;
 VARIANT 	?= standard ;
@@ -29,13 +30,13 @@ PORT_u2 	= /dev/ttyUSB2 ;
 
 if $(OS) = MACOSX 
 {
-	AVR_BIN 	= /usr/local/avrtools/bin ;
+	AVR_BIN 	?= /usr/local/avrtools/bin ;
 	AVR_ETC 	= /usr/local/avrtools/etc ;
 	AVR_INCLUDE	= /usr/local/avrtools/include ; 
 }
 else
 {
-	AVR_BIN 	= /usr/bin ;
+	AVR_BIN 	?= /usr/bin ;
 	AVR_INCLUDE 	= /usr/lib/avr/include ;
 	AVR_ETC 	= /etc ; 
 }
@@ -57,21 +58,23 @@ SKETCH_LIB      = $(HOME)/Source/Arduino/libraries ;
 CC	  	= $(AVR_BIN)/avr-gcc ;
 C++	 	= $(AVR_BIN)/avr-g++ ;
 LINK	  	= $(AVR_BIN)/avr-gcc ;
+AR		= $(AVR_BIN)/avr-ar rcs ;
+RANLIB		= ;
 OBJCOPY 	= $(AVR_BIN)/avr-objcopy ;
-AVRDUDE 	= $(AVR_BIN)/avrdude ;
+AVRDUDE 	?= $(AVR_BIN)/avrdude ;
 
 # Flags
 
 DEFINES  	+= F_CPU=$(F_CPU)L ARDUINO=$(ARDUINO_VERSION) VERSION_H ;
 OPTIM		= -Os ;
-CCFLAGS  	= -Wall -Wextra -mmcu=$(MCU) -ffunction-sections -fdata-sections ;
+CCFLAGS  	= -Wall -Wextra -Wno-strict-aliasing -mmcu=$(MCU) -ffunction-sections -fdata-sections ;
 C++FLAGS  	= $(CCFLAGS) -fno-exceptions -fno-strict-aliasing ;
 LINKFLAGS  	= $(OPTIM) -lm -Wl,--gc-sections -mmcu=$(MCU) ;
 AVRDUDEFLAGS	= -V -F -D -C $(AVR_ETC)/avrdude.conf -p $(MCU) -c $(UPLOAD_PROTOCOL) -b $(UPLOAD_SPEED) ;
 
 # Search everywhere for headers
 
-HDRS  	 	= $(PWD) $(AVR_INCLUDE) $(ARDUINO_CORE) $(ARDUINO_LIB)/$(PROJECT_LIBS) $(ARDUINO_LIB)/$(PROJECT_LIBS)/utility $(SKETCH_LIB)/$(PROJECT_LIBS) ;
+HDRS  	 	= $(PROJECT_DIRS) $(AVR_INCLUDE) $(ARDUINO_CORE) $(ARDUINO_LIB)/$(PROJECT_LIBS) $(ARDUINO_LIB)/$(PROJECT_LIBS)/utility $(SKETCH_LIB)/$(PROJECT_LIBS) ;
 
 # Output locations
 
@@ -149,6 +152,12 @@ rule Objects
         }
 }
 
+rule Library
+{
+	LibraryFromObjects $(<) : $(>:B)$(SUFOBJ) ;
+	Objects $(>) ;
+}
+
 rule Main
 {
         MainFromObjects $(<) : $(>:B)$(SUFOBJ) ;
@@ -183,28 +192,28 @@ actions UploadAction
 	$(AVRDUDE) $(AVRDUDEFLAGS) -P $(<) $(AVRDUDE_WRITE_FLASH) -U flash:w:$(>):i
 }
 
+rule Arduino
+{
+	LINKFLAGS on $(<) = $(LINKFLAGS) -Wl,-Map=$(LOCATE_TARGET)/$(<:B).map ;
+	Main $(<) : $(>) ;
+	LinkLibraries $(<) : core libs ;
+	Hex $(<:B).hex : $(<) ;
+	for _p in $(PORTS)
+	{
+		Upload $(_p) : $(PORT_$(_p)) : $(<:B).hex ;
+	}
+}
+
 #
 # Targets
 #
 
 # Grab everything from the core directory
-CORE_MODULES  	= [ GLOB $(ARDUINO_CORE) : *.c *.cpp ] ;
+Library core : [ GLOB $(ARDUINO_CORE) : *.c *.cpp ] ;
 
 # Grab everything from libraries.  To avoid this "grab everything" behaviour, you
 # can specify specific modules to pick up in PROJECT_MODULES
-LIB_MODULES  	= [ GLOB $(ARDUINO_LIB)/$(PROJECT_LIBS) $(ARDUINO_LIB)/$(PROJECT_LIBS)/utility $(SKETCH_LIB)/$(PROJECT_LIBS) : *.cpp *.c ] ;
-
-# Grab everything from the current dir
-PROJECT_MODULES += [ GLOB $(PWD) : *.c *.cpp *.pde *.ino ] ;
+Library libs : [ GLOB $(ARDUINO_LIB)/$(PROJECT_LIBS) $(ARDUINO_LIB)/$(PROJECT_LIBS)/utility $(SKETCH_LIB)/$(PROJECT_LIBS) : *.cpp *.c ] ;
 
 # Main output executable
-MAIN		= $(PWD:B).elf ;
-
-Main $(MAIN) : $(CORE_MODULES) $(LIB_MODULES) $(PROJECT_MODULES) ;
-Hex $(MAIN:B).hex : $(MAIN) ;
-
-# Upload targets
-for _p in $(PORTS)
-{
-	Upload $(_p) : $(PORT_$(_p)) : $(MAIN:B).hex ;
-}
+Arduino $(PWD:B).elf : $(PROJECT_MODULES) [ GLOB $(PROJECT_DIRS) : *.c *.cpp *.pde *.ino ] ;
