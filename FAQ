@@ -9,6 +9,8 @@
  *
  * @ref issues
  *
+ * @ref ram
+ *
  * @ref tests
  *
  * @section starting Where do I start?
@@ -35,8 +37,12 @@
  * @section issues What should I do if I find a problem?
  *
  * Please <a href="https://github.com/maniacbug/RF24/issues/new">open an issue</a> on github if you find any problems using it with any version of Arduino or Maple.
+ *
+ * @section ram What is the RAM footprint of this library?
+ *
+ * 16 bytes.  A single radio object consumes 16 bytes of RAM, and the library 
+ * does not use any other RAM statically.
  * 
- *  
  * @section tests Why are the examples in the 'tests' directory failing?
  *
  * The sketches in the 'tests' directory are not for general use.
@@ -44,9 +50,4 @@
  *
  * The 'tests' directory is only for people making changes to the library
  * to ensure that their changes do not break anything.
- *
- *
- *
- *
- *
  */
