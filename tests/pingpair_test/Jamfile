@@ -6,7 +6,7 @@ PROJECT_DIRS	= $(PWD) ;
 # (2) Board Information
 
 UPLOAD_PROTOCOL ?= arduino ;
-UPLOAD_SPEED 	?= 57600 ;
+UPLOAD_SPEED 	?= 115200 ;
 MCU		?= atmega328p ;
 F_CPU 		?= 16000000 ;
 CORE		?= arduino ;
