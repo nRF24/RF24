@@ -194,7 +194,7 @@ protected:
    * @param reg Which register. Use constants from nRF24L01.h
    * @param qty How many successive registers to print
    */
-  void print_byte_register(prog_char* name, uint8_t reg, uint8_t qty = 1);
+  void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
   /**
    * Print the name and value of a 40-bit address register to stdout
@@ -207,7 +207,7 @@ protected:
    * @param reg Which register. Use constants from nRF24L01.h
    * @param qty How many successive registers to print
    */
-  void print_address_register(prog_char* name, uint8_t reg, uint8_t qty = 1);
+  void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
   /**
    * Turn on or off the special features of the chip

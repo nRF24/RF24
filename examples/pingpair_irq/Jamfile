@@ -1,206 +1,219 @@
-PROJECT_NAME 	= $(PWD:B) ;
-PROJECT_DIR 	= . ;
-PROJECT_LIBS = SPI RF24 ; 
+# (1) Project Information
 
-OUT_DIR = ojam ;
-F_CPU 		= 16000000 ;
-MCU             = atmega328p ;
-PORTS           = /dev/tty.usbserial-A600eHIs /dev/tty.usbserial-A40081RP /dev/tty.usbserial-A9007LmI ;
+PROJECT_LIBS 	= SPI RF24 ; 
+PROJECT_DIRS	= $(PWD) ;
 
-UPLOAD_RATE 	= 57600 ;
-AVRDUDE_PROTOCOL = stk500v1 ;
-COM 		= 33 ;
+# (2) Board Information
 
-# Host-specific overrides for locations 
+UPLOAD_PROTOCOL ?= arduino ;
+UPLOAD_SPEED 	?= 115200 ;
+MCU		?= atmega328p ;
+F_CPU 		?= 16000000 ;
+CORE		?= arduino ;
+VARIANT 	?= standard ;
+ARDUINO_VERSION	?= 100 ;
+
+# (3) USB Ports
+
+PORTS		= p4 p6 p9 u0 u1 u2 ;
+PORT_p6 	= /dev/tty.usbserial-A600eHIs ;
+PORT_p4 	= /dev/tty.usbserial-A40081RP ;
+PORT_p9		= /dev/tty.usbserial-A9007LmI ;
+PORT_u0 	= /dev/ttyUSB0 ;
+PORT_u1 	= /dev/ttyUSB1 ;
+PORT_u2 	= /dev/ttyUSB2 ;
+
+# (4) Location of AVR tools
+#
+# This configuration assumes using avr-tools that were obtained separate from the Arduino
+# distribution. 
+
 if $(OS) = MACOSX 
 {
-ARDUINO_VERSION	= 22 ;
-OLD_DIR 	= /opt/arduino-0021 ;
-AVR_TOOLS_PATH 	= $(OLD_DIR)/hardware/tools/avr/bin ;
-AVRDUDECONFIG_PATH = $(OLD_DIR)/hardware/tools/avr/etc ;
-ARDUINO_DIR 	= /opt/Arduino ;
-ARDUINO_AVR 	= /usr/lib/avr/include ;
+	AVR_BIN 	?= /usr/local/avrtools/bin ;
+	AVR_ETC 	= /usr/local/avrtools/etc ;
+	AVR_INCLUDE	= /usr/local/avrtools/include ; 
+}
+else
+{
+	AVR_BIN 	?= /usr/bin ;
+	AVR_INCLUDE 	= /usr/lib/avr/include ;
+	AVR_ETC 	= /etc ; 
 }
 
-# Where is everything?
-ARDUINO_VERSION	?= 22 ;
-AVR_TOOLS_PATH 	?= /usr/bin ;
-ARDUINO_DIR 	?= /opt/arduino-00$(ARDUINO_VERSION) ;
-ARDUINO_AVR 	?= $(ARDUINO_DIR)/hardware/tools/avr/avr/include/avr ;
-AVRDUDECONFIG_PATH ?= $(ARDUINO_DIR)/hardware/tools ;
-ARDUINO_CORE 	= $(ARDUINO_DIR)/hardware/arduino/cores/arduino ;
+# (5) Directories where Arduino core and libraries are located
+
+ARDUINO_DIR 	?= /opt/Arduino ;
+ARDUINO_CORE 	= $(ARDUINO_DIR)/hardware/arduino/cores/$(CORE) $(ARDUINO_DIR)/hardware/arduino/variants/$(VARIANT) ;
 ARDUINO_LIB 	= $(ARDUINO_DIR)/libraries ;
 SKETCH_LIB      = $(HOME)/Source/Arduino/libraries ;
-AVR_CC  	= $(AVR_TOOLS_PATH)/avr-gcc ;
-AVR_CXX  	= $(AVR_TOOLS_PATH)/avr-g++ ;
-AVR_LD  	= $(AVR_TOOLS_PATH)/avr-gcc ;
-AVR_OBJCOPY 	= $(AVR_TOOLS_PATH)/avr-objcopy ;
-AVRDUDE 	= $(AVR_TOOLS_PATH)/avrdude ;
 
-DEFINES  	= F_CPU=$(F_CPU)L ARDUINO=$(ARDUINO_VERSION) VERSION_H ;
-CTUNING  	= -ffunction-sections -fdata-sections ;
-CXXTUNING  	= -fno-exceptions -fno-strict-aliasing ; 
-CFLAGS  	= -Os -Wall -Wextra -mmcu=$(MCU) $(CTUNING) ;
-CXXFLAGS  	= $(CFLAGS) $(CXXTUNING) ;
-LDFLAGS  	= -Os -lm -Wl,--gc-sections -mmcu=atmega328p ;
+#
+# --------------------------------------------------
+# Below this line usually never needs to be modified 
+#
+
+# Tool locations
+
+CC	  	= $(AVR_BIN)/avr-gcc ;
+C++	 	= $(AVR_BIN)/avr-g++ ;
+LINK	  	= $(AVR_BIN)/avr-gcc ;
+AR		= $(AVR_BIN)/avr-ar rcs ;
+RANLIB		= ;
+OBJCOPY 	= $(AVR_BIN)/avr-objcopy ;
+AVRDUDE 	?= $(AVR_BIN)/avrdude ;
+
+# Flags
+
+DEFINES  	+= F_CPU=$(F_CPU)L ARDUINO=$(ARDUINO_VERSION) VERSION_H ;
+OPTIM		= -Os ;
+CCFLAGS  	= -Wall -Wextra -Wno-strict-aliasing -mmcu=$(MCU) -ffunction-sections -fdata-sections ;
+C++FLAGS  	= $(CCFLAGS) -fno-exceptions -fno-strict-aliasing ;
+LINKFLAGS  	= $(OPTIM) -lm -Wl,--gc-sections -mmcu=$(MCU) ;
+AVRDUDEFLAGS	= -V -F -D -C $(AVR_ETC)/avrdude.conf -p $(MCU) -c $(UPLOAD_PROTOCOL) -b $(UPLOAD_SPEED) ;
 
 # Search everywhere for headers
-HDRS  	 	= $(PROJECT_DIR) $(ARDUINO_AVR) $(ARDUINO_CORE) [ GLOB $(ARDUINO_LIB) $(SKETCH_LIB) : [^.]* ] ;
 
-# Grab everything from the core directory
-CORE_MODULES  	= [ GLOB $(ARDUINO_CORE) : *.c *.cpp ] ;
+HDRS  	 	= $(PROJECT_DIRS) $(AVR_INCLUDE) $(ARDUINO_CORE) $(ARDUINO_LIB)/$(PROJECT_LIBS) $(ARDUINO_LIB)/$(PROJECT_LIBS)/utility $(SKETCH_LIB)/$(PROJECT_LIBS) ;
 
-# Grab everything from libraries.  To avoid this "grab everything" behaviour, you
-# can specify specific modules to pick up in PROJECT_MODULES
-LIB_MODULES  	= [ GLOB $(ARDUINO_LIB)/$(PROJECT_LIBS) $(SKETCH_LIB)/$(PROJECT_LIBS) : *.cpp ] ;
+# Output locations
 
-# In addition to explicitly-specified program modules, pick up anything from the current
-# dir.
-PROJECT_MODULES += [ GLOB $(PROJECT_DIR) : *.c *.cpp *.pde ] ;
+LOCATE_TARGET	= $(F_CPU) ;
+LOCATE_SOURCE	= $(F_CPU) ;
 
-# Shortcut for the out files
-OUT             = $(OUT_DIR)/$(PROJECT_NAME) ;
-
-# AvrDude setup
-AVRDUDE_FLAGS = -V -F -D -C $(AVRDUDECONFIG_PATH)/avrdude.conf -p $(MCU) -c $(AVRDUDE_PROTOCOL) -b $(UPLOAD_RATE) ;
+#
+# Custom rules
+#
 
 rule GitVersion
 {
-  Always $(<) ;
-  Depends all : $(<) ;
+	Always $(<) ;
+	Depends all : $(<) ;
 }
 
 actions GitVersion
 {
-  echo "const char program_version[] = \"\\" > $(<)
-  git log -1 --pretty=format:%h >> $(<)
-  echo "\";" >> $(<)
+	echo "const char program_version[] = \"\\" > $(<)
+	git log -1 --pretty=format:%h >> $(<)
+	echo "\";" >> $(<)
 }
 
 GitVersion version.h ;
 
-rule AvrCc
-{
-  Depends $(<) : $(>) ;
-  Depends $(<) : $(<:D) ;
-  Clean clean : $(<) ;
-
-  CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
-  CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
-}
-
-actions AvrCc
-{
-  $(AVR_CC) -c -o $(<) $(CCHDRS) $(CCDEFS) $(CFLAGS) $(>) 
-}
-
-rule AvrC++
-{
-  Depends $(<) : $(>) ;
-  Depends $(<) : $(<:D) ;
-  Clean clean : $(<) ;
-
-  CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
-  CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
-}
-
-actions AvrC++
-{
-  $(AVR_CXX) -c -o $(<) $(CCHDRS) $(CCDEFS) $(CXXFLAGS) $(>) 
-}
-
 rule Pde
 {
-  Depends $(<) : $(>) ;
-  Depends $(<) : $(<:D) ;
-  Clean clean : $(<) ;
+	Depends $(<) : $(>) ;
+	MakeLocate $(<) : $(LOCATE_SOURCE) ;
+	Clean clean : $(<) ;
+}
 
+if ( $(ARDUINO_VERSION) < 100 )
+{
+	ARDUINO_H = WProgram.h ;
+}
+else
+{
+	ARDUINO_H = Arduino.h ;
 }
 
 actions Pde
 {
-  echo "#include <WProgram.h>" > $(<) 
-  echo "#line 1 \"$(>)\"" >> $(<)
-  cat $(>) >> $(<) 
+	echo "#include <$(ARDUINO_H)>" > $(<) 
+	echo "#line 1 \"$(>)\"" >> $(<)
+	cat $(>) >> $(<) 
 }
 
-rule AvrPde
+rule C++Pde
 {
-  local _CPP = $(OUT_DIR)/$(_I:B).cpp ;
-  Pde $(_CPP) : $(>) ;
-  AvrC++ $(<) : $(_CPP) ;
+	local _CPP = $(>:B).cpp ;
+	Pde $(_CPP) : $(>) ;
+	C++ $(<) : $(_CPP) ;
 }
 
-rule AvrObject
+rule UserObject
 {
-  switch $(>:S)
-  {
-    case .c :   AvrCc $(<) : $(>) ;
-    case .cpp : AvrC++ $(<) : $(>) ;
-    case .pde : AvrPde $(<) : $(>) ;
-  }
+	switch $(>:S)
+	{
+		case .ino : C++Pde $(<) : $(>) ;
+		case .pde : C++Pde $(<) : $(>) ;
+	}
 }
 
-rule AvrObjects
+rule Objects
 {
-  for _I in $(<) 
-  {
-    AvrObject $(OUT_DIR)/$(_I:B).o : $(_I) ;
-  }
+        local _i ;
+
+        for _i in [ FGristFiles $(<) ]
+        {
+		local _b = $(_i:B)$(SUFOBJ) ;
+		local _o = $(_b:G=$(SOURCE_GRIST:E)) ;
+                Object $(_o) : $(_i) ;
+                Depends obj : $(_o) ;
+        }
 }
 
-rule AvrMainFromObjects
+rule Library
 {
-  Depends $(<) : $(>) ;
-  Depends $(<) : $(<:D) ;
-  MkDir $(<:D) ;
-  Depends all : $(<) ;
-  Clean clean : $(<) ;
+	LibraryFromObjects $(<) : $(>:B)$(SUFOBJ) ;
+	Objects $(>) ;
 }
 
-actions AvrMainFromObjects
+rule Main
 {
-  $(AVR_LD) $(LDFLAGS) -o $(<) $(>) 
+        MainFromObjects $(<) : $(>:B)$(SUFOBJ) ;
+        Objects $(>) ;
 }
 
-rule AvrMain
+rule Hex
 {
-  AvrMainFromObjects $(<) : $(OUT_DIR)/$(>:B).o ;
-  AvrObjects $(>) ;
+	Depends $(<) : $(>) ;
+	MakeLocate $(<) : $(LOCATE_TARGET) ;
+	Depends hex : $(<) ;
+	Clean clean : $(<) ;
 }
 
-rule AvrHex
+actions Hex
 {
-  Depends $(<) : $(>) ;
-  Depends $(<) : $(<:D) ;
-  Depends hex : $(<) ;
-  Clean clean : $(<) ;
+	$(OBJCOPY) -O ihex -R .eeprom $(>) $(<)
 }
 
-actions AvrHex
+rule Upload
 {
-  $(AVR_OBJCOPY) -O ihex -R .eeprom $(>) $(<)
+	Depends $(1) : $(2) ;
+	Depends $(2) : $(3) ;
+	NotFile $(1) ;
+	Always $(1) ;
+	Always $(2) ;
+	UploadAction $(2) : $(3) ;
 }
 
-rule AvrUpload
+actions UploadAction
 {
-  Depends $(1) : $(2) ;
-  Depends $(2) : $(3) ;
-  NotFile $(1) ;
-  Always $(1) ;
-  Always $(2) ;
-  AvrUploadAction $(2) : $(3) ;
+	$(AVRDUDE) $(AVRDUDEFLAGS) -P $(<) $(AVRDUDE_WRITE_FLASH) -U flash:w:$(>):i
 }
 
-actions AvrUploadAction
+rule Arduino
 {
-  $(AVRDUDE) $(AVRDUDE_FLAGS) -P $(<) $(AVRDUDE_WRITE_FLASH) -U flash:w:$(>):i
+	LINKFLAGS on $(<) = $(LINKFLAGS) -Wl,-Map=$(LOCATE_TARGET)/$(<:B).map ;
+	Main $(<) : $(>) ;
+	LinkLibraries $(<) : core libs ;
+	Hex $(<:B).hex : $(<) ;
+	for _p in $(PORTS)
+	{
+		Upload $(_p) : $(PORT_$(_p)) : $(<:B).hex ;
+	}
 }
 
-AvrMain $(OUT).elf : $(CORE_MODULES) $(LIB_MODULES) $(PROJECT_MODULES) ;
-AvrHex $(OUT).hex : $(OUT).elf ;
+#
+# Targets
+#
 
-AvrUpload p6 : /dev/tty.usbserial-A600eHIs : $(OUT).hex ;
-AvrUpload p4 : /dev/tty.usbserial-A40081RP : $(OUT).hex ;
-AvrUpload p9 : /dev/tty.usbserial-A9007LmI : $(OUT).hex ;
+# Grab everything from the core directory
+Library core : [ GLOB $(ARDUINO_CORE) : *.c *.cpp ] ;
 
+# Grab everything from libraries.  To avoid this "grab everything" behaviour, you
+# can specify specific modules to pick up in PROJECT_MODULES
+Library libs : [ GLOB $(ARDUINO_LIB)/$(PROJECT_LIBS) $(ARDUINO_LIB)/$(PROJECT_LIBS)/utility $(SKETCH_LIB)/$(PROJECT_LIBS) : *.cpp *.c ] ;
+
+# Main output executable
+Arduino $(PWD:B).elf : $(PROJECT_MODULES) [ GLOB $(PROJECT_DIRS) : *.c *.cpp *.pde *.ino ] ;
