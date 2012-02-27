@@ -89,6 +89,8 @@ const int interval = 100; //*< ms to wait between sends */
 
 char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
 
+uint8_t pipe_number = 1; // Which pipe to send on.
+
 void one_ok(void)
 {
   // Have we received enough yet?
@@ -203,6 +205,20 @@ void setup(void)
     radio.enableDynamicPayloads();
   }
 
+  // Config 4 tests out a higher pipe ##
+  if (configuration == '4' && role == role_sender)
+  {
+    // Set top 4 bytes of the address in pipe 1 
+    radio.openReadingPipe(1,pipe & 0xFFFFFFFF00ULL);
+
+    // indicate the pipe to use 
+    pipe_number = 5;
+  }
+  else if ( role == role_sender )
+  {
+    radio.openReadingPipe(5,0);
+  }
+
   //
   // Open pipes to other nodes for communication
   //
@@ -216,7 +232,7 @@ void setup(void)
   }
   else
   {
-    radio.openReadingPipe(1,pipe);
+    radio.openReadingPipe(pipe_number,pipe);
   }
 
   //
@@ -230,7 +246,7 @@ void setup(void)
   // Dump the configuration of the rf unit for debugging
   //
 
-  //radio.printDetails();
+  radio.printDetails();
 
   //
   // Attach interrupt handler to interrupt #0 (using pin 2)
@@ -410,7 +426,7 @@ void check_radio(void)
 
       // Add an ack packet for the next time around.
       // Here we will report back how many bytes we got this time.
-      radio.writeAckPayload( 1, &len, sizeof(len) );
+      radio.writeAckPayload( pipe_number, &len, sizeof(len) );
       ++message_count;
     }
   }

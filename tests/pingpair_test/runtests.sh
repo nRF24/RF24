@@ -14,3 +14,8 @@ stty 57600 raw ignbrk hup < /dev/ttyUSB0
 sleep 1
 stty 57600 raw ignbrk hup < /dev/ttyUSB1
 expect test.ex 3
+sleep 1
+stty 57600 raw ignbrk hup < /dev/ttyUSB0
+sleep 1
+stty 57600 raw ignbrk hup < /dev/ttyUSB1
+expect test.ex 4
