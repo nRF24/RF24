@@ -37,7 +37,7 @@ if $(OS) = MACOSX
 else
 {
 	AVR_BIN 	?= /usr/bin ;
-	AVR_INCLUDE 	= /usr/lib/avr/include ;
+	AVR_INCLUDE 	?= /usr/lib/avr/include ;
 	AVR_ETC 	= /etc ; 
 }
 

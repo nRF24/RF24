@@ -75,7 +75,7 @@ void setup(void)
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
-  radio.setPayloadSize(8);
+  //radio.setPayloadSize(8);
 
   //
   // Open pipes to other nodes for communication
@@ -86,15 +86,15 @@ void setup(void)
   // Open 'our' pipe for writing
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
 
-  if ( role == role_ping_out )
+  //if ( role == role_ping_out )
   {
-    radio.openWritingPipe(pipes[0]);
+    //radio.openWritingPipe(pipes[0]);
     radio.openReadingPipe(1,pipes[1]);
   }
-  else
+  //else
   {
-    radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1,pipes[0]);
+    //radio.openWritingPipe(pipes[1]);
+    //radio.openReadingPipe(1,pipes[0]);
   }
 
   //

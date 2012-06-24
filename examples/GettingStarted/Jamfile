@@ -4,7 +4,7 @@ PROJECT_LIBS 	= SPI RF24 ;
 
 # (2) Board Information
 
-UPLOAD_PROTOCOL ?= stk500v1 ;
+UPLOAD_PROTOCOL ?= arduino ;
 UPLOAD_SPEED 	?= 57600 ;
 MCU		?= atmega328p ;
 F_CPU 		?= 16000000 ;
@@ -35,8 +35,8 @@ if $(OS) = MACOSX
 }
 else
 {
-	AVR_BIN 	= /usr/bin ;
-	AVR_INCLUDE 	= /usr/lib/avr/include ;
+	AVR_BIN 	?= /usr/bin ;
+	AVR_INCLUDE 	?= /usr/lib/avr/include ;
 	AVR_ETC 	= /etc ; 
 }
 
