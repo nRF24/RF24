@@ -78,9 +78,9 @@ void setup(void)
 
   // read the address pin, establish our role
   //if ( ! digitalRead(role_pin) )
-    role = role_ping_out;
+  //  role = role_ping_out;
   //else
-  //  role = role_pong_back;
+    role = role_pong_back;
 
   //
   // Print preamble:

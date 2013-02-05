@@ -1,9 +1,9 @@
 CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 
-all: scanner pingtest pingtest2
+all: scanner pingtest pongtest
 
-pingtest2: main_pingtest2.cpp
-	g++ ${CCFLAGS} -Wall -L.  -lrf24 main_pingtest2.cpp -o pingtest2
+pongtest: main_pongtest.cpp
+	g++ ${CCFLAGS} -Wall -L.  -lrf24 main_pongtest.cpp -o pongtest
 
 pingtest: main_pingtest.cpp
 	g++ ${CCFLAGS} -Wall -L.  -lrf24 main_pingtest.cpp -o pingtest
