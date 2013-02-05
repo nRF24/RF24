@@ -39,8 +39,8 @@ const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 //
 
 // The various roles supported by this sketch
-// typedef enum { role_ping_out = 1, role_pong_back } role_e;
-typedef enum { role_ping_out , role_pong_back=1 } role_e;
+ typedef enum { role_ping_out = 1, role_pong_back } role_e;
+//typedef enum { role_ping_out , role_pong_back=1 } role_e;
 
 //
 // Payload
@@ -63,15 +63,16 @@ void setup(void)
 {
 	//
 	radio.begin();
-	radio.enableDynamicPayloads();
-	radio.setRetries(15,15);
-	radio.setDataRate(RF24_250KBPS);
-	radio.setPALevel(RF24_PA_HIGH);
-	//radio.setChannel(120);
-	radio.setCRCLength(RF24_CRC_16);
+//	radio.enableDynamicPayloads();
+//	radio.setRetries(15,15);
+//	radio.setDataRate(RF24_1MBPS);
+	radio.setPALevel(RF24_PA_LOW);
+	radio.setChannel(0x4c);
+//	radio.setCRCLength(RF24_CRC_16);
+//	radio.setPayloadSize(8);
 
-	radio.openWritingPipe(pipes[1]);
-	radio.openReadingPipe(1,pipes[0]);
+	radio.openWritingPipe(pipes[0]);
+	radio.openReadingPipe(1,pipes[1]);
 
 	//
 	// Start listening

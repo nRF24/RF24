@@ -14,17 +14,16 @@
 
 void RF24::csn(int mode)
 {
-  // Minimum ideal spi bus speed is 2x data rate
+  // Minimum ideal SPI bus speed is 2x data rate
   // If we assume 2Mbs data rate and 16Mhz clock, a
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
   spi->setBitOrder(MSBFIRST);
-  spi->setDataMode(spi_MODE0);
-  spi->setClockDivider(spi_CLOCK_DIV4);
+  spi->setDataMode(SPI_MODE0);
+  spi->setClockDivider(SPI_CLOCK_DIV4);
 #endif
   digitalWrite(csn_pin,mode);
-  
 }
 
 /****************************************************************************/
@@ -238,7 +237,6 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 }
 
 /****************************************************************************/
-//void RF24::spispeed(uint32_t _spispeed)
 
 RF24::RF24(string _spidevice, uint32_t _spispeed, uint8_t _cspin):
 spidevice( _spidevice) ,spispeed( _spispeed),csn_pin(_cspin), wide_band(true), p_variant(false),
@@ -254,7 +252,6 @@ RF24::RF24(uint8_t _cepin, uint8_t _cspin):
   payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
   pipe0_reading_address(0)
 {
-
 }
 
 /****************************************************************************/
@@ -344,17 +341,18 @@ void RF24::printDetails(void)
 
 void RF24::begin(void)
 {
-  spi = new SPI();
-	spi->setdevice(spidevice);
-	spi->setspeed(spispeed);
-	spi->setbits(8);
-	spi->init();
-  
-  // just to simulate arduino milis()
-  __start_timer();
   // Initialize pins
-  pinMode(ce_pin,OUTPUT); //why??
+  pinMode(ce_pin,OUTPUT);
   pinMode(csn_pin,OUTPUT);
+
+  // Initialize SPI bus
+  //spi->begin();
+spi = new SPI();
+        spi->setdevice(spidevice);
+        spi->setspeed(spispeed);
+        spi->setbits(8);
+        spi->init();
+
 
   ce(LOW);
   csn(HIGH);
@@ -506,7 +504,7 @@ bool RF24::write( const void* buf, uint8_t len )
   {
     ack_payload_length = getDynamicPayloadSize();
     IF_SERIAL_DEBUG(printf("[AckPacket]/"));
-    IF_SERIAL_DEBUG(printf("\n%d", ack_payload_length));
+    IF_SERIAL_DEBUG(printfln(ack_payload_length,DEC));
   }
 
   // Yay, we are done.
@@ -657,16 +655,16 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&address), 5);
+      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 5);
     else
-      write_register(child_pipe[child], reinterpret_cast<const uint8_t*>(&address), 1);
+      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
 
-    write_register(child_payload_size[child],payload_size);
+    write_register(pgm_read_byte(&child_payload_size[child]),payload_size);
 
     // Note it would be more efficient to set all of the bits for all open
     // pipes at once.  However, I thought it would make the calling code
     // more simple to do it this way.
-    write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(child_pipe_enable[child]));
+    write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[child])));
   }
 }
 

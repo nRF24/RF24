@@ -5,15 +5,21 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
-
  */
+
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
 
 
-#include <stddef.h>
-//#include "../spi/spi.h"
-//#include "../gpio/gpio.h"
+#ifdef ARDUINO
+//#warning "Arduino enabled"
+#if ARDUINO < 100
+//#include <WProgram.h>
+#else
+//#include <Arduino.h>
+#endif
+#else 
+//#warning "Arduino disabled"
 #include "spi.h"
 #include "gpio.h"
 #include "compatibility.h"
@@ -23,7 +29,31 @@
 #include <string.h>
 #include <sys/time.h>
 
+#define pgm_read_word(p) (*(p))
+#define pgm_read_byte(p) (*(p))
+#endif
+
+#include <stddef.h>
+
+// Stuff that is normally provided by Arduino
+//#ifdef ARDUINO
+//#include <SPI.h>
+//#else
+//#include <stdint.h>
+//#//include <stdio.h>
+//#include <string.h>
+//extern HardwareSPI SPI;
+//#define _BV(x) (1<<(x))
+
+//#else 
+//#endif
+
+//#include "../spi/spi.h"
+//#include "../gpio/gpio.h"
+
 #define _BV(x) (1<<(x))
+
+// #endif
 
 #undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
@@ -42,6 +72,12 @@
 #endif
 #endif
 
+// Progmem is Arduino-specific
+//#ifdef ARDUINO
+//#include <avr/pgmspace.h>
+//#define PRIPSTR "%S"
+//#else
+//typedef char const char;
 typedef uint16_t prog_uint16_t;
 #define PSTR(x) (x)
 #define printf_P printf
@@ -60,6 +96,8 @@ typedef uint16_t prog_uint16_t;
 #define pinMode(pin, direction) GPIO::open(pin, direction)
 #define delay(milisec) __msleep(milisec)
 #define delayMicroseconds(usec) __usleep(usec)
+
+//#endif
 
 #endif // __RF24_CONFIG_H__
 // vim:ai:cin:sts=2 sw=2 ft=cpp
