@@ -23,14 +23,16 @@ SOURCES = ${PROGRAMS:=.cpp}
 all: ${PROGRAMS}
 
 ${PROGRAMS}: ${SOURCES}
-	g++ ${CCFLAGS} -Wall -L../librf24/  -lrf24 $< -o $@
+	g++ ${CCFLAGS} -Wall -L../librf24/  -lrf24 $@.cpp -o $@
 
 clean:
 	rm -rf $(PROGRAMS)
 
-$(phony install): all
+install: all
 	test -d $(prefix) || mkdir $(prefix)
 	test -d $(prefix)/bin || mkdir $(prefix)/bin
 	for prog in $(PROGRAMS); do \
 	  install -m 0755 $$prog $(prefix)/bin; \
 	done
+
+.PHONY: install

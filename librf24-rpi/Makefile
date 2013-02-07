@@ -15,3 +15,5 @@ install:
 	$(MAKE) -C librf24 install
 	$(MAKE) -C examples install
 
+.PHONY:  all install  librf24 examples
+
