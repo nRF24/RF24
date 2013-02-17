@@ -166,9 +166,12 @@ void loop(void)
     // Wait here until we get a response, or timeout (250ms)
     unsigned long started_waiting_at = __millis();
     bool timeout = false;
-    while ( ! radio.available() && ! timeout )
+    while ( ! radio.available() && ! timeout ) {
+	// by bcatalin » Thu Feb 14, 2013 11:26 am 
+	__msleep(5); //add a small delay to let radio.available to check payload
       if (__millis() - started_waiting_at > 200 )
         timeout = true;
+    }
 
     // Describe the results
     if ( timeout )
