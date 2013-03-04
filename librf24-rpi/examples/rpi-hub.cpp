@@ -12,7 +12,8 @@
  *
  *  Modified by : Stanley to work with Arduino using the following
  *  CE/SS and CSN pins on header using GPIO numbering (not pin numbers)
- *  RF24 radio(23,24);  // Setup for GPIO 23 CE and 24 CSN
+ *  
+ *  RF24 radio("/dev/spidev0.0",8000000,24);  // Setup for GPIO 24 CSN
  *  Refer to RPi docs for GPIO numbers
  *  Author : Stanley Seow
  *  e-mail : stanleyseow@gmail.com
@@ -38,8 +39,9 @@ void setup(void)
 	//
 	// Refer to RF24.h or nRF24L01 DS for settings
 	radio.begin();
+	// Enable AutoAck, was disable by default
+	radio.setAutoAck(1);
 	radio.enableDynamicPayloads();
-	radio.enableAckPayload();
 	radio.setRetries(15,15);
 	radio.setDataRate(RF24_1MBPS);
 	radio.setPALevel(RF24_PA_MAX);
@@ -75,23 +77,37 @@ void loop(void)
 	char receivePayload[32]="";
 
 	uint8_t len = 0;
-	uint8_t ok = 0;
+	uint8_t pipe = 1;
 
 	// Start listening
 	radio.startListening();
-        
-	while ( radio.available() ) {
+       
+	// Reset pipes to 1, valid pipes for reading is 1 to 5 only 
+
+	for (pipe=1;pipe<6;pipe++) {
+	   while ( radio.available( &pipe ) ) { 
+	   //while ( radio.available() ) {
 
 		len = radio.getDynamicPayloadSize();
 		radio.read( receivePayload, len );
-		radio.writeAckPayload(1,receivePayload,len);
+		printf("Recv: size=%i payload=%s\n\r",len,receivePayload);
+
+		radio.stopListening();
+		if (pipe!=7) {
+		radio.write(receivePayload,len);
+		radio.write(receivePayload,len);
+		radio.write(receivePayload,len);
+		radio.write(receivePayload,len);
+		radio.write(receivePayload,len);
+		printf("\tSend: size=%i payload=%s pipes:%i\n\r",len,receivePayload,pipe);
+		}
 
 		// Put 0 to string before printing		
-		receivePayload[len] = 0;
-			printf("Recv: size=%i payload=%s \n\r",len,receivePayload);
-			//printf("\tSend: size=%i payload=%s\n\r",len,receivePayload);
+		//receivePayload[len] = 0;
 
+	   }
 	}
+
 	usleep(20);
 }
 
