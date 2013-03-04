@@ -1,29 +1,35 @@
-this is library to use the nrf24l01 on the raspberry pi.
+This is library to use the nrf24l01 on the raspberry pi.
 
-it's based on the arduino lib from J. Coliz <maniacbug@ymail.com>.
-the library was berryfied by Purinda Gunasekara <purinda@gmail.com>.
+- It was based on the arduino lib from J. Coliz <maniacbug@ymail.com>.
+( https://github.com/maniacbug/RF24 ) 
 
-examples
+- The library was berryfied by Purinda Gunasekara <purinda@gmail.com>.
+
+- Made into a dynamic linked library by Arco van Geest <arco@appeltaart.mine.nu>
+( https://github.com/gnulnulf/RF24 ) 
+
+I'm using the following pins for nRF24L01 and RPi
+
+RPi GPIO 9  (Pin 21) to nRF Pin 7 (MISO)
+RPi GPIO 10 (Pin 19) to nRF Pin 6 (MOSI)
+RPi GPIO 11 (Pin 23) to nRF Pin 5 (SCK)
+RPi GPIO 23 (Pin 16) to nRF Pin 3 (CE)
+RPi GPIO 24 (Pin 18) to nRF Pin 4 (CSN)
+RPi 3.3V (Pin 17)    to nRF Pin 2 (Vcc)
+RPi Gnd  (Pin 25)    to nRF Pin 1 (Gnd)
+ 
+If you do not wish to change the pinout, pls make sure this line is as below :-
+
+RF24 radio("/dev/spidev0.0",8000000,24)
+
+Examples
 ========
-you need to set the library path:
-cd examples
-export LD_LIBRARY_PATH=.
-./pingtest
 
-In my examples I used /dev/spidev0.0 and GPIO25
-I have a model 1 rpi so you should check if the pins are on the same spot
-nrf-vcc = rpi-3v3 (1)
-nrf-gnd = rpi-gnd (6)
-nrf-ce =  rpi-ce0 (24)
-nrf-csn = rpi-gpio25 (22)
-nrf-sck = rpi-sckl (23)
-nrf-mo = rpi-mosi (19)
-nrf-mi = rpi-miso (21)
+I've written the RPi codes as a hub listening to sensor data from Arduino remote nodes 
+Filename : rpi-hub.cpp
 
-known issues
-============
-spidev0.0 or spidev0.1 doesn't seem to work. 
+Stanley Seow
+stanleyseow@gmail.com
+http://arduino-for-beginner.blogspot.com
 
-contact
-=======
-Arco van Geest <arco@appeltaart.mine.nu>
+
