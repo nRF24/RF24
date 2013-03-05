@@ -39,16 +39,17 @@ LiquidCrystal lcd(10, 7, 3, 4, 5, 6);
 RF24 radio(8,9);
 
 // Radio pipe addresses for the 2 nodes to communicate.
- const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+// const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 // const uint64_t pipes[2] = { 0xF0F0F0F0E2LL, 0xF0F0F0F0D2LL };
 // const uint64_t pipes[2] = { 0xF0F0F0F0E3LL, 0xF0F0F0F0D2LL };
-// const uint64_t pipes[2] = { 0xF0F0F0F0F1LL, 0xF0F0F0F0D2LL };
+ const uint64_t pipes[2] = { 0xF0F0F0F0F1LL, 0xF0F0F0F0D2LL };
 // const uint64_t pipes[2] = { 0xF0F0F0F0F2LL, 0xF0F0F0F0D2LL };
 // Pipe0 is F0F0F0F0D2 ( same as reading pipe )
 
 char receivePayload[32];
 int counter=0;
 int timeoutTimer = 500;
+int loops = 0;
 
 void setup(void)
 {
@@ -57,7 +58,7 @@ void setup(void)
   lcd.begin(16,2);
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("Ard Remote Node");
+  lcd.print("Ard Remote Node 2");
   
   Serial.begin(57600);
   
@@ -68,9 +69,10 @@ void setup(void)
 
   // Enable this seems to work better
   radio.enableDynamicPayloads();
-  // radio.setPayloadSize(32);
+  radio.setAutoAck(1);
 
   // Setup default radio settings  
+  
   radio.setDataRate(RF24_1MBPS);
   radio.setPALevel(RF24_PA_MAX);
   radio.setChannel(76);
@@ -94,16 +96,13 @@ void loop(void)
   char temp[5];
   char nodeID[12];
   bool timeout=0;
+  int timeout_timer = 500;
 
   // Use the last 2 pipes address as nodeID  
   sprintf(nodeID,"%X",pipes[0]);
   
   char outBuffer[31]=""; // Clear the outBuffer before every loop
   unsigned long send_time, rtt = 0;
-
-    // First, open writing pipe & stop listening so we can talk
-
-    radio.stopListening();
     
     // Get readings from sensors
     Data1 = counter++;
@@ -151,6 +150,10 @@ void loop(void)
 
     send_time = millis();
     
+    // Stop listening and write to radio 
+    radio.stopListening();
+    
+    // Send to hub
     if ( radio.write( outBuffer, strlen(outBuffer)) ) {
        printf("Send successful\n\r"); 
        lcd.setCursor(0,0);
@@ -163,12 +166,13 @@ void loop(void)
     }
   
     radio.startListening();
-    //delay(20);  
+    delay(20);  
 
     lcd.setCursor(0,1);
     lcd.print("R:              ");
-    
-    if ( radio.available() ) {
+  
+  while ( radio.available() && !timeout ) {
+
          uint8_t len = radio.getDynamicPayloadSize();
          radio.read( receivePayload, len); 
          // receive_payload[len] = 0;
@@ -184,19 +188,30 @@ void loop(void)
              
              // Send beep to Pin 2
              digitalWrite(2,HIGH);
+           
+             lcd.setCursor(0,1);
+             lcd.print("R:              ");
              
              lcd.setCursor(2,1);
              lcd.print(rtt);
              Serial.println(rtt);       
-         } 
-        
-    } else {
-             //lcd.setCursor(2,1);
-             //lcd.print("Timeout");
-    }       
+         }       
+    
+    // Check for timeout and exit the while loop
+    if ( millis() - send_time > timeout_timer ) {
+         lcd.setCursor(2,1);
+         lcd.print("Timeout");
+         Serial.println("Timeout!!!");
+         timeout = 1;
+         loops = 0;
+     }          
+      Serial.print(loops++);
+      delay(10);
+   } // End while  
+ 
     
     Serial.flush();
-    delay(500);
+    delay(250);
     digitalWrite(2,LOW);
     
   }

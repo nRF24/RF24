@@ -12,8 +12,7 @@
  *
  *  Modified by : Stanley to work with Arduino using the following
  *  CE/SS and CSN pins on header using GPIO numbering (not pin numbers)
- *  
- *  RF24 radio("/dev/spidev0.0",8000000,24);  // Setup for GPIO 24 CSN
+ *  RF24 radio(23,24);  // Setup for GPIO 23 CE and 24 CSN
  *  Refer to RPi docs for GPIO numbers
  *  Author : Stanley Seow
  *  e-mail : stanleyseow@gmail.com
@@ -31,7 +30,9 @@ using namespace std;
 const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0F1, 0xF0F0F0F0F2 };
 
 // CE and CSN pins On header using GPIO numbering (not pin numbers)
-RF24 radio("/dev/spidev0.0",8000000,24);  // Setup for GPIO 24 CSN
+RF24 radio("/dev/spidev0.0",8000000,24);  // Setup for GPIO 23 CE and 24 CSN
+
+// Receive payload size
 
 
 void setup(void)
@@ -39,9 +40,8 @@ void setup(void)
 	//
 	// Refer to RF24.h or nRF24L01 DS for settings
 	radio.begin();
-	// Enable AutoAck, was disable by default
-	radio.setAutoAck(1);
 	radio.enableDynamicPayloads();
+	radio.setAutoAck(1);
 	radio.setRetries(15,15);
 	radio.setDataRate(RF24_1MBPS);
 	radio.setPALevel(RF24_PA_MAX);
@@ -61,7 +61,6 @@ void setup(void)
 	//
 
 	radio.startListening();
-	radio.stopListening();
 
 	//
 	// Dump the configuration of the rf unit for debugging
@@ -72,42 +71,35 @@ void setup(void)
 
 void loop(void)
 {
-	
-	// Receive payload size
-	char receivePayload[32]="";
-
-	uint8_t len = 0;
+	char receivePayload[32];
 	uint8_t pipe = 1;
-
+	
 	// Start listening
 	radio.startListening();
-       
-	// Reset pipes to 1, valid pipes for reading is 1 to 5 only 
 
-	for (pipe=1;pipe<6;pipe++) {
-	   while ( radio.available( &pipe ) ) { 
-	   //while ( radio.available() ) {
+        
+	 while ( radio.available(&pipe) ) {
 
-		len = radio.getDynamicPayloadSize();
+		uint8_t len = radio.getDynamicPayloadSize();
 		radio.read( receivePayload, len );
-		printf("Recv: size=%i payload=%s\n\r",len,receivePayload);
 
+		// Display it on screen
+		printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,pipe);
+
+		// Send back payload to sender
 		radio.stopListening();
-		if (pipe!=7) {
-		radio.write(receivePayload,len);
-		radio.write(receivePayload,len);
-		radio.write(receivePayload,len);
-		radio.write(receivePayload,len);
-		radio.write(receivePayload,len);
-		printf("\tSend: size=%i payload=%s pipes:%i\n\r",len,receivePayload,pipe);
-		}
 
-		// Put 0 to string before printing		
-		//receivePayload[len] = 0;
-
-	   }
+		// Match for blank and do not re-send it out
+		if ( pipe != 7 ) {
+			radio.write(receivePayload,len);
+			receivePayload[len]=0;
+			printf("\t Send: size=%i payload=%s pipe:%i\n\r",len,receivePayload,pipe);
+		} else {
+			printf("\n\r");
+                }
+		pipe++;
+		if ( pipe > 6 ) pipe = 1;
 	}
-
 	usleep(20);
 }
 
