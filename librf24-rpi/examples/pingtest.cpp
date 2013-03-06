@@ -104,7 +104,7 @@ void setup(void)
   // improve reliability
 //  radio.setPayloadSize(8);
  radio.setChannel(0x4c);
-     radio.setPALevel(RF24_PA_LOW);
+     radio.setPALevel(RF24_PA_MAX);
 
   //
   // Open pipes to other nodes for communication

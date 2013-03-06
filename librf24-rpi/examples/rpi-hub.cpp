@@ -1,21 +1,25 @@
 /* 
- * File:   main.cpp
- * Author: purinda
- * 
- * 
- * This file has to be compiled and uploaded to the Beaglebone
- * the role of the application is to ping the arduino module
- * file the arduino sketch in 
  *
- * Created on 24 June 2012, 10:54 AM
- *  Date : 2/2/2013
+ *  Filename : rpi-hub.cpp
  *
- *  Modified by : Stanley to work with Arduino using the following
- *  CE/SS and CSN pins on header using GPIO numbering (not pin numbers)
- *  RF24 radio(23,24);  // Setup for GPIO 23 CE and 24 CSN
+ *  This program makes the RPi as a hub listening to all six pipes from the remote sensor nodes ( usually Arduino )
+ *  and will return the packet back to the sensor on pipe0 so that the sender can calculate the round trip delays
+ *  when the payload matches.
+ *  
+ *  I encounter that at times, it also receive from pipe7 ( or pipe0 ) with content of FFFFFFFFF that I will not sent
+ *  back to the sender
+ *
+ *  Refer to RF24/examples/rpi_hub_arduino/ for the corresponding Arduino sketches to work with this code.
+ * 
+ *  
+ *  CE is not used and CSN is GPIO25 (not pinout)
+ *
  *  Refer to RPi docs for GPIO numbers
+ *
  *  Author : Stanley Seow
  *  e-mail : stanleyseow@gmail.com
+ *  date   : 6th Mar 2013
+ *
  */
 
 #include <cstdlib>
@@ -30,9 +34,7 @@ using namespace std;
 const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0F1, 0xF0F0F0F0F2 };
 
 // CE and CSN pins On header using GPIO numbering (not pin numbers)
-RF24 radio("/dev/spidev0.0",8000000,24);  // Setup for GPIO 23 CE and 24 CSN
-
-// Receive payload size
+RF24 radio("/dev/spidev0.0",8000000,25);  // Setup for GPIO 25 CSN
 
 
 void setup(void)
@@ -67,6 +69,8 @@ void setup(void)
 	//
 
 	radio.printDetails();
+	printf("\n\rOutput below : \n\r");
+	usleep(1000);
 }
 
 void loop(void)
@@ -89,7 +93,7 @@ void loop(void)
 		// Send back payload to sender
 		radio.stopListening();
 
-		// Match for blank and do not re-send it out
+		// if pipe is 7, do not send it back
 		if ( pipe != 7 ) {
 			radio.write(receivePayload,len);
 			receivePayload[len]=0;
@@ -98,7 +102,8 @@ void loop(void)
 			printf("\n\r");
                 }
 		pipe++;
-		if ( pipe > 6 ) pipe = 1;
+		// reset pipe to 0
+		if ( pipe > 6 ) pipe = 0;
 	}
 	usleep(20);
 }
