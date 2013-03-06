@@ -39,7 +39,7 @@ using namespace std;
 
 // CE and CSN pins 
 //RF24 radio(8, 25);  //only CSN is NEEDED in RPI
-RF24 radio("/dev/spidev0.1",8000000 , 25);  //spi device, speed and CSN,only CSN is NEEDED in RPI
+RF24 radio("/dev/spidev0.0",8000000 , 25);  //spi device, speed and CSN,only CSN is NEEDED in RPI
 
 //
 // Channel info

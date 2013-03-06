@@ -32,7 +32,7 @@
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
 //RF24 radio(9,10);
-RF24 radio("/dev/spidev0.0",8000000 , 25);  //spi device, speed and CSN,only CSN is NEEDED in RPI
+RF24 radio("/dev/spidev0.0",8000000 , 24);  //spi device, speed and CSN,only CSN is NEEDED in RPI
 
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
@@ -104,7 +104,7 @@ void setup(void)
   // improve reliability
 //  radio.setPayloadSize(8);
  radio.setChannel(0x4c);
-     radio.setPALevel(RF24_PA_LOW);
+     radio.setPALevel(RF24_PA_MAX);
 
   //
   // Open pipes to other nodes for communication
