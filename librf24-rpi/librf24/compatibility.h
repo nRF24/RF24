@@ -13,10 +13,15 @@ extern "C" {
 #endif
 	
 #include <stddef.h>
+#include <time.h>
 #include <sys/time.h>
 
-static struct timeval start, end;
-static long mtime, seconds, useconds;    
+// added attribute unused to avoid compiler warnings
+static struct timeval start __attribute__ ((unused)) ,end __attribute__ ((unused));
+
+static long __attribute__ ((unused)) mtime;
+static long __attribute__ ((unused)) seconds;
+static long __attribute__ ((unused)) useconds;
 
 void __msleep(int milisec);
 void __usleep(int milisec);
