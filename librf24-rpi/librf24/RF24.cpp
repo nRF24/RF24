@@ -30,7 +30,7 @@ void RF24::csn(int mode)
 
 void RF24::ce(int level)
 {
-  digitalWrite(ce_pin,level);
+  //digitalWrite(ce_pin,level);
 }
 
 /****************************************************************************/
@@ -317,6 +317,11 @@ static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = {
 
 void RF24::printDetails(void)
 {
+
+  printf_P(PSTR("SPI device\t = %s\r\n"),spidevice.c_str() );
+  printf_P(PSTR("SPI speed\t = %d\r\n"),spispeed);
+  printf_P(PSTR("CSN GPIO\t = %d\r\n"),csn_pin);
+	
   print_status(get_status());
 
   print_address_register(PSTR("RX_ADDR_P0-1"),RX_ADDR_P0,2);
@@ -342,7 +347,7 @@ void RF24::printDetails(void)
 void RF24::begin(void)
 {
   // Initialize pins
-  pinMode(ce_pin,OUTPUT);
+  //pinMode(ce_pin,OUTPUT);
   pinMode(csn_pin,OUTPUT);
 
   // Initialize SPI bus
@@ -354,7 +359,7 @@ spi = new SPI();
         spi->init();
 
 
-  ce(LOW);
+  //ce(LOW);
   csn(HIGH);
 
   // Must allow the radio time to settle else configuration bits will not necessarily stick.
@@ -422,7 +427,7 @@ void RF24::startListening(void)
   flush_tx();
 
   // Go!
-  ce(HIGH);
+  //ce(HIGH);
 
   // wait for the radio to come up (130us actually only needed)
   delayMicroseconds(130);
@@ -432,7 +437,7 @@ void RF24::startListening(void)
 
 void RF24::stopListening(void)
 {
-  ce(LOW);
+  //ce(LOW);
   flush_tx();
   flush_rx();
 }
@@ -529,9 +534,9 @@ void RF24::startWrite( const void* buf, uint8_t len )
   write_payload( buf, len );
 
   // Allons!
-  ce(HIGH);
+  //ce(HIGH);
   delayMicroseconds(15);
-  ce(LOW);
+  //ce(LOW);
 }
 
 /****************************************************************************/
