@@ -369,6 +369,7 @@ spi = new SPI();
   // Technically we require 4.5ms + 14us as a worst case. We'll just call it 5ms for good measure.
   // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
   delay( 5 ) ;
+	resetcfg();
 
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
@@ -412,6 +413,11 @@ spi = new SPI();
 }
 
 /****************************************************************************/
+
+
+void RF24::resetcfg(void){
+	write_register(0x00,0x0f);
+}
 
 void RF24::startListening(void)
 {

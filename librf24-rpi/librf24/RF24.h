@@ -47,7 +47,9 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
 class RF24
 {
 private:
-  uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
+  uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role, unused on rpi */
+  string spidevice;
+  uint32_t spispeed;
   uint8_t csn_pin; /**< SPI Chip select */
   bool wide_band; /* 2Mbs data rate in use? */
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
@@ -56,8 +58,6 @@ private:
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
-	string spidevice;
-	uint32_t spispeed;
 
   SPI* spi;
   
@@ -242,7 +242,7 @@ public:
    * @param _cspin The pin attached to Chip Select
    */
   RF24(uint8_t _cepin, uint8_t _cspin);
-  RF24(string _spidevice, uint32_t spispeed, uint8_t _cspin);
+  RF24(string _spidevice, uint32_t _spispeed, uint8_t _cspin);
 
   /**
    * Begin operation of the chip
@@ -250,6 +250,13 @@ public:
    * Call this in setup(), before calling any other methods.
    */
   void begin(void);
+
+ /**
+   * Reset confguration of the chip
+   *
+   * Call this to reset all registers
+   */
+  void resetcfg(void);
 
   /**
    * Start listening on the pipes opened for reading.
