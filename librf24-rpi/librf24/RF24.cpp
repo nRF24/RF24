@@ -19,9 +19,9 @@ void RF24::csn(int mode)
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
-  spi->setBitOrder(MSBFIRST);
-  spi->setDataMode(SPI_MODE0);
-  spi->setClockDivider(SPI_CLOCK_DIV4);
+//  spi->setBitOrder(MSBFIRST);
+//  spi->setDataMode(SPI_MODE0);
+//  spi->setClockDivider(SPI_CLOCK_DIV4);
 #endif
   digitalWrite(csn_pin,mode);
 }
@@ -30,7 +30,7 @@ void RF24::csn(int mode)
 
 void RF24::ce(int level)
 {
-  //digitalWrite(ce_pin,level);
+  digitalWrite(ce_pin,level);
 }
 
 /****************************************************************************/
@@ -238,8 +238,8 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
 /****************************************************************************/
 
-RF24::RF24(string _spidevice, uint32_t _spispeed, uint8_t _cspin):
-spidevice( _spidevice) ,spispeed( _spispeed),csn_pin(_cspin), wide_band(true), p_variant(false),
+RF24::RF24(string _spidevice, uint32_t _spispeed, uint8_t _cepin):
+spidevice( _spidevice) ,spispeed( _spispeed),ce_pin(_cepin), wide_band(true), p_variant(false),
   payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
   pipe0_reading_address(0)
 {
@@ -320,7 +320,7 @@ void RF24::printDetails(void)
 
   printf_P(PSTR("SPI device\t = %s\r\n"),spidevice.c_str() );
   printf_P(PSTR("SPI speed\t = %d\r\n"),spispeed);
-  printf_P(PSTR("CSN GPIO\t = %d\r\n"),csn_pin);
+  printf_P(PSTR("CE GPIO\t = %d\r\n"),ce_pin);
 	
   print_status(get_status());
 
@@ -347,7 +347,13 @@ void RF24::printDetails(void)
 void RF24::begin(void)
 {
   // Initialize pins
-  //pinMode(ce_pin,OUTPUT);
+  pinMode(ce_pin,OUTPUT);
+
+if ( spidevice == "/dev/spidev0.1" ) {
+	csn_pin=9;
+} else {
+	csn_pin=8;
+}
   pinMode(csn_pin,OUTPUT);
 
   // Initialize SPI bus
@@ -359,7 +365,7 @@ spi = new SPI();
         spi->init();
 
 
-  //ce(LOW);
+  ce(LOW);
   csn(HIGH);
 
   // Must allow the radio time to settle else configuration bits will not necessarily stick.
@@ -433,7 +439,7 @@ void RF24::startListening(void)
   flush_tx();
 
   // Go!
-  //ce(HIGH);
+  ce(HIGH);
 
   // wait for the radio to come up (130us actually only needed)
   delayMicroseconds(130);
@@ -443,7 +449,7 @@ void RF24::startListening(void)
 
 void RF24::stopListening(void)
 {
-  //ce(LOW);
+  ce(LOW);
   flush_tx();
   flush_rx();
 }
@@ -540,9 +546,9 @@ void RF24::startWrite( const void* buf, uint8_t len )
   write_payload( buf, len );
 
   // Allons!
-  //ce(HIGH);
+  ce(HIGH);
   delayMicroseconds(15);
-  //ce(LOW);
+  ce(LOW);
 }
 
 /****************************************************************************/

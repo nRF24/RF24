@@ -16,8 +16,9 @@ SPI::SPI() {
 	this->bits = 8;
 //	this->speed = 24000000; // 24Mhz - proly doesnt work
 //	this->speed = 16000000; // 16Mhz 
-	this->speed = 8000000; // 8Mhz 
-//	this->speed = 2000000; // 2Mhz 
+//	this->speed = 8000000; // 8Mhz 
+	this->speed = 2000000; // 2Mhz 
+	this->mode = 0;
 
 //	this->init();
 }
@@ -111,7 +112,7 @@ uint8_t SPI::transfer(uint8_t tx_)
 	tr.rx_buf = (unsigned long)rx;
 	tr.len = ARRAY_SIZE(tx);
 	tr.delay_usecs = 0;
-	tr.cs_change = 1;
+//	tr.cs_change = 1;
 	tr.speed_hz = this->speed;
 	tr.bits_per_word = this->bits;
 

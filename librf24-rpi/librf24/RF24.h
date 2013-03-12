@@ -239,10 +239,10 @@ public:
    * and send in the unique pins that this chip is connected to.
    *
    * @param _cepin The pin attached to Chip Enable on the RF module
-   * @param _cspin The pin attached to Chip Select
+   * @param _cspin The pin attached to Chip SPI chipSelect
    */
   RF24(uint8_t _cepin, uint8_t _cspin);
-  RF24(string _spidevice, uint32_t _spispeed, uint8_t _cspin);
+  RF24(string _spidevice, uint32_t _spispeed, uint8_t _cepin);
 
   /**
    * Begin operation of the chip
