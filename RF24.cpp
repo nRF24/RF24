@@ -467,8 +467,8 @@ bool RF24::write( const void* buf, uint8_t len, bool multicast )
   // Generally much faster.
   uint8_t observe_tx;
   uint8_t status;
-  uint32_t sent_at = millis();
-  const uint16_t timeout = getMaxTimeout() ; //ms to wait for timeout
+  uint32_t sent_at = micros();
+  const uint16_t timeout = getMaxTimeout() ; //us to wait for timeout
 
   // Monitor the send
   do
@@ -476,7 +476,7 @@ bool RF24::write( const void* buf, uint8_t len, bool multicast )
     status = read_register(OBSERVE_TX,&observe_tx,1);
     IF_SERIAL_DEBUG(Serial.print(observe_tx,HEX));
   }
-  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( millis() - sent_at < timeout ) );
+  while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( micros() - sent_at < timeout ) );
 
   // The part above is what you could recreate with your own interrupt handler,
   // and then call this when you got an interrupt
@@ -1015,8 +1015,8 @@ uint8_t RF24::getRetries( void )
 uint16_t RF24::getMaxTimeout( void )
 {
   uint8_t retries = getRetries() ;
-  uint16_t to = ((250 + (250 * ((retries & 0xf0) >> 4))) * (retries & 0x0f)) / 1000 ;
-
+  uint16_t to = ((250 + (250 * ((retries & 0xf0) >> 4))) * (retries & 0x0f)) ;
+  
   return to ;
 }
 

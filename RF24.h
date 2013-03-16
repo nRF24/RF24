@@ -659,10 +659,10 @@ public:
 
 
   /**
-   * Calculate the maximum timeout in ms based on current hardware
+   * Calculate the maximum timeout in us based on current hardware
    * configuration.
    *
-   * @return ms of maximum timeout; accounting for retries
+   * @return us of maximum timeout; accounting for retries
    */
   uint16_t getMaxTimeout(void) ;
 
