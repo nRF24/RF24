@@ -278,7 +278,7 @@ public:
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
-   * @param multicast Buffer will be multicast; ignoring retry/timeoute
+   * @param multicast Buffer will be multicast; ignoring retry/timeout
    * @return True if the payload was delivered successfully false if not
    */
   bool write( const void* buf, uint8_t len, bool multicast=false );
