@@ -1,19 +1,43 @@
 /*
- Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
+ Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+ Portions Copyright (C) 2011 Greg Copeland
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  */
 
+/**
+ * @file RF24.h
+ *
+ * Class declaration for RF24 and helper enums
+ */
+
 #ifndef __RF24_H__
 #define __RF24_H__
 
-#include <stddef.h>
-#include <avr/pgmspace.h>
+#include <nRF24L01.h>
+#include <RF24_config.h>
 
+/**
+ * Power Amplifier level.
+ *
+ * For use with setPALevel()
+ */
 typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
+
+/**
+ * Data rate.  How fast data moves through the air.
+ *
+ * For use with setDataRate()
+ */
 typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
+
+/**
+ * CRC Length.  How big (if any) of a CRC is included.
+ *
+ * For use with setCRCLength()
+ */
 typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e;
 
 /**
@@ -46,6 +70,11 @@ protected:
   /**
    * Set chip select pin
    *
+   * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
+   * and best of all, we make use of the radio's FIFO buffers. A lower speed
+   * means we're less likely to effectively leverage our FIFOs and pay a higher
+   * AVR runtime cost as toll.
+   *
    * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
    */
   void csn(int mode);
@@ -57,20 +86,6 @@ protected:
    * for a much more detailed description of this pin.
    */
   void ce(int level);
-
-  /**
-   *
-   * Setup the SPI bus. This centralizes its configuration. Use insures proper
-   * SPI operation whereby multiple SPI devices, having a different SPI configuration,
-   * are in use.
-   *
-   * Running SPI bus at PI_CLOCK_DIV4 so we don't waste time transferring data
-   * and best of all, we make use of the radio's FIFO buffers. A lower speed
-   * means we're less likely to effectively leverage our FIFOs and pay a higher
-   * AVR runtime cost as toll.
-   *
-   */
-  void configSPIBus(void) ;
 
   /**
    * Read a chunk of data in from a register
@@ -118,7 +133,7 @@ protected:
    * @param len Number of bytes to be sent
    * @return Current value of status register
    */
-  uint8_t write_payload(const void* buf, uint8_t len);
+  uint8_t write_payload(const void* buf, uint8_t len, uint8_t writeType=W_TX_PAYLOAD);
 
   /**
    * Read the receive payload
@@ -181,7 +196,7 @@ protected:
    * @param reg Which register. Use constants from nRF24L01.h
    * @param qty How many successive registers to print
    */
-  void print_byte_register(prog_char* name, uint8_t reg, uint8_t qty = 1);
+  void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
   /**
    * Print the name and value of a 40-bit address register to stdout
@@ -194,7 +209,7 @@ protected:
    * @param reg Which register. Use constants from nRF24L01.h
    * @param qty How many successive registers to print
    */
-  void print_address_register(prog_char* name, uint8_t reg, uint8_t qty = 1);
+  void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
   /**
    * Turn on or off the special features of the chip
@@ -265,7 +280,7 @@ public:
    * @param len Number of bytes to be sent
    * @return True if the payload was delivered successfully false if not
    */
-  bool write( const void* buf, uint8_t len );
+  bool write( const void* buf, uint8_t len, bool multicast=false );
 
   /**
    * Test whether there are bytes available to be read
@@ -354,12 +369,29 @@ public:
    */
   void setRetries(uint8_t delay, uint8_t count);
 
+  /**@{*/
+  /**
+   * Get delay and count values of the radio
+   *
+   * @param high and low nibbles of delay and count as currently configured on
+   * the radio. Valid ranges for both nibbles are 0x00-0x0f. The delay nibble
+   * translates as 0=250us, 15=4000us, in bit multiples of 250us.
+   */
+  uint8_t getRetries( void ) ;
+
   /**
    * Set RF communication channel
    *
    * @param channel Which RF channel to communicate on, 0-127
    */
   void setChannel(uint8_t channel);
+
+  /**
+   * Get RF communication channel
+   *
+   * @param channel To which RF channel radio is current tuned, 0-127
+   */
+  uint8_t getChannel(void);
 
   /**
    * Set Static Payload Size
@@ -448,7 +480,7 @@ public:
    * Relative mnemonics have been used to allow for future PA level
    * changes. According to 6.5 of the nRF24L01+ specification sheet,
    * they translate to: RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm,
-   * RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+   * RF24_PA_HIGH=-6dBM, and RF24_PA_MAX=0dBm.
    *
    * @param level Desired PA level.
    */
@@ -557,7 +589,7 @@ public:
    * @param len Number of bytes to be sent
    * @return True if the payload was delivered successfully false if not
    */
-  void startWrite( const void* buf, uint8_t len );
+  void startWrite( const void* buf, uint8_t len, uint8_t writeType=W_TX_PAYLOAD);
 
   /**
    * Write an ack payload for the specified pipe
@@ -628,6 +660,27 @@ public:
 };
 
 /**
+ * @example GettingStarted.pde
+ *
+ * This is an example which corresponds to my "Getting Started" blog post:
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>. 
+ *
+ * It is an example of how to use the RF24 class.  Write this sketch to two 
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting 
+ * with the serial monitor and sending a 'T'.  The ping node sends the current 
+ * time to the pong node, which responds by sending the value back.  The ping 
+ * node can then see how long the whole cycle took.
+ */
+
+/**
+ * @example nordic_fob.pde
+ *
+ * This is an example of how to use the RF24 class to receive signals from the
+ * Sparkfun Nordic FOB.  See http://www.sparkfun.com/products/8602 .
+ * Thanks to Kirk Mower for providing test hardware.
+ */
+
+/**
  * @example led_remote.pde
  *
  * This is an example of how to use the RF24 class to control a remote
@@ -644,6 +697,21 @@ public:
  * different nodes, connect the role_pin to ground on one.  The ping node sends
  * the current time to the pong node, which responds by sending the value back.
  * The ping node can then see how long the whole cycle took.
+ */
+
+/**
+ * @example pingpair_maple.pde 
+ *
+ * This is an example of how to use the RF24 class on the Maple.  For a more
+ * detailed explanation, see my blog post:
+ * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
+ *
+ * It will communicate well to an Arduino-based unit as well, so it's not for only Maple-to-Maple communication.
+ * 
+ * Write this sketch to two different nodes,
+ * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
+ * which responds by sending the value back.  The ping node can then see how long the whole cycle
+ * took.
  */
 
 /**
@@ -700,12 +768,26 @@ public:
 /**
  * @mainpage Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  *
- * Design Goals: This library is designed to be...
+ * @section Goals Design Goals
+ * 
+ * This library is designed to be...
  * @li Maximally compliant with the intended operation of the chip
  * @li Easy for beginners to use
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
- * @li Built against the standard SPI library.
  *
+ * @section News News
+ * 
+ * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.  
+ * Please <a href="https://github.com/maniacbug/RF24/issues/new">open an issue</a> if you find any problems using it with any version of Arduino.
+ *
+ * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the 
+ * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>, 
+ * and should work with any Maple board.  See the pingpair_maple example.
+ * Note that only the pingpair_maple example has been tested on Maple, although
+ * the others can certainly be adapted.
+ *
+ * @section Useful Useful References
+ * 
  * Please refer to:
  *
  * @li <a href="http://maniacbug.github.com/RF24/">Documentation Main Page</a>
@@ -720,6 +802,26 @@ public:
  * @section More More Information
  *
  * @subpage FAQ
+ *
+ * @section Projects Projects
+ *
+ * Stuff I have built with RF24
+ *
+ * <img src="http://farm7.staticflickr.com/6044/6307669179_a8d19298a6_m.jpg" width="240" height="160" alt="RF24 Getting Started - Finished Product">
+ *
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a> 
+ *
+ * <img src="http://farm8.staticflickr.com/7159/6645514331_38eb2bdeaa_m.jpg" width="240" height="160" alt="Nordic FOB and nRF24L01+">
+ *
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a> 
+ *
+ * <img src="http://farm7.staticflickr.com/6097/6224308836_b9b3b421a3_m.jpg" width="240" height="160" alt="RF Duinode V3 (2V4)">
+ *
+ * <a href="http://maniacbug.wordpress.com/2011/10/19/sensor-node/">Low-Power Wireless Sensor Node</a>
+ *
+ * <img src="http://farm8.staticflickr.com/7012/6489477865_b56edb629b_m.jpg" width="240" height="161" alt="nRF24L01+ connected to Leaf Labs Maple Native">
+ *
+ * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
  */
 
 #endif // __RF24_H__
