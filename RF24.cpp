@@ -463,13 +463,12 @@ bool RF24::write( const void* buf, uint8_t len, bool multicast )
   // or MAX_RT (maximum retries, transmission failed).  Also, we'll timeout in case the radio
   // is flaky and we get neither.
 
-  // IN the end, the send should be blocking.  It comes back in 1500ms worst case, or much faster
-  // if I tighted up the retry logic.  (Default settings will be 1500ms.
-  // FIXME: timeout is hardware configuration dependent. This is wrong.
+  // IN the end, the send should be blocking.  It comes back in 60ms worst case.
+  // Generally much faster.
   uint8_t observe_tx;
   uint8_t status;
   uint32_t sent_at = millis();
-  const uint32_t timeout = 1500; //ms to wait for timeout
+  const uint16_t timeout = getMaxTimeout() ; //ms to wait for timeout
 
   // Monitor the send
   do
@@ -1009,6 +1008,16 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 uint8_t RF24::getRetries( void )
 {
   return read_register( SETUP_RETR ) ;
+}
+
+/****************************************************************************/
+
+uint16_t RF24::getMaxTimeout( void )
+{
+  uint8_t retries = getRetries() ;
+  uint16_t to = ((250 + (250 * ((retries & 0xf0) >> 4))) * (retries & 0x0f)) / 1000 ;
+
+  return to ;
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp

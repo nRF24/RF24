@@ -278,6 +278,7 @@ public:
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
+   * @param multicast Buffer will be multicast; ignoring retry/timeoute
    * @return True if the payload was delivered successfully false if not
    */
   bool write( const void* buf, uint8_t len, bool multicast=false );
@@ -655,6 +656,15 @@ public:
    * @return true if signal => -64dBm, false if not
    */
   bool testRPD(void) ;
+
+
+  /**
+   * Calculate the maximum timeout in ms based on current hardware
+   * configuration.
+   *
+   * @return ms of maximum timeout; accounting for retries
+   */
+  uint16_t getMaxTimeout(void) ;
 
   /**@}*/
 };
