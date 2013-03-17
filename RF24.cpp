@@ -242,7 +242,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
   ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false), 
   payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
-  pipe0_reading_address(0xe7e7e7e7e7)
+  pipe0_reading_address(0)
 {
 }
 
@@ -305,7 +305,7 @@ static const char * const rf24_crclength_e_str_P[] PROGMEM = {
 };
 static const char rf24_pa_dbm_e_str_0[] PROGMEM = "PA_MIN";
 static const char rf24_pa_dbm_e_str_1[] PROGMEM = "PA_LOW";
-static const char rf24_pa_dbm_e_str_2[] PROGMEM = "LA_HIGH";
+static const char rf24_pa_dbm_e_str_2[] PROGMEM = "PA_HIGH";
 static const char rf24_pa_dbm_e_str_3[] PROGMEM = "PA_MAX";
 static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = { 
   rf24_pa_dbm_e_str_0,
