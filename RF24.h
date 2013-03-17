@@ -346,7 +346,8 @@ public:
    * pipe 0 for reading, and then startListening(), it will overwrite the
    * writing pipe.  Ergo, do an openWritingPipe() again before write().
    *
-   * @warning Pipe 0 is also used as the multicast address pipe.
+   * @warning Pipe 0 is also used as the multicast address pipe. Pipe 1
+   * is the unicast pipe address.
    *
    * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
    *
