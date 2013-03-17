@@ -305,8 +305,8 @@ static const char * const rf24_crclength_e_str_P[] PROGMEM = {
 };
 static const char rf24_pa_dbm_e_str_0[] PROGMEM = "PA_MIN";
 static const char rf24_pa_dbm_e_str_1[] PROGMEM = "PA_LOW";
-static const char rf24_pa_dbm_e_str_2[] PROGMEM = "LA_MED";
-static const char rf24_pa_dbm_e_str_3[] PROGMEM = "PA_HIGH";
+static const char rf24_pa_dbm_e_str_2[] PROGMEM = "LA_HIGH";
+static const char rf24_pa_dbm_e_str_3[] PROGMEM = "PA_MAX";
 static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = { 
   rf24_pa_dbm_e_str_0,
   rf24_pa_dbm_e_str_1,
@@ -447,13 +447,12 @@ void RF24::powerUp(void)
 
 /******************************************************************/
 
-bool RF24::write( const void* buf, uint8_t len, bool multicast )
+bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 {
   bool result = false;
 
-  // Begin the write - unicast or multicast
-  uint8_t writeType = multicast?static_cast<uint8_t>(W_TX_PAYLOAD_NO_ACK):static_cast<uint8_t>(W_TX_PAYLOAD) ;
-  startWrite(buf,len, writeType );
+  // Begin the write
+  startWrite( buf, len, multicast );
 
   // ------------
   // At this point we could return from a non-blocking write, and then call
@@ -519,24 +518,18 @@ bool RF24::write( const void* buf, uint8_t len, bool multicast )
 }
 /****************************************************************************/
 
-void RF24::startWrite( const void* buf, uint8_t len, const uint8_t writeType )
+void RF24::startWrite( const void* buf, uint8_t len, const bool multicast )
 {
   // Transmitter power-up
   write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
-#if 0
-  delayMicroseconds(150);
-#endif
 
-  // Send the payload
-  write_payload( buf, len, writeType );
+  // Send the payload - Unicast (W_TX_PAYLOAD) or multicast (W_TX_PAYLOAD_NO_ACK)
+  write_payload( buf, len,
+		 multicast?static_cast<uint8_t>(W_TX_PAYLOAD_NO_ACK):static_cast<uint8_t>(W_TX_PAYLOAD) ) ;
 
   // Allons!
   ce(HIGH);
-#if 0
-  delayMicroseconds(15); // Can this be 10uS??
-#else
-  delayMicroseconds(10); // Can this be 10uS??
-#endif
+  delayMicroseconds(10);
   ce(LOW);
 }
 
@@ -1016,7 +1009,7 @@ uint16_t RF24::getMaxTimeout( void )
 {
   uint8_t retries = getRetries() ;
   uint16_t to = ((250 + (250 * ((retries & 0xf0) >> 4))) * (retries & 0x0f)) ;
-  
+
   return to ;
 }
 

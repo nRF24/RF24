@@ -56,6 +56,9 @@ private:
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
+#if 0
+  uint64_t multicast_address; /** Address used for multicast */
+#endif
 
 protected:
   /**
@@ -278,10 +281,11 @@ public:
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
-   * @param multicast Buffer will be multicast; ignoring retry/timeout
+   * @param multicast true or false. True, buffer will be multicast; ignoring retry/timeout
    * @return True if the payload was delivered successfully false if not
+   * for multicast payloads, true only means it was transmitted.
    */
-  bool write( const void* buf, uint8_t len, bool multicast=false );
+  bool write( const void* buf, uint8_t len, const bool multicast=false );
 
   /**
    * Test whether there are bytes available to be read
@@ -588,9 +592,11 @@ public:
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
+   * @param multicast true or false. True, buffer will be multicast; ignoring retry/timeout
    * @return True if the payload was delivered successfully false if not
+   * for multicast payloads, true only means it was transmitted.
    */
-  void startWrite( const void* buf, uint8_t len, uint8_t writeType=W_TX_PAYLOAD);
+  void startWrite( const void* buf, uint8_t len, const bool multicast=false );
 
   /**
    * Write an ack payload for the specified pipe
