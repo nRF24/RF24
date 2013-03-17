@@ -437,6 +437,8 @@ public:
    * Ack payloads are a handy way to return data back to senders without
    * manually changing the radio modes on both units.
    *
+   * @warning Do note, multicast payloads will not trigger ack payloads.
+   *
    * @see examples/pingpair_pl/pingpair_pl.pde
    */
   void enableAckPayload(void);
@@ -603,6 +605,8 @@ public:
    *
    * The next time a message is received on @p pipe, the data in @p buf will
    * be sent back in the acknowledgement.
+   *
+   * @warning Do note, multicast payloads will not trigger ack payloads.
    *
    * @warning According to the data sheet, only three of these can be pending
    * at any time.  I have not tested this.
