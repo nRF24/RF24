@@ -56,9 +56,6 @@ private:
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
-#if 0
-  uint64_t multicast_address; /** Address used for multicast */
-#endif
 
 protected:
   /**
@@ -136,7 +133,7 @@ protected:
    * @param len Number of bytes to be sent
    * @return Current value of status register
    */
-  uint8_t write_payload(const void* buf, uint8_t len, uint8_t writeType=W_TX_PAYLOAD);
+  uint8_t write_payload(const void* buf, uint8_t len, const uint8_t writeType);
 
   /**
    * Read the receive payload
@@ -348,6 +345,8 @@ public:
    * @warning Pipe 0 is also used by the writing pipe.  So if you open
    * pipe 0 for reading, and then startListening(), it will overwrite the
    * writing pipe.  Ergo, do an openWritingPipe() again before write().
+   *
+   * @warning Pipe 0 is also used as the multicast address pipe.
    *
    * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
    *

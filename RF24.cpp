@@ -96,7 +96,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
 /****************************************************************************/
 
-uint8_t RF24::write_payload(const void* buf, uint8_t len, uint8_t writeType)
+uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeType)
 {
   uint8_t status;
 
@@ -240,9 +240,9 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
-  ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false), 
+  ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false), 
   payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
-  pipe0_reading_address(0)
+  pipe0_reading_address(0xe7e7e7e7e7)
 {
 }
 
@@ -501,18 +501,6 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
     IF_SERIAL_DEBUG(Serial.print("[AckPacket]/"));
     IF_SERIAL_DEBUG(Serial.println(ack_payload_length,DEC));
   }
-
-  // Powering down is an application requirement, not a driver requirement.
-  // Radio will automatically enter standby mode.
-  // There exists no need to flush the buffer. In fact, doing so makes it
-  // difficult to implement some hardware features down the road.
-#if 0
-  // Power down
-  powerDown();
-
-  // Flush buffers (Is this a relic of past experimentation, and not needed anymore??)
-  flush_tx();
-#endif
 
   return result;
 }
