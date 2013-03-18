@@ -144,10 +144,11 @@ void loop(void)
     // Take the time, and send it.
     unsigned long time = millis();
     printf("Now sending %lu\n\r",time);
+    radio.powerUp() ;
     radio.startWrite( &time, sizeof(unsigned long) );
 
     // Try again soon
-    delay(2000);
+    delay(1000);
   }
 
   //
