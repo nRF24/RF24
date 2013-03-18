@@ -84,7 +84,7 @@ bool notified; //*< Have we notified the user we're done? */
 const int num_needed = 10; //*< How many success/failures until we're done? */
 int receives_remaining = num_needed; //*< How many ack packets until we declare victory? */
 int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
-const int interval = 100; //*< ms to wait between sends */
+int interval = 100; //*< ms to wait between sends */
 
 char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
 
@@ -228,14 +228,13 @@ void setup(void)
   //
   // Dump the configuration of the rf unit for debugging
   //
-
   radio.printDetails();
 
   //
   // Attach interrupt handler to interrupt #0 (using pin 2)
   // on BOTH the sender and receiver
   //
-
+  delay(40) ;
   attachInterrupt(0, check_radio, FALLING);
 }
 
@@ -261,6 +260,7 @@ void loop(void)
     radio.stopListening();
 
     // Send it.  This will block until complete
+    radio.powerUp() ;
     printf("\n\rNow sending length %i...",next_payload_size);
     radio.startWrite( send_payload, next_payload_size );
 
@@ -270,6 +270,7 @@ void loop(void)
       next_payload_size = min_payload_size;
     
     // Try again soon
+    interval = 1 + (radio.getMaxTimeout()/1000) ;
     delay(interval);
     
     // Timeout if we have not received anything back ever
