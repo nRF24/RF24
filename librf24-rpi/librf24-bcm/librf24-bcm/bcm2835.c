@@ -6,6 +6,14 @@
 // Author: Mike McCauley
 // Copyright (C) 2011-2013 Mike McCauley
 // $Id: bcm2835.c,v 1.8 2013/02/15 22:06:09 mikem Exp mikem $
+// 
+// 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
+//              Modified Adding some fonctionnalities
+//							Added millis() function
+//              Added option to use custom Chip Select Pin PI GPIO instead of only CE0 CE1
+//              Done a hack to use CE1 by software as custom CS pin because HW does not work
+//              Added function to determine PI revision board
+//							Added function to set SPI speed (instead of divider for easier look in code)
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,10 +21,11 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <string.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 
-#include "bcm2835.h"
+#include "./bcm2835.h"
 
 // This define enables a little test program (by default a blinking output on pin RPI_GPIO_PIN_11)
 // You can do some safe, non-destructive testing on any platform with:
@@ -46,6 +55,9 @@ static int i2c_byte_wait_us = 0;
 // SPI Custom Chip Select Pin
 static int spi_custom_cs = 0;
 
+// Time for millis function
+static unsigned long long epoch ;
+
 //
 // Low level register access functions
 //
@@ -55,20 +67,93 @@ void  bcm2835_set_debug(uint8_t d)
     debug = d;
 }
 
+
+// Get raspberry PI model version
+int bcm2835_get_pi_version( void ) 
+{ 
+	int rev = 0;
+	char buff[512];
+	char * p;
+	char * pend;
+	
+	FILE * fd ;
+
+	// do some clean up
+	memset(buff,0,sizeof(buff));
+
+	fd = fopen("/proc/cpuinfo","r");
+
+	// Opened successfully
+	if( fd )
+	{
+		//printf("File opened successfully through fopen()\n");
+		
+		// parse each line until we the end or we find the good one
+		while( fgets(buff, sizeof(buff), fd) != NULL && rev ==0 ) 
+		{
+			// search 
+			if( (strstr(buff, "Revision" )) != NULL )  
+			{
+				// point to the separator ":" format is has follow
+				// Revision        : 000f
+				if ( (p = strtok( buff, ":")) != NULL )
+				{
+					// Ok get value
+					if ( (p = strtok( NULL, ":")) != NULL )
+					{
+						// Revision Version is in hex format so put 0x before the number
+						*p   = 'x';
+						*--p = '0';
+						
+						// convert to number
+						rev = strtol(p, &pend, 16);
+						
+						//printf("rev=%d 0x%04x\n", rev, rev);
+						
+						// not Okay ?
+						if ( !*pend )
+						{
+							rev= 0;
+						}
+						else
+						{
+							// Revision 1 or 2 ?
+							rev = (rev < 4 ) ? 1 : 2 ;
+						}
+					}
+				}
+			}
+		}
+
+		// Close the file.
+		if(fd) 
+		{
+			fclose(fd);
+		}
+	}
+
+	return rev;
+} 
+
+
+
 // safe read from peripheral
 uint32_t bcm2835_peri_read(volatile uint32_t* paddr)
 {
-    if (debug)
+	uint32_t ret ;
+	uint32_t dummy = 0 ;
+
+	if (debug)
     {
         printf("bcm2835_peri_read  paddr %08X\n", (unsigned) paddr);
-	return 0;
+	return dummy;
     }
     else
     {
 	// Make sure we dont return the _last_ read which might get lost
 	// if subsequent code changes to a different peripheral
-	uint32_t ret = *paddr;
-	uint32_t dummy = *paddr;
+	ret = *paddr;
+	dummy = *paddr;
 	return ret;
     }
 }
@@ -373,6 +458,19 @@ void bcm2835_delayMicroseconds(uint64_t micros)
     bcm2835_st_delay(start, micros);
 }
 
+// This function is added in order to simulate arduino millis() function
+unsigned int bcm2835_millis(void)
+{
+	struct timeval now;
+	unsigned long long ms;    
+	
+	gettimeofday(&now, NULL);
+	
+	ms = (now.tv_sec * 1000000 + now.tv_usec) / 1000 ;
+	
+	return ((uint32_t) (ms - epoch ));
+}
+
 //
 // Higher level convenience functions
 //
@@ -429,25 +527,65 @@ void bcm2835_gpio_set_pud(uint8_t pin, uint8_t pud)
     bcm2835_gpio_pudclk(pin, 0);
 }
 
-void bcm2835_spi_begin(void)
+void bcm2835_spi_begin(uint8_t cs)
 {
+    volatile uint32_t* paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
+
     // Set the SPI0 pins to the Alt 0 function to enable SPI0 access on them
 		// except if we need custom Chip Select Pin 
+		// printf("bcm2835_spi_begin -> spi_custom_cs = %d \n",cs );
+		
+		// Do we need custom chip select control or 
+		// drive CE1 manually (because CE1 does not work with hardware) 
+		if ( cs > BCM2835_SPI_CS_NONE || cs == BCM2835_SPI_CS1 )
+		{
+			// indicate we will use a custom GPIO port
+			spi_custom_cs = cs ;
+
+			// ok hard CE1 not working, drive it manually
+			if (cs == BCM2835_SPI_CS1 )
+			{
+				// Dirty Hack CE1 in now custom Chip Select GPIO 26
+				// the real CE1 pin
+				spi_custom_cs = RPI_GPIO_P1_26 ; 
+				
+				bcm2835_gpio_fsel(spi_custom_cs, BCM2835_GPIO_FSEL_OUTP); 
+				bcm2835_gpio_write(spi_custom_cs, HIGH);
+			}
+
+			// Mask in we use custom CS (not sure it has a real effect)
+			bcm2835_peri_set_bits(paddr, BCM2835_SPI_CS_NONE, BCM2835_SPI0_CS_CS);
+		}
+		// Ok hardware driving of chip select
+		else
+		{
+			// Just in case
+			spi_custom_cs = 0 ;
+			
+			// Mask in the CS bits of CS
+			bcm2835_peri_set_bits(paddr, cs, BCM2835_SPI0_CS_CS);
+		}		
+		
+		// Now we can drive the I/O as asked 
 		if (spi_custom_cs == 0)
 		{
-			bcm2835_gpio_fsel(RPI_GPIO_P1_26, BCM2835_GPIO_FSEL_ALT0); // CE1
-			bcm2835_gpio_fsel(RPI_GPIO_P1_24, BCM2835_GPIO_FSEL_ALT0); // CE0
+			// Not custom CS, so hardware driven
+			bcm2835_gpio_fsel(RPI_GPIO_P1_24, BCM2835_GPIO_FSEL_ALT0); // CE0 
+			bcm2835_gpio_fsel(RPI_GPIO_P1_26, BCM2835_GPIO_FSEL_ALT0); // CE1 
 		}
 		else
 		{
+			// so set custom CS as output, High level by default
 			bcm2835_gpio_fsel(spi_custom_cs, BCM2835_GPIO_FSEL_OUTP); // Custom GPIO
+			bcm2835_gpio_write(spi_custom_cs, HIGH);
 		}
+		
+		// Classic pin, hardware driven
     bcm2835_gpio_fsel(RPI_GPIO_P1_21, BCM2835_GPIO_FSEL_ALT0); // MISO
     bcm2835_gpio_fsel(RPI_GPIO_P1_19, BCM2835_GPIO_FSEL_ALT0); // MOSI
     bcm2835_gpio_fsel(RPI_GPIO_P1_23, BCM2835_GPIO_FSEL_ALT0); // CLK
     
     // Set the SPI CS register to the some sensible defaults
-    volatile uint32_t* paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
     bcm2835_peri_write(paddr, 0); // All 0s
     
     // Clear TX and RX fifos
@@ -457,7 +595,6 @@ void bcm2835_spi_begin(void)
 void bcm2835_spi_end(void)
 {  
     // Set all the SPI0 pins back to input
-
 		if (spi_custom_cs == 0)
 		{
 			bcm2835_gpio_fsel(RPI_GPIO_P1_26, BCM2835_GPIO_FSEL_INPT); // CE1
@@ -471,6 +608,16 @@ void bcm2835_spi_end(void)
     bcm2835_gpio_fsel(RPI_GPIO_P1_19, BCM2835_GPIO_FSEL_INPT); // MOSI
     bcm2835_gpio_fsel(RPI_GPIO_P1_23, BCM2835_GPIO_FSEL_INPT); // CLK
 }
+
+
+// Drive Custom chip select pin
+void bcm2835_spi_setChipSelect(uint8_t level)
+{
+	// Do this only if we are using custom ChipSelect I/O
+	if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
+		bcm2835_gpio_write(spi_custom_cs, level);
+}
+
 
 void bcm2835_spi_setBitOrder(uint8_t order)
 {
@@ -487,6 +634,11 @@ void bcm2835_spi_setClockDivider(uint16_t divider)
     bcm2835_peri_write(paddr, divider);
 }
 
+void bcm2835_spi_setClockSpeed(uint16_t speed)
+{
+    bcm2835_spi_setClockDivider( speed);
+}
+
 void bcm2835_spi_setDataMode(uint8_t mode)
 {
     volatile uint32_t* paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
@@ -501,8 +653,7 @@ uint8_t bcm2835_spi_transfer(uint8_t value)
     volatile uint32_t* fifo = bcm2835_spi0 + BCM2835_SPI0_FIFO/4;
 
 		// Custom chip select LOW
-	  if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
-			bcm2835_gpio_write(spi_custom_cs, LOW);
+		bcm2835_spi_setChipSelect(LOW);
 
     // This is Polled transfer as per section 10.6.1
     // BUG ALERT: what happens if we get interupted in this section, and someone else
@@ -531,8 +682,7 @@ uint8_t bcm2835_spi_transfer(uint8_t value)
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
 
 		// Custom chip select HIGH
-	  if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
-			bcm2835_gpio_write(spi_custom_cs, HIGH);
+		bcm2835_spi_setChipSelect(HIGH);
 
     return ret;
 }
@@ -544,8 +694,7 @@ void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
     volatile uint32_t* fifo = bcm2835_spi0 + BCM2835_SPI0_FIFO/4;
 
 		// Custom chip select LOW
-	  if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
-			bcm2835_gpio_write(spi_custom_cs, LOW);
+		bcm2835_spi_setChipSelect(LOW);
 
     // This is Polled transfer as per section 10.6.1
     // BUG ALERT: what happens if we get interupted in this section, and someone else
@@ -582,9 +731,8 @@ void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
 
 		// Custom chip select HIGH
-	  if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
-			bcm2835_gpio_write(spi_custom_cs, HIGH);
-		
+		bcm2835_spi_setChipSelect(HIGH);
+	
 }
 
 // Writes an number of bytes to SPI
@@ -594,8 +742,7 @@ void bcm2835_spi_writenb(char* tbuf, uint32_t len)
     volatile uint32_t* fifo = bcm2835_spi0 + BCM2835_SPI0_FIFO/4;
 
 		// Custom chip select LOW
-	  if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
-			bcm2835_gpio_write(spi_custom_cs, LOW);
+		bcm2835_spi_setChipSelect(LOW);
 
     // This is Polled transfer as per section 10.6.1
     // BUG ALERT: what happens if we get interupted in this section, and someone else
@@ -626,8 +773,7 @@ void bcm2835_spi_writenb(char* tbuf, uint32_t len)
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
 
 		// Custom chip select HIGH
-	  if ( spi_custom_cs > BCM2835_SPI_CS_NONE )
-			bcm2835_gpio_write(spi_custom_cs, HIGH);
+		bcm2835_spi_setChipSelect(HIGH);
 }
 
 // Writes (and reads) an number of bytes to SPI
@@ -639,32 +785,22 @@ void bcm2835_spi_transfern(char* buf, uint32_t len)
 
 void bcm2835_spi_chipSelect(uint8_t cs)
 {
-    volatile uint32_t* paddr ;
-		
-		// Do we need custom chip select control
-		if ( cs > BCM2835_SPI_CS_NONE )
-		{
-			// set the custom GPIO port
-			spi_custom_cs = cs ;
-		}
-		else
-		{
-    	paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
+	// All is done now in bcm2835_spi_begin()
 
-			// Just in case
-			spi_custom_cs = 0 ;
-
-			// Mask in the CS bits of CS
-			bcm2835_peri_set_bits(paddr, cs, BCM2835_SPI0_CS_CS);
-		}
 }
 
 void bcm2835_spi_setChipSelectPolarity(uint8_t cs, uint8_t active)
 {
     volatile uint32_t* paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
-    uint8_t shift = 21 + cs;
-    // Mask in the appropriate CSPOLn bit
-    bcm2835_peri_set_bits(paddr, active << shift, 1 << shift);
+
+		// only valid for no custom CS
+		if (cs <= BCM2835_SPI_CS_NONE)
+		{
+			uint8_t shift = 21 + cs;
+			
+			// Mask in the appropriate CSPOLn bit
+			bcm2835_peri_set_bits(paddr, active << shift, 1 << shift);
+		}
 }
 
 void bcm2835_i2c_begin(void)
@@ -882,6 +1018,8 @@ static void unmapmem(void **pmem, size_t size)
 // Initialise this library.
 int bcm2835_init(void)
 {
+	struct timeval tv ;
+	
     if (debug) 
     {
 	bcm2835_pads = (uint32_t*)BCM2835_GPIO_PADS;
@@ -941,6 +1079,9 @@ exit:
 
     if (!ok)
 	bcm2835_close();
+	
+  gettimeofday (&tv, NULL) ;
+	epoch = (tv.tv_sec * 1000000 + tv.tv_usec) / 1000 ;
 
     return ok;
 }
@@ -958,81 +1099,3 @@ int bcm2835_close(void)
     unmapmem((void**) &bcm2835_st,   BCM2835_BLOCK_SIZE);
     return 1; // Success
 }    
-
-#ifdef BCM2835_TEST
-// this is a simple test program that prints out what it will do rather than 
-// actually doing it
-int main(int argc, char **argv)
-{
-    // Be non-destructive
-    bcm2835_set_debug(1);
-
-    if (!bcm2835_init())
-	return 1;
-
-    // Configure some GPIO pins fo some testing
-    // Set RPI pin P1-11 to be an output
-    bcm2835_gpio_fsel(RPI_GPIO_P1_11, BCM2835_GPIO_FSEL_OUTP);
-    // Set RPI pin P1-15 to be an input
-    bcm2835_gpio_fsel(RPI_GPIO_P1_15, BCM2835_GPIO_FSEL_INPT);
-    //  with a pullup
-    bcm2835_gpio_set_pud(RPI_GPIO_P1_15, BCM2835_GPIO_PUD_UP);
-    // And a low detect enable
-    bcm2835_gpio_len(RPI_GPIO_P1_15);
-    // and input hysteresis disabled on GPIOs 0 to 27
-    bcm2835_gpio_set_pad(BCM2835_PAD_GROUP_GPIO_0_27, BCM2835_PAD_SLEW_RATE_UNLIMITED|BCM2835_PAD_DRIVE_8mA);
-
-#if 1
-    // Blink
-    while (1)
-    {
-	// Turn it on
-	bcm2835_gpio_write(RPI_GPIO_P1_11, HIGH);
-	
-	// wait a bit
-	bcm2835_delay(500);
-	
-	// turn it off
-	bcm2835_gpio_write(RPI_GPIO_P1_11, LOW);
-	
-	// wait a bit
-	bcm2835_delay(500);
-    }
-#endif
-
-#if 0
-    // Read input
-    while (1)
-    {
-	// Read some data
-	uint8_t value = bcm2835_gpio_lev(RPI_GPIO_P1_15);
-	printf("read from pin 15: %d\n", value);
-	
-	// wait a bit
-	bcm2835_delay(500);
-    }
-#endif
-
-#if 0
-    // Look for a low event detection
-    // eds will be set whenever pin 15 goes low
-    while (1)
-    {
-	if (bcm2835_gpio_eds(RPI_GPIO_P1_15))
-	{
-	    // Now clear the eds flag by setting it to 1
-	    bcm2835_gpio_set_eds(RPI_GPIO_P1_15);
-	    printf("low event detect for pin 15\n");
-	}
-
-	// wait a bit
-	bcm2835_delay(500);
-    }
-#endif
-
-    if (!bcm2835_close())
-	return 1;
-
-    return 0;
-}
-#endif
