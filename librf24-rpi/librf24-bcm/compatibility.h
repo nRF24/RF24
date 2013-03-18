@@ -15,12 +15,18 @@ extern "C" {
 #include <stddef.h>
 #include <sys/time.h>
 
+static struct timeval start, end;
+static long mtime, seconds, useconds;    
+
+void __msleep(int milisec);
+void __usleep(int milisec);
+void __start_timer();
 long __millis();
 
 
 // Function, constant map as a result of migrating from Arduino
-//#define delay(milisec) bcm2835_delay(milisec)
-//#define delayMicroseconds(usec) bcm2835_delayMicroseconds(usec)
+#define delay(milisec) __msleep(milisec)
+#define delayMicroseconds(usec) __usleep(usec)
 
 #ifdef	__cplusplus
 }

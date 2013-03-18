@@ -6,15 +6,6 @@
 // Copyright (C) 2011-2013 Mike McCauley
 // $Id: bcm2835.h,v 1.8 2013/02/15 22:06:09 mikem Exp mikem $
 //
-// 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
-//              Modified Adding some fonctionnalities
-//							Added millis() function
-//              Added option to use custom Chip Select Pin PI GPIO instead of only CE0 CE1
-//              Done a hack to use CE1 by software as custom CS pin because HW does not work
-//              Added function to determine PI revision board
-//							Added function to set SPI speed (instead of divider for easier look in code)
-
-//
 /// \mainpage C library for Broadcom BCM 2835 as used in Raspberry Pi
 ///
 /// This is a C library for Raspberry Pi (RPi). It provides access to 
@@ -521,7 +512,7 @@ typedef enum
     BCM2835_SPI_CS2 = 2,     ///< Chip Select 2 (ie pins CS1 and CS2 are asserted)
     BCM2835_SPI_CS_NONE = 3, ///< No CS, control it yourself
 
-		// Only GPIO > 3 can be used (to not interfere with the previous value just above )
+		// Only GPIO > 3 can be used (to not interfere with the previous )
 		// Lucky we have plenty of theese pins
 		BCM2835_SPI_CS_GPIO4  = RPI_V2_GPIO_P1_07, /// BCM GPIO 4
 		BCM2835_SPI_CS_GPIO17 = RPI_V2_GPIO_P1_11, /// BCM GPIO 17
@@ -563,25 +554,6 @@ typedef enum
     BCM2835_SPI_CLOCK_DIVIDER_2     = 2,       ///< 2 = 8ns = 125MHz, fastest you can get
     BCM2835_SPI_CLOCK_DIVIDER_1     = 1,       ///< 0 = 262.144us = 3.814697260kHz, same as 0/65536
 } bcm2835SPIClockDivider;
-
-/// \brief bcm2835SPISpeed
-/// Specifies the divider used to generate the SPI clock from the system clock.
-/// Figures below give the clock speed instead of clock divider.
-#define BCM2835_SPI_SPEED_64MHZ  BCM2835_SPI_CLOCK_DIVIDER_4
-#define BCM2835_SPI_SPEED_32MHZ  BCM2835_SPI_CLOCK_DIVIDER_8
-#define BCM2835_SPI_SPEED_16MHZ  BCM2835_SPI_CLOCK_DIVIDER_16
-#define BCM2835_SPI_SPEED_8MHZ   BCM2835_SPI_CLOCK_DIVIDER_32
-#define BCM2835_SPI_SPEED_4MHZ   BCM2835_SPI_CLOCK_DIVIDER_64
-#define BCM2835_SPI_SPEED_2MHZ   BCM2835_SPI_CLOCK_DIVIDER_128
-#define BCM2835_SPI_SPEED_1MHZ   BCM2835_SPI_CLOCK_DIVIDER_256
-#define BCM2835_SPI_SPEED_512KHZ BCM2835_SPI_CLOCK_DIVIDER_512
-#define BCM2835_SPI_SPEED_256KHZ BCM2835_SPI_CLOCK_DIVIDER_1024
-#define BCM2835_SPI_SPEED_128KHZ BCM2835_SPI_CLOCK_DIVIDER_2048
-#define BCM2835_SPI_SPEED_64KHZ  BCM2835_SPI_CLOCK_DIVIDER_4096
-#define BCM2835_SPI_SPEED_32KHZ  BCM2835_SPI_CLOCK_DIVIDER_8192
-#define BCM2835_SPI_SPEED_16KHZ  BCM2835_SPI_CLOCK_DIVIDER_16384
-#define BCM2835_SPI_SPEED_8KHZ   BCM2835_SPI_CLOCK_DIVIDER_32768
-
 
 // Defines for I2C
 // GPIO register offsets from BCM2835_BSC*_BASE.
@@ -688,7 +660,6 @@ typedef enum
 #ifndef BCM2835_NO_DELAY_COMPATIBILITY
 #define delay(x) bcm2835_delay(x)
 #define delayMicroseconds(x) bcm2835_delayMicroseconds(x)
-#define millis() bcm2835_millis()
 #endif
 
 #ifdef __cplusplus
@@ -712,10 +683,6 @@ extern "C" {
     /// Close the library, deallocating any allocated memory and closing /dev/mem
     /// \return 1 if successful else 0
     extern int bcm2835_close(void);
-		
-    /// Returns the revision of the Raspberry PI board
-    /// \return the value of revision (0 if error else 1 or 2)
-		extern int bcm2835_get_pi_version( void ) ;
 
     /// Sets the debug level of the library.
     /// A value of 1 prevents mapping to /dev/mem, and makes the library print out
@@ -952,11 +919,6 @@ extern "C" {
     /// result in a delay of about 80 microseconds. Your mileage may vary.
     /// \param[in] micros Delay in microseconds
     extern void bcm2835_delayMicroseconds (uint64_t micros);
-		
-    /// Indicate the number of milliseconds since startup of PI
-		/// This function is like the Arduino millis function
-    /// \return Number of milliseconds
-		extern unsigned int bcm2835_millis(void);
 
     /// Sets the output state of the specified pin
     /// \param[in] pin GPIO number, or one of RPI_GPIO_P1_* from \ref RPiGPIOPin.
@@ -989,25 +951,16 @@ extern "C" {
     /// Start SPI operations.
     /// Forces RPi SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
     /// to alternate function ALT0, which enables those pins for SPI interface.
-    /// \param[in] cs Specifies the CS pins(s) that are used to activate the desired slave. 
-    ///   One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
-    ///   or one of One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
-		///   by default PI hardware driven using CE0
     /// You should call bcm2835_spi_end() when all SPI funcitons are complete to return the pins to 
     /// their default functions
     /// \sa  bcm2835_spi_end()
-    extern void bcm2835_spi_begin(uint8_t cs);
+    extern void bcm2835_spi_begin(void);
 
     /// End SPI operations.
     /// SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
     /// are returned to their default INPUT behaviour.
     extern void bcm2835_spi_end(void);
-		
-    /// Sets the SPI custom Chip Select pin to correct level
-    /// Defaults to 
-    /// \param[in] level The desired level, LOW or HIGH, 
-		extern void bcm2835_spi_setChipSelect(uint8_t level);
-		
+
     /// Sets the SPI bit order
     /// NOTE: has no effect. Not supported by SPI0.
     /// Defaults to 
@@ -1020,12 +973,7 @@ extern "C" {
     /// \param[in] divider The desired SPI clock divider, one of BCM2835_SPI_CLOCK_DIVIDER_*, 
     /// see \ref bcm2835SPIClockDivider
     extern void bcm2835_spi_setClockDivider(uint16_t divider);
-    
-		/// Sets the SPI clock speed.
-    /// \param[in] speed The desired SPI speed, one of BCM2835_SPI_CLOCK_SPEED_*, 
-    /// see \ref bcm2835SPIClockSpeed
-    extern void bcm2835_spi_setClockSpeed(uint16_t divider);
-		
+
     /// Sets the SPI data mode
     /// Sets the clock polariy and phase
     /// \param[in] mode The desired data mode, one of BCM2835_SPI_MODE*, 

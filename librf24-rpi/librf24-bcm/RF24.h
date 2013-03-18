@@ -4,10 +4,6 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
- 
- 
- 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
-              Modified to use the great bcm2835 library for I/O and SPI
  */
 
 /**
@@ -18,10 +14,6 @@
 
 #ifndef __RF24_H__
 #define __RF24_H__
-
-#include "RF24_config.h"
-#include "./bcm2835.h"
-
 
 /**
  * Power Amplifier level.
@@ -53,7 +45,6 @@ class RF24
 private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
-	uint16_t spi_speed; /**< SPI Bus Speed */
   bool wide_band; /* 2Mbs data rate in use? */
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
@@ -61,10 +52,8 @@ private:
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
-	//uint32_t spispeed;
+	uint32_t spispeed;
   uint8_t debug ; /* Debug flag */
-  uint8_t spi_rxbuff[32] ; //SPI receive buffer (payload max 32 bytes)
-  uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
 
 protected:
   /**
