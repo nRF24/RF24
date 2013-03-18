@@ -25,7 +25,6 @@
 #include <cstdlib>
 #include <iostream>
 #include "../librf24-bcm/RF24.h"
-#include "../librf24-bcm/compatibility.h"
 
 using namespace std;
 
