@@ -4,6 +4,12 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
+ 
+ 
+ 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
+              Modified to use with Arduipi board http://hallard.me/arduipi
+						  Changed to use modified bcm2835 and RF24 library 
+
  */
 
 /**
@@ -42,16 +48,16 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_8MHZ);
 //
 // Channel info
 //
-
 //const uint8_t num_channels = 128;
 const uint8_t num_channels = 120;
 uint8_t values[num_channels];
 
-//
-// Setup
-//
 
-void setup(void)
+const int num_reps = 100;
+int reset_array=0;
+
+
+int main(int argc, char** argv)
 {
   //
   // Print preamble
@@ -59,14 +65,12 @@ void setup(void)
 
   //Serial.begin(57600);
   //printf_begin();
-  printf("\n\rRF24/examples/scanner/\n\r");
+  printf("RF24/examples/scanner/\n");
 
   //
   // Setup and configure rf radio
   //
-
   radio.begin();
-	
 	
   radio.setAutoAck(false);
 
@@ -78,75 +82,65 @@ void setup(void)
 
   // Print out header, high then low digit
   int i = 0;
+	
   while ( i < num_channels )
   {
     printf("%x",i>>4);
     ++i;
   }
-  printf("\n\r");
+  printf("\n");
+	
   i = 0;
   while ( i < num_channels )
   {
     printf("%x",i&0xf);
     ++i;
   }
-  printf("\n\r");
+  printf("\n");       
+	
+	// forever loop
+  while(1)
+	{
+		if ( reset_array == 1 )
+		{	
+			// Clear measurement values
+			memset(values,0,sizeof(values));
+			printf("\n");
+		}
 
-}
+		// Scan all channels num_reps times
+		int i = num_channels;
+		while (i--)
+		{
+			// Select this channel
+			radio.setChannel(i);
 
+			// Listen for a little
+			radio.startListening();
+			delayMicroseconds(128);
+			radio.stopListening();
 
-const int num_reps = 100;
+			// Did we get a carrier?
+			if ( radio.testCarrier() )
+					++values[i];
+			if ( values[i] == 0xf ) 
+			{
+				reset_array = 2;
+			}
+		}
 
-int reset_array=0;
-
-void loop(void)
-{
-
-if ( reset_array == 1 ) {	
-  // Clear measurement values
-  memset(values,0,sizeof(values));
-  printf("\n\r");
-}
-
-  // Scan all channels num_reps times
-    int i = num_channels;
-    while (i--)
-    {
-      // Select this channel
-      radio.setChannel(i);
-
-      // Listen for a little
-      radio.startListening();
-      delayMicroseconds(128);
-      radio.stopListening();
-
-      // Did we get a carrier?
-      if ( radio.testCarrier() )
-        ++values[i];
-	if ( values[i] == 0xf ) {
-		reset_array = 2;
+		// Print out channel measurements, clamped to a single hex digit
+		i = 0;
+		while ( i < num_channels )
+		{
+			printf("%x",min(0xf,(values[i]&0xf)));
+			++i;
+		}
+		
+		printf("\n");
 	}
-    }
-
-  // Print out channel measurements, clamped to a single hex digit
-  i = 0;
-  while ( i < num_channels )
-  {
-    printf("%x",min(0xf,(values[i]&0xf)));
-    ++i;
-  }
-  printf("\n\r");
+	
+  return 0;
 }
-
-int main(int argc, char** argv)
-{
-        setup();
-        while(1)
-                loop();
-
-        return 0;
-}
-
-
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp

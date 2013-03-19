@@ -20,6 +20,11 @@
  *  e-mail : stanleyseow@gmail.com
  *  date   : 6th Mar 2013
  *
+ * 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
+ *              Modified to use with Arduipi board http://hallard.me/arduipi
+ *						  Changed to use modified bcm2835 and RF24 library 
+ *
+ *
  */
 
 #include <cstdlib>
@@ -30,7 +35,11 @@ using namespace std;
 
 // Radio pipe addresses for the 2 nodes to communicate.
 // First pipe is for writing, 2nd, 3rd, 4th, 5th & 6th is for reading...
-const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0F1, 0xF0F0F0F0F2 };
+const uint64_t pipes[6] = 
+					{ 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 
+						0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 
+						0xF0F0F0F0F1, 0xF0F0F0F0F2 
+					};
 
 // CE Pin, CSN Pin, SPI Speed
 
@@ -44,9 +53,10 @@ const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_8MHZ);  
 
 
-void setup(void)
+int main(int argc, char** argv) 
 {
-	//
+	uint8_t len;
+
 	// Refer to RF24.h or nRF24L01 DS for settings
 	radio.begin();
 	radio.enableDynamicPayloads();
@@ -68,59 +78,56 @@ void setup(void)
 	//
 	// Start listening
 	//
-
 	radio.startListening();
 
 	//
 	// Dump the configuration of the rf unit for debugging
 	//
-
 	radio.printDetails();
-	printf("\n\rOutput below : \n\r");
-	usleep(1000);
-}
-
-void loop(void)
-{
-	char receivePayload[32];
-	uint8_t pipe = 1;
 	
-	// Start listening
-	radio.startListening();
-
-        
-	 while ( radio.available(&pipe) ) {
-
-		uint8_t len = radio.getDynamicPayloadSize();
-		radio.read( receivePayload, len );
-
-		// Display it on screen
-		printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,pipe);
-
-		// Send back payload to sender
-		radio.stopListening();
-
-		// if pipe is 7, do not send it back
-		if ( pipe != 7 ) {
-			radio.write(receivePayload,len);
-			receivePayload[len]=0;
-			printf("\t Send: size=%i payload=%s pipe:%i\n\r",len,receivePayload,pipe);
-		} else {
-			printf("\n\r");
-                }
-		pipe++;
-		// reset pipe to 0
-		if ( pipe > 6 ) pipe = 0;
-	}
-	usleep(20);
-}
-
-
-int main(int argc, char** argv) 
-{
-	setup();
+	printf("Output below : \n");
+	delay(1);
+	
 	while(1)
-		loop();
+	{
+		char receivePayload[32];
+		uint8_t pipe = 1;
+		
+		// Start listening
+		radio.startListening();
+					
+		while ( radio.available(&pipe) ) 
+		{
+			len = radio.getDynamicPayloadSize();
+			radio.read( receivePayload, len );
+
+			// Display it on screen
+			printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,pipe);
+
+			// Send back payload to sender
+			radio.stopListening();
+
+			// if pipe is 7, do not send it back
+			if ( pipe != 7 ) 
+			{
+				radio.write(receivePayload,len);
+				receivePayload[len]=0;
+				printf("\t Send: size=%i payload=%s pipe:%i\n",len,receivePayload,pipe);
+			}
+			else 
+			{
+				printf("\n");
+			}
+			
+			pipe++;
+			
+			// reset pipe to 0
+			if ( pipe > 6 ) 
+				pipe = 0;
+		}
+		
+		delayMicroseconds(20);
+	}
 	
 	return 0;
 }

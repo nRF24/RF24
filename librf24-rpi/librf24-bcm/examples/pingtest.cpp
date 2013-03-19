@@ -4,6 +4,10 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
+ 
+ 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
+              Modified to use with Arduipi board http://hallard.me/arduipi
+						  Changed to use modified bcm2835 and RF24 library 
  */
 
 /**
@@ -22,6 +26,7 @@
 //
 // Hardware configuration
 //
+
 // CE Pin, CSN Pin, SPI Speed
 
 // Setup for GPIO 22 CE and GPIO 25 CSN with SPI Speed @ 1Mhz
@@ -32,6 +37,7 @@
 
 // Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_8MHZ);  
+
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -63,36 +69,26 @@ const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 // The role of the current running sketch
 role_e role;
 
-void setup(void)
+
+int main(int argc, char** argv)
 {
   //
   // Role
   //
 
-  // set up the role pin
- // pinMode(role_pin, INPUT);
-  //digitalWrite(role_pin,HIGH);
- // delay(20); // Just to get a solid reading on the role pin
-
-  // read the address pin, establish our role
-  //if ( ! digitalRead(role_pin) )
-    role = role_ping_out;
-  //else
-  //  role = role_pong_back;
+  // set up the role 
+  role = role_ping_out;
 
   //
   // Print preamble:
   //
 
-  //Serial.begin(115200);
-  //printf_begin();
-  printf("\n\rRF24/examples/pingpair/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
+  printf("RF24/examples/pingtest/\n");
+  printf("ROLE: %s\n",role_friendly_name[role]);
 
   //
   // Setup and configure rf radio
   //
-
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
@@ -100,9 +96,9 @@ void setup(void)
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
-//  radio.setPayloadSize(8);
- radio.setChannel(0x4c);
-     radio.setPALevel(RF24_PA_MAX);
+	//  radio.setPayloadSize(8);
+	radio.setChannel(0x4c);
+  radio.setPALevel(RF24_PA_LOW);
 
   //
   // Open pipes to other nodes for communication
@@ -112,7 +108,6 @@ void setup(void)
   // back and forth.
   // Open 'our' pipe for writing
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
-
   if ( role == role_ping_out )
   {
     radio.openWritingPipe(pipes[0]);
@@ -127,116 +122,109 @@ void setup(void)
   //
   // Start listening
   //
-
   radio.startListening();
 
   //
   // Dump the configuration of the rf unit for debugging
   //
-
   radio.printDetails();
-}
-
-void loop(void)
-{
   //
   // Ping out role.  Repeatedly send the current time
   //
+	
+	// forever loop
+	while (1)
+	{
+		if (role == role_ping_out)
+		{
+			// First, stop listening so we can talk.
+			radio.stopListening();
 
-  if (role == role_ping_out)
-  {
-    // First, stop listening so we can talk.
-    radio.stopListening();
+			// Take the time, and send it.  This will block until complete
+			unsigned long time = millis();
+			printf("Now sending %lu...",time);
+			bool ok = radio.write( &time, sizeof(unsigned long) );
+			
+			if (ok)
+				printf("ok...");
+			else
+				printf("failed.\n");
 
-    // Take the time, and send it.  This will block until complete
-    unsigned long time = millis();
-    printf("Now sending %lu...",time);
-    bool ok = radio.write( &time, sizeof(unsigned long) );
-    
-    if (ok)
-      printf("ok...");
-    else
-      printf("failed.\n\r");
+			// Now, continue listening
+			radio.startListening();
 
-    // Now, continue listening
-    radio.startListening();
+			// Wait here until we get a response, or timeout (250ms)
+			unsigned long started_waiting_at = millis();
+			bool timeout = false;
+			while ( ! radio.available() && ! timeout ) {
+					// by bcatalin » Thu Feb 14, 2013 11:26 am
+					delay(5); //add a small delay to let radio.available to check payload
+				if (millis() - started_waiting_at > 200 )
+					timeout = true;
+			}
 
-    // Wait here until we get a response, or timeout (250ms)
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
-    while ( ! radio.available() && ! timeout ) {
-	// by bcatalin » Thu Feb 14, 2013 11:26 am 
-		delay(5); //add a small delay to let radio.available to check payload
-      if (millis() - started_waiting_at > 200 )
-        timeout = true;
-    }
 
-    // Describe the results
-    if ( timeout )
-    {
-      printf("Failed, response timed out.\n\r");
-    }
-    else
-    {
-      // Grab the response, compare, and send to debugging spew
-      unsigned long got_time;
-      radio.read( &got_time, sizeof(unsigned long) );
+			// Describe the results
+			if ( timeout )
+			{
+				printf("Failed, response timed out.\n");
+			}
+			else
+			{
+				// Grab the response, compare, and send to debugging spew
+				unsigned long got_time;
+				radio.read( &got_time, sizeof(unsigned long) );
 
-      // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
-    }
+				// Spew it
+				printf("Got response %lu, round-trip delay: %lu\n",got_time,millis()-got_time);
+			}
 
-    // Try again 1s later
-//    delay(1000);
-sleep(1);
-  }
+			// Try again 1s later
+			//    delay(1000);
+			sleep(1);
+			
+		}
 
-  //
-  // Pong back role.  Receive each packet, dump it out, and send it back
-  //
+		//
+		// Pong back role.  Receive each packet, dump it out, and send it back
+		//
 
-  if ( role == role_pong_back )
-  {
-    // if there is data ready
-    if ( radio.available() )
-    {
-      // Dump the payloads until we've gotten everything
-      unsigned long got_time;
-      bool done = false;
-      while (!done)
-      {
-        // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+		if ( role == role_pong_back )
+		{
+			// if there is data ready
+			//printf("Check available...\n");
+			if ( radio.available() )
+			{
+				// Dump the payloads until we've gotten everything
+				unsigned long got_time;
+				bool done = false;
+				
+				while (!done)
+				{
+					// Fetch the payload, and see if this was the last one.
+					done = radio.read( &got_time, sizeof(unsigned long) );
 
-        // Spew it
-        printf("Got payload %lu...",got_time);
+					// Spew it
+					printf("Got payload(%d) %lu...\n",sizeof(unsigned long), got_time);
 
-	// Delay just a little bit to let the other unit
-	// make the transition to receiver
-	delay(20);
-      }
+					// Delay just a little bit to let the other unit
+					// make the transition to receiver
+					delay(20);
+				}
 
-      // First, stop listening so we can talk
-      radio.stopListening();
+				// First, stop listening so we can talk
+				radio.stopListening();
 
-      // Send the final one back.
-      printf("Sent response.\n\r");
-      radio.write( &got_time, sizeof(unsigned long) );
+				// Send the final one back.
+				radio.write( &got_time, sizeof(unsigned long) );
 
-      // Now, resume listening so we catch the next packets.
-      radio.startListening();
-    }
-  }
+				// Now, resume listening so we catch the next packets.
+				radio.startListening();
+			}
+		}
+	} // forever loop
+
+  return 0;
 }
-
-int main(int argc, char** argv)
-{
-        setup();
-        while(1)
-                loop();
-
-        return 0;
-}
-
 
 // vim:cin:ai:sts=2 sw=2 ft=cpp

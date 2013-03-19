@@ -4,7 +4,14 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
- */
+ 
+ 
+ 
+03/17/2013 : Charles-Henri Hallard (http://hallard.me)
+             Modified to use with Arduipi board http://hallard.me/arduipi
+						 Changed to use modified bcm2835 library 
+
+*/
 
 #include "./RF24_config.h"
 #include "./RF24.h"
@@ -150,7 +157,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   if (debug)
 		printf("[Reading %u bytes %u blanks]",data_len,blank_len);
   
-	*ptx =  R_RX_PAYLOAD;
+	*ptx++ =  R_RX_PAYLOAD;
 	while(size--)
 		*ptx++ = NOP;
 		
@@ -407,6 +414,7 @@ void RF24::printDetails(void)
 bool RF24::begin(void)
 {
 	debug = false;
+	//debug = true;
 
 	// Init BCM2835 chipset for talking with us
 	if (!bcm2835_init())
@@ -556,14 +564,14 @@ bool RF24::write( const void* buf, uint8_t len )
   uint32_t sent_at = millis();
   const unsigned long timeout = 500; //ms to wait for timeout
 	
-	printf("millis()=%d\n", sent_at);
   do
   {
     status = read_register(OBSERVE_TX,&observe_tx,1);
-    IF_SERIAL_DEBUG(printf(observe_tx,HEX));
+		
+    if (debug)
+			printf("%02X", observe_tx);
   }
   while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( millis() - sent_at < timeout ) );
-	printf("millis(out)=%d\n", millis());
 
 	
   // The part above is what you could recreate with your own interrupt handler,

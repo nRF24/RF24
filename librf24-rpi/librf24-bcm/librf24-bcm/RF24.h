@@ -5,9 +5,10 @@
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  
- 
  03/17/2013 : Charles-Henri Hallard (http://hallard.me)
+              Modified to use with Arduipi board http://hallard.me/arduipi
               Modified to use the great bcm2835 library for I/O and SPI
+							
  */
 
 /**
