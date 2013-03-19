@@ -19,17 +19,9 @@
 
 #include <cstdlib>
 #include <iostream>
-//#include "lib/RF24/RF24.h"
-#include "../librf24/RF24.h"
-//#include "lib/RF24/compatibility.h"
+#include "../RF24.h"
 
 using namespace std;
-
-
-//#include <SPI.h>
-//#include "nRF24L01.h"
-//#include "RF24.h"
-//#include "printf.h"
 
 //
 // Hardware configuration

@@ -18,12 +18,7 @@
 #include <cstdlib>
 #include <iostream>
 
-//#include <SPI.h>
-//#include "nRF24L01.h"
-//#include "RF24.h"
-#include "../librf24/RF24.h"
-
-//#include "printf.h"
+#include "../RF24.h"
 
 //
 // Hardware configuration
@@ -32,7 +27,7 @@
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
 //RF24 radio(9,10);
-RF24 radio("/dev/spidev0.0",8000000 , 25);  //spi device, speed and CSN,only CSN is NEEDED in RPI
+RF24 radio("/dev/spidev0.0",2000000 , 25);  //spi device, speed and CE,only CE is NEEDED in RPI
 
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
@@ -78,9 +73,9 @@ void setup(void)
 
   // read the address pin, establish our role
   //if ( ! digitalRead(role_pin) )
-    role = role_ping_out;
+  //  role = role_ping_out;
   //else
-  //  role = role_pong_back;
+    role = role_pong_back;
 
   //
   // Print preamble:
@@ -104,7 +99,7 @@ void setup(void)
   // improve reliability
 //  radio.setPayloadSize(8);
  radio.setChannel(0x4c);
-     radio.setPALevel(RF24_PA_MAX);
+     radio.setPALevel(RF24_PA_LOW);
 
   //
   // Open pipes to other nodes for communication
@@ -167,11 +162,12 @@ void loop(void)
     unsigned long started_waiting_at = __millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout ) {
-	// by bcatalin » Thu Feb 14, 2013 11:26 am 
-	__msleep(5); //add a small delay to let radio.available to check payload
+        // by bcatalin » Thu Feb 14, 2013 11:26 am
+        __msleep(5); //add a small delay to let radio.available to check payload
       if (__millis() - started_waiting_at > 200 )
         timeout = true;
     }
+
 
     // Describe the results
     if ( timeout )

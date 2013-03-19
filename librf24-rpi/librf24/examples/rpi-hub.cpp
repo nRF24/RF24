@@ -24,8 +24,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "../librf24/RF24.h"
-#include "../librf24/compatibility.h"
+#include "../RF24.h"
 
 using namespace std;
 
