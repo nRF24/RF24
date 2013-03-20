@@ -21,7 +21,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "../RF24.h"
+#include "./RF24.h"
 
 //
 // Hardware configuration

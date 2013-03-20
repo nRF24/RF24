@@ -11,8 +11,15 @@
 # use make all and mak install to install the library 
 # You can change the install directory by editing the LIBDIR line
 #
-LIBDIR=/usr/local/lib
-LIBNAME=librf24-bcm.so.1.0
+PREFIX=/usr/local
+
+# Library parameters
+# where to put the lib
+LIBDIR=$(PREFIX)/lib
+# lib name 
+LIB=librf24-bcm
+# shared library name
+LIBNAME=$(LIB).so.1.0
 
 
 # The recommended compiler flags for the Raspberry Pi
@@ -20,27 +27,29 @@ CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 
 # make all
 # reinstall the library after each recompilation
-all: librf24-bcm 
+all: librf24-bcm install
 
 # Make the library
 librf24-bcm: RF24.o bcm2835.o 
-
+	g++ -shared -Wl,-soname,$@.so.1 ${CCFLAGS} -o ${LIBNAME} $^
+	
 # Library parts
 RF24.o: RF24.cpp
-	g++ -Wall -fPIC ${CCFLAGS} -c RF24.cpp
+	g++ -Wall -fPIC ${CCFLAGS} -c $^
 
 bcm2835.o: bcm2835.c
-	gcc -Wall -fPIC ${CCFLAGS} -c bcm2835.c
+	gcc -Wall -fPIC ${CCFLAGS} -c $^
 
 # clear build files
 clean:
-	rm -rf *o ${LIBNAME}
+	rm -rf *.o ${LIB}.*
 
 # Install the library to LIBPATH
 install: 
-	g++ -shared -Wl,-soname,librf24-bcm.so.1 ${CCFLAGS}  -o ${LIBNAME} bcm2835.o RF24.o
-	mv librf24-bcm.so.1.0 ${LIBDIR}/${LIBNAME}
-	ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/librf24-bcm.so.1
-	ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/librf24-bcm.so
-	ldconfig
-
+	@echo "[Install]"
+	@if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
+	#@install -m 0755 ${LIB}.a ${LIBDIR}
+	@install -m 0755 ${LIBNAME} ${LIBDIR}
+	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so.1
+	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so
+	@ldconfig
