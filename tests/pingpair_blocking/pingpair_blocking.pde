@@ -68,7 +68,7 @@ bool notified; //*< Have we notified the user we're done? */
 const int num_needed = 10; //*< How many success/failures until we're done? */
 int receives_remaining = num_needed; //*< How many ack packets until we declare victory? */
 int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
-const int interval = 100; //*< ms to wait between sends */
+int interval = 100; //*< ms to wait between sends */
 
 char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
 
@@ -133,7 +133,6 @@ void setup(void)
   //
 
   radio.begin();
-
   //
   // Open pipes to other nodes for communication
   //
@@ -186,11 +185,11 @@ void loop(void)
     // Now, continue listening
     radio.startListening();
 
-    // Wait here until we get a response, or timeout (250ms)
-    unsigned long started_waiting_at = millis();
+    // Wait here until we get a response, or timeout
+    unsigned long started_waiting_at = micros();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 200 )
+      if (micros() - started_waiting_at > radio.getMaxTimeout() )
         timeout = true;
 
     // Describe the results
