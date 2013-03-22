@@ -356,6 +356,14 @@ public:
    */
   void openReadingPipe(uint8_t number, uint64_t address);
 
+
+  /**
+   * Close a pipe after it has been previously opened.
+   * Can be safely called without having previously opened a pipe.
+   * @param pipe Which pipe # to close, 0-5.
+   */
+  void closeReadingPipe( uint8_t pipe ) ;
+
   /**@}*/
   /**
    * @name Optional Configurators 
