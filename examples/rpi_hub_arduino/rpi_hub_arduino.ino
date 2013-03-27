@@ -1,21 +1,22 @@
 /*
  This program sends readings from four or more sensor readings and appends
- addr data pipes to the beginning of the payloads. 
+ 2 bytes addr data pipes to the beginning of the payloads. The sender will send and
+ receive the payload on the same sender/receiver address.
 
- The receiver is a RPi accepting 6 pipes and display received payload to the screen
+ The receiver is a RPi or UNO accepting 6 pipes and display received payload to the screen
 
- RPi receiver will return the receive payload for sender to calculate the rtt
- if the string compared matched
+ The receiver will return the receive payload for sender to calculate the rtt
+ if the string compared matched to the lcd display
 
  Max payload size is 32 bytes
 
 Forked RF24 at github :-
 https://github.com/stanleyseow/RF24
 
- Date : 5/03/2013
+ Date : 28/03/2013
 
  Written by Stanley Seow
- stanleyseow@gmai.com
+ stanleyseow@gmail.com
 */
 
 #include <LiquidCrystal.h>
@@ -39,17 +40,17 @@ LiquidCrystal lcd(10, 7, 3, 4, 5, 6);
 RF24 radio(8,9);
 
 // Radio pipe addresses for the 2 nodes to communicate.
-// const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
-// const uint64_t pipes[2] = { 0xF0F0F0F0E2LL, 0xF0F0F0F0D2LL };
-// const uint64_t pipes[2] = { 0xF0F0F0F0E3LL, 0xF0F0F0F0D2LL };
- const uint64_t pipes[2] = { 0xF0F0F0F0F1LL, 0xF0F0F0F0D2LL };
-// const uint64_t pipes[2] = { 0xF0F0F0F0F2LL, 0xF0F0F0F0D2LL };
+
+ const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0E1LL };
+// const uint64_t pipes[2] = { 0xF0F0F0F0E2LL, 0xF0F0F0F0E2LL };
+// const uint64_t pipes[2] = { 0xF0F0F0F0E3LL, 0xF0F0F0F0E3LL };
+// const uint64_t pipes[2] = { 0xF0F0F0F0E4LL, 0xF0F0F0F0E4LL };
+// const uint64_t pipes[2] = { 0xF0F0F0F0E5LL, 0xF0F0F0F0E5LL };
 // Pipe0 is F0F0F0F0D2 ( same as reading pipe )
 
 char receivePayload[32];
-int counter=0;
-int timeoutTimer = 500;
-int loops = 0;
+uint8_t counter=0;
+uint8_t loops = 0;
 
 void setup(void)
 {
@@ -69,19 +70,16 @@ void setup(void)
 
   // Enable this seems to work better
   radio.enableDynamicPayloads();
-  radio.setAutoAck(1);
 
-  // Setup default radio settings  
-  
   radio.setDataRate(RF24_1MBPS);
   radio.setPALevel(RF24_PA_MAX);
   radio.setChannel(76);
-  radio.setCRCLength(RF24_CRC_16);
   radio.setRetries(15,15);
 
   radio.openWritingPipe(pipes[0]); 
   radio.openReadingPipe(1,pipes[1]); 
 
+      
   // Send only, ignore listening mode
   //radio.startListening();
 
@@ -92,19 +90,21 @@ void setup(void)
 
 void loop(void)
 {
-  int Data1,Data2,Data3,Data4 = 0;
+  uint8_t Data1,Data2,Data3,Data4 = 0;
   char temp[5];
-  char nodeID[12];
   bool timeout=0;
-  int timeout_timer = 500;
+  uint8_t timeout_timer = 500;
+
+  // Get the last two Bytes as node-id
+  uint16_t nodeID = pipes[0] & 0xff;
 
   // Use the last 2 pipes address as nodeID  
-  sprintf(nodeID,"%X",pipes[0]);
+  // sprintf(nodeID,"%X",pipes[0]);
   
   char outBuffer[31]=""; // Clear the outBuffer before every loop
   unsigned long send_time, rtt = 0;
     
-    // Get readings from sensors
+    // Get readings from sensors, change codes below to read sensors
     Data1 = counter++;
     Data2 = analogRead(0);
     Data3 = analogRead(1);
@@ -112,8 +112,9 @@ void loop(void)
     
     if ( counter > 999 ) counter = 0;
 
-    // Append nodeID to the beginning of the payload    
-    strcat(outBuffer,nodeID);
+    // Append the hex nodeID to the beginning of the payload    
+    sprintf(outBuffer,"%2X",nodeID);
+    
     strcat(outBuffer,",");
     
     // Convert int to strings and append with zeros if number smaller than 3 digits
@@ -175,7 +176,6 @@ void loop(void)
 
          uint8_t len = radio.getDynamicPayloadSize();
          radio.read( receivePayload, len); 
-         // receive_payload[len] = 0;
          Serial.print("inBuffer:  ");
          Serial.println(receivePayload);
          
@@ -186,7 +186,7 @@ void loop(void)
          if ( ! strcmp(outBuffer, receivePayload) ) {
              rtt = millis() - send_time;
              
-             // Send beep to Pin 2
+             // Turn on buzzer to Pin 2
              digitalWrite(2,HIGH);
            
              lcd.setCursor(0,1);
@@ -212,7 +212,7 @@ void loop(void)
     
     Serial.flush();
     delay(250);
-    digitalWrite(2,LOW);
+    digitalWrite(2,LOW); // Off the buzzer
     
   }
 
