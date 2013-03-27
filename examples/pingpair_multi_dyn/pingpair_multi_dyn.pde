@@ -6,38 +6,39 @@
  version 2 as published by the Free Software Foundation.
  */
 
+/**
+ * Example using Dynamic Payloads 
+ *
+ * This is an example of how to use payloads of a varying (dynamic) size. 
+ */
+
 #include <SPI.h>
 #include "RF24.h"
 #include "printf.h"
-
-//
-// Test version of RF24, exposes some protected interface
-//
-
-class RF24Test: public RF24
-{
-public: RF24Test(int a, int b): RF24(a,b) {}
-};
-
 
 //
 // Hardware configuration
 //
 
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
+RF24 radio(8,9);
 
-RF24Test radio(8,9);
+// Use multicast?
+// sets the multicast behavior this unit in hardware.  Connect to GND to use unicast
+// Leave open (default) to use multicast.
+const int multicast_pin = 6 ;
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
 const int role_pin = 7;
+bool multicast = true ;
 
 //
 // Topology
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+const uint64_t pipes[2] = { 0xEEFAFDFDEELL, 0xEEFDFAF50DFLL };
 
 //
 // Role management
@@ -59,49 +60,40 @@ const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 role_e role;
 
 //
-// Test state
+// Payload
 //
 
-bool done; //*< Are we done with the test? */
-bool passed; //*< Have we passed the test? */
-bool notified; //*< Have we notified the user we're done? */
-const int num_needed = 10; //*< How many success/failures until we're done? */
-int receives_remaining = num_needed; //*< How many ack packets until we declare victory? */
-int failures_remaining = num_needed; //*< How many more failed sends until we declare failure? */
-int interval = 100; //*< ms to wait between sends */
+const int min_payload_size = 1;
+const int max_payload_size = 32;
+const int payload_size_increments_by = 1;
+int next_payload_size = min_payload_size;
 
-char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
-
-void one_ok(void)
-{
-  // Have we received enough yet?
-  if ( ! --receives_remaining )
-  {
-    done = true;
-    passed = true;
-  }
-}
-
-void one_failed(void)
-{
-  // Have we failed enough yet?
-  if ( ! --failures_remaining )
-  {
-    done = true;
-    passed = false;
-  }
-}
+char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
 
 void setup(void)
 {
   //
+  // Multicast
+  //
+  pinMode(multicast_pin, INPUT);
+  digitalWrite(multicast_pin,HIGH);
+  delay( 20 ) ;
+
+  // read multicast role, LOW for unicast
+  if( digitalRead( multicast_pin ) )
+    multicast = true ;
+  else
+    multicast = false ;
+
+
+ //
   // Role
   //
 
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
-  delay(20); // Just to get a solid reading on the role pin
+  delay( 20 ); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
@@ -115,24 +107,24 @@ void setup(void)
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/tests/pingpair_blocking/\n\r");
+  printf("\n\rRF24/examples/pingpair_multi_dyn/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
-
-  //
-  // get test config
-  //
-
-  printf("+READY press any key to start\n\r\n\r");
-
-  while (! Serial.available() ) {}
-  configuration = Serial.read();
-  printf("Configuration\t = %c\n\r",configuration);
-   
+  printf("MULTICAST: %s\r\n",(multicast?"true (unreliable)":"false (reliable)"));
   //
   // Setup and configure rf radio
   //
 
   radio.begin();
+
+  // enable dynamic payloads
+  radio.enableDynamicPayloads();
+  radio.setCRCLength( RF24_CRC_16 ) ;
+
+  // optionally, increase the delay between retries & # of retries
+  radio.setRetries( 15, 5 ) ;
+  radio.setAutoAck( true ) ;
+  //radio.setPALevel( RF24_PA_LOW ) ;
+
   //
   // Open pipes to other nodes for communication
   //
@@ -156,7 +148,7 @@ void setup(void)
   //
   // Start listening
   //
-
+  radio.powerUp() ;
   radio.startListening();
 
   //
@@ -164,9 +156,6 @@ void setup(void)
   //
 
   radio.printDetails();
-  
-  if ( role == role_pong_back )
-    printf("\n\r+OK ");
 }
 
 void loop(void)
@@ -177,42 +166,50 @@ void loop(void)
 
   if (role == role_ping_out)
   {
+    // The payload will always be the same, what will change is how much of it we send.
+    static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
+
     // First, stop listening so we can talk.
     radio.stopListening();
 
     // Take the time, and send it.  This will block until complete
-    unsigned long time = millis();
-    printf("Now sending %lu...",time);
-    radio.write( &time, sizeof(unsigned long) );
+    printf("Now sending length %i...",next_payload_size);
+    radio.write( send_payload, next_payload_size, multicast );
 
     // Now, continue listening
     radio.startListening();
 
     // Wait here until we get a response, or timeout
-    unsigned long started_waiting_at = micros();
+    unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (micros() - started_waiting_at > radio.getMaxTimeout() )
+      if (millis() - started_waiting_at > 1 + radio.getMaxTimeout()/1000 )
         timeout = true;
 
     // Describe the results
     if ( timeout )
     {
       printf("Failed, response timed out.\n\r");
-      one_failed();
     }
     else
     {
       // Grab the response, compare, and send to debugging spew
-      unsigned long got_time;
-      radio.read( &got_time, sizeof(unsigned long) );
+      uint8_t len = radio.getDynamicPayloadSize();
+      radio.read( receive_payload, len );
+
+      // Put a zero at the end for easy printing
+      receive_payload[len] = 0;
 
       // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
-      one_ok();
+      printf("Got response size=%i value=%s\n\r",len,receive_payload);
     }
+    
+    // Update size for next time.
+    next_payload_size += payload_size_increments_by;
+    if ( next_payload_size > max_payload_size )
+      next_payload_size = min_payload_size;
 
-    // Try again  later
+    // Try again 1s later
     delay(250);
   }
 
@@ -226,46 +223,31 @@ void loop(void)
     if ( radio.available() )
     {
       // Dump the payloads until we've gotten everything
-      unsigned long got_time;
+      uint8_t len;
       bool done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+	len = radio.getDynamicPayloadSize();
+	done = radio.read( receive_payload, len );
 
-        // Spew it
-        printf("Got payload %lu...",got_time);
+	// Put a zero at the end for easy printing
+	receive_payload[len] = 0;
 
-	// Delay just a little bit to let the other unit
-	// make the transition to receiver
-	delay(20);
+	// Spew it
+	printf("Got payload size=%i value=%s\n\r",len,receive_payload);
       }
 
       // First, stop listening so we can talk
       radio.stopListening();
 
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );
+      radio.write( receive_payload, len, multicast );
       printf("Sent response.\n\r");
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
-
     }
-  }
-  
-  //
-  // Stop the test if we're done and report results
-  //
-  if ( done && ! notified )
-  {
-    notified = true;
-
-    printf("\n\r+OK ");
-    if ( passed )
-      printf("PASS\n\r\n\r");
-    else
-      printf("FAIL\n\r\n\r");
   }
 }
 // vim:cin:ai:sts=2 sw=2 ft=cpp

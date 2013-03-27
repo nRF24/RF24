@@ -16,8 +16,7 @@
  */
 
 #include <SPI.h>
-#include "nRF24L01.h"
-#include "RF24.h"
+#include <RF24.h>
 #include "printf.h"
 
 //
@@ -91,13 +90,17 @@ void setup(void)
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15);
+  // radio.setRetries(15,15);
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
+<<<<<<< HEAD
   //radio.setPayloadSize(8);
  radio.setPALevel(RF24_PA_LOW);
  radio.setChannel(0x4c);
+=======
+  // radio.setPayloadSize(8);
+>>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
 
   //
   // Open pipes to other nodes for communication
@@ -122,7 +125,16 @@ void setup(void)
   //
   // Start listening
   //
-
+  // if( radio.setDataRate( RF24_250KBPS ) ) {
+  //   printf( "Data rate 250KBPS set!\n\r" ) ;
+  // } else {
+  //   printf( "Data rate 250KBPS set FAILED!!\n\r" ) ;
+  // }
+  // radio.setDataRate( RF24_2MBPS ) ;
+  // radio.setPALevel( RF24_PA_MAX ) ;
+  radio.enableDynamicPayloads() ;
+  radio.setAutoAck( true ) ;
+  radio.powerUp() ;
   radio.startListening();
 
   //
@@ -160,13 +172,14 @@ void loop(void)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 200 )
+      if (millis() - started_waiting_at > 1+(radio.getMaxTimeout()/1000) )
         timeout = true;
 
     // Describe the results
     if ( timeout )
     {
       printf("Failed, response timed out.\n\r");
+      printf("Timeout duration: %d\n\r", (1+radio.getMaxTimeout()/1000) ) ;
     }
     else
     {
@@ -198,21 +211,15 @@ void loop(void)
       {
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &got_time, sizeof(unsigned long) );
-
-        // Spew it
-        printf("Got payload %lu...",got_time);
-
-	// Delay just a little bit to let the other unit
-	// make the transition to receiver
-	delay(20);
       }
 
       // First, stop listening so we can talk
       radio.stopListening();
 
-      // Send the final one back.
+      // Send the final one back. This way, we don't delay
+      // the reply while we wait on serial i/o.
       radio.write( &got_time, sizeof(unsigned long) );
-      printf("Sent response.\n\r");
+      printf("Sent response %lu\n\r", got_time);
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();

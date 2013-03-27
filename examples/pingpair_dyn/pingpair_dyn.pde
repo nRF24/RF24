@@ -13,7 +13,6 @@
  */
 
 #include <SPI.h>
-#include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
 
@@ -23,7 +22,12 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
+<<<<<<< HEAD
 RF24 radio(9,10);
+=======
+//RF24 radio(8,9);
+RF24 radio(22,23);
+>>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -34,7 +38,7 @@ const int role_pin = 7;
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+const uint64_t pipes[2] = { 0xEEFDFDFDECLL, 0xEEFDFDF0DFLL };
 
 //
 // Role management
@@ -59,9 +63,9 @@ role_e role;
 // Payload
 //
 
-const int min_payload_size = 4;
+const int min_payload_size = 1;
 const int max_payload_size = 32;
-const int payload_size_increments_by = 2;
+const int payload_size_increments_by = 1;
 int next_payload_size = min_payload_size;
 
 char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
@@ -99,10 +103,12 @@ void setup(void)
   radio.begin();
 
   // enable dynamic payloads
+  radio.setCRCLength( RF24_CRC_16 ) ;
   radio.enableDynamicPayloads();
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15);
+  radio.setAutoAck( true ) ;
+  radio.setPALevel( RF24_PA_HIGH ) ;
 
   //
   // Open pipes to other nodes for communication
@@ -153,7 +159,7 @@ void loop(void)
 
     // Take the time, and send it.  This will block until complete
     printf("Now sending length %i...",next_payload_size);
-    radio.write( send_payload, next_payload_size );
+    radio.write( send_payload, next_payload_size, false );
 
     // Now, continue listening
     radio.startListening();
@@ -162,7 +168,7 @@ void loop(void)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 500 )
+      if (millis() - started_waiting_at > 1 + radio.getMaxTimeout()/1000 )
         timeout = true;
 
     // Describe the results

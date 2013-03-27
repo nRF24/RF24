@@ -23,7 +23,6 @@
 #include <SPI.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
-#include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
 
@@ -283,6 +282,7 @@ void do_sleep(void)
   sleep_mode();                        // System sleeps here
 
   sleep_disable();                     // System continues execution here when watchdog timed out
+  radio.powerUp() ;
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp
