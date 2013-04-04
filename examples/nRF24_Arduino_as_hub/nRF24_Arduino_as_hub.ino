@@ -32,13 +32,22 @@ LiquidCrystal lcd(10, 7, 3, 4, 5, 6);
 RF24 radio(8,9);
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
+//const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
+// bytes serv1 = 0x7365727631 in hex 
+const uint64_t pipes[6] = { 0x7365727631LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
+
 
 void setup(void)
 {
   digitalWrite(2,HIGH);
   delay(500);
   digitalWrite(2,LOW);
+  
+    // Setup LCD
+  lcd.begin(16,2);
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("SensorHub V0.90");
 
   Serial.begin(57600);
   printf_begin();
@@ -60,6 +69,9 @@ void setup(void)
 
   radio.startListening();
   radio.printDetails();
+  
+  delay(1000);
+  lcd.clear();
 }
 
 void loop(void)
@@ -79,12 +91,23 @@ void loop(void)
         
         // Sending back reply to sender using the same pipe
         radio.stopListening();
-        radio.openWritingPipe(pipes[pipe]);
+        //radio.openWritingPipe(pipes[pipe]);
         radio.write(receivePayload,len);
         
         // Format string for printing ending with 0
         receivePayload[len] = 0;
         printf("Got payload: %s len:%i pipe:%i\n\r",receivePayload,len,pipe);
+        
+        lcd.setCursor(0,0);
+        lcd.print("L:");
+        lcd.setCursor(2,0);
+        lcd.print(len);
+        lcd.setCursor(5,0);    
+        lcd.print("P:");
+        lcd.setCursor(7,0);  
+        lcd.print(pipe);        
+        lcd.setCursor(0,1);
+        lcd.print(receivePayload);
      
         radio.startListening();
         
@@ -96,5 +119,6 @@ void loop(void)
     }
 
 delay(20);
+
 }
 
