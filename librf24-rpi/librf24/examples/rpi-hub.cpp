@@ -30,7 +30,8 @@ using namespace std;
 
 // Radio pipe addresses for the 2 nodes to communicate.
 // First pipe is for writing, 2nd, 3rd, 4th, 5th & 6th is for reading...
-const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0F1, 0xF0F0F0F0F2 };
+// Pipe0 in bytes is "serv1" for mirf compatibility
+const uint64_t pipes[6] = { 0x7365727631LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4, 0xF0F0F0F0E5 };
 
 // CE and CSN pins On header using GPIO numbering (not pin numbers)
 RF24 radio("/dev/spidev0.0",8000000,25);  // Setup for GPIO 25 CSN
@@ -58,12 +59,6 @@ void setup(void)
 	radio.openReadingPipe(5,pipes[5]);
 
 	//
-	// Start listening
-	//
-
-	radio.startListening();
-
-	//
 	// Dump the configuration of the rf unit for debugging
 	//
 
@@ -75,13 +70,13 @@ void setup(void)
 void loop(void)
 {
 	char receivePayload[32];
-	uint8_t pipe = 1;
+	uint8_t pipe = 0;
 	
 	// Start listening
 	radio.startListening();
 
         
-	 while ( radio.available(&pipe) ) {
+	 while ( radio.available( &pipe ) ) {
 
 		uint8_t len = radio.getDynamicPayloadSize();
 		radio.read( receivePayload, len );
@@ -92,19 +87,24 @@ void loop(void)
 		// Send back payload to sender
 		radio.stopListening();
 
+
 		// if pipe is 7, do not send it back
 		if ( pipe != 7 ) {
+			// Send back using the same pipe
+			radio.openWritingPipe(pipes[pipe]);
 			radio.write(receivePayload,len);
+
 			receivePayload[len]=0;
 			printf("\t Send: size=%i payload=%s pipe:%i\n\r",len,receivePayload,pipe);
 		} else {
 			printf("\n\r");
                 }
-		pipe++;
-		// reset pipe to 0
-		if ( pipe > 6 ) pipe = 0;
 	}
 	usleep(20);
+	// Increase the pipe outside the while loop
+	pipe++;
+	// reset pipe to 0
+	if ( pipe > 5 ) pipe = 0;
 }
 
 
