@@ -39,9 +39,12 @@ LiquidCrystal lcd(10, 7, 3, 4, 5, 6);
 // Set up nRF24L01 radio on SPI pin for CE, CSN
 RF24 radio(8,9);
 
-// Radio pipe addresses for the 2 nodes to communicate.
+// For best performance, use P1-P5 for writing and Pipe0 for reading as per the hub setting
+// Below is the settings from the hub/receiver listening to P0 to P5
+//const uint64_t pipes[6] = { 0x7365727631LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
+// Example below using pipe5 for writing
+const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0x7365727631LL };
 
- const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0E1LL };
 // const uint64_t pipes[2] = { 0xF0F0F0F0E2LL, 0xF0F0F0F0E2LL };
 // const uint64_t pipes[2] = { 0xF0F0F0F0E3LL, 0xF0F0F0F0E3LL };
 // const uint64_t pipes[2] = { 0xF0F0F0F0E4LL, 0xF0F0F0F0E4LL };
@@ -50,7 +53,6 @@ RF24 radio(8,9);
 
 char receivePayload[32];
 uint8_t counter=0;
-uint8_t loops = 0;
 
 void setup(void)
 {
@@ -59,7 +61,7 @@ void setup(void)
   lcd.begin(16,2);
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("Ard Remote Node 2");
+  lcd.print("Remote Node V0.99");
   
   Serial.begin(57600);
   
@@ -93,7 +95,6 @@ void loop(void)
   uint8_t Data1,Data2,Data3,Data4 = 0;
   char temp[5];
   bool timeout=0;
-  uint8_t timeout_timer = 500;
 
   // Get the last two Bytes as node-id
   uint16_t nodeID = pipes[0] & 0xff;
@@ -101,7 +102,7 @@ void loop(void)
   // Use the last 2 pipes address as nodeID  
   // sprintf(nodeID,"%X",pipes[0]);
   
-  char outBuffer[31]=""; // Clear the outBuffer before every loop
+  char outBuffer[32]=""; // Clear the outBuffer before every loop
   unsigned long send_time, rtt = 0;
     
     // Get readings from sensors, change codes below to read sensors
@@ -137,6 +138,10 @@ void loop(void)
    
     sprintf(temp,"%03d",Data4);
     strcat(outBuffer,temp); 
+
+    // Test for max payload size
+    //strcat(outBuffer,"012345678901");
+
     
     // End string with 0
     // strcat(outBuffer,0);
@@ -169,48 +174,42 @@ void loop(void)
     radio.startListening();
     delay(20);  
 
-    lcd.setCursor(0,1);
-    lcd.print("R:              ");
-  
   while ( radio.available() && !timeout ) {
 
          uint8_t len = radio.getDynamicPayloadSize();
          radio.read( receivePayload, len); 
-         Serial.print("inBuffer:  ");
-         Serial.println(receivePayload);
          
-         lcd.setCursor(2,1);
-         lcd.print(receivePayload);
+         receivePayload[len] = 0;
+         printf("inBuffer:  %s\n\r",receivePayload);
+         
+         //lcd.setCursor(2,1);
+         //lcd.print(receivePayload);
         
          // Compare receive payload with outBuffer        
          if ( ! strcmp(outBuffer, receivePayload) ) {
              rtt = millis() - send_time;
-             
+
+             printf("inBuffer --> rtt: %i \n\r",rtt);            
+
              // Turn on buzzer to Pin 2
              digitalWrite(2,HIGH);
-           
+
              lcd.setCursor(0,1);
-             lcd.print("R:              ");
-             
-             lcd.setCursor(2,1);
+             lcd.print("                ");
+
+             lcd.setCursor(0,1);
              lcd.print(rtt);
-             Serial.println(rtt);       
          }       
     
     // Check for timeout and exit the while loop
-    if ( millis() - send_time > timeout_timer ) {
-         lcd.setCursor(2,1);
-         lcd.print("Timeout");
+    if ( millis() - send_time > radio.getMaxTimeout() ) {
          Serial.println("Timeout!!!");
          timeout = 1;
-         loops = 0;
      }          
-      Serial.print(loops++);
-      delay(10);
+      
+     delay(10);
    } // End while  
- 
-    
-    Serial.flush();
+     
     delay(250);
     digitalWrite(2,LOW); // Off the buzzer
     
