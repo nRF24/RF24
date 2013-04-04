@@ -2,23 +2,22 @@
  *
  *  Filename : rpi-hub.cpp
  *
- *  This program makes the RPi as a hub listening to all six pipes from the remote sensor nodes ( usually Arduino )
- *  and will return the packet back to the sensor on pipe0 so that the sender can calculate the round trip delays
+ *  This program makes the RPi as a hub listening to all six pipes from the remote 
+ *  sensor nodes ( usually Arduino  or RPi ) and will return the packet back to the 
+ *  sensor on pipe0 so that the sender can calculate the round trip delays
  *  when the payload matches.
  *  
- *  I encounter that at times, it also receive from pipe7 ( or pipe0 ) with content of FFFFFFFFF that I will not sent
- *  back to the sender
- *
- *  Refer to RF24/examples/rpi_hub_arduino/ for the corresponding Arduino sketches to work with this code.
- * 
+ *  Refer to RF24/examples/rpi_hub_arduino/ for the corresponding Arduino sketches 
+ * to work with this code.
  *  
- *  CE is not used and CSN is GPIO25 (not pinout)
+ *  CE is connected to GPIO25
+ *  CSN is connected to GPIO8 
  *
  *  Refer to RPi docs for GPIO numbers
  *
  *  Author : Stanley Seow
  *  e-mail : stanleyseow@gmail.com
- *  date   : 6th Mar 2013
+ *  date   : 4th Apr 2013
  *
  */
 
@@ -62,6 +61,9 @@ void setup(void)
 	// Dump the configuration of the rf unit for debugging
 	//
 
+	// Start Listening
+	radio.startListening();
+
 	radio.printDetails();
 	printf("\n\rOutput below : \n\r");
 	usleep(1000);
@@ -72,10 +74,7 @@ void loop(void)
 	char receivePayload[32];
 	uint8_t pipe = 0;
 	
-	// Start listening
-	radio.startListening();
 
-        
 	 while ( radio.available( &pipe ) ) {
 
 		uint8_t len = radio.getDynamicPayloadSize();
@@ -91,20 +90,25 @@ void loop(void)
 		// if pipe is 7, do not send it back
 		if ( pipe != 7 ) {
 			// Send back using the same pipe
-			radio.openWritingPipe(pipes[pipe]);
+			// radio.openWritingPipe(pipes[pipe]);
 			radio.write(receivePayload,len);
 
 			receivePayload[len]=0;
 			printf("\t Send: size=%i payload=%s pipe:%i\n\r",len,receivePayload,pipe);
-		} else {
+  		} else {
 			printf("\n\r");
                 }
-	}
-	usleep(20);
+
+		// Enable start listening again
+		radio.startListening();
+
 	// Increase the pipe outside the while loop
 	pipe++;
 	// reset pipe to 0
 	if ( pipe > 5 ) pipe = 0;
+	}
+
+	usleep(20);
 }
 
 

@@ -1,7 +1,14 @@
 /*
+ *
+ *  Filename : sendto_hub.cpp
+ *
+ * This is the client for rpi-hub.cpp or use the RPi as a client to an Arduino as a hub
+ * The first address in the pipe is for writing and the second address is for reading
+ *
+ *
  *  Author : Stanley Seow
  *  e-mail : stanleyseow@gmail.com
- *  date   : 6th Mar 2013
+ *  date   : 4th Apr 2013
  *
  */
 

@@ -375,7 +375,9 @@ spi = new SPI();
   // Technically we require 4.5ms + 14us as a worst case. We'll just call it 5ms for good measure.
   // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
   delay( 5 ) ;
-	resetcfg();
+
+  // Adjustments as per gcopeland fork  
+  //resetcfg();
 
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
@@ -434,15 +436,17 @@ void RF24::startListening(void)
   if (pipe0_reading_address)
     write_register(RX_ADDR_P0, reinterpret_cast<const uint8_t*>(&pipe0_reading_address), 5);
 
+
+  // Adjustments as per gcopeland fork  
   // Flush buffers
-  flush_rx();
-  flush_tx();
+  //flush_rx();
+  //flush_tx();
 
   // Go!
   ce(HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-//  delayMicroseconds(130);
+  delayMicroseconds(130);
 }
 
 /****************************************************************************/
