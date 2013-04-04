@@ -380,7 +380,7 @@ spi = new SPI();
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
   // sizes must never be used. See documentation for a more complete explanation.
-  write_register(SETUP_RETR,(0b0100 << ARD) | (0b1111 << ARC));
+  write_register(SETUP_RETR,(0b0101 << ARD) | (0b1111 << ARC));
 
   // Restore our default PA level
   setPALevel( RF24_PA_MAX ) ;
@@ -442,7 +442,7 @@ void RF24::startListening(void)
   ce(HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-  delayMicroseconds(130);
+//  delayMicroseconds(130);
 }
 
 /****************************************************************************/
@@ -459,6 +459,9 @@ void RF24::stopListening(void)
 void RF24::powerDown(void)
 {
   write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
+
+// Adjustments as per gcopeland fork  
+  delayMicroseconds(150);
 }
 
 /****************************************************************************/
@@ -466,6 +469,8 @@ void RF24::powerDown(void)
 void RF24::powerUp(void)
 {
   write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
+// Adjustments as per gcopeland fork  
+  delayMicroseconds(150);
 }
 
 /******************************************************************/
@@ -477,17 +482,6 @@ bool RF24::write( const void* buf, uint8_t len )
   // Begin the write
   startWrite(buf,len);
 
-  // ------------
-  // At this point we could return from a non-blocking write, and then call
-  // the rest after an interrupt
-
-  // Instead, we are going to block here until we get TX_DS (transmission completed and ack'd)
-  // or MAX_RT (maximum retries, transmission failed).  Also, we'll timeout in case the radio
-  // is flaky and we get neither.
-
-  // IN the end, the send should be blocking.  It comes back in 60ms worst case, or much faster
-  // if I tighted up the retry logic.  (Default settings will be 1500us.
-  // Monitor the send
   uint8_t observe_tx;
   uint8_t status;
   uint32_t sent_at = __millis();
@@ -499,15 +493,6 @@ bool RF24::write( const void* buf, uint8_t len )
   }
   while( ! ( status & ( _BV(TX_DS) | _BV(MAX_RT) ) ) && ( __millis() - sent_at < timeout ) );
 
-  // The part above is what you could recreate with your own interrupt handler,
-  // and then call this when you got an interrupt
-  // ------------
-
-  // Call this when you get an interrupt
-  // The status tells us three things
-  // * The send was successful (TX_DS)
-  // * The send failed, too many retries (MAX_RT)
-  // * There is an ack packet waiting (RX_DR)
   bool tx_ok, tx_fail;
   whatHappened(tx_ok,tx_fail,ack_payload_available);
   
@@ -524,13 +509,10 @@ bool RF24::write( const void* buf, uint8_t len )
     IF_SERIAL_DEBUG(printfln(ack_payload_length,DEC));
   }
 
-  // Yay, we are done.
 
-  // Power down
-  powerDown();
-
-  // Flush buffers (Is this a relic of past experimentation, and not needed anymore??)
-  flush_tx();
+  // Disable powerDown and flush_tx as per gcopeland fork
+  //powerDown();
+  //flush_tx();
 
   return result;
 }
@@ -540,14 +522,15 @@ void RF24::startWrite( const void* buf, uint8_t len )
 {
   // Transmitter power-up
   write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
-  delayMicroseconds(150);
+// Adjustments as per gcopeland fork  
+// delayMicroseconds(150);
 
   // Send the payload
   write_payload( buf, len );
 
   // Allons!
   ce(HIGH);
-  delayMicroseconds(15);
+  delayMicroseconds(10);
   ce(LOW);
 }
 

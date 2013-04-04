@@ -5,7 +5,7 @@ This is the collection of libraries for RF24 / NRF24L01 wireless modules on the 
 
 There are two folders with two different libraries :-
 
-- librf24 	 This library/driver are ported from Arduino to beaglebone then to RPi
+- librf24 	 This library/driver are ported from Arduino to beaglebone then to RPi, uses GPIO
 - librf24-bcm 	 This library/driver are further ported to use Broadcom bcm2835 using hardware SPI
 
 Setup
@@ -15,10 +15,10 @@ Setup
 3. Change to examples folder, change to the correct connected pins and execte "make"
 
 
-
 Known issues
 ============
-- the current bcm2835 drivers still have some minor bugs
+- the current bcm2835 drivers still have some minor bugs/errors, if you have errors, use the GPIO version
+
 
 Links 
 =====
