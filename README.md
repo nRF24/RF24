@@ -1,11 +1,12 @@
-# Arduino driver for nRF24L01(+) 2.4GHz Wireless Transceiver
+# Arduino & Raspberry Pi driver for nRF24L01(+) 2.4GHz Wireless Transceiver
 
-Design Goals: This library is designed to be...
+Design Goals: 
 
 * Maximally compliant with the intended operation of the chip
 * Easy for beginners to use
 * Consumed with a public interface that's similiar to other Arduino standard libraries
 * Built against the standard SPI library. 
+* Support popular platform
 
 * Modifications to the RF24 library in this fork is backward compatible. A single
   enhancement which may cause issue, is code which relies on the driver to power down the
@@ -14,16 +15,15 @@ Design Goals: This library is designed to be...
   achieved by use of powerDown and powerUp. If you wish to maximize power efficiency,
   you must call powerDown after transmit (write, startWrite).
 
-Please refer to:
+Please refer to links :
 
+* [Blog on setting up both Arduino UNO & Raspberry Pi] (http://arduino-for-beginners.blogspot.com/2013/02/setup-nordic-nrf24l01-rf-modules-to.html)
 * [Documentation Main Page](http://maniacbug.github.com/RF24)
 * [RF24 Class Documentation](http://maniacbug.github.com/RF24/classRF24.html)
 * [Source Code](https://github.com/maniacbug/RF24)
 * [Downloads](https://github.com/maniacbug/RF24/archives/master)
-* [Chip Datasheet](http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf)
+* [nRF24L01+ product page](http://www.nordicsemi.com/eng/Products/2.4GHz-RF/nRF24L01P/(language)/eng-GB/ )
 
-This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
-the SPI hardware will go into 'slave' mode. This is because the 'SS', or slave select, pin on the arduino
-controls if the arduino is the slave. For RF24 use, the arduino is the master and the RF24 is the slave.
+
 
 
