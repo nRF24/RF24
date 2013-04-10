@@ -22,7 +22,7 @@ Please refer to links :
 * [RF24 Class Documentation](http://maniacbug.github.com/RF24/classRF24.html)
 * [Source Code](https://github.com/maniacbug/RF24)
 * [Downloads](https://github.com/maniacbug/RF24/archives/master)
-* [nRF24L01+ product page](http://www.nordicsemi.com/eng/Products/2.4GHz-RF/nRF24L01P/(language)/eng-GB/ )
+* [nRF24L01+ datasheet](http://www.nordicsemi.com/eng/nordic/download_resource/8765/2/27999719 )
 
 
 
