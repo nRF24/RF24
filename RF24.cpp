@@ -8,7 +8,6 @@
  version 2 as published by the Free Software Foundation.
  */
 
-<<<<<<< HEAD
 #include "nRF24L01.h"
 #include "RF24_config.h"
 #include "RF24.h"
