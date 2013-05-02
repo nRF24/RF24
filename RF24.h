@@ -1,9 +1,5 @@
 /*
  Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
-<<<<<<< HEAD
-=======
- Portions Copyright (C) 2011 Greg Copeland
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -22,7 +18,6 @@
 <<<<<<< HEAD
 =======
 #include <nRF24L01.h>
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
 #include <RF24_config.h>
 
 /**
