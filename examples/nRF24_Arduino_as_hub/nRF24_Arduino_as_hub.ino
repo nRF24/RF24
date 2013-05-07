@@ -15,7 +15,7 @@
 Forked RF24 at github :-
 https://github.com/stanleyseow/RF24
 
- Date : 28/03/2013
+ Date : 08/05/2013
 
  Written by Stanley Seow
  stanleyseow@gmail.com
@@ -34,7 +34,7 @@ RF24 radio(8,9);
 // Radio pipe addresses for the 2 nodes to communicate.
 //const uint64_t pipes[6] = { 0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
 // bytes serv1 = 0x7365727631 in hex 
-const uint64_t pipes[6] = { 0x7365727631LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
+const uint64_t pipes[6] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F0F0F0E3LL, 0xF0F0F0F0E4LL, 0xF0F0F0F0E5LL };
 
 
 void setup(void)
@@ -47,7 +47,7 @@ void setup(void)
   lcd.begin(16,2);
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("SensorHub V0.90");
+  lcd.print("SensorHub V0.91");
 
   Serial.begin(57600);
   printf_begin();
@@ -59,6 +59,8 @@ void setup(void)
   radio.setChannel(76);
   radio.enableDynamicPayloads();
   radio.setRetries(15,15);
+  
+  radio.setCRCLength(RF24_CRC_16);
 
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
@@ -99,13 +101,42 @@ void loop(void)
         printf("Got payload: %s len:%i pipe:%i\n\r",receivePayload,len,pipe);
         
         lcd.setCursor(0,0);
+        lcd.clear();
         lcd.print("L:");
         lcd.setCursor(2,0);
         lcd.print(len);
         lcd.setCursor(5,0);    
         lcd.print("P:");
-        lcd.setCursor(7,0);  
-        lcd.print(pipe);        
+        switch (pipe) {
+          case 0:
+            lcd.setCursor(7,0);  
+            lcd.print(pipe);     
+            break;
+          case 1:
+            lcd.setCursor(8,0);  
+            lcd.print(pipe);     
+            break;          
+          case 2:
+            lcd.setCursor(9,0);  
+            lcd.print(pipe);     
+            break;        
+          case 3:
+            lcd.setCursor(10,0);  
+            lcd.print(pipe);     
+            break;
+          case 4:
+            lcd.setCursor(11,0);  
+            lcd.print(pipe);     
+            break;
+          case 5:
+            lcd.setCursor(12,0);  
+            lcd.print(pipe);     
+            break;   
+          default:
+             break; 
+        }        
+        
+        
         lcd.setCursor(0,1);
         lcd.print(receivePayload);
      
@@ -121,4 +152,3 @@ void loop(void)
 delay(20);
 
 }
-
