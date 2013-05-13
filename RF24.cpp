@@ -247,11 +247,8 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
-<<<<<<< HEAD
+
   ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false), 
-=======
-  ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false), 
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
   payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
   pipe0_reading_address(0)
 {
@@ -266,8 +263,7 @@ void RF24::setChannel(uint8_t channel)
 
   const uint8_t max_channel = 127;
   write_register(RF_CH,min(channel,max_channel));
-<<<<<<< HEAD
-=======
+
 }
 
 /****************************************************************************/
@@ -275,7 +271,6 @@ void RF24::setChannel(uint8_t channel)
 uint8_t RF24::getChannel( void )
 {
   return read_register( RF_CH );
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
 }
 
 /****************************************************************************/
@@ -502,12 +497,6 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
   // * There is an ack packet waiting (RX_DR)
   bool tx_ok, tx_fail;
   whatHappened(tx_ok,tx_fail,ack_payload_available);
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
-  //printf("%u%u%u\r\n",tx_ok,tx_fail,ack_payload_available);
 
   result = tx_ok;
   IF_SERIAL_DEBUG(Serial.print(result?"...OK.":"...Failed"));
@@ -528,10 +517,8 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast )
 {
   // Transmitter power-up
   write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
-<<<<<<< HEAD
   delayMicroseconds(150);
-=======
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
+
 
   // Send the payload - Unicast (W_TX_PAYLOAD) or multicast (W_TX_PAYLOAD_NO_ACK)
   write_payload( buf, len,
@@ -539,11 +526,8 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast )
 
   // Allons!
   ce(HIGH);
-<<<<<<< HEAD
-  delayMicroseconds(15);
-=======
   delayMicroseconds(10);
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
+
   ce(LOW);
 }
 
