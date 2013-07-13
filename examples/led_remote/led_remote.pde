@@ -169,7 +169,7 @@ void setup(void)
     int i = num_led_pins;
     while(i--)
     {
-      pinMode(button_pins[i],OUTPUT);
+      pinMode(led_pins[i],OUTPUT);
       led_states[i] = HIGH;
       digitalWrite(led_pins[i],led_states[i]);
     }
