@@ -25,7 +25,7 @@ void RF24::csn(int mode)
 #ifdef ARDUINO
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV16);
+  SPI.setClockDivider(SPI_CLOCK_DIV4);
 
 #endif
   digitalWrite(csn_pin,mode);
