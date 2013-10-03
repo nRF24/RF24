@@ -637,6 +637,15 @@ public:
    */
   bool testRPD(void) ;
 
+  /**
+   * Test whether this is a real radio, or a mock shim for
+   * debugging.  Setting either pin to 0xff is the way to
+   * indicate that this is not a real radio.
+   *
+   * @return true if this is a legitimate radio 
+   */
+  bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; } 
+
   /**@}*/
 };
 
