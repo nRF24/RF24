@@ -389,6 +389,15 @@ public:
   void setPayloadSize(uint8_t size);
 
   /**
+   * Set Hardware Address Size
+   *
+   * Set to either 3, 4 or 5 bytes. Default is 5.
+   *
+   * @param size The number of bytes in the payload
+   */
+  void setAddressSize(uint8_t size);
+
+  /**
    * Get Static Payload Size
    *
    * @see setPayloadSize()

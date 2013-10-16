@@ -266,6 +266,14 @@ void RF24::setPayloadSize(uint8_t size)
 
 /****************************************************************************/
 
+void RF24::setAddressSize(uint8_t size)
+{
+  uint8_t tmp = max(3,min(5,size));
+  write_register(SETUP_AW, (tmp-2) & 0x03 );
+}
+
+/****************************************************************************/
+
 uint8_t RF24::getPayloadSize(void)
 {
   return payload_size;
