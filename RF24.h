@@ -50,6 +50,7 @@ private:
   bool wide_band; /* 2Mbs data rate in use? */
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
+  uint8_t address_size; /**< Size of hardware addresses */
   bool ack_payload_available; /**< Whether there is an ack payload waiting */
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
