@@ -20,7 +20,11 @@
 
 // Stuff that is normally provided by Arduino
 #ifdef ARDUINO
-#include <SPI.h>
+  #ifndef USE_SOFTWARE_SPI
+    #include <SPI.h>
+  #else
+    #include <TinySoftwareSPI.h>
+  #endif
 #else
 #include <stdint.h>
 #include <stdio.h>
