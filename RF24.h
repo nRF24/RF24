@@ -51,9 +51,10 @@ private:
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool ack_payload_available; /**< Whether there is an ack payload waiting */
-  bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
+  bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
+  bool avail;
 
 protected:
   /**
@@ -219,6 +220,11 @@ protected:
   /**@}*/
 
 public:
+
+//TMRh20
+	void txStandBy();
+	bool writeClear( const void* buf, uint8_t len );
+
   /**
    * @name Primary public interface
    *
@@ -301,7 +307,7 @@ public:
    * @param len Maximum number of bytes to read into the buffer
    * @return True if the payload was delivered successfully false if not
    */
-  bool read( void* buf, uint8_t len );
+  void read( void* buf, uint8_t len );
 
   /**
    * Open a pipe for writing
@@ -351,7 +357,7 @@ public:
 
   /**@}*/
   /**
-   * @name Optional Configurators 
+   * @name Optional Configurators
    *
    *  Methods you can use to get or set the configuration of the chip.
    *  None are required.  Calling begin() sets up a reasonable set of
@@ -406,7 +412,7 @@ public:
    * @return Payload length of last-received dynamic payload
    */
   uint8_t getDynamicPayloadSize(void);
-  
+
   /**
    * Enable custom payloads on the acknowledge packets
    *
@@ -486,7 +492,7 @@ public:
    * @return true if the change was successful
    */
   bool setDataRate(rf24_datarate_e speed);
-  
+
   /**
    * Fetches the transmission data rate
    *
@@ -518,9 +524,9 @@ public:
 
   /**@}*/
   /**
-   * @name Advanced Operation 
+   * @name Advanced Operation
    *
-   *  Methods you can use to drive the chip in more advanced ways 
+   *  Methods you can use to drive the chip in more advanced ways
    */
   /**@{*/
 
@@ -642,9 +648,9 @@ public:
    * debugging.  Setting either pin to 0xff is the way to
    * indicate that this is not a real radio.
    *
-   * @return true if this is a legitimate radio 
+   * @return true if this is a legitimate radio
    */
-  bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; } 
+  bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
 
   /**@}*/
 };
@@ -653,12 +659,12 @@ public:
  * @example GettingStarted.pde
  *
  * This is an example which corresponds to my "Getting Started" blog post:
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>. 
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>.
  *
- * It is an example of how to use the RF24 class.  Write this sketch to two 
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting 
- * with the serial monitor and sending a 'T'.  The ping node sends the current 
- * time to the pong node, which responds by sending the value back.  The ping 
+ * It is an example of how to use the RF24 class.  Write this sketch to two
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting
+ * with the serial monitor and sending a 'T'.  The ping node sends the current
+ * time to the pong node, which responds by sending the value back.  The ping
  * node can then see how long the whole cycle took.
  */
 
@@ -690,14 +696,14 @@ public:
  */
 
 /**
- * @example pingpair_maple.pde 
+ * @example pingpair_maple.pde
  *
  * This is an example of how to use the RF24 class on the Maple.  For a more
  * detailed explanation, see my blog post:
  * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
  *
  * It will communicate well to an Arduino-based unit as well, so it's not for only Maple-to-Maple communication.
- * 
+ *
  * Write this sketch to two different nodes,
  * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
  * which responds by sending the value back.  The ping node can then see how long the whole cycle
@@ -759,25 +765,25 @@ public:
  * @mainpage Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  *
  * @section Goals Design Goals
- * 
+ *
  * This library is designed to be...
  * @li Maximally compliant with the intended operation of the chip
  * @li Easy for beginners to use
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
  *
  * @section News News
- * 
- * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.  
+ *
+ * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.
  * Please <a href="https://github.com/maniacbug/RF24/issues/new">open an issue</a> if you find any problems using it with any version of Arduino.
  *
- * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the 
- * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>, 
+ * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the
+ * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>,
  * and should work with any Maple board.  See the pingpair_maple example.
  * Note that only the pingpair_maple example has been tested on Maple, although
  * the others can certainly be adapted.
  *
  * @section Useful Useful References
- * 
+ *
  * Please refer to:
  *
  * @li <a href="http://maniacbug.github.com/RF24/">Documentation Main Page</a>
@@ -799,11 +805,11 @@ public:
  *
  * <img src="http://farm7.staticflickr.com/6044/6307669179_a8d19298a6_m.jpg" width="240" height="160" alt="RF24 Getting Started - Finished Product">
  *
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a> 
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>
  *
  * <img src="http://farm8.staticflickr.com/7159/6645514331_38eb2bdeaa_m.jpg" width="240" height="160" alt="Nordic FOB and nRF24L01+">
  *
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a> 
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a>
  *
  * <img src="http://farm7.staticflickr.com/6097/6224308836_b9b3b421a3_m.jpg" width="240" height="160" alt="RF Duinode V3 (2V4)">
  *
