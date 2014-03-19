@@ -480,11 +480,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len )
 	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
 
 		if( get_status() & _BV(MAX_RT)){
-			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 			reUseTX();										  //Set re-transmit
-			ce(LOW);										  //Re-Transfer packet
-			ce(HIGH);
-			delayMicroseconds(15);
 		}
 
   	}
@@ -496,10 +492,12 @@ bool RF24::writeBlocking( const void* buf, uint8_t len )
 
 
 void RF24::reUseTX(){
+		write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 		csn(LOW);
   		SPI.transfer( REUSE_TX_PL );
   		csn(HIGH);
-
+		ce(LOW);										  //Re-Transfer packet
+		ce(HIGH);
 }
 
 /****************************************************************************/
@@ -518,8 +516,6 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 		if( get_status() & _BV(MAX_RT)){
 			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 			reUseTX();										  //Set re-transmit
-			ce(LOW);										  //Re-Transfer packet
-			ce(HIGH);
 			delayMicroseconds(15);							  //CE needs to stay high for 10us, for TX_REUSE to engage
 			return 0;										  //Return 0. The previous payload has been retransmitted
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
