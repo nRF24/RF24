@@ -468,7 +468,7 @@ bool RF24::write( const void* buf, uint8_t len )
 
 /****************************************************************************/
 
-//For general use, the flags are not important to clear
+//For general use, the interrupt flags are not important to clear
 bool RF24::writeBlocking( const void* buf, uint8_t len )
 {
 	//Block until the FIFO is NOT full.
@@ -476,8 +476,6 @@ bool RF24::writeBlocking( const void* buf, uint8_t len )
 	//This way the FIFO will fill up and allow blocking until packets go through
 	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
-		//Start Writing
-	startWrite(buf,len);
 
 	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
 
@@ -486,9 +484,12 @@ bool RF24::writeBlocking( const void* buf, uint8_t len )
 			reUseTX();										  //Set re-transmit
 			ce(LOW);										  //Re-Transfer packet
 			ce(HIGH);
+			delayMicroseconds(15);
 		}
 
   	}
+  			//Start Writing
+	startWrite(buf,len);
 
 	return 1;
 }
@@ -500,6 +501,39 @@ void RF24::reUseTX(){
   		csn(HIGH);
 
 }
+
+/****************************************************************************/
+
+//This is for when every bit of data is important
+bool RF24::writeFast( const void* buf, uint8_t len )
+{
+	//Block until the FIFO is NOT full.
+	//Keep track of the MAX retries and set auto-retry if seeing failures
+	//Return 0 so the user can control the retrys and set a timer or failure counter if required
+	//The radio will auto-clear everything in the FIFO as long as CE remains high
+
+
+	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
+
+		if( get_status() & _BV(MAX_RT)){
+			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
+			reUseTX();										  //Set re-transmit
+			ce(LOW);										  //Re-Transfer packet
+			ce(HIGH);
+			delayMicroseconds(15);							  //CE needs to stay high for 10us, for TX_REUSE to engage
+			return 0;										  //Return 0. The previous payload has been retransmitted
+															  //From the user perspective, if you get a 0, just keep trying to send the same payload
+		}
+
+  	}
+  			//Start Writing
+	startWrite(buf,len);
+
+	return 1;
+}
+
+
+
 /****************************************************************************/
 
 //Per the documentation, we want to set PTX Mode when not listening. Then all we do is write data and set CE high
