@@ -223,7 +223,8 @@ public:
 
 //TMRh20
 	void txStandBy();
-	bool writeClear( const void* buf, uint8_t len );
+	bool writeBlocking( const void* buf, uint8_t len );
+	void reUseTX();
 
   /**
    * @name Primary public interface

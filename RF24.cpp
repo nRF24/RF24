@@ -445,7 +445,7 @@ void RF24::powerUp(void)
 /******************************************************************/
 
 //Similar to the previous write, clears the interrupt flags
-bool RF24::writeClear( const void* buf, uint8_t len )
+bool RF24::write( const void* buf, uint8_t len )
 {
 	//Start Writing
     startWrite(buf,len);
@@ -459,37 +459,47 @@ bool RF24::writeClear( const void* buf, uint8_t len )
 
   //Max retries exceeded
   if( status & _BV(MAX_RT)){
-	  //Flush the FIFO since this is a single-packet-write function, and FIFO is NOT cleared when MAX_RT is reached
-  	flush_tx();
+  	flush_tx(); //Only going to be 1 packet int the FIFO at a time using this method, so just flush
+  	return 0;
   }
 	//TX OK 1 or 0
-  return status & _BV(TX_DS);//tx_ok;
+  return 1;
 }
 
 /****************************************************************************/
 
 //For general use, the flags are not important to clear
-bool RF24::write( const void* buf, uint8_t len )
+bool RF24::writeBlocking( const void* buf, uint8_t len )
 {
-	//Start Writing
-    startWrite(buf,len);
+	//Block until the FIFO is NOT full.
+	//Keep track of the MAX retries and set auto-retry if seeing failures
+	//This way the FIFO will fill up and allow blocking until packets go through
+	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
-	//Wait until complete or failed
-	//ACK payloads that are handled improperly will cause this to hang
-	//If autoAck is ON, a payload has to be written prior to reading a payload, else write after reading a payload
-	uint8_t status;
-	while( ! ( status = get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { }
+		//Start Writing
+	startWrite(buf,len);
 
-  //Max retries exceeded
-  if( status & _BV(MAX_RT)){
-	  //Flush the FIFO since this is a single-packet-write function, and FIFO is NOT cleared when MAX_RT is reached
-  	flush_tx();
-  }
-	//TX OK 1 or 0
-  return status & _BV(TX_DS);//tx_ok;
+	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
+
+		if( get_status() & _BV(MAX_RT)){
+			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
+			reUseTX();										  //Set re-transmit
+			ce(LOW);										  //Re-Transfer packet
+			ce(HIGH);
+		}
+
+  	}
+
+	return 1;
 }
 
 
+void RF24::reUseTX(){
+		csn(LOW);
+  		SPI.transfer( REUSE_TX_PL );
+  		csn(HIGH);
+
+}
 /****************************************************************************/
 
 //Per the documentation, we want to set PTX Mode when not listening. Then all we do is write data and set CE high
