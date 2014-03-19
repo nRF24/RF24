@@ -222,7 +222,7 @@ protected:
 public:
 
 //TMRh20
-	void txStandBy();
+	bool txStandBy();
 	bool writeBlocking( const void* buf, uint8_t len );
 	void reUseTX();
     bool writeFast( const void* buf, uint8_t len ); //Fills FIFO buffer, uses packet re-use function of the chip and returns 0 if packet failed and re-sent

@@ -545,8 +545,13 @@ void RF24::startWrite( const void* buf, uint8_t len ){ //TMRh20
 }
 
 
-void RF24::txStandBy(){
-	ce(LOW);
+bool RF24::txStandBy(){
+
+	if ( (read_register(FIFO_STATUS) & _BV(TX_EMPTY))){
+		ce(LOW);
+		return 1;
+	}
+	return 0;
 }
 
 /****************************************************************************/
