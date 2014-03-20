@@ -301,8 +301,8 @@ public:
    *
    * This will not block until the 3 FIFO buffers are filled with data.
    * Once the FIFOs are full, writeFast will simply return 0. From a user
-   * perspective, just keep trying to send. The library will keep auto
-   * retrying the previous payload using the built in functionality.
+   * perspective, just keep trying to send the same data. The library will
+   * keep auto retrying the previous payload using the built in functionality.
    *
    * The maximum size of data written is the fixed payload size, see
    * getPayloadSize().  However, you can write less, and the remainder
@@ -329,7 +329,7 @@ public:
      * used to control the timeout period.
      *
      * This will never return a 0. It will not return until a packet is
-     * sent successfully
+     * loaded successfully into the FIFO and TX is complete.
      *
      * The maximum size of data written is the fixed payload size, see
      * getPayloadSize().  However, you can write less, and the remainder
