@@ -221,12 +221,6 @@ protected:
 
 public:
 
-//TMRh20
-	bool txStandBy();
-	bool writeBlocking( const void* buf, uint8_t len );
-	void reUseTX();
-    bool writeFast( const void* buf, uint8_t len ); //Fills FIFO buffer, uses packet re-use function of the chip and returns 0 if packet failed and re-sent
-
   /**
    * @name Primary public interface
    *
@@ -249,6 +243,9 @@ public:
    * Begin operation of the chip
    *
    * Call this in setup(), before calling any other methods.
+   *
+   * @note Optimization: The radio is partially configured in PTX mode
+   * when begin is called to make the transition to PTX mode simpler.
    */
   void begin(void);
 
@@ -265,10 +262,15 @@ public:
    * Stop listening for incoming messages
    *
    * Do this before calling write().
+   *
+   * @note Optimization: The radio will be taken out of PRX mode as soon
+   * as listening is stopped. Enables quicker and simpler engaging of
+   * primary transmitter (PTX) mode.
    */
   void stopListening(void);
 
   /**
+   * Optimization: Improved performance and reliability
    * Write to the open writing pipe
    *
    * Be sure to call openWritingPipe() first to set the destination
@@ -282,6 +284,8 @@ public:
    * getPayloadSize().  However, you can write less, and the remainder
    * will just be filled with zeroes.
    *
+   * TX/RX/RT interrupt flags will be cleared every time write is called
+   *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
    * @return True if the payload was delivered successfully false if not
@@ -289,7 +293,111 @@ public:
   bool write( const void* buf, uint8_t len );
 
   /**
+   * Optimization: New Command
+   * Write to the open writing pipe filling up the FIFO buffers
+   *
+   * Be sure to call openWritingPipe() first to set the destination
+   * of where to write to.
+   *
+   * This will not block until the 3 FIFO buffers are filled with data.
+   * Once the FIFOs are full, writeFast will simply return 0. From a user
+   * perspective, just keep trying to send. The library will keep auto
+   * retrying the previous payload using the built in functionality.
+   *
+   * The maximum size of data written is the fixed payload size, see
+   * getPayloadSize().  However, you can write less, and the remainder
+   * will just be filled with zeroes.
+   *
+   * TX/RX/RT interrupt flags will be cleared every time write is called
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  bool writeFast( const void* buf, uint8_t len );
+
+    /**
+     * Optimization: New Command
+     * Write to the open writing pipe
+     *
+     * Be sure to call openWritingPipe() first to set the destination
+     * of where to write to.
+     *
+     * This will not block until the 3 FIFO buffers are filled with data or
+     * a timeout is detected. If so the library will auto retry until a new
+     * payload is written or the TX buffers are flushed. Interrupts can be
+     * used to control the timeout period.
+     *
+     * This will never return a 0. It will not return until a packet is
+     * sent successfully
+     *
+     * The maximum size of data written is the fixed payload size, see
+     * getPayloadSize().  However, you can write less, and the remainder
+     * will just be filled with zeroes.
+     *
+     * TX/RX/RT interrupt flags will be cleared every time write is called
+     *
+     * @param buf Pointer to the data to be sent
+     * @param len Number of bytes to be sent
+     * @return True if the payload was delivered successfully false if not
+     */
+  bool writeBlocking( const void* buf, uint8_t len );
+
+  /**
+   * Optimization: New Command
+   * This function should be called as soon as transmission is finished to
+   * drop the radio back to STANDBY-I mode. If not issued, the radio will
+   * remain in STANDBY-II mode which, per the data sheet, is not a recommended
+   * operating mode.
+   *
+   * @note When transmitting data in rapid succession, it is still recommended by
+   * the manufacturer to drop the radio out of TX or STANDBY-II mode if there is
+   * time enough between sends for the FIFOs to empty.
+   *
+   * @note This does NOT need to be called when using per-payload noACK commands.
+   * Per the datasheet, the radio will automatically engage STANDBY-I mode when
+   * using the W_TX_PAYLOAD_NOACK command.
+   *
+   * @code
+   * Example:
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
+   *			while( !txStandBy() ){}	   //Waits for TX complete or timeout
+   *
+   * @endcode
+   *
+   * @return True if transmission is finished and the radio has been commanded
+   * to enter STANDBY-I operating mode.
+   *
+   */
+  bool txStandBy();
+
+  /**
+   * Optimization: New Command
+   *
+   * This function is mainly used internally to take advantage of the auto payload
+   * re-use functionality of the chip, but can be beneficial to users as well.
+   *
+   * The function will instruct the radio to re-use the data in the FIFO buffers,
+   * and instructs the radio to re-send once the timeout limit has been reached.
+   * Used by writeFast and writeBlocking to initiate retries when a TX failure
+   * occurs. Retries are automatically initiated except with the standard write().
+   * This way, data is not flushed from the buffer until switching between modes.
+   *
+   * @note This is to be used AFTER auto-retry fails if wanting to resend
+   * using the built-in payload reuse features.
+   */
+   void reUseTX();
+
+  /**
    * Test whether there are bytes available to be read
+   *
+   * @note Optimization: The available functino now checks the FIFO
+   * buffers directly for data instead of relying of interrupt flags.
+   *
+   * @note: Interrupt flags will not be cleared until a payload is
+   * actually read from the FIFO
    *
    * @return True if there is a payload available, false if none is
    */
@@ -298,16 +406,18 @@ public:
   /**
    * Read the payload
    *
-   * Return the last payload received
-   *
    * The size of data read is the fixed payload size, see getPayloadSize()
    *
    * @note I specifically chose 'void*' as a data type to make it easier
    * for beginners to use.  No casting needed.
    *
+   * @note Optimization: No longer boolean. Use available to
+   * determine if packets are available. Interrupt flags are now cleared
+   * during reads instead of when calling available().
+   *
    * @param buf Pointer to a buffer where the data should be written
    * @param len Maximum number of bytes to read into the buffer
-   * @return True if the payload was delivered successfully false if not
+   * @return No return value. Use available.
    */
   void read( void* buf, uint8_t len );
 
@@ -410,6 +520,9 @@ public:
    *
    * For dynamic payloads, this pulls the size of the payload off
    * the chip
+   *
+   * Optimization: Corrupt packets are now detected and flushed per the
+   * manufacturer.
    *
    * @return Payload length of last-received dynamic payload
    */
@@ -544,6 +657,9 @@ public:
    *
    * To return to normal power mode, either write() some data or
    * startListening, or powerUp().
+   *
+   * Optimization: The radio will never enter power down unless instructed
+   * by the MCU via this command.
    */
   void powerDown(void);
 
@@ -555,10 +671,12 @@ public:
   void powerUp(void) ;
 
   /**
-   * Test whether there are bytes available to be read
+   * Test whether there are bytes available to be read in the
+   * FIFO buffers. This optimized version does not rely on interrupt
+   * flags, but checks the actual FIFO buffers.
    *
-   * Use this version to discover on which pipe the message
-   * arrived.
+   * @note Optimization: Interrupt flags are no longer cleared when available is called,
+   * but will be reset only when the data is read from the FIFO buffers.
    *
    * @param[out] pipe_num Which pipe has the payload available
    * @return True if there is a payload available, false if none is
@@ -570,6 +688,10 @@ public:
    *
    * Just like write(), but it returns immediately. To find out what happened
    * to the send, catch the IRQ and then call whatHappened().
+   *
+   * @note Optimization: This function now leaves the CE pin high, so the radio
+   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
+   * This allows the chip to be used to its full potential in TX mode.
    *
    * @see write()
    * @see whatHappened()
@@ -587,7 +709,7 @@ public:
    * be sent back in the acknowledgement.
    *
    * @warning According to the data sheet, only three of these can be pending
-   * at any time.  I have not tested this.
+   * at any time as there are only 3 FIFO buffers.
    *
    * @param pipe Which pipe# (typically 1-5) will get this response.
    * @param buf Pointer to data that is sent
@@ -602,10 +724,9 @@ public:
    *
    * Call read() to retrieve the ack payload.
    *
-   * @warning Calling this function clears the internal flag which indicates
-   * a payload is available.  If it returns true, you must read the packet
-   * out as the very next interaction with the radio, or the results are
-   * undefined.
+   * @note Optimization: Calling this function NO LONGER clears the interrupt
+   * flag. The new functionality checks the RX FIFO buffer for an ACK payload
+   * instead of relying on interrupt flags.
    *
    * @return True if an ack payload is available.
    */
@@ -764,62 +885,41 @@ public:
  */
 
 /**
- * @mainpage Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
+ * @mainpage Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  *
  * @section Goals Design Goals
  *
- * This library is designed to be...
- * @li Maximally compliant with the intended operation of the chip
+ * This library fork is designed to be...
+ * @li More compliant with the manufacturer specified operation of the chip
+ * @li Utilize the capabilities of the radio to their full potential via Arduino
+ * @li More reliable, responsive and feature rich
  * @li Easy for beginners to use
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
  *
  * @section News News
  *
- * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.
- * Please <a href="https://github.com/maniacbug/RF24/issues/new">open an issue</a> if you find any problems using it with any version of Arduino.
- *
- * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the
- * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>,
- * and should work with any Maple board.  See the pingpair_maple example.
- * Note that only the pingpair_maple example has been tested on Maple, although
- * the others can certainly be adapted.
+ * March 2014: Fork currently being optimized for high speed and more responsive data transfers
  *
  * @section Useful Useful References
  *
  * Please refer to:
  *
- * @li <a href="http://maniacbug.github.com/RF24/">Documentation Main Page</a>
- * @li <a href="http://maniacbug.github.com/RF24/classRF24.html">RF24 Class Documentation</a>
- * @li <a href="https://github.com/maniacbug/RF24/">Source Code</a>
- * @li <a href="https://github.com/maniacbug/RF24/archives/master">Downloads Page</a>
+ * @li <a href="http://tmrh20.github.io/">Documentation Main Page</a>
+ * @li <a href="file:///C:/Users/tmr/Documents/ArduinoBuilds/RF24%20Docs/html/class_r_f24.html">RF24 Class Documentation</a>
+ * @li <a href="https://github.com/tmrh20/RF24/">Source Code</a>
+ * @li <a href="https://github.com/tmrh20/RF24/archives/master">Downloads Page</a>
  * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
+ * @li <a href="https://github.com/maniacbug/RF24">Original Library</a>
  *
  * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
  * the SPI hardware will go into 'slave' mode.
  *
  * @section More More Information
  *
- * @subpage FAQ
+ * @section Info and Projects
  *
- * @section Projects Projects
- *
- * Stuff I have built with RF24
- *
- * <img src="http://farm7.staticflickr.com/6044/6307669179_a8d19298a6_m.jpg" width="240" height="160" alt="RF24 Getting Started - Finished Product">
- *
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>
- *
- * <img src="http://farm8.staticflickr.com/7159/6645514331_38eb2bdeaa_m.jpg" width="240" height="160" alt="Nordic FOB and nRF24L01+">
- *
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a>
- *
- * <img src="http://farm7.staticflickr.com/6097/6224308836_b9b3b421a3_m.jpg" width="240" height="160" alt="RF Duinode V3 (2V4)">
- *
- * <a href="http://maniacbug.wordpress.com/2011/10/19/sensor-node/">Low-Power Wireless Sensor Node</a>
- *
- * <img src="http://farm8.staticflickr.com/7012/6489477865_b56edb629b_m.jpg" width="240" height="161" alt="nRF24L01+ connected to Leaf Labs Maple Native">
- *
- * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
+ * @li Project blog:
+ * @li <a href="http://TMRh20.blogspot.com"> TMRh20.blogspot.com </a>
  */
 
 #endif // __RF24_H__
