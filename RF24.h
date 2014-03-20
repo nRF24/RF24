@@ -907,7 +907,7 @@ public:
  * Please refer to:
  *
  * @li <a href="http://tmrh20.github.io/">Documentation Main Page</a>
- * @li <a href="file:///C:/Users/tmr/Documents/ArduinoBuilds/RF24%20Docs/html/class_r_f24.html">RF24 Class Documentation</a>
+ * @li <a href="http://tmrh20.github.io/RF24/class_r_f24.html">RF24 Class Documentation</a>
  * @li <a href="https://github.com/tmrh20/RF24/">Source Code</a>
  * @li <a href="https://github.com/tmrh20/RF24/archives/master">Downloads Page</a>
  * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
