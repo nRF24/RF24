@@ -354,7 +354,9 @@ public:
    * the manufacturer to drop the radio out of TX or STANDBY-II mode if there is
    * time enough between sends for the FIFOs to empty.
    *
-   * @note This does NOT need to be called when using per-payload noACK commands.
+   * @note This does NOT need to be called when using per-payload noACK commands,
+   * or when using the regular write command since it is only capable of single
+   * payload transmission..
    * Per the datasheet, the radio will automatically engage STANDBY-I mode when
    * using the W_TX_PAYLOAD_NOACK command.
    *
