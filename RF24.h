@@ -308,7 +308,7 @@ public:
    * getPayloadSize().  However, you can write less, and the remainder
    * will just be filled with zeroes.
    *
-   * TX/RX/RT interrupt flags will be cleared every time write is called
+   * ONLY max retry interrupt flags will be cleared when writeFast is called
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
@@ -335,7 +335,7 @@ public:
      * getPayloadSize().  However, you can write less, and the remainder
      * will just be filled with zeroes.
      *
-     * TX/RX/RT interrupt flags will be cleared every time write is called
+     * ONLY max retry interrupt flags will be cleared when writeBlocking is called
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -899,7 +899,7 @@ public:
  * @section News News
  *
  * March 2014: Fork currently being optimized for high speed and more responsive data transfers
- *
+ * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  * @section Useful Useful References
  *
  * Please refer to:
