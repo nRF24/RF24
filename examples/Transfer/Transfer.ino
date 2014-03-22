@@ -19,105 +19,92 @@ TMRh20 2014
 #include "RF24.h"
 #include "printf.h"
 
-// Hardware configuration
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
+/*************  USER Configuration *****************************/
+                                          // Hardware configuration
+RF24 radio(48,49);                        // Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
+boolean RADIO_NO = 0;  //SET THIS TO 0 or 1 for 1st or 2nd radio
 
-RF24 radio(48,49);
+/***************************************************************/
 
-// Topology
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
+const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };   // Radio pipe addresses for the 2 nodes to communicate.
 
-// Role management
-// Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.  
+byte data[32];                           //Data buffer for testing data transfer speeds
 
-// The various roles supported by this sketch
-typedef enum { role_TX = 1, role_RX } role_e;
-
-// The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
-
-//Set this to determine the default role of the current running sketch
-role_e role = role_RX;
-
-//Data buffer for testing data transfer speeds
-byte data[32]; 
-
-//Counter and timer for keeping track transfer info
-unsigned long counter, rxTimer;
+unsigned long counter, rxTimer;          //Counter and timer for keeping track transfer info
 float startTime, stopTime;  
+bool TX=1,RX=0,role=0;
 
-void setup(void)
-{
+void setup(void) {
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/GettingStarted/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
-  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
 
-  radio.begin();                          // Setup and configure rf radio
+  radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_MAX);
-  radio.setAutoAck(1);  // Ensure autoACK is enabled
-  radio.setRetries(2,3);                // Optionally, increase the delay between retries & # of retries
-  //radio.disableCRC();
+  radio.setAutoAck(1);                     // Ensure autoACK is enabled
+  radio.setRetries(1,1);                   // Optionally, increase the delay between retries & # of retries
   radio.setCRCLength(RF24_CRC_8); 
-  radio.openWritingPipe(pipes[1]);
-  radio.openReadingPipe(1,pipes[0]);
-
+  
+  if(RADIO_NO){                            //Lets the two radios choose the correct pipes depending on user selection
+    radio.openWritingPipe(pipes[0]);
+    radio.openReadingPipe(1,pipes[1]);
+  }else{
+    radio.openWritingPipe(pipes[1]);
+    radio.openReadingPipe(1,pipes[0]);
+  }
+  
   radio.startListening();                 // Start listening
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+  
+  printf("\n\rRF24/examples/Transfer Rates/\n\r");
+  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
   
   randomSeed(analogRead(0));              //Seed for random number generation
   
   for(int i=0; i<32; i++){
      data[i] = random(255);               //Load the buffer with random data
   }
-  radio.powerUp();
+  radio.powerUp();                        //Power up the radio
 }
 
 void loop(void){
 
-  
-  //TX with pre-blocking writes
-  if(role == role_TX){
+
+  if(role == TX){
     
     delay(1500);
     
     printf("Initiating Basic Data Transfer\n\r");
     
     
-    float cycles = 10000;
+    float cycles = 1000; //Change this to a higher or lower number. 
     
     startTime = millis();
             
-    for(int i=0; i<cycles; i++){
-      if(!radio.writeFast(&data,32)){
-        counter++;
+    for(int i=0; i<cycles; i++){        //Loop through a number of cycles
+      data[0] = i;                      //Change the first byte of the payload for identification
+      if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers
+        counter++;                      //Keep count of failed payloads
       }
     }
+    
     stopTime = millis();
-     
-   while(!radio.txStandBy()){ }
+    
+    while(!radio.txStandBy()){ }         //This should be called to wait for completion and put the radio in standby mode after transmission
    
    float numBytes = cycles * 32;
    float rate = numBytes / (stopTime - startTime) / cycles;
-
     
-    printf("Transfer complete at "); Serial.print(rate); printf(" KB/s \n\r");
-    printf("%d of ",counter); Serial.print(cycles); printf(" Packets Failed to Send\n\r");
-    counter = 0;   
+   printf("Transfer complete at "); Serial.print(rate); printf(" KB/s \n\r");
+   printf("%d of ",counter); Serial.print(cycles); printf(" Packets Failed to Send\n\r");
+   counter = 0;   
     
-
-
-
    }
   
   
   
-  if(role == role_RX){
+  if(role == RX){
      while(radio.available()){       
       radio.read(&data,32);
       counter++;
@@ -130,9 +117,7 @@ void loop(void){
      printf("Payload Count: %d \n\r", counter);
      counter = 0;
    }
-    
   }
-
   //
   // Change roles
   //
@@ -140,23 +125,17 @@ void loop(void){
   if ( Serial.available() )
   {
     char c = toupper(Serial.read());
-    if ( c == 'T' && role == role_RX )
+    if ( c == 'T' && role == RX )
     {
       printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
       radio.stopListening();
-      role = role_TX;                  // Become the primary transmitter (ping out)
-      //radio.openWritingPipe(pipes[0]);
-      //radio.openReadingPipe(1,pipes[1]);
+      role = TX;                  // Become the primary transmitter (ping out)
     }
-    else if ( c == 'R' && role == role_TX )
+    else if ( c == 'R' && role == TX )
     {
       radio.startListening();
-      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
-      
-       role = role_RX;                // Become the primary receiver (pong back)
-       
-      //radio.openWritingPipe(pipes[1]);
-      //radio.openReadingPipe(1,pipes[0]);
+      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");      
+      role = RX;                // Become the primary receiver (pong back)
     }
   }
 }

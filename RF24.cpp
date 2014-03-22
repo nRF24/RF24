@@ -524,7 +524,7 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 		}
 
   	}
-  			//Start Writing
+		     //Start Writing
 	startWrite(buf,len);
 
 	return 1;
@@ -552,6 +552,10 @@ bool RF24::txStandBy(){
 	if ( (read_register(FIFO_STATUS) & _BV(TX_EMPTY))){
 		ce(LOW);
 		return 1;
+	}
+	if( get_status() & _BV(MAX_RT)){
+		write_register(STATUS,_BV(MAX_RT) );
+	return 0;
 	}
 	return 0;
 }

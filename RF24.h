@@ -270,7 +270,7 @@ public:
   void stopListening(void);
 
   /**
-   * Optimization: Improved performance and reliability
+   * @note Optimization: Improved performance and reliability
    * Write to the open writing pipe
    *
    * Be sure to call openWritingPipe() first to set the destination
@@ -293,16 +293,17 @@ public:
   bool write( const void* buf, uint8_t len );
 
   /**
-   * Optimization: New Command
+   * @note Optimization: New Command
    * Write to the open writing pipe filling up the FIFO buffers
    *
    * Be sure to call openWritingPipe() first to set the destination
    * of where to write to.
    *
    * This will not block until the 3 FIFO buffers are filled with data.
-   * Once the FIFOs are full, writeFast will simply return 0. From a user
-   * perspective, just keep trying to send the same data. The library will
-   * keep auto retrying the previous payload using the built in functionality.
+   * Once the FIFOs are full, writeFast will simply wait for success or
+   * timeout, and return 1 or 0 respectively. From a user perspective, just
+   * keep trying to send the same data. The library will keep auto retrying
+   * the current payload using the built in functionality.
    *
    * The maximum size of data written is the fixed payload size, see
    * getPayloadSize().  However, you can write less, and the remainder
@@ -317,7 +318,7 @@ public:
   bool writeFast( const void* buf, uint8_t len );
 
     /**
-     * Optimization: New Command
+     * @note Optimization: New Command
      * Write to the open writing pipe
      *
      * Be sure to call openWritingPipe() first to set the destination
@@ -344,7 +345,7 @@ public:
   bool writeBlocking( const void* buf, uint8_t len );
 
   /**
-   * Optimization: New Command
+   * @note Optimization: New Command
    * This function should be called as soon as transmission is finished to
    * drop the radio back to STANDBY-I mode. If not issued, the radio will
    * remain in STANDBY-II mode which, per the data sheet, is not a recommended
@@ -781,8 +782,8 @@ public:
 };
 
 /**
- * @example GettingStarted.pde
- *
+ * @example GettingStarted.ino
+ * Updated: TMRh20
  * This is an example which corresponds to my "Getting Started" blog post:
  * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>.
  *
@@ -791,6 +792,17 @@ public:
  * with the serial monitor and sending a 'T'.  The ping node sends the current
  * time to the pong node, which responds by sending the value back.  The ping
  * node can then see how long the whole cycle took.
+ */
+
+/**
+ * @example Transfer.ino
+ * Updated: TMRh20
+ * This example demonstrates half-rate transfer using the FIFO buffers
+ *
+ * It is an example of how to use the RF24 class.  Write this sketch to two
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting
+ * with the serial monitor and sending a 'T'.  The data transfer will begin,
+ * with the receiver displaying the payload count. (32Byte Payloads)
  */
 
 /**
@@ -812,7 +824,7 @@ public:
  */
 
 /**
- * @example pingpair.pde
+ * @example pingpair.ino
  *
  * This is an example of how to use the RF24 class.  Write this sketch to two
  * different nodes, connect the role_pin to ground on one.  The ping node sends
