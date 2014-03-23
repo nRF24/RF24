@@ -382,32 +382,18 @@ public:
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-   *			while( !txStandBy() ){}	   //Waits for TX complete or timeout
+   *			bool ok = txStandBy(0);    //Returns 0 if failed. 1 if success.
+   *					  				   //Blocks only until timeout or success. Data flushed on fail.
+   *
+   *			Using txStandBy(1) will not return until the data is transmitted. It will never return 0.
    *
    * @endcode
    *
-   * @return True if transmission is finished and the radio has been commanded
-   * to enter STANDBY-I operating mode.
+   * @return True if transmission is successful
    *
    */
   bool txStandBy();
-
-  /**
-   * Optimization: New Command
-   *
-   * This function is mainly used internally to take advantage of the auto payload
-   * re-use functionality of the chip, but can be beneficial to users as well.
-   *
-   * The function will instruct the radio to re-use the data in the FIFO buffers,
-   * and instructs the radio to re-send once the timeout limit has been reached.
-   * Used by writeFast and writeBlocking to initiate retries when a TX failure
-   * occurs. Retries are automatically initiated except with the standard write().
-   * This way, data is not flushed from the buffer until switching between modes.
-   *
-   * @note This is to be used AFTER auto-retry fails if wanting to resend
-   * using the built-in payload reuse features.
-   */
-   void reUseTX();
+  bool txStandBy(bool block);
 
   /**
    * Test whether there are bytes available to be read
@@ -690,19 +676,6 @@ public:
   void powerUp(void) ;
 
   /**
-   * Test whether there are bytes available to be read in the
-   * FIFO buffers. This optimized version does not rely on interrupt
-   * flags, but checks the actual FIFO buffers.
-   *
-   * @note Optimization: Interrupt flags are no longer cleared when available is called,
-   * but will be reset only when the data is read from the FIFO buffers.
-   *
-   * @param[out] pipe_num Which pipe has the payload available
-   * @return True if there is a payload available, false if none is
-   */
-  bool available(uint8_t* pipe_num);
-
-  /**
    * Non-blocking write to the open writing pipe
    *
    * Just like write(), but it returns immediately. To find out what happened
@@ -720,6 +693,23 @@ public:
    *
    */
   void startWrite( const void* buf, uint8_t len );
+
+  /**
+   * Optimization: New Command
+   *
+   * This function is mainly used internally to take advantage of the auto payload
+   * re-use functionality of the chip, but can be beneficial to users as well.
+   *
+   * The function will instruct the radio to re-use the data in the FIFO buffers,
+   * and instructs the radio to re-send once the timeout limit has been reached.
+   * Used by writeFast and writeBlocking to initiate retries when a TX failure
+   * occurs. Retries are automatically initiated except with the standard write().
+   * This way, data is not flushed from the buffer until switching between modes.
+   *
+   * @note This is to be used AFTER auto-retry fails if wanting to resend
+   * using the built-in payload reuse features.
+   */
+   void reUseTX();
 
   /**
    * Write an ack payload for the specified pipe
@@ -750,6 +740,19 @@ public:
    * @return True if an ack payload is available.
    */
   bool isAckPayloadAvailable(void);
+
+  /**
+   * Test whether there are bytes available to be read in the
+   * FIFO buffers. This optimized version does not rely on interrupt
+   * flags, but checks the actual FIFO buffers.
+   *
+   * @note Optimization: Interrupt flags are no longer cleared when available is called,
+   * but will be reset only when the data is read from the FIFO buffers.
+   *
+   * @param[out] pipe_num Which pipe has the payload available
+   * @return True if there is a payload available, false if none is
+   */
+  bool available(uint8_t* pipe_num);
 
   /**
    * Call this when you get an interrupt to find out why

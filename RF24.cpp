@@ -564,18 +564,30 @@ void RF24::startWrite( const void* buf, uint8_t len )
   ce(LOW);
 }
 
-
 bool RF24::txStandBy(){
+	txStandBy(0);
+}
 
-	if ( (read_register(FIFO_STATUS) & _BV(TX_EMPTY))){
-		ce(LOW);
-		return 1;
+bool RF24::txStandBy(bool block){
+
+	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
+		if( get_status() & _BV(MAX_RT)){
+			write_register(STATUS,_BV(MAX_RT) );
+			if(block){
+				ce(LOW);										  //Set re-transmit
+				ce(HIGH);
+				delayMicroseconds(15);
+
+			}else{
+				flush_tx();    //Non blocking, flush the data
+				ce(LOW);	   //Set STANDBY-I mode
+				return 0;
+			}
+		}
 	}
-	if( get_status() & _BV(MAX_RT)){
-		write_register(STATUS,_BV(MAX_RT) );
-	return 0;
-	}
-	return 0;
+	ce(LOW);				   //Set STANDBY-I mode
+	return 1;
+
 }
 
 /****************************************************************************/
