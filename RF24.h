@@ -67,22 +67,6 @@ protected:
   /**@{*/
 
   /**
-   * Non-blocking write to the open writing pipe used for buffered writes
-   *
-   * @note Optimization: This function now leaves the CE pin high, so the radio
-   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
-   * This allows the chip to be used to its full potential in TX mode.
-   *
-   * @see writeFast()
-   * @see writeBlocking()
-   *
-   * @param buf Pointer to the data to be sent
-   * @param len Number of bytes to be sent
-   * @return True if the payload was delivered successfully false if not
-   */
-  void startFastWrite( const void* buf, uint8_t len );
-
-  /**
    * Set chip select pin
    *
    * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
@@ -394,6 +378,22 @@ public:
    */
   bool txStandBy();
   bool txStandBy(bool block);
+
+  /**
+   * Non-blocking write to the open writing pipe used for buffered writes
+   *
+   * @note Optimization: This function now leaves the CE pin high, so the radio
+   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
+   * This allows the chip to be used to its full potential in TX mode.
+   *
+   * @see writeFast()
+   * @see writeBlocking()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  void startFastWrite( const void* buf, uint8_t len );
 
   /**
    * Test whether there are bytes available to be read
