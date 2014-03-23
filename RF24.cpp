@@ -448,7 +448,7 @@ void RF24::powerUp(void)
 bool RF24::write( const void* buf, uint8_t len )
 {
 	//Start Writing
-    startWrite(buf,len);
+    startFastWrite(buf,len);
 
 	//Wait until complete or failed
 	//ACK payloads that are handled improperly will cause this to hang
@@ -487,7 +487,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len )
 
   	}
   			//Start Writing
-	startWrite(buf,len);
+	startFastWrite(buf,len);
 
 	return 1;
 }
@@ -525,7 +525,7 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 
   	}
 		     //Start Writing
-	startWrite(buf,len);
+	startFastWrite(buf,len);
 
 	return 1;
 }
@@ -539,11 +539,29 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 //Otherwise we enter Standby-II mode, which is still faster than standby mode
 //Also, we remove the need to keep writing the config register over and over and delaying for 150 us each time if sending a stream of data
 
-void RF24::startWrite( const void* buf, uint8_t len ){ //TMRh20
+void RF24::startFastWrite( const void* buf, uint8_t len ){ //TMRh20
 
 	write_payload( buf,len);
 	ce(HIGH);
 
+}
+
+
+//Added the original startWrite back in so users can still use interrupts, ack payloads, etc
+//Allows the library to pass all tests
+void RF24::startWrite( const void* buf, uint8_t len )
+{
+  // Transmitter power-up
+  write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
+  delayMicroseconds(150);
+
+  // Send the payload
+  write_payload( buf, len );
+
+  // Allons!
+  ce(HIGH);
+  delayMicroseconds(15);
+  ce(LOW);
 }
 
 
@@ -613,7 +631,7 @@ void RF24::read( void* buf, uint8_t len ){
   read_payload( buf, len );
 
   //Clear the two possible interrupt flags with one command
-  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) );
+  write_register(STATUS,_BV(RX_DR) | _BV(MAX_RT) | _BV(TX_DS) );
 
 }
 

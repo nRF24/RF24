@@ -67,6 +67,22 @@ protected:
   /**@{*/
 
   /**
+   * Non-blocking write to the open writing pipe used for buffered writes
+   *
+   * @note Optimization: This function now leaves the CE pin high, so the radio
+   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
+   * This allows the chip to be used to its full potential in TX mode.
+   *
+   * @see writeFast()
+   * @see writeBlocking()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  void startFastWrite( const void* buf, uint8_t len );
+
+  /**
    * Set chip select pin
    *
    * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
@@ -692,16 +708,16 @@ public:
    * Just like write(), but it returns immediately. To find out what happened
    * to the send, catch the IRQ and then call whatHappened().
    *
-   * @note Optimization: This function now leaves the CE pin high, so the radio
-   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
-   * This allows the chip to be used to its full potential in TX mode.
+   * @note Optimization: This function again behaves as it did previously.
+   * startFastWrite() has been moved to an internal function
    *
    * @see write()
+   * @see startFastWrite()
    * @see whatHappened()
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
-   * @return True if the payload was delivered successfully false if not
+   *
    */
   void startWrite( const void* buf, uint8_t len );
 
@@ -934,6 +950,7 @@ public:
  *
  * @li Project blog:
  * @li <a href="http://TMRh20.blogspot.com"> TMRh20.blogspot.com </a>
+ * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
  */
 
 #endif // __RF24_H__
