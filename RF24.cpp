@@ -471,25 +471,27 @@ bool RF24::write( const void* buf, uint8_t len )
 /****************************************************************************/
 
 //For general use, the interrupt flags are not important to clear
-bool RF24::writeBlocking( const void* buf, uint8_t len )
+bool RF24::writeBlocking( const void* buf, uint8_t len, unsigned long timeout )
 {
 	//Block until the FIFO is NOT full.
 	//Keep track of the MAX retries and set auto-retry if seeing failures
 	//This way the FIFO will fill up and allow blocking until packets go through
 	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
+	unsigned long timer = millis();							  //Get the time that the payload transmission started
 
 	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
 
-		if( get_status() & _BV(MAX_RT)){
-			reUseTX();										  //Set re-transmit
+		if( get_status() & _BV(MAX_RT)){					  //If MAX Retries have been reached
+			reUseTX();										  //Set re-transmit and clear the MAX_RT interrupt flag
 		}
-
+		if(millis() - timer > timeout){ return 0; }			  //If this payload has exceeded the user-defined timeout, exit and return 0
   	}
-  			//Start Writing
-	startFastWrite(buf,len);
 
-	return 1;
+  	//Start Writing
+	startFastWrite(buf,len);								  //Write the payload if a buffer is clear
+
+	return 1;												  //Return 1 to indicate successful transmission
 }
 
 
@@ -504,7 +506,6 @@ void RF24::reUseTX(){
 
 /****************************************************************************/
 
-//This is for when every bit of data is important
 bool RF24::writeFast( const void* buf, uint8_t len )
 {
 	//Block until the FIFO is NOT full.
@@ -516,9 +517,7 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
 
 		if( get_status() & _BV(MAX_RT)){
-			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 			reUseTX();										  //Set re-transmit
-			delayMicroseconds(15);							  //CE needs to stay high for 10us, for TX_REUSE to engage
 			return 0;										  //Return 0. The previous payload has been retransmitted
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
@@ -565,23 +564,31 @@ void RF24::startWrite( const void* buf, uint8_t len )
 }
 
 bool RF24::txStandBy(){
-	txStandBy(0);
+	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
+		if( get_status() & _BV(MAX_RT)){
+			write_register(STATUS,_BV(MAX_RT) );
+			flush_tx();    //Non blocking, flush the data
+			ce(LOW);	   //Set STANDBY-I mode
+			return 0;
+		}
+	}
+
+	ce(LOW);				   //Set STANDBY-I mode
+	return 1;
 }
 
-bool RF24::txStandBy(bool block){
+bool RF24::txStandBy(unsigned long timeout){
+
+	unsigned long start = millis();
 
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
 			write_register(STATUS,_BV(MAX_RT) );
-			if(block){
+			if(timeout > 0){
 				ce(LOW);										  //Set re-transmit
 				ce(HIGH);
-				delayMicroseconds(15);
+				if(millis() - start > timeout){ ce(LOW); flush_tx(); return 0; }
 
-			}else{
-				flush_tx();    //Non blocking, flush the data
-				ce(LOW);	   //Set STANDBY-I mode
-				return 0;
 			}
 		}
 	}

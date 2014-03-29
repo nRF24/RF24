@@ -89,8 +89,8 @@ void loop(void)
     
     unsigned long time = millis();                          // Take the time, and send it.  This will block until complete
     printf("Now sending %lu...",time);
-    bool ok = radio.writeFast( &time, sizeof(unsigned long) );//New function for proper use of FIFO buffers
-    while( ! radio.txStandBy() ){}                          //Called when STANDBY-I mode is engaged (User is finished sending)
+    radio.writeFast( &time, sizeof(unsigned long) );        //New function for proper use of FIFO buffers
+    bool ok = radio.txStandBy();                            //Called when STANDBY-I mode is engaged (User is finished sending)
     if (!ok)
       printf("failed.\n\r");
     
@@ -142,8 +142,8 @@ void loop(void)
      
       radio.stopListening();                                          // First, stop listening so we can talk
      
-      radio.write( &got_time, sizeof(unsigned long) );                // Send the final one back.      
-      
+      radio.writeFast( &got_time, sizeof(unsigned long) );            // Send the final one back.      
+      radio.txStandBy();
       radio.startListening();                                         // Now, resume listening so we catch the next packets.
       
       //printf("Sent response.\n\r");
@@ -163,17 +163,16 @@ void loop(void)
       printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
 
       role = role_ping_out;                  // Become the primary transmitter (ping out)
-      //radio.openWritingPipe(pipes[0]);
-      //radio.openReadingPipe(1,pipes[1]);
+      radio.openWritingPipe(pipes[0]);
+      radio.openReadingPipe(1,pipes[1]);
     }
     else if ( c == 'R' && role == role_ping_out )
     {
       printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
       
        role = role_pong_back;                // Become the primary receiver (pong back)
-      //radio.openWritingPipe(pipes[1]);
-      //radio.openReadingPipe(1,pipes[0]);
+       radio.openWritingPipe(pipes[1]);
+       radio.openReadingPipe(1,pipes[0]);
     }
   }
 }
-// vim:cin:ai:sts=2 sw=2 ft=cpp

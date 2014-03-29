@@ -153,13 +153,6 @@ protected:
   uint8_t flush_rx(void);
 
   /**
-   * Empty the transmit buffer
-   *
-   * @return Current value of status register
-   */
-  uint8_t flush_tx(void);
-
-  /**
    * Retrieve the current status of the chip
    *
    * @return Current value of status register
@@ -270,7 +263,7 @@ public:
   void stopListening(void);
 
   /**
-   * @note Optimization: Improved performance and reliability
+   * @note Optimization: Improved performance slightly
    * Write to the open writing pipe
    *
    * Be sure to call openWritingPipe() first to set the destination
@@ -293,23 +286,25 @@ public:
   bool write( const void* buf, uint8_t len );
 
   /**
-   * @note Optimization: New Command
-   * Write to the open writing pipe filling up the FIFO buffers
-   *
-   * Be sure to call openWritingPipe() first to set the destination
-   * of where to write to.
-   *
+   * @note Optimization: New Command   *
    * This will not block until the 3 FIFO buffers are filled with data.
    * Once the FIFOs are full, writeFast will simply wait for success or
    * timeout, and return 1 or 0 respectively. From a user perspective, just
    * keep trying to send the same data. The library will keep auto retrying
    * the current payload using the built in functionality.
    *
-   * The maximum size of data written is the fixed payload size, see
-   * getPayloadSize().  However, you can write less, and the remainder
-   * will just be filled with zeroes.
-   *
    * ONLY max retry interrupt flags will be cleared when writeFast is called
+   *
+   * @code
+   * Example (Partial blocking):
+   *
+   *			radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
+   *			txStandBy();     		   // Returns 0 if failed. 1 if success. Blocks only until MAX_RT timeout or success. Data flushed on fail.
+   * @endcode
+   *
+   * @see txStandBy()
+   * @see write()
+   * @see writeBlocking()
    *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
@@ -317,32 +312,31 @@ public:
    */
   bool writeFast( const void* buf, uint8_t len );
 
-    /**
-     * @note Optimization: New Command
-     * Write to the open writing pipe
-     *
-     * Be sure to call openWritingPipe() first to set the destination
-     * of where to write to.
-     *
-     * This will not block until the 3 FIFO buffers are filled with data or
-     * a timeout is detected. If so the library will auto retry until a new
-     * payload is written or the TX buffers are flushed. Interrupts can be
-     * used to control the timeout period.
-     *
-     * This will never return a 0. It will not return until a packet is
-     * loaded successfully into the FIFO and TX is complete.
-     *
-     * The maximum size of data written is the fixed payload size, see
-     * getPayloadSize().  However, you can write less, and the remainder
-     * will just be filled with zeroes.
-     *
-     * ONLY max retry interrupt flags will be cleared when writeBlocking is called
-     *
-     * @param buf Pointer to the data to be sent
-     * @param len Number of bytes to be sent
-     * @return True if the payload was delivered successfully false if not
-     */
-  bool writeBlocking( const void* buf, uint8_t len );
+  /**
+   * @note Optimization: New Command
+   * This function extends the auto-retry mechanism to any specified duration.
+   * It will not block until the 3 FIFO buffers are filled with data.
+   * If so the library will auto retry until a new payload is written
+   * or the user specified timeout period is reached.
+   *
+   * ONLY max retry interrupt flags will be cleared when writeBlocking is called
+   * @code
+   * Example (Full blocking):
+   *
+   *			radio.writeBlocking(&buf,32,1000); //Writes 1 payload to the buffers with extended timeout of 1 second
+   *			txStandBy(1000);     			   //Returns 0 if failed after timeout period. 1 if success.
+   *					  				   		   //Blocks only until user timeout or success. Data flushed on fail.
+   * @endcode
+   * @see txStandBy()
+   * @see write()
+   * @see writeFast()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @param timeout User defined timeout in milliseconds.
+   * @return True if the payload was delivered successfully false if not
+   */
+  bool writeBlocking( const void* buf, uint8_t len, uint32_t timeout );
 
   /**
    * @note Optimization: New Command
@@ -355,29 +349,42 @@ public:
    * the manufacturer to drop the radio out of TX or STANDBY-II mode if there is
    * time enough between sends for the FIFOs to empty.
    *
-   * @note This does NOT need to be called when using per-payload noACK commands,
-   * or when using the regular write command since it is only capable of single
-   * payload transmission..
-   * Per the datasheet, the radio will automatically engage STANDBY-I mode when
-   * using the W_TX_PAYLOAD_NOACK command.
+   * Relies on built-in auto retry functionality.
    *
    * @code
-   * Example:
+   * Example (Partial blocking):
+   *
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-   *			bool ok = txStandBy(0);    //Returns 0 if failed. 1 if success.
-   *					  				   //Blocks only until timeout or success. Data flushed on fail.
-   *
-   *			Using txStandBy(1) will not return until the data is transmitted. It will never return 0.
-   *
+   *			bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
+   *					  				   //Blocks only until MAX_RT timeout or success. Data flushed on fail.
    * @endcode
-   *
+   * @see txStandBy(unsigned long timeout)
    * @return True if transmission is successful
    *
    */
-  bool txStandBy();
-  bool txStandBy(bool block);
+   bool txStandBy();
+
+  /**
+   * @note Optimization: New Command
+   *
+   * This function allows extended blocking and auto-retries per a user defined timeout
+   * @code
+   *	Fully Blocking Example:
+   *
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);   //Fills the FIFO buffers up
+   *			bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
+   *					  				    //Blocks only until user defined timeout or success. Data flushed on fail.
+   * @endcode
+   *
+   * @param timeout Number of milliseconds to retry failed payloads
+   * @return True if transmission is successful
+   *
+   */
+   bool txStandBy(unsigned long timeout);
 
   /**
    * Non-blocking write to the open writing pipe used for buffered writes
@@ -386,7 +393,9 @@ public:
    * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
    * This allows the chip to be used to its full potential in TX mode.
    *
+   * @see write()
    * @see writeFast()
+   * @see startWrite()
    * @see writeBlocking()
    *
    * @param buf Pointer to the data to be sent
@@ -401,8 +410,13 @@ public:
    * @note Optimization: The available functino now checks the FIFO
    * buffers directly for data instead of relying of interrupt flags.
    *
-   * @note: Interrupt flags will not be cleared until a payload is
+   * @note Interrupt flags will not be cleared until a payload is
    * actually read from the FIFO
+   *
+   * @see txStandBy()
+   * @see startWrite()
+   * @see write()
+   * @see writeFast()
    *
    * @return True if there is a payload available, false if none is
    */
@@ -422,7 +436,7 @@ public:
    *
    * @param buf Pointer to a buffer where the data should be written
    * @param len Maximum number of bytes to read into the buffer
-   * @return No return value. Use available.
+   * @return No return value. Use available().
    */
   void read( void* buf, uint8_t len );
 
@@ -526,7 +540,7 @@ public:
    * For dynamic payloads, this pulls the size of the payload off
    * the chip
    *
-   * Optimization: Corrupt packets are now detected and flushed per the
+   * @note Optimization: Corrupt packets are now detected and flushed per the
    * manufacturer.
    *
    * @return Payload length of last-received dynamic payload
@@ -663,7 +677,7 @@ public:
    * To return to normal power mode, either write() some data or
    * startListening, or powerUp().
    *
-   * Optimization: The radio will never enter power down unless instructed
+   * @note Optimization: The radio will never enter power down unless instructed
    * by the MCU via this command.
    */
   void powerDown(void);
@@ -681,10 +695,12 @@ public:
    * Just like write(), but it returns immediately. To find out what happened
    * to the send, catch the IRQ and then call whatHappened().
    *
-   * @note Optimization: This function again behaves as it did previously.
-   * startFastWrite() has been moved to an internal function
+   * @note Optimization: This function again behaves as it did previously for backwards-compatibility.
+   * with user code. The library uses startFastWrite() internally.
+   * This is mainly used for single-payload transactions.
    *
    * @see write()
+   * @see writeFast()
    * @see startFastWrite()
    * @see whatHappened()
    *
@@ -708,6 +724,8 @@ public:
    *
    * @note This is to be used AFTER auto-retry fails if wanting to resend
    * using the built-in payload reuse features.
+   * After issuing reUseTX(), it will keep reending the same payload forever or until
+   * a payload is written to the FIFO, or a flush_tx command is given.
    */
    void reUseTX();
 
@@ -735,7 +753,7 @@ public:
    *
    * @note Optimization: Calling this function NO LONGER clears the interrupt
    * flag. The new functionality checks the RX FIFO buffer for an ACK payload
-   * instead of relying on interrupt flags.
+   * instead of relying on interrupt flags.Reading the payload will clear the flags.
    *
    * @return True if an ack payload is available.
    */
@@ -765,6 +783,13 @@ public:
    * @param[out] rx_ready There is a message waiting to be read (RX_DS)
    */
   void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready);
+
+  /**
+   * Empty the transmit buffer
+   *
+   * @return Current value of status register
+   */
+  uint8_t flush_tx(void);
 
   /**
    * Test whether there was a carrier on the line for the
@@ -797,6 +822,11 @@ public:
    */
   bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
 
+  /**
+   * @see txStandBy()
+   */
+  bool txStandBy(bool block);
+
   /**@}*/
 };
 
@@ -822,6 +852,18 @@ public:
  * different nodes.  Put one of the nodes into 'transmit' mode by connecting
  * with the serial monitor and sending a 'T'.  The data transfer will begin,
  * with the receiver displaying the payload count. (32Byte Payloads)
+ */
+
+/**
+ * @example TransferTimeouts.ino
+ * Updated: TMRh20
+ * This example demonstrates the use of and extended timeout period and
+ * auto-retries/auto-reUse to increase reliability in noisy or low signal scenarios.
+ *
+ * Write this sketch to two different nodes.  Put one of the nodes into 'transmit'
+ * mode by connecting with the serial monitor and sending a 'T'.  The data
+ * transfer will begin, with the receiver displaying the payload count and the
+ * data transfer rate.
  */
 
 /**
