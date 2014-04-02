@@ -21,7 +21,7 @@ TMRh20 2014
 
 /*************  USER Configuration *****************************/
                                           // Hardware configuration
-RF24 radio(48,49);                        // Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
+RF24 radio(48,49);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 boolean RADIO_NO = 0;  //SET THIS TO 0 or 1 for 1st or 2nd radio
 
 /***************************************************************/
@@ -31,7 +31,7 @@ const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };   // Radio pipe ad
 byte data[32];                           //Data buffer for testing data transfer speeds
 
 unsigned long counter, rxTimer;          //Counter and timer for keeping track transfer info
-float startTime, stopTime;  
+unsigned long startTime, stopTime;  
 bool TX=1,RX=0,role=0;
 
 void setup(void) {
@@ -42,17 +42,13 @@ void setup(void) {
   radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_MAX);
+  radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
-  radio.setRetries(1,1);                   // Optionally, increase the delay between retries & # of retries
+  radio.setRetries(2,15);                   // Optionally, increase the delay between retries & # of retries
   radio.setCRCLength(RF24_CRC_8); 
-  
-  if(RADIO_NO){                            //Lets the two radios choose the correct pipes depending on user selection
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
-  }else{
-    radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1,pipes[0]);
-  }
+  //radio.disableCRC();
+  radio.openWritingPipe(pipes[0]);
+  radio.openReadingPipe(1,pipes[1]);
   
   radio.startListening();                 // Start listening
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
@@ -73,28 +69,29 @@ void loop(void){
 
   if(role == TX){
     
-    delay(1500);
+    delay(2000);
     
     printf("Initiating Basic Data Transfer\n\r");
     
     
-    float cycles = 1000; //Change this to a higher or lower number. 
+    unsigned long cycles = 10000; //Change this to a higher or lower number. 
     
     startTime = millis();
             
     for(int i=0; i<cycles; i++){        //Loop through a number of cycles
       data[0] = i;                      //Change the first byte of the payload for identification
-      if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers
+      if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers        
         counter++;                      //Keep count of failed payloads
       }
     }
     
-    stopTime = millis();
-    
-    while(!radio.txStandBy()){ }         //This should be called to wait for completion and put the radio in standby mode after transmission
+   stopTime = millis();   
+                                         //This should be called to wait for completion and put the radio in standby mode after transmission, returns 0 if data still in FIFO (timed out), 1 if success
+   if(!radio.txStandBy()){ counter+=3; } //Standby, block only until FIFO empty or auto-retry timeout. Flush TX FIFO if failed
+   //radio.txStandBy(1000);              //Standby, using extended timeout period of 1 second
    
-   float numBytes = cycles * 32;
-   float rate = numBytes / (stopTime - startTime) / cycles;
+   float numBytes = cycles*32;
+   float rate = numBytes / (stopTime - startTime);
     
    printf("Transfer complete at "); Serial.print(rate); printf(" KB/s \n\r");
    printf("%d of ",counter); Serial.print(cycles); printf(" Packets Failed to Send\n\r");
@@ -104,16 +101,17 @@ void loop(void){
   
   
   
-  if(role == RX){
+if(role == RX){
      while(radio.available()){       
       radio.read(&data,32);
       counter++;
      }
    if(millis() - rxTimer > 1000){
      rxTimer = millis();
-//     printf("Rx Rate: ");
-//     Serial.print(counter*32/1000);
-//     printf(" KB/s\n\r"); 
+     printf("Rate: ");
+     float numBytes = counter*32;
+     Serial.print(numBytes/1000);
+     printf(" KB/s\n\r"); 
      printf("Payload Count: %d \n\r", counter);
      counter = 0;
    }
@@ -128,11 +126,15 @@ void loop(void){
     if ( c == 'T' && role == RX )
     {
       printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
+      radio.openWritingPipe(pipes[1]);
+      radio.openReadingPipe(1,pipes[0]);
       radio.stopListening();
       role = TX;                  // Become the primary transmitter (ping out)
     }
     else if ( c == 'R' && role == TX )
     {
+      radio.openWritingPipe(pipes[0]);
+      radio.openReadingPipe(1,pipes[1]); 
       radio.startListening();
       printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");      
       role = RX;                // Become the primary receiver (pong back)

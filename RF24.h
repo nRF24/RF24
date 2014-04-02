@@ -56,162 +56,6 @@ private:
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
   bool avail;
 
-protected:
-  /**
-   * @name Low-level internal interface.
-   *
-   *  Protected methods that address the chip directly.  Regular users cannot
-   *  ever call these.  They are documented for completeness and for developers who
-   *  may want to extend this class.
-   */
-  /**@{*/
-
-  /**
-   * Set chip select pin
-   *
-   * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
-   * and best of all, we make use of the radio's FIFO buffers. A lower speed
-   * means we're less likely to effectively leverage our FIFOs and pay a higher
-   * AVR runtime cost as toll.
-   *
-   * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
-   */
-  void csn(int mode);
-
-  /**
-   * Set chip enable
-   *
-   * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
-   * for a much more detailed description of this pin.
-   */
-  void ce(int level);
-
-  /**
-   * Read a chunk of data in from a register
-   *
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @param buf Where to put the data
-   * @param len How many bytes of data to transfer
-   * @return Current value of status register
-   */
-  uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
-
-  /**
-   * Read single byte from a register
-   *
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @return Current value of register @p reg
-   */
-  uint8_t read_register(uint8_t reg);
-
-  /**
-   * Write a chunk of data to a register
-   *
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @param buf Where to get the data
-   * @param len How many bytes of data to transfer
-   * @return Current value of status register
-   */
-  uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
-
-  /**
-   * Write a single byte to a register
-   *
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @param value The new value to write
-   * @return Current value of status register
-   */
-  uint8_t write_register(uint8_t reg, uint8_t value);
-
-  /**
-   * Write the transmit payload
-   *
-   * The size of data written is the fixed payload size, see getPayloadSize()
-   *
-   * @param buf Where to get the data
-   * @param len Number of bytes to be sent
-   * @return Current value of status register
-   */
-  uint8_t write_payload(const void* buf, uint8_t len);
-
-  /**
-   * Read the receive payload
-   *
-   * The size of data read is the fixed payload size, see getPayloadSize()
-   *
-   * @param buf Where to put the data
-   * @param len Maximum number of bytes to read
-   * @return Current value of status register
-   */
-  uint8_t read_payload(void* buf, uint8_t len);
-
-  /**
-   * Empty the receive buffer
-   *
-   * @return Current value of status register
-   */
-  uint8_t flush_rx(void);
-
-  /**
-   * Retrieve the current status of the chip
-   *
-   * @return Current value of status register
-   */
-  uint8_t get_status(void);
-
-  /**
-   * Decode and print the given status to stdout
-   *
-   * @param status Status value to print
-   *
-   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
-   */
-  void print_status(uint8_t status);
-
-  /**
-   * Decode and print the given 'observe_tx' value to stdout
-   *
-   * @param value The observe_tx value to print
-   *
-   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
-   */
-  void print_observe_tx(uint8_t value);
-
-  /**
-   * Print the name and value of an 8-bit register to stdout
-   *
-   * Optionally it can print some quantity of successive
-   * registers on the same line.  This is useful for printing a group
-   * of related registers on one line.
-   *
-   * @param name Name of the register
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @param qty How many successive registers to print
-   */
-  void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
-
-  /**
-   * Print the name and value of a 40-bit address register to stdout
-   *
-   * Optionally it can print some quantity of successive
-   * registers on the same line.  This is useful for printing a group
-   * of related registers on one line.
-   *
-   * @param name Name of the register
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @param qty How many successive registers to print
-   */
-  void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
-
-  /**
-   * Turn on or off the special features of the chip
-   *
-   * The chip has certain 'features' which are only available when the 'features'
-   * are enabled.  See the datasheet for details.
-   */
-  void toggle_features(void);
-  /**@}*/
-
 public:
 
   /**
@@ -263,148 +107,6 @@ public:
   void stopListening(void);
 
   /**
-   * @note Optimization: Improved performance slightly
-   * Write to the open writing pipe
-   *
-   * Be sure to call openWritingPipe() first to set the destination
-   * of where to write to.
-   *
-   * This blocks until the message is successfully acknowledged by
-   * the receiver or the timeout/retransmit maxima are reached.  In
-   * the current configuration, the max delay here is 60ms.
-   *
-   * The maximum size of data written is the fixed payload size, see
-   * getPayloadSize().  However, you can write less, and the remainder
-   * will just be filled with zeroes.
-   *
-   * TX/RX/RT interrupt flags will be cleared every time write is called
-   *
-   * @param buf Pointer to the data to be sent
-   * @param len Number of bytes to be sent
-   * @return True if the payload was delivered successfully false if not
-   */
-  bool write( const void* buf, uint8_t len );
-
-  /**
-   * @note Optimization: New Command   *
-   * This will not block until the 3 FIFO buffers are filled with data.
-   * Once the FIFOs are full, writeFast will simply wait for success or
-   * timeout, and return 1 or 0 respectively. From a user perspective, just
-   * keep trying to send the same data. The library will keep auto retrying
-   * the current payload using the built in functionality.
-   *
-   * ONLY max retry interrupt flags will be cleared when writeFast is called
-   *
-   * @code
-   * Example (Partial blocking):
-   *
-   *			radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
-   *			txStandBy();     		   // Returns 0 if failed. 1 if success. Blocks only until MAX_RT timeout or success. Data flushed on fail.
-   * @endcode
-   *
-   * @see txStandBy()
-   * @see write()
-   * @see writeBlocking()
-   *
-   * @param buf Pointer to the data to be sent
-   * @param len Number of bytes to be sent
-   * @return True if the payload was delivered successfully false if not
-   */
-  bool writeFast( const void* buf, uint8_t len );
-
-  /**
-   * @note Optimization: New Command
-   * This function extends the auto-retry mechanism to any specified duration.
-   * It will not block until the 3 FIFO buffers are filled with data.
-   * If so the library will auto retry until a new payload is written
-   * or the user specified timeout period is reached.
-   *
-   * ONLY max retry interrupt flags will be cleared when writeBlocking is called
-   * @code
-   * Example (Full blocking):
-   *
-   *			radio.writeBlocking(&buf,32,1000); //Writes 1 payload to the buffers with extended timeout of 1 second
-   *			txStandBy(1000);     			   //Returns 0 if failed after timeout period. 1 if success.
-   *					  				   		   //Blocks only until user timeout or success. Data flushed on fail.
-   * @endcode
-   * @see txStandBy()
-   * @see write()
-   * @see writeFast()
-   *
-   * @param buf Pointer to the data to be sent
-   * @param len Number of bytes to be sent
-   * @param timeout User defined timeout in milliseconds.
-   * @return True if the payload was delivered successfully false if not
-   */
-  bool writeBlocking( const void* buf, uint8_t len, uint32_t timeout );
-
-  /**
-   * @note Optimization: New Command
-   * This function should be called as soon as transmission is finished to
-   * drop the radio back to STANDBY-I mode. If not issued, the radio will
-   * remain in STANDBY-II mode which, per the data sheet, is not a recommended
-   * operating mode.
-   *
-   * @note When transmitting data in rapid succession, it is still recommended by
-   * the manufacturer to drop the radio out of TX or STANDBY-II mode if there is
-   * time enough between sends for the FIFOs to empty.
-   *
-   * Relies on built-in auto retry functionality.
-   *
-   * @code
-   * Example (Partial blocking):
-   *
-   *			radio.writeFast(&buf,32);
-   *			radio.writeFast(&buf,32);
-   *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-   *			bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
-   *					  				   //Blocks only until MAX_RT timeout or success. Data flushed on fail.
-   * @endcode
-   * @see txStandBy(unsigned long timeout)
-   * @return True if transmission is successful
-   *
-   */
-   bool txStandBy();
-
-  /**
-   * @note Optimization: New Command
-   *
-   * This function allows extended blocking and auto-retries per a user defined timeout
-   * @code
-   *	Fully Blocking Example:
-   *
-   *			radio.writeFast(&buf,32);
-   *			radio.writeFast(&buf,32);
-   *			radio.writeFast(&buf,32);   //Fills the FIFO buffers up
-   *			bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
-   *					  				    //Blocks only until user defined timeout or success. Data flushed on fail.
-   * @endcode
-   *
-   * @param timeout Number of milliseconds to retry failed payloads
-   * @return True if transmission is successful
-   *
-   */
-   bool txStandBy(unsigned long timeout);
-
-  /**
-   * Non-blocking write to the open writing pipe used for buffered writes
-   *
-   * @note Optimization: This function now leaves the CE pin high, so the radio
-   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
-   * This allows the chip to be used to its full potential in TX mode.
-   *
-   * @see write()
-   * @see writeFast()
-   * @see startWrite()
-   * @see writeBlocking()
-   *
-   * @param buf Pointer to the data to be sent
-   * @param len Number of bytes to be sent
-   * @return True if the payload was delivered successfully false if not
-   */
-  void startFastWrite( const void* buf, uint8_t len );
-
-  /**
    * Test whether there are bytes available to be read
    *
    * @note Optimization: The available functino now checks the FIFO
@@ -439,6 +141,29 @@ public:
    * @return No return value. Use available().
    */
   void read( void* buf, uint8_t len );
+
+  /**
+   * @note Optimization: Improved performance slightly
+   * Write to the open writing pipe
+   *
+   * Be sure to call openWritingPipe() first to set the destination
+   * of where to write to.
+   *
+   * This blocks until the message is successfully acknowledged by
+   * the receiver or the timeout/retransmit maxima are reached.  In
+   * the current configuration, the max delay here is 60ms.
+   *
+   * The maximum size of data written is the fixed payload size, see
+   * getPayloadSize().  However, you can write less, and the remainder
+   * will just be filled with zeroes.
+   *
+   * TX/RX/RT interrupt flags will be cleared every time write is called
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  bool write( const void* buf, uint8_t len );
 
   /**
    * Open a pipe for writing
@@ -488,6 +213,302 @@ public:
 
   /**@}*/
   /**
+   * @name Advanced Operation
+   *
+   *  Methods you can use to drive the chip in more advanced ways
+   */
+  /**@{*/
+
+  /**
+   * Print a giant block of debugging information to stdout
+   *
+   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+   */
+  void printDetails(void);
+
+  /**
+   * Test whether there are bytes available to be read in the
+   * FIFO buffers. This optimized version does not rely on interrupt
+   * flags, but checks the actual FIFO buffers.
+   *
+   * @note Optimization: Interrupt flags are no longer cleared when available is called,
+   * but will be reset only when the data is read from the FIFO buffers.
+   *
+   * @param[out] pipe_num Which pipe has the payload available
+   * @return True if there is a payload available, false if none is
+   */
+  bool available(uint8_t* pipe_num);
+
+  /**
+   * Enter low-power mode
+   *
+   * To return to normal power mode, either write() some data or
+   * startListening, or powerUp().
+   *
+   * @note Optimization: The radio will never enter power down unless instructed
+   * by the MCU via this command.
+   */
+  void powerDown(void);
+
+  /**
+   * Leave low-power mode - making radio more responsive
+   *
+   * To return to low power mode, call powerDown().
+   */
+  void powerUp(void) ;
+
+  /**
+   * @note Optimization: New Command   *
+   * This will not block until the 3 FIFO buffers are filled with data.
+   * Once the FIFOs are full, writeFast will simply wait for success or
+   * timeout, and return 1 or 0 respectively. From a user perspective, just
+   * keep trying to send the same data. The library will keep auto retrying
+   * the current payload using the built in functionality.
+   *
+   * ONLY max retry interrupt flags will be cleared when writeFast is called
+   *
+   * @code
+   * Example (Partial blocking):
+   *
+   *			radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
+   *			txStandBy();     		   // Returns 0 if failed. 1 if success. Blocks only until MAX_RT timeout or success. Data flushed on fail.
+   *
+   *			radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
+   *			txStandBy(1000);		   // Using extended timeouts, returns 1 if success. Retries failed payloads for 1 seconds before returning 0.
+   * @endcode
+   *
+   * @see txStandBy()
+   * @see write()
+   * @see writeBlocking()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  bool writeFast( const void* buf, uint8_t len );
+
+  /**
+   * @note Optimization: New Command
+   * This function extends the auto-retry mechanism to any specified duration.
+   * It will not block until the 3 FIFO buffers are filled with data.
+   * If so the library will auto retry until a new payload is written
+   * or the user specified timeout period is reached.
+   *
+   * ONLY max retry interrupt flags will be cleared when writeBlocking is called
+   * @code
+   * Example (Full blocking):
+   *
+   *			radio.writeBlocking(&buf,32,1000); //Wait up to 1 second to write 1 payload to the buffers
+   *			txStandBy(1000);     			   //Wait up to 1 second for the payload to send. Return 1 if ok, 0 if failed.
+   *					  				   		   //Blocks only until user timeout or success. Data flushed on fail.
+   * @endcode
+   * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
+   * @see txStandBy()
+   * @see write()
+   * @see writeFast()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @param timeout User defined timeout in milliseconds.
+   * @return True if the payload was loaded into the buffer successfully false if not
+   */
+  bool writeBlocking( const void* buf, uint8_t len, uint32_t timeout );
+
+  /**
+   * @note Optimization: New Command
+   * This function should be called as soon as transmission is finished to
+   * drop the radio back to STANDBY-I mode. If not issued, the radio will
+   * remain in STANDBY-II mode which, per the data sheet, is not a recommended
+   * operating mode.
+   *
+   * @note When transmitting data in rapid succession, it is still recommended by
+   * the manufacturer to drop the radio out of TX or STANDBY-II mode if there is
+   * time enough between sends for the FIFOs to empty.
+   *
+   * Relies on built-in auto retry functionality.
+   *
+   * @code
+   * Example (Partial blocking):
+   *
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
+   *			bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
+   *					  				   //Blocks only until MAX_RT timeout or success. Data flushed on fail.
+   * @endcode
+   * @see txStandBy(unsigned long timeout)
+   * @return True if transmission is successful
+   *
+   */
+   bool txStandBy();
+
+  /**
+   * @note Optimization: New Command
+   *
+   * This function allows extended blocking and auto-retries per a user defined timeout
+   * @code
+   *	Fully Blocking Example:
+   *
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);
+   *			radio.writeFast(&buf,32);   //Fills the FIFO buffers up
+   *			bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
+   *					  				    //Blocks only until user defined timeout or success. Data flushed on fail.
+   * @endcode
+   * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
+   * @param timeout Number of milliseconds to retry failed payloads
+   * @return True if transmission is successful
+   *
+   */
+   bool txStandBy(unsigned long timeout);
+
+  /**
+   * Write an ack payload for the specified pipe
+   *
+   * The next time a message is received on @p pipe, the data in @p buf will
+   * be sent back in the acknowledgement.
+   *
+   * @warning According to the data sheet, only three of these can be pending
+   * at any time as there are only 3 FIFO buffers.
+   *
+   * @param pipe Which pipe# (typically 1-5) will get this response.
+   * @param buf Pointer to data that is sent
+   * @param len Length of the data to send, up to 32 bytes max.  Not affected
+   * by the static payload set by setPayloadSize().
+   */
+  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+
+  /**
+   * Determine if an ack payload was received in the most recent call to
+   * write().
+   *
+   * Call read() to retrieve the ack payload.
+   *
+   * @note Optimization: Calling this function NO LONGER clears the interrupt
+   * flag. The new functionality checks the RX FIFO buffer for an ACK payload
+   * instead of relying on interrupt flags.Reading the payload will clear the flags.
+   *
+   * @return True if an ack payload is available.
+   */
+  bool isAckPayloadAvailable(void);
+
+  /**
+   * Call this when you get an interrupt to find out why
+   *
+   * Tells you what caused the interrupt, and clears the state of
+   * interrupts.
+   *
+   * @param[out] tx_ok The send was successful (TX_DS)
+   * @param[out] tx_fail The send failed, too many retries (MAX_RT)
+   * @param[out] rx_ready There is a message waiting to be read (RX_DS)
+   */
+  void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready);
+
+  /**
+   * Non-blocking write to the open writing pipe used for buffered writes
+   *
+   * @note Optimization: This function now leaves the CE pin high, so the radio
+   * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
+   * This allows the chip to be used to its full potential in TX mode.
+   *
+   * @see write()
+   * @see writeFast()
+   * @see startWrite()
+   * @see writeBlocking()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   * @return True if the payload was delivered successfully false if not
+   */
+  void startFastWrite( const void* buf, uint8_t len );
+
+  /**
+   * Non-blocking write to the open writing pipe
+   *
+   * Just like write(), but it returns immediately. To find out what happened
+   * to the send, catch the IRQ and then call whatHappened().
+   *
+   * @note Optimization: This function again behaves as it did previously for backwards-compatibility.
+   * with user code. The library uses startFastWrite() internally.
+   * This is mainly used for single-payload transactions.
+   *
+   * @see write()
+   * @see writeFast()
+   * @see startFastWrite()
+   * @see whatHappened()
+   *
+   * @param buf Pointer to the data to be sent
+   * @param len Number of bytes to be sent
+   *
+   */
+  void startWrite( const void* buf, uint8_t len );
+
+  /**
+   * Optimization: New Command
+   *
+   * This function is mainly used internally to take advantage of the auto payload
+   * re-use functionality of the chip, but can be beneficial to users as well.
+   *
+   * The function will instruct the radio to re-use the data in the FIFO buffers,
+   * and instructs the radio to re-send once the timeout limit has been reached.
+   * Used by writeFast and writeBlocking to initiate retries when a TX failure
+   * occurs. Retries are automatically initiated except with the standard write().
+   * This way, data is not flushed from the buffer until switching between modes.
+   *
+   * @note This is to be used AFTER auto-retry fails if wanting to resend
+   * using the built-in payload reuse features.
+   * After issuing reUseTX(), it will keep reending the same payload forever or until
+   * a payload is written to the FIFO, or a flush_tx command is given.
+   */
+   void reUseTX();
+
+  /**
+   * Empty the transmit buffer
+   *
+   * @return Current value of status register
+   */
+  uint8_t flush_tx(void);
+
+  /**
+   * Test whether there was a carrier on the line for the
+   * previous listening period.
+   *
+   * Useful to check for interference on the current channel.
+   *
+   * @return true if was carrier, false if not
+   */
+  bool testCarrier(void);
+
+  /**
+   * Test whether a signal (carrier or otherwise) greater than
+   * or equal to -64dBm is present on the channel. Valid only
+   * on nRF24L01P (+) hardware. On nRF24L01, use testCarrier().
+   *
+   * Useful to check for interference on the current channel and
+   * channel hopping strategies.
+   *
+   * @return true if signal => -64dBm, false if not
+   */
+  bool testRPD(void) ;
+
+  /**
+   * Test whether this is a real radio, or a mock shim for
+   * debugging.  Setting either pin to 0xff is the way to
+   * indicate that this is not a real radio.
+   *
+   * @return true if this is a legitimate radio
+   */
+  bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
+
+  /**
+  *
+  */
+  void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready);
+
+  /**@}*/
+
+  /**@}*/
+  /**
    * @name Optional Configurators
    *
    *  Methods you can use to get or set the configuration of the chip.
@@ -495,6 +516,7 @@ public:
    *  defaults.
    */
   /**@{*/
+
   /**
    * Set the number and delay of retries upon failed submit
    *
@@ -656,256 +678,209 @@ public:
    */
   void disableCRC( void ) ;
 
-  /**@}*/
+private:
+
   /**
-   * @name Advanced Operation
+   * @name Low-level internal interface.
    *
-   *  Methods you can use to drive the chip in more advanced ways
+   *  Protected methods that address the chip directly.  Regular users cannot
+   *  ever call these.  They are documented for completeness and for developers who
+   *  may want to extend this class.
    */
   /**@{*/
 
   /**
-   * Print a giant block of debugging information to stdout
+   * Set chip select pin
    *
-   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+   * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
+   * and best of all, we make use of the radio's FIFO buffers. A lower speed
+   * means we're less likely to effectively leverage our FIFOs and pay a higher
+   * AVR runtime cost as toll.
+   *
+   * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
    */
-  void printDetails(void);
+  void csn(int mode);
 
   /**
-   * Enter low-power mode
+   * Set chip enable
    *
-   * To return to normal power mode, either write() some data or
-   * startListening, or powerUp().
-   *
-   * @note Optimization: The radio will never enter power down unless instructed
-   * by the MCU via this command.
+   * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
+   * for a much more detailed description of this pin.
    */
-  void powerDown(void);
+  void ce(int level);
 
   /**
-   * Leave low-power mode - making radio more responsive
+   * Read a chunk of data in from a register
    *
-   * To return to low power mode, call powerDown().
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @param buf Where to put the data
+   * @param len How many bytes of data to transfer
+   * @return Current value of status register
    */
-  void powerUp(void) ;
+  uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
 
   /**
-   * Non-blocking write to the open writing pipe
+   * Read single byte from a register
    *
-   * Just like write(), but it returns immediately. To find out what happened
-   * to the send, catch the IRQ and then call whatHappened().
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @return Current value of register @p reg
+   */
+  uint8_t read_register(uint8_t reg);
+
+  /**
+   * Write a chunk of data to a register
    *
-   * @note Optimization: This function again behaves as it did previously for backwards-compatibility.
-   * with user code. The library uses startFastWrite() internally.
-   * This is mainly used for single-payload transactions.
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @param buf Where to get the data
+   * @param len How many bytes of data to transfer
+   * @return Current value of status register
+   */
+  uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
+
+  /**
+   * Write a single byte to a register
    *
-   * @see write()
-   * @see writeFast()
-   * @see startFastWrite()
-   * @see whatHappened()
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @param value The new value to write
+   * @return Current value of status register
+   */
+  uint8_t write_register(uint8_t reg, uint8_t value);
+
+  /**
+   * Write the transmit payload
    *
-   * @param buf Pointer to the data to be sent
+   * The size of data written is the fixed payload size, see getPayloadSize()
+   *
+   * @param buf Where to get the data
    * @param len Number of bytes to be sent
-   *
+   * @return Current value of status register
    */
-  void startWrite( const void* buf, uint8_t len );
+  uint8_t write_payload(const void* buf, uint8_t len);
 
   /**
-   * Optimization: New Command
+   * Read the receive payload
    *
-   * This function is mainly used internally to take advantage of the auto payload
-   * re-use functionality of the chip, but can be beneficial to users as well.
+   * The size of data read is the fixed payload size, see getPayloadSize()
    *
-   * The function will instruct the radio to re-use the data in the FIFO buffers,
-   * and instructs the radio to re-send once the timeout limit has been reached.
-   * Used by writeFast and writeBlocking to initiate retries when a TX failure
-   * occurs. Retries are automatically initiated except with the standard write().
-   * This way, data is not flushed from the buffer until switching between modes.
-   *
-   * @note This is to be used AFTER auto-retry fails if wanting to resend
-   * using the built-in payload reuse features.
-   * After issuing reUseTX(), it will keep reending the same payload forever or until
-   * a payload is written to the FIFO, or a flush_tx command is given.
+   * @param buf Where to put the data
+   * @param len Maximum number of bytes to read
+   * @return Current value of status register
    */
-   void reUseTX();
+  uint8_t read_payload(void* buf, uint8_t len);
 
   /**
-   * Write an ack payload for the specified pipe
-   *
-   * The next time a message is received on @p pipe, the data in @p buf will
-   * be sent back in the acknowledgement.
-   *
-   * @warning According to the data sheet, only three of these can be pending
-   * at any time as there are only 3 FIFO buffers.
-   *
-   * @param pipe Which pipe# (typically 1-5) will get this response.
-   * @param buf Pointer to data that is sent
-   * @param len Length of the data to send, up to 32 bytes max.  Not affected
-   * by the static payload set by setPayloadSize().
-   */
-  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
-
-  /**
-   * Determine if an ack payload was received in the most recent call to
-   * write().
-   *
-   * Call read() to retrieve the ack payload.
-   *
-   * @note Optimization: Calling this function NO LONGER clears the interrupt
-   * flag. The new functionality checks the RX FIFO buffer for an ACK payload
-   * instead of relying on interrupt flags.Reading the payload will clear the flags.
-   *
-   * @return True if an ack payload is available.
-   */
-  bool isAckPayloadAvailable(void);
-
-  /**
-   * Test whether there are bytes available to be read in the
-   * FIFO buffers. This optimized version does not rely on interrupt
-   * flags, but checks the actual FIFO buffers.
-   *
-   * @note Optimization: Interrupt flags are no longer cleared when available is called,
-   * but will be reset only when the data is read from the FIFO buffers.
-   *
-   * @param[out] pipe_num Which pipe has the payload available
-   * @return True if there is a payload available, false if none is
-   */
-  bool available(uint8_t* pipe_num);
-
-  /**
-   * Call this when you get an interrupt to find out why
-   *
-   * Tells you what caused the interrupt, and clears the state of
-   * interrupts.
-   *
-   * @param[out] tx_ok The send was successful (TX_DS)
-   * @param[out] tx_fail The send failed, too many retries (MAX_RT)
-   * @param[out] rx_ready There is a message waiting to be read (RX_DS)
-   */
-  void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready);
-
-  /**
-   * Empty the transmit buffer
+   * Empty the receive buffer
    *
    * @return Current value of status register
    */
-  uint8_t flush_tx(void);
+  uint8_t flush_rx(void);
 
   /**
-   * Test whether there was a carrier on the line for the
-   * previous listening period.
+   * Retrieve the current status of the chip
    *
-   * Useful to check for interference on the current channel.
-   *
-   * @return true if was carrier, false if not
+   * @return Current value of status register
    */
-  bool testCarrier(void);
+  uint8_t get_status(void);
 
   /**
-   * Test whether a signal (carrier or otherwise) greater than
-   * or equal to -64dBm is present on the channel. Valid only
-   * on nRF24L01P (+) hardware. On nRF24L01, use testCarrier().
+   * Decode and print the given status to stdout
    *
-   * Useful to check for interference on the current channel and
-   * channel hopping strategies.
+   * @param status Status value to print
    *
-   * @return true if signal => -64dBm, false if not
+   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
    */
-  bool testRPD(void) ;
+  void print_status(uint8_t status);
 
   /**
-   * Test whether this is a real radio, or a mock shim for
-   * debugging.  Setting either pin to 0xff is the way to
-   * indicate that this is not a real radio.
+   * Decode and print the given 'observe_tx' value to stdout
    *
-   * @return true if this is a legitimate radio
+   * @param value The observe_tx value to print
+   *
+   * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
    */
-  bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
+  void print_observe_tx(uint8_t value);
 
   /**
-   * @see txStandBy()
+   * Print the name and value of an 8-bit register to stdout
+   *
+   * Optionally it can print some quantity of successive
+   * registers on the same line.  This is useful for printing a group
+   * of related registers on one line.
+   *
+   * @param name Name of the register
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @param qty How many successive registers to print
    */
-  bool txStandBy(bool block);
+  void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
+  /**
+   * Print the name and value of a 40-bit address register to stdout
+   *
+   * Optionally it can print some quantity of successive
+   * registers on the same line.  This is useful for printing a group
+   * of related registers on one line.
+   *
+   * @param name Name of the register
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @param qty How many successive registers to print
+   */
+  void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
+
+  /**
+   * Turn on or off the special features of the chip
+   *
+   * The chip has certain 'features' which are only available when the 'features'
+   * are enabled.  See the datasheet for details.
+   */
+  void toggle_features(void);
   /**@}*/
+
 };
 
 /**
  * @example GettingStarted.ino
- * Updated: TMRh20
- * This is an example which corresponds to my "Getting Started" blog post:
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>.
+ * <b>Updated: TMRh20 2014 </b><br>
  *
- * It is an example of how to use the RF24 class.  Write this sketch to two
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting
- * with the serial monitor and sending a 'T'.  The ping node sends the current
- * time to the pong node, which responds by sending the value back.  The ping
- * node can then see how long the whole cycle took.
+ * This is an example of how to use the RF24 class to communicate on a basic level.  Write this sketch to two
+ * different nodes. Put one of the nodes into 'transmit' mode by connecting with the serial monitor and <br>
+ * sending a 'T'. The ping node sends the current time to the pong node, which responds by sending the value
+ * back. The ping node can then see how long the whole cycle took. <br>
+ * @note For a more efficient call-response scenario see the GettingStarted_CallResponse.ino example.
+ * @note When switching between sketches, the radio may need to be powered down to clear settings that are not "un-set" otherwise
+ */
+
+/**
+ * @example GettingStarted_CallResponse.ino
+ * <b>New: TMRh20 2014</b><br>
+ *
+ * This example continues to make use of all the normal functionality of the radios including
+ * the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well. <br>
+ * This allows very fast call-response communication, with the responding radio never having to
+ * switch out of Primary Receiver mode to send back a payload, but having the option to switch to <br>
+ * primary transmitter if wanting to initiate communication instead of respond to a commmunication.
  */
 
 /**
  * @example Transfer.ino
- * Updated: TMRh20
- * This example demonstrates half-rate transfer using the FIFO buffers
+ * <b>New: TMRh20 </b><br>
+ * This example demonstrates half-rate transfer using the FIFO buffers<br>
  *
  * It is an example of how to use the RF24 class.  Write this sketch to two
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting <br>
  * with the serial monitor and sending a 'T'.  The data transfer will begin,
- * with the receiver displaying the payload count. (32Byte Payloads)
+ * with the receiver displaying the payload count. (32Byte Payloads) <br>
  */
 
 /**
  * @example TransferTimeouts.ino
- * Updated: TMRh20
+ * <b>New: TMRh20 </b><br>
  * This example demonstrates the use of and extended timeout period and
- * auto-retries/auto-reUse to increase reliability in noisy or low signal scenarios.
+ * auto-retries/auto-reUse to increase reliability in noisy or low signal scenarios. <br>
  *
  * Write this sketch to two different nodes.  Put one of the nodes into 'transmit'
- * mode by connecting with the serial monitor and sending a 'T'.  The data
+ * mode by connecting with the serial monitor and sending a 'T'.  The data <br>
  * transfer will begin, with the receiver displaying the payload count and the
  * data transfer rate.
- */
-
-/**
- * @example nordic_fob.pde
- *
- * This is an example of how to use the RF24 class to receive signals from the
- * Sparkfun Nordic FOB.  See http://www.sparkfun.com/products/8602 .
- * Thanks to Kirk Mower for providing test hardware.
- */
-
-/**
- * @example led_remote.pde
- *
- * This is an example of how to use the RF24 class to control a remote
- * bank of LED's using buttons on a remote control.
- *
- * Every time the buttons change on the remote, the entire state of
- * buttons is send to the led board, which displays the state.
- */
-
-/**
- * @example pingpair.ino
- *
- * This is an example of how to use the RF24 class.  Write this sketch to two
- * different nodes, connect the role_pin to ground on one.  The ping node sends
- * the current time to the pong node, which responds by sending the value back.
- * The ping node can then see how long the whole cycle took.
- */
-
-/**
- * @example pingpair_maple.pde
- *
- * This is an example of how to use the RF24 class on the Maple.  For a more
- * detailed explanation, see my blog post:
- * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
- *
- * It will communicate well to an Arduino-based unit as well, so it's not for only Maple-to-Maple communication.
- *
- * Write this sketch to two different nodes,
- * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
- * which responds by sending the value back.  The ping node can then see how long the whole cycle
- * took.
  */
 
 /**
@@ -924,28 +899,70 @@ public:
  */
 
 /**
- * @example pingpair_pl.pde
- *
- * This is an example of how to do two-way communication without changing
- * transmit/receive modes.  Here, a payload is set to the transmitter within
- * the Ack packet of each transmission.  Note that the payload is set BEFORE
- * the sender's message arrives.
+ * @example pingpair_ack.ino
+ * <b>Update: TMRh20</b><br>
+ * This example continues to make use of all the normal functionality of the radios including
+ * the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well.<br>
+ * This allows very fast call-response communication, with the responding radio never having to
+ * switch out of Primary Receiver mode to send back a payload, but having the option to if wanting<br>
+ * to initiate communication instead of respond to a commmunication.
  */
 
 /**
- * @example pingpair_irq.pde
- *
- * This is an example of how to user interrupts to interact with the radio.
- * It builds on the pingpair_pl example, and uses ack payloads.
+ * @example pingpair_irq.ino
+ * <b>Update: TMRh20</b><br>
+ * This is an example of how to user interrupts to interact with the radio, and a demonstration
+ * of how to use them to sleep when receiving, and not miss any payloads.<br>
+ * The pingpair_sleepy example expands on sleep functionality with a timed sleep option for the transmitter.
+ * Sleep functionality is built directly into my fork of the RF24Network library<br>
  */
 
 /**
- * @example pingpair_sleepy.pde
- *
+ * @example pingpair_sleepy.ino
+ * <b>Update: TMRh20</b><br>
  * This is an example of how to use the RF24 class to create a battery-
- * efficient system.  It is just like the pingpair.pde example, but the
+ * efficient system.  It is just like the GettingStarted_CallResponse example, but the<br>
  * ping node powers down the radio and sleeps the MCU after every
- * ping/pong cycle.
+ * ping/pong cycle, and the receiver sleeps between payloads. <br>
+ */
+
+/**
+ * @example pingpair_dyn.pde
+ *
+ * This is an example of how to use payloads of a varying (dynamic) size.
+ */
+
+/**
+ * @example pingpair_maple.pde
+ *
+ * This is an example of how to use the RF24 class on the Maple.  For a more
+ * detailed explanation, see my blog post:
+ * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
+ *
+ * It will communicate well to an Arduino-based unit as well, so it's not for only Maple-to-Maple communication.
+ *
+ * Write this sketch to two different nodes,
+ * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
+ * which responds by sending the value back.  The ping node can then see how long the whole cycle
+ * took.
+ */
+
+/**
+ * @example nordic_fob.pde
+ *
+ * This is an example of how to use the RF24 class to receive signals from the
+ * Sparkfun Nordic FOB.  See http://www.sparkfun.com/products/8602 .
+ * Thanks to Kirk Mower for providing test hardware.
+ */
+
+/**
+ * @example led_remote.pde
+ *
+ * This is an example of how to use the RF24 class to control a remote
+ * bank of LED's using buttons on a remote control.
+ *
+ * Every time the buttons change on the remote, the entire state of
+ * buttons is send to the led board, which displays the state.
  */
 
 /**
@@ -973,14 +990,21 @@ public:
  *
  * @section News News
  *
- * March 2014: Fork currently being optimized for high speed and more responsive data transfers
+ * <b>March 2014: Optimization begun<br>
+ * April 2014: Optimization nearing completion </b><br>
+ * - The library has been tweaked to allow full use of the FIFO buffers for maximum transfer speeds
+ * - Changes to read() functionality have increased reliability and response
+ * - Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
+ * - Delays have been removed where possible to ensure maximum efficiency
+ * - More! See the links below and class documentation for more info.
+ *
  * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  * @section Useful Useful References
  *
  * Please refer to:
  *
  * @li <a href="http://tmrh20.github.io/">Documentation Main Page</a>
- * @li <a href="http://tmrh20.github.io/RF24/class_r_f24.html">RF24 Class Documentation</a>
+ * @li <a href="http://tmrh20.github.io/RF24/classRF24.html">RF24 Class Documentation</a>
  * @li <a href="https://github.com/tmrh20/RF24/">Source Code</a>
  * @li <a href="https://github.com/tmrh20/RF24/archives/master">Downloads Page</a>
  * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
@@ -995,6 +1019,8 @@ public:
  *
  * @li Project blog:
  * @li <a href="http://TMRh20.blogspot.com"> TMRh20.blogspot.com </a>
+ * @li <a href="https://github.com/TMRh20"> RF24 Wireless Audio Library (Coming Soon) </a>
+ * @li <a href="https://github.com/TMRh20/RF24Network"> Optimized RF24 Network Layer </a>
  * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
  */
 

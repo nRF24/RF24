@@ -19,9 +19,15 @@ void RF24::csn(int mode)
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
+	#if !defined( __AVR_ATtiny85__ ) && !defined( __AVR_ATtiny84__)
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV4);
+  #ifdef __arm__ // Shouldn't need to set the clock divider on DUE
+	SPI.setClockDivider(21);
+  #else
+    SPI.setClockDivider(SPI_CLOCK_DIV4);
+  #endif
+#endif
 #endif
   digitalWrite(csn_pin,mode);
 }
@@ -273,6 +279,8 @@ uint8_t RF24::getPayloadSize(void)
 
 /****************************************************************************/
 
+#if !defined (MINIMAL)
+
 static const char rf24_datarate_e_str_0[] PROGMEM = "1MBPS";
 static const char rf24_datarate_e_str_1[] PROGMEM = "2MBPS";
 static const char rf24_datarate_e_str_2[] PROGMEM = "250KBPS";
@@ -328,6 +336,7 @@ void RF24::printDetails(void)
   printf_P(PSTR("PA Power\t = %S\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 }
 
+#endif
 /****************************************************************************/
 
 void RF24::begin(void)
@@ -440,6 +449,7 @@ void RF24::powerDown(void)
 void RF24::powerUp(void)
 {
   write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
+  delay(2);
 }
 
 /******************************************************************/
@@ -484,8 +494,9 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, unsigned long timeout )
 
 		if( get_status() & _BV(MAX_RT)){					  //If MAX Retries have been reached
 			reUseTX();										  //Set re-transmit and clear the MAX_RT interrupt flag
+			if(millis() - timer > timeout){ return 0; }		  //If this payload has exceeded the user-defined timeout, exit and return 0
 		}
-		if(millis() - timer > timeout){ return 0; }			  //If this payload has exceeded the user-defined timeout, exit and return 0
+
   	}
 
   	//Start Writing
@@ -548,32 +559,29 @@ void RF24::startFastWrite( const void* buf, uint8_t len ){ //TMRh20
 
 //Added the original startWrite back in so users can still use interrupts, ack payloads, etc
 //Allows the library to pass all tests
-void RF24::startWrite( const void* buf, uint8_t len )
-{
-  // Transmitter power-up
-  write_register(CONFIG, ( read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );
-  delayMicroseconds(150);
+void RF24::startWrite( const void* buf, uint8_t len ){
 
   // Send the payload
-  write_payload( buf, len );
 
-  // Allons!
+  write_payload( buf, len );
   ce(HIGH);
-  delayMicroseconds(15);
   ce(LOW);
+
+
 }
 
 bool RF24::txStandBy(){
+
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
 			write_register(STATUS,_BV(MAX_RT) );
+			ce(LOW);
 			flush_tx();    //Non blocking, flush the data
-			ce(LOW);	   //Set STANDBY-I mode
 			return 0;
 		}
 	}
 
-	ce(LOW);				   //Set STANDBY-I mode
+	ce(LOW);			   //Set STANDBY-I mode
 	return 1;
 }
 
@@ -584,12 +592,11 @@ bool RF24::txStandBy(unsigned long timeout){
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
 			write_register(STATUS,_BV(MAX_RT) );
-			if(timeout > 0){
 				ce(LOW);										  //Set re-transmit
 				ce(HIGH);
-				if(millis() - start > timeout){ ce(LOW); flush_tx(); return 0; }
-
-			}
+				if(millis() - start >= timeout){
+					ce(LOW); flush_tx(); return 0;
+				}
 		}
 	}
 	ce(LOW);				   //Set STANDBY-I mode
@@ -1051,5 +1058,51 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
  write_register(SETUP_RETR,(delay&0xf)<<ARD | (count&0xf)<<ARC);
 }
 
-// vim:ai:cin:sts=2 sw=2 ft=cpp
+
+
+
+
+
+#if defined (ATTINY)
+
+#include "pins_arduino.h"
+
+#if defined( __AVR_ATtiny85__ )
+const static uint8_t _CS = PB4;
+const static uint8_t _MOSI = PB1;
+const static uint8_t _MISO = PB0;
+const static uint8_t _SCK  = PB2;
+#endif
+
+#if defined( __AVR_ATtiny84__ )
+const static uint8_t _CS   = 3;
+const static uint8_t _MOSI = 5;
+const static uint8_t _MISO = 4;
+const static uint8_t _SCK  = 6;
+#endif
+
+SPIClass SPI;
+
+void SPIClass::begin() {
+
+  pinMode(_SCK, OUTPUT);
+  pinMode(_MOSI, OUTPUT);
+  pinMode(_MISO,INPUT);
+
+  digitalWrite(_MISO,HIGH);
+  digitalWrite(_SCK, LOW);
+  digitalWrite(_MOSI, LOW);
+}
+
+void SPIClass::end() {
+
+  pinMode(_SCK, INPUT);
+  pinMode(_MOSI, INPUT);
+  pinMode(_MISO,INPUT);
+}
+
+void SPIClass::setDataMode(byte mode){}
+void SPIClass::setClockDivider(byte rate){}
+
+#endif
 

@@ -7,6 +7,9 @@
   startListening KEYWORD2
   stopListening KEYWORD2
   write KEYWORD2
+  writeFast	KEYWORD2
+  writeBlocking	KEYWORD2
+  txStandBy	KEYWORD2
   available KEYWORD2
   read KEYWORD2
   openWritingPipe KEYWORD2

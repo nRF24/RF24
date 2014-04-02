@@ -4,20 +4,19 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
+//2014 - TMRh20 - Updated along with Optimized RF24 Library fork
  */
 
 /**
  * Example for Getting Started with nRF24L01+ radios. 
  *
- * This is an example of how to use the RF24 class.  Write this sketch to two 
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting 
- * with the serial monitor and sending a 'T'.  The ping node sends the current 
- * time to the pong node, which responds by sending the value back.  The ping 
- * node can then see how long the whole cycle took.
+ * This is an example of how to use the RF24 class to communicate on a basic level.  Write this sketch to two 
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting with the serial monitor and
+ * sending a 'T'.  The ping node sends the current time to the pong node, which responds by sending the value
+ * back.  The ping node can then see how long the whole cycle took. 
+ * Note: For a more efficient call-response scenario see the GettingStarted_CallResponse.ino example.
+ * Note: When switching between sketches, the radio may need to be powered down to clear settings that are not "un-set" otherwise
  */
-
-//March 2014 - TMRh20 - Updated to utilize High Speed RF24 Library fork
-//This 
 
 
 #include <SPI.h>
@@ -25,135 +24,95 @@
 #include "RF24.h"
 #include "printf.h"
 
-// Hardware configuration
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
+// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
+RF24 radio(7,8);
 
-RF24 radio(48,49);
+const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };  // Radio pipe addresses for the 2 nodes to communicate.
 
-// Topology
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
+// Set up roles to simplify testing 
+boolean role;                                    // The main role variable, holds the current role identifier
+boolean role_ping_out = 1, role_pong_back = 0;   // The two different roles.
 
-//
-// Role management
-// Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.  
+void setup() {
 
-// The various roles supported by this sketch
-typedef enum { role_ping_out = 1, role_pong_back } role_e;
-
-// The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
-
-// The role of the current running sketch
-role_e role = role_pong_back;
-
-void setup(void)
-{
-  //
-  // Print preamble
-  //
 
   Serial.begin(57600);
   printf_begin();
   printf("\n\rRF24/examples/GettingStarted/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
   printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
 
-  //
   // Setup and configure rf radio
-
-  radio.begin();
+  radio.begin();                          // Start up the radio
   radio.setAutoAck(1);                    // Ensure autoACK is enabled
-
-  radio.setRetries(15,15);                // Optionally, increase the delay between retries & # of retries
-
-  radio.openWritingPipe(pipes[1]);
-  radio.openReadingPipe(1,pipes[0]);
+  radio.setRetries(15,15);                // Max delay between retries & number of retries
+  
+  radio.openWritingPipe(addresses[1]);    // Open a writing pipe on pipe 0, with address 1
+  radio.openReadingPipe(1,addresses[0]);  // Open a reading pipe on pipe 1, with address 0
 
   radio.startListening();                 // Start listening
-
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 }
 
-void loop(void)
-{
-  //
-  // Ping out role.  Repeatedly send the current time
-  //
+void loop(void){
+    
 
-  if (role == role_ping_out)
-  {
+/****************** Ping Out Role ***************************/
+  if (role == role_ping_out)  {
     
-    radio.stopListening();                                  // First, stop listening so we can talk.
+    radio.stopListening();                                    // First, stop listening so we can talk.
     
-    unsigned long time = millis();                          // Take the time, and send it.  This will block until complete
-    printf("Now sending %lu...",time);
-    radio.writeFast( &time, sizeof(unsigned long) );        //New function for proper use of FIFO buffers
-    bool ok = radio.txStandBy();                            //Called when STANDBY-I mode is engaged (User is finished sending)
-    if (!ok)
-      printf("failed.\n\r");
-    
-    
-    radio.startListening();                                 // Now, continue listening
-    
-    unsigned long started_waiting_at = millis();            // Wait here until we get a response, or timeout (250ms)
-    bool timeout = false;
-    while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 200 )
-        timeout = true;
+    unsigned long time;
+    printf("Now sending ",time);
+
+    time = micros();                                          // Take the time, and send it.  This will block until complete
+    boolean ok = radio.write( &time, sizeof(unsigned long) ); // Send the current time
+    if (!ok){  printf("failed.\n\r");  }
         
-    if ( timeout )                                          // Describe the results
-    {
-      printf("Failed, response timed out.\n\r");
+    radio.startListening();                                    // Now, continue listening
+    
+    unsigned long started_waiting_at = micros();               // Set up a timeout period, get the current microseconds
+    boolean timeout = false;                                   // Set up a variable to indicate if a response was received or not
+    
+    while ( ! radio.available() ){                             // While nothing is received
+      if (micros() - started_waiting_at > 200000 ){            // If waited longer than 200ms, indicate timeout and exit while loop
+          timeout = true;
+          break;
+      }      
     }
-    else
-    {
-      unsigned long got_time;                               // Grab the response, compare, and send to debugging spew
-      radio.read( &got_time, sizeof(unsigned long) );
-      unsigned long tim = millis();
-      // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,tim-got_time);
+        
+    if ( timeout ){                                             // Describe the results
+        printf("Failed, response timed out.\n\r");
+    }else{
+        unsigned long got_time;                                 // Grab the response, compare, and send to debugging spew
+        radio.read( &got_time, sizeof(unsigned long) );
+
+        // Spew it
+        printf("Sent %lu, Got response %lu, round-trip delay: %lu microseconds\n\r",time,got_time,micros()-got_time);
     }
 
     // Try again 1s later
     delay(1000);
   }
 
-  //
-  // Pong back role.  Receive each packet, dump it out, and send it back
-  //
+/****************** Pong Back Role ***************************/
 
   if ( role == role_pong_back )
   {
     if( radio.available()){
-      unsigned long got_time;                                       // Dump the payloads until we've gotten everything
-      bool done = false;
+      unsigned long got_time;                                       // Variable for the received timestamp
       while (radio.available()) {                                   // While there is data ready
-        // Fetch the payload, and see if this was the last one.
-        radio.read( &got_time, sizeof(unsigned long) );
+        radio.read( &got_time, sizeof(unsigned long) );             // Get the payload
       }    
-        // Spew it
-        //printf("Got payload %lu...",got_time);
-
-	// Delay just a little bit to let the other unit
-	// make the transition to receiver
-	//delay(2);
      
-      radio.stopListening();                                          // First, stop listening so we can talk
-     
-      radio.writeFast( &got_time, sizeof(unsigned long) );            // Send the final one back.      
-      radio.txStandBy();
-      radio.startListening();                                         // Now, resume listening so we catch the next packets.
-      
-      //printf("Sent response.\n\r");
-    
+      radio.stopListening();                                        // First, stop listening so we can talk   
+      radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
+      radio.startListening();                                       // Now, resume listening so we catch the next packets.     
+      printf("Sent response %lu \n\r", got_time);  
    }
  }
 
-  //
-  // Change roles
-  //
+
+/****************** Change Roles via Serial Commands ***************************/
 
   if ( Serial.available() )
   {
@@ -163,16 +122,16 @@ void loop(void)
       printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
 
       role = role_ping_out;                  // Become the primary transmitter (ping out)
-      radio.openWritingPipe(pipes[0]);
-      radio.openReadingPipe(1,pipes[1]);
+      radio.openWritingPipe(addresses[0]);
+      radio.openReadingPipe(1,addresses[1]);
     }
     else if ( c == 'R' && role == role_ping_out )
     {
       printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
       
        role = role_pong_back;                // Become the primary receiver (pong back)
-       radio.openWritingPipe(pipes[1]);
-       radio.openReadingPipe(1,pipes[0]);
+       radio.openWritingPipe(addresses[1]);
+       radio.openReadingPipe(1,addresses[0]);
     }
   }
 }
