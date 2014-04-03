@@ -996,6 +996,7 @@ private:
  * - Changes to read() functionality have increased reliability and response
  * - Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
  * - Delays have been removed where possible to ensure maximum efficiency
+ * - Untested: Arduino Due and ATTiny 84/85 support: Do NOT #include <SPI.h> with ATTiny.
  * - More! See the links below and class documentation for more info.
  *
  * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
@@ -1025,5 +1026,5 @@ private:
  */
 
 #endif // __RF24_H__
-// vim:ai:cin:sts=2 sw=2 ft=cpp
+
 

@@ -399,6 +399,8 @@ void RF24::begin(void)
   flush_rx();
   flush_tx();
 
+  powerUp();
+  delay(5);
   //Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
 
@@ -449,7 +451,7 @@ void RF24::powerDown(void)
 void RF24::powerUp(void)
 {
   write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
-  delay(2);
+  delay(5);
 }
 
 /******************************************************************/
