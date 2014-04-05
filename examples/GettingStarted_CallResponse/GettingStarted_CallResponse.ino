@@ -61,10 +61,10 @@ void loop(void) {
   if (role == role_ping_out){                               // Radio is in ping mode
 
     byte gotByte;                                           // Initialize a variable for the incoming response
-    unsigned long time = micros();                          // Record the current microsecond count   
     
     radio.stopListening();                                  // First, stop listening so we can talk.      
     printf("Now sending %d as payload. ",counter);          // Use a simple byte counter as payload
+    unsigned long time = micros();                          // Record the current microsecond count   
                                                             
     if ( radio.write(&counter,1) ){                         // Send the counter variable to the other radio 
         if(!radio.available()){                             // If nothing in the buffer, we got an ack but it is blank

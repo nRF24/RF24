@@ -54,7 +54,6 @@ private:
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
-  bool avail;
 
 public:
 
@@ -360,7 +359,7 @@ public:
    * @return True if transmission is successful
    *
    */
-   bool txStandBy(unsigned long timeout);
+   bool txStandBy(uint32_t timeout);
 
   /**
    * Write an ack payload for the specified pipe
@@ -699,7 +698,7 @@ private:
    *
    * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
    */
-  void csn(int mode);
+  void csn(bool mode);
 
   /**
    * Set chip enable
@@ -707,7 +706,7 @@ private:
    * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
    * for a much more detailed description of this pin.
    */
-  void ce(int level);
+  void ce(bool level);
 
   /**
    * Read a chunk of data in from a register

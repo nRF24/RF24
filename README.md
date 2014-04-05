@@ -2,7 +2,7 @@
   
 Design Goals: This library is designed to be...  
   
-* More complianct with the manufacturer specified operation of the chip  
+* More compliant with the manufacturer specified operation of the chip  
 * More reliable and feature rich  
 * Easy for beginners to use  
 * Consumed with a public interface that's similiar to other Arduino standard libraries  
@@ -14,6 +14,7 @@ April 2014: Optimization nearing completion
 * Changes to read() functionality have increased reliability and response  
 * Extended timeout periods have been added to aid in noisy or otherwise unreliable environments  
 * Delays have been removed where possible to ensure maximum efficiency  
+* Arduino Due fully supported with extended SPI functions
 * More! See the links below and class documentation for more info.  
   
 Please refer to:  

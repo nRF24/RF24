@@ -24,9 +24,9 @@
   //#define MINIMAL
 
   // Define _BV for non-Arduino platforms and for Arduino DUE
-  #if ! defined(ARDUINO) || (defined(ARDUINO) && defined(__arm__))
-	#define _BV(x) (1<<(x))
-  #endif
+
+
+
 
   #undef SERIAL_DEBUG
   #ifdef SERIAL_DEBUG
@@ -35,27 +35,29 @@
 	#define IF_SERIAL_DEBUG(x)
   #endif
 
-  // Avoid spurious warnings
-  #if 1
-	#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)
-		#undef PROGMEM
-		#define PROGMEM __attribute__(( section(".progmem.data") ))
-		#undef PSTR
-		#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
-	#endif
-  #endif
+// Avoid spurious warnings
+// Arduino DUE is arm and uses traditional PROGMEM constructs
+#if 1
+#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)
+#undef PROGMEM
+#define PROGMEM __attribute__(( section(".progmem.data") ))
+#undef PSTR
+#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
+#endif
+#endif
 
-  // Progmem is Arduino-specific
-  #if defined(ARDUINO) && ! defined(__arm__)
-	#include <avr/pgmspace.h>
-	#define PRIPSTR "%S"
-  #else
+// Progmem is Arduino-specific
+// Arduino DUE is arm and does not include avr/pgmspace
+#if defined(ARDUINO) && ! defined(__arm__)
+#include <avr/pgmspace.h>
+#define PRIPSTR "%S"
+#else
+#if ! defined(ARDUINO) // This doesn't work on Arduino DUE
+typedef char const char;
+#else // Fill in pgm_read_byte that is used, but missing from DUE
+#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#endif
 
-  	#if ! defined(ARDUINO)
-	  typedef char const char;
-      else // Fill in pgm_read_byte that is used, but missing from DUE
-	  #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-	#endif
 	typedef uint16_t prog_uint16_t;
 	#define PSTR(x) (x)
 	#define printf_P printf
@@ -66,14 +68,18 @@
   #endif
 
 
-
+// Define _BV for non-Arduino platforms and for Arduino DUE
+#if ! defined(ARDUINO) || (defined(ARDUINO) && defined(__arm__))
+#define _BV(x) (1<<(x))
+#endif
   // Stuff that is normally provided by Arduino
-  #if !defined ARDUINO
+  #if !defined (ARDUINO)
 
 	#include <stdint.h>
 	#include <stdio.h>
 	#include <string.h>
 	extern HardwareSPI SPI;
+	#define _BV(x) (1<<(x))
   #else
 
     #if !defined( __AVR_ATtiny85__ ) || defined( __AVR_ATtiny84__)
