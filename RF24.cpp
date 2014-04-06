@@ -206,7 +206,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
 		  }
 		  *current++ = SPI.transfer(csn_pin,0xff);
 	  }else{
-		  while ( data_len-- > 1 ){
+		  while ( data_len-- ){
 		    *current++ = SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
 		  }
 
