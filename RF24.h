@@ -263,6 +263,9 @@ public:
    * timeout, and return 1 or 0 respectively. From a user perspective, just
    * keep trying to send the same data. The library will keep auto retrying
    * the current payload using the built in functionality.
+   * @warning It is important to never keep the nRF24L01 in TX mode for more than 4ms at a time. If the auto
+   * retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
+   * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
    *
    * ONLY max retry interrupt flags will be cleared when writeFast is called
    *
@@ -292,6 +295,9 @@ public:
    * It will not block until the 3 FIFO buffers are filled with data.
    * If so the library will auto retry until a new payload is written
    * or the user specified timeout period is reached.
+   * @warning It is important to never keep the nRF24L01 in TX mode for more than 4ms at a time. If the auto
+   * retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
+   * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
    *
    * ONLY max retry interrupt flags will be cleared when writeBlocking is called
    * @code
@@ -409,6 +415,9 @@ public:
    * @note Optimization: This function now leaves the CE pin high, so the radio
    * will remain in TX or STANDBY-II Mode until a txStandBy() command is issued.
    * This allows the chip to be used to its full potential in TX mode.
+   * @warning It is important to never keep the nRF24L01 in TX mode for more than 4ms at a time. If the auto
+   * retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
+   * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
    *
    * @see write()
    * @see writeFast()
@@ -500,7 +509,20 @@ public:
   bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
 
   /**
+  * The radio will generate interrupt signals when a transmission is complete,
+  * a transmission fails, or a payload is received. This allows users to mask
+  * those interrupts to prevent them from generating a signal on the interrupt
+  * pin.
   *
+  * @code
+  * 	Mask all interrupts except the receive interrupt:
+  *
+  *		radio.maskIRQ(1,1,0);
+  * @endcode
+  *
+  * @param tx_ok  Mask transmission complete interrupts
+  * @param tx_fail  Mask transmit failure interrupts
+  * @param rx_ready Mask payload received interrupts
   */
   void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready);
 
@@ -995,7 +1017,8 @@ private:
  * - Changes to read() functionality have increased reliability and response
  * - Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
  * - Delays have been removed where possible to ensure maximum efficiency
- * - Untested: Arduino Due and ATTiny 84/85 support: Do NOT #include <SPI.h> with ATTiny.
+ * - Full Due support with extended SPI functions
+ * - Initial ATTiny support added (Untested)
  * - More! See the links below and class documentation for more info.
  *
  * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
@@ -1012,6 +1035,15 @@ private:
  *
  * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
  * the SPI hardware will go into 'slave' mode.
+ *
+ * @section BoardSupport Board Support
+ *
+ * Most standard Arduino based boards are supported:
+ * - ATMega 328 based boards (Uno, Nano, etc)
+ * - Mega Boards (1280, 2560, etc)
+ * - ARM based boards (Arduino Due)  Note: Do not include printf.h or use printf begin. This functionality is already present. Must use one of the
+ * 	hardware SS/CSN pins.
+ * - ATTiny boards (Not fully tested) Note: Do not include SPI.h. The SPI functions for ATTiny are already included.
  *
  * @section More More Information
  *

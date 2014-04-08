@@ -579,14 +579,12 @@ void RF24::powerUp(void)
 bool RF24::write( const void* buf, uint8_t len )
 {
 	//Start Writing
-    startFastWrite(buf,len);
+    startWrite(buf,len);
 
 	//Wait until complete or failed
 	//ACK payloads that are handled improperly will cause this to hang
 	//If autoAck is ON, a payload has to be written prior to reading a payload, else write after reading a payload
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { }
-
-	ce(LOW); //Set the radio back to STANDBY-I mode since we can only fill one buffer at a time using this method, and tx is complete
 
 	uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 

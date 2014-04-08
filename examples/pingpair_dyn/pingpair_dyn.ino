@@ -15,7 +15,7 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-#include "printf.h"
+//#include "printf.h"
 
 //
 // Hardware configuration
@@ -27,7 +27,7 @@ RF24 radio(9,10);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 7;
+const int role_pin = 5;
 
 //
 // Topology
@@ -61,7 +61,7 @@ role_e role;
 
 const int min_payload_size = 4;
 const int max_payload_size = 32;
-const int payload_size_increments_by = 2;
+const int payload_size_increments_by = 1;
 int next_payload_size = min_payload_size;
 
 char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
@@ -74,7 +74,7 @@ void setup(void)
 
   // set up the role pin
   pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,HIGH);
+  digitalWrite(role_pin,LOW);
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
@@ -88,7 +88,7 @@ void setup(void)
   //
 
   Serial.begin(57600);
-  printf_begin();
+  //printf_begin();
   printf("\n\rRF24/examples/pingpair_dyn/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
 
@@ -102,7 +102,7 @@ void setup(void)
   radio.enableDynamicPayloads();
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15);
+  radio.setRetries(5,15);
 
   //
   // Open pipes to other nodes for communication
@@ -189,7 +189,7 @@ void loop(void)
       next_payload_size = min_payload_size;
 
     // Try again 1s later
-    delay(1000);
+    delay(100);
   }
 
   //
@@ -204,11 +204,11 @@ void loop(void)
       // Dump the payloads until we've gotten everything
       uint8_t len;
       bool done = false;
-      while (!done)
+      while (radio.available())
       {
         // Fetch the payload, and see if this was the last one.
 	len = radio.getDynamicPayloadSize();
-	done = radio.read( receive_payload, len );
+	radio.read( receive_payload, len );
 
 	// Put a zero at the end for easy printing
 	receive_payload[len] = 0;
