@@ -135,48 +135,45 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
 /****************************************************************************/
 
-uint8_t RF24::write_payload(const void* buf, uint8_t len)
+uint8_t RF24::write_payload(const void* buf, uint8_t data_len)
 {
   uint8_t status;
-
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-  uint8_t data_len = min(len,payload_size);
+  if(data_len > payload_size) data_len = payload_size;
   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
 
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
 
-  #if defined (__arm__)
+ #if defined (__arm__)
 
-  	  status = SPI.transfer(csn_pin, W_TX_PAYLOAD , SPI_CONTINUE);
+  status = SPI.transfer(csn_pin, W_TX_PAYLOAD , SPI_CONTINUE);
 
-	  if(data_len == 32 || dynamic_payloads_enabled){
-		  while ( data_len-- > 1){
-		  	    SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
-	  	  }
-	  	  SPI.transfer(csn_pin,*current++);
-	  }else{
-		  while ( data_len-- ){
-		    	SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
-		  }
-  	  }
-
-  	  if(blank_len){
-	  while ( blank_len-- > 1){
-        SPI.transfer(csn_pin,0, SPI_CONTINUE);
-	  }
-	  SPI.transfer(csn_pin,0);
-	  }
-
+  if(blank_len){
+    while ( data_len--){
+      SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
+    }
+    while ( --blank_len ){
+      SPI.transfer(csn_pin,0, SPI_CONTINUE);
+    }
+    SPI.transfer(csn_pin,0);
+  }else{
+    while( --data_len ){
+      SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
+    }    
+    SPI.transfer(csn_pin,*current);
+  }
 
   #else
 
   csn(LOW);
   status = SPI.transfer( W_TX_PAYLOAD );
-  while ( data_len-- )
+  while ( data_len-- ) {
     SPI.transfer(*current++);
-  while ( blank_len-- )
+  }
+  while ( blank_len-- ) {
     SPI.transfer(0);
+  }
   csn(HIGH);
 
   #endif
@@ -186,46 +183,47 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len)
 
 /****************************************************************************/
 
-uint8_t RF24::read_payload(void* buf, uint8_t len)
+uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 {
   uint8_t status;
   uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
-  uint8_t data_len = min(len,payload_size);
+  if(data_len > payload_size) data_len = payload_size;
   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
 
   //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
+
   #if defined (__arm__)
 
-  	  status = SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
+  status = SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
 
-	  if(data_len == 32 || dynamic_payloads_enabled){
-		  while ( data_len-- > 1 ){
-		    *current++ = SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
-		  }
-		  *current++ = SPI.transfer(csn_pin,0xff);
-	  }else{
-		  while ( data_len-- ){
-		    *current++ = SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
-		  }
+  if( blank_len ){
 
-	  }
-		  if(blank_len){
-		  while ( blank_len-- ){
-	  	    SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
-	  	  }
-	  	  SPI.transfer(csn_pin,0xff);
-	  	  }
+	while ( data_len-- ){
+      *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+	}
+	while ( --blank_len ){
+	  SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+	}  
+	SPI.transfer(csn_pin,0xFF);
+  }else{
+	while ( --data_len ){
+	  *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+	}
+	*current = SPI.transfer(csn_pin,0xFF);
+  }
 
   #else
 
   csn(LOW);
   status = SPI.transfer( R_RX_PAYLOAD );
-  while ( data_len-- )
-    *current++ = SPI.transfer(0xff);
-  while ( blank_len-- )
+  while ( data_len-- ) {
+    *current++ = SPI.transfer(0xFF);
+  }
+  while ( blank_len-- ) {
     SPI.transfer(0xff);
+  }
   csn(HIGH);
 
   #endif
