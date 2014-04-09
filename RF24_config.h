@@ -24,8 +24,15 @@
   //#define MINIMAL
 
   // Define _BV for non-Arduino platforms and for Arduino DUE
-
-
+#if defined (ARDUINO)
+	#include <SPI.h>
+#else
+	#include <stdint.h>
+	#include <stdio.h>
+	#include <string.h>
+	extern HardwareSPI SPI;
+	#define _BV(x) (1<<(x))
+  #endif
 
 
   #undef SERIAL_DEBUG
@@ -33,6 +40,9 @@
 	#define IF_SERIAL_DEBUG(x) ({x;})
   #else
 	#define IF_SERIAL_DEBUG(x)
+	#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
+	#define printf_P(...)
+    #endif
   #endif
 
 // Avoid spurious warnings
@@ -49,13 +59,13 @@
 // Progmem is Arduino-specific
 // Arduino DUE is arm and does not include avr/pgmspace
 #if defined(ARDUINO) && ! defined(__arm__)
-#include <avr/pgmspace.h>
-#define PRIPSTR "%S"
+	#include <avr/pgmspace.h>
+	#define PRIPSTR "%S"
 #else
 #if ! defined(ARDUINO) // This doesn't work on Arduino DUE
-typedef char const char;
+	typedef char const char;
 #else // Fill in pgm_read_byte that is used, but missing from DUE
-#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 #endif
 
 	typedef uint16_t prog_uint16_t;
@@ -65,75 +75,55 @@ typedef char const char;
 	#define PROGMEM
 	#define pgm_read_word(p) (*(p))
 	#define PRIPSTR "%s"
-  #endif
-
-
-// Define _BV for non-Arduino platforms and for Arduino DUE
-#if ! defined(ARDUINO) || (defined(ARDUINO) && defined(__arm__))
-#define _BV(x) (1<<(x))
 #endif
-  // Stuff that is normally provided by Arduino
-  #if !defined (ARDUINO)
-
-	#include <stdint.h>
-	#include <stdio.h>
-	#include <string.h>
-	extern HardwareSPI SPI;
-	#define _BV(x) (1<<(x))
-  #else
-
-    #if !defined( __AVR_ATtiny85__ ) || defined( __AVR_ATtiny84__)
-	  #include <SPI.h>
-    #else
-	  #define ATTINY
-
-	  #define SPI_CLOCK_DIV4 0x00
-	  #define SPI_CLOCK_DIV16 0x01
-	  #define SPI_CLOCK_DIV64 0x02
-	  #define SPI_CLOCK_DIV128 0x03
-	  #define SPI_CLOCK_DIV2 0x04
-	  #define SPI_CLOCK_DIV8 0x05
-	  #define SPI_CLOCK_DIV32 0x06
-	  //#define SPI_CLOCK_DIV64 0x07
-
-	  #define SPI_MODE0 0x00
-	  #define SPI_MODE1 0x04
-	  #define SPI_MODE2 0x08
-	  #define SPI_MODE3 0x0C
-
-	  #define SPI_MODE_MASK 0x0C  // CPOL = bit 3, CPHA = bit 2 on SPCR
-	  #define SPI_CLOCK_MASK 0x03  // SPR1 = bit 1, SPR0 = bit 0 on SPCR
-	  #define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
 
 
 
-	  class SPIClass {
-	  public:
-	    inline static byte transfer(byte _data);
+// ATTiny support code is from https://github.com/jscrane/RF24
 
-	    static void begin(); // Default
-	    static void end();
+#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+#include <stdio.h>
+#include <Arduino.h>
+#include <avr/pgmspace.h>
 
-	    static void setDataMode(byte);
-	    static void setClockDivider(byte);
-	    static void setBitOrder(byte);
-	  };
+#define SPI_CLOCK_DIV4 0x00
+#define SPI_CLOCK_DIV16 0x01
+#define SPI_CLOCK_DIV64 0x02
+#define SPI_CLOCK_DIV128 0x03
+#define SPI_CLOCK_DIV2 0x04
+#define SPI_CLOCK_DIV8 0x05
+#define SPI_CLOCK_DIV32 0x06
+//#define SPI_CLOCK_DIV64 0x07
 
-	  extern SPIClass SPI;
+#define SPI_MODE0 0x00
+#define SPI_MODE1 0x04
+#define SPI_MODE2 0x08
+#define SPI_MODE3 0x0C
 
-	  byte SPIClass::transfer(byte _data){
+#define SPI_MODE_MASK 0x0C  // CPOL = bit 3, CPHA = bit 2 on SPCR
+#define SPI_CLOCK_MASK 0x03  // SPR1 = bit 1, SPR0 = bit 0 on SPCR
+#define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
 
-	  	USIDR = _data;
-	  	USISR = _BV(USIOIF);
 
-		while((USISR & _BV(USIOIF)) == 0){
-	    	USICR = _BV(USIWM0) | _BV(USICS1) | _BV(USICLK) | _BV(USITC);
-	  	}
-	  	return USIDR;
-	  }
-    #endif //ATTINY
 
-  #endif //Defined Arduino
+class SPIClass {
+public:
+  static byte transfer(byte _data);
 
+  // SPI Configuration methods
+
+  inline static void attachInterrupt();
+  inline static void detachInterrupt(); // Default
+
+  static void begin(); // Default
+  static void end();
+
+  static void setBitOrder(uint8_t);
+  static void setDataMode(uint8_t);
+  static void setClockDivider(uint8_t);
+};
+extern SPIClass SPI;
+
+#endif //ATTiny
 #endif // __RF24_CONFIG_H__
 

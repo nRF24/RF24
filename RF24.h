@@ -948,7 +948,7 @@ private:
  */
 
 /**
- * @example pingpair_dyn.pde
+ * @example pingpair_dyn.ino
  *
  * This is an example of how to use payloads of a varying (dynamic) size.
  */
@@ -1018,7 +1018,7 @@ private:
  * - Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
  * - Delays have been removed where possible to ensure maximum efficiency
  * - Full Due support with extended SPI functions
- * - Initial ATTiny support added (Untested)
+ * - ATTiny 24/44/84 25/45/85 now supported.
  * - More! See the links below and class documentation for more info.
  *
  * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
@@ -1042,8 +1042,11 @@ private:
  * - ATMega 328 based boards (Uno, Nano, etc)
  * - Mega Boards (1280, 2560, etc)
  * - ARM based boards (Arduino Due)  Note: Do not include printf.h or use printf begin. This functionality is already present. Must use one of the
- * 	hardware SS/CSN pins.
- * - ATTiny boards (Not fully tested) Note: Do not include SPI.h. The SPI functions for ATTiny are already included.
+ * 	hardware SS/CSN pins as extended SPI methods are used.
+ *  Initial Due support taken from https://github.com/mcrosson/RF24/tree/due
+ * - ATTiny board support added from https://github.com/jscrane/RF24
+ * Note: ATTiny support is built into the library. Do not include SPI.h.
+ * See <a href="http://programmablehardware.blogspot.ca/2013/09/rf24-with-attiny84.html">here </a>for wiring/pin info.
  *
  * @section More More Information
  *

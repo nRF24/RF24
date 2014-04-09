@@ -380,7 +380,7 @@ uint8_t RF24::getPayloadSize(void)
 
 /****************************************************************************/
 
-#if !defined (MINIMAL)
+
 
 static const char rf24_datarate_e_str_0[] PROGMEM = "1MBPS";
 static const char rf24_datarate_e_str_1[] PROGMEM = "2MBPS";
@@ -414,7 +414,7 @@ static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = {
   rf24_pa_dbm_e_str_2,
   rf24_pa_dbm_e_str_3,
 };
-
+#if !defined (MINIMAL)
 void RF24::printDetails(void)
 {
   print_status(get_status());
@@ -1210,50 +1210,51 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 }
 
 
+//ATTiny support code pulled in from https://github.com/jscrane/RF24
 
-
-
-
-#if defined (ATTINY)
-
-#include "pins_arduino.h"
-
-#if defined( __AVR_ATtiny85__ )
-const static uint8_t _CS = PB4;
-const static uint8_t _MOSI = PB1;
-const static uint8_t _MISO = PB0;
-const static uint8_t _SCK  = PB2;
+#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+// see http://gammon.com.au/spi
+#	define DI   0  // D0, pin 5  Data In
+#	define DO   1  // D1, pin 6  Data Out (this is *not* MOSI)
+#	define USCK 2  // D2, pin 7  Universal Serial Interface clock
+#	define SS   3  // D3, pin 2  Slave Select
+#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+// these depend on the core used (check pins_arduino.h)
+// this is for jeelabs' one (based on google-code core)
+#	define DI   4   // PA6
+#	define DO   5   // PA5
+#	define USCK 6   // PA4
+#	define SS   3   // PA7
 #endif
 
-#if defined( __AVR_ATtiny84__ )
-const static uint8_t _CS   = 3;
-const static uint8_t _MOSI = 5;
-const static uint8_t _MISO = 4;
-const static uint8_t _SCK  = 6;
-#endif
-
-SPIClass SPI;
+#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
 
 void SPIClass::begin() {
 
-  pinMode(_SCK, OUTPUT);
-  pinMode(_MOSI, OUTPUT);
-  pinMode(_MISO,INPUT);
+  digitalWrite(SS, HIGH);
+  pinMode(USCK, OUTPUT);
+  pinMode(DO, OUTPUT);
+  pinMode(SS, OUTPUT);
+  pinMode(DI, INPUT);
+  USICR = _BV(USIWM0);
 
-  digitalWrite(_MISO,HIGH);
-  digitalWrite(_SCK, LOW);
-  digitalWrite(_MOSI, LOW);
 }
 
-void SPIClass::end() {
+byte SPIClass::transfer(byte b) {
 
-  pinMode(_SCK, INPUT);
-  pinMode(_MOSI, INPUT);
-  pinMode(_MISO,INPUT);
+  USIDR = b;
+  USISR = _BV(USIOIF);
+  do
+    USICR = _BV(USIWM0) | _BV(USICS1) | _BV(USICLK) | _BV(USITC);
+  while ((USISR & _BV(USIOIF)) == 0);
+  return USIDR;
+
 }
 
-void SPIClass::setDataMode(byte mode){}
-void SPIClass::setClockDivider(byte rate){}
+void SPIClass::end() {}
+void SPIClass::setDataMode(uint8_t mode){}
+void SPIClass::setBitOrder(uint8_t bitOrder){}
+void SPIClass::setClockDivider(uint8_t rate){}
+
 
 #endif
-
