@@ -2,20 +2,23 @@
   
 Design Goals: This library is designed to be...  
   
-* More compliant with the manufacturer specified operation of the chip  
+* More compliant with the manufacturer specified operation of the chip, while allowing advanced users
+* to work outside the reccommended operation. 
+* Utilize the capabilities of the radio to their full potential via Arduino
 * More reliable and feature rich  
-* Easy for beginners to use  
+* Easy for beginners to use, with well documented examples and features 
 * Consumed with a public interface that's similiar to other Arduino standard libraries  
 * Built against the standard SPI library.   
   
-March 2014: Optimization begun  
-April 2014: Optimization nearing completion    
-* The library has been tweaked to allow full use of the FIFO buffers for maximum transfer speeds  
-* Changes to read() functionality have increased reliability and response  
-* Extended timeout periods have been added to aid in noisy or otherwise unreliable environments  
-* Delays have been removed where possible to ensure maximum efficiency  
-* Arduino Due fully supported with extended SPI functions
-* More! See the links below and class documentation for more info.  
+April 2014: Official Release: Still some work to do, but most benefits have been realized
+
+* The library has been tweaked to allow full use of the FIFO buffers for maximum transfer speeds
+* Changes to read() and available () functionality have increased reliability and response
+* Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
+* Delays have been removed where possible to ensure maximum efficiency
+* Full Due support with extended SPI functions
+* ATTiny 24/44/84 25/45/85 now supported.
+* More! See the links below and class documentation for more info.
   
 Please refer to:  
   
@@ -27,4 +30,11 @@ Please refer to:
   
 This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or  
 the SPI hardware will go into 'slave' mode.  
-
+  
+Supported Boards:  
+  
+* Uno, Nano, etc (328 based boards)  
+* Mega Types (2560, 1280, etc)  
+* ARM (Arduino Due) via extended SPI methods 
+* ATTiny 24/44/84 25/45/85  
+* See the [documentation](http://tmrh20.github.io/) for more info

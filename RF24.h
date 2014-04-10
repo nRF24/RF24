@@ -257,6 +257,22 @@ public:
   void powerUp(void) ;
 
   /**
+  * Write for single NOACK writes. Disables acknowledgements/autoretries for a single write.
+  *
+  * @note enableDynamicAck() must be called to enable this feature
+  *
+  * Can be used with enableAckPayload() to request a response
+  * @see enableDynamicAck()
+  * @see setAutoAck()
+  * @see write()
+  *
+  * @param buf Pointer to the data to be sent
+  * @param len Number of bytes to be sent
+  * @param multicast Request ACK (0), NOACK (1)
+  */
+  bool write( const void* buf, uint8_t len, const bool multicast );
+
+  /**
    * @note Optimization: New Command   *
    * This will not block until the 3 FIFO buffers are filled with data.
    * Once the FIFOs are full, writeFast will simply wait for success or
@@ -288,6 +304,19 @@ public:
    * @return True if the payload was delivered successfully false if not
    */
   bool writeFast( const void* buf, uint8_t len );
+
+  /**
+  * WriteFast for single NOACK writes. Disables acknowledgements/autoretries for a single write.
+  *
+  * @note enableDynamicAck() must be called to enable this feature
+  * @see enableDynamicAck()
+  * @see setAutoAck()
+  *
+  * @param buf Pointer to the data to be sent
+  * @param len Number of bytes to be sent
+  * @param multicast Request ACK (0) or NOACK (1)
+  */
+  bool writeFast( const void* buf, uint8_t len, const bool multicast );
 
   /**
    * @note Optimization: New Command
@@ -384,6 +413,20 @@ public:
   void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
   /**
+   * Enable dynamic ACKs (single write multicasting) for chosen messages
+   *
+   * @note To enable full multicasting or per-pipe multicast, use setAutoAck()
+   *
+   * @warning This MUST be called prior to attempting single write NOACK calls
+   * @code
+   * radio.enableDynamicAck();
+   * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
+   * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
+   * @endcode
+   */
+  void enableDynamicAck();
+
+  /**
    * Determine if an ack payload was received in the most recent call to
    * write().
    *
@@ -424,11 +467,16 @@ public:
    * @see startWrite()
    * @see writeBlocking()
    *
+   * For single noAck writes see:
+   * @see enableDynamicAck()
+   * @see setAutoAck()
+   *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
+   * @param multicast Request ACK (0) or NOACK (1)
    * @return True if the payload was delivered successfully false if not
    */
-  void startFastWrite( const void* buf, uint8_t len );
+  void startFastWrite( const void* buf, uint8_t len, const bool multicast );
 
   /**
    * Non-blocking write to the open writing pipe
@@ -445,11 +493,16 @@ public:
    * @see startFastWrite()
    * @see whatHappened()
    *
+   * For single noAck writes see:
+   * @see enableDynamicAck()
+   * @see setAutoAck()
+   *
    * @param buf Pointer to the data to be sent
    * @param len Number of bytes to be sent
+   * @param multicast Request ACK (0) or NOACK (1)
    *
    */
-  void startWrite( const void* buf, uint8_t len );
+  void startWrite( const void* buf, uint8_t len, const bool multicast );
 
   /**
    * Optimization: New Command
@@ -776,7 +829,7 @@ private:
    * @param len Number of bytes to be sent
    * @return Current value of status register
    */
-  uint8_t write_payload(const void* buf, uint8_t len);
+  uint8_t write_payload(const void* buf, uint8_t len, const uint8_t writeType);
 
   /**
    * Read the receive payload
@@ -1003,18 +1056,18 @@ private:
  * @section Goals Design Goals
  *
  * This library fork is designed to be...
- * @li More compliant with the manufacturer specified operation of the chip
+ * @li More compliant with the manufacturer specified operation of the chip, while allowing advanced users
+ * to work outside the reccommended operation.
  * @li Utilize the capabilities of the radio to their full potential via Arduino
  * @li More reliable, responsive and feature rich
- * @li Easy for beginners to use
+ * @li Easy for beginners to use, with well documented examples and features
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
  *
  * @section News News
  *
- * <b>March 2014: Optimization begun<br>
- * April 2014: Optimization nearing completion </b><br>
+ * <b>April 2014: Official Release: Still some work to do, but most benefits have been realized </b><br>
  * - The library has been tweaked to allow full use of the FIFO buffers for maximum transfer speeds
- * - Changes to read() functionality have increased reliability and response
+ * - Changes to read() and available () functionality have increased reliability and response
  * - Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
  * - Delays have been removed where possible to ensure maximum efficiency
  * - Full Due support with extended SPI functions

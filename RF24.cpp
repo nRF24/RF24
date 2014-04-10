@@ -135,7 +135,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
 /****************************************************************************/
 
-uint8_t RF24::write_payload(const void* buf, uint8_t data_len)
+uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeType)
 {
   uint8_t status;
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
@@ -147,7 +147,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len)
 
  #if defined (__arm__)
 
-  status = SPI.transfer(csn_pin, W_TX_PAYLOAD , SPI_CONTINUE);
+  status = SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
 
   if(blank_len){
     while ( data_len--){
@@ -160,14 +160,14 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len)
   }else{
     while( --data_len ){
       SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
-    }    
+    }
     SPI.transfer(csn_pin,*current);
   }
 
   #else
 
   csn(LOW);
-  status = SPI.transfer( W_TX_PAYLOAD );
+  status = SPI.transfer( writeType );
   while ( data_len-- ) {
     SPI.transfer(*current++);
   }
@@ -205,7 +205,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 	}
 	while ( --blank_len ){
 	  SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
-	}  
+	}
 	SPI.transfer(csn_pin,0xFF);
   }else{
 	while ( --data_len ){
@@ -346,7 +346,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
-  ce_pin(_cepin), csn_pin(_cspin), wide_band(true), p_variant(false),
+  ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false),
   payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
   pipe0_reading_address(0)
 {
@@ -466,8 +466,6 @@ void RF24::begin(void)
   	csn(HIGH);
   #endif
 
-
-
   // Must allow the radio time to settle else configuration bits will not necessarily stick.
   // This is actually only required following power up but some settling time also appears to
   // be required after resets too. For full coverage, we'll always assume the worst.
@@ -479,7 +477,7 @@ void RF24::begin(void)
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
   // sizes must never be used. See documentation for a more complete explanation.
-  write_register(SETUP_RETR,(B0100 << ARD) | (B1111 << ARC));
+  setRetries(5,15);
 
   // Restore our default PA level
   setPALevel( RF24_PA_MAX ) ;
@@ -516,9 +514,10 @@ void RF24::begin(void)
   flush_rx();
   flush_tx();
 
-  powerUp();
-  delay(5);
-  //Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
+  powerUp(); //Power up by default when begin() is called
+
+  // Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
+  // PTX should use only 22uA of power
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
 
 
@@ -528,7 +527,8 @@ void RF24::begin(void)
 
 void RF24::startListening(void)
 {
-  write_register(CONFIG, read_register(CONFIG) | _BV(PWR_UP) | _BV(PRIM_RX));
+  powerUp();
+  write_register(CONFIG, read_register(CONFIG) | _BV(PRIM_RX));
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Restore the pipe0 adddress, if exists
@@ -559,6 +559,7 @@ void RF24::stopListening(void)
 
 void RF24::powerDown(void)
 {
+  ce(LOW); // Guarantee CE is low on powerDown
   write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
 }
 
@@ -567,17 +568,23 @@ void RF24::powerDown(void)
 //Power up now. Radio will not power down unless instructed by MCU for config changes etc.
 void RF24::powerUp(void)
 {
-  write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
-  delay(5);
+   uint8_t cfg = read_register(CONFIG);
+
+   // if not powered up then power up and wait for the radio to initialize
+   if (!(cfg & _BV(PWR_UP))){
+      write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
+      delayMicroseconds(1500);
+
+   }
 }
 
 /******************************************************************/
 
 //Similar to the previous write, clears the interrupt flags
-bool RF24::write( const void* buf, uint8_t len )
+bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 {
 	//Start Writing
-    startWrite(buf,len);
+    startWrite(buf,len,multicast);
 
 	//Wait until complete or failed
 	//ACK payloads that are handled improperly will cause this to hang
@@ -595,6 +602,9 @@ bool RF24::write( const void* buf, uint8_t len )
   return 1;
 }
 
+bool RF24::write( const void* buf, uint8_t len ){
+	write(buf,len,0);
+}
 /****************************************************************************/
 
 //For general use, the interrupt flags are not important to clear
@@ -617,7 +627,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
   	}
 
   	//Start Writing
-	startFastWrite(buf,len);								  //Write the payload if a buffer is clear
+	startFastWrite(buf,len,0);								  //Write the payload if a buffer is clear
 
 	return 1;												  //Return 1 to indicate successful transmission
 }
@@ -638,7 +648,7 @@ void RF24::reUseTX(){
 
 /****************************************************************************/
 
-bool RF24::writeFast( const void* buf, uint8_t len )
+bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 {
 	//Block until the FIFO is NOT full.
 	//Keep track of the MAX retries and set auto-retry if seeing failures
@@ -656,12 +666,14 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 
   	}
 		     //Start Writing
-	startFastWrite(buf,len);
+	startFastWrite(buf,len,multicast);
 
 	return 1;
 }
 
-
+bool RF24::writeFast( const void* buf, uint8_t len ){
+	writeFast(buf,len,0);
+}
 
 /****************************************************************************/
 
@@ -670,9 +682,10 @@ bool RF24::writeFast( const void* buf, uint8_t len )
 //Otherwise we enter Standby-II mode, which is still faster than standby mode
 //Also, we remove the need to keep writing the config register over and over and delaying for 150 us each time if sending a stream of data
 
-void RF24::startFastWrite( const void* buf, uint8_t len ){ //TMRh20
+void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast){ //TMRh20
 
-	write_payload( buf,len);
+	//write_payload( buf,len);
+	write_payload( buf, len,multicast?static_cast<uint8_t>(W_TX_PAYLOAD_NO_ACK):static_cast<uint8_t>(W_TX_PAYLOAD) ) ;
 	ce(HIGH);
 
 }
@@ -680,11 +693,12 @@ void RF24::startFastWrite( const void* buf, uint8_t len ){ //TMRh20
 
 //Added the original startWrite back in so users can still use interrupts, ack payloads, etc
 //Allows the library to pass all tests
-void RF24::startWrite( const void* buf, uint8_t len ){
+void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
 
   // Send the payload
 
-  write_payload( buf, len );
+  //write_payload( buf, len );
+  write_payload( buf, len,multicast?static_cast<uint8_t>(W_TX_PAYLOAD_NO_ACK):static_cast<uint8_t>(W_TX_PAYLOAD) ) ;
   ce(HIGH);
   ce(LOW);
 
@@ -929,6 +943,27 @@ void RF24::enableAckPayload(void)
   //
 
   write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
+}
+
+/****************************************************************************/
+
+void RF24::enableDynamicAck(void){
+  //
+  // enable dynamic ack features
+  //
+
+  write_register(FEATURE,read_register(FEATURE) | _BV(EN_DYN_ACK) );
+
+  // If it didn't work, the features are not enabled
+  if ( ! read_register(FEATURE) & _BV(EN_DYN_ACK) ){
+    // So enable them and try again
+    toggle_features();
+    write_register(FEATURE,read_register(FEATURE) | _BV(EN_DYN_ACK) );
+  }
+
+  IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
+
+
 }
 
 /****************************************************************************/
