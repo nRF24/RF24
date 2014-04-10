@@ -573,7 +573,11 @@ void RF24::powerUp(void)
    // if not powered up then power up and wait for the radio to initialize
    if (!(cfg & _BV(PWR_UP))){
       write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
-      delayMicroseconds(1500);
+
+      // For nRF24L01+ to go from power down mode to TX or RX mode it must first pass through stand-by mode.
+	  // There must be a delay of Tpd2stby (see Table 16.) after the nRF24L01+ leaves power down mode before
+	  // the CEis set high. - Tpd2stby can be up to 5ms per the 1.0 datasheet
+      delay(5);
 
    }
 }
