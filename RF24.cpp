@@ -607,7 +607,7 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 }
 
 bool RF24::write( const void* buf, uint8_t len ){
-	write(buf,len,0);
+	return write(buf,len,0);
 }
 /****************************************************************************/
 
@@ -676,7 +676,7 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 }
 
 bool RF24::writeFast( const void* buf, uint8_t len ){
-	writeFast(buf,len,0);
+	return writeFast(buf,len,0);
 }
 
 /****************************************************************************/
