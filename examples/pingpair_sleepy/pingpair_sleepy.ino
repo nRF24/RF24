@@ -71,7 +71,7 @@ void setup(){
 
   // set up the role pin
   pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,LOW);
+  digitalWrite(role_pin,HIGH);
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
@@ -113,7 +113,7 @@ void setup(){
   radio.startListening();
 
   // Dump the configuration of the rf unit for debugging
-  radio.printDetails();
+  //radio.printDetails();
 }
 
 void loop(){
@@ -123,8 +123,9 @@ void loop(){
     radio.powerUp();                                // Power up the radio after sleeping
     radio.stopListening();                          // First, stop listening so we can talk.
                          
-    printf("Now sending... ");
-    unsigned long time = millis();                  // Take the time, and send it.
+    unsigned long time = millis();                  // Take the time, and send it.                     
+    printf("Now sending... %lu \n\r",time);
+    
     radio.write( &time, sizeof(unsigned long) );
 
     radio.startListening();                         // Now, continue listening
@@ -177,7 +178,7 @@ void loop(){
         radio.startListening();                                 // Now, resume listening so we catch the next packets.
     }else{
         Serial.println("Sleeping");
-        delay(200);                                             // Delay so the serial data can print out
+        delay(50);                                             // Delay so the serial data can print out
         do_sleep();
 
     }
@@ -199,7 +200,6 @@ void setup_watchdog(uint8_t prescalar){
   uint8_t wdtcsr = prescalar & 7;
   if ( prescalar & 8 )
     wdtcsr |= _BV(WDP3);
-    Serial.println(wdtcsr);
   MCUSR &= ~_BV(WDRF);                      // Clear the WD System Reset Flag
   WDTCSR = _BV(WDCE) | _BV(WDE);            // Write the WD Change enable bit to enable changing the prescaler and enable system reset
   WDTCSR = _BV(WDCE) | wdtcsr | _BV(WDIE);  // Write the prescalar bits (how long to sleep, enable the interrupt to wake the MCU
@@ -223,4 +223,3 @@ void do_sleep(void)
   detachInterrupt(0);  
   WDTCSR &= ~_BV(WDIE);  
 }
-

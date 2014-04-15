@@ -29,11 +29,11 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
-RF24 radio(8,9);
+RF24 radio(7,8);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const short role_pin = 7;
+const short role_pin = 5;
 
 //
 // Topology
@@ -254,7 +254,7 @@ void setup(void)
   //
 
   attachInterrupt(0, check_radio, FALLING);
-  
+  delay(50);
   if ( role == role_receiver )
     printf("\n\r+OK ");
 }
@@ -294,7 +294,7 @@ void loop(void)
 
     // Send it.  This will block until complete
     printf("\n\rNow sending length %i...",next_payload_size);
-    radio.startWrite( send_payload, next_payload_size );
+    radio.startWrite( send_payload, next_payload_size,0 );
 
     // Update size for next time.
     next_payload_size += payload_size_increments_by;
@@ -374,10 +374,9 @@ void check_radio(void)
       prbuf_in += sprintf(prbuf_in,"Ack Payload:Failed\n\r");
   }
 
-  // Transmitter can power down for now, because
-  // the transmission is done.
-  if ( ( tx || fail ) && ( role == role_sender ) )
-    radio.powerDown();
+  // Not powering down since radio is in standby mode
+  //if ( ( tx || fail ) && ( role == role_sender ) )
+    //radio.powerDown();
 
   // Did we receive a message?
   if ( rx )
@@ -387,7 +386,7 @@ void check_radio(void)
     {
       radio.read(&message_count,sizeof(message_count));
       prbuf_in += sprintf(prbuf_in,"Ack:%lu ",message_count);
-     
+ 
       // is this ack what we were expecting?  to account
       // for failures, we simply want to make sure we get a
       // DIFFERENT ack every time.
@@ -411,10 +410,11 @@ void check_radio(void)
       size_t len = max_payload_size;
       memset(receive_payload,0,max_payload_size);
       
-      if ( configuration == '3' )
+      if ( configuration == '3' ){
 	len = next_payload_size;
-      else
+      }else{
 	len = radio.getDynamicPayloadSize();
+      }
       
       radio.read( receive_payload, len );
       
@@ -427,9 +427,9 @@ void check_radio(void)
       // Add an ack packet for the next time around.
       // Here we will report back how many bytes we got this time.
       radio.writeAckPayload( pipe_number, &len, sizeof(len) );
+
       ++message_count;
     }
+
   }
 }
-
-// vim:ai:cin:sts=2 sw=2 ft=cpp

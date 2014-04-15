@@ -15,7 +15,7 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-//#include "printf.h"
+#include "printf.h"
 
 //
 // Hardware configuration
@@ -23,7 +23,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
-RF24 radio(9,10);
+RF24 radio(7,8);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -74,7 +74,7 @@ void setup(void)
 
   // set up the role pin
   pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,LOW);
+  digitalWrite(role_pin,HIGH);
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
@@ -88,7 +88,7 @@ void setup(void)
   //
 
   Serial.begin(57600);
-  //printf_begin();
+  printf_begin();
   printf("\n\rRF24/examples/pingpair_dyn/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
 

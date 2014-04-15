@@ -102,12 +102,14 @@ void loop(void)
 
       // Listen for a little
       radio.startListening();
-      delayMicroseconds(128);
-      radio.stopListening();
+      delayMicroseconds(225);
+      
 
       // Did we get a carrier?
-      if ( radio.testCarrier() )
+      if ( radio.testCarrier() ){
         ++values[i];
+      }
+      radio.stopListening();
     }
   }
 

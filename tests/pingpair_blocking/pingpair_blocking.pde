@@ -27,11 +27,11 @@ public: RF24Test(int a, int b): RF24(a,b) {}
 
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
-RF24Test radio(8,9);
+RF24Test radio(48,49);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 7;
+const int role_pin = 5;
 
 //
 // Topology
@@ -230,28 +230,28 @@ void loop(void)
       // Dump the payloads until we've gotten everything
       unsigned long got_time;
       bool done = false;
-      while (!done)
+      while (radio.available())
       {
         // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
-
-        // Spew it
-        printf("Got payload %lu...",got_time);
-
+        radio.read( &got_time, sizeof(unsigned long) );
+      }
 	// Delay just a little bit to let the other unit
 	// make the transition to receiver
-	delay(20);
-      }
+	//delay(20);
+      //}
 
       // First, stop listening so we can talk
       radio.stopListening();
+      
+              // Spew it
+        printf("Got payload %lu...",got_time);
 
       // Send the final one back.
       radio.write( &got_time, sizeof(unsigned long) );
-      printf("Sent response.\n\r");
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
+      printf("Sent response.\n\r");
 
     }
   }

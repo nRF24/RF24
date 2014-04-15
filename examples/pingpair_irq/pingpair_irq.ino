@@ -67,13 +67,15 @@ void setup(){
   radio.enableAckPayload();                         // We will be using the Ack Payload feature, so please enable it
                                                     // Open pipes to other node for communication
   if ( role == role_sender ) {                      // This simple sketch opens a pipe on a single address for these two nodes to 
-     radio.openWritingPipe(address[0]);             // communicate back and forth.  One listens on it, the other talks to it. 
+     radio.openWritingPipe(address[0]);             // communicate back and forth.  One listens on it, the other talks to it.
+     radio.openReadingPipe(1,address[1]); 
   }else{
+    radio.openWritingPipe(address[1]);
     radio.openReadingPipe(1,address[0]);
     radio.startListening();
   }
   radio.printDetails();                              // Dump the configuration of the rf unit for debugging
-  radio.powerUp();                                   // Power up the radio
+  delay(50);
   attachInterrupt(0, check_radio, FALLING);          // Attach interrupt handler to interrupt #0 (using pin 2) on BOTH the sender and receiver
 }
 
@@ -87,20 +89,12 @@ void loop() {
   if (role == role_sender)  {                        // Sender role.  Repeatedly send the current time 
     unsigned long time = millis();                   // Take the time, and send it.
     printf("Now sending %lu\n\r",time);
-    radio.startWrite( &time, sizeof(unsigned long) );
+    radio.startWrite( &time, sizeof(unsigned long) ,0);
     delay(2000);                                     // Try again soon
   }
 
 
-  if(role == role_receiver){                        // Receiver does nothing but sleep between payloads
-    if(!radio.available() && gotMsg == 1 ){         // Display the uptime in millis(). (Counter does not increment during sleep)
-      gotMsg = 0;
-      set_sleep_mode(SLEEP_MODE_PWR_DOWN);          // Put the Arduino to sleep between payloads
-      sleep_enable();                               
-      sleep_mode();                                 // Arduino goes to sleep here
-      //ZZZ... sleeping
-      sleep_disable();                              // This happens when the interrupt wakes Arduino up        
-    }
+  if(role == role_receiver){                        // Receiver does nothing except in IRQ
   }  
 }
 
@@ -141,4 +135,3 @@ void check_radio(void)                                // Receiver role: Does not
     }
   }
 }
-

@@ -61,12 +61,11 @@ void loop(void){
     
     radio.stopListening();                                    // First, stop listening so we can talk.
     
-    unsigned long time;
-    printf("Now sending ",time);
+    
+    printf("Now sending \n\r");
 
-    time = micros();                                          // Take the time, and send it.  This will block until complete
-    boolean ok = radio.write( &time, sizeof(unsigned long) ); // Send the current time
-    if (!ok){  printf("failed.\n\r");  }
+    unsigned long time = micros();                             // Take the time, and send it.  This will block until complete
+     if (!radio.write( &time, sizeof(unsigned long) )){  printf("failed.\n\r");  }
         
     radio.startListening();                                    // Now, continue listening
     

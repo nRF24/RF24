@@ -235,55 +235,39 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 
 uint8_t RF24::flush_rx(void)
 {
-  uint8_t status;
 
-  #if defined (__arm__)
-	status = SPI.transfer(csn_pin, FLUSH_RX );
-  #else
-  csn(LOW);
-  status = SPI.transfer( FLUSH_RX );
-  csn(HIGH);
-
-  #endif
-
-  return status;
+  return spiTrans( FLUSH_TX );
 }
 
 /****************************************************************************/
 
 uint8_t RF24::flush_tx(void)
 {
-  uint8_t status;
+  return spiTrans( FLUSH_TX );
+}
 
+/****************************************************************************/
+
+uint8_t RF24::spiTrans(uint8_t cmd){
+
+  uint8_t status;
   #if defined (__arm__)
-	status = SPI.transfer(csn_pin, FLUSH_TX );
+	status = SPI.transfer(csn_pin, cmd );
   #else
 
   csn(LOW);
-  status = SPI.transfer( FLUSH_TX );
+  status = SPI.transfer( cmd );
   csn(HIGH);
-
   #endif
-
   return status;
+
 }
 
 /****************************************************************************/
 
 uint8_t RF24::get_status(void)
 {
-  uint8_t status;
-
-  #if defined (__arm__)
-	status = SPI.transfer(csn_pin, NOP );
-  #else
-
-  csn(LOW);
-  status = SPI.transfer( NOP );
-  csn(HIGH);
-  #endif
-
-  return status;
+  return spiTrans(NOP);
 }
 
 /****************************************************************************/
@@ -347,7 +331,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
   ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false),
-  payload_size(32), ack_payload_available(false), dynamic_payloads_enabled(false),
+  payload_size(32), dynamic_payloads_enabled(false),
   pipe0_reading_address(0)
 {
 }
@@ -367,8 +351,7 @@ void RF24::setChannel(uint8_t channel)
 
 void RF24::setPayloadSize(uint8_t size)
 {
-  const uint8_t max_payload_size = 32;
-  payload_size = min(size,max_payload_size);
+  payload_size = min(size,32);
 }
 
 /****************************************************************************/
@@ -380,7 +363,7 @@ uint8_t RF24::getPayloadSize(void)
 
 /****************************************************************************/
 
-
+#if !defined (MINIMAL)
 
 static const char rf24_datarate_e_str_0[] PROGMEM = "1MBPS";
 static const char rf24_datarate_e_str_1[] PROGMEM = "2MBPS";
@@ -414,7 +397,7 @@ static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = {
   rf24_pa_dbm_e_str_2,
   rf24_pa_dbm_e_str_3,
 };
-#if !defined (MINIMAL)
+
 void RF24::printDetails(void)
 {
   print_status(get_status());
@@ -479,8 +462,8 @@ void RF24::begin(void)
   // sizes must never be used. See documentation for a more complete explanation.
   setRetries(5,15);
 
-  // Restore our default PA level
-  setPALevel( RF24_PA_MAX ) ;
+  // Reset value is MAX
+  //setPALevel( RF24_PA_MAX ) ;
 
   // Determine if this is a p or non-p RF24 module and then
   // reset our data rate back to default value. This works
@@ -498,8 +481,8 @@ void RF24::begin(void)
   // Initialize CRC and request 2-byte (16bit) CRC
   setCRCLength( RF24_CRC_16 ) ;
 
-  // Disable dynamic payloads, to match dynamic_payloads_enabled setting
-  write_register(DYNPD,0);
+  // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
+  //write_register(DYNPD,0);
 
   // Reset current status
   // Notice reset and flush is the last thing we do
@@ -532,8 +515,9 @@ void RF24::startListening(void)
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Restore the pipe0 adddress, if exists
-  if (pipe0_reading_address)
+  if (pipe0_reading_address){
     write_register(RX_ADDR_P0, reinterpret_cast<const uint8_t*>(&pipe0_reading_address), 5);
+  }
 
   // Flush buffers
   flush_rx();
@@ -636,16 +620,11 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 	return 1;												  //Return 1 to indicate successful transmission
 }
 
+/****************************************************************************/
 
 void RF24::reUseTX(){
 		write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
-		#if defined (__arm__)
-			SPI.transfer(csn_pin, REUSE_TX_PL );
-		#else
-			csn(LOW);
-	  		SPI.transfer( REUSE_TX_PL );
-	  		csn(HIGH);
-		#endif
+		spiTrans( REUSE_TX_PL );
 		ce(LOW);										  //Re-Transfer packet
 		ce(HIGH);
 }
@@ -659,11 +638,11 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 	//Return 0 so the user can control the retrys and set a timer or failure counter if required
 	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
-
 	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
 
 		if( get_status() & _BV(MAX_RT)){
-			reUseTX();										  //Set re-transmit
+			//reUseTX();										  //Set re-transmit
+			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 			return 0;										  //Return 0. The previous payload has been retransmitted
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
@@ -689,7 +668,7 @@ bool RF24::writeFast( const void* buf, uint8_t len ){
 void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast){ //TMRh20
 
 	//write_payload( buf,len);
-	write_payload( buf, len,multicast?static_cast<uint8_t>(W_TX_PAYLOAD_NO_ACK):static_cast<uint8_t>(W_TX_PAYLOAD) ) ;
+	write_payload( buf, len,multicast ? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
 	ce(HIGH);
 
 }
@@ -702,7 +681,8 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
   // Send the payload
 
   //write_payload( buf, len );
-  write_payload( buf, len,multicast?static_cast<uint8_t>(W_TX_PAYLOAD_NO_ACK):static_cast<uint8_t>(W_TX_PAYLOAD) ) ;
+  write_payload( buf, len,multicast? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
+
   ce(HIGH);
   ce(LOW);
 
@@ -836,8 +816,9 @@ void RF24::openWritingPipe(uint64_t value)
   write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), 5);
   write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), 5);
 
-  const uint8_t max_payload_size = 32;
-  write_register(RX_PW_P0,min(payload_size,max_payload_size));
+  //const uint8_t max_payload_size = 32;
+  //write_register(RX_PW_P0,min(payload_size,max_payload_size));
+  write_register(RX_PW_P0,payload_size);
 }
 
 /****************************************************************************/
@@ -901,15 +882,10 @@ void RF24::toggle_features(void)
 void RF24::enableDynamicPayloads(void)
 {
   // Enable dynamic payload throughout the system
-  write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
 
-  // If it didn't work, the features are not enabled
-  if ( ! read_register(FEATURE) )
-  {
-    // So enable them and try again
     toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
-  }
+
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
 
@@ -930,15 +906,8 @@ void RF24::enableAckPayload(void)
   // enable ack payload and dynamic payload features
   //
 
-  write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
-
-  // If it didn't work, the features are not enabled
-  if ( ! read_register(FEATURE) )
-  {
-    // So enable them and try again
     toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
-  }
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
 
@@ -955,15 +924,8 @@ void RF24::enableDynamicAck(void){
   //
   // enable dynamic ack features
   //
-
-  write_register(FEATURE,read_register(FEATURE) | _BV(EN_DYN_ACK) );
-
-  // If it didn't work, the features are not enabled
-  if ( ! read_register(FEATURE) & _BV(EN_DYN_ACK) ){
-    // So enable them and try again
     toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DYN_ACK) );
-  }
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
 
@@ -976,8 +938,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-  const uint8_t max_payload_size = 32;
-  uint8_t data_len = min(len,max_payload_size);
+  uint8_t data_len = min(len,32);
 
   #if defined (__arm__)
 	SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & B111 ), SPI_CONTINUE);
@@ -1002,10 +963,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
 bool RF24::isAckPayloadAvailable(void)
 {
-  if (!( read_register(FIFO_STATUS) & _BV(RX_EMPTY) )){
-	  return 1;
-  }
-  return 0;
+  return ! read_register(FIFO_STATUS) & _BV(RX_EMPTY);
 }
 
 /****************************************************************************/
