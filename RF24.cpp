@@ -235,8 +235,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 
 uint8_t RF24::flush_rx(void)
 {
-
-  return spiTrans( FLUSH_TX );
+  return spiTrans( FLUSH_RX );
 }
 
 /****************************************************************************/
@@ -605,7 +604,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 
 	uint32_t timer = millis();							  //Get the time that the payload transmission started
 
-	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
+	while( ( get_status()  & ( _BV(TX_FULL) ))) {		  //Blocking only if FIFO is full. This will loop and block until TX is successful or timeout
 
 		if( get_status() & _BV(MAX_RT)){					  //If MAX Retries have been reached
 			reUseTX();										  //Set re-transmit and clear the MAX_RT interrupt flag
@@ -638,7 +637,7 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 	//Return 0 so the user can control the retrys and set a timer or failure counter if required
 	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
-	while ( (read_register(FIFO_STATUS) & _BV(FIFO_FULL))){   //Blocking only if FIFO is full. This will loop and block until TX is successful
+	while( ( get_status()  & ( _BV(TX_FULL) ))) {			  //Blocking only if FIFO is full. This will loop and block until TX is successful or fail
 
 		if( get_status() & _BV(MAX_RT)){
 			//reUseTX();										  //Set re-transmit
@@ -1018,63 +1017,22 @@ bool RF24::testRPD(void)
 
 /****************************************************************************/
 
-void RF24::setPALevel(rf24_pa_dbm_e level)
+void RF24::setPALevel(uint8_t level)
 {
-  uint8_t setup = read_register(RF_SETUP) ;
-  setup &= ~(_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
-
-  // switch uses RAM (evil!)
-  if ( level == RF24_PA_MAX )
-  {
-    setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
+  if(level > 3){  						// If invalid level, go to max PA
+	  level = RF24_PA_MAX << 1 + 1;		// +1 to support the SI24R1 chip extra bit
+  }else{
+	  level = (level << 1) + 1;	 		// Else set level as requested
   }
-  else if ( level == RF24_PA_HIGH )
-  {
-    setup |= _BV(RF_PWR_HIGH) ;
-  }
-  else if ( level == RF24_PA_LOW )
-  {
-    setup |= _BV(RF_PWR_LOW);
-  }
-  else if ( level == RF24_PA_MIN )
-  {
-    // nothing
-  }
-  else if ( level == RF24_PA_ERROR )
-  {
-    // On error, go to maximum PA
-    setup |= (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
-  }
-
-  write_register( RF_SETUP, setup ) ;
+  write_register( RF_SETUP, level ) ;	// Write it to the chip
 }
 
 /****************************************************************************/
 
-rf24_pa_dbm_e RF24::getPALevel(void)
+uint8_t RF24::getPALevel(void)
 {
-  rf24_pa_dbm_e result = RF24_PA_ERROR ;
-  uint8_t power = read_register(RF_SETUP) & (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
 
-  // switch uses RAM (evil!)
-  if ( power == (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) )
-  {
-    result = RF24_PA_MAX ;
-  }
-  else if ( power == _BV(RF_PWR_HIGH) )
-  {
-    result = RF24_PA_HIGH ;
-  }
-  else if ( power == _BV(RF_PWR_LOW) )
-  {
-    result = RF24_PA_LOW ;
-  }
-  else
-  {
-    result = RF24_PA_MIN ;
-  }
-
-  return result ;
+  return (read_register(RF_SETUP) & (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH))) >> 1 ;
 }
 
 /****************************************************************************/

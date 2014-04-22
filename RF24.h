@@ -691,25 +691,27 @@ public:
   void setAutoAck( uint8_t pipe, bool enable ) ;
 
   /**
-   * Set Power Amplifier (PA) level to one of four levels.
-   * Relative mnemonics have been used to allow for future PA level
-   * changes. According to 6.5 of the nRF24L01+ specification sheet,
-   * they translate to: RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm,
-   * RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+   * Set Power Amplifier (PA) level to one of four levels:
+   * RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH and RF24_PA_MAX
+   *
+   * The power levels correspond to the following output levels respectively:
+   * NRF24L01: -18dBm, -12dBm,-6dBM, and 0dBm
+   *
+   * SI24R1: -6dBm, 0dBm, 3dBM, and 7dBm.
    *
    * @param level Desired PA level.
    */
-  void setPALevel( rf24_pa_dbm_e level ) ;
+  void setPALevel ( uint8_t level );
 
   /**
    * Fetches the current PA level.
    *
-   * @return Returns a value from the rf24_pa_dbm_e enum describing
-   * the current PA setting. Please remember, all values represented
-   * by the enum mnemonics are negative dBm. See setPALevel for
-   * return value descriptions.
+   * NRF24L01: -18dBm, -12dBm, -6dBm and 0dBm
+   * SI24R1:   -6dBm, 0dBm, 3dBm, 7dBm
+   *
+   * @return Returns values 0 to 3 representing the PA Level.
    */
-  rf24_pa_dbm_e getPALevel( void ) ;
+   uint8_t getPALevel( void );
 
   /**
    * Set the transmission data rate
@@ -906,6 +908,10 @@ private:
    */
   void toggle_features(void);
 
+  /**
+   * Built in spi transfer function to simplify repeating code repeating code
+   */
+
   uint8_t spiTrans(uint8_t cmd);
   /**@}*/
 
@@ -1089,7 +1095,7 @@ private:
  * This chip uses the SPI bus, plus two chip control pins.  Remember that pin 10 must still remain an output, or
  * the SPI hardware will go into 'slave' mode.
  *
- * @section BoardSupport Board Support
+ * @section Board_Support Board Support
  *
  * Most standard Arduino based boards are supported:
  * - ATMega 328 based boards (Uno, Nano, etc)
@@ -1098,8 +1104,9 @@ private:
  * 	hardware SS/CSN pins as extended SPI methods are used.
  *  Initial Due support taken from https://github.com/mcrosson/RF24/tree/due
  * - ATTiny board support added from https://github.com/jscrane/RF24
- * Note: ATTiny support is built into the library. Do not include SPI.h.
- * See <a href="http://programmablehardware.blogspot.ca/2013/09/rf24-with-attiny84.html">here </a>for wiring/pin info.
+ * Note: ATTiny support is built into the library. Do not include SPI.h. <br>
+ * ATTiny 85: D0(pin 5): MISO, D1(pin6) MOSI, D2(pin7) SCK, D3(pin2):CSN/SS, D4(pin3): CE <br>
+ * ATTiny 84: PA6:MISO, PA5:MOSI, PA4:SCK, PA7:CSN/SS,  CE as desired <br>
  *
  * @section More More Information
  *
