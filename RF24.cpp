@@ -1019,12 +1019,17 @@ bool RF24::testRPD(void)
 
 void RF24::setPALevel(uint8_t level)
 {
+
+  uint8_t setup = read_register(RF_SETUP) & 0b11111000;
+
   if(level > 3){  						// If invalid level, go to max PA
 	  level = RF24_PA_MAX << 1 + 1;		// +1 to support the SI24R1 chip extra bit
   }else{
 	  level = (level << 1) + 1;	 		// Else set level as requested
   }
-  write_register( RF_SETUP, level ) ;	// Write it to the chip
+
+
+  write_register( RF_SETUP, setup |= level ) ;	// Write it to the chip
 }
 
 /****************************************************************************/
