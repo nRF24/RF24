@@ -48,8 +48,7 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 //
 // Channel info
 //
-//const uint8_t num_channels = 128;
-const uint8_t num_channels = 120;
+const uint8_t num_channels = 126;
 uint8_t values[num_channels];
 
 
@@ -63,7 +62,7 @@ int main(int argc, char** argv)
   // Print preamble
   //
 
-  //Serial.begin(57600);
+  //Serial.begin(115200);
   //printf_begin();
   printf("RF24/examples/scanner/\n");
 

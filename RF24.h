@@ -17,10 +17,8 @@
 
 #include "RF24_config.h"
 
-#if defined (RF24_LINUX)
+#if defined (RF24_LINUX) || defined (LITTLEWIRE)
   #include "utility/includes.h"
-#elif LITTLEWIRE
-  #include <LittleWireSPI/LittleWireSPI.h>
 #elif defined SOFTSPI
   #include <DigitalIO.h>
 #endif
@@ -59,7 +57,7 @@ private:
   SPIUARTClass uspi;
 #endif
 
-#if defined (RF24_LINUX)
+#if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
   SPI spi;
 #endif
 #if defined (MRAA)
@@ -68,8 +66,8 @@ private:
 
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
-#if defined (RF24_LINUX)
   uint16_t spi_speed; /**< SPI Bus Speed */
+#if defined (RF24_LINUX) || defined (XMEGA_D3)
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
 #endif  
@@ -708,7 +706,7 @@ s   *
   /**
    * Set RF communication channel
    *
-   * @param channel Which RF channel to communicate on, 0-127
+   * @param channel Which RF channel to communicate on, 0-125
    */
   void setChannel(uint8_t channel);
   
@@ -1844,6 +1842,62 @@ private:
  *
  * <br><br><br>
  *
+ * 
+ * @page ATXMEGA ATXMEGA
+ * 
+ * The RF24 driver can be build as a static library with Atmel Studio 7 in order to be included as any other library in another program for the XMEGA family.
+ *
+ * Currently only the </b>ATXMEGA256D3</b> is implemented.
+ * 
+ * @section Preparation 
+ * 
+ * Create an empty GCC Static Library project in AS7.<br>
+ * As not all files are required, copy the following directory structure in the project:
+ * 
+ * @code
+ * utility\
+ *   ATXMega256D3\
+ *     compatibility.c
+ *     compatibility.h
+ *     gpio.cpp
+ *     gpio.h
+ *     gpio_helper.c
+ *     gpio_helper.h
+ *     includes.h
+ *     RF24_arch_config.h
+ *     spi.cpp
+ *     spi.h
+ * nRF24L01.h
+ * printf.h
+ * RF24.cpp
+ * RF24.h
+ * RF24_config.h
+ * @endcode
+ * 
+ * @section Usage
+ * 
+ * Add the library to your project!</br>
+ * In the file where the **main()** is put the following in order to update the millisecond functionality:
+ * 
+ * @code
+ * ISR(TCE0_OVF_vect)
+ * {
+ * 	update_milisec();
+ * }
+ * @endcode
+ * 
+ * Declare the rf24 radio with **RF24 radio(XMEGA_PORTC_PIN3, XMEGA_SPI_PORT_C);**
+ * 
+ * First parameter is the CE pin which can be any available pin on the uC.
+ * 
+ * Second parameter is the CS which can be on port C (**XMEGA_SPI_PORT_C**) or on port D (**XMEGA_SPI_PORT_D**). 
+ * 
+ * Call the **__start_timer()** to start the millisecond timer.
+ * 
+ * @note Note about the millisecond functionality:<br>
+ * 
+ * 	The millisecond functionality is based on the TCE0 so don't use these pins as IO.<br>
+ * 	The operating frequency of the uC is 32MHz. If you have other frequency change the TCE0 registers appropriatly in function **__start_timer()** in **compatibility.c** file for your frequency. 
  *
  * @page Portability RF24 Portability
  *

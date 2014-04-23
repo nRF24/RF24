@@ -1,6 +1,7 @@
-
-
 #include "spi.h"
+#include <pthread.h>
+
+static pthread_mutex_t spiMutex;
 
 SPI::SPI() {
 
@@ -8,17 +9,23 @@ SPI::SPI() {
 
 
 void SPI::begin( int busNo ) {
-	
 	if (!bcm2835_init()){
 		return;
 	}
 	
 	bcm2835_spi_begin();
-	
 }
 
-void SPI::end() {
+void SPI::beginTransaction(SPISettings settings){
+   
+	pthread_mutex_lock (&spiMutex);
+	setBitOrder(settings.border);
+	setDataMode(settings.dmode);
+	setClockDivider(settings.clck);
+}
 
+void SPI::endTransaction() {
+	pthread_mutex_unlock (&spiMutex);
 }
 
 void SPI::setBitOrder(uint8_t bit_order) {
@@ -35,6 +42,7 @@ void SPI::setClockDivider(uint16_t spi_speed) {
 
 void SPI::chipSelect(int csn_pin){
 	bcm2835_spi_chipSelect(csn_pin);
+	delayMicroseconds(5);
 }
 
 SPI::~SPI() {

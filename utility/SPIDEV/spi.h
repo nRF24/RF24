@@ -35,6 +35,11 @@
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 
+#ifndef RF24_SPIDEV_SPEED
+/* 8MHz as default */
+#define RF24_SPIDEV_SPEED 8000000
+#endif
+
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 using namespace std;

@@ -29,20 +29,23 @@
     #define RF24_SPI_TRANSACTIONS
   #endif
   
-//Generic Linux/ARM and //http://iotdk.intel.com/docs/master/mraa/
-#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
+#if ( !defined (ARDUINO) ) // Any non-arduino device is handled via configure/Makefile
 
-  // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /utility/includes.h (Default is spidev config)
-  // This behavior can be overridden by calling 'make RF24_SPIDEV=1' or 'make RF24_MRAA=1'
-  // The includes.h file defines either RF24_RPi, MRAA or RF24_BBB and includes the correct RF24_arch_config.h file
+  // The configure script detects device and copies the correct includes.h file to /utility/includes.h
+  // This behavior can be overridden by calling configure with respective parameters
+  // The includes.h file defines either RF24_RPi, MRAA, LITTLEWIRE or RF24_SPIDEV and includes the correct RF24_arch_config.h file
   #include "utility/includes.h"
 
 //ATTiny  
-#elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
-  
+#elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__) || defined(__AVR_ATtiny861__)  
   #define RF24_TINY
   #include "utility/ATTiny/RF24_arch_config.h"
 
+//ATXMega
+#elif defined(__AVR_ATxmega256D3__)
+  #define XMEGA
+  #define XMEGA_D3
+  #include "utility/ATXMegaD3/RF24_arch_config.h"
 //LittleWire  
 #elif defined(LITTLEWIRE)
   
@@ -58,7 +61,7 @@
   #include <Arduino.h>
   
   // RF modules support 10 Mhz SPI bus speed
-  const uint32_t RF_SPI_SPEED = 10000000;  
+  const uint32_t RF24_SPI_SPEED = 10000000;  
 
 #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
       #if defined SPI_UART
@@ -126,7 +129,7 @@
   #define pgm_read_word(p) (*(p))
   #define PRIPSTR "%s"
 
-#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__)
+#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__) && defined(XMEGA)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
 #else

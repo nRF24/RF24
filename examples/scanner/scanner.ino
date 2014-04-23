@@ -34,7 +34,7 @@ RF24 radio(7,8);
 // Channel info
 //
 
-const uint8_t num_channels = 128;
+const uint8_t num_channels = 126;
 uint8_t values[num_channels];
 
 //

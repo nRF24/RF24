@@ -10,6 +10,8 @@
  */
 
 #include "gpio.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 GPIO::GPIO() {
 }
@@ -24,12 +26,24 @@ void GPIO::open(int port, int DDR)
 	fprintf(f, "%d\n", port);
 	fclose(f);
 
-	char file[128];
-	sprintf(file, "/sys/class/gpio/gpio%d/direction", port);
-	f = fopen(file, "w");
-	if (DDR == 0)	fprintf(f, "in\n");
-	else		fprintf(f, "out\n");
-	fclose(f);
+    int counter = 0;
+	char file[128];    
+	sprintf(file, "/sys/class/gpio/gpio%d/direction", port);  
+    
+    while( ( f = fopen(file,"w")) == NULL ){ //Wait 10 seconds for the file to be accessible if not open on first attempt
+        sleep(1);
+        counter++;
+        if(counter > 10){
+          perror("Could not open /sys/class/gpio/gpio%d/direction");
+          exit(0);
+        }
+    }
+	if (DDR == 0)
+          fprintf(f, "in\n");
+	else  fprintf(f, "out\n");
+    
+    fclose(f);
+
 }
 
 void GPIO::close(int port)

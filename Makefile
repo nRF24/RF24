@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Makefile for librf24-bcm on Raspberry Pi
+# Makefile for librf24
 #
 # License: GPL (General Public License)
 # Author:  Charles-Henri Hallard 
@@ -8,106 +8,117 @@
 #
 # Description:
 # ------------
-# use make all and mak install to install the library 
-# You can change the install directory by editing the LIBDIR line
+# use make all and make install to install the library 
 #
-PREFIX=/usr/local
 
-# Library parameters
-# where to put the lib
-LIBDIR=$(PREFIX)/lib
-# lib name 
-LIB=librf24-bcm
-# shared library name
-LIBNAME=$(LIB).so.1.0
+CONFIG_FILE=Makefile.inc
+REMOTE_ERROR="[ERROR] Remote machine not configured. Run configure with respective arguments."
 
-# Where to put the header files
-HEADER_DIR=${PREFIX}/include/RF24
+include $(CONFIG_FILE)
 
-# The base location of support files for different devices
-ARCH_DIR=utility
-
-# The default objects to compile
-OBJECTS=RF24.o spi.o
-
-SHARED_LINKER_FLAGS=-shared -Wl,-soname,$@.so.1
-
-
-
-# Detect the Raspberry Pi from cpuinfo
-# Allow users to override the use of BCM2835 driver and force use of SPIDEV by specifying " sudo make install -B RF24_SPIDEV=1 "
-ifeq "$(RF24_SPIDEV)" "1"
-RPI=0
-else
-#Count the matches for BCM2708 or BCM2709 in cpuinfo
-RPI=$(shell cat /proc/cpuinfo | grep Hardware | grep -c BCM2708)
-  ifneq "${RPI}" "1"
-  RPI=$(shell cat /proc/cpuinfo | grep Hardware | grep -c BCM2709)
-  endif
+# Objects to compile
+OBJECTS=RF24.o
+ifeq ($(DRIVER), MRAA)
+OBJECTS+=spi.o gpio.o compatibility.o
+else ifeq ($(DRIVER), RPi)
+OBJECTS+=spi.o bcm2835.o interrupt.o
+else ifeq ($(DRIVER), SPIDEV)
+OBJECTS+=spi.o gpio.o compatibility.o interrupt.o
 endif
-
-ifeq "$(RF24_MRAA)" "1"
-SHARED_LINKER_FLAGS+=-lmraa 
-DRIVER_DIR=$(ARCH_DIR)/MRAA
-OBJECTS+=gpio.o compatibility.o
-
-else ifeq "$(RPI)" "1"
-DRIVER_DIR=$(ARCH_DIR)/RPi
-OBJECTS+=bcm2835.o	
-# The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
-
-else
-DRIVER_DIR=$(ARCH_DIR)/BBB
-OBJECTS+=gpio.o compatibility.o
-endif
-
 
 # make all
 # reinstall the library after each recompilation
-all: test librf24-bcm
+all: $(LIBNAME)
 
-test:
-	cp ${DRIVER_DIR}/includes.h $(ARCH_DIR)/includes.h
 # Make the library
-librf24-bcm: $(OBJECTS)
-	g++ ${SHARED_LINKER_FLAGS} ${CCFLAGS} -o ${LIBNAME} $^
-	
+$(LIBNAME): $(OBJECTS)
+	@echo "[Linking]"
+	$(CC) $(SHARED_LINKER_FLAGS) $(CFLAGS) -o $(LIBNAME) $^
+
 # Library parts
 RF24.o: RF24.cpp	
-	g++ -Wall -fPIC ${CCFLAGS} -c $^
+	$(CXX) -fPIC $(CFLAGS) -c $^
 
 bcm2835.o: $(DRIVER_DIR)/bcm2835.c
-	gcc -Wall -fPIC ${CCFLAGS} -c $^
+	$(CC) -fPIC $(CFLAGS) -c $^
 
 spi.o: $(DRIVER_DIR)/spi.cpp
-	g++ -Wall -fPIC ${CCFLAGS} -c $^
+	$(CXX) -fPIC $(CFLAGS) -c $^
 
 compatibility.o: $(DRIVER_DIR)/compatibility.c
-	gcc -Wall -fPIC  ${CCFLAGS} -c $(DRIVER_DIR)/compatibility.c
+	$(CC) -fPIC  $(CFLAGS) -c $(DRIVER_DIR)/compatibility.c
 
 gpio.o: $(DRIVER_DIR)/gpio.cpp
-	g++ -Wall -fPIC ${CCFLAGS} -c $(DRIVER_DIR)/gpio.cpp
+	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/gpio.cpp
+
+interrupt.o: $(DRIVER_DIR)/interrupt.c
+	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/interrupt.c
 	
+# clear configuration files
+cleanconfig:
+	@echo "[Cleaning configuration]"
+	rm -rf $(CONFIG_FILE) utility/includes.h
+
 # clear build files
 clean:
-	rm -rf *.o ${LIB}.*
+	@echo "[Cleaning]"
+	rm -rf *.o $(LIBNAME)
+
+$(CONFIG_FILE):
+	@echo "[Running configure]"
+	@./configure --no-clean
 
 install: all install-libs install-headers
+upload: all upload-libs upload-headers
 
 # Install the library to LIBPATH
-install-libs: 
-	@echo "[Installing Libs]"
-	@if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
-	@install -m 0755 ${LIBNAME} ${LIBDIR}
-	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so.1
-	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so
-	@ldconfig
+install-libs:
+	@echo "[Installing Libs to $(LIB_DIR)]"
+	@if ( test ! -d $(LIB_DIR) ); then mkdir -p $(LIB_DIR); fi
+	@install -m 0755 $(LIBNAME) $(LIB_DIR)
+	@orig=$(LIBNAME) && \
+	for sl in $(LIBSYMLINKS); do \
+		ln -sf $(LIB_DIR)/$${orig} $(LIB_DIR)/$${sl}; \
+		orig=$${sl}; \
+	done && \
+	if [ "$(LIBDEPRECATE)" ]; then ln -sf $(LIB_DIR)/$${orig} $(LIB_DIR)/$(LIBDEPRECATE); fi
+ifneq ($(LDCONFIG),)
+	@$(LDCONFIG)
+endif
+
+upload-libs:
+	@echo "[Uploading Libs to $(REMOTE):$(REMOTE_LIB_DIR)]"
+ifeq ($(REMOTE),)
+	@echo "$(REMOTE_ERROR)"
+	@exit 1
+endif
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p $(REMOTE_LIB_DIR)"
+	@scp -q -P $(REMOTE_PORT) $(LIBNAME) $(REMOTE):/tmp
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0755 /tmp/$(LIBNAME) $(REMOTE_LIB_DIR) &&" \
+		" orig=$(LIBNAME) && for sl in $(LIBSYMLINKS); do sudo ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/\$${sl}; orig=\$${sl}; done &&" \
+		" if [ "$(LIBDEPRECATE)" ]; then sudo ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/$(LIBDEPRECATE); fi &&" \
+		" rm /tmp/$(LIBNAME)"
+ifneq ($(REMOTE_LDCONFIG),)
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo $(REMOTE_LDCONFIG)"
+endif
 
 install-headers:
-	@echo "[Installing Headers]"
-	@if ( test ! -d ${HEADER_DIR} ) ; then mkdir -p ${HEADER_DIR} ; fi
-	@install -m 0644 *.h ${HEADER_DIR}
-	@if ( test ! -d ${HEADER_DIR}/${DRIVER_DIR} ) ; then mkdir -p ${HEADER_DIR}/${DRIVER_DIR} ; fi
-	@install -m 0644 ${DRIVER_DIR}/*.h ${HEADER_DIR}/${DRIVER_DIR}
-	@install -m 0644 ${ARCH_DIR}/*.h ${HEADER_DIR}/${ARCH_DIR}
+	@echo "[Installing Headers to $(HEADER_DIR)]"
+	@mkdir -p $(HEADER_DIR)/$(DRIVER_DIR)
+	@install -m 0644 *.h $(HEADER_DIR)
+	@install -m 0644 $(DRIVER_DIR)/*.h $(HEADER_DIR)/$(DRIVER_DIR)
+	@install -m 0644 $(ARCH_DIR)/*.h $(HEADER_DIR)/$(ARCH_DIR)
+
+upload-headers:
+	@echo "[Uploading Headers to $(REMOTE):$(REMOTE_HEADER_DIR)]"
+ifeq ($(REMOTE),)
+	@echo "$(REMOTE_ERROR)"
+	@exit 1
+endif
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo mkdir -p $(REMOTE_HEADER_DIR)/$(DRIVER_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p /tmp/RF24 && rm -rf /tmp/RF24/*"
+	@rsync -a --include="*.h" --include="*/" --exclude="*" -e "ssh -p $(REMOTE_PORT)" . $(REMOTE):/tmp/RF24
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/*.h $(REMOTE_HEADER_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/$(DRIVER_DIR)/*.h $(REMOTE_HEADER_DIR)/$(DRIVER_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/$(ARCH_DIR)/*.h $(REMOTE_HEADER_DIR)/$(ARCH_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "rm -rf /tmp/RF24"
