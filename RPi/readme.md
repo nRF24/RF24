@@ -58,7 +58,7 @@ B. Clone the RF24Network Repo
 ```  
 C. Copy the RF24Network folder to the current directory, and delete the rest  
 ```  
-	mv rtemp/RPi/RF24Network ./  
+	mv ntemp/RPi/RF24Network ./  
 	rm -r ntemp  
 	cd RF24Network  
 ```  
