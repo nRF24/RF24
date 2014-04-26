@@ -4,12 +4,12 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
- 
- 
- 
+
+
+
 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
              Modified to use with Arduipi board http://hallard.me/arduipi
-						 Changed to use modified bcm2835 library 
+						 Changed to use modified bcm2835 library
 
 TMRh20 2014: Updated to work with optimized RF24 and RF24 Network Arduino libs.
 */
@@ -53,7 +53,7 @@ uint8_t RF24::read_register(uint8_t reg)
 
 	*ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx++ = NOP ; // Dummy operation, just for reading
-	
+
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
 	result = *++prx;   // result is 2nd byte of receive buffer
@@ -71,12 +71,12 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx = value ;
-	
+
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
-	
+
 	status = *prx++; // status is 1st byte of receive buffer
 
-  if (debug) 
+  if (debug)
 		printf("write_register(%02x,%02x)\r\n",reg,value);
 
   return status;
@@ -90,7 +90,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
   uint8_t size = len + 1; // Add register value to transmit buffer
-	
+
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
     *ptx++ = *buf++;
@@ -98,7 +98,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
-	
+
   return status;
 }
 
@@ -110,15 +110,15 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
   uint8_t status;
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
-  uint8_t size ; 
-	
+  uint8_t size ;
+
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
   uint8_t data_len = min(len,payload_size);
   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
-	
+
 	size = data_len + blank_len + 1 ; // Add register value to transmit buffer
-  
+
   if (debug)
 		printf("[Writing %u bytes %u blanks]",data_len,blank_len);
 
@@ -126,13 +126,13 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
   while ( data_len-- )
     *ptx++ =  *current++;
   while ( blank_len-- )
-		*ptx++ =  0; 
+		*ptx++ =  0;
 
 	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
 
-		
+
   return status;
 }
 
@@ -143,30 +143,30 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
   uint8_t status;
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
-  uint8_t size ; 
-	
+  uint8_t size ;
+
   uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
   uint8_t data_len = min(len,payload_size);
   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
-	
+
 	size = data_len + blank_len + 1; // Add register value to transmit buffer
-  
+
   if (debug)
 		printf("[Reading %u bytes %u blanks]",data_len,blank_len);
-  
+
 	*ptx++ =  R_RX_PAYLOAD;
 	while(size--)
 		*ptx++ = NOP;
-		
+
 	// Size has been lost during while, re affect
 	size = data_len + blank_len + 1; // Add register value to transmit buffer
-	
+
 	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-	
+
 	// 1st byte is status
 	status = *prx++;
-	
+
 	// Decrement before to skip 1st status byte
   while ( --size )
     *current++ = *prx++;
@@ -264,7 +264,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin, uint32_t _spi_speed):
-  ce_pin(_cepin), csn_pin(_cspin), spi_speed(_spi_speed), wide_band(true), p_variant(false), 
+  ce_pin(_cepin), csn_pin(_cspin), spi_speed(_spi_speed), wide_band(true), p_variant(false),
   payload_size(32), dynamic_payloads_enabled(false),
   pipe0_reading_address(0)
 {
@@ -324,7 +324,7 @@ static const char rf24_pa_dbm_e_str_0[] = "PA_MIN";
 static const char rf24_pa_dbm_e_str_1[] = "PA_LOW";
 static const char rf24_pa_dbm_e_str_2[] = "PA_HIGH";
 static const char rf24_pa_dbm_e_str_3[] = "PA_MAX";
-static const char * const rf24_pa_dbm_e_str_P[] = { 
+static const char * const rf24_pa_dbm_e_str_P[] = {
   rf24_pa_dbm_e_str_0,
   rf24_pa_dbm_e_str_1,
   rf24_pa_dbm_e_str_2,
@@ -335,7 +335,7 @@ static const char rf24_csn_e_str_0[] = "CE0 (PI Hardware Driven)";
 static const char rf24_csn_e_str_1[] = "CE1 (PI Hardware Driven)";
 static const char rf24_csn_e_str_2[] = "CE2 (PI Hardware Driven)";
 static const char rf24_csn_e_str_3[] = "Custom GPIO Software Driven";
-static const char * const rf24_csn_e_str_P[] = { 
+static const char * const rf24_csn_e_str_P[] = {
   rf24_csn_e_str_0,
   rf24_csn_e_str_1,
   rf24_csn_e_str_2,
@@ -352,13 +352,13 @@ void RF24::printDetails(void)
 		printf("CSN Pin  \t = %s\n",rf24_csn_e_str_P[csn_pin]);
 	}
 	else
-	{	
-		printf("CSN Pin  \t = Custom GPIO%d%s\n", csn_pin, 
+	{
+		printf("CSN Pin  \t = Custom GPIO%d%s\n", csn_pin,
 			csn_pin==RPI_V2_GPIO_P1_26 ? " (CE1) Software Driven" : "" );
 	}
-	
+
   printf("CE Pin  \t = Custom GPIO%d\n", ce_pin );
-	
+
 	// SPI Bus Speed
 	printf("Clock Speed\t = " );
 	switch (spi_speed)
@@ -409,32 +409,45 @@ bool RF24::begin(void)
 {
 	debug = false;
 	//debug = true;
+    // This initialize the SPI bus with
+	// csn pin as chip select (custom or not)
+
 
 	// Init BCM2835 chipset for talking with us
 	if (!bcm2835_init()){
 		return false;
 	}
-	// Initialise the CE pin of NRF24 (chip enable)
-	bcm2835_gpio_fsel(ce_pin, BCM2835_GPIO_FSEL_OUTP);
- 	bcm2835_gpio_write(ce_pin, LOW);
-	
+
+	switch(csn_pin){     //Ensure valid hardware CS pin
+		case 0: break;
+		case 1: break;
+		case 8: csn_pin = 0; break;
+		case 7: csn_pin = 1; break;
+		default: csn_pin = 0; break;
+	}
+
+
+	bcm2835_spi_begin();
+
 	// used to drive custom I/O to trigger my logic analyser
 	// bcm2835_gpio_fsel(GPIO_CTRL_PIN , BCM2835_GPIO_FSEL_OUTP);
 
 	// start the SPI library:
 	// Note the NRF24 wants mode 0, MSB first and default to 1 Mbps
-	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);      
-	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0); 
+	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
+	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
 
 	// Set SPI bus Speed
 	bcm2835_spi_setClockDivider(spi_speed);
 
-    if(csn_pin <= BCM2835_SPI_CS_NONE){
-		bcm2835_spi_chipSelect(csn_pin);
-	}
-	// This initialize the SPI bus with 
-	// csn pin as chip select (custom or not)
-	bcm2835_spi_begin(csn_pin);
+    // Choose hardware CSN pin
+    bcm2835_spi_chipSelect(csn_pin);
+
+
+	// Initialise the CE pin of NRF24 (chip enable) after the CSN pin, so that
+	// The input mode is not changed if using one of the hardware CE pins
+	bcm2835_gpio_fsel(ce_pin, BCM2835_GPIO_FSEL_OUTP);
+ 	bcm2835_gpio_write(ce_pin, LOW);
 
   // wait 100ms
   delay(100);
@@ -453,14 +466,14 @@ bool RF24::begin(void)
   {
     p_variant = true ;
   }
-  
+
   // Then set the data rate to the slowest (and most reliable) speed supported by all
   // hardware.
   setDataRate( RF24_1MBPS ) ;
 
   // Initialize CRC and request 2-byte (16bit) CRC
   setCRCLength( RF24_CRC_16 ) ;
-  
+
   // Reset current status
   // Notice reset and flush is the last thing we do
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
@@ -479,7 +492,7 @@ bool RF24::begin(void)
   // Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
   // PTX should use only 22uA of power
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
-	
+
   return true;
 }
 
@@ -501,7 +514,7 @@ void RF24::startListening(void)
 
   // Go!
   bcm2835_gpio_write(ce_pin, HIGH);
-  
+
   // wait for the radio to come up (130us actually only needed)
   //delayMicroseconds(130);
 }
@@ -514,7 +527,7 @@ void RF24::stopListening(void)
   flush_tx();
   flush_rx();
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
-  
+
 }
 
 /****************************************************************************/
@@ -528,7 +541,7 @@ void RF24::powerDown(void)
 /****************************************************************************/
 
 void RF24::powerUp(void)
-{ 
+{
   bool up = read_register(CONFIG) & _BV(PWR_UP);
 
   if(! up ){
@@ -536,7 +549,7 @@ void RF24::powerUp(void)
 	delay(5);
   }
 
-  
+
 }
 
 /******************************************************************/
@@ -544,13 +557,13 @@ void RF24::powerUp(void)
 bool RF24::write( const void* buf, uint8_t len, const bool multicast ){
 
   // Begin the write
-  startWrite(buf,len, multicast);
+  startFastWrite(buf,len, multicast);
 
 
 	//Wait until complete or failed
     // If this hangs, it ain't coming back, no sense in timing out
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { }
-	
+
 
 	uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 	bcm2835_gpio_write(ce_pin, LOW);
@@ -566,7 +579,7 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast ){
 
 bool RF24::write( const void* buf, uint8_t len ){
 	return write(buf,len,0);
-}	
+}
 
 /****************************************************************************/
 
@@ -600,7 +613,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 void RF24::reUseTX(){
 		write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 		//spiTrans( REUSE_TX_PL );
-		bcm2835_spi_transfer( REUSE_TX_PL);		
+		bcm2835_spi_transfer( REUSE_TX_PL);
 		bcm2835_gpio_write(ce_pin, LOW);										  //Re-Transfer packet
 		bcm2835_gpio_write(ce_pin, HIGH);
 }
@@ -648,18 +661,18 @@ void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast){ 
 	bcm2835_gpio_write(ce_pin, HIGH);
 
 }
- 
+
 /****************************************************************************/
 
 void RF24::startWrite( const void* buf, uint8_t len, const bool multicast )
 {
 
   // Send the payload
+
   write_payload( buf, len,multicast ? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
-
   bcm2835_gpio_write(ce_pin, HIGH);
-  //bcm2835_gpio_write(ce_pin, LOW);
-
+  delayMicroseconds(10);
+  bcm2835_gpio_write(ce_pin, LOW);
 }
 
 /****************************************************************************/
@@ -736,7 +749,7 @@ bool RF24::available(uint8_t* pipe_num)
     //Check the FIFO buffer to see if data is waitng to be read
 
   if (!( read_register(FIFO_STATUS) & _BV(RX_EMPTY) )){
-  
+
 
     // If the caller wants the pipe number, include that
     if ( pipe_num ){
@@ -840,12 +853,12 @@ void RF24::toggle_features(void)
 
 void RF24::enableDynamicPayloads(void)
 {
- 
+
     // So enable them and try again
     toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
 
-  if (debug) 
+  if (debug)
 		printf("FEATURE=%i\r\n",read_register(FEATURE));
 
   // Enable dynamic payload on all pipes
@@ -900,14 +913,14 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
 
   uint8_t * ptx = spi_txbuff;
-  uint8_t size ; 
-	
+  uint8_t size ;
+
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
   uint8_t data_len = min(len,payload_size);
- 	
+
   size = data_len + 1 ; // Add register value to transmit buffer
-  
+
   if (debug){
 		printf("[Writing %u bytes]",data_len);
   }
@@ -917,9 +930,9 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   }
 	bcm2835_spi_transfern( (char *) spi_txbuff, size);
 
-}  
-  
-  
+}
+
+
 /****************************************************************************/
 
 bool RF24::isAckPayloadAvailable(void)
@@ -1053,7 +1066,7 @@ rf24_datarate_e RF24::getDataRate( void )
 {
   rf24_datarate_e result ;
   uint8_t dr = read_register(RF_SETUP) & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH));
-  
+
   // switch uses RAM (evil!)
   // Order matters in our case below
   if ( dr == _BV(RF_DR_LOW) )
@@ -1079,11 +1092,11 @@ rf24_datarate_e RF24::getDataRate( void )
 void RF24::setCRCLength(rf24_crclength_e length)
 {
   uint8_t config = read_register(CONFIG) & ~( _BV(CRCO) | _BV(EN_CRC)) ;
-  
+
   // switch uses RAM (evil!)
   if ( length == RF24_CRC_DISABLED )
   {
-    // Do nothing, we turned it off above. 
+    // Do nothing, we turned it off above.
   }
   else if ( length == RF24_CRC_8 )
   {

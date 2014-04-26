@@ -75,24 +75,33 @@ Connection Info
 
 Using pin 15/GPIO 22 for CE, pin 24/GPIO8 (CE0) for CSN
 
+Can use either RPi CE0 or CE1 pins for radio CSN.
+Choose any RPi output pin for radio CE pin.
+
 **Constructor:**
 ```
 RF24 radio(RPI_V2_GPIO_P1_15,BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ);
+or
+RF24 radio(RPI_V2_GPIO_P1_15,BCM2835_SPI_CS1, BCM2835_SPI_SPEED_8MHZ);
 ```  
 
 **Pins:**  
 
  |NRF24L01 |  RPI    | P1 Connector |  
- |----- |----------- | -------------|  
- |VCC:  	 | rpi-3v3    |    (17) |  
- |GND:  	 | rpi-gnd    |    (25) |  
- |CE:   	 | rpi-gpio22 |    (15) |  
- |CSN:  	 | rpi-gpio8  |    (24) |  
- |SCK:  	 | rpi-sckl   |    (23) |  
- |MOSI: 	 | rpi-mosi   |    (19) |  
- |MISO: 	 | rpi-miso   |    (21) |  
+ |-----|-----------|-------------|  
+ | VCC  	 | rpi-3v3    |    (17) |  
+ | GND  	 | rpi-gnd    |    (25) |  
+ | CE   	 | rpi-gpio22 |    (15) |  
+ | CSN  	 | rpi-gpio8  |    (24) |  
+ | SCK  	 | rpi-sckl   |    (23) |  
+ | MOSI 	 | rpi-mosi   |    (19) |  
+ | MISO 	 | rpi-miso   |    (21) |  
   
   
+See http://www.airspayce.com/mikem/bcm2835/index.html for BCM2835 class documentation.  
+Note: The BCM library has been customized slightly to allow use of hardware CE pins not
+in use for SPI, and to include a millis() function.  
+   
 ****************
   
   

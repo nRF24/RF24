@@ -37,4 +37,5 @@ Supported Boards:
 * Mega Types (2560, 1280, etc)  
 * ARM (Arduino Due) via extended SPI methods 
 * ATTiny 24/44/84 25/45/85  
+* Raspberry Pi
 * See the [documentation](http://tmrh20.github.io/) for more info

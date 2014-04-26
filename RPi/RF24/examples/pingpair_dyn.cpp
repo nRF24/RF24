@@ -3,9 +3,9 @@
 */
 
 /**
- * Example using Dynamic Payloads 
+ * Example using Dynamic Payloads
  *
- * This is an example of how to use payloads of a varying (dynamic) size. 
+ * This is an example of how to use payloads of a varying (dynamic) size.
  */
 
 #include <cstdlib>
@@ -22,14 +22,14 @@ using namespace std;
 
 // CE Pin, CSN Pin, SPI Speed
 
-// Setup for GPIO 22 CE and GPIO 25 CSN with SPI Speed @ 1Mhz
-//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_18, BCM2835_SPI_SPEED_1MHZ);
+// Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 1Mhz
+//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_1MHZ);
 
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
-//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ); 
+//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ);
 
-// Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
-RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_8MHZ);  
+// Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 8Mhz
+RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 
 // Radio pipe addresses for the 2 nodes to communicate.
@@ -47,7 +47,7 @@ char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating 
 
 int main(int argc, char** argv){
 
- 
+
   // Print preamble:
   printf("RF24/examples/pingpair_dyn/\n");
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv){
   char myChar = {0};
   cout << "Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit) \n>";
   getline(cin,input);
-  
+
   if(input.length() == 1) {
 	myChar = input[0];
 	if(myChar == '0'){
@@ -129,7 +129,7 @@ if (role == role_ping_out)
       // Spew it
       printf("Got response size=%i value=%s\n\r",len,receive_payload);
     }
-    
+
     // Update size for next time.
     next_payload_size += payload_size_increments_by;
     if ( next_payload_size > max_payload_size )

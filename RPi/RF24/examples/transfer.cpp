@@ -7,7 +7,7 @@ TMRh20 2014
  */
 
 /** General Data Transfer Rate Test
- * This example demonstrates basic data transfer functionality with the 
+ * This example demonstrates basic data transfer functionality with the
  updated library. This example will display the transfer rates acheived using
  the slower form of high-speed transfer using blocking-writes.
  */
@@ -26,14 +26,14 @@ using namespace std;
 
 // CE Pin, CSN Pin, SPI Speed
 
-// Setup for GPIO 22 CE and GPIO 25 CSN with SPI Speed @ 1Mhz
-//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_18, BCM2835_SPI_SPEED_1MHZ);
+// Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 1Mhz
+//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_1MHZ);
 
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
-//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ); 
+//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ);
 
-// Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
-RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_8MHZ);  
+// Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 8Mhz
+RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 
 
@@ -42,16 +42,16 @@ const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
 
 bool role_ping_out = 1, role_pong_back = 0;
 bool role = 0;
-uint8_t data[32]; 
-unsigned long startTime, stopTime, counter, rxTimer=0; 
+uint8_t data[32];
+unsigned long startTime, stopTime, counter, rxTimer=0;
 
 int main(int argc, char** argv){
 
- 
+
   // Print preamble:
 
   printf("RF24/examples/Transfer/\n");
-  
+
   radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_MAX);
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
   char myChar = {0};
   cout << "Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit)\n>";
   getline(cin,input);
-  
+
   if(input.length() == 1) {
 	myChar = input[0];
 	if(myChar == '0'){
@@ -86,8 +86,8 @@ int main(int argc, char** argv){
       radio.openReadingPipe(1,addresses[0]);
       radio.startListening();
     }
-    
-     
+
+
   for(int i=0; i<32; i++){
      data[i] = rand() % 255;               //Load the buffer with random data
   }
@@ -105,7 +105,7 @@ int main(int argc, char** argv){
 
 		for(int i=0; i<cycles; i++){        //Loop through a number of cycles
       			data[0] = i;                      //Change the first byte of the payload for identification
-      			if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers        
+      			if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
     		}
@@ -115,16 +115,16 @@ int main(int argc, char** argv){
 
   		float numBytes = cycles*32;
    		float rate = numBytes / (stopTime - startTime);
-    
+
   		printf("Transfer complete at %.2f KB/s \n\r",rate);
    		printf("%lu of %lu Packets Failed to Send\n\r",counter,cycles);
-  		counter = 0;   
+  		counter = 0;
 
 	}
-    
+
 
 if(role == role_pong_back){
-     while(radio.available()){       
+     while(radio.available()){
       radio.read(&data,32);
       counter++;
      }
