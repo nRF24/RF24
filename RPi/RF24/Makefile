@@ -46,7 +46,7 @@ bcm2835.o: bcm2835.c
 clean:
 	rm -rf *.o ${LIB}.*
 
-install: install-libs install-headers
+install: all install-libs install-headers
 
 # Install the library to LIBPATH
 install-libs: 
