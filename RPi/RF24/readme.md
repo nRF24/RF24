@@ -25,9 +25,9 @@ C. Update other software and libraries:
 A. Make a directory to contain the RF24 and possibly RF24Network lib and enter it:  
 
     mkdir ~/rf24libs  
-	  cd ~/rf24libs  
+    cd ~/rf24libs  
 
-B. 	Clone the RF24 Repo  
+B.  Clone the RF24 Repo  
 
     git clone https://github.com/tmrh20/RF24.git rtemp  
 
@@ -44,7 +44,7 @@ D. Build the library, and run an example file:
     cd examples  
     make
     sudo ./gettingstarted  
-	
+  
 
 # RPi - RF24Network Quick-Start  
 
@@ -68,7 +68,7 @@ D. Build the library
     cd examples  
     sudo make  
     sudo ./helloworld_rx   OR   sudo ./helloworld_tx  
-	
+  
 
 # Connection Info
 
@@ -87,13 +87,13 @@ Choose any RPi output pin for radio CE pin.
 
 | NRF24L01 | RPI        | P1 Connector |  
 |----------|------------|--------------|  
-| VCC  	   | rpi-3v3    |     (17)     |  
-| GND  	   | rpi-gnd    |     (25)     |  
-| CE   	   | rpi-gpio22 |     (15)     |  
-| CSN  	   | rpi-gpio8  |     (24)     |  
-| SCK  	   | rpi-sckl   |     (23)     |  
-| MOSI 	   | rpi-mosi   |     (19)     |  
-| MISO 	   | rpi-miso   |     (21)     |  
+| VCC      | rpi-3v3    |     (17)     |  
+| GND      | rpi-gnd    |     (25)     |  
+| CE       | rpi-gpio22 |     (15)     |  
+| CSN      | rpi-gpio8  |     (24)     |  
+| SCK      | rpi-sckl   |     (23)     |  
+| MOSI     | rpi-mosi   |     (19)     |  
+| MISO     | rpi-miso   |     (21)     |  
   
   
 See http://www.airspayce.com/mikem/bcm2835/index.html for BCM2835 class documentation.  
