@@ -85,15 +85,15 @@ Choose any RPi output pin for radio CE pin.
 
 **Pins:**  
 
- |NRF24L01 |  RPI    | P1 Connector |  
- |-----|-----------|-------------|  
- | VCC  	 | rpi-3v3    |    (17) |  
- | GND  	 | rpi-gnd    |    (25) |  
- | CE   	 | rpi-gpio22 |    (15) |  
- | CSN  	 | rpi-gpio8  |    (24) |  
- | SCK  	 | rpi-sckl   |    (23) |  
- | MOSI 	 | rpi-mosi   |    (19) |  
- | MISO 	 | rpi-miso   |    (21) |  
+| NRF24L01 | RPI        | P1 Connector |  
+|----------|------------|--------------|  
+| VCC  	   | rpi-3v3    |     (17)     |  
+| GND  	   | rpi-gnd    |     (25)     |  
+| CE   	   | rpi-gpio22 |     (15)     |  
+| CSN  	   | rpi-gpio8  |     (24)     |  
+| SCK  	   | rpi-sckl   |     (23)     |  
+| MOSI 	   | rpi-mosi   |     (19)     |  
+| MISO 	   | rpi-miso   |     (21)     |  
   
   
 See http://www.airspayce.com/mikem/bcm2835/index.html for BCM2835 class documentation.  
