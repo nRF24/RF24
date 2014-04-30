@@ -40,9 +40,10 @@ C.  Copy the RPi library folder to the current directory, and delete the rest
 ```  
 D. Build the library, and run an example file:  
 ```
-    sudo make  
+  make  
+  sudo make install
 	cd examples  
-	sudo make  
+	make
 	sudo ./gettingstarted  
 ```  
 	
