@@ -21,13 +21,15 @@ LIB=librf24-bcm
 # shared library name
 LIBNAME=$(LIB).so.1.0
 
+# Where to put the header files
+HEADER_DIR=${PREFIX}/include/RF24
 
 # The recommended compiler flags for the Raspberry Pi
 CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 
 # make all
 # reinstall the library after each recompilation
-all: librf24-bcm install
+all: librf24-bcm
 
 # Make the library
 librf24-bcm: RF24.o bcm2835.o 
@@ -44,12 +46,18 @@ bcm2835.o: bcm2835.c
 clean:
 	rm -rf *.o ${LIB}.*
 
+install: all install-libs install-headers
+
 # Install the library to LIBPATH
-install: 
-	@echo "[Install]"
+install-libs: 
+	@echo "[Installing Libs]"
 	@if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
-	#@install -m 0755 ${LIB}.a ${LIBDIR}
 	@install -m 0755 ${LIBNAME} ${LIBDIR}
 	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so.1
 	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so
 	@ldconfig
+
+install-headers:
+	@echo "[Installing Headers]"
+	@if ( test ! -d ${HEADER_DIR} ) ; then mkdir -p ${HEADER_DIR} ; fi
+	@install -m 0644 *.h ${HEADER_DIR}
