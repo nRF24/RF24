@@ -474,6 +474,10 @@ bool RF24::begin(void)
   // Initialize CRC and request 2-byte (16bit) CRC
   setCRCLength( RF24_CRC_16 ) ;
 
+  toggle_features();
+  write_register(FEATURE,0 );
+  write_register(DYNPD,0);
+  
   // Reset current status
   // Notice reset and flush is the last thing we do
   write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
