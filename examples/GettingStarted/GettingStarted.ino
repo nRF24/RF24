@@ -27,7 +27,8 @@
 // Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
 RF24 radio(7,8);
 
-const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };  // Radio pipe addresses for the 2 nodes to communicate.
+byte addresses[][6] = {"1Node","2Node"};
+
 
 // Set up roles to simplify testing 
 boolean role;                                    // The main role variable, holds the current role identifier
@@ -45,10 +46,9 @@ void setup() {
   radio.begin();                          // Start up the radio
   radio.setAutoAck(1);                    // Ensure autoACK is enabled
   radio.setRetries(15,15);                // Max delay between retries & number of retries
+  radio.openWritingPipe(addresses[1]);
+  radio.openReadingPipe(1,addresses[0]);
   
-  radio.openWritingPipe(addresses[1]);    // Open a writing pipe on pipe 0, with address 1
-  radio.openReadingPipe(1,addresses[0]);  // Open a reading pipe on pipe 1, with address 0
-
   radio.startListening();                 // Start listening
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 }
@@ -123,6 +123,7 @@ void loop(void){
       role = role_ping_out;                  // Become the primary transmitter (ping out)
       radio.openWritingPipe(addresses[0]);
       radio.openReadingPipe(1,addresses[1]);
+  
     }
     else if ( c == 'R' && role == role_ping_out )
     {

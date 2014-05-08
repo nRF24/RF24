@@ -51,7 +51,8 @@ private:
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
-  uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
+  const uint8_t *pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
+  uint8_t addr_width;
 
 public:
 
@@ -163,24 +164,26 @@ public:
   bool write( const void* buf, uint8_t len );
 
   /**
-   * Open a pipe for writing
+   * New: Open a pipe for writing
    *
    * Only one pipe can be open at once, but you can change the pipe
-   * you'll listen to.  Do not call this while actively listening.
-   * Remember to stopListening() first.
+   * you'll write to. Call stopListening() first.
    *
-   * Addresses are 40-bit hex values, e.g.:
+   * Addresses are assigned via a byte array, default is 5 byte address length
+   *
+   * Usage is exactly the same as before, except for declaring the array
    *
    * @code
-   *   openWritingPipe(0xF0F0F0F0F0);
+   *   uint8_t addresses[][6] = {"1Node","2Node"};
+   *   openWritingPipe(addresses[0]);
    * @endcode
+   * @see setAddressWidth
    *
-   * @param address The 40-bit address of the pipe to open.  This can be
-   * any value whatsoever, as long as you are the only one writing to it
-   * and only one other radio is listening to it.  Coordinate these pipe
+   * @param address The address of the pipe to open. Coordinate these pipe
    * addresses amongst nodes on the network.
    */
-  void openWritingPipe(uint64_t address);
+
+  void openWritingPipe(const uint8_t *address);
 
   /**
    * Open a pipe for reading
@@ -189,24 +192,25 @@ public:
    * reading pipes, and then call startListening().
    *
    * @see openWritingPipe
+   * @see setAddressWidth
    *
-   * @warning Pipes 1-5 should share the first 32 bits.
-   * Only the least significant byte should be unique, e.g.
+   * @warning Pipes 1-5 should share the same address, except the first byte.
+   * Only the first byte in the array should be unique, e.g.
    * @code
-   *   openReadingPipe(1,0xF0F0F0F0AA);
-   *   openReadingPipe(2,0xF0F0F0F066);
+   *   uint8_t addresses[][6] = {"1Node","2Node"};
+   *   openReadingPipe(1,addresses[0]);
+   *   openReadingPipe(2,addresses[1]);
    * @endcode
    *
    * @warning Pipe 0 is also used by the writing pipe.  So if you open
    * pipe 0 for reading, and then startListening(), it will overwrite the
    * writing pipe.  Ergo, do an openWritingPipe() again before write().
    *
-   * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
-   *
    * @param number Which pipe# to open, 0-5.
-   * @param address The 40-bit address of the pipe to open.
+   * @param address The 24, 32 or 40 bit address of the pipe to open.
    */
-  void openReadingPipe(uint8_t number, uint64_t address);
+
+  void openReadingPipe(uint8_t number, const uint8_t *address);
 
   /**
    * Close a pipe after it has been previously opened.
@@ -584,6 +588,14 @@ public:
   */
   void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready);
 
+  /**
+  * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
+  *
+  * @param a_width The address width to use: 3,4 or 5
+  */
+
+  void setAddressWidth(uint8_t a_width);
+
   /**@}*/
 
   /**@}*/
@@ -758,6 +770,48 @@ public:
    *
    */
   void disableCRC( void ) ;
+
+  /**@}*/
+  /**
+   * @name Deprecated
+   *
+   *  Methods provided for backwards compabibility.
+   */
+  /**@{*/
+
+
+  /**
+   * Open a pipe for reading
+   * @note For compatibility with old code only, see new function
+   *
+   * @warning Pipes 1-5 should share the first 32 bits.
+   * Only the least significant byte should be unique, e.g.
+   * @code
+   *   openReadingPipe(1,0xF0F0F0F0AA);
+   *   openReadingPipe(2,0xF0F0F0F066);
+   * @endcode
+   *
+   * @warning Pipe 0 is also used by the writing pipe.  So if you open
+   * pipe 0 for reading, and then startListening(), it will overwrite the
+   * writing pipe.  Ergo, do an openWritingPipe() again before write().
+   *
+   * @param number Which pipe# to open, 0-5.
+   * @param address The 40-bit address of the pipe to open.
+   */
+  void openReadingPipe(uint8_t number, uint64_t address);
+
+  /**
+   * Open a pipe for writing
+   * @note For compatibility with old code only, see new function
+   * Addresses are 40-bit hex values, e.g.:
+   *
+   * @code
+   *   openWritingPipe(0xF0F0F0F0F0);
+   * @endcode
+   *
+   * @param address The 40-bit address of the pipe to open.
+   */
+  void openWritingPipe(uint64_t address);
 
 private:
 
@@ -1085,6 +1139,7 @@ private:
  * - Delays have been removed where possible to ensure maximum efficiency
  * - Full Due support with extended SPI functions
  * - ATTiny 24/44/84 25/45/85 now supported.
+ * - Raspberry Pi now supported
  * - More! See the links below and class documentation for more info.
  *
  * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
@@ -1114,6 +1169,7 @@ private:
  * Note: ATTiny support is built into the library. Do not include SPI.h. <br>
  * ATTiny 85: D0(pin 5): MISO, D1(pin6) MOSI, D2(pin7) SCK, D3(pin2):CSN/SS, D4(pin3): CE <br>
  * ATTiny 84: PA6:MISO, PA5:MOSI, PA4:SCK, PA7:CSN/SS,  CE as desired <br>
+ * - Raspberry Pi Support: See the readme at https://github.com/TMRh20/RF24/tree/master/RPi
  *
  * @section More More Information
  *

@@ -44,13 +44,14 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
+const uint8_t pipes[][6] = {"1Node","2Node"};
+//const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
 
-bool role_ping_out = 1, role_pong_back = 0;
-bool role = 0;
 
 int main(int argc, char** argv){
 
+  bool role_ping_out = true, role_pong_back = false;
+  bool role = role_pong_back;
 
   // Print preamble:
   printf("RF24/examples/pingtest/\n");
@@ -94,7 +95,7 @@ int main(int argc, char** argv){
       radio.startListening();
 
     }
-
+	
 	// forever loop
 	while (1)
 	{
@@ -144,6 +145,7 @@ int main(int argc, char** argv){
 
 			// Try again 1s later
 			//    delay(1000);
+
 			sleep(1);
 
 		}
@@ -156,7 +158,7 @@ int main(int argc, char** argv){
 		{
 			// if there is data ready
 			//printf("Check available...\n");
-			//delay(3);
+
 			if ( radio.available() )
 			{
 				// Dump the payloads until we've gotten everything
@@ -167,19 +169,20 @@ int main(int argc, char** argv){
 				radio.read( &got_time, sizeof(unsigned long) );
 
 				radio.stopListening();
-				//delay(1);
+
 				// Seem to need a  delay, or the RPi is too quick
 				radio.write( &got_time, sizeof(unsigned long) );
 
-				//delay(1);
 				// Now, resume listening so we catch the next packets.
 				radio.startListening();
-				 //delay(1);
+
 				// Spew it
 				printf("Got payload(%d) %lu...\n",sizeof(unsigned long), got_time);
+				
 			}
-		//delay(5);
+		
 		}
+
 	} // forever loop
 
   return 0;

@@ -20,7 +20,7 @@
 // Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
 RF24 radio(7,8);
                                                                            // Topology
-const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };              // Radio pipe addresses for the 2 nodes to communicate.
+byte addresses[][6] = {"1Node","2Node"};              // Radio pipe addresses for the 2 nodes to communicate.
 
 // Role management: Set up role.  This sketch uses the same software for all the nodes
 // in this system.  Doing so greatly simplifies testing.  

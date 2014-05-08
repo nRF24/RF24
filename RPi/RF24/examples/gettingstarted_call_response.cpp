@@ -38,7 +38,7 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
+const uint8_t addresses[][6] = {"1Node","2Node"};
 
 bool role_ping_out = 1, role_pong_back = 0, role = 0;
 

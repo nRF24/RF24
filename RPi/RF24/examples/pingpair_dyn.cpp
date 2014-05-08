@@ -35,8 +35,7 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
-bool role_ping_out = 1, role_pong_back = 0;
-bool role = 0;
+
 
 const int min_payload_size = 4;
 const int max_payload_size = 32;
@@ -47,6 +46,8 @@ char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating 
 
 int main(int argc, char** argv){
 
+  bool role_ping_out = 1, role_pong_back = 0;
+  bool role = 0;
 
   // Print preamble:
   printf("RF24/examples/pingpair_dyn/\n");

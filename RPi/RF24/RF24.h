@@ -4,11 +4,11 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
- 
+
  03/17/2013 : Charles-Henri Hallard (http://hallard.me)
               Modified to use with Arduipi board http://hallard.me/arduipi
               Modified to use the great bcm2835 library for I/O and SPI
-							
+
  */
 
 /**
@@ -54,15 +54,15 @@ class RF24
 private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
-	uint16_t spi_speed; /**< SPI Bus Speed */
+  uint16_t spi_speed; /**< SPI Bus Speed */
   bool wide_band; /* 2Mbs data rate in use? */
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
-  //bool ack_payload_available; /**< Whether there is an ack payload waiting */
-  bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
-  //uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
-  uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
-	//uint32_t spispeed;
+
+  bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
+  const uint8_t *pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
+  uint8_t addr_width;
+
   uint8_t debug ; /* Debug flag */
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
@@ -298,24 +298,26 @@ public:
   void read( void* buf, uint8_t len );
 
   /**
-   * Open a pipe for writing
+   * New: Open a pipe for writing
    *
    * Only one pipe can be open at once, but you can change the pipe
-   * you'll listen to.  Do not call this while actively listening.
-   * Remember to stopListening() first.
+   * you'll write to. Call stopListening() first.
    *
-   * Addresses are 40-bit hex values, e.g.:
+   * Addresses are assigned via a byte array, default is 5 byte address length
+   *
+   * Usage is exactly the same as before, except for declaring the array
    *
    * @code
-   *   openWritingPipe(0xF0F0F0F0F0);
+   *   uint8_t addresses[][6] = {"1Node","2Node"};
+   *   openWritingPipe(addresses[0]);
    * @endcode
+   * @see setAddressWidth
    *
-   * @param address The 40-bit address of the pipe to open.  This can be
-   * any value whatsoever, as long as you are the only one writing to it
-   * and only one other radio is listening to it.  Coordinate these pipe
+   * @param address The address of the pipe to open. Coordinate these pipe
    * addresses amongst nodes on the network.
    */
-  void openWritingPipe(uint64_t address);
+
+  void openWritingPipe(const uint8_t *address);
 
   /**
    * Open a pipe for reading
@@ -324,28 +326,29 @@ public:
    * reading pipes, and then call startListening().
    *
    * @see openWritingPipe
+   * @see setAddressWidth
    *
-   * @warning Pipes 1-5 should share the first 32 bits.
-   * Only the least significant byte should be unique, e.g.
+   * @warning Pipes 1-5 should share the same address, except the first byte.
+   * Only the first byte in the array should be unique, e.g.
    * @code
-   *   openReadingPipe(1,0xF0F0F0F0AA);
-   *   openReadingPipe(2,0xF0F0F0F066);
+   *   uint8_t addresses[][6] = {"1Node","2Node"};
+   *   openReadingPipe(1,addresses[0]);
+   *   openReadingPipe(2,addresses[1]);
    * @endcode
    *
    * @warning Pipe 0 is also used by the writing pipe.  So if you open
    * pipe 0 for reading, and then startListening(), it will overwrite the
    * writing pipe.  Ergo, do an openWritingPipe() again before write().
    *
-   * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
-   *
    * @param number Which pipe# to open, 0-5.
-   * @param address The 40-bit address of the pipe to open.
+   * @param address The 24, 32 or 40 bit address of the pipe to open.
    */
-  void openReadingPipe(uint8_t number, uint64_t address);
+
+  void openReadingPipe(uint8_t number, const uint8_t *address);
 
   /**@}*/
   /**
-   * @name Optional Configurators 
+   * @name Optional Configurators
    *
    *  Methods you can use to get or set the configuration of the chip.
    *  None are required.  Calling begin() sets up a reasonable set of
@@ -400,7 +403,7 @@ public:
    * @return Payload length of last-received dynamic payload
    */
   uint8_t getDynamicPayloadSize(void);
-  
+
   /**
    * Enable custom payloads on the acknowledge packets
    *
@@ -480,7 +483,7 @@ public:
    * @return true if the change was successful
    */
   bool setDataRate(rf24_datarate_e speed);
-  
+
   /**
    * Fetches the transmission data rate
    *
@@ -512,9 +515,65 @@ public:
 
   /**@}*/
   /**
-   * @name Advanced Operation 
+   * @name Deprecated
    *
-   *  Methods you can use to drive the chip in more advanced ways 
+   *  Methods provided for backwards compabibility.
+   */
+  /**@{*/
+
+  /**
+   * Open a pipe for writing
+   *
+   * Only one pipe can be open at once, but you can change the pipe
+   * you'll listen to.  Do not call this while actively listening.
+   * Remember to stopListening() first.
+   *
+   * Addresses are 40-bit hex values, e.g.:
+   *
+   * @code
+   *   openWritingPipe(0xF0F0F0F0F0);
+   * @endcode
+   *
+   * @param address The 40-bit address of the pipe to open.  This can be
+   * any value whatsoever, as long as you are the only one writing to it
+   * and only one other radio is listening to it.  Coordinate these pipe
+   * addresses amongst nodes on the network.
+   */
+  void openWritingPipe(uint64_t address);
+
+  /**
+   * Open a pipe for reading
+   *
+   * Up to 6 pipes can be open for reading at once.  Open all the
+   * reading pipes, and then call startListening().
+   *
+   * @see openWritingPipe
+   *
+   * @warning Pipes 1-5 should share the first 32 bits.
+   * Only the least significant byte should be unique, e.g.
+   * @code
+   *   openReadingPipe(1,0xF0F0F0F0AA);
+   *   openReadingPipe(2,0xF0F0F0F066);
+   * @endcode
+   *
+   * @warning Pipe 0 is also used by the writing pipe.  So if you open
+   * pipe 0 for reading, and then startListening(), it will overwrite the
+   * writing pipe.  Ergo, do an openWritingPipe() again before write().
+   *
+   * @todo Enforce the restriction that pipes 1-5 must share the top 32 bits
+   *
+   * @param number Which pipe# to open, 0-5.
+   * @param address The 40-bit address of the pipe to open.
+   */
+  void openReadingPipe(uint8_t number, uint64_t address);
+
+
+
+  /**@}*/
+  /**
+   * @name Advanced Operation
+   *
+   *  Methods you can use to drive the chip in more advanced ways
    */
   /**@{*/
 
@@ -849,7 +908,7 @@ public:
    * @return true if this is a legitimate radio
    */
   bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
-  
+
   /**
   * The radio will generate interrupt signals when a transmission is complete,
   * a transmission fails, or a payload is received. This allows users to mask
@@ -868,6 +927,14 @@ public:
   */
   void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready);
 
+  /**
+  * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
+  *
+  * @param a_width The address width to use: 3,4 or 5
+  */
+
+  void setAddressWidth(uint8_t a_width);
+
   /**@}*/
 };
 
@@ -875,12 +942,12 @@ public:
  * @example GettingStarted.pde
  *
  * This is an example which corresponds to my "Getting Started" blog post:
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>. 
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>.
  *
- * It is an example of how to use the RF24 class.  Write this sketch to two 
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting 
- * with the serial monitor and sending a 'T'.  The ping node sends the current 
- * time to the pong node, which responds by sending the value back.  The ping 
+ * It is an example of how to use the RF24 class.  Write this sketch to two
+ * different nodes.  Put one of the nodes into 'transmit' mode by connecting
+ * with the serial monitor and sending a 'T'.  The ping node sends the current
+ * time to the pong node, which responds by sending the value back.  The ping
  * node can then see how long the whole cycle took.
  */
 
@@ -912,14 +979,14 @@ public:
  */
 
 /**
- * @example pingpair_maple.pde 
+ * @example pingpair_maple.pde
  *
  * This is an example of how to use the RF24 class on the Maple.  For a more
  * detailed explanation, see my blog post:
  * <a href="http://maniacbug.wordpress.com/2011/12/14/nrf24l01-running-on-maple-3/">nRF24L01+ Running on Maple</a>
  *
  * It will communicate well to an Arduino-based unit as well, so it's not for only Maple-to-Maple communication.
- * 
+ *
  * Write this sketch to two different nodes,
  * connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
  * which responds by sending the value back.  The ping node can then see how long the whole cycle
@@ -981,25 +1048,25 @@ public:
  * @mainpage Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  *
  * @section Goals Design Goals
- * 
+ *
  * This library is designed to be...
  * @li Maximally compliant with the intended operation of the chip
  * @li Easy for beginners to use
  * @li Consumed with a public interface that's similiar to other Arduino standard libraries
  *
  * @section News News
- * 
- * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.  
+ *
+ * NOW COMPATIBLE WITH ARDUINO 1.0 - The 'master' branch and all examples work with both Arduino 1.0 and earlier versions.
  * Please <a href="https://github.com/maniacbug/RF24/issues/new">open an issue</a> if you find any problems using it with any version of Arduino.
  *
- * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the 
- * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>, 
+ * NOW COMPATIBLE WITH MAPLE - RF24 has been tested with the
+ * <a href="http://leaflabs.com/store/#Maple-Native">Maple Native</a>,
  * and should work with any Maple board.  See the pingpair_maple example.
  * Note that only the pingpair_maple example has been tested on Maple, although
  * the others can certainly be adapted.
  *
  * @section Useful Useful References
- * 
+ *
  * Please refer to:
  *
  * @li <a href="http://maniacbug.github.com/RF24/">Documentation Main Page</a>
@@ -1021,11 +1088,11 @@ public:
  *
  * <img src="http://farm7.staticflickr.com/6044/6307669179_a8d19298a6_m.jpg" width="240" height="160" alt="RF24 Getting Started - Finished Product">
  *
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a> 
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2011/11/02/getting-started-rf24/">Getting Started with nRF24L01+ on Arduino</a>
  *
  * <img src="http://farm8.staticflickr.com/7159/6645514331_38eb2bdeaa_m.jpg" width="240" height="160" alt="Nordic FOB and nRF24L01+">
  *
- * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a> 
+ * <a style="text-align:center" href="http://maniacbug.wordpress.com/2012/01/08/nordic-fob/">Using the Sparkfun Nordic FOB</a>
  *
  * <img src="http://farm7.staticflickr.com/6097/6224308836_b9b3b421a3_m.jpg" width="240" height="160" alt="RF Duinode V3 (2V4)">
  *
