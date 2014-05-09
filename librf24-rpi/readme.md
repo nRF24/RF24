@@ -3,10 +3,11 @@ Raspberry Pi RF24 libraries
 
 This is the collection of libraries for RF24 / NRF24L01 wireless modules on the raspberry pi.
 
-There are two folders with two different libraries :-
+There are three folders with three different libraries :-
 
-- librf24 	 This library/driver are ported from Arduino to beaglebone then to RPi, uses GPIO
-- librf24-bcm 	 This library/driver are further ported to use Broadcom bcm2835 using hardware SPI
+- **librf24**			This library/driver is ported from Arduino to beaglebone then to RPi, uses GPIO
+- **librf24-bcm**		This library/driver is further ported to use Broadcom bcm2835 using hardware SPI
+- **librf24-wiringpi**	This library/driver implements a modified version of librf24 which uses WiringPi
 
 Setup
 =====
@@ -17,7 +18,7 @@ Setup
 
 Known issues
 ============
-- the current bcm2835 drivers still have some minor bugs/errors, if you have errors, use the GPIO version
+- The current bcm2835 drivers still have some minor bugs/errors. If you have errors, use the GPIO or WiringPi version.
 
 
 Links 
@@ -33,10 +34,14 @@ Contact
 Stanley Seow ( stanleyseow@gmail.com )
 https://github.com/stanleyseow/RF24
 
-RF24 for RPi using gpio :-
+RF24 for RPi using gpio:
 Arco van Geest <arco@appeltaart.mine.nu> 
 https://github.com/gnulnulf/RF24
 
-RF24 for RPi using bcm2835 :-
+RF24 for RPi using bcm2835:
 Charles-Henri Hallard http://hallard.me/ 
 https://github.com/hallard/RF24
+
+RF24 for RPi using WiringPi:
+Trey Keown <jfktrey@gmail.com>
+https://github.com/jfktrey/RF24
