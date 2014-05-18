@@ -63,9 +63,9 @@ C. Copy the RF24Network folder to the current directory, and delete the rest
 
 D. Build the library  
 
-    sudo make  
+    sudo make install
     cd examples  
-    sudo make  
+    make  
     sudo ./helloworld_rx   OR   sudo ./helloworld_tx  
   
 
