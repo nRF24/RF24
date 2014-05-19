@@ -48,7 +48,7 @@
 // Avoid spurious warnings
 // Arduino DUE is arm and uses traditional PROGMEM constructs
 #if 1
-#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)
+#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)  && ! defined( CORE_TEENSY3 )
 #undef PROGMEM
 #define PROGMEM __attribute__(( section(".progmem.data") ))
 #undef PSTR
@@ -68,13 +68,18 @@
 	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 #endif
 
+
+#if !defined ( CORE_TEENSY )
 	typedef uint16_t prog_uint16_t;
 	#define PSTR(x) (x)
 	#define printf_P printf
 	#define strlen_P strlen
 	#define PROGMEM
 	#define pgm_read_word(p) (*(p))
+#endif
+
 	#define PRIPSTR "%s"
+
 #endif
 
 

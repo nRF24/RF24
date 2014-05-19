@@ -45,7 +45,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
   uint8_t status;
 
-#if defined (__arm__)
+#if defined (__arm__) && !defined ( CORE_TEENSY )
   status = SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
   while ( len-- > 1 ){
     *buf++ = SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
@@ -70,7 +70,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 uint8_t RF24::read_register(uint8_t reg)
 {
 
-  #if defined (__arm__)
+  #if defined (__arm__) && !defined ( CORE_TEENSY )
   SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ) , SPI_CONTINUE);
   uint8_t result = SPI.transfer(csn_pin,0xff);
   #else
@@ -90,7 +90,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 {
   uint8_t status;
 
-  #if defined (__arm__)
+  #if defined (__arm__) && !defined ( CORE_TEENSY )
   	status = SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
     while ( len-- > 1){
     	SPI.transfer(csn_pin,*buf++, SPI_CONTINUE);
@@ -118,7 +118,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
-  #if defined (__arm__)
+  #if defined (__arm__) && !defined ( CORE_TEENSY )
   status = SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE);
   SPI.transfer(csn_pin,value);
   #else
@@ -145,7 +145,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
 
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
 
- #if defined (__arm__)
+ #if defined (__arm__) && !defined ( CORE_TEENSY )
 
   status = SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
 
@@ -194,7 +194,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
 
-  #if defined (__arm__)
+  #if defined (__arm__) && !defined ( CORE_TEENSY )
 
   status = SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
 
@@ -250,7 +250,7 @@ uint8_t RF24::flush_tx(void)
 uint8_t RF24::spiTrans(uint8_t cmd){
 
   uint8_t status;
-  #if defined (__arm__)
+  #if defined (__arm__) && !defined ( CORE_TEENSY )
 	status = SPI.transfer(csn_pin, cmd );
   #else
 
@@ -433,7 +433,7 @@ void RF24::begin(void)
   // Initialize pins
   pinMode(ce_pin,OUTPUT);
 
-  #if defined(__arm__)
+  #if defined(__arm__) && ! defined( CORE_TEENSY )
   	SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
 	SPI.setClockDivider(csn_pin, 9);   // Set the bus speed to 8.4mhz on Due
 	SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
@@ -732,7 +732,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
 {
   uint8_t result = 0;
 
-  #if defined (__arm__)
+  #if defined (__arm__) && ! defined( CORE_TEENSY )
   SPI.transfer(csn_pin, R_RX_PL_WID, SPI_CONTINUE );
   result = SPI.transfer(csn_pin,0xff);
   #else
@@ -922,7 +922,7 @@ void RF24::closeReadingPipe( uint8_t pipe )
 void RF24::toggle_features(void)
 {
 
-  #if defined (__arm__)
+  #if defined (__arm__) && ! defined( CORE_TEENSY )
   SPI.transfer(csn_pin, ACTIVATE, SPI_CONTINUE );
   SPI.transfer(csn_pin, 0x73 );
   #else
@@ -996,7 +996,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
   uint8_t data_len = min(len,32);
 
-  #if defined (__arm__)
+  #if defined (__arm__) && ! defined( CORE_TEENSY )
 	SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & B111 ), SPI_CONTINUE);
 	while ( data_len-- > 1 ){
 		SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
@@ -1080,7 +1080,7 @@ void RF24::setPALevel(uint8_t level)
   uint8_t setup = read_register(RF_SETUP) & 0b11111000;
 
   if(level > 3){  						// If invalid level, go to max PA
-	  level = RF24_PA_MAX << 1 + 1;		// +1 to support the SI24R1 chip extra bit
+	  level = (RF24_PA_MAX << 1) + 1;		// +1 to support the SI24R1 chip extra bit
   }else{
 	  level = (level << 1) + 1;	 		// Else set level as requested
   }
