@@ -24,15 +24,28 @@
   //#define MINIMAL
 
   // Define _BV for non-Arduino platforms and for Arduino DUE
-#if defined (ARDUINO)
+#if defined (ARDUINO) && !defined (__arm__)
 	#include <SPI.h>
 #else
-	#include <stdint.h>
-	#include <stdio.h>
-	#include <string.h>
-	extern HardwareSPI SPI;
-	#define _BV(x) (1<<(x))
-  #endif
+
+  #include <stdint.h>
+  #include <stdio.h>
+  #include <string.h>
+
+
+ #if defined(__arm__) || defined (CORE_TEENSY)
+   #include <SPI.h>
+ #endif
+
+ #if !defined(CORE_TEENSY)
+   #define _BV(x) (1<<(x))
+   #if !defined(__arm__)
+     extern HardwareSPI SPI;
+   #endif
+ #endif
+
+
+#endif
 
 
   #undef SERIAL_DEBUG
