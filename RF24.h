@@ -51,7 +51,7 @@ private:
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
-  const uint8_t *pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
+  uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
   uint8_t addr_width;
 
 public:

@@ -314,7 +314,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
   while (qty--)
   {
-    uint8_t buffer[5];
+    uint8_t buffer[addr_width];
     read_register(reg++,buffer,sizeof buffer);
 
     printf_P(PSTR(" 0x"));
@@ -330,7 +330,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
   ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false),
-  payload_size(32), dynamic_payloads_enabled(false),addr_width(5)//,pipe0_reading_address(0)
+  payload_size(32), dynamic_payloads_enabled(false), addr_width(5)//,pipe0_reading_address(0)
 {
 }
 
@@ -501,7 +501,6 @@ void RF24::begin(void)
   // PTX should use only 22uA of power
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
 
-
 }
 
 /****************************************************************************/
@@ -513,7 +512,7 @@ void RF24::startListening(void)
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Restore the pipe0 adddress, if exists
-  if (pipe0_reading_address){
+  if (pipe0_reading_address[0] > 0){
     write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);
   }
 
@@ -811,8 +810,8 @@ void RF24::openWritingPipe(uint64_t value)
   // Note that AVR 8-bit uC's store this LSB first, and the NRF24L01(+)
   // expects it LSB first too, so we're good.
 
-  write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), 5);
-  write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), 5);
+  write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), addr_width);
+  write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), addr_width);
 
   //const uint8_t max_payload_size = 32;
   //write_register(RX_PW_P0,min(payload_size,max_payload_size));
@@ -852,14 +851,15 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
   // If this is pipe 0, cache the address.  This is needed because
   // openWritingPipe() will overwrite the pipe 0 address, so
   // startListening() will have to restore it.
-  if (child == 0)
-    pipe0_reading_address = reinterpret_cast<uint8_t*>(&address);
+  if (child == 0){
+    memcpy(pipe0_reading_address,&address,addr_width);
+  }
 
   if (child <= 6)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 5);
+      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), addr_width);
     else
       write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
 
@@ -889,9 +889,9 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t *address)
   // If this is pipe 0, cache the address.  This is needed because
   // openWritingPipe() will overwrite the pipe 0 address, so
   // startListening() will have to restore it.
-  if (child == 0)
-    pipe0_reading_address = address;
-
+  if (child == 0){
+    memcpy(pipe0_reading_address,address,addr_width);
+  }
   if (child <= 6)
   {
     // For pipes 2-5, only write the LSB
