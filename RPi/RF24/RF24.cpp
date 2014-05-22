@@ -32,7 +32,6 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 		*ptx++ = NOP ; // Dummy operation, just for reading
 	}
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-  //bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) buf, size);
 
 	status = *prx++; // status is 1st byte of receive buffer
 
@@ -42,19 +41,20 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 	}
 
   return status;
-}
+} 
 
 /****************************************************************************/
 uint8_t RF24::read_register(uint8_t reg)
 {
   uint8_t result;
+	
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
-
+	
 	*ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx++ = NOP ; // Dummy operation, just for reading
 
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
 	result = *++prx;   // result is 2nd byte of receive buffer
 
@@ -66,13 +66,14 @@ uint8_t RF24::read_register(uint8_t reg)
 uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 {
   uint8_t status;
+	
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
 
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx = value ;
 
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  	bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, 2);  
 
 	status = *prx++; // status is 1st byte of receive buffer
 
@@ -162,7 +163,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
 	// Size has been lost during while, re affect
 	size = data_len + blank_len + 1; // Add register value to transmit buffer
 
-	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+	bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	// 1st byte is status
 	status = *prx++;
@@ -512,14 +513,14 @@ void RF24::startListening(void)
     write_register(RX_ADDR_P0, pipe0_reading_address,addr_width);	
   }
   // Flush buffers
-  flush_rx();
-  flush_tx();
+  //flush_rx();
+  //flush_tx();
 
   // Go!
   bcm2835_gpio_write(ce_pin, HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-  //delayMicroseconds(130);
+  delayMicroseconds(130);
 }
 
 /****************************************************************************/
@@ -527,10 +528,10 @@ void RF24::startListening(void)
 void RF24::stopListening(void)
 {
   bcm2835_gpio_write(ce_pin, LOW);
-  flush_tx();
-  flush_rx();
-  write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
-
+  //flush_tx();
+  //flush_rx();
+  write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
+  delayMicroseconds(130);
 }
 
 /****************************************************************************/
@@ -567,9 +568,9 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast ){
     // If this hangs, it ain't coming back, no sense in timing out
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { }
 
-
-	uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 	bcm2835_gpio_write(ce_pin, LOW);
+	uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+	
 
   //Max retries exceeded
   if( status & _BV(MAX_RT)){
@@ -731,7 +732,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
   spi_txbuff[0] = R_RX_PL_WID;
   spi_rxbuff[1] = 0xff;
 
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
   if(spi_rxbuff[1] > 32) { flush_rx(); return 0; }
 
@@ -750,7 +751,6 @@ bool RF24::available(void)
 bool RF24::available(uint8_t* pipe_num)
 {
     //Check the FIFO buffer to see if data is waitng to be read
-
   if (!( read_register(FIFO_STATUS) & _BV(RX_EMPTY) )){
 
 
@@ -946,7 +946,7 @@ void RF24::enableAckPayload(void)
   //
   // Enable dynamic payload on pipes 0 & 1
   //
-
+  dynamic_payloads_enabled = true;
   write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
 }
 
@@ -985,7 +985,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   while ( data_len-- ){
     *ptx++ =  *current++;
   }
-	bcm2835_spi_transfern( (char *) spi_txbuff, size);
+	bcm2835_spi_transfernb( (char *) spi_txbuff,(char *)spi_rxbuff, size);
 
 }
 

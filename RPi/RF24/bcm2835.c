@@ -562,17 +562,15 @@ uint8_t bcm2835_spi_transfer(uint8_t value)
 
     // Maybe wait for TXD
     while (!(bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD)){
-		delayMicroseconds(10);
+		
 	}
-
     // Write to FIFO, no barrier
     bcm2835_peri_write_nb(fifo, value);
 
     // Wait for DONE to be set
     while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)){
-		delayMicroseconds(10);
-	}
-
+		
+	}	
     // Read any byte that was sent back by the slave while we sere sending to it
     uint32_t ret = bcm2835_peri_read_nb(fifo);
 
@@ -586,8 +584,19 @@ uint8_t bcm2835_spi_transfer(uint8_t value)
     return ret;
 }
 
-// Writes (and reads) an number of bytes to SPI
 void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
+{
+	__bcm2835_spi_transfernb(tbuf,rbuf,len,0);
+}
+
+void bcm2835_spi_transfernbd(char* tbuf, char* rbuf, uint32_t len)
+{
+	__bcm2835_spi_transfernb(tbuf,rbuf,len,1);
+}
+
+
+// Writes (and reads) an number of bytes to SPI
+void __bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len, uint8_t delay)
 {
     volatile uint32_t* paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
     volatile uint32_t* fifo = bcm2835_spi0 + BCM2835_SPI0_FIFO/4;
@@ -608,27 +617,35 @@ void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
     while((TXCnt < len)||(RXCnt < len))
     {
         // TX fifo not full, so add some more bytes
-        while(((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD))&&(TXCnt < len ))
+        while( (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD )  && (TXCnt < len )  && !(bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXR) )
         {
-		   delayMicroseconds(10);
            bcm2835_peri_write_nb(fifo, tbuf[TXCnt]);
            TXCnt++;
-        }
+        }	
         //Rx fifo not empty, so get the next received bytes
+	while(! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD) ){}
         while(((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD))&&( RXCnt < len ))
         {
-		   delayMicroseconds(10);
+		   
            rbuf[RXCnt] = bcm2835_peri_read_nb(fifo);
            RXCnt++;
+	   
         }
+	if(delay){ delayMicroseconds(10); }
+
     }
+
     // Wait for DONE to be set
     while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)){
-		delayMicroseconds(10);
+		
 	}
+    
     // Set TA = 0, and also set the barrier
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
+    if(delay){delayMicroseconds(10);}
 }
+
+
 
 // Writes an number of bytes to SPI
 void bcm2835_spi_writenb(char* tbuf, uint32_t len)

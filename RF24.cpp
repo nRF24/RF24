@@ -533,7 +533,7 @@ void RF24::stopListening(void)
   flush_tx();
   flush_rx();
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
-
+  delayMicroseconds(130); //Found that adding this delay back actually increases response time
 }
 
 /****************************************************************************/
@@ -972,6 +972,7 @@ void RF24::enableAckPayload(void)
   //
 
   write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
+  dynamic_payloads_enabled = true;
 }
 
 /****************************************************************************/
