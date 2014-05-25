@@ -145,13 +145,6 @@ protected:
   uint8_t flush_rx(void);
 
   /**
-   * Empty the transmit buffer
-   *
-   * @return Current value of status register
-   */
-  uint8_t flush_tx(void);
-
-  /**
    * Retrieve the current status of the chip
    *
    * @return Current value of status register
@@ -345,6 +338,13 @@ public:
    */
 
   void openReadingPipe(uint8_t number, const uint8_t *address);
+
+  /**
+   * Empty the transmit buffer
+   *
+   * @return Current value of status register
+   */
+  uint8_t flush_tx(void);
 
   /**@}*/
   /**

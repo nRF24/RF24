@@ -129,7 +129,8 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
   while ( blank_len-- )
 		*ptx++ =  0;
 
-	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+
+	bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
 
@@ -163,8 +164,11 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
 	// Size has been lost during while, re affect
 	size = data_len + blank_len + 1; // Add register value to transmit buffer
 
-	bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-
+	if(dynamic_payloads_enabled){
+		bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+	}else{
+		bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+	}
 	// 1st byte is status
 	status = *prx++;
 

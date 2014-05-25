@@ -116,6 +116,7 @@ while (1){
     }else{        printf("Sending failed.\n\r"); }          // If no ack response, sending failed
 
     sleep(1);  // Try again later
+    //delay(250);
   }
 
 /****************** Pong Back Role ***************************/
@@ -123,11 +124,14 @@ while (1){
   if ( role == role_pong_back ) {
     uint8_t pipeNo, gotByte;                       // Declare variables for the pipe and the byte received
     while( radio.available(&pipeNo)){              // Read all available payloads
+      radio.flush_tx();				   // Clear any unused ACK payloads
       radio.read( &gotByte, 1 );
                                                    // Since this is a call-response. Respond directly with an ack payload.
-      		  				                       // Ack payloads are much more efficient than switching to transmit mode to respond to a call
+      						   // Ack payloads are much more efficient than switching to transmit mode to respond to a call
       radio.writeAckPayload(pipeNo,&gotByte, 1 );  // This can be commented out to send empty payloads.
+      
       printf("Sent response %d \n\r", gotByte);
+      
    }
  }
 
