@@ -16,6 +16,7 @@ PREFIX=/usr/local
 # Library parameters
 # where to put the lib
 LIBDIR=$(PREFIX)/lib
+INCLUDEDIR=$(PREFIX)/include
 # lib name 
 LIB=librf24-bcm
 # shared library name
@@ -52,4 +53,8 @@ install:
 	@install -m 0755 ${LIBNAME} ${LIBDIR}
 	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so.1
 	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so
+	@cp RF24_config.h ${INCLUDEDIR}
+	@cp RF24.h ${INCLUDEDIR}
+	@cp bcm2835.h ${INCLUDEDIR}
+	@cp nRF24L01.h ${INCLUDEDIR}
 	@ldconfig

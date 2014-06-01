@@ -12,6 +12,7 @@
 # You can change the install directory by editing the LIBDIR line
 #
 LIBDIR=/usr/local/lib
+INCLUDEDIR=/usr/local/include
 LIBNAME=librf24.so.1.0
 
 
@@ -47,5 +48,11 @@ install:
 	cp librf24.so.1.0 ${LIBDIR}/${LIBNAME}
 	ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/librf24.so.1
 	ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/librf24.so
+	cp compatibility.h ${INCLUDEDIR}
+	cp gpio.h ${INCLUDEDIR}
+	cp nRF24L01.h ${INCLUDEDIR}
+	cp RF24_config.h ${INCLUDEDIR}
+	cp RF24.h ${INCLUDEDIR}
+	cp spi.h ${INCLUDEDIR}
 	ldconfig
 
