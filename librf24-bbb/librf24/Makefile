@@ -8,16 +8,12 @@
 #
 # Description:
 # ------------
-# use make all and mak install to install the library 
+# use make all and mak install to install the library
 # You can change the install directory by editing the LIBDIR line
 #
 LIBDIR=/usr/local/lib
 INCLUDEDIR=/usr/local/include
 LIBNAME=librf24.so.1.0
-
-
-# The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 
 # make all
 all: librf24
@@ -44,7 +40,7 @@ clean:
 	rm -rf *o ${LIBNAME}
 
 # Install the library to LIBPATH
-install: 
+install:
 	cp librf24.so.1.0 ${LIBDIR}/${LIBNAME}
 	ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/librf24.so.1
 	ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/librf24.so
