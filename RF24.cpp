@@ -19,14 +19,14 @@ void RF24::csn(bool mode)
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
-	#if !defined( __AVR_ATtiny85__ ) && !defined( __AVR_ATtiny84__) && !defined (__arm__)
+	#if  ( !defined( __AVR_ATtiny85__ ) && !defined( __AVR_ATtiny84__) && !defined (__arm__)  ) || defined (CORE_TEENSY)
  			SPI.setBitOrder(MSBFIRST);
   			SPI.setDataMode(SPI_MODE0);
 			SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
 #endif
 
-#ifndef __arm__
+#if !defined  (__arm__) || defined (CORE_TEENSY)
 	digitalWrite(csn_pin,mode);
 #endif
 
@@ -92,7 +92,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 
   #if defined (__arm__) && !defined ( CORE_TEENSY )
   	status = SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
-    while ( len-- > 1){
+    while ( --len){
     	SPI.transfer(csn_pin,*buf++, SPI_CONTINUE);
 	}
 	SPI.transfer(csn_pin,*buf++);
@@ -140,8 +140,8 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   uint8_t status;
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-  if(data_len > payload_size) data_len = payload_size;
-  uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
+  if(data_len > 32) data_len = 32;
+  uint8_t blank_len = dynamic_payloads_enabled ? 0 : 32 - data_len;
 
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
 
@@ -189,7 +189,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
   if(data_len > payload_size) data_len = payload_size;
-  uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
+  uint8_t blank_len = dynamic_payloads_enabled ? 0 : 32 - data_len;
 
   //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
@@ -199,14 +199,16 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   status = SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
 
   if( blank_len ){
-
 	while ( data_len-- ){
       *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
 	}
+
 	while ( --blank_len ){
 	  SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+	  delayMicroseconds(10);
 	}
 	SPI.transfer(csn_pin,0xFF);
+	delayMicroseconds(10);
   }else{
 	while ( --data_len ){
 	  *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
@@ -771,8 +773,8 @@ bool RF24::available(uint8_t* pipe_num)
   	return 1;
   }
 
-  return 0;
 
+  return 0;
 
 
 }
