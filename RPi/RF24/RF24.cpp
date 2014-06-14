@@ -130,7 +130,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
 		*ptx++ =  0;
 
 
-	bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
 
@@ -517,8 +517,8 @@ void RF24::startListening(void)
     write_register(RX_ADDR_P0, pipe0_reading_address,addr_width);	
   }
   // Flush buffers
-  //flush_rx();
-  //flush_tx();
+  flush_rx();
+  flush_tx();
 
   // Go!
   bcm2835_gpio_write(ce_pin, HIGH);
@@ -532,8 +532,8 @@ void RF24::startListening(void)
 void RF24::stopListening(void)
 {
   bcm2835_gpio_write(ce_pin, LOW);
-  //flush_tx();
-  //flush_rx();
+  flush_tx();
+  flush_rx();
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
   delayMicroseconds(130);
 }
@@ -989,7 +989,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   while ( data_len-- ){
     *ptx++ =  *current++;
   }
-	bcm2835_spi_transfernb( (char *) spi_txbuff,(char *)spi_rxbuff, size);
+	bcm2835_spi_transfern( (char *) spi_txbuff, size);	
 
 }
 

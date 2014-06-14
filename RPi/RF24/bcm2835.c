@@ -642,7 +642,7 @@ void __bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len, uint8_t dela
     
     // Set TA = 0, and also set the barrier
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
-    if(delay){delayMicroseconds(10);}
+    if(delay){ delayMicroseconds(20);}
 }
 
 
