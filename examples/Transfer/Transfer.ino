@@ -13,16 +13,13 @@ TMRh20 2014
  */
 
 
-
 #include <SPI.h>
-#include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
 
 /*************  USER Configuration *****************************/
                                           // Hardware configuration
-RF24 radio(48,49);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
-boolean RADIO_NO = 0;  //SET THIS TO 0 or 1 for 1st or 2nd radio
+RF24 radio(7,8);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
 /***************************************************************/
 
@@ -46,7 +43,6 @@ void setup(void) {
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
   radio.setRetries(2,15);                   // Optionally, increase the delay between retries & # of retries
   radio.setCRCLength(RF24_CRC_8); 
-  //radio.disableCRC();
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
   
@@ -77,12 +73,21 @@ void loop(void){
     unsigned long cycles = 10000; //Change this to a higher or lower number. 
     
     startTime = millis();
+    unsigned long pauseTime = millis();
             
     for(int i=0; i<cycles; i++){        //Loop through a number of cycles
       data[0] = i;                      //Change the first byte of the payload for identification
       if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers        
         counter++;                      //Keep count of failed payloads
       }
+      
+      //This is only required when NO ACK ( enableAutoAck(0) ) payloads are used
+//      if(millis() - pauseTime > 3){
+//        pauseTime = millis();
+//        radio.txStandBy();          // Need to drop out of TX mode every 4ms if sending a steady stream of multicast data
+//        //delayMicroseconds(130);     // This gives the PLL time to sync back up   
+//      }
+      
     }
     
    stopTime = millis();   
@@ -93,8 +98,8 @@ void loop(void){
    float numBytes = cycles*32;
    float rate = numBytes / (stopTime - startTime);
     
-   printf("Transfer complete at "); Serial.print(rate); printf(" KB/s \n\r");
-   printf("%d of ",counter); Serial.print(cycles); printf(" Packets Failed to Send\n\r");
+   Serial.print("Transfer complete at "); Serial.print(rate); printf(" KB/s \n\r");
+   Serial.print(counter); Serial.print(" of "); Serial.print(cycles); printf(" Packets Failed to Send\n\r");
    counter = 0;   
     
    }
@@ -107,12 +112,11 @@ if(role == RX){
       counter++;
      }
    if(millis() - rxTimer > 1000){
-     rxTimer = millis();
-     printf("Rate: ");
-     float numBytes = counter*32;
-     Serial.print(numBytes/1000);
-     printf(" KB/s\n\r"); 
-     printf("Payload Count: %d \n\r", counter);
+     rxTimer = millis();     
+     float numBytes = (counter*32)/1000.0;
+     Serial.print("Rate: ");
+     Serial.print(numBytes);
+     printf("KB/s \n Payload Count: %d \n\r", counter);
      counter = 0;
    }
   }
@@ -141,4 +145,3 @@ if(role == RX){
     }
   }
 }
-// vim:cin:ai:sts=2 sw=2 ft=cpp

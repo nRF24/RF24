@@ -28,12 +28,12 @@ using namespace std;
 // CE Pin, CSN Pin, SPI Speed
 
 // Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 1Mhz
-//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_1MHZ);
+//RF24 radio(RPI_V2_GPIO_P1_22, BCM2835_SPI_CS1, BCM2835_SPI_SPEED_1MHZ);
 
-// Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
+// Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 4Mhz
 //RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ);
 
-// Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 8Mhz
+// Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 
@@ -48,14 +48,12 @@ uint8_t counter = 1;                                                          //
 int main(int argc, char** argv){
 
 
-  printf("RF24/examples/gettingstarted_call_response\n");
-
+  printf("RPi/RF24/examples/gettingstarted_call_response\n");
   radio.begin();
   radio.setAutoAck(1);                    // Ensure autoACK is enabled
   radio.enableAckPayload();               // Allow optional ack payloads
   radio.setRetries(1,15);                 // Smallest time between retries, max no. of retries
   radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed
-  //radio.powerUp();
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 
 
@@ -76,9 +74,8 @@ int main(int argc, char** argv){
 	}
   }
 /***********************************/
-  // This simple sketch opens two pipes for these two nodes to communicate
+  // This opens two pipes for these two nodes to communicate
   // back and forth.
-
     if ( role == role_ping_out )    {
       radio.openWritingPipe(addresses[0]);
       radio.openReadingPipe(1,addresses[1]);
@@ -96,7 +93,7 @@ while (1){
 
   if (role == role_ping_out){                               // Radio is in ping mode
 
-    uint8_t gotByte;                                           // Initialize a variable for the incoming response
+    uint8_t gotByte;                                        // Initialize a variable for the incoming response
 
     radio.stopListening();                                  // First, stop listening so we can talk.
     printf("Now sending %d as payload. ",counter);          // Use a simple byte counter as payload
@@ -122,16 +119,16 @@ while (1){
 /****************** Pong Back Role ***************************/
 
   if ( role == role_pong_back ) {
-    uint8_t pipeNo, gotByte;                       // Declare variables for the pipe and the byte received
-    while( radio.available(&pipeNo)){              // Read all available payloads
-      radio.flush_tx();				   // Clear any unused ACK payloads
+    uint8_t pipeNo, gotByte;           		        // Declare variables for the pipe and the byte received
+    if( radio.available(&pipeNo)){               	// Read all available payloads      
+	  radio.flush_tx();							 	// Clear any unused ACK payloads	  				  
       radio.read( &gotByte, 1 );
-                                                   // Since this is a call-response. Respond directly with an ack payload.
-      						   // Ack payloads are much more efficient than switching to transmit mode to respond to a call
-      radio.writeAckPayload(pipeNo,&gotByte, 1 );  // This can be commented out to send empty payloads.
-      
+													// Since this is a call-response. Respond directly with an ack payload.
+													// Ack payloads are much more efficient than switching to transmit mode to respond to a call
+	  radio.writeAckPayload(pipeNo,&gotByte, 1 );   // This can be commented out to send empty payloads.	  
       printf("Sent response %d \n\r", gotByte);
-      
+	  delay(900); //Delay after a response to minimize CPU usage on RPi
+				  //Expects a payload every second      
    }
  }
 

@@ -621,28 +621,17 @@ void __bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len, uint8_t dela
         {
            bcm2835_peri_write_nb(fifo, tbuf[TXCnt]);
            TXCnt++;
+		   
         }	
         //Rx fifo not empty, so get the next received bytes
-	while(! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD) ){}
-        while(((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD))&&( RXCnt < len ))
-        {
-		   
+	while(! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_DONE) ){}
+	if(TXCnt == len){ bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA); if(delay){ delayMicroseconds(20);}}	
+        while(((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD))&&( RXCnt < len )){		   
            rbuf[RXCnt] = bcm2835_peri_read_nb(fifo);
-           RXCnt++;
-	   
+           RXCnt++;	   
         }
-	if(delay){ delayMicroseconds(10); }
-
     }
-
-    // Wait for DONE to be set
-    while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)){
-		
-	}
-    
-    // Set TA = 0, and also set the barrier
-    bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
-    if(delay){ delayMicroseconds(20);}
+	delayMicroseconds(5);
 }
 
 

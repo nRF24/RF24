@@ -42,7 +42,6 @@ using namespace std;
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 
-
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint8_t pipes[][6] = {"1Node","2Node"};
 //const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
@@ -61,7 +60,6 @@ int main(int argc, char** argv){
 
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(15,15);
-
   // Dump the configuration of the rf unit for debugging
   radio.printDetails();
 
@@ -121,8 +119,6 @@ int main(int argc, char** argv){
 			unsigned long started_waiting_at = millis();
 			bool timeout = false;
 			while ( ! radio.available() && ! timeout ) {
-					// by bcatalin » Thu Feb 14, 2013 11:26 am
-					//delay(5); //add a small delay to let radio.available to check payload
 				if (millis() - started_waiting_at > 200 )
 					timeout = true;
 			}
@@ -144,7 +140,7 @@ int main(int argc, char** argv){
 			}
 
 			// Try again 1s later
-			//    delay(1000);
+			// delay(1000);
 
 			sleep(1);
 
@@ -156,6 +152,7 @@ int main(int argc, char** argv){
 
 		if ( role == role_pong_back )
 		{
+			
 			// if there is data ready
 			//printf("Check available...\n");
 
@@ -169,8 +166,7 @@ int main(int argc, char** argv){
 				radio.read( &got_time, sizeof(unsigned long) );
 
 				radio.stopListening();
-
-				// Seem to need a  delay, or the RPi is too quick
+				
 				radio.write( &got_time, sizeof(unsigned long) );
 
 				// Now, resume listening so we catch the next packets.
@@ -178,6 +174,8 @@ int main(int argc, char** argv){
 
 				// Spew it
 				printf("Got payload(%d) %lu...\n",sizeof(unsigned long), got_time);
+				
+				delay(925); //Delay after payload responded to, minimize RPi CPU time
 				
 			}
 		

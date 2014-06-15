@@ -56,9 +56,9 @@ int main(int argc, char** argv){
   radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_2MBPS);
+  radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
-  radio.setRetries(2,15);                   // Optionally, increase the delay between retries & # of retries
+  radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
   radio.setCRCLength(RF24_CRC_8);
   radio.printDetails();
 /********* Role chooser ***********/
@@ -90,7 +90,7 @@ int main(int argc, char** argv){
 
 
   for(int i=0; i<32; i++){
-     data[i] = rand() % 255;               //Load the buffer with random data
+     data[i] = rand() % 255;               			//Load the buffer with random data
   }
 
     // forever loop
@@ -100,16 +100,24 @@ int main(int argc, char** argv){
 		sleep(2);
 		printf("Initiating Basic Data Transfer\n\r");
 
-		long int cycles = 10000; //Change this to a higher or lower number.
-
+		long int cycles = 10000; 					//Change this to a higher or lower number.
+		
+		// unsigned long pauseTime = millis();		//Uncomment if autoAck == 1 ( NOACK )
 		startTime = millis();
-
-		for(int i=0; i<cycles; i++){        //Loop through a number of cycles
-      			data[0] = i;                      //Change the first byte of the payload for identification
-      			if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers
+	
+		for(int i=0; i<cycles; i++){        		//Loop through a number of cycles
+      			data[0] = i;                        //Change the first byte of the payload for identification
+      			if(!radio.writeFast(&data,32)){     //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
-    		}
+				
+				//This is only required when NO ACK ( enableAutoAck(0) ) payloads are used
+		/*		if(millis() - pauseTime > 3){       // Need to drop out of TX mode every 4ms if sending a steady stream of multicast data
+					pauseTime = millis();		    
+					radio.txStandBy();				// This gives the PLL time to sync back up	
+				}
+		*/
+		}
 		stopTime = millis();
 
 		if(!radio.txStandBy()){ counter+=3; }
