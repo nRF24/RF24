@@ -54,7 +54,7 @@ uint8_t RF24::read_register(uint8_t reg)
 	*ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx++ = NOP ; // Dummy operation, just for reading
 
-  bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
 	result = *++prx;   // result is 2nd byte of receive buffer
 
@@ -73,7 +73,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx = value ;
 
-  	bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, 2);  
+  	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);  
 
 	status = *prx++; // status is 1st byte of receive buffer
 
@@ -129,7 +129,6 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
   while ( blank_len-- )
 		*ptx++ =  0;
 
-
 	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
@@ -164,11 +163,8 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
 	// Size has been lost during while, re affect
 	size = data_len + blank_len + 1; // Add register value to transmit buffer
 
-	if(dynamic_payloads_enabled){
-		bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-	}else{
-		bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-	}
+	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+
 	// 1st byte is status
 	status = *prx++;
 
@@ -534,8 +530,9 @@ void RF24::stopListening(void)
   bcm2835_gpio_write(ce_pin, LOW);
   flush_tx();
   flush_rx();
+  delayMicroseconds(150);
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
-  delayMicroseconds(130);
+  delayMicroseconds(150);
 }
 
 /****************************************************************************/
@@ -736,7 +733,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
   spi_txbuff[0] = R_RX_PL_WID;
   spi_rxbuff[1] = 0xff;
 
-  bcm2835_spi_transfernbd( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
   if(spi_rxbuff[1] > 32) { flush_rx(); return 0; }
 

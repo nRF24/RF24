@@ -205,10 +205,8 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 
 	while ( --blank_len ){
 	  SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
-	  delayMicroseconds(10);
 	}
 	SPI.transfer(csn_pin,0xFF);
-	delayMicroseconds(10);
   }else{
 	while ( --data_len ){
 	  *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
@@ -531,9 +529,14 @@ void RF24::startListening(void)
 
 void RF24::stopListening(void)
 {
+
   ce(LOW);
+  #if defined(__arm__)
+  	delayMicroseconds(130);
+  #endif
   flush_tx();
   flush_rx();
+
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
   delayMicroseconds(130); //Found that adding this delay back actually increases response time
 }

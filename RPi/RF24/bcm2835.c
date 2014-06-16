@@ -584,19 +584,9 @@ uint8_t bcm2835_spi_transfer(uint8_t value)
     return ret;
 }
 
-void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
-{
-	__bcm2835_spi_transfernb(tbuf,rbuf,len,0);
-}
-
-void bcm2835_spi_transfernbd(char* tbuf, char* rbuf, uint32_t len)
-{
-	__bcm2835_spi_transfernb(tbuf,rbuf,len,1);
-}
-
 
 // Writes (and reads) an number of bytes to SPI
-void __bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len, uint8_t delay)
+void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
     volatile uint32_t* paddr = bcm2835_spi0 + BCM2835_SPI0_CS/4;
     volatile uint32_t* fifo = bcm2835_spi0 + BCM2835_SPI0_FIFO/4;
@@ -623,15 +613,14 @@ void __bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len, uint8_t dela
            TXCnt++;
 		   
         }	
-        //Rx fifo not empty, so get the next received bytes
-	while(! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_DONE) ){}
-	if(TXCnt == len){ bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA); if(delay){ delayMicroseconds(20);}}	
+        //Rx fifo not empty, so get the next received bytes		
         while(((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD))&&( RXCnt < len )){		   
            rbuf[RXCnt] = bcm2835_peri_read_nb(fifo);
            RXCnt++;	   
         }
     }
-	delayMicroseconds(5);
+	while(! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_DONE) ){}
+	if(TXCnt == len){ bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);}
 }
 
 

@@ -1177,8 +1177,6 @@ extern "C" {
     /// \param[in] len Number of bytes in the tbuf buffer, and the number of bytes to send/received
     /// \sa bcm2835_spi_transfer()
     extern void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len);
-    extern void bcm2835_spi_transfernbd(char* tbuf, char* rbuf, uint32_t len);
-    extern void __bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len,uint8_t delay);
 
     /// Transfers any number of bytes to and from the currently selected SPI slave
     /// using bcm2835_spi_transfernb.
