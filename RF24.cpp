@@ -517,7 +517,7 @@ void RF24::startListening(void)
   }
 
   // Flush buffers
-  flush_rx();
+  //flush_rx();
   flush_tx();
 
   // Go!
@@ -535,7 +535,7 @@ void RF24::stopListening(void)
   	delayMicroseconds(130);
   #endif
   flush_tx();
-  flush_rx();
+  //flush_rx();
 
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
   delayMicroseconds(130); //Found that adding this delay back actually increases response time
@@ -574,12 +574,14 @@ void RF24::powerUp(void)
 bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 {
 	//Start Writing
-    startWrite(buf,len,multicast);
+	startFastWrite(buf,len,multicast);
 
 	//Wait until complete or failed
 	//ACK payloads that are handled improperly will cause this to hang
 	//If autoAck is ON, a payload has to be written prior to reading a payload, else write after reading a payload
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { }
+    
+	ce(LOW);
 
 	uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
@@ -684,8 +686,10 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
 
   //write_payload( buf, len );
   write_payload( buf, len,multicast? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
-
   ce(HIGH);
+  #if defined(CORE_TEENSY) || !defined(ARDUINO)
+	delayMicroseconds(10);
+  #endif
   ce(LOW);
 
 
