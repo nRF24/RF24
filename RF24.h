@@ -47,12 +47,13 @@ class RF24
 private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
-  bool wide_band; /* 2Mbs data rate in use? */
+  
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
   uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
   uint8_t addr_width;
+  
 
 public:
 
@@ -770,7 +771,30 @@ public:
    *
    */
   void disableCRC( void ) ;
-
+  
+   /**
+   * Enable error detection by un-commenting #define FAILURE_HANDLING in RF24_config.h
+   * If a failure has been detected, it usually indicates a hardware issue. By default the library
+   * will cease operation when a failure is detected.  
+   * This should allow advanced users to detect and resolve intermittent hardware issues.  
+   *   
+   * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
+   * applied after a failure occurs, if wanting to re-enable the device immediately.
+   * 
+   * Usage: (Failure handling must be enabled per above)
+   *  @code
+   *  if(radio.failureDetected){ 
+   *    radio.begin(); 					     // Attempt to re-configure the radio with defaults
+   *    radio.failureDetected = 0;		     // Reset the detection value
+   *	radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
+    *   radio.openReadingPipe(1,addresses[0]);
+   *    report_failure();               	 // Blink leds, send a message, etc. to indicate failure
+   *  }
+   * @endcode
+  */
+  #if defined (FAILURE_HANDLING)
+    bool failureDetected; 
+  #endif
   /**@}*/
   /**
    * @name Deprecated
@@ -974,6 +998,11 @@ private:
    */
 
   uint8_t spiTrans(uint8_t cmd);
+  
+  #if defined (FAILURE_HANDLING)
+	void errNotify(void);
+  #endif
+  
   /**@}*/
 
 };
@@ -1124,7 +1153,7 @@ private:
  *
  * This library fork is designed to be...
  * @li More compliant with the manufacturer specified operation of the chip, while allowing advanced users
- * to work outside the reccommended operation.
+ * to work outside the recommended operation.
  * @li Utilize the capabilities of the radio to their full potential via Arduino
  * @li More reliable, responsive and feature rich
  * @li Easy for beginners to use, with well documented examples and features
@@ -1132,17 +1161,17 @@ private:
  *
  * @section News News
  *
- * <b>April 2014: Official Release: Still some work to do, but most benefits have been realized </b><br>
+ * <b>Main changes: </b><br>
  * - The library has been tweaked to allow full use of the FIFO buffers for maximum transfer speeds
  * - Changes to read() and available () functionality have increased reliability and response
  * - Extended timeout periods have been added to aid in noisy or otherwise unreliable environments
  * - Delays have been removed where possible to ensure maximum efficiency
  * - Full Due support with extended SPI functions
- * - ATTiny 24/44/84 25/45/85 now supported.
+ * - ATTiny now supported.
  * - Raspberry Pi now supported
  * - More! See the links below and class documentation for more info.
  *
- * If issues are discovered with the documentation, please report them here: <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
+ * If issues are discovered with the documentation, please report them <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  * @section Useful Useful References
  *
  * Please refer to:
@@ -1150,7 +1179,7 @@ private:
  * @li <a href="http://tmrh20.github.io/">Documentation Main Page</a>
  * @li <a href="http://tmrh20.github.io/RF24/classRF24.html">RF24 Class Documentation</a>
  * @li <a href="https://github.com/tmrh20/RF24/">Source Code</a>
- * @li <a href="https://github.com/tmrh20/RF24/archives/master">Downloads Page</a>
+ * @li <a href="https://github.com/TMRh20/RF24/archive/master.zip">Download</a>
  * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
  * @li <a href="https://github.com/maniacbug/RF24">Original Library</a>
  *
@@ -1162,13 +1191,13 @@ private:
  * Most standard Arduino based boards are supported:
  * - ATMega 328 based boards (Uno, Nano, etc)
  * - Mega Boards (1280, 2560, etc)
- * - ARM based boards (Arduino Due)  Note: Do not include printf.h or use printf begin. This functionality is already present. Must use one of the
- * 	hardware SS/CSN pins as extended SPI methods are used.
+ * - Arduino Due: Must use one of the hardware SS/CSN pins as extended SPI methods are used.
  *  Initial Due support taken from https://github.com/mcrosson/RF24/tree/due
  * - ATTiny board support added from https://github.com/jscrane/RF24
  * Note: ATTiny support is built into the library. Do not include SPI.h. <br>
  * ATTiny 85: D0(pin 5): MISO, D1(pin6) MOSI, D2(pin7) SCK, D3(pin2):CSN/SS, D4(pin3): CE <br>
  * ATTiny 84: PA6:MISO, PA5:MOSI, PA4:SCK, PA7:CSN/SS,  CE as desired <br>
+ * See https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC for ATTiny patch
  * - Raspberry Pi Support: See the readme at https://github.com/TMRh20/RF24/tree/master/RPi
  *
  * @section More More Information
@@ -1177,7 +1206,7 @@ private:
  *
  * @li Project blog:
  * @li <a href="http://TMRh20.blogspot.com"> TMRh20.blogspot.com </a>
- * @li <a href="https://github.com/TMRh20"> RF24 Wireless Audio Library (Coming Soon) </a>
+ * @li <a href="http://tmrh20.github.io/RF24Audio/"> RF24 Wireless Audio Library </a>
  * @li <a href="https://github.com/TMRh20/RF24Network"> Optimized RF24 Network Layer </a>
  * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
  */

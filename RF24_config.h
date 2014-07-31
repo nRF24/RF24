@@ -20,9 +20,12 @@
 
   #include <stddef.h>
 
-  //TMRh20:
+  /*** USER DEFINES:  ***/  
+  //#define FAILURE_HANDLING
+  //#define SERIAL_DEBUG  
   //#define MINIMAL
-
+  /**********************/
+  
   // Define _BV for non-Arduino platforms and for Arduino DUE
 #if defined (ARDUINO) && !defined (__arm__)
 	#include <SPI.h>
@@ -47,8 +50,7 @@
 
 #endif
 
-
-  #undef SERIAL_DEBUG
+  
   #ifdef SERIAL_DEBUG
 	#define IF_SERIAL_DEBUG(x) ({x;})
   #else

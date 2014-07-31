@@ -329,7 +329,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
-  ce_pin(_cepin), csn_pin(_cspin), wide_band(false), p_variant(false),
+  ce_pin(_cepin), csn_pin(_cspin), p_variant(false),
   payload_size(32), dynamic_payloads_enabled(false), addr_width(5)//,pipe0_reading_address(0)
 {
 }
@@ -338,9 +338,6 @@ RF24::RF24(uint8_t _cepin, uint8_t _cspin):
 
 void RF24::setChannel(uint8_t channel)
 {
-  // TODO: This method could take advantage of the 'wide_band' calculation
-  // done in setChannel() to require certain channel spacing.
-
   const uint8_t max_channel = 127;
   write_register(RF_CH,min(channel,max_channel));
 }
@@ -569,6 +566,13 @@ void RF24::powerUp(void)
 }
 
 /******************************************************************/
+#if defined (FAILURE_HANDLING)
+void RF24::errNotify(){
+	IF_SERIAL_DEBUG(printf_P(PSTR("HARDWARE FAIL\r\n")));
+	failureDetected = 1;
+}
+#endif
+/******************************************************************/
 
 //Similar to the previous write, clears the interrupt flags
 bool RF24::write( const void* buf, uint8_t len, const bool multicast )
@@ -577,9 +581,18 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 	startFastWrite(buf,len,multicast);
 
 	//Wait until complete or failed
-	//ACK payloads that are handled improperly will cause this to hang
-	//If autoAck is ON, a payload has to be written prior to reading a payload, else write after reading a payload
-	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { }
+	#if defined (FAILURE_HANDLING)
+		uint32_t timer = millis();
+	#endif 
+	
+	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { 
+		#if defined (FAILURE_HANDLING)
+			if(millis() - timer > 75){			
+				errNotify();
+				return 0;							
+			}
+		#endif
+	}
     
 	ce(LOW);
 
@@ -615,6 +628,12 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 			reUseTX();										  //Set re-transmit and clear the MAX_RT interrupt flag
 			if(millis() - timer > timeout){ return 0; }		  //If this payload has exceeded the user-defined timeout, exit and return 0
 		}
+		#if defined (FAILURE_HANDLING)
+			if(millis() - timer > (timeout+75) ){			
+				errNotify();
+				return 0;							
+			}
+		#endif
 
   	}
 
@@ -642,6 +661,10 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 	//Return 0 so the user can control the retrys and set a timer or failure counter if required
 	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
+	#if defined (FAILURE_HANDLING)
+		uint32_t timer = millis();
+	#endif
+	
 	while( ( get_status()  & ( _BV(TX_FULL) ))) {			  //Blocking only if FIFO is full. This will loop and block until TX is successful or fail
 
 		if( get_status() & _BV(MAX_RT)){
@@ -650,7 +673,12 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 			return 0;										  //Return 0. The previous payload has been retransmitted
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
-
+		#if defined (FAILURE_HANDLING)
+			if(millis() - timer > 75 ){			
+				errNotify();
+				return 0;							
+			}
+		#endif
   	}
 		     //Start Writing
 	startFastWrite(buf,len,multicast);
@@ -696,7 +724,9 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
 }
 
 bool RF24::txStandBy(){
-
+    #if defined (FAILURE_HANDLING)
+		uint32_t timeout = millis();
+	#endif
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
 			write_register(STATUS,_BV(MAX_RT) );
@@ -704,6 +734,12 @@ bool RF24::txStandBy(){
 			flush_tx();    //Non blocking, flush the data
 			return 0;
 		}
+		#if defined (FAILURE_HANDLING)
+			if( millis() - timeout > 75){
+				errNotify();
+				return 0;	
+			}
+		#endif
 	}
 
 	ce(LOW);			   //Set STANDBY-I mode
@@ -723,7 +759,15 @@ bool RF24::txStandBy(uint32_t timeout){
 					ce(LOW); flush_tx(); return 0;
 				}
 		}
+		#if defined (FAILURE_HANDLING)
+			if( millis() - start > (timeout+75)){
+				errNotify();
+				return 0;	
+			}
+		#endif
 	}
+
+	
 	ce(LOW);				   //Set STANDBY-I mode
 	return 1;
 
@@ -1115,13 +1159,11 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   uint8_t setup = read_register(RF_SETUP) ;
 
   // HIGH and LOW '00' is 1Mbs - our default
-  wide_band = false ;
   setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ;
   if( speed == RF24_250KBPS )
   {
     // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
     // Making it '10'.
-    wide_band = false ;
     setup |= _BV( RF_DR_LOW ) ;
   }
   else
@@ -1130,13 +1172,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     // Making it '01'
     if ( speed == RF24_2MBPS )
     {
-      wide_band = true ;
       setup |= _BV(RF_DR_HIGH);
-    }
-    else
-    {
-      // 1Mbs
-      wide_band = false ;
     }
   }
   write_register(RF_SETUP,setup);
@@ -1145,10 +1181,6 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   if ( read_register(RF_SETUP) == setup )
   {
     result = true;
-  }
-  else
-  {
-    wide_band = false;
   }
 
   return result;

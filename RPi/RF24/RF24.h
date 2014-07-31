@@ -51,6 +51,30 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
 
 class RF24
 {
+public:
+  /**
+   * Enable error detection by un-commenting #define FAILURE_HANDLING in RF24_config.h
+   * If a failure has been detected, it usually indicates a hardware issue. By default the library
+   * will cease operation when a failure is detected.  
+   * This should allow advanced users to detect and resolve intermittent hardware issues.  
+   *   
+   * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
+   * applied after a failure occurs, if wanting to re-enable the device immediately.
+   * 
+   * Usage: (Failure handling must be enabled per above)
+   *  @code
+   *  if(radio.failureDetected){ 
+   *    radio.begin(); 					     // Attempt to re-configure the radio with defaults
+   *    radio.failureDetected = 0;		     // Reset the detection value
+   *	radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
+    *   radio.openReadingPipe(1,addresses[0]);
+   *    report_failure();               	 // Blink leds, send a message, etc. to indicate failure
+   *  }
+   * @endcode
+   **/
+   #if defined (FAILURE_HANDLING)
+	 bool failureDetect; 
+   #endif
 private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
@@ -87,7 +111,7 @@ protected:
    * @return Current value of status register
    */
   uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
-
+  
   /**
    * Read single byte from a register
    *
@@ -95,7 +119,7 @@ protected:
    * @return Current value of register @p reg
    */
   uint8_t read_register(uint8_t reg);
-
+  
   /**
    * Write a chunk of data to a register
    *
@@ -202,6 +226,11 @@ protected:
    * are enabled.  See the datasheet for details.
    */
   void toggle_features(void);
+  
+  #if defined (FAILURE_HANDLING)
+	void errNotify(void);
+  #endif
+  
   /**@}*/
 
 public:
@@ -424,6 +453,20 @@ public:
    */
   void enableDynamicPayloads(void);
 
+   /**
+   * Enable dynamic ACKs (single write multicasting) for chosen messages
+   *
+   * @note To enable full multicasting or per-pipe multicast, use setAutoAck()
+   *
+   * @warning This MUST be called prior to attempting single write NOACK calls
+   * @code
+   * radio.enableDynamicAck();
+   * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
+   * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
+   * @endcode
+   */
+  void enableDynamicAck(void);
+
   /**
    * Determine whether the hardware is an nRF24L01+ or not.
    *
@@ -513,6 +556,8 @@ public:
    */
   void disableCRC( void ) ;
 
+
+  
   /**@}*/
   /**
    * @name Deprecated
@@ -836,20 +881,6 @@ public:
    * by the static payload set by setPayloadSize().
    */
   void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
-
-  /**
-   * Enable dynamic ACKs (single write multicasting) for chosen messages
-   *
-   * @note To enable full multicasting or per-pipe multicast, use setAutoAck()
-   *
-   * @warning This MUST be called prior to attempting single write NOACK calls
-   * @code
-   * radio.enableDynamicAck();
-   * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
-   * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
-   * @endcode
-   */
-  void enableDynamicAck();
 
   /**
    * Determine if an ack payload was received in the most recent call to

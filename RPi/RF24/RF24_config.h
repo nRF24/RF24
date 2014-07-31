@@ -15,6 +15,11 @@
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
 
+  /*** USER DEFINES:  ***/  
+  //#define FAILURE_HANDLING
+  //#define DEBUG
+  /**********************/
+  
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
