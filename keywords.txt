@@ -13,7 +13,13 @@
   startListening KEYWORD2
   stopListening KEYWORD2
   write KEYWORD2
+<<<<<<< HEAD
   startWrite KEYWORD2
+=======
+  writeFast	KEYWORD2
+  writeBlocking	KEYWORD2
+  txStandBy	KEYWORD2
+>>>>>>> 327f0609cf7b52b70accccc175b5809dd5074704
   available KEYWORD2
   read KEYWORD2
   openWritingPipe KEYWORD2

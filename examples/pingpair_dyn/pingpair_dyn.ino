@@ -22,16 +22,20 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
+<<<<<<< HEAD:examples/pingpair_dyn/pingpair_dyn.pde
 <<<<<<< HEAD
 RF24 radio(9,10);
 =======
 //RF24 radio(8,9);
 RF24 radio(22,23);
 >>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
+=======
+RF24 radio(7,8);
+>>>>>>> 327f0609cf7b52b70accccc175b5809dd5074704:examples/pingpair_dyn/pingpair_dyn.ino
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 7;
+const int role_pin = 5;
 
 //
 // Topology
@@ -107,8 +111,12 @@ void setup(void)
   radio.enableDynamicPayloads();
 
   // optionally, increase the delay between retries & # of retries
+<<<<<<< HEAD:examples/pingpair_dyn/pingpair_dyn.pde
   radio.setAutoAck( true ) ;
   radio.setPALevel( RF24_PA_HIGH ) ;
+=======
+  radio.setRetries(5,15);
+>>>>>>> 327f0609cf7b52b70accccc175b5809dd5074704:examples/pingpair_dyn/pingpair_dyn.ino
 
   //
   // Open pipes to other nodes for communication
@@ -195,7 +203,7 @@ void loop(void)
       next_payload_size = min_payload_size;
 
     // Try again 1s later
-    delay(1000);
+    delay(100);
   }
 
   //
@@ -210,11 +218,11 @@ void loop(void)
       // Dump the payloads until we've gotten everything
       uint8_t len;
       bool done = false;
-      while (!done)
+      while (radio.available())
       {
         // Fetch the payload, and see if this was the last one.
 	len = radio.getDynamicPayloadSize();
-	done = radio.read( receive_payload, len );
+	radio.read( receive_payload, len );
 
 	// Put a zero at the end for easy printing
 	receive_payload[len] = 0;
