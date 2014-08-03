@@ -23,9 +23,9 @@
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-
-RF24 radio(9,10);
+// Set up nRF24L01 radio on SPI bus 
+// Support for nRF UNO Adpater, pin 8 = CE, pin 9 = CSN
+RF24 radio(8,9);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -59,6 +59,12 @@ role_e role;
 
 void setup(void)
 {
+
+  // Support for nRF UNO Adpater, turn on Pin 10 as Vcc
+  pinMode(10,OUTPUT);
+  digitalWrite(10,HIGH);
+  delay(500);
+
   //
   // Role
   //
