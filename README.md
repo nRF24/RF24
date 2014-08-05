@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Arduino & Raspberry Pi driver for nRF24L01(+) 2.4GHz Wireless Transceiver
 
 Design Goals: 
@@ -26,8 +25,6 @@ Please refer to links :
 * [nRF24L01+ datasheet](http://www.nordicsemi.com/eng/nordic/download_resource/8765/2/27999719 )
 
 
-
-=======
 # Optimized High Speed Arduino driver for nRF24L01 2.4GHz Wireless Transceiver
   
 Design Goals: This library is designed to be...  
