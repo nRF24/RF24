@@ -528,14 +528,14 @@ void RF24::stopListening(void)
 {
 
   ce(LOW);
-  #if defined(__arm__)
-  	delayMicroseconds(130);
-  #endif
+  //#if defined(__arm__)
+  	delayMicroseconds(140);
+  //#endif
   flush_tx();
   //flush_rx();
 
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
-  delayMicroseconds(130); //Found that adding this delay back actually increases response time
+  delayMicroseconds(140); //Found that adding this delay back actually increases response time
 }
 
 /****************************************************************************/
