@@ -527,11 +527,12 @@ void RF24::startListening(void)
 void RF24::stopListening(void)
 {
   bcm2835_gpio_write(ce_pin, LOW);
+  delayMicroseconds(470);
   flush_tx();
   //flush_rx();
-  delayMicroseconds(150);
+  
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
-  delayMicroseconds(150);
+  delayMicroseconds(130);
 }
 
 /****************************************************************************/
