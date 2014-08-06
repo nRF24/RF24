@@ -140,9 +140,9 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   uint8_t status;
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-  if(data_len > 32) data_len = 32;
-  uint8_t blank_len = dynamic_payloads_enabled ? 0 : 32 - data_len;
-
+   data_len = min(data_len, payload_size);
+   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
+  
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
 
  #if defined (__arm__) && !defined ( CORE_TEENSY )
@@ -189,8 +189,8 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
   if(data_len > payload_size) data_len = payload_size;
-  uint8_t blank_len = dynamic_payloads_enabled ? 0 : 32 - data_len;
-
+  uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
+  
   //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
 
