@@ -487,7 +487,7 @@ bool RF24::begin(void)
   setChannel(76);
 
   // Flush buffers
-  //flush_rx();
+  flush_rx();
   flush_tx();
 
   powerUp();
@@ -528,7 +528,7 @@ void RF24::stopListening(void)
 {
   bcm2835_gpio_write(ce_pin, LOW);
   flush_tx();
-  flush_rx();
+  //flush_rx();
   delayMicroseconds(150);
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
   delayMicroseconds(150);
@@ -561,7 +561,7 @@ void RF24::powerUp(void)
 #if defined (FAILURE_HANDLING)
 void RF24::errNotify(){
 	if(debug){ printf("HARDWARE FAIL\n\r"); }	
-	failureDetect = true;
+	failureDetected = true;
 }
 #endif
 /******************************************************************/
