@@ -123,7 +123,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
   if (debug)
 		printf("[Writing %u bytes %u blanks]",data_len,blank_len);
 
-	*ptx++ =  W_TX_PAYLOAD;
+	*ptx++ =  writeType;
   while ( data_len-- )
     *ptx++ =  *current++;
   while ( blank_len-- )
