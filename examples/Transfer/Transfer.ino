@@ -19,7 +19,7 @@ TMRh20 2014
 
 /*************  USER Configuration *****************************/
                                           // Hardware configuration
-RF24 radio(7,8);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
+RF24 radio(8,9);                        // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
 /***************************************************************/
 
@@ -33,6 +33,11 @@ bool TX=1,RX=0,role=0;
 
 void setup(void) {
 
+  // The UNO Adapter uses pin 10 as Vcc
+  pinMode(10,OUTPUT);
+  digitalWrite(10,HIGH);
+  delay(500);
+  
   Serial.begin(57600);
   printf_begin();
 
