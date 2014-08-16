@@ -73,7 +73,7 @@ public:
    * @endcode
    **/
    #if defined (FAILURE_HANDLING)
-	 bool failureDetect; 
+	 bool failureDetected; 
    #endif
 private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
@@ -966,6 +966,13 @@ public:
 
   void setAddressWidth(uint8_t a_width);
 
+  /**
+  * Close a pipe after it has been previously opened.
+  * Can be safely called without having previously opened a pipe.
+  * @param pipe Which pipe # to close, 0-5.
+  */
+  void closeReadingPipe( uint8_t pipe ) ;
+  
   /**@}*/
 };
 

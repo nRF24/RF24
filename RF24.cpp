@@ -510,7 +510,9 @@ void RF24::startListening(void)
 
   // Restore the pipe0 adddress, if exists
   if (pipe0_reading_address[0] > 0){
-    write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);
+    write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);	
+  }else{
+	closeReadingPipe(0);
   }
 
   // Flush buffers
@@ -519,23 +521,30 @@ void RF24::startListening(void)
 
   // Go!
   ce(HIGH);
-
+ 
 }
 
 /****************************************************************************/
+static const uint8_t child_pipe_enable[] PROGMEM =
+{
+  ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
+};
 
 void RF24::stopListening(void)
 {
 
   ce(LOW);
-  //#if defined(__arm__)
-  	delayMicroseconds(140);
-  //#endif
+  #if defined(__arm__)
+  	delayMicroseconds(300);
+  #endif
+  delayMicroseconds(130);
   flush_tx();
   //flush_rx();
-
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
-  delayMicroseconds(140); //Found that adding this delay back actually increases response time
+  write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0]))); // Enable RX on pipe0
+  
+  delayMicroseconds(100);
+
 }
 
 /****************************************************************************/
@@ -865,7 +874,8 @@ void RF24::openWritingPipe(uint64_t value)
 
   write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), addr_width);
   write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), addr_width);
-
+  
+  
   //const uint8_t max_payload_size = 32;
   //write_register(RX_PW_P0,min(payload_size,max_payload_size));
   write_register(RX_PW_P0,payload_size);
@@ -894,10 +904,7 @@ static const uint8_t child_payload_size[] PROGMEM =
 {
   RX_PW_P0, RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5
 };
-static const uint8_t child_pipe_enable[] PROGMEM =
-{
-  ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
-};
+
 
 void RF24::openReadingPipe(uint8_t child, uint64_t address)
 {

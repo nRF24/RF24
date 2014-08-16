@@ -510,6 +510,8 @@ void RF24::startListening(void)
   // Restore the pipe0 adddress, if exists
   if (pipe0_reading_address[0] > 0){
     write_register(RX_ADDR_P0, pipe0_reading_address,addr_width);	
+  }else{
+    closeReadingPipe(0);
   }
   // Flush buffers
   //flush_rx();
@@ -523,6 +525,11 @@ void RF24::startListening(void)
 }
 
 /****************************************************************************/
+static const uint8_t child_pipe_enable[] =
+{
+  ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
+};
+
 
 void RF24::stopListening(void)
 {
@@ -532,6 +539,7 @@ void RF24::stopListening(void)
   //flush_rx();
   
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
+  write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0])));
   delayMicroseconds(130);
 }
 
@@ -874,10 +882,6 @@ static const uint8_t child_payload_size[] =
 {
   RX_PW_P0, RX_PW_P1, RX_PW_P2, RX_PW_P3, RX_PW_P4, RX_PW_P5
 };
-static const uint8_t child_pipe_enable[] =
-{
-  ERX_P0, ERX_P1, ERX_P2, ERX_P3, ERX_P4, ERX_P5
-};
 
 void RF24::openReadingPipe(uint8_t child, uint64_t address)
 {
@@ -942,6 +946,13 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t *address)
     write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[child])));
 
   }
+}
+
+/****************************************************************************/
+
+void RF24::closeReadingPipe( uint8_t pipe )
+{
+  write_register(EN_RXADDR,read_register(EN_RXADDR) & ~_BV(pgm_read_byte(&child_pipe_enable[pipe])));
 }
 
 /****************************************************************************/
