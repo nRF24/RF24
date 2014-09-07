@@ -19,7 +19,7 @@ void RF24::csn(bool mode)
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
-	#if  ( !defined( __AVR_ATtiny85__ ) && !defined( __AVR_ATtiny84__) && !defined (__arm__)  ) || defined (CORE_TEENSY)
+	#if  ( !defined(RF24_TINY) && !defined (__arm__)  ) || defined (CORE_TEENSY)
  			SPI.setBitOrder(MSBFIRST);
   			SPI.setDataMode(SPI_MODE0);
 			SPI.setClockDivider(SPI_CLOCK_DIV2);
@@ -270,7 +270,7 @@ uint8_t RF24::get_status(void)
 }
 
 /****************************************************************************/
-
+#if !defined (MINIMAL)
 void RF24::print_status(uint8_t status)
 {
   printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n"),
@@ -325,7 +325,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
   printf_P(PSTR("\r\n"));
 }
-
+#endif
 /****************************************************************************/
 
 RF24::RF24(uint8_t _cepin, uint8_t _cspin):
@@ -1293,7 +1293,7 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 #	define SS   3   // PA7
 #endif
 
-#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+#if defined(RF24_TINY)
 
 void SPIClass::begin() {
 

@@ -28,7 +28,11 @@
   
   // Define _BV for non-Arduino platforms and for Arduino DUE
 #if defined (ARDUINO) && !defined (__arm__)
-	#include <SPI.h>
+	#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+		#define RF24_TINY
+	#else
+		#include <SPI.h>
+	#endif
 #else
 
   #include <stdint.h>
@@ -55,7 +59,7 @@
 	#define IF_SERIAL_DEBUG(x) ({x;})
   #else
 	#define IF_SERIAL_DEBUG(x)
-	#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
+	#if defined(RF24_TINY)
 	#define printf_P(...)
     #endif
   #endif
@@ -101,7 +105,7 @@
 
 // ATTiny support code is from https://github.com/jscrane/RF24
 
-#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+#if defined(RF24_TINY)
 #include <stdio.h>
 #include <Arduino.h>
 #include <avr/pgmspace.h>
