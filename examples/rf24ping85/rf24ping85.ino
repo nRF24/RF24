@@ -14,11 +14,11 @@ version 2 as published by the Free Software Foundation.
 
     ** Hardware configuration **
     ATtiny25/45/85 Pin map
-    +-\/-+
-    Reset/Ain0 (D 5) PB5 1|o |8 Vcc (3v3 or -- LED -- 5v)
-    nRF24L01 CE, Pin3 - Ain3 (D 3) PB3 2| |7 PB2 (D 2) Ain1 - nRF24L01 SCK, pin5
-    nRF24L01 CSN, Pin4 - Ain2 (D 4) PB4 3| |6 PB1 (D 1) pwm1 - nRF24L01 MOSI, pin7
-    GND 4| |5 PB0 (D 0) pwm0 - nRF24L01 MISO, pin6
+                                         +-\/-+
+                   Reset/Ain0 (D 5) PB5 1|o   |8 Vcc (3v3 or -- LED -- 5v)
+    nRF24L01 CE,  Pin3 - Ain3 (D 3) PB3 2|    |7 PB2 (D 2) Ain1 - nRF24L01 SCK, pin5
+    nRF24L01 CSN, Pin4 - Ain2 (D 4) PB4 3|    |6 PB1 (D 1) pwm1 - nRF24L01 MOSI, pin7
+                                    GND 4|    |5 PB0 (D 0) pwm0 - nRF24L01 MISO, pin6
     CE and CSN are configurable
 */  
 
