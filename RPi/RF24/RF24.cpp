@@ -788,7 +788,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
-  if(spi_rxbuff[1] > 32) { flush_rx(); return 0; }
+  if(spi_rxbuff[1] > 32) { flush_rx(); delay(2);return 0; }
 
   return spi_rxbuff[1];
 }
