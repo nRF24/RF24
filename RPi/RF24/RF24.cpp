@@ -514,8 +514,10 @@ void RF24::startListening(void)
     closeReadingPipe(0);
   }
   // Flush buffers
-  //flush_rx();
-  flush_tx();
+  flush_rx();
+  if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
+	flush_tx();
+  }
 
   // Go!
   bcm2835_gpio_write(ce_pin, HIGH);
@@ -535,8 +537,11 @@ void RF24::stopListening(void)
 {
   bcm2835_gpio_write(ce_pin, LOW);
   delayMicroseconds(470);
-  flush_tx();
-  //flush_rx();
+
+  if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
+	flush_tx();
+  }
+  flush_rx();
   
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
   write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0])));
@@ -743,7 +748,11 @@ bool RF24::txStandBy(){
 	bcm2835_gpio_write(ce_pin, LOW);			   //Set STANDBY-I mode
 	return 1;
 }
+bool RF24::rxFifoFull(){
 
+	bool val = (read_register(FIFO_STATUS) & _BV(RX_FULL));
+	return val;
+}
 /****************************************************************************/
 
 bool RF24::txStandBy(uint32_t timeout){

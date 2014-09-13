@@ -517,7 +517,9 @@ void RF24::startListening(void)
 
   // Flush buffers
   //flush_rx();
-  flush_tx();
+  if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
+	flush_tx();
+  }
 
   // Go!
   ce(HIGH);
@@ -538,7 +540,9 @@ void RF24::stopListening(void)
   	delayMicroseconds(300);
   #endif
   delayMicroseconds(130);
-  flush_tx();
+  if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
+	flush_tx();
+  }
   //flush_rx();
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
   write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0]))); // Enable RX on pipe0
@@ -714,6 +718,7 @@ void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast){ 
 
 }
 
+/****************************************************************************/
 
 //Added the original startWrite back in so users can still use interrupts, ack payloads, etc
 //Allows the library to pass all tests
@@ -731,6 +736,13 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
 
 
 }
+
+/****************************************************************************/
+
+bool RF24::rxFifoFull(){
+	return read_register(FIFO_STATUS) & _BV(RX_FULL);
+}
+/****************************************************************************/
 
 bool RF24::txStandBy(){
     #if defined (FAILURE_HANDLING)
@@ -754,6 +766,8 @@ bool RF24::txStandBy(){
 	ce(LOW);			   //Set STANDBY-I mode
 	return 1;
 }
+
+/****************************************************************************/
 
 bool RF24::txStandBy(uint32_t timeout){
 

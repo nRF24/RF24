@@ -218,6 +218,12 @@ public:
   bool available(uint8_t* pipe_num);
 
   /**
+   * Check if the radio needs to be read. Can be used to prevent data loss
+   * @@return True if all three 32-byte radio buffers are full
+   */
+  bool rxFifoFull();
+  
+  /**
    * Enter low-power mode
    *
    * To return to normal power mode, either write() some data or
@@ -908,6 +914,7 @@ private:
    */
   uint8_t get_status(void);
 
+  #if !defined (MINIMAL)
   /**
    * Decode and print the given status to stdout
    *
@@ -951,7 +958,7 @@ private:
    * @param qty How many successive registers to print
    */
   void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
-
+#endif
   /**
    * Turn on or off the special features of the chip
    *
@@ -1063,6 +1070,12 @@ private:
  * ping/pong cycle, and the receiver sleeps between payloads. <br>
  */
 
+ /**
+ * @example rf24ping85.ino
+ * <b>New: Contributed by https://github.com/tong67</b><br>
+ * This is an example of how to use the RF24 class to communicate with ATtiny85 and other node. <br>
+ */
+ 
 /**
  * @example pingpair_dyn.ino
  *

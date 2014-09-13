@@ -795,6 +795,12 @@ public:
    */
   bool available(uint8_t* pipe_num);
 
+  /**
+   * Check if the radio needs to be read. Can be used to prevent data loss and during delays
+   * @@return True if all three 32-byte radio buffers are full
+   */
+  bool rxFifoFull();
+  
 /**
    * Non-blocking write to the open writing pipe used for buffered writes
    *
