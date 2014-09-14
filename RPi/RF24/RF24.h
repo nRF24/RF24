@@ -91,6 +91,9 @@ private:
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
 
+  bool listeningStarted; /**< Var for delaying available() after start listening */
+  uint32_t lastAvailableCheck;  /**< Var for preventing available() from being called too often */
+  
 protected:
   /**
    * @name Low-level internal interface.

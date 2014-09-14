@@ -834,9 +834,12 @@ bool RF24::available(void)
 
 bool RF24::available(uint8_t* pipe_num)
 {
-
-  //Check the FIFO buffer to see if data is waitng to be read
-
+    //Check the FIFO buffer to see if data is waiting to be read
+	if(listeningStarted){
+		while(micros() - lastAvailableCheck < 800 && listeningStarted){};
+		lastAvailableCheck = micros();
+		listeningStarted = 0;
+	}
   if (!( read_register(FIFO_STATUS) & _BV(RX_EMPTY) )){
 
     // If the caller wants the pipe number, include that

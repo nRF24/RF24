@@ -514,7 +514,7 @@ void RF24::startListening(void)
     closeReadingPipe(0);
   }
   // Flush buffers
-  flush_rx();
+  //flush_rx();
   if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
 	flush_tx();
   }
@@ -523,7 +523,8 @@ void RF24::startListening(void)
   bcm2835_gpio_write(ce_pin, HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-  delayMicroseconds(130);
+  //delayMicroseconds(130);
+  listeningStarted = 1;
 }
 
 /****************************************************************************/
@@ -541,7 +542,7 @@ void RF24::stopListening(void)
   if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
 	flush_tx();
   }
-  flush_rx();
+  //flush_rx();
   
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );  
   write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0])));
@@ -812,10 +813,15 @@ bool RF24::available(void)
 /****************************************************************************/
 
 bool RF24::available(uint8_t* pipe_num)
-{
+{	
+
+	if(listeningStarted){
+		if(millis() - lastAvailableCheck < 2 && listeningStarted){delayMicroseconds(400);}
+		lastAvailableCheck = millis();
+		listeningStarted = 0;
+	}
     //Check the FIFO buffer to see if data is waitng to be read
   if (!( read_register(FIFO_STATUS) & _BV(RX_EMPTY) )){
-
 
     // If the caller wants the pipe number, include that
     if ( pipe_num ){
