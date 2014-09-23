@@ -26,8 +26,23 @@ void RF24::csn(bool mode)
 	#endif
 #endif
 
-#if !defined  (__arm__) || defined (CORE_TEENSY)
-	digitalWrite(csn_pin,mode);
+
+#if defined (RF24_TINY)
+	if (ce_pin != csn_pin) {
+		digitalWrite(csn_pin,mode);
+	} 
+	else {
+		if (mode == HIGH) {
+			PORTB |= (1<<PINB2);  	// SCK->CSN HIGH
+			delayMicroseconds(100); // allow csn to settle.
+		} 
+		else {
+			PORTB &= ~(1<<PINB2);	// SCK->CSN LOW
+			delayMicroseconds(20);  // allow csn to settle
+		}
+	}		
+#else if !defined  (__arm__) || defined (CORE_TEENSY)
+	digitalWrite(csn_pin,mode);		
 #endif
 
 }
@@ -36,7 +51,8 @@ void RF24::csn(bool mode)
 
 void RF24::ce(bool level)
 {
-  digitalWrite(ce_pin,level);
+  //Allow for 3-pin use on ATTiny
+  if (ce_pin != csn_pin) digitalWrite(ce_pin,level);
 }
 
 /****************************************************************************/
@@ -420,6 +436,7 @@ void RF24::printDetails(void)
   printf_P(PSTR("CRC Length\t = %S\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
   printf_P(PSTR("PA Power\t = %S\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 #endif
+
 }
 
 #endif
@@ -428,7 +445,7 @@ void RF24::printDetails(void)
 void RF24::begin(void)
 {
   // Initialize pins
-  pinMode(ce_pin,OUTPUT);
+  if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);
 
   #if defined(__arm__) && ! defined( CORE_TEENSY )
   	SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
@@ -438,7 +455,7 @@ void RF24::begin(void)
 	ce(LOW);
   	//csn(HIGH);
   #else
-    pinMode(csn_pin,OUTPUT);
+    if (ce_pin != csn_pin) pinMode(csn_pin,OUTPUT);
     SPI.begin();
     ce(LOW);
   	csn(HIGH);
@@ -504,7 +521,9 @@ void RF24::begin(void)
 
 void RF24::startListening(void)
 {
+ #if !defined (RF24_TINY)
   powerUp();
+ #endif
   write_register(CONFIG, read_register(CONFIG) | _BV(PRIM_RX));
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
@@ -545,6 +564,14 @@ void RF24::stopListening(void)
   }
   //flush_rx();
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
+ 
+  #if defined (RF24_TINY)
+  // for 3 pins solution TX mode is only left with additonal powerDown/powerUp cycle
+  if (ce_pin == csn_pin) {
+    powerDown();
+	powerUp();
+  }
+  #endif
   write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0]))); // Enable RX on pipe0
   
   delayMicroseconds(100);
