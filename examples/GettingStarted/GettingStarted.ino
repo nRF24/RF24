@@ -24,7 +24,7 @@
 #include "RF24.h"
 #include "printf.h"
 
-// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 9 & 10 
+// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 
 RF24 radio(7,8);
 
 byte addresses[][6] = {"1Node","2Node"};

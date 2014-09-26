@@ -26,7 +26,7 @@ TMRh20 2014
 
 /*************  USER Configuration *****************************/
 
-RF24 radio(48,49);                      // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
+RF24 radio(7,8);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 unsigned long timeoutPeriod = 3000;     // Set a user-defined timeout period. With auto-retransmit set to (15,15) retransmission will take up to 60ms and as little as 7.5ms with it set to (1,15).
                                         // With a timeout period of 1000, the radio will retry each payload for up to 1 second before giving up on the transmission and starting over
 
