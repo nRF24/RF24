@@ -49,11 +49,11 @@ CE and CSN are configurable.
 |-----|----------|-------------|--------------------|-----------------|
 |  1  |   GND    |   GND       |     pin 4          |    pin 14       |
 |  2  |   VCC    |   3.3V      |     pin 8          |    pin  1       |
-|  3  |   CE     |   digIO 7   |     pin 3          |    pin 12       |
-|  4  |   CSN    |   digIO 8   |     pin 4          |    pin 11       |
-|  5  |   SCK    |   digIO 13  |     pin 5          |    pin  9       |
-|  6  |   MOSI   |   digIO 11  |     pin 7          |    pin  7       |
-|  7  |   MISO   |   digIO 12  |     pin 6          |    pin  8       |
+|  3  |   CE     |   digIO 7   |     pin 2          |    pin 12       |
+|  4  |   CSN    |   digIO 8   |     pin 3          |    pin 11       |
+|  5  |   SCK    |   digIO 13  |     pin 7          |    pin  9       |
+|  6  |   MOSI   |   digIO 11  |     pin 6          |    pin  7       |
+|  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       |
 |  8  |   IRQ    |      -      |        -           |         -       |
 
 [0] https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
