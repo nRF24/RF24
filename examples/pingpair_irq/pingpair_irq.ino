@@ -25,7 +25,7 @@
 #include <avr/power.h>
 
 // Hardware configuration
-RF24 radio(7,8);                          // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
+RF24 radio(7,8);                          // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
                                         
 const short role_pin = 5;                 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
                                           // Leave open to be the 'ping' transmitter

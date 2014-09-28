@@ -32,7 +32,7 @@
 #include "printf.h"
 
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
+// Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 RF24 radio(7,8);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
