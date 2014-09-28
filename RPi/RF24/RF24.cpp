@@ -523,7 +523,7 @@ void RF24::startListening(void)
   bcm2835_gpio_write(ce_pin, HIGH);
 
   // wait for the radio to come up (130us actually only needed)
-  //delayMicroseconds(130);
+  delayMicroseconds(130);
   listeningStarted = 1;
 }
 
