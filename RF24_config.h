@@ -49,6 +49,8 @@
    #if !defined(__arm__)
      extern HardwareSPI SPI;
    #endif
+ #else
+    #define printf Serial.printf
  #endif
 
 
