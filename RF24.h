@@ -1077,6 +1077,12 @@ private:
  * This is an example of how to use the RF24 class to communicate with ATtiny85 and other node. <br>
  */
  
+ /**
+ * @example timingSearch3pin.ino
+ * <b>New: Contributed by https://github.com/tong67</b><br>
+ * This is an example of how to determine the correct timing for ATtiny when using only 3-pins
+ */
+  
 /**
  * @example pingpair_dyn.ino
  *
@@ -1178,12 +1184,11 @@ private:
  * - Mega Boards (1280, 2560, etc)
  * - Arduino Due: Must use one of the hardware SS/CSN pins as extended SPI methods are used.
  *  Initial Due support taken from https://github.com/mcrosson/RF24/tree/due
- * - ATTiny board support added from https://github.com/jscrane/RF24
+ * - ATTiny board support initially added from https://github.com/jscrane/RF24
  * Note: ATTiny support is built into the library. Do not include SPI.h. <br>
- * ATTiny 85: D0(pin 5): MISO, D1(pin6) MOSI, D2(pin7) SCK, D3(pin2):CSN/SS, D4(pin3): CE <br>
- * ATTiny 84: PA6:MISO, PA5:MOSI, PA4:SCK, PA7:CSN/SS,  CE as desired <br>
+ * See the included examples for more info on using ATTiny with RF24 <br>
  * See https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC for ATTiny patch
- * - Raspberry Pi Support: See the readme at https://github.com/TMRh20/RF24/tree/master/RPi
+ * - Raspberry Pi Support: See the readme at https://github.com/TMRh20/RF24/tree/master/RPi/RF24
  *
  * @section More More Information
  *
