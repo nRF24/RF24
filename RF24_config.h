@@ -24,6 +24,7 @@
   //#define FAILURE_HANDLING
   //#define SERIAL_DEBUG  
   //#define MINIMAL
+  #define SPI_UART
   /**********************/
   
   // Define _BV for non-Arduino platforms and for Arduino DUE
@@ -31,7 +32,11 @@
 	#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
 		#define RF24_TINY
 	#else
+      #if defined SPI_UART
+		#include <SPI_UART.h>
+	  #else
 		#include <SPI.h>
+	  #endif
 	#endif
 #else
 
