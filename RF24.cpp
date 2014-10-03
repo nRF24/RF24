@@ -19,7 +19,7 @@ void RF24::csn(bool mode)
   // divider of 4 is the minimum we want.
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
-	#if  ( !defined(RF24_TINY) && !defined (__arm__)  ) || defined (CORE_TEENSY)
+	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
  			SPI.setBitOrder(MSBFIRST);
   			SPI.setDataMode(SPI_MODE0);
 			SPI.setClockDivider(SPI_CLOCK_DIV2);
@@ -38,7 +38,7 @@ void RF24::csn(bool mode)
 		} 
 		else {
 			PORTB &= ~(1<<PINB2);	// SCK->CSN LOW
-			delayMicroseconds(20);  // allow csn to settle
+			delayMicroseconds(11);  // allow csn to settle
 		}
 	}		
 #else if !defined  (__arm__) || defined (CORE_TEENSY)
