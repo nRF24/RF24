@@ -24,7 +24,7 @@
   //#define FAILURE_HANDLING
   //#define SERIAL_DEBUG  
   //#define MINIMAL
-  #define SPI_UART
+  //#define SPI_UART
   //#define SOFTSPI
   /**********************/
   
