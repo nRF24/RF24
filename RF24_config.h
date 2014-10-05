@@ -45,9 +45,9 @@
       const uint8_t SPI_MODE = 0;
       #define _SPI spi
       
-	  #else
-	    #defome _SPI SPI;
+	  #else	    
 		#include <SPI.h>
+		#define _SPI SPI
 	  #endif
 	#endif
 #else

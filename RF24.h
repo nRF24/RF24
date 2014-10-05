@@ -49,10 +49,10 @@ class RF24
 private:
 #ifdef SOFTSPI
   SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
-#endif
-#ifdef SPI_UART
+#elif defined (SPI_UART)
   SPIUARTClass uspi;
 #endif
+
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */  
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
