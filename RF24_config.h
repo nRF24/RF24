@@ -35,17 +35,18 @@
 	#else
       #if defined SPI_UART
 		#include <SPI_UART.h>
-		#define SPI spi
+		#define _SPI uspi
 	  #elif defined SOFTSPI
 	  // change these pins to your liking
       //
       const uint8_t SOFT_SPI_MISO_PIN = 16; 
-      const uint8_t SOFT_SPI_MOSI_PIN = 15;
-      const uint8_t SOFT_SPI_SCK_PIN = 14;
+      const uint8_t SOFT_SPI_MOSI_PIN = 15; 
+      const uint8_t SOFT_SPI_SCK_PIN = 14;  
       const uint8_t SPI_MODE = 0;
-      #define SPI spi
+      #define _SPI spi
       
 	  #else
+	    #defome _SPI SPI;
 		#include <SPI.h>
 	  #endif
 	#endif

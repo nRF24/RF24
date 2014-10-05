@@ -20,9 +20,9 @@ void RF24::csn(bool mode)
   // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 #ifdef ARDUINO
 	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
- 			SPI.setBitOrder(MSBFIRST);
-  			SPI.setDataMode(SPI_MODE0);
-			SPI.setClockDivider(SPI_CLOCK_DIV2);
+ 			_SPI.setBitOrder(MSBFIRST);
+  			_SPI.setDataMode(SPI_MODE0);
+			_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
 #endif
 
@@ -62,17 +62,17 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   uint8_t status;
 
 #if defined (__arm__) && !defined ( CORE_TEENSY )
-  status = SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
+  status = _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
   while ( len-- > 1 ){
-    *buf++ = SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
+    *buf++ = _SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
   }
-  *buf++ = SPI.transfer(csn_pin,0xff);
+  *buf++ = _SPI.transfer(csn_pin,0xff);
 
 #else
   csn(LOW);
-  status = SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  status = _SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- ){
-    *buf++ = SPI.transfer(0xff);
+    *buf++ = _SPI.transfer(0xff);
   }
   csn(HIGH);
 
@@ -87,12 +87,12 @@ uint8_t RF24::read_register(uint8_t reg)
 {
 
   #if defined (__arm__) && !defined ( CORE_TEENSY )
-  SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ) , SPI_CONTINUE);
-  uint8_t result = SPI.transfer(csn_pin,0xff);
+  _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ) , SPI_CONTINUE);
+  uint8_t result = _SPI.transfer(csn_pin,0xff);
   #else
   csn(LOW);
-  SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
-  uint8_t result = SPI.transfer(0xff);
+  _SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  uint8_t result = _SPI.transfer(0xff);
 
   csn(HIGH);
   #endif
@@ -107,17 +107,17 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   uint8_t status;
 
   #if defined (__arm__) && !defined ( CORE_TEENSY )
-  	status = SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
+  	status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
     while ( --len){
-    	SPI.transfer(csn_pin,*buf++, SPI_CONTINUE);
+    	_SPI.transfer(csn_pin,*buf++, SPI_CONTINUE);
 	}
-	SPI.transfer(csn_pin,*buf++);
+	_SPI.transfer(csn_pin,*buf++);
   #else
 
   csn(LOW);
-  status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
+  status = _SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
-    SPI.transfer(*buf++);
+    _SPI.transfer(*buf++);
 
   csn(HIGH);
 
@@ -135,13 +135,13 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
   #if defined (__arm__) && !defined ( CORE_TEENSY )
-  status = SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE);
-  SPI.transfer(csn_pin,value);
+  status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE);
+  _SPI.transfer(csn_pin,value);
   #else
 
   csn(LOW);
-  status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
-  SPI.transfer(value);
+  status = _SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
+  _SPI.transfer(value);
   csn(HIGH);
 
   #endif
@@ -163,32 +163,32 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
 
  #if defined (__arm__) && !defined ( CORE_TEENSY )
 
-  status = SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
+  status = _SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
 
   if(blank_len){
     while ( data_len--){
-      SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
+      _SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
     }
     while ( --blank_len ){
-      SPI.transfer(csn_pin,0, SPI_CONTINUE);
+      _SPI.transfer(csn_pin,0, SPI_CONTINUE);
     }
-    SPI.transfer(csn_pin,0);
+    _SPI.transfer(csn_pin,0);
   }else{
     while( --data_len ){
-      SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
+      _SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
     }
-    SPI.transfer(csn_pin,*current);
+    _SPI.transfer(csn_pin,*current);
   }
 
   #else
 
   csn(LOW);
-  status = SPI.transfer( writeType );
+  status = _SPI.transfer( writeType );
   while ( data_len-- ) {
-    SPI.transfer(*current++);
+    _SPI.transfer(*current++);
   }
   while ( blank_len-- ) {
-    SPI.transfer(0);
+    _SPI.transfer(0);
   }
   csn(HIGH);
 
@@ -212,33 +212,33 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 
   #if defined (__arm__) && !defined ( CORE_TEENSY )
 
-  status = SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
+  status = _SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
 
   if( blank_len ){
 	while ( data_len-- ){
-      *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+      *current++ = _SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
 	}
 
 	while ( --blank_len ){
-	  SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+	  _SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
 	}
-	SPI.transfer(csn_pin,0xFF);
+	_SPI.transfer(csn_pin,0xFF);
   }else{
 	while ( --data_len ){
-	  *current++ = SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
+	  *current++ = _SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
 	}
-	*current = SPI.transfer(csn_pin,0xFF);
+	*current = _SPI.transfer(csn_pin,0xFF);
   }
 
   #else
 
   csn(LOW);
-  status = SPI.transfer( R_RX_PAYLOAD );
+  status = _SPI.transfer( R_RX_PAYLOAD );
   while ( data_len-- ) {
-    *current++ = SPI.transfer(0xFF);
+    *current++ = _SPI.transfer(0xFF);
   }
   while ( blank_len-- ) {
-    SPI.transfer(0xff);
+    _SPI.transfer(0xff);
   }
   csn(HIGH);
 
@@ -267,11 +267,11 @@ uint8_t RF24::spiTrans(uint8_t cmd){
 
   uint8_t status;
   #if defined (__arm__) && !defined ( CORE_TEENSY )
-	status = SPI.transfer(csn_pin, cmd );
+	status = _SPI.transfer(csn_pin, cmd );
   #else
 
   csn(LOW);
-  status = SPI.transfer( cmd );
+  status = _SPI.transfer( cmd );
   csn(HIGH);
   #endif
   return status;
@@ -448,15 +448,15 @@ void RF24::begin(void)
   if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);
 
   #if defined(__arm__) && ! defined( CORE_TEENSY )
-  	SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
-	SPI.setClockDivider(csn_pin, 9);   // Set the bus speed to 8.4mhz on Due
-	SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
-  	SPI.setDataMode(csn_pin,SPI_MODE0);
+  	_SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
+	_SPI.setClockDivider(csn_pin, 9);   // Set the bus speed to 8.4mhz on Due
+	_SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
+  	_SPI.setDataMode(csn_pin,SPI_MODE0);
 	ce(LOW);
   	//csn(HIGH);
   #else
     if (ce_pin != csn_pin) pinMode(csn_pin,OUTPUT);
-    SPI.begin();
+    _SPI.begin();
     ce(LOW);
   	csn(HIGH);
   #endif
@@ -836,12 +836,12 @@ uint8_t RF24::getDynamicPayloadSize(void)
   uint8_t result = 0;
 
   #if defined (__arm__) && ! defined( CORE_TEENSY )
-  SPI.transfer(csn_pin, R_RX_PL_WID, SPI_CONTINUE );
-  result = SPI.transfer(csn_pin,0xff);
+  _SPI.transfer(csn_pin, R_RX_PL_WID, SPI_CONTINUE );
+  result = _SPI.transfer(csn_pin,0xff);
   #else
   csn(LOW);
-  SPI.transfer( R_RX_PL_WID );
-  result = SPI.transfer(0xff);
+  _SPI.transfer( R_RX_PL_WID );
+  result = _SPI.transfer(0xff);
   csn(HIGH);
 
   #endif
@@ -1027,12 +1027,12 @@ void RF24::toggle_features(void)
 {
 
   #if defined (__arm__) && ! defined( CORE_TEENSY )
-  SPI.transfer(csn_pin, ACTIVATE, SPI_CONTINUE );
-  SPI.transfer(csn_pin, 0x73 );
+  _SPI.transfer(csn_pin, ACTIVATE, SPI_CONTINUE );
+  _SPI.transfer(csn_pin, 0x73 );
   #else
   csn(LOW);
-  SPI.transfer( ACTIVATE );
-  SPI.transfer( 0x73 );
+  _SPI.transfer( ACTIVATE );
+  _SPI.transfer( 0x73 );
   csn(HIGH);
   #endif
 }
@@ -1102,18 +1102,18 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   uint8_t data_len = min(len,32);
 
   #if defined (__arm__) && ! defined( CORE_TEENSY )
-	SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & B111 ), SPI_CONTINUE);
+	_SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & B111 ), SPI_CONTINUE);
 	while ( data_len-- > 1 ){
-		SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
+		_SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
 	}
-	SPI.transfer(csn_pin,*current++);
+	_SPI.transfer(csn_pin,*current++);
 
   #else
   csn(LOW);
-  SPI.transfer(W_ACK_PAYLOAD | ( pipe & B111 ) );
+  _SPI.transfer(W_ACK_PAYLOAD | ( pipe & B111 ) );
 
   while ( data_len-- )
-    SPI.transfer(*current++);
+    _SPI.transfer(*current++);
 
   csn(HIGH);
 
