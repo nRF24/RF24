@@ -1233,8 +1233,9 @@ rf24_crclength_e RF24::getCRCLength(void)
 {
   rf24_crclength_e result = RF24_CRC_DISABLED;
   uint8_t config = read_register(CONFIG) & ( _BV(CRCO) | _BV(EN_CRC)) ;
-
-  if ( config & _BV(EN_CRC ) )
+  uint8_t AA = read_register(EN_AA);
+  
+  if ( config & _BV(EN_CRC ) || AA)
   {
     if ( config & _BV(CRCO) )
       result = RF24_CRC_16;
