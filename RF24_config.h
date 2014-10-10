@@ -24,8 +24,8 @@
   //#define FAILURE_HANDLING
   //#define SERIAL_DEBUG  
   //#define MINIMAL
-  //#define SPI_UART
-  //#define SOFTSPI
+  //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
+  //#define SOFTSPI   // Requires library from https://github.com/greiman/DigitalIO
   /**********************/
   
   // Define _BV for non-Arduino platforms and for Arduino DUE
@@ -52,7 +52,6 @@
 	  #endif
 	#endif
 #else
-
   #include <stdint.h>
   #include <stdio.h>
   #include <string.h>
@@ -71,7 +70,7 @@
     #define printf Serial.printf
  #endif
 
-
+  #define _SPI SPI
 #endif
 
   
