@@ -19,6 +19,15 @@ TMRh20 2014: Updated to work with optimized RF24 and RF24 Network Arduino libs.
 #include "./nRF24L01.h"
 
 
+void RF24::spiSettings(){
+	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
+	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
+	// Set SPI bus Speed
+	bcm2835_spi_setClockDivider(spi_speed);
+    // Choose hardware CSN pin
+    bcm2835_spi_chipSelect(csn_pin);
+}
+
 /****************************************************************************/
 uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
@@ -31,6 +40,8 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 	while (len--){
 		*ptx++ = NOP ; // Dummy operation, just for reading
 	}
+  
+  spiSettings();
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx++; // status is 1st byte of receive buffer
@@ -54,6 +65,7 @@ uint8_t RF24::read_register(uint8_t reg)
 	*ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx++ = NOP ; // Dummy operation, just for reading
 
+  spiSettings();
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
 	result = *++prx;   // result is 2nd byte of receive buffer
@@ -73,7 +85,8 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx = value ;
 
-  	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);  
+  	spiSettings();
+	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);  
 
 	status = *prx++; // status is 1st byte of receive buffer
 
@@ -96,6 +109,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   while ( len-- )
     *ptx++ = *buf++;
 
+  spiSettings();
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
@@ -129,6 +143,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t len, const uint8_t writeTyp
   while ( blank_len-- )
 		*ptx++ =  0;
 
+	spiSettings();
 	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	status = *prx; // status is 1st byte of receive buffer
@@ -163,6 +178,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t len)
 	// Size has been lost during while, re affect
 	size = data_len + blank_len + 1; // Add register value to transmit buffer
 
+	spiSettings();
 	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 
 	// 1st byte is status
@@ -181,6 +197,7 @@ uint8_t RF24::flush_rx(void)
 {
   uint8_t status;
 
+  spiSettings();
   status = bcm2835_spi_transfer( FLUSH_RX );
 
   return status;
@@ -192,6 +209,7 @@ uint8_t RF24::flush_tx(void)
 {
   uint8_t status;
 
+  spiSettings();
   status = bcm2835_spi_transfer( FLUSH_TX );
 
   return status;
@@ -201,6 +219,7 @@ uint8_t RF24::flush_tx(void)
 
 uint8_t RF24::get_status(void)
 {
+  spiSettings();
   return bcm2835_spi_transfer( NOP );
 }
 
@@ -433,15 +452,6 @@ bool RF24::begin(void)
 
 	// start the SPI library:
 	// Note the NRF24 wants mode 0, MSB first and default to 1 Mbps
-	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
-	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-
-	// Set SPI bus Speed
-	bcm2835_spi_setClockDivider(spi_speed);
-
-    // Choose hardware CSN pin
-    bcm2835_spi_chipSelect(csn_pin);
-
 
 	// Initialise the CE pin of NRF24 (chip enable) after the CSN pin, so that
 	// The input mode is not changed if using one of the hardware CE pins
@@ -654,6 +664,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 void RF24::reUseTX(){
 		write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 		//spiTrans( REUSE_TX_PL );
+		spiSettings();
 		bcm2835_spi_transfer( REUSE_TX_PL);
 		bcm2835_gpio_write(ce_pin, LOW);										  //Re-Transfer packet
 		bcm2835_gpio_write(ce_pin, HIGH);
@@ -796,6 +807,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
   spi_txbuff[0] = R_RX_PL_WID;
   spi_rxbuff[1] = 0xff;
 
+  spiSettings();
   bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 
   if(spi_rxbuff[1] > 32) { flush_rx(); delay(2);return 0; }
@@ -974,6 +986,7 @@ void RF24::closeReadingPipe( uint8_t pipe )
 
 void RF24::toggle_features(void)
 {
+  spiSettings();
   bcm2835_spi_transfer( ACTIVATE );
   bcm2835_spi_transfer( 0x73 );
 }
@@ -1057,6 +1070,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   while ( data_len-- ){
     *ptx++ =  *current++;
   }
+	spiSettings();
 	bcm2835_spi_transfern( (char *) spi_txbuff, size);	
 
 }

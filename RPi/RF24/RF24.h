@@ -79,6 +79,7 @@ private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
   uint16_t spi_speed; /**< SPI Bus Speed */
+  void spiSettings(); /**< Enable dual SPI devices with separate settings */
   bool wide_band; /* 2Mbs data rate in use? */
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
