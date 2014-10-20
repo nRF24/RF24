@@ -11,21 +11,28 @@
 # use make all and mak install to install the library 
 # You can change the install directory by editing the LIBDIR line
 #
-PREFIX=/usr/local
+PREFIX=$(DESTDIR)/usr
 
 # Library parameters
 # where to put the lib
 LIBDIR=$(PREFIX)/lib
+
 # lib name 
 LIB=librf24-bcm
+
 # shared library name
-LIBNAME=$(LIB).so.1.0
+LIBNAME=$(LIB).so.1
 
 # Where to put the header files
 HEADER_DIR=${PREFIX}/include/RF24
 
+# Examples to install for debian package
+EXAMPLES_DIR=${PREFIX}/share/doc/$(LIB).1
+
 # The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
+CCFLAGS=-Wall -Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s -D_FORTIFY_SOURCE=2 -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security
+LDFLAGS=-Wl,-z,relro
+
 
 # make all
 # reinstall the library after each recompilation
@@ -33,31 +40,45 @@ all: librf24-bcm
 
 # Make the library
 librf24-bcm: RF24.o bcm2835.o 
-	g++ -shared -Wl,-soname,$@.so.1 ${CCFLAGS} -o ${LIBNAME} $^
+	g++ -shared -Wl,-soname,$@.so.1 ${LDFLAGS} -o ${LIBNAME} $^
+	ar rcs $(LIB).a $^
 	
 # Library parts
 RF24.o: RF24.cpp
-	g++ -Wall -fPIC ${CCFLAGS} -c $^
+	g++ -fPIC ${CCFLAGS} -c $^
 
 bcm2835.o: bcm2835.c
-	gcc -Wall -fPIC ${CCFLAGS} -c $^
+	gcc -fPIC ${CCFLAGS} -c $^
 
 # clear build files
 clean:
 	rm -rf *.o ${LIB}.*
 
-install: all install-libs install-headers
+install: all install-libs install-headers install-examples
 
 # Install the library to LIBPATH
 install-libs: 
 	@echo "[Installing Libs]"
 	@if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
 	@install -m 0755 ${LIBNAME} ${LIBDIR}
-	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so.1
-	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so
-	@ldconfig
+	@ln -s $(PREFIX)/lib/$(LIB).so.1 $(PREFIX)/lib/$(LIB).so
 
 install-headers:
 	@echo "[Installing Headers]"
 	@if ( test ! -d ${HEADER_DIR} ) ; then mkdir -p ${HEADER_DIR} ; fi
 	@install -m 0644 *.h ${HEADER_DIR}
+
+install-examples:
+	@echo "[Installing Examples]"
+	@if ( test ! -d ${EXAMPLES_DIR} ) ; then mkdir -p ${EXAMPLES_DIR} ; fi
+	@if ( test ! -d ${EXAMPLES_DIR}/extra ) ; then mkdir -p ${EXAMPLES_DIR}/extra ; fi
+	@install -m 0644 examples/*.cpp ${EXAMPLES_DIR}
+	@install -m 0644 examples/Makefile ${EXAMPLES_DIR}
+	@install -m 0644 examples/extra/* ${EXAMPLES_DIR}/extra
+
+
+# you need 'devscripts' package installed
+deb:
+	@rm -rf debian/librf24*
+	@tar -jcf ../librf24-bcm1_1.0.orig.tar.bz2 ../RF24
+	@debuild -i -us -uc -b

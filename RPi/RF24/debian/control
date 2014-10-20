@@ -1,0 +1,17 @@
+Source: librf24-bcm1
+Section: devel
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: 
+Maintainer: Andreas Steinel <A.Steinel@gmail.com>
+Standards-Version: 3.9.4
+Vcs-Git: git://github.com/TMRh20/RF24
+Vcs-Browser: https://github.com/TMRh20/RF24/
+
+Package: librf24-bcm1
+Architecture: armhf
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: nRF24L01 Wireless Transceiver
+ Optimized High Speed RaspberryPI driver for nRF24L01 2.4GHz
+ Wireless Transceiver
+
