@@ -96,9 +96,11 @@ public:
    * Be sure to call openReadingPipe() first.  Do not call write() while
    * in this mode, without first calling stopListening().  Call
    * Available() to check for incoming traffic, and read() to get it.
+   *
+   * @param user_flush_tx Just in case you need NOT to flush_tx (see rf24ackPayload85.ino example). Default value is TRUE
    */
-  void startListening(void);
-
+  void startListening(const bool user_flush_tx = true);
+  
   /**
    * Stop listening for incoming messages
    *
@@ -1089,6 +1091,17 @@ private:
  * @example timingSearch3pin.ino
  * <b>New: Contributed by https://github.com/tong67</b><br>
  * This is an example of how to determine the correct timing for ATtiny when using only 3-pins
+ */
+ /**
+ * @example rf24ackPayload85.ino
+ * <b>New: Contributed by https://github.com/op2op2op2</b><br>
+ * This is an example of how to use the RF24 class to communicate with ATtiny85 and other node. <br>
+ * ATtiny85 works as RX and use ackPayload to send data back to TX node. It sleeps most of the time
+ * and when it wakes up it reads from TX node, and sends back the ackPayload with the value measured
+ * just after waking up (it wakes up, writes ackPayload and, AFTER, start listening)
+ * You need 4 or 5 pins solutions.
+ * NOTE: in GettingStarted_CallResponse.ino example, you get the ackPayload
+ * response of a "previous run" (see http://forum.arduino.cc/index.php?topic=178511.msg1872563)
  */
   
 /**
