@@ -26,9 +26,8 @@ void RF24::csn(bool mode)
 	#endif
 #endif
 
-
 #if defined (RF24_TINY)
-	if (ce_pin != csn_pin) {
+	if ((ce_pin != csn_pin) && (csn_pin != 0)) {
 		digitalWrite(csn_pin,mode);
 	} 
 	else {
@@ -455,7 +454,7 @@ void RF24::begin(void)
 	ce(LOW);
   	//csn(HIGH);
   #else
-    if (ce_pin != csn_pin) pinMode(csn_pin,OUTPUT);
+    if ((ce_pin != csn_pin) && (csn_pin != 0)) pinMode(csn_pin,OUTPUT);
     _SPI.begin();
     ce(LOW);
   	csn(HIGH);
@@ -519,7 +518,7 @@ void RF24::begin(void)
 
 /****************************************************************************/
 
-void RF24::startListening(void)
+void RF24::startListening(const bool user_flush_tx)
 {
  #if !defined (RF24_TINY)
   powerUp();
@@ -536,7 +535,7 @@ void RF24::startListening(void)
 
   // Flush buffers
   //flush_rx();
-  if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
+  if(read_register(FEATURE) & _BV(EN_ACK_PAY) & user_flush_tx){
 	flush_tx();
   }
 

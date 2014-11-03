@@ -37,6 +37,18 @@ version 2 as published by the Free Software Foundation.
                         |-----------------------------------------------||----x-- nRF24L01 CSN, pin4 
                                                                        10nF
 
+    ATtiny25/45/85 Pin map with CSN_PIN 0 => PB4 is free to use for application and you can use ackPayload funtionallity
+    (see rf24ackPayload85.ino example)    
+                                                                                            ^^
+                                 +-\/-+                                                    //
+                           PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 -----------------x--|<|-- 5V
+    nRF24L01  CE, pin3 --- PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5 --|<|---x-[22k]--|  LED
+                   NC      PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin7  1n4148 |
+    nRF24L01 GND, pin1 -x- GND  4|    |5  PB0 --- nRF24L01 MISO, pin6         |
+                        |        +----+                                       |
+                        |-----------------------------------------------||----x-- nRF24L01 CSN, pin4 
+                                                                       10nF    
+
     ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7
 	Schematic provided and successfully tested by Carmine Pastore (https://github.com/Carminepz)
                                   +-\/-+
@@ -52,21 +64,21 @@ version 2 as published by the Free Software Foundation.
 
 // CE and CSN are configurable, specified values for ATtiny85 as connected above
 #define CE_PIN 3
-#define CSN_PIN 4
+#define CSN_PIN 4 // uncomment for ATtiny85 5 pins solution
+//#define CSN_PIN 0 // uncomment for ATtiny85 4 pins solution
 //#define CSN_PIN 3 // uncomment for ATtiny85 3 pins solution
 
 #include "RF24.h"
 
 RF24 radio(CE_PIN, CSN_PIN);
 
-byte addresses[][6] = {
-  "1Node","2Node"};
+byte addresses[][6] = {"1Node","2Node"};
 unsigned long payload = 0;
 
 void setup() {
   // Setup and configure rf radio
   radio.begin(); // Start up the radio
-  radio.setAutoAck(1); // Ensure autoACK is enabled
+  radio.setAutoAck(1); // Ensure autoACK is enabled 
   radio.setRetries(15,15); // Max delay between retries & number of retries
   radio.openWritingPipe(addresses[0]); // Write to device address '1Node'
   radio.openReadingPipe(1,addresses[1]); // Read on pipe 1 for device address '2Node'
@@ -80,7 +92,7 @@ void loop(void){
   radio.write( &payload, sizeof(unsigned long) );
   radio.startListening(); // Now, continue listening
 
-    unsigned long started_waiting_at = micros(); // Set up a timeout period, get the current microseconds
+  unsigned long started_waiting_at = micros(); // Set up a timeout period, get the current microseconds
   boolean timeout = false; // Set up a variable to indicate if a response was received or not
 
   while ( !radio.available() ){ // While nothing is received
@@ -92,8 +104,8 @@ void loop(void){
   }
 
   if ( !timeout ){ // Describe the results
-    unsigned long got_time; // Grab the response, compare, and send to debugging spew
-    radio.read( &got_time, sizeof(unsigned long) );
+    byte got_time; // Grab the response, compare, and send to debugging spew
+    radio.read( &got_time, sizeof(byte) );
   }
 
   // Try again 1s later
