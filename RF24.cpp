@@ -27,7 +27,7 @@ void RF24::csn(bool mode)
 #endif
 
 #if defined (RF24_TINY)
-	if (csn_pin != 0) {
+	if ((ce_pin != csn_pin) && (csn_pin != 0)) {
 		digitalWrite(csn_pin,mode);
 	} 
 	else {
