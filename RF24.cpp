@@ -454,7 +454,7 @@ void RF24::begin(void)
 	ce(LOW);
   	//csn(HIGH);
   #else
-    if (csn_pin != 0) pinMode(csn_pin,OUTPUT);
+    if ((ce_pin != csn_pin) && (csn_pin != 0)) pinMode(csn_pin,OUTPUT);
     _SPI.begin();
     ce(LOW);
   	csn(HIGH);
