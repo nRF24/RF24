@@ -12,6 +12,51 @@
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
 
+  /*** USER DEFINES:  ***/  
+  //#define FAILURE_HANDLING
+  //#define SERIAL_DEBUG
+  //#define MINIMAL
+  //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
+  //#define SOFTSPI   // Requires library from https://github.com/greiman/DigitalIO
+  /**********************/
+  
+#if defined (__linux) || defined (linux)
+  
+  #define RF24_LINUX
+  
+  #include <stdint.h>
+  #include <stdio.h>
+  #include <time.h>
+  #include <string.h>
+  #include <sys/time.h>
+  #include <stddef.h>
+  #include "bcm2835.h"
+
+  // GCC a Arduino Missing
+  #define max(a,b) (a>b?a:b)
+  #define min(a,b) (a<b?a:b)
+  #define _BV(x) (1<<(x))
+  #define pgm_read_word(p) (*(p))
+  #define pgm_read_byte(p) (*(p))
+  
+  //typedef uint16_t prog_uint16_t;
+  #define PSTR(x) (x)
+  #define printf_P printf
+  #define strlen_P strlen
+  #define PROGMEM
+  #define PRIPSTR "%s"
+
+  #ifdef SERIAL_DEBUG
+	#define IF_SERIAL_DEBUG(x) ({x;})
+  #else
+	#define IF_SERIAL_DEBUG(x)
+	#if defined(RF24_TINY)
+	  #define printf_P(...)
+    #endif
+  #endif
+  
+#else //Everything else
+
   #if ARDUINO < 100
 	#include <WProgram.h>
   #else
@@ -19,15 +64,8 @@
   #endif
 
   #include <stddef.h>
-
-  /*** USER DEFINES:  ***/  
-  //#define FAILURE_HANDLING
-  //#define SERIAL_DEBUG  
-  //#define MINIMAL
-  //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
-  //#define SOFTSPI   // Requires library from https://github.com/greiman/DigitalIO
-  /**********************/
   
+ 
   // Define _BV for non-Arduino platforms and for Arduino DUE
 #if defined (ARDUINO) && !defined (__arm__)
 	#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
@@ -120,6 +158,7 @@
 
 #endif
 
+#endif //Defined Linux 
 
 
 // ATTiny support code is from https://github.com/jscrane/RF24

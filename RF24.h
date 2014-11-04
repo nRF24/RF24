@@ -16,9 +16,12 @@
 #define __RF24_H__
 
 #include <RF24_config.h>
-#if defined SOFTSPI
-#include <DigitalIO.h>
+#if defined (RF24_LINUX)
+  #include "bcm2835.h"
+#elif defined SOFTSPI
+  #include <DigitalIO.h>
 #endif
+
 /**
  * Power Amplifier level.
  *
@@ -54,14 +57,21 @@ private:
 #endif
 
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-  uint8_t csn_pin; /**< SPI Chip select */  
+  uint8_t csn_pin; /**< SPI Chip select */
+#if defined (__linux)
+  uint16_t spi_speed; /**< SPI Bus Speed */
+  uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
+  uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
+#endif  
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
   uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
   uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
   uint32_t lastAvailableCheck; /**< Limits the amount of time between reading data, only when switching between modes */
-  boolean listeningStarted; /**< Var for delaying available() after start listening */
+  bool listeningStarted; /**< Var for delaying available() after start listening */
+
+
   
 public:
 
@@ -80,9 +90,12 @@ public:
    *
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
+   * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
    */
   RF24(uint8_t _cepin, uint8_t _cspin);
-
+  //#if defined (RF24_LINUX)
+  RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
+  //#endif
   /**
    * Begin operation of the chip
    *

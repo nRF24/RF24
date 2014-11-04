@@ -16,7 +16,7 @@ TMRh20 2014
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <RF24/RF24.h>
+#include "./RF24.h"
 
 
 using namespace std;
@@ -32,9 +32,6 @@ using namespace std;
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
 //RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ);
 
-// NEW: Setup for RPi B+
-//RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
-
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
@@ -43,14 +40,13 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
 
-
+bool role_ping_out = 1, role_pong_back = 0;
+bool role = 0;
 uint8_t data[32];
 unsigned long startTime, stopTime, counter, rxTimer=0;
 
 int main(int argc, char** argv){
 
-  bool role_ping_out = 1, role_pong_back = 0;
-  bool role = 0;
 
   // Print preamble:
 
@@ -59,9 +55,9 @@ int main(int argc, char** argv){
   radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_1MBPS);
+  radio.setDataRate(RF24_2MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
-  radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
+  radio.setRetries(2,15);                   // Optionally, increase the delay between retries & # of retries
   radio.setCRCLength(RF24_CRC_8);
   radio.printDetails();
 /********* Role chooser ***********/
@@ -93,7 +89,7 @@ int main(int argc, char** argv){
 
 
   for(int i=0; i<32; i++){
-     data[i] = rand() % 255;               			//Load the buffer with random data
+     data[i] = rand() % 255;               //Load the buffer with random data
   }
 
     // forever loop
@@ -103,24 +99,16 @@ int main(int argc, char** argv){
 		sleep(2);
 		printf("Initiating Basic Data Transfer\n\r");
 
-		long int cycles = 10000; 					//Change this to a higher or lower number.
-		
-		// unsigned long pauseTime = millis();		//Uncomment if autoAck == 1 ( NOACK )
+		long int cycles = 10000; //Change this to a higher or lower number.
+
 		startTime = millis();
-	
-		for(int i=0; i<cycles; i++){        		//Loop through a number of cycles
-      			data[0] = i;                        //Change the first byte of the payload for identification
-      			if(!radio.writeFast(&data,32)){     //Write to the FIFO buffers
+
+		for(int i=0; i<cycles; i++){        //Loop through a number of cycles
+      			data[0] = i;                      //Change the first byte of the payload for identification
+      			if(!radio.writeFast(&data,32)){   //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
-				
-				//This is only required when NO ACK ( enableAutoAck(0) ) payloads are used
-		/*		if(millis() - pauseTime > 3){       // Need to drop out of TX mode every 4ms if sending a steady stream of multicast data
-					pauseTime = millis();		    
-					radio.txStandBy();				// This gives the PLL time to sync back up	
-				}
-		*/
-		}
+    		}
 		stopTime = millis();
 
 		if(!radio.txStandBy()){ counter+=3; }
