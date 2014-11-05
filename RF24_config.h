@@ -30,7 +30,7 @@
   #include <string.h>
   #include <sys/time.h>
   #include <stddef.h>
-  #include "bcm2835.h"
+  #include "RPi/bcm2835.h"
 
   // GCC a Arduino Missing
   #define max(a,b) (a>b?a:b)

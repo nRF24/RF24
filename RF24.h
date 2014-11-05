@@ -17,7 +17,7 @@
 
 #include <RF24_config.h>
 #if defined (RF24_LINUX)
-  #include "bcm2835.h"
+  #include "RPi/bcm2835.h"
 #elif defined SOFTSPI
   #include <DigitalIO.h>
 #endif
