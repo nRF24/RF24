@@ -15,7 +15,7 @@
 #ifndef __RF24_H__
 #define __RF24_H__
 
-#include <RF24_config.h>
+#include "RF24_config.h"
 #if defined (RF24_LINUX)
   #include "RPi/bcm2835.h"
 #elif defined SOFTSPI
