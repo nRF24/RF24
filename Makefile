@@ -41,7 +41,7 @@ librf24-bcm: RF24.o bcm2835.o
 RF24.o: RF24.cpp
 	g++ -Wall -fPIC ${CCFLAGS} -c $^
 
-bcm2835.o: RPi/bcm2835.c
+bcm2835.o: ${DRIVER_DIR}/bcm2835.c
 	gcc -Wall -fPIC ${CCFLAGS} -c $^
 
 # clear build files
