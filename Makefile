@@ -24,6 +24,8 @@ LIBNAME=$(LIB).so.1.0
 # Where to put the header files
 HEADER_DIR=${PREFIX}/include/RF24
 
+DRIVER_DIR=RPi
+
 # The recommended compiler flags for the Raspberry Pi
 CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 
@@ -39,7 +41,7 @@ librf24-bcm: RF24.o bcm2835.o
 RF24.o: RF24.cpp
 	g++ -Wall -fPIC ${CCFLAGS} -c $^
 
-bcm2835.o: bcm2835.c
+bcm2835.o: RPi/bcm2835.c
 	gcc -Wall -fPIC ${CCFLAGS} -c $^
 
 # clear build files
@@ -61,3 +63,5 @@ install-headers:
 	@echo "[Installing Headers]"
 	@if ( test ! -d ${HEADER_DIR} ) ; then mkdir -p ${HEADER_DIR} ; fi
 	@install -m 0644 *.h ${HEADER_DIR}
+	@if ( test ! -d ${HEADER_DIR}/RPi ) ; then mkdir -p ${HEADER_DIR}/RPi ; fi
+	@install -m 0644 ${DRIVER_DIR}/*.h ${HEADER_DIR}/${DRIVER_DIR}
