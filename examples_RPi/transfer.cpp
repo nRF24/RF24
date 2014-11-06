@@ -83,11 +83,12 @@ int main(int argc, char** argv){
 /***********************************/
 
     if ( role == role_ping_out )    {
-      radio.openWritingPipe(addresses[0]);
-      radio.openReadingPipe(1,addresses[1]);
-    } else {
       radio.openWritingPipe(addresses[1]);
       radio.openReadingPipe(1,addresses[0]);
+	  radio.stopListening();
+    } else {
+      radio.openWritingPipe(addresses[0]);
+      radio.openReadingPipe(1,addresses[1]);
       radio.startListening();
     }
 
@@ -113,6 +114,7 @@ int main(int argc, char** argv){
       			if(!radio.writeFast(&data,32)){     //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
+
 				
 				//This is only required when NO ACK ( enableAutoAck(0) ) payloads are used
 		/*		if(millis() - pauseTime > 3){       // Need to drop out of TX mode every 4ms if sending a steady stream of multicast data

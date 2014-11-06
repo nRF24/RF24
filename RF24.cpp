@@ -757,7 +757,7 @@ void RF24::stopListening(void)
   delayMicroseconds(230);
   
   if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
-    delayMicroseconds(170);
+    delayMicroseconds(200);
 	flush_tx();
   }
   //flush_rx();
