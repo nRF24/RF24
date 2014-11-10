@@ -91,7 +91,7 @@ B.  Clone the RF24 Repo
 
     git clone https://github.com/tmrh20/RF24.git RF24  
 
-C.  Copy the RPi library folder to the current directory, and delete the rest  
+C.  Change to the new RF24 directory    
 
     cd RF24  
 
