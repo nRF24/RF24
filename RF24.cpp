@@ -734,8 +734,10 @@ void RF24::startListening(void)
 	flush_tx();
   }
 
-  // Go!  
-  //delayMicroseconds(130);
+  // Go!
+  #if defined (RF24_LINUX) || defined (__arm__)
+    delayMicroseconds(100);
+  #endif
   listeningStarted = 1;
 }
 
