@@ -735,9 +735,7 @@ void RF24::startListening(void)
   }
 
   // Go!
-  #if defined (RF24_LINUX) || defined (__arm__)
-    delayMicroseconds(100);
-  #endif
+  delayMicroseconds(100);
   listeningStarted = 1;
 }
 
