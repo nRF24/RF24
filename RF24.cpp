@@ -734,9 +734,8 @@ void RF24::startListening(void)
 	flush_tx();
   }
 
-  // Go!
-  
-  delayMicroseconds(130);
+  // Go!  
+  //delayMicroseconds(130);
   listeningStarted = 1;
 }
 
