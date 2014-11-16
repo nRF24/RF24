@@ -720,7 +720,7 @@ void RF24::startListening(void)
  #endif
   write_register(CONFIG, read_register(CONFIG) | _BV(PRIM_RX));
   write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
-
+  ce(HIGH);
   // Restore the pipe0 adddress, if exists
   if (pipe0_reading_address[0] > 0){
     write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);	
@@ -735,7 +735,7 @@ void RF24::startListening(void)
   }
 
   // Go!
-  ce(HIGH);
+  
   delayMicroseconds(130);
   listeningStarted = 1;
 }
@@ -1066,16 +1066,16 @@ bool RF24::available(void)
 bool RF24::available(uint8_t* pipe_num)
 {
     //Check the FIFO buffer to see if data is waiting to be read
-	if(listeningStarted){
-	    #if defined (RF24_LINUX)
-		   if(millis() - lastAvailableCheck < 2 && listeningStarted){delayMicroseconds(400);}
+	    #if defined (RF24_LINUX) // This seems to prevent faster devices like RPi from saturating the RF24 module with SPI requests
+		   while(millis() - lastAvailableCheck < 1){}
 		   lastAvailableCheck = millis();
-		#else	
+		#else
+	if(listeningStarted){	
 		while(micros() - lastAvailableCheck < 800 && listeningStarted){};
-		lastAvailableCheck = micros();
-		#endif
+		lastAvailableCheck = micros();		
 		listeningStarted = 0;
 	}
+	#endif
   if (!( read_register(FIFO_STATUS) & _BV(RX_EMPTY) )){
 
     // If the caller wants the pipe number, include that
