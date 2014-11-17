@@ -33,8 +33,8 @@
   #include "RPi/bcm2835.h"
 
   // GCC a Arduino Missing
-  #define max(a,b) (a>b?a:b)
-  #define min(a,b) (a<b?a:b)
+  #define rf24_max(a,b) (a>b?a:b)
+  #define rf24_min(a,b) (a<b?a:b)
   #define _BV(x) (1<<(x))
   #define pgm_read_word(p) (*(p))
   #define pgm_read_byte(p) (*(p))
