@@ -16,7 +16,7 @@
 #define __RF24_H__
 
 #include "RF24_config.h"
-#if defined (__linux) || defined (LINUX)
+#if (defined (__linux) || defined (LINUX)) && !defined (__ARDUINO_X86__)
   #include "RPi/bcm2835.h"
 #elif defined SOFTSPI
   #include <DigitalIO.h>
