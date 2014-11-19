@@ -1,4 +1,26 @@
-N
+/*
+ Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ version 2 as published by the Free Software Foundation.
+ */
+
+#include "nRF24L01.h"
+#include "RF24_config.h"
+#include "RF24.h"
+
+/****************************************************************************/
+
+void RF24::csn(bool mode)
+{
+  // Minimum ideal SPI bus speed is 2x data rate
+  // If we assume 2Mbs data rate and 16Mhz clock, a
+  // divider of 4 is the minimum we want.
+  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+#ifdef ARDUINO
+	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
+ 			_SPI.setBitOrder(MSBFIRST);
   			_SPI.setDataMode(SPI_MODE0);
 			_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
@@ -572,12 +594,13 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("RF_SETUP"),RF_SETUP);
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
-
+printf("dsad");
 #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
   printf_P(PSTR("Data Rate\t = %s\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
   printf_P(PSTR("Model\t\t = %s\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
   printf_P(PSTR("CRC Length\t = %s\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
   printf_P(PSTR("PA Power\t = %s\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  printf("asd");
 #else
   printf_P(PSTR("Data Rate\t = %S\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
   printf_P(PSTR("Model\t\t = %S\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
