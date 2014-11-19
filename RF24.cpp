@@ -1,26 +1,4 @@
-/*
- Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
-
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- version 2 as published by the Free Software Foundation.
- */
-
-#include "nRF24L01.h"
-#include "RF24_config.h"
-#include "RF24.h"
-
-/****************************************************************************/
-
-void RF24::csn(bool mode)
-{
-  // Minimum ideal SPI bus speed is 2x data rate
-  // If we assume 2Mbs data rate and 16Mhz clock, a
-  // divider of 4 is the minimum we want.
-  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-#ifdef ARDUINO
-	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
- 			_SPI.setBitOrder(MSBFIRST);
+N
   			_SPI.setDataMode(SPI_MODE0);
 			_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
@@ -650,6 +628,9 @@ void RF24::begin(void)
     _SPI.begin();
     ce(LOW);
   	csn(HIGH);
+  	#if defined (__ARDUINO_X86__)
+		delay(100);
+  	#endif
   #endif
   #endif //Linux
 
@@ -748,7 +729,7 @@ static const uint8_t child_pipe_enable[] PROGMEM =
 void RF24::stopListening(void)
 {  
   ce(LOW);
-  #if defined (RF24_LINUX)
+  #if defined (RF24_LINUX) || defined (__ARDUINO_X86__)
     delayMicroseconds(370);
   #elif defined(__arm__)
   	delayMicroseconds(300);
@@ -1065,7 +1046,7 @@ bool RF24::available(void)
 bool RF24::available(uint8_t* pipe_num)
 {
     //Check the FIFO buffer to see if data is waiting to be read
-	    #if defined (RF24_LINUX) // This seems to prevent faster devices like RPi from saturating the RF24 module with SPI requests
+	    #if defined (RF24_LINUX)  || defined (__ARDUINO_X86__) // This seems to prevent faster devices like RPi from saturating the RF24 module with SPI requests
 		   while(millis() - lastAvailableCheck < 1){}
 		   lastAvailableCheck = millis();
 		#else
