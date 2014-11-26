@@ -23,6 +23,8 @@
   //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
   //#define SOFTSPI   // Requires library from https://github.com/greiman/DigitalIO
   /**********************/
+  #define rf24_max(a,b) (a>b?a:b)
+  #define rf24_min(a,b) (a<b?a:b)
   
 #if (defined (__linux) || defined (linux)) && !defined (__ARDUINO_X86__)
   #define RF24_LINUX
@@ -36,8 +38,6 @@
   #include "RPi/bcm2835.h"
 
   // GCC a Arduino Missing
-  #define max(a,b) (a>b?a:b)
-  #define min(a,b) (a<b?a:b)
   #define _BV(x) (1<<(x))
   #define pgm_read_word(p) (*(p))
   #define pgm_read_byte(p) (*(p))

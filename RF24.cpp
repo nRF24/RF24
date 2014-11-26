@@ -220,7 +220,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   uint8_t status;
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-   data_len = min(data_len, payload_size);
+   data_len = rf24_min(data_len, payload_size);
    uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
   
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
@@ -479,14 +479,14 @@ RF24::RF24(uint8_t _cepin, uint8_t _cspin, uint32_t _spi_speed):
 void RF24::setChannel(uint8_t channel)
 {
   const uint8_t max_channel = 127;
-  write_register(RF_CH,min(channel,max_channel));
+  write_register(RF_CH,rf24_min(channel,max_channel));
 }
 
 /****************************************************************************/
 
 void RF24::setPayloadSize(uint8_t size)
 {
-  payload_size = min(size,32);
+  payload_size = rf24_min(size,32);
 }
 
 /****************************************************************************/
@@ -1131,7 +1131,7 @@ void RF24::openWritingPipe(uint64_t value)
   
   
   //const uint8_t max_payload_size = 32;
-  //write_register(RX_PW_P0,min(payload_size,max_payload_size));
+  //write_register(RX_PW_P0,rf24_min(payload_size,max_payload_size));
   write_register(RX_PW_P0,payload_size);
 }
 
@@ -1145,7 +1145,7 @@ void RF24::openWritingPipe(const uint8_t *address)
   write_register(TX_ADDR, address, addr_width);
 
   //const uint8_t max_payload_size = 32;
-  //write_register(RX_PW_P0,min(payload_size,max_payload_size));
+  //write_register(RX_PW_P0,rf24_min(payload_size,max_payload_size));
   write_register(RX_PW_P0,payload_size);
 }
 
@@ -1313,7 +1313,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-  uint8_t data_len = min(len,32);
+  uint8_t data_len = rf24_min(len,32);
 
   #if defined (RF24_LINUX)
     uint8_t * ptx = spi_txbuff;
