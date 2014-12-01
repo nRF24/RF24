@@ -22,7 +22,7 @@ void RF24::csn(bool mode)
 	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
  			_SPI.setBitOrder(MSBFIRST);
   			_SPI.setDataMode(SPI_MODE0);
-			_SPI.setClockDivider(SPI_CLOCK_DIV2);
+			_SPI.setClockDivider(SPI_CLOCK_DIV4);
 	#endif
 #endif
 
@@ -639,7 +639,7 @@ void RF24::begin(void)
   
   #if defined(__arm__) && ! defined( CORE_TEENSY )
   	_SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
-	_SPI.setClockDivider(csn_pin, 9);   // Set the bus speed to 8.4mhz on Due
+	_SPI.setClockDivider(csn_pin, 37);   // Set the bus speed to 8.4mhz on Due
 	_SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
   	_SPI.setDataMode(csn_pin,SPI_MODE0);
 	ce(LOW);
