@@ -594,8 +594,7 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("RF_SETUP"),RF_SETUP);
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
-
-#if defined(__arm__) || defined (RF24_LINUX)
+#if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
   printf_P(PSTR("Data Rate\t = %s\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
   printf_P(PSTR("Model\t\t = %s\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
   printf_P(PSTR("CRC Length\t = %s\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
@@ -650,6 +649,9 @@ void RF24::begin(void)
     _SPI.begin();
     ce(LOW);
   	csn(HIGH);
+  	#if defined (__ARDUINO_X86__)
+		delay(100);
+  	#endif
   #endif
   #endif //Linux
 
@@ -748,7 +750,7 @@ static const uint8_t child_pipe_enable[] PROGMEM =
 void RF24::stopListening(void)
 {  
   ce(LOW);
-  #if defined (RF24_LINUX)
+  #if defined (RF24_LINUX) || defined (__ARDUINO_X86__)
     delayMicroseconds(370);
   #elif defined(__arm__)
   	delayMicroseconds(300);
@@ -1065,7 +1067,7 @@ bool RF24::available(void)
 bool RF24::available(uint8_t* pipe_num)
 {
     //Check the FIFO buffer to see if data is waiting to be read
-	    #if defined (RF24_LINUX) // This seems to prevent faster devices like RPi from saturating the RF24 module with SPI requests
+	    #if defined (RF24_LINUX)  || defined (__ARDUINO_X86__) // This seems to prevent faster devices like RPi from saturating the RF24 module with SPI requests
 		   while(millis() - lastAvailableCheck < 1){}
 		   lastAvailableCheck = millis();
 		#else

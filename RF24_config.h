@@ -8,6 +8,10 @@
 
  Added Arduino Due support from https://github.com/mcrosson/
  */
+ 
+ /* spaniakos <spaniakos@gmail.com>
+  Added __ARDUINO_X86__ support
+*/
 
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
@@ -22,8 +26,7 @@
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
   
-#if defined (__linux) || defined (linux)
-  
+#if (defined (__linux) || defined (linux)) && !defined (__ARDUINO_X86__)
   #define RF24_LINUX
   
   #include <stdint.h>
@@ -67,7 +70,7 @@
   
  
   // Define _BV for non-Arduino platforms and for Arduino DUE
-#if defined (ARDUINO) && !defined (__arm__)
+#if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
 	#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
 		#define RF24_TINY
 		#define _SPI SPI
@@ -95,13 +98,13 @@
   #include <string.h>
 
 
- #if defined(__arm__) || defined (CORE_TEENSY)
+ #if defined(__arm__) || defined (CORE_TEENSY) || defined (__ARDUINO_X86__)
    #include <SPI.h>
  #endif
 
- #if !defined(CORE_TEENSY)
+ #if !defined(CORE_TEENSY)	
    #define _BV(x) (1<<(x))
-   #if !defined(__arm__)
+   #if !defined(__arm__) && !defined (__ARDUINO_X86__)
      extern HardwareSPI SPI;
    #endif
  #else
@@ -120,7 +123,12 @@
 	#define printf_P(...)
     #endif
   #endif
-
+  
+#if  defined (__ARDUINO_X86__)
+	#define printf_P printf
+	#define _BV(bit) (1<<(bit))
+#endif
+  
 // Avoid spurious warnings
 // Arduino DUE is arm and uses traditional PROGMEM constructs
 #if 1
@@ -134,7 +142,7 @@
 
 // Progmem is Arduino-specific
 // Arduino DUE is arm and does not include avr/pgmspace
-#if defined(ARDUINO) && ! defined(__arm__)
+#if defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
 #else
@@ -143,7 +151,6 @@
 #else // Fill in pgm_read_byte that is used, but missing from DUE
 	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 #endif
-
 
 #if !defined ( CORE_TEENSY )
 	typedef uint16_t prog_uint16_t;
