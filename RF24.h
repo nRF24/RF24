@@ -1210,6 +1210,7 @@ private:
  * See the included examples for more info on using ATTiny with RF24 <br>
  * See https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC for ATTiny patch
  * - Raspberry Pi Support: See the readme at https://github.com/TMRh20/RF24/tree/master/RPi/RF24
+ * - A python wrapper is also available for RPi: https://github.com/TMRh20/RF24/tree/Updates/RPi/pyRF24/readme.md
  *
  * @section More More Information
  *
