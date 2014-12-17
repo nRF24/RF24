@@ -92,8 +92,14 @@ B. Make it executable:
 
 C. Run it and choose your options:  
 
-    sudo ./install.sh  
+    ./install.sh  
 
+D. Run an example file from one of the libraries:
+
+    cd rf24libs/RF24/examples_RPi  
+    make  
+    sudo ./gettingstarted  
+    
 
 # RPi - RF24 Quick-Start
 
