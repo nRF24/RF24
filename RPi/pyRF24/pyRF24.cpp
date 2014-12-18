@@ -180,6 +180,14 @@ BOOST_PYTHON_MODULE(RF24){
         .value("BCM2835_SPI_CLOCK_DIVIDER_1", BCM2835_SPI_CLOCK_DIVIDER_1)
         .export_values();
 
+
+    bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
+        .value("BCM2835_SPI_CS0", BCM2835_SPI_CS0)
+        .value("BCM2835_SPI_CS1", BCM2835_SPI_CS1)
+        .value("BCM2835_SPI_CS2", BCM2835_SPI_CS2)
+        .value("BCM2835_SPI_CS_NONE", BCM2835_SPI_CS_NONE)
+        .export_values();
+
 // exposing '#define's for SPI speed as this is needed for RF24 constructor
     bp::scope().attr("BCM2835_SPI_SPEED_64MHZ") = BCM2835_SPI_SPEED_64MHZ;
     bp::scope().attr("BCM2835_SPI_SPEED_32MHZ") = BCM2835_SPI_SPEED_32MHZ;
