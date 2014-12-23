@@ -15,7 +15,7 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-#include "printf.h"
+//#include <printf.h>  // Printf is used for debug 
 
 //
 // Hardware configuration
@@ -87,10 +87,12 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(57600);
-  printf_begin();
-  printf("\n\rRF24/examples/pingpair_dyn/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
+  Serial.begin(115200);
+  //printf_begin(); //Printf is used for debug
+  
+  Serial.println(F("RF24/examples/pingpair_dyn/"));
+  Serial.print(F("ROLE: "));
+  Serial.println(role_friendly_name[role]);
 
   //
   // Setup and configure rf radio
@@ -152,7 +154,8 @@ void loop(void)
     radio.stopListening();
 
     // Take the time, and send it.  This will block until complete
-    printf("Now sending length %i...",next_payload_size);
+    Serial.print(F("Now sending length "));
+    Serial.println(next_payload_size);
     radio.write( send_payload, next_payload_size );
 
     // Now, continue listening
@@ -168,19 +171,28 @@ void loop(void)
     // Describe the results
     if ( timeout )
     {
-      printf("Failed, response timed out.\n\r");
+      Serial.println(F("Failed, response timed out."));
     }
     else
     {
       // Grab the response, compare, and send to debugging spew
       uint8_t len = radio.getDynamicPayloadSize();
+      
+      // If a corrupt dynamic payload is received, it will be flushed
+      if(!len){
+        return; 
+      }
+      
       radio.read( receive_payload, len );
 
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
 
       // Spew it
-      printf("Got response size=%i value=%s\n\r",len,receive_payload);
+      Serial.print(F("Got response size="));
+      Serial.print(len);
+      Serial.print(F(" value="));
+      Serial.println(receive_payload);
     }
     
     // Update size for next time.
@@ -199,30 +211,34 @@ void loop(void)
   if ( role == role_pong_back )
   {
     // if there is data ready
-    if ( radio.available() )
+    while ( radio.available() )
     {
-      // Dump the payloads until we've gotten everything
-      uint8_t len;
-      bool done = false;
-      while (radio.available())
-      {
-        // Fetch the payload, and see if this was the last one.
-	len = radio.getDynamicPayloadSize();
-	radio.read( receive_payload, len );
 
-	// Put a zero at the end for easy printing
-	receive_payload[len] = 0;
-
-	// Spew it
-	printf("Got payload size=%i value=%s\n\r",len,receive_payload);
+      // Fetch the payload, and see if this was the last one.
+      uint8_t len = radio.getDynamicPayloadSize();
+      
+      // If a corrupt dynamic payload is received, it will be flushed
+      if(!len){
+        continue; 
       }
+      
+      radio.read( receive_payload, len );
+
+      // Put a zero at the end for easy printing
+      receive_payload[len] = 0;
+
+      // Spew it
+      Serial.print(F("Got response size="));
+      Serial.print(len);
+      Serial.print(F(" value="));
+      Serial.println(receive_payload);
 
       // First, stop listening so we can talk
       radio.stopListening();
 
       // Send the final one back.
       radio.write( receive_payload, len );
-      printf("Sent response.\n\r");
+      Serial.println(F("Sent response."));
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
