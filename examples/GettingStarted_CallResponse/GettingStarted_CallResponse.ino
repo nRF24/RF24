@@ -46,7 +46,7 @@ void setup(){
   radio.begin();
 
   radio.enableAckPayload();                     // Allow optional ack payloads
-  radio.enableDynamicAck();
+  radio.enableDynamicPayloads();                // Ack payloads are dynamic payloads
   
   if(radioNumber){
     radio.openWritingPipe(addresses[1]);        // Both radios listen on the same pipes by default, but opposite addresses
