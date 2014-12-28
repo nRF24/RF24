@@ -1081,7 +1081,7 @@ private:
 
   uint8_t spiTrans(uint8_t cmd);
   
-  #if defined (FAILURE_HANDLING)
+  #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 	void errNotify(void);
   #endif
   

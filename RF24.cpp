@@ -22,7 +22,7 @@ void RF24::csn(bool mode)
 	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
  			_SPI.setBitOrder(MSBFIRST);
   			_SPI.setDataMode(SPI_MODE0);
-			_SPI.setClockDivider(SPI_CLOCK_DIV4);
+			_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
 #endif
 
@@ -641,7 +641,7 @@ void RF24::begin(void)
   
   #if defined(__arm__) && ! defined( CORE_TEENSY )
   	_SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
-	_SPI.setClockDivider(csn_pin, 37);   // Set the bus speed to 8.4mhz on Due
+	_SPI.setClockDivider(csn_pin, 11);   // Set the bus speed to just under 8mhz on Due
 	_SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
   	_SPI.setDataMode(csn_pin,SPI_MODE0);
 	ce(LOW);
@@ -807,10 +807,16 @@ void RF24::powerUp(void)
 }
 
 /******************************************************************/
-#if defined (FAILURE_HANDLING)
+#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 void RF24::errNotify(){
-	IF_SERIAL_DEBUG(printf_P(PSTR("HARDWARE FAIL\r\n")));
+	#if defined (SERIAL_DEBUG) || defined (RF24_LINUX)
+	  printf_P(PSTR("RF24 HARDWARE FAIL: Radio not responding, verify pin connections, wiring, etc.\r\n"));
+	#endif
+	#if defined (FAILURE_HANDLING)
 	failureDetected = 1;
+	#else
+	delay(5000);
+	#endif
 }
 #endif
 /******************************************************************/
@@ -822,15 +828,19 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 	startFastWrite(buf,len,multicast);
 
 	//Wait until complete or failed
-	#if defined (FAILURE_HANDLING)
+	#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 		uint32_t timer = millis();
 	#endif 
 	
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { 
-		#if defined (FAILURE_HANDLING)
+		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if(millis() - timer > 75){			
 				errNotify();
-				return 0;							
+				#if defined (FAILURE_HANDLING)
+				  return 0;		
+				#else
+				  delay(100);
+				#endif
 			}
 		#endif
 	}
@@ -869,10 +879,12 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 			reUseTX();										  //Set re-transmit and clear the MAX_RT interrupt flag
 			if(millis() - timer > timeout){ return 0; }		  //If this payload has exceeded the user-defined timeout, exit and return 0
 		}
-		#if defined (FAILURE_HANDLING)
+		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if(millis() - timer > (timeout+75) ){			
 				errNotify();
-				return 0;							
+				#if defined (FAILURE_HANDLING)
+				return 0;			
+                #endif				
 			}
 		#endif
 
@@ -902,7 +914,7 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 	//Return 0 so the user can control the retrys and set a timer or failure counter if required
 	//The radio will auto-clear everything in the FIFO as long as CE remains high
 
-	#if defined (FAILURE_HANDLING)
+	#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 		uint32_t timer = millis();
 	#endif
 	
@@ -914,10 +926,12 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 			return 0;										  //Return 0. The previous payload has been retransmitted
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
-		#if defined (FAILURE_HANDLING)
+		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if(millis() - timer > 75 ){			
 				errNotify();
+				#if defined (FAILURE_HANDLING)
 				return 0;							
+				#endif
 			}
 		#endif
   	}
@@ -973,7 +987,7 @@ bool RF24::rxFifoFull(){
 /****************************************************************************/
 
 bool RF24::txStandBy(){
-    #if defined (FAILURE_HANDLING)
+    #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 		uint32_t timeout = millis();
 	#endif
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
@@ -983,10 +997,12 @@ bool RF24::txStandBy(){
 			flush_tx();    //Non blocking, flush the data
 			return 0;
 		}
-		#if defined (FAILURE_HANDLING)
+		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if( millis() - timeout > 75){
 				errNotify();
+				#if defined (FAILURE_HANDLING)
 				return 0;	
+				#endif
 			}
 		#endif
 	}
@@ -1010,10 +1026,12 @@ bool RF24::txStandBy(uint32_t timeout){
 					ce(LOW); flush_tx(); return 0;
 				}
 		}
-		#if defined (FAILURE_HANDLING)
+		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if( millis() - start > (timeout+75)){
 				errNotify();
+				#if defined (FAILURE_HANDLING)
 				return 0;	
+				#endif
 			}
 		#endif
 	}
