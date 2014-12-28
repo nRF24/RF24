@@ -80,8 +80,29 @@ C. Update other software and libraries:
      sudo apt-get upgrade  
 
 
-# RPi - RF24 Quick-Start  
-     
+#New: RPi RF24 Library Installer for all RF24 libraries
+
+A. Download the install.sh file from http://tmrh20.github.io/RF24Installer/RPi/install.sh
+
+    wget http://tmrh20.github.io/RF24Installer/RPi/install.sh  	
+
+B. Make it executable:
+
+    chmod +x install.sh  
+
+C. Run it and choose your options:  
+
+    ./install.sh  
+
+D. Run an example file from one of the libraries:
+
+    cd rf24libs/RF24/examples_RPi  
+    make  
+    sudo ./gettingstarted  
+    
+
+# RPi - RF24 Quick-Start
+
 A. Make a directory to contain the RF24 and possibly RF24Network lib and enter it:  
 
     mkdir ~/rf24libs  
@@ -111,18 +132,16 @@ A. Enter the same directory that contains the RF24 library folder
 
 B. Clone the RF24Network Repo  
 
-    git clone https://github.com/tmrh20/RF24Network.git ntemp  
+    git clone https://github.com/tmrh20/RF24Network.git RF24Network  
 
 C. Copy the RF24Network folder to the current directory, and delete the rest  
 
-    mv ntemp/RPi/RF24Network ./  
-    rm -r ntemp  
     cd RF24Network  
 
 D. Build the library  
 
     sudo make install
-    cd examples  
+    cd examples_RPi  
     make  
     sudo ./helloworld_rx   OR   sudo ./helloworld_tx  
   

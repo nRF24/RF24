@@ -18,7 +18,7 @@
 using namespace std;
 //
 // Hardware configuration
-//
+// Configure the appropriate pins for your connections
 
 // CE Pin, CSN Pin, SPI Speed
 
