@@ -42,7 +42,7 @@ void setup(){
   
   // Setup and configure rf radio
   radio.begin();
-  
+
   // Use dynamic payloads to improve response time
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);             // communicate back and forth.  One listens on it, the other talks to it.
@@ -67,7 +67,7 @@ void loop() {
                 while(micros() - round_trip_timer < 45000){
                   //delay between writes 
                 }
-                Serial.println(F("Sending ping"));
+                Serial.print(F("Sending Ping"));
                 radio.stopListening();                
                 round_trip_timer = micros();
                 radio.startWrite( &ping, sizeof(uint8_t),0 );
@@ -99,9 +99,12 @@ void check_radio(void)                                // Receiver role: Does not
     // If this is a ping, send back a pong
     if(received == ping){
       radio.stopListening();
-      // Can be important to flush the TX FIFO here if using 250KBPS data rate
-      //radio.flush_tx();
+      // Normal delay will not work here, so cycle through some no-operations (16nops @16mhz = 1us delay)
+      for(uint32_t i=0; i<130;i++){
+         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+      }
       radio.startWrite(&pong,sizeof(pong),0);
+      Serial.print("pong");
     }else    
     // If this is a pong, get the current micros()
     if(received == pong){
@@ -114,6 +117,6 @@ void check_radio(void)                                // Receiver role: Does not
   // Start listening if transmission is complete
   if( tx || fail ){
      radio.startListening(); 
-     Serial.println(tx ? F("Send:OK") : F("Send:Fail"));
+     Serial.println(tx ? F(":OK") : F(":Fail"));
   }  
 }
