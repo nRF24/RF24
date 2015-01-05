@@ -683,18 +683,27 @@ void RF24::begin(void)
   {
     p_variant = true ;
   }
-
+  
   // Then set the data rate to the slowest (and most reliable) speed supported by all
   // hardware.
   setDataRate( RF24_1MBPS ) ;
 
   // Initialize CRC and request 2-byte (16bit) CRC
   setCRCLength( RF24_CRC_16 ) ;
-
-  // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
-  toggle_features();
-  write_register(FEATURE,0 );
+  
+  // Disable per-pipe dynpd settings
   write_register(DYNPD,0);
+  
+  // Attempt to write to the 'FEATURE' register
+  write_register(FEATURE,1 );
+  // If succesful, features are activated
+  if(read_register(FEATURE)){
+    // Leave features enabled, but set the features themselves to off 
+	write_register(FEATURE,0);	
+  }else{
+    // Set ACTIVATE to enable the extra features register
+    toggle_features();
+  }
 
   // Reset current status
   // Notice reset and flush is the last thing we do
@@ -1263,7 +1272,7 @@ void RF24::enableDynamicPayloads(void)
 {
   // Enable dynamic payload throughout the system
 
-    toggle_features();
+    //toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
 
 
@@ -1286,7 +1295,7 @@ void RF24::enableAckPayload(void)
   // enable ack payload and dynamic payload features
   //
 
-    toggle_features();
+    //toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
@@ -1305,7 +1314,7 @@ void RF24::enableDynamicAck(void){
   //
   // enable dynamic ack features
   //
-    toggle_features();
+    //toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DYN_ACK) );
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
@@ -1333,7 +1342,6 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
     bcm2835_spi_transfern( (char *) spi_txbuff, size);
 
   #elif defined (__arm__) && ! defined( CORE_TEENSY )
-    csn(LOW);
 	_SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & 0b111 ), SPI_CONTINUE);
 	while ( data_len-- > 1 ){
 		_SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
