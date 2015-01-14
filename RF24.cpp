@@ -49,7 +49,7 @@ void RF24::csn(bool mode)
 		}
 	}		
 #elif !defined  (__arm__) || defined (CORE_TEENSY)
-	digitalWrite(csn_pin,mode);		
+	digitalWrite(csn_pin,mode);
 #endif
 
 }
@@ -595,16 +595,16 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-#if defined(__arm__) || defined (RF24_LINUX)
-  printf_P(PSTR("Data Rate\t = %s\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
-  printf_P(PSTR("Model\t\t = %s\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
+#if defined(__arm__) || defined (RF24_LINUX) || defined(LITTLEWIRE)
+  printf_P(PSTR("Data Rate\t = %s\r\n"), pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
+  printf_P(PSTR("Model\t\t = %s\r\n"),   pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
   printf_P(PSTR("CRC Length\t = %s\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
-  printf_P(PSTR("PA Power\t = %s\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  printf_P(PSTR("PA Power\t = %s\r\n"),  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 #else
-  printf_P(PSTR("Data Rate\t = %S\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
-  printf_P(PSTR("Model\t\t = %S\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
+  printf_P(PSTR("Data Rate\t = %S\r\n"), pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
+  printf_P(PSTR("Model\t\t = %S\r\n"),   pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
   printf_P(PSTR("CRC Length\t = %S\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
-  printf_P(PSTR("PA Power\t = %S\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  printf_P(PSTR("PA Power\t = %S\r\n"),  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 #endif
 
 }
@@ -634,6 +634,10 @@ void RF24::begin(void)
  	ce(LOW);
 	delay(100);
   
+  #elif defined(LITTLEWIRE)
+    pinMode(csn_pin,OUTPUT);
+    _SPI.begin();
+    csn(HIGH);
   #else
     // Initialize pins
   if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
@@ -646,7 +650,11 @@ void RF24::begin(void)
 	ce(LOW);
   	//csn(HIGH);
   #else
-    if (ce_pin != csn_pin) pinMode(csn_pin,OUTPUT);
+    #if ! defined(LITTLEWIRE)
+    if (ce_pin != csn_pin)
+    #endif
+        pinMode(csn_pin,OUTPUT);
+    
     _SPI.begin();
     ce(LOW);
   	csn(HIGH);
@@ -715,7 +723,7 @@ void RF24::begin(void)
 
 void RF24::startListening(void)
 {
- #if !defined (RF24_TINY)
+ #if !defined (RF24_TINY) && ! defined(LITTLEWIRE)
   powerUp();
  #endif
   write_register(CONFIG, read_register(CONFIG) | _BV(PRIM_RX));
@@ -762,7 +770,7 @@ void RF24::stopListening(void)
   //flush_rx();
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
  
-  #if defined (RF24_TINY)
+  #if defined (RF24_TINY) || defined (LITTLEWIRE)
   // for 3 pins solution TX mode is only left with additonal powerDown/powerUp cycle
   if (ce_pin == csn_pin) {
     powerDown();
