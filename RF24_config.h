@@ -26,8 +26,12 @@
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
   
-#if (defined (__linux) || defined (linux)) && !defined (__ARDUINO_X86__)
+#if ( ( defined (__linux) || defined (linux) ) && defined( __arm__ ) || defined(LITTLEWIRE) )
+  
+  #if defined(__arm__) && defined(linux)
+
   #define RF24_LINUX
+  #endif
   
   #include <stdint.h>
   #include <stdio.h>
@@ -35,7 +39,16 @@
   #include <string.h>
   #include <sys/time.h>
   #include <stddef.h>
-  #include "RPi/bcm2835.h"
+  #ifdef __arm__
+    #include "RPi/bcm2835.h"
+  #endif
+
+  // Additional fixes for LittleWire
+  #if defined(LITTLEWIRE)
+    #include <LittleWireSPI/LittleWireSPI.h>
+    #include <LittleWireSPI/avr_fixes.h>
+    extern LittleWireSPI _SPI;
+  #endif
 
   // GCC a Arduino Missing
   #define _BV(x) (1<<(x))
@@ -57,7 +70,7 @@
 	  #define printf_P(...)
     #endif
   #endif
-  
+
 #else //Everything else
 
   #if ARDUINO < 100

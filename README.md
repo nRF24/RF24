@@ -1,4 +1,4 @@
-# Optimized High Speed Arduino driver for nRF24L01 2.4GHz Wireless Transceiver
+# Optimized High Speed Arduino/Rapsberry Pi/LittleWire driver for nRF24L01 2.4GHz Wireless Transceiver
   
 Design Goals: This library is designed to be...  
   
@@ -40,34 +40,43 @@ Supported Boards:
 * Raspberry Pi
 * See the [documentation](http://tmrh20.github.io/) for more info
 
-## Pin layout
+## µC Pin layout
 
 The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
 CE and CSN are configurable.
 
-| PIN | NRF24L01 | Arduino UNO | ATtiny25/45/85 [0] | ATtiny44/84 [1] |
-|-----|----------|-------------|--------------------|-----------------|
-|  1  |   GND    |   GND       |     pin 4          |    pin 14       |
-|  2  |   VCC    |   3.3V      |     pin 8          |    pin  1       |
-|  3  |   CE     |   digIO 7   |     pin 2          |    pin 12       |
-|  4  |   CSN    |   digIO 8   |     pin 3          |    pin 11       |
-|  5  |   SCK    |   digIO 13  |     pin 7          |    pin  9       |
-|  6  |   MOSI   |   digIO 11  |     pin 6          |    pin  7       |
-|  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       |
-|  8  |   IRQ    |      -      |        -           |         -       |
+| PIN | NRF24L01 | Arduino UNO | ATtiny25/45/85 [0] | ATtiny44/84 [1] | LittleWire [2]
+|-----|----------|-------------|--------------------|-----------------|--------------
+|  1  |   GND    |   GND       |     pin 4          |    pin 14       | GND
+|  2  |   VCC    |   3.3V      |     pin 8          |    pin  1       | regulator 3.3V required
+|  3  |   CE     |   digIO 7   |     pin 2          |    pin 12       | pin to 3.3V
+|  4  |   CSN    |   digIO 8   |     pin 3          |    pin 11       | RESET
+|  5  |   SCK    |   digIO 13  |     pin 7          |    pin  9       | SCK
+|  6  |   MOSI   |   digIO 11  |     pin 6          |    pin  7       | MOSI
+|  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       | MISO
+|  8  |   IRQ    |      -      |        -           |         -       | -
 
 [0] https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
+
 [1] http://highlowtech.org/?p=1695
 
+[2] http://littlewire.cc/
 
-## Raspberry Pi Configuration:  
+### LittleWire
+
+In order to connect it directly to your LittleWire powered device (ATtiny85-based), you need
+
+* on the hardware side: regulated 3.3 volts by using some DC-DC converter like TSC295033
+* [LittleWire Wrapper library](https://github.com/lnxbil/LittleWireSPI) by [lnxbil](https://github.com/lnxbil) to bridge SPI to the computer.
+
+## Raspberry Pi
+
+### Configuration:  
    
  Library functions are mostly the same.  
  See the included examples for RPi specific usage  
  
-## Raspberry Pi - PreConfig
-    
-### Possible pre-configuration:  
+### Raspberry Pi - Possible pre-configuration:  
 If SPI is not already enabled, load it on boot:   
 
     sudo raspi-config  
@@ -101,7 +110,9 @@ D. Run an example file from one of the libraries:
     sudo ./gettingstarted  
     
 
-# RPi - RF24 Quick-Start
+
+### RPi - RF24 Quick-Start  
+     
 
 A. Make a directory to contain the RF24 and possibly RF24Network lib and enter it:  
 
@@ -124,7 +135,7 @@ D. Build the library, and run an example file:
     sudo ./gettingstarted  
   
 
-# RPi - RF24Network Quick-Start  
+### RPi - RF24Network Quick-Start  
 
 A. Enter the same directory that contains the RF24 library folder  
 
@@ -146,7 +157,7 @@ D. Build the library
     sudo ./helloworld_rx   OR   sudo ./helloworld_tx  
   
 
-# Connection Info
+### Connection Info
 
 Using pin 15/GPIO 22 for CE, pin 24/GPIO8 (CE0) for CSN
 
