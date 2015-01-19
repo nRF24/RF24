@@ -958,11 +958,13 @@ bool RF24::writeFast( const void* buf, uint8_t len ){
 //Otherwise we enter Standby-II mode, which is still faster than standby mode
 //Also, we remove the need to keep writing the config register over and over and delaying for 150 us each time if sending a stream of data
 
-void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast){ //TMRh20
+void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast, bool startTx){ //TMRh20
 
 	//write_payload( buf,len);
 	write_payload( buf, len,multicast ? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
-	ce(HIGH);
+	if(startTx){
+		ce(HIGH);
+	}
 
 }
 
@@ -993,6 +995,7 @@ bool RF24::rxFifoFull(){
 /****************************************************************************/
 
 bool RF24::txStandBy(){
+
     #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 		uint32_t timeout = millis();
 	#endif
@@ -1019,8 +1022,12 @@ bool RF24::txStandBy(){
 
 /****************************************************************************/
 
-bool RF24::txStandBy(uint32_t timeout){
+bool RF24::txStandBy(uint32_t timeout, bool startTx){
 
+    if(startTx){
+	  stopListening();
+	  ce(HIGH);
+	}
 	uint32_t start = millis();
 
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
@@ -1047,6 +1054,7 @@ bool RF24::txStandBy(uint32_t timeout){
 	return 1;
 
 }
+
 /****************************************************************************/
 
 void RF24::maskIRQ(bool tx, bool fail, bool rx){
