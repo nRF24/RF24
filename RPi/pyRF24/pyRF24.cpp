@@ -47,9 +47,9 @@ bool writeBlocking_wrap(RF24& ref, std::string buf, uint32_t timeout)
     return ref.writeBlocking(buf.c_str(), buf.length(), timeout);
 }
 
-void startFastWrite_wrap(RF24& ref, std::string buf, const bool multicast)
+void startFastWrite_wrap(RF24& ref, std::string buf, const bool multicast, bool startTx)
 {
-    ref.startFastWrite(buf.c_str(), buf.length(), multicast);
+    ref.startFastWrite(buf.c_str(), buf.length(), multicast, bool startTx);
 }
 
 void startWrite_wrap(RF24& ref, std::string buf, const bool multicast)
@@ -266,14 +266,14 @@ BOOST_PYTHON_MODULE(RF24){
         .def("setDataRate", &RF24::setDataRate, ( bp::arg("speed") ) )    
         .def("setPALevel", &RF24::setPALevel, ( bp::arg("level") ) )    
         .def("setRetries", &RF24::setRetries , (bp::arg("delay"), bp::arg("count")))    
-        .def("startFastWrite", &startFastWrite_wrap, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast") ) )    
+        .def("startFastWrite", &startFastWrite_wrap, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast"), bp::arg("startTx")=1) )    
         .def("startListening", &RF24::startListening)    
         .def("startWrite", &startWrite_wrap, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast") ) )    
         .def("stopListening", &RF24::stopListening)
         .def("testCarrier", &RF24::testCarrier)
         .def("testRPD", &RF24::testRPD)
         .def("txStandBy", (bool ( ::RF24::* )( ) ) (&RF24::txStandBy) )
-        .def("txStandBy", (bool ( ::RF24::* )( ::uint32_t ) )( &RF24::txStandBy ), ( bp::arg("timeout") ) )    
+        .def("txStandBy", (bool ( ::RF24::* )( ::uint32_t,bool ) )( &RF24::txStandBy ), ( bp::arg("timeout"), bp::arg("startTx")=0 ) )    
         .def("whatHappened", &whatHappened_wrap)    
         .def("write", &write_wrap1, ( bp::arg("buf") ) )    
         .def("write", &write_wrap2, ( bp::arg("buf"), bp::arg("multicast") ) )    
