@@ -10,20 +10,26 @@ import time
 from RF24 import *
 
 
+########### USER CONFIGURATION ###########
+# See https://github.com/TMRh20/RF24/blob/master/RPi/pyRF24/readme.md
+
 # CE Pin, CSN Pin, SPI Speed
 
 # Setup for GPIO 22 CE and GPIO 25 CSN with SPI Speed @ 1Mhz
-#radio = radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_18, BCM2835_SPI_SPEED_1MHZ)
+#radio = RF24(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_18, BCM2835_SPI_SPEED_1MHZ)
 
 # Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
 #radio = RF24(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ)
 
-# Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
+#RPi B
+# Setup for GPIO 15 CE and CE1 CSN with SPI Speed @ 8Mhz
 #radio = RF24(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ)
 
+#RPi B+
 # Setup for GPIO 22 CE and CE0 CSN for RPi B+ with SPI Speed @ 8Mhz
 radio = RF24(RPI_BPLUS_GPIO_J8_22, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ)
 
+##########################################
 
 pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
 min_payload_size = 4

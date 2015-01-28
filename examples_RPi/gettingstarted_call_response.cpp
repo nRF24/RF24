@@ -23,7 +23,7 @@ using namespace std;
 
 //
 // Hardware configuration
-//
+// Configure the appropriate pins for your connections
 
 // CE Pin, CSN Pin, SPI Speed
 
@@ -39,12 +39,17 @@ using namespace std;
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
+/********** User Config *********/
+// Assign a unique identifier for this node, 0 or 1. Arduino example uses radioNumber 0 by default.
+bool radioNumber = 1;
+
+/********************************/
+
 
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint8_t addresses[][6] = {"1Node","2Node"};
 
 bool role_ping_out = 1, role_pong_back = 0, role = 0;
-
 uint8_t counter = 1;                                                          // A single byte to keep track of the data being sent back and forth
 
 
@@ -53,10 +58,8 @@ int main(int argc, char** argv){
 
   printf("RPi/RF24/examples/gettingstarted_call_response\n");
   radio.begin();
-  radio.setAutoAck(1);                    // Ensure autoACK is enabled
   radio.enableAckPayload();               // Allow optional ack payloads
-  radio.setRetries(1,15);                 // Smallest time between retries, max no. of retries
-  radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed
+  radio.enableDynamicAck();
   radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 
 
@@ -79,14 +82,15 @@ int main(int argc, char** argv){
 /***********************************/
   // This opens two pipes for these two nodes to communicate
   // back and forth.
-    if ( role == role_ping_out )    {
+    if ( !radioNumber )    {
       radio.openWritingPipe(addresses[0]);
       radio.openReadingPipe(1,addresses[1]);
     }else{
       radio.openWritingPipe(addresses[1]);
       radio.openReadingPipe(1,addresses[0]);
-      radio.startListening();
     }
+	radio.startListening();
+	radio.writeAckPayload(1,&counter,1);
 
 // forever loop
 while (1){
@@ -116,7 +120,6 @@ while (1){
     }else{        printf("Sending failed.\n\r"); }          // If no ack response, sending failed
 
     sleep(1);  // Try again later
-    //delay(250);
   }
 
 /****************** Pong Back Role ***************************/
@@ -124,12 +127,11 @@ while (1){
   if ( role == role_pong_back ) {
     uint8_t pipeNo, gotByte;           		        // Declare variables for the pipe and the byte received
     if( radio.available(&pipeNo)){               	// Read all available payloads      
-	  radio.flush_tx();							 	// Clear any unused ACK payloads	  				  
       radio.read( &gotByte, 1 );
 													// Since this is a call-response. Respond directly with an ack payload.
-													// Ack payloads are much more efficient than switching to transmit mode to respond to a call
+	  gotByte += 1;  								// Ack payloads are much more efficient than switching to transmit mode to respond to a call
 	  radio.writeAckPayload(pipeNo,&gotByte, 1 );   // This can be commented out to send empty payloads.	  
-      printf("Sent response %d \n\r", gotByte);
+      printf("Loaded next response %d \n\r", gotByte);
 	  delay(900); //Delay after a response to minimize CPU usage on RPi
 				  //Expects a payload every second      
    }

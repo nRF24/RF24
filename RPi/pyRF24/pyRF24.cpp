@@ -47,9 +47,14 @@ bool writeBlocking_wrap(RF24& ref, std::string buf, uint32_t timeout)
     return ref.writeBlocking(buf.c_str(), buf.length(), timeout);
 }
 
-void startFastWrite_wrap(RF24& ref, std::string buf, const bool multicast)
+void startFastWrite_wrap1(RF24& ref, std::string buf, const bool multicast)
 {
     ref.startFastWrite(buf.c_str(), buf.length(), multicast);
+}
+
+void startFastWrite_wrap2(RF24& ref, std::string buf, const bool multicast, bool startTx)
+{
+    ref.startFastWrite(buf.c_str(), buf.length(), multicast, startTx);
 }
 
 void startWrite_wrap(RF24& ref, std::string buf, const bool multicast)
@@ -85,6 +90,9 @@ bp::tuple available_wrap(RF24& ref)
     result = ref.available(&pipe);
     return bp::make_tuple(result, pipe);
 }
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
+//BOOST_PYTHON_FUNCTION_OVERLOADS(txStandBy_wrap2, RF24::txStandBy, 1, 2)
 
 // ******************** enums **************************
 // from both RF24 and bcm2835
@@ -180,6 +188,14 @@ BOOST_PYTHON_MODULE(RF24){
         .value("BCM2835_SPI_CLOCK_DIVIDER_1", BCM2835_SPI_CLOCK_DIVIDER_1)
         .export_values();
 
+
+    bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
+        .value("BCM2835_SPI_CS0", BCM2835_SPI_CS0)
+        .value("BCM2835_SPI_CS1", BCM2835_SPI_CS1)
+        .value("BCM2835_SPI_CS2", BCM2835_SPI_CS2)
+        .value("BCM2835_SPI_CS_NONE", BCM2835_SPI_CS_NONE)
+        .export_values();
+
 // exposing '#define's for SPI speed as this is needed for RF24 constructor
     bp::scope().attr("BCM2835_SPI_SPEED_64MHZ") = BCM2835_SPI_SPEED_64MHZ;
     bp::scope().attr("BCM2835_SPI_SPEED_32MHZ") = BCM2835_SPI_SPEED_32MHZ;
@@ -258,14 +274,14 @@ BOOST_PYTHON_MODULE(RF24){
         .def("setDataRate", &RF24::setDataRate, ( bp::arg("speed") ) )    
         .def("setPALevel", &RF24::setPALevel, ( bp::arg("level") ) )    
         .def("setRetries", &RF24::setRetries , (bp::arg("delay"), bp::arg("count")))    
-        .def("startFastWrite", &startFastWrite_wrap, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast") ) )    
+        .def("startFastWrite", &startFastWrite_wrap1, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast") ) )    
+        .def("startFastWrite", &startFastWrite_wrap2, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast"), bp::arg("startTx") ) )    
         .def("startListening", &RF24::startListening)    
         .def("startWrite", &startWrite_wrap, ( bp::arg("buf"), bp::arg("len"), bp::arg("multicast") ) )    
         .def("stopListening", &RF24::stopListening)
         .def("testCarrier", &RF24::testCarrier)
         .def("testRPD", &RF24::testRPD)
-        .def("txStandBy", (bool ( ::RF24::* )( ) ) (&RF24::txStandBy) )
-        .def("txStandBy", (bool ( ::RF24::* )( ::uint32_t ) )( &RF24::txStandBy ), ( bp::arg("timeout") ) )    
+        .def("txStandBy", (bool ( ::RF24::* )( ::uint32_t,bool))(&RF24::txStandBy), txStandBy_wrap1( bp::args("timeout", "startTx") ) )
         .def("whatHappened", &whatHappened_wrap)    
         .def("write", &write_wrap1, ( bp::arg("buf") ) )    
         .def("write", &write_wrap2, ( bp::arg("buf"), bp::arg("multicast") ) )    
