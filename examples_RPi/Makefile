@@ -14,9 +14,7 @@
 prefix := /usr/local
 
 # The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s 
-# direct linkage to local library
-# -I../../ -L../ -Wl,-rpath=../
+CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 #CCFLAGS=
 
 # define all programs
