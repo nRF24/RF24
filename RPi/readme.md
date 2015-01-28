@@ -1,1 +1,1 @@
-See RPi/RF24/readme.md
+See https://github.com/TMRh20/RF24/blob/master/README.md

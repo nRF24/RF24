@@ -21,8 +21,6 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
-#include <avr/sleep.h>
-#include <avr/power.h>
 
 // Hardware configuration
 RF24 radio(7,8);                          // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
@@ -30,7 +28,8 @@ RF24 radio(7,8);                          // Set up nRF24L01 radio on SPI bus pl
 const short role_pin = 5;                 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
                                           // Leave open to be the 'ping' transmitter
 
-  const uint64_t address[2] = {0xABCDABCD71LL, 0x544d52687CLL};  // Radio pipe addresses for the 2 nodes to communicate.
+// Demonstrates another method of setting up the addresses
+byte address[][5] = { 0xCC,0xCE,0xCC,0xCE,0xCC , 0xCE,0xCC,0xCE,0xCC,0xCE};
 
 // Role management
 
@@ -42,9 +41,11 @@ typedef enum { role_sender = 1, role_receiver } role_e;                 // The v
 const char* role_friendly_name[] = { "invalid", "Sender", "Receiver"};  // The debug-friendly names of those roles
 role_e role;                                                            // The role of the current running sketch
 
-boolean gotMsg = 0;                                                     // So we know when to go to sleep
+static uint32_t message_count = 0;
+
 
 /********************** Setup *********************/
+
 void setup(){
 
   pinMode(role_pin, INPUT);                        // set up the role pin                  
@@ -64,7 +65,9 @@ void setup(){
 
   // Setup and configure rf radio
   radio.begin();  
+  //radio.setPALevel(RF24_PA_LOW);
   radio.enableAckPayload();                         // We will be using the Ack Payload feature, so please enable it
+  radio.enableDynamicPayloads();                    // Ack payloads are dynamic payloads
                                                     // Open pipes to other node for communication
   if ( role == role_sender ) {                      // This simple sketch opens a pipe on a single address for these two nodes to 
      radio.openWritingPipe(address[0]);             // communicate back and forth.  One listens on it, the other talks to it.
@@ -73,13 +76,14 @@ void setup(){
     radio.openWritingPipe(address[1]);
     radio.openReadingPipe(1,address[0]);
     radio.startListening();
+    radio.writeAckPayload( 1, &message_count, sizeof(message_count) );  // Add an ack packet for the next time around.  This is a simple
+    ++message_count;        
   }
-  radio.printDetails();                              // Dump the configuration of the rf unit for debugging
+  radio.printDetails();                             // Dump the configuration of the rf unit for debugging
   delay(50);
-  attachInterrupt(0, check_radio, FALLING);          // Attach interrupt handler to interrupt #0 (using pin 2) on BOTH the sender and receiver
+  attachInterrupt(0, check_radio, LOW);             // Attach interrupt handler to interrupt #0 (using pin 2) on BOTH the sender and receiver
 }
 
-static uint32_t message_count = 0;
 
 
 /********************** Main Loop *********************/

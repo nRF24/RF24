@@ -14,6 +14,7 @@
 // 	Any CE pin can be used
 // 	For use with optimized RPi RF24 and RF24 Network libs - see github.com/TMRh20
 //****************************************/
+#if defined (__linux) || defined (LINUX)
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1361,5 +1362,5 @@ int main(int argc, char **argv)
 }
 #endif
 
-
+#endif //Linux
 
