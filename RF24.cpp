@@ -676,6 +676,9 @@ void RF24::begin(void)
   // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
   delay( 5 ) ;
 
+  // Reset CONFIG and enable 16-bit CRC.
+  write_register( CONFIG, 0b00001100 ) ;
+
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
   // sizes must never be used. See documentation for a more complete explanation.
@@ -698,7 +701,7 @@ void RF24::begin(void)
   setDataRate( RF24_1MBPS ) ;
 
   // Initialize CRC and request 2-byte (16bit) CRC
-  setCRCLength( RF24_CRC_16 ) ;
+  //setCRCLength( RF24_CRC_16 ) ;
 
   // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
   toggle_features();
@@ -1280,7 +1283,7 @@ void RF24::enableDynamicPayloads(void)
 {
   // Enable dynamic payload throughout the system
 
-    toggle_features();
+    //toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DPL) );
 
 
@@ -1303,7 +1306,7 @@ void RF24::enableAckPayload(void)
   // enable ack payload and dynamic payload features
   //
 
-    toggle_features();
+    //toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
@@ -1322,7 +1325,7 @@ void RF24::enableDynamicAck(void){
   //
   // enable dynamic ack features
   //
-    toggle_features();
+    //toggle_features();
     write_register(FEATURE,read_register(FEATURE) | _BV(EN_DYN_ACK) );
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
