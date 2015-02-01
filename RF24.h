@@ -16,8 +16,10 @@
 #define __RF24_H__
 
 #include "RF24_config.h"
-#if (defined (__linux) || defined (LINUX)) && !defined (__ARDUINO_X86__)
+#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ )
   #include "RPi/bcm2835.h"
+#elif LITTLEWIRE
+  #include <LittleWireSPI/LittleWireSPI.h>
 #elif defined SOFTSPI
   #include <DigitalIO.h>
 #endif
@@ -463,7 +465,7 @@ s   *
    * @return True if transmission is successful
    *
    */
-   bool txStandBy(uint32_t timeout);
+   bool txStandBy(uint32_t timeout, bool startTx = 0);
 
   /**
    * Write an ack payload for the specified pipe
@@ -543,7 +545,7 @@ s   *
    * @param multicast Request ACK (0) or NOACK (1)
    * @return True if the payload was delivered successfully false if not
    */
-  void startFastWrite( const void* buf, uint8_t len, const bool multicast );
+  void startFastWrite( const void* buf, uint8_t len, const bool multicast, bool startTx = 1 );
 
   /**
    * Non-blocking write to the open writing pipe
@@ -566,7 +568,7 @@ s   *
    *
    */
   void startWrite( const void* buf, uint8_t len, const bool multicast );
-
+  
   /**
    * This function is mainly used internally to take advantage of the auto payload
    * re-use functionality of the chip, but can be beneficial to users as well.
