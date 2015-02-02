@@ -16,7 +16,7 @@
 #define __RF24_H__
 
 #include "RF24_config.h"
-#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ )
+#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) && !defined (RF24_BBB)
   #include "RPi/bcm2835.h"
 #elif LITTLEWIRE
   #include <LittleWireSPI/LittleWireSPI.h>
@@ -56,6 +56,10 @@ private:
   SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
 #elif defined (SPI_UART)
   SPIUARTClass uspi;
+#endif
+
+#ifdef RF24_BBB
+  SPI spi;
 #endif
 
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
