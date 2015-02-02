@@ -25,8 +25,15 @@
   /**********************/
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
+
+#if defined __ARM_ARCH_7A__ //|| defined __linux || defined (linux)// BeagleBone Black running GNU/Linux
+
+  #define RF24_BBB
+  #include "arch/BBB/RF24_arch_config.h"
+  #define _SPI spi
+  #define millis __millis
   
-#if ( ( defined (__linux) || defined (linux) ) && defined( __arm__ ) || defined(LITTLEWIRE) )
+#elif ( ( defined (__linux) || defined (linux) ) && defined( __arm__ ) || defined(LITTLEWIRE) )
   
   #if defined(__arm__) && defined(linux)
 
