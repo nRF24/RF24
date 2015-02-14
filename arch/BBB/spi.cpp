@@ -24,7 +24,7 @@ SPI::SPI() {
 	this->speed = 8000000; // 8Mhz 
 //	this->speed = 4000000;
 //	this->speed = 2000000; // 2Mhz 
-
+    //this->mode |= SPI_NO_CS;
 	this->init();
 }
 
@@ -48,12 +48,12 @@ void SPI::init()
 		abort();		
 	}
 
-	ret = ioctl(this->fd, SPI_IOC_RD_MODE, &this->mode);
+	/*ret = ioctl(this->fd, SPI_IOC_RD_MODE, &this->mode);
 	if (ret == -1)
 	{
 		perror("can't set spi mode");
 		abort();				
-	}
+	}*/
 	
 	/*
 	 * bits per word
@@ -81,12 +81,12 @@ void SPI::init()
 		abort();						
 	}
 
-	ret = ioctl(this->fd, SPI_IOC_RD_MAX_SPEED_HZ, &this->speed);
+	/*ret = ioctl(this->fd, SPI_IOC_RD_MAX_SPEED_HZ, &this->speed);
 	if (ret == -1)
 	{
 		perror("can't set max speed hz");
 		abort();						
-	}
+	}*/
 }
 
 uint8_t SPI::transfer(uint8_t tx_)
@@ -115,6 +115,42 @@ uint8_t SPI::transfer(uint8_t tx_)
 
 	return rx[0];
 }
+
+//void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
+void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
+{
+	
+	
+	int ret;
+	// One byte is transfered at once
+	//uint8_t tx[] = {0};
+	//tx[0] = tx_;
+
+	//uint8_t rx[ARRAY_SIZE(tx)] = {0};
+	struct spi_ioc_transfer tr;
+	tr.tx_buf = (unsigned long)tbuf;//(unsigned long)tx;
+	tr.rx_buf = (unsigned long)rbuf;//(unsigned long)rx;
+	tr.len = len;//ARRAY_SIZE(tx);
+	tr.delay_usecs = 0;
+	tr.cs_change = 1;
+	tr.speed_hz = this->speed;
+	tr.bits_per_word = this->bits;
+
+	ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
+	if (ret < 1)
+	{
+		perror("can't send spi message");
+		abort();		
+	}
+
+	//return rx[0];
+}
+
+void SPI::transfern(char* buf, uint32_t len)
+{
+    transfernb(buf, buf, len);
+}
+
 
 SPI::~SPI() {
 	close(this->fd);

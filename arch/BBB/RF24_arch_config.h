@@ -10,6 +10,7 @@
 #ifndef __ARCH_CONFIG_H__
 #define __ARCH_CONFIG_H__
 
+#define RF24_LINUX
 
 #include <stddef.h>
 #include "spi.h"
@@ -22,6 +23,7 @@
 #include <sys/time.h>
 
 #define _BV(x) (1<<(x))
+#define _SPI spi
 
 #undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG

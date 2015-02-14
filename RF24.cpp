@@ -26,14 +26,16 @@ void RF24::csn(bool mode)
 	#endif
 #endif
 
-#if defined (RF24_LINUX)
-    //if(!mode){
-	  bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
-	  bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-	  bcm2835_spi_setClockDivider(spi_speed);
-      bcm2835_spi_chipSelect(csn_pin);
-      delayMicroseconds(5);
+#if defined (RF24_RPI)
+    if(!mode){
 
+	  _SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
+	  _SPI.setDataMode(BCM2835_SPI_MODE0);
+	  _SPI.setClockDivider(spi_speed);
+      _SPI.chipSelect(csn_pin);
+	  
+      delayMicroseconds(5);
+	}
 #elif defined (RF24_TINY)
 	if (ce_pin != csn_pin) {
 		digitalWrite(csn_pin,mode);
@@ -49,8 +51,10 @@ void RF24::csn(bool mode)
 		}
 	}		
 #elif !defined  (__arm__) || defined (CORE_TEENSY) || defined (RF24_BBB)
-	digitalWrite(csn_pin,mode);	
-    delayMicroseconds(5);	
+	digitalWrite(csn_pin,mode);
+	#if !defined (RF24_BBB)
+    delayMicroseconds(5);
+	#endif
 #endif
 
 }
@@ -59,12 +63,8 @@ void RF24::csn(bool mode)
 
 void RF24::ce(bool level)
 {
-  #if defined (RF24_LINUX)
-  bcm2835_gpio_write(ce_pin, level);
-#else
   //Allow for 3-pin use on ATTiny
   if (ce_pin != csn_pin) digitalWrite(ce_pin,level);
-#endif
 }
 
 /****************************************************************************/
@@ -83,12 +83,13 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 
   while (len--){ *ptx++ = NOP; } // Dummy operation, just for reading
   
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+  
   status = *prx++; // status is 1st byte of receive buffer
 
   // decrement before to skip status byte
   while ( --size ){ *buf++ = *prx++; } 
-  
+  csn(HIGH);
 #elif defined (RF24_DUE)
   status = _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
   while ( len-- > 1 ){
@@ -124,9 +125,9 @@ uint8_t RF24::read_register(uint8_t reg)
   *ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
   *ptx++ = NOP ; // Dummy operation, just for reading
   
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = *++prx;   // result is 2nd byte of receive buffer  
-  
+  csn(HIGH);
   #elif defined (RF24_DUE)
   _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ) , SPI_CONTINUE);
   result = _SPI.transfer(csn_pin,0xff);
@@ -147,7 +148,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 {
   uint8_t status;
 
-  #if defined (RF24_LINUX)
+  #if defined (RF24_LINUX) 
 
   csn(LOW);
   uint8_t * prx = spi_rxbuff;
@@ -158,9 +159,9 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   while ( len-- )
     *ptx++ = *buf++;
   
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
   status = *prx; // status is 1st byte of receive buffer
-  
+  csn(HIGH);
   #elif defined (RF24_DUE)
   	status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
     while ( --len){
@@ -196,9 +197,9 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
 	*ptx = value ;	
   	
-	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 	status = *prx++; // status is 1st byte of receive buffer
-	
+	csn(HIGH);
   #elif defined (RF24_DUE)
   status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE);
   _SPI.transfer(csn_pin,value);
@@ -240,9 +241,9 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
     while ( blank_len-- )
 	  *ptx++ =  0;
 	
-	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 	status = *prx; // status is 1st byte of receive buffer
-	
+	csn(HIGH);
  #elif defined (RF24_DUE)
 
   status = _SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
@@ -271,7 +272,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   }
   while ( blank_len-- ) {
     _SPI.transfer(0);
-  }
+  }  
   csn(HIGH);
 
   #endif
@@ -306,7 +307,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 		
 	size = data_len + blank_len + 1; // Size has been lost during while, re affect
 	
-	bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
+	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 	
 	status = *prx++; // 1st byte is status	
     
@@ -314,7 +315,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
         *current++ = *prx++;
 		
 	*current = *prx;
-
+    csn(HIGH);
   #elif defined (RF24_DUE)
 
   status = _SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
@@ -373,7 +374,8 @@ uint8_t RF24::spiTrans(uint8_t cmd){
   uint8_t status;
   #if defined (RF24_LINUX)
     csn(LOW);
-    status = bcm2835_spi_transfer( cmd );
+    status = _SPI.transfer( cmd );
+	csn(HIGH);
   #elif defined (RF24_DUE)
 	status = _SPI.transfer(csn_pin, cmd );
   #else
@@ -553,7 +555,7 @@ static const char * const rf24_csn_e_str_P[] = {
 void RF24::printDetails(void)
 {
 
-#if defined (RF24_LINUX)
+#if defined (RF24_RPi)
   printf("================ SPI Configuration ================\n" );
   if (csn_pin < BCM2835_SPI_CS_NONE ){
     printf("CSN Pin  \t = %s\n",rf24_csn_e_str_P[csn_pin]);
@@ -628,23 +630,21 @@ void RF24::begin(void)
     pinMode(csn_pin,OUTPUT);
 
     ce(LOW);
-    csn(HIGH);
-  #elif defined(RF24_LINUX)
+    csn(HIGH);	
+  #elif defined(RF24_RPi)
 	// Init BCM2835 chipset for talking with us
-	if (!bcm2835_init()){
-		return;
-	}
-    switch(csn_pin){     //Ensure valid hardware CS pin
+	SPI();
+	switch(csn_pin){     //Ensure valid hardware CS pin
 		case 0: break;
 		case 1: break;
 		case 8: csn_pin = 0; break;
 		case 7: csn_pin = 1; break;
 		default: csn_pin = 0; break;
 	}	
-	bcm2835_spi_begin();
+	_SPI.begin();	
 	// Initialise the CE pin of NRF24 (chip enable) after the CSN pin, so that
 	// The input mode is not changed if using one of the hardware CE pins
-	bcm2835_gpio_fsel(ce_pin, BCM2835_GPIO_FSEL_OUTP);
+	bcm2835_gpio_fsel(ce_pin, BCM2835_GPIO_FSEL_OUTP);	
  	ce(LOW);
 	delay(100);
   
@@ -821,7 +821,6 @@ void RF24::powerUp(void)
 	  // There must be a delay of Tpd2stby (see Table 16.) after the nRF24L01+ leaves power down mode before
 	  // the CEis set high. - Tpd2stby can be up to 5ms per the 1.0 datasheet
       delay(5);
-
    }
 }
 
@@ -1085,8 +1084,9 @@ uint8_t RF24::getDynamicPayloadSize(void)
   spi_txbuff[0] = R_RX_PL_WID;
   spi_rxbuff[1] = 0xff;
   csn(LOW);
-  bcm2835_spi_transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = spi_rxbuff[1];  
+  csn(HIGH);
   #elif defined (RF24_DUE)
   _SPI.transfer(csn_pin, R_RX_PL_WID, SPI_CONTINUE );
   result = _SPI.transfer(csn_pin,0xff);
@@ -1274,8 +1274,9 @@ void RF24::toggle_features(void)
 
   #if defined (RF24_LINUX)
     csn(LOW);
-    bcm2835_spi_transfer( ACTIVATE );
-    bcm2835_spi_transfer( 0x73 );
+    _SPI.transfer( ACTIVATE );
+    _SPI.transfer( 0x73 );
+	csn(HIGH);
   #elif defined (RF24_DUE)
   _SPI.transfer(csn_pin, ACTIVATE, SPI_CONTINUE );
   _SPI.transfer(csn_pin, 0x73 );
@@ -1360,8 +1361,8 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
       *ptx++ =  *current++;
     }
 	
-    bcm2835_spi_transfern( (char *) spi_txbuff, size);
-
+    _SPI.transfern( (char *) spi_txbuff, size);
+	csn(HIGH);
   #elif defined (RF24_DUE)
 	_SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & 0b111 ), SPI_CONTINUE);
 	while ( data_len-- > 1 ){
@@ -1510,7 +1511,6 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   {
     result = true;
   }
-
   return result;
 }
 

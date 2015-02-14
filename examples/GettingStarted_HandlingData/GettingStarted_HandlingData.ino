@@ -23,6 +23,15 @@ RF24 radio(7,8);
 // Used to control whether this node is sending or receiving
 bool role = 0;
 
+/**
+* Create a data structure for transmitting and receiving data
+* This allows many variables to be easily sent and received in a single transmission
+* See http://www.cplusplus.com/doc/tutorial/structures/
+*/
+struct dataStruct{
+  unsigned long _micros;
+  float value;
+}myData;
 
 void setup() {
 
@@ -45,21 +54,11 @@ void setup() {
     radio.openReadingPipe(1,addresses[1]);
   }
   
+  myData.value = 1.22;
   // Start the radio listening for data
   radio.startListening();
 }
 
-
-
-/**
-* Create a data structure for transmitting and receiving data
-* This allows many variables to be easily sent and received in a single transmission
-* See http://www.cplusplus.com/doc/tutorial/structures/
-*/
-struct dataStruct{
-  unsigned long _micros;
-  float value = 1.22;  
-}myData;
 
 
 
@@ -160,4 +159,3 @@ if (role == 1)  {
 
 
 } // Loop
-

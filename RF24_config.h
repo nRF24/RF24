@@ -26,69 +26,35 @@
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
 
-#if defined __ARM_ARCH_7A__ //|| defined __linux || defined (linux)// BeagleBone Black running GNU/Linux
 
-  #define RF24_BBB
-  #include "arch/BBB/RF24_arch_config.h"
-  #define _SPI spi
-  #define millis __millis
+//Generic Linux/ARM
+#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
 
-#elif defined ARDUINO_SAM_DUE //Arduino Due
+  // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /arch/includes.h
+  // The includes.h file defines either RF24_RPi or RF24_BBB and includes the correct RF24_arch_config.h file
+  #include "arch/includes.h"
+
+//Arduino Due
+#elif defined ARDUINO_SAM_DUE 
   
   #define RF24_DUE
   #include "arch/Due/RF24_arch_config.h"
 
+//ATTiny  
 #elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-
+  
   #define RF24_TINY
   #include "arch/ATTiny/RF24_arch_config.h"
-		
-#elif ( ( defined (__linux) || defined (linux) ) && defined( __arm__ ) || defined(LITTLEWIRE) )
+
+//LittleWire  
+#elif defined(LITTLEWIRE)
   
-  #if defined(__arm__) && defined(linux)
+  #include "arch/LittleWire/RF24_arch_config.h"
 
-  #define RF24_LINUX
-  #endif
   
-  #include <stdint.h>
-  #include <stdio.h>
-  #include <time.h>
-  #include <string.h>
-  #include <sys/time.h>
-  #include <stddef.h>
-  #ifdef __arm__
-    #include "RPi/bcm2835.h"
-  #endif
-
-  // Additional fixes for LittleWire
-  #if defined(LITTLEWIRE)
-    #include <LittleWireSPI/LittleWireSPI.h>
-    #include <LittleWireSPI/avr_fixes.h>
-    extern LittleWireSPI _SPI;
-  #endif
-
-  // GCC a Arduino Missing
-  #define _BV(x) (1<<(x))
-  #define pgm_read_word(p) (*(p))
-  #define pgm_read_byte(p) (*(p))
   
-  //typedef uint16_t prog_uint16_t;
-  #define PSTR(x) (x)
-  #define printf_P printf
-  #define strlen_P strlen
-  #define PROGMEM
-  #define PRIPSTR "%s"
-
-  #ifdef SERIAL_DEBUG
-	#define IF_SERIAL_DEBUG(x) ({x;})
-  #else
-	#define IF_SERIAL_DEBUG(x)
-	#if defined(RF24_TINY)
-	  #define printf_P(...)
-    #endif
-  #endif
-
-#else //Everything else
+//Everything else
+#else 
 
   #if ARDUINO < 100
 	#include <WProgram.h>
@@ -104,6 +70,8 @@
 	#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
 		#define RF24_TINY
 		#define _SPI SPI
+		#include "arch/ATTiny/RF24_arch_config.h"
+		
 	#else
       #if defined SPI_UART
 		#include <SPI_UART.h>
