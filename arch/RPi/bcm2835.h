@@ -29,7 +29,7 @@
 /// BCM 2835).
 ///
 /// The version of the package that this documentation refers to can be downloaded 
-/// from http://www.airspayce.com/mikem/bcm2835/bcm2835-1.36.tar.gz
+/// from http://www.airspayce.com/mikem/bcm2835/bcm2835-1.39.tar.gz
 /// You can find the latest version at http://www.airspayce.com/mikem/bcm2835
 ///
 /// Several example programs are provided.
@@ -316,6 +316,12 @@
 /// \version 1.37 Moved confiure.in to configure.ac as receommnded by autoreconf.<br>
 ///               Improvements to bcm2835_st_read to account for possible timer overflow, contributed by 'Ed'.<br>
 ///               Added definitions for Raspberry Pi B+ J8 header GPIO pins.<br>
+/// \version 1.38 Added bcm2835_regbase for the benefit of C# wrappers, patch by Frank Hommers <br>
+/// \version 1.39 Beta version of RPi2 compatibility. Not tested here on RPi2 hardware. 
+///               Testers please confirm correct operation on RPi2.<br>
+///               Unneccessary 'volatile' qualifiers removed from all variables and signatures.<br>
+///               Removed unsupportable PWM dividers, based on a report from Christophe Cecillon.<br>
+///               Minor improvements to spi.c example.<br>
 ///
 /// \author  Mike McCauley (mikem@airspayce.com) DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS
 
@@ -340,58 +346,92 @@
 /// Speed of the core clock core_clk
 #define BCM2835_CORE_CLK_HZ				250000000	///< 250 MHz
 
-// Physical addresses for various peripheral register sets
-/// Base Physical Address of the BCM 2835 peripheral registers
-#define BCM2835_PERI_BASE               0x20000000
-/// Base Physical Address of the System Timer registers
-#define BCM2835_ST_BASE			(BCM2835_PERI_BASE + 0x3000)
-/// Base Physical Address of the Pads registers
-#define BCM2835_GPIO_PADS               (BCM2835_PERI_BASE + 0x100000)
-/// Base Physical Address of the Clock/timer registers
-#define BCM2835_CLOCK_BASE              (BCM2835_PERI_BASE + 0x101000)
-/// Base Physical Address of the GPIO registers
-#define BCM2835_GPIO_BASE               (BCM2835_PERI_BASE + 0x200000)
-/// Base Physical Address of the SPI0 registers
-#define BCM2835_SPI0_BASE               (BCM2835_PERI_BASE + 0x204000)
-/// Base Physical Address of the BSC0 registers
-#define BCM2835_BSC0_BASE 		(BCM2835_PERI_BASE + 0x205000)
-/// Base Physical Address of the PWM registers
-#define BCM2835_GPIO_PWM                (BCM2835_PERI_BASE + 0x20C000)
- /// Base Physical Address of the BSC1 registers
-#define BCM2835_BSC1_BASE		(BCM2835_PERI_BASE + 0x804000)
+/// On RPi2 with BCM2836, the base of the peripherals is read from a /proc file
+#define BMC2835_RPI2_DT_FILENAME "/proc/device-tree/soc/ranges"
+/// On RPi2, offset into BMC2835_RPI2_DT_FILENAME for the peripherals base address
+#define BMC2835_RPI2_DT_PERI_BASE_ADDRESS_OFFSET 4
+/// On RPi2, offset into BMC2835_RPI2_DT_FILENAME for the peripherals size address
+#define BMC2835_RPI2_DT_PERI_SIZE_OFFSET 8
 
+/// Physical addresses for various peripheral register sets
+/// Base Physical Address of the BCM 2835 peripheral registers
+/// Note this is different for the RPi2 BCM2836, where this isderived from /proc/device-tree/soc/ranges
+#define BCM2835_PERI_BASE               0x20000000
+/// Size of the perioherals block on RPi 1
+#define BCM2835_PERI_SIZE               0x01000000
+
+/// Offsets for the bases of various peripherals within the peripherals block
+/// Base Address of the System Timer registers
+#define BCM2835_ST_BASE			0x3000
+/// Base Address of the Pads registers
+#define BCM2835_GPIO_PADS               0x100000
+/// Base Address of the Clock/timer registers
+#define BCM2835_CLOCK_BASE              0x101000
+/// Base Address of the GPIO registers
+#define BCM2835_GPIO_BASE               0x200000
+/// Base Address of the SPI0 registers
+#define BCM2835_SPI0_BASE               0x204000
+/// Base Address of the BSC0 registers
+#define BCM2835_BSC0_BASE 		0x205000
+/// Base Address of the PWM registers
+#define BCM2835_GPIO_PWM                0x20C000
+/// Base Address of the BSC1 registers
+#define BCM2835_BSC1_BASE		0x804000
+
+/// Physical address and size of the peripherals block
+/// May be overridden on RPi2
+extern uint32_t *bcm2835_peripherals_base;
+/// Size of the peripherals block to be mapped
+extern uint32_t bcm2835_peripherals_size;
+
+/// Virtual memory address of the mapped peripherals block
+extern void *bcm2835_peripherals;
 
 /// Base of the ST (System Timer) registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_st;
+extern uint32_t *bcm2835_st;
 
 /// Base of the GPIO registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_gpio;
+extern uint32_t *bcm2835_gpio;
 
 /// Base of the PWM registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_pwm;
+extern uint32_t *bcm2835_pwm;
 
 /// Base of the CLK registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_clk;
+extern uint32_t *bcm2835_clk;
 
 /// Base of the PADS registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_pads;
+extern uint32_t *bcm2835_pads;
 
 /// Base of the SPI0 registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_spi0;
+extern uint32_t *bcm2835_spi0;
 
 /// Base of the BSC0 registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_bsc0;
+extern uint32_t *bcm2835_bsc0;
 
 /// Base of the BSC1 registers.
 /// Available after bcm2835_init has been called
-extern volatile uint32_t *bcm2835_bsc1;
+extern uint32_t *bcm2835_bsc1;
+
+/// \brief bcm2835RegisterBase
+/// Register bases for bcm2835_regbase()
+typedef enum
+{
+    BCM2835_REGBASE_ST   = 1, ///< Base of the ST (System Timer) registers.
+    BCM2835_REGBASE_GPIO = 2, ///< Base of the GPIO registers.
+    BCM2835_REGBASE_PWM  = 3, ///< Base of the PWM registers.
+    BCM2835_REGBASE_CLK  = 4, ///< Base of the CLK registers.
+    BCM2835_REGBASE_PADS = 5, ///< Base of the PADS registers.
+    BCM2835_REGBASE_SPI0 = 6, ///< Base of the SPI0 registers.
+    BCM2835_REGBASE_BSC0 = 7, ///< Base of the BSC0 registers.
+    BCM2835_REGBASE_BSC1 = 8 ///< Base of the BSC1 registers.
+} bcm2835RegisterBase;
 
 /// Size of memory page on RPi
 #define BCM2835_PAGE_SIZE               (4*1024)
@@ -437,24 +477,24 @@ extern volatile uint32_t *bcm2835_bsc1;
 /// Port function select modes for bcm2835_gpio_fsel()
 typedef enum
 {
-    BCM2835_GPIO_FSEL_INPT  = 0x00,   ///< Input
-    BCM2835_GPIO_FSEL_OUTP  = 0x01,   ///< Output
-    BCM2835_GPIO_FSEL_ALT0  = 0x04,   ///< Alternate function 0
-    BCM2835_GPIO_FSEL_ALT1  = 0x05,   ///< Alternate function 1
-    BCM2835_GPIO_FSEL_ALT2  = 0x06,   ///< Alternate function 2
-    BCM2835_GPIO_FSEL_ALT3  = 0x07,   ///< Alternate function 3
-    BCM2835_GPIO_FSEL_ALT4  = 0x03,   ///< Alternate function 4
-    BCM2835_GPIO_FSEL_ALT5  = 0x02,   ///< Alternate function 5
-    BCM2835_GPIO_FSEL_MASK  = 0x07    ///< Function select bits mask
+    BCM2835_GPIO_FSEL_INPT  = 0b000,   ///< Input
+    BCM2835_GPIO_FSEL_OUTP  = 0b001,   ///< Output
+    BCM2835_GPIO_FSEL_ALT0  = 0b100,   ///< Alternate function 0
+    BCM2835_GPIO_FSEL_ALT1  = 0b101,   ///< Alternate function 1
+    BCM2835_GPIO_FSEL_ALT2  = 0b110,   ///< Alternate function 2
+    BCM2835_GPIO_FSEL_ALT3  = 0b111,   ///< Alternate function 3
+    BCM2835_GPIO_FSEL_ALT4  = 0b011,   ///< Alternate function 4
+    BCM2835_GPIO_FSEL_ALT5  = 0b010,   ///< Alternate function 5
+    BCM2835_GPIO_FSEL_MASK  = 0b111    ///< Function select bits mask
 } bcm2835FunctionSelect;
 
 /// \brief bcm2835PUDControl
 /// Pullup/Pulldown defines for bcm2835_gpio_pud()
 typedef enum
 {
-    BCM2835_GPIO_PUD_OFF     = 0x00,   ///< Off ? disable pull-up/down
-    BCM2835_GPIO_PUD_DOWN    = 0x01,   ///< Enable Pull Down control
-    BCM2835_GPIO_PUD_UP      = 0x02    ///< Enable Pull Up control
+    BCM2835_GPIO_PUD_OFF     = 0b00,   ///< Off ? disable pull-up/down
+    BCM2835_GPIO_PUD_DOWN    = 0b01,   ///< Enable Pull Down control
+    BCM2835_GPIO_PUD_UP      = 0b10    ///< Enable Pull Up control
 } bcm2835PUDControl;
 
 /// Pad control register offsets from BCM2835_GPIO_PADS
@@ -494,7 +534,9 @@ typedef enum
 /// RPi B+ has yet differnet pinouts and these are defined in RPI_BPLUS_*.
 /// At bootup, pins 8 and 10 are set to UART0_TXD, UART0_RXD (ie the alt0 function) respectively
 /// When SPI0 is in use (ie after bcm2835_spi_begin()), SPI0 pins are dedicated to SPI
-/// and cant be controlled independently
+/// and cant be controlled independently.
+/// If you are using the RPi Compute Module, just use the GPIO number: there is no need to use one of these
+/// symbolic names
 typedef enum
 {
     RPI_GPIO_P1_03        =  0,  ///< Version 1, Pin P1-03
@@ -629,12 +671,10 @@ typedef enum
 /// Specify the SPI chip select pin(s)
 typedef enum
 {
-	// Can also use non-standard pins with this lib
     BCM2835_SPI_CS0 = 0,     ///< Chip Select 0
     BCM2835_SPI_CS1 = 1,     ///< Chip Select 1
     BCM2835_SPI_CS2 = 2,     ///< Chip Select 2 (ie pins CS1 and CS2 are asserted)
     BCM2835_SPI_CS_NONE = 3, ///< No CS, control it yourself
-
 } bcm2835SPIChipSelect;
 
 /// \brief bcm2835SPIClockDivider
@@ -681,6 +721,7 @@ typedef enum
 #define BCM2835_SPI_SPEED_32KHZ BCM2835_SPI_CLOCK_DIVIDER_8192
 #define BCM2835_SPI_SPEED_16KHZ BCM2835_SPI_CLOCK_DIVIDER_16384
 #define BCM2835_SPI_SPEED_8KHZ BCM2835_SPI_CLOCK_DIVIDER_32768
+
 
 // Defines for I2C
 // GPIO register offsets from BCM2835_BSC*_BASE.
@@ -788,7 +829,6 @@ typedef enum
 #define BCM2835_PWM0_SERIAL     0x0002  ///< Run in serial mode
 #define BCM2835_PWM0_ENABLE     0x0001  ///< Channel Enable
 
-
 /// \brief bcm2835PWMClockDivider
 /// Specifies the divider used to generate the PWM clock from the system clock.
 /// Figures below give the divider, clock period and clock frequency.
@@ -796,10 +836,6 @@ typedef enum
 /// The frequencies shown for each divider have been confirmed by measurement
 typedef enum
 {
-    BCM2835_PWM_CLOCK_DIVIDER_32768 = 32768,   ///< 32768 = 585Hz
-    BCM2835_PWM_CLOCK_DIVIDER_16384 = 16384,   ///< 16384 = 1171.8Hz
-    BCM2835_PWM_CLOCK_DIVIDER_8192  = 8192,    ///< 8192 = 2.34375kHz
-    BCM2835_PWM_CLOCK_DIVIDER_4096  = 4096,    ///< 4096 = 4.6875kHz
     BCM2835_PWM_CLOCK_DIVIDER_2048  = 2048,    ///< 2048 = 9.375kHz
     BCM2835_PWM_CLOCK_DIVIDER_1024  = 1024,    ///< 1024 = 18.75kHz
     BCM2835_PWM_CLOCK_DIVIDER_512   = 512,     ///< 512 = 37.5kHz
@@ -859,13 +895,20 @@ extern "C" {
     /// 
     /// @{
 
+    /// Gets the base of a register
+    /// \param[in] regbase You can use one of the common values BCM2835_REGBASE_*
+    /// in \ref bcm2835RegisterBase
+    /// \return the register base
+    /// \sa Physical Addresses
+    extern uint32_t* bcm2835_regbase(uint8_t regbase);
+
     /// Reads 32 bit value from a peripheral address
     /// The read is done twice, and is therefore always safe in terms of 
     /// manual section 1.3 Peripheral access precautions for correct memory ordering
     /// \param[in] paddr Physical address to read from. See BCM2835_GPIO_BASE etc.
     /// \return the value read from the 32 bit register
     /// \sa Physical Addresses
-    extern uint32_t bcm2835_peri_read(volatile uint32_t* paddr);
+    extern uint32_t bcm2835_peri_read(uint32_t* paddr);
 
 
     /// Reads 32 bit value from a peripheral address without the read barrier
@@ -874,7 +917,7 @@ extern "C" {
     /// \param[in] paddr Physical address to read from. See BCM2835_GPIO_BASE etc.
     /// \return the value read from the 32 bit register
     /// \sa Physical Addresses
-    extern uint32_t bcm2835_peri_read_nb(volatile uint32_t* paddr);
+    extern uint32_t bcm2835_peri_read_nb(uint32_t* paddr);
 
 
     /// Writes 32 bit value from a peripheral address
@@ -883,7 +926,7 @@ extern "C" {
     /// \param[in] paddr Physical address to read from. See BCM2835_GPIO_BASE etc.
     /// \param[in] value The 32 bit value to write
     /// \sa Physical Addresses
-    extern void bcm2835_peri_write(volatile uint32_t* paddr, uint32_t value);
+    extern void bcm2835_peri_write(uint32_t* paddr, uint32_t value);
 
     /// Writes 32 bit value from a peripheral address without the write barrier
     /// You should only use this when your code has previously called bcm2835_peri_write()
@@ -891,7 +934,7 @@ extern "C" {
     /// \param[in] paddr Physical address to read from. See BCM2835_GPIO_BASE etc.
     /// \param[in] value The 32 bit value to write
     /// \sa Physical Addresses
-    extern void bcm2835_peri_write_nb(volatile uint32_t* paddr, uint32_t value);
+    extern void bcm2835_peri_write_nb(uint32_t* paddr, uint32_t value);
 
     /// Alters a number of bits in a 32 peripheral regsiter.
     /// It reads the current valu and then alters the bits deines as 1 in mask, 
@@ -904,7 +947,7 @@ extern "C" {
     /// \param[in] value The 32 bit value to write, masked in by mask.
     /// \param[in] mask Bitmask that defines the bits that will be altered in the register.
     /// \sa Physical Addresses
-    extern void bcm2835_peri_set_bits(volatile uint32_t* paddr, uint32_t value, uint32_t mask);
+    extern void bcm2835_peri_set_bits(uint32_t* paddr, uint32_t value, uint32_t mask);
     /// @} // end of lowlevel
 
     /// \defgroup gpio GPIO register access
@@ -1107,89 +1150,79 @@ extern "C" {
     /// \param[in] pud The desired Pull-up/down mode. One of BCM2835_GPIO_PUD_* from bcm2835PUDControl
     extern void bcm2835_gpio_set_pud(uint8_t pin, uint8_t pud);
 
-    /// @}
+    /// @} 
 
     /// \defgroup spi SPI access
-    /// These functions let you use SPI0 (Serial Peripheral Interface) to
+    /// These functions let you use SPI0 (Serial Peripheral Interface) to 
     /// interface with an external SPI device.
     /// @{
 
     /// Start SPI operations.
     /// Forces RPi SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
     /// to alternate function ALT0, which enables those pins for SPI interface.
-    /// \param[in] cs Specifies the CS pins(s) that are used to activate the desired slave.
-    ///   One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
-    ///   or one of One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
-	///   by default PI hardware driven using CE0
-    /// You should call bcm2835_spi_end() when all SPI funcitons are complete to return the pins to
+    /// You should call bcm2835_spi_end() when all SPI funcitons are complete to return the pins to 
     /// their default functions
     /// \sa  bcm2835_spi_end()
-    extern void bcm2835_spi_begin();
+    extern void bcm2835_spi_begin(void);
 
     /// End SPI operations.
     /// SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
     /// are returned to their default INPUT behaviour.
     extern void bcm2835_spi_end(void);
 
-	/// Sets the SPI custom Chip Select pin to correct level
-    /// Defaults to
-    /// \param[in] level The desired level, LOW or HIGH,
-	extern void bcm2835_spi_setChipSelect(uint8_t level);
-
     /// Sets the SPI bit order
     /// NOTE: has no effect. Not supported by SPI0.
-    /// Defaults to
-    /// \param[in] order The desired bit order, one of BCM2835_SPI_BIT_ORDER_*,
+    /// Defaults to 
+    /// \param[in] order The desired bit order, one of BCM2835_SPI_BIT_ORDER_*, 
     /// see \ref bcm2835SPIBitOrder
     extern void bcm2835_spi_setBitOrder(uint8_t order);
 
-    /// Sets the SPI clock divider and therefore the
-    /// SPI clock speed.
-    /// \param[in] divider The desired SPI clock divider, one of BCM2835_SPI_CLOCK_DIVIDER_*,
+    /// Sets the SPI clock divider and therefore the 
+    /// SPI clock speed. 
+    /// \param[in] divider The desired SPI clock divider, one of BCM2835_SPI_CLOCK_DIVIDER_*, 
     /// see \ref bcm2835SPIClockDivider
     extern void bcm2835_spi_setClockDivider(uint16_t divider);
 
     /// Sets the SPI data mode
     /// Sets the clock polariy and phase
-    /// \param[in] mode The desired data mode, one of BCM2835_SPI_MODE*,
+    /// \param[in] mode The desired data mode, one of BCM2835_SPI_MODE*, 
     /// see \ref bcm2835SPIMode
     extern void bcm2835_spi_setDataMode(uint8_t mode);
 
     /// Sets the chip select pin(s)
     /// When an bcm2835_spi_transfer() is made, the selected pin(s) will be asserted during the
     /// transfer.
-    /// \param[in] cs Specifies the CS pins(s) that are used to activate the desired slave.
+    /// \param[in] cs Specifies the CS pins(s) that are used to activate the desired slave. 
     ///   One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
-    ///   or one of One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
     extern void bcm2835_spi_chipSelect(uint8_t cs);
 
     /// Sets the chip select pin polarity for a given pin
-    /// When an bcm2835_spi_transfer() occurs, the currently selected chip select pin(s)
-    /// will be asserted to the
-    /// value given by active. When transfers are not happening, the chip select pin(s)
+    /// When an bcm2835_spi_transfer() occurs, the currently selected chip select pin(s) 
+    /// will be asserted to the 
+    /// value given by active. When transfers are not happening, the chip select pin(s) 
     /// return to the complement (inactive) value.
     /// \param[in] cs The chip select pin to affect
     /// \param[in] active Whether the chip select pin is to be active HIGH
     extern void bcm2835_spi_setChipSelectPolarity(uint8_t cs, uint8_t active);
 
     /// Transfers one byte to and from the currently selected SPI slave.
-    /// Asserts the currently selected CS pins (as previously set by bcm2835_spi_chipSelect)
+    /// Asserts the currently selected CS pins (as previously set by bcm2835_spi_chipSelect) 
     /// during the transfer.
-    /// Clocks the 8 bit value out on MOSI, and simultaneously clocks in data from MISO.
+    /// Clocks the 8 bit value out on MOSI, and simultaneously clocks in data from MISO. 
     /// Returns the read data byte from the slave.
     /// Uses polled transfer as per section 10.6.1 of the BCM 2835 ARM Peripherls manual
     /// \param[in] value The 8 bit data byte to write to MOSI
     /// \return The 8 bit byte simultaneously read from  MISO
     /// \sa bcm2835_spi_transfern()
     extern uint8_t bcm2835_spi_transfer(uint8_t value);
-
+    
     /// Transfers any number of bytes to and from the currently selected SPI slave.
-    /// Asserts the currently selected CS pins (as previously set by bcm2835_spi_chipSelect)
+    /// Asserts the currently selected CS pins (as previously set by bcm2835_spi_chipSelect) 
     /// during the transfer.
-    /// Clocks the len 8 bit bytes out on MOSI, and simultaneously clocks in data from MISO.
+    /// Clocks the len 8 bit bytes out on MOSI, and simultaneously clocks in data from MISO. 
     /// The data read read from the slave is placed into rbuf. rbuf must be at least len bytes long
     /// Uses polled transfer as per section 10.6.1 of the BCM 2835 ARM Peripherls manual
-    /// \param[in] tbuf Buffer of bytes to send.
+    /// \param[in] tbuf Buffer of bytes to send. 
     /// \param[out] rbuf Received bytes will by put in this buffer
     /// \param[in] len Number of bytes in the tbuf buffer, and the number of bytes to send/received
     /// \sa bcm2835_spi_transfer()
@@ -1301,7 +1334,7 @@ extern "C" {
     /// \param[in] micros Delay in microseconds
     extern void bcm2835_st_delay(uint64_t offset_micros, uint64_t micros);
 
-    /// @}
+    /// @} 
 
     /// \defgroup pwm Pulse Width Modulation
     /// Allows control of 2 independent PWM channels. A limited subset of GPIO pins
@@ -1310,12 +1343,12 @@ extern "C" {
     /// documentation on the Main Page.
     /// @{
 
-    /// Sets the PWM clock divisor,
+    /// Sets the PWM clock divisor, 
     /// to control the basic PWM pulse widths.
     /// \param[in] divisor Divides the basic 19.2MHz PWM clock. You can use one of the common
     /// values BCM2835_PWM_CLOCK_DIVIDER_* in \ref bcm2835PWMClockDivider
     extern void bcm2835_pwm_set_clock(uint32_t divisor);
-
+    
     /// Sets the mode of the given PWM channel,
     /// allowing you to control the PWM mode and enable/disable that channel
     /// \param[in] channel The PWM channel. 0 or 1.
@@ -1328,15 +1361,15 @@ extern "C" {
     /// \param[in] channel The PWM channel. 0 or 1.
     /// \param[in] range The maximum value permitted for DATA.
     extern void bcm2835_pwm_set_range(uint8_t channel, uint32_t range);
-
-    /// Sets the PWM pulse ratio to emit to DATA/RANGE,
+    
+    /// Sets the PWM pulse ratio to emit to DATA/RANGE, 
     /// where RANGE is set by bcm2835_pwm_set_range().
     /// \param[in] channel The PWM channel. 0 or 1.
-    /// \param[in] data Controls the PWM output ratio as a fraction of the range.
+    /// \param[in] data Controls the PWM output ratio as a fraction of the range. 
     ///  Can vary from 0 to RANGE.
     extern void bcm2835_pwm_set_data(uint8_t channel, uint32_t data);
 
-    /// @}
+    /// @} 
 #ifdef __cplusplus
 }
 #endif
@@ -1362,9 +1395,9 @@ extern "C" {
 /// Shows how to use PWM to control GPIO pins
 
 /// @example i2c.c
-/// Command line utility for executing i2c commands with the
+/// Command line utility for executing i2c commands with the 
 /// Broadcom bcm2835. Contributed by Shahrooz Shahparnia.
 
 /// example gpio.c
-/// Command line utility for executing gpio commands with the
+/// Command line utility for executing gpio commands with the 
 ///   Broadcom bcm2835. Contributed by Shahrooz Shahparnia.
