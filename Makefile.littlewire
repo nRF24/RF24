@@ -18,6 +18,7 @@ LIB=librf24
 
 HEADER_DIR=${PREFIX}/include/RF24
 LIB_DIR=$(PREFIX)/lib
+DRIVER_DIR=arch/LittleWire
 
 ifeq ($(shell uname), Linux)
 	DYN_SUFFIX=so
@@ -63,3 +64,5 @@ install-headers:
 	@echo "[Installing Headers]"
 	@if ( test ! -d ${HEADER_DIR} ) ; then mkdir -p ${HEADER_DIR} ; fi
 	@install -m 0644 *.h ${HEADER_DIR}
+	@if ( test ! -d ${HEADER_DIR}/${DRIVER_DIR} ) ; then mkdir -p ${HEADER_DIR}/${DRIVER_DIR} ; fi
+	@install -m 0644 ${DRIVER_DIR}/*.h ${HEADER_DIR}/${DRIVER_DIR}
