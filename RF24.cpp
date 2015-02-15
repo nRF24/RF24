@@ -26,14 +26,13 @@ void RF24::csn(bool mode)
 	#endif
 #endif
 
-#if defined (RF24_RPI)
+#if defined (RF24_RPi)
     if(!mode){
 
 	  _SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
 	  _SPI.setDataMode(BCM2835_SPI_MODE0);
 	  _SPI.setClockDivider(spi_speed);
       _SPI.chipSelect(csn_pin);
-	  
       delayMicroseconds(5);
 	}
 #elif defined (RF24_TINY)
