@@ -13,9 +13,13 @@
 #
 prefix := /usr/local
 
+# Detect the Raspberry Pi by the existence of the bcm_host.h file
+BCMLOC=/opt/vc/include/bcm_host.h
+
+ifneq ("$(wildcard $(BCMLOC))","")
 # The recommended compiler flags for the Raspberry Pi
 CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
-#CCFLAGS=
+endif
 
 # define all programs
 #PROGRAMS = scanner pingtest gettingstarted

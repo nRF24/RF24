@@ -27,9 +27,6 @@ HEADER_DIR=${PREFIX}/include/RF24
 # The base location of support files for different devices
 ARCH_DIR=arch
 
-# The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
-
 # The default objects to compile
 OBJECTS=RF24.o spi.o
 
@@ -44,6 +41,8 @@ endif
 ifneq ("$(wildcard $(BCMLOC))","")
 DRIVER_DIR=$(ARCH_DIR)/RPi
 OBJECTS+=bcm2835.o	
+# The recommended compiler flags for the Raspberry Pi
+CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 else
 DRIVER_DIR=$(ARCH_DIR)/BBB
 OBJECTS+=gpio.o compatibility.o
@@ -69,7 +68,7 @@ bcm2835.o: $(DRIVER_DIR)/bcm2835.c
 	gcc -Wall -fPIC ${CCFLAGS} -c $^
 
 spi.o: $(DRIVER_DIR)/spi.cpp
-	gcc -Wall -fPIC ${CCFLAGS} -c $^
+	g++ -Wall -fPIC ${CCFLAGS} -c $^
 
 compatibility.o: $(DRIVER_DIR)/compatibility.c
 	gcc -Wall -fPIC  ${CCFLAGS} -c $(DRIVER_DIR)/compatibility.c

@@ -44,6 +44,9 @@ using namespace std;
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
+// Setup for ARM(Linux) devices like BBB using spidev
+//RF24 radio(115,117);
+
 /********** User Config *********/
 // Assign a unique identifier for this node, 0 or 1
 bool radioNumber = 1;
