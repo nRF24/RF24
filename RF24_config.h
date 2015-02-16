@@ -51,7 +51,10 @@
   
   #include "arch/LittleWire/RF24_arch_config.h"
 
+// MRAA
+#elif defined(MRAA)
   
+  #include "arch/mraa/RF24_arch_config.h"
   
 //Everything else
 #else 

@@ -69,7 +69,12 @@ private:
   uint16_t spi_speed; /**< SPI Bus Speed */
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
-#endif  
+#elif defined(MRAA)
+  mraa_spi_context m_spi;
+  mraa_gpio_context m_csnPinCtx;
+  mraa_gpio_context m_cePinCtx;
+#endif
+
   bool p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
@@ -111,6 +116,13 @@ public:
   
   RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
+
+  /**
+   * Default destructor
+   * Removes allocated contexts with MRAA
+   */
+  ~RF24();
+
   /**
    * Begin operation of the chip
    * 
