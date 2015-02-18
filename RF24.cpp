@@ -24,9 +24,8 @@ void RF24::csn(bool mode)
   			_SPI.setDataMode(SPI_MODE0);
 			_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
-#endif
 
-#if defined (RF24_RPi)
+#elif defined (RF24_RPi)
     if(!mode){
 
 	  _SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
@@ -49,7 +48,7 @@ void RF24::csn(bool mode)
 			delayMicroseconds(11);  // allow csn to settle
 		}
 	}		
-#elif !defined  (__arm__) || defined (CORE_TEENSY) || defined (RF24_BBB)
+#elif !defined (ARDUINO_SAM_DUE)
 	digitalWrite(csn_pin,mode);
 	#if !defined (RF24_BBB)
     delayMicroseconds(5);
@@ -472,7 +471,7 @@ RF24::RF24(uint8_t _cepin, uint8_t _cspin):
 
 /****************************************************************************/
 
-#if defined (RF24_LINUX)//RPi constructor
+#if defined (RF24_LINUX) && !defined (MRAA)//RPi constructor
 RF24::RF24(uint8_t _cepin, uint8_t _cspin, uint32_t _spi_speed):
   ce_pin(_cepin),csn_pin(_cspin),spi_speed(_spi_speed),p_variant(false), payload_size(32), dynamic_payloads_enabled(false),addr_width(5)//,pipe0_reading_address(0) 
 {	
@@ -619,32 +618,36 @@ void RF24::printDetails(void)
 
 void RF24::begin(void)
 {
-  
-  #if defined (RF24_BBB)
-    SPI();
-  
-    // just to simulate arduino milis()
-    __start_timer();
-    pinMode(ce_pin,OUTPUT);
-    pinMode(csn_pin,OUTPUT);
 
-    ce(LOW);
-    csn(HIGH);	
-  #elif defined(RF24_RPi)
-	// Init BCM2835 chipset for talking with us
+  #if defined (RF24_LINUX)
+
 	SPI();
-	switch(csn_pin){     //Ensure valid hardware CS pin
+    
+	#if defined (MRAA)
+	  GPIO();	
+	  gpio.begin(ce_pin,csn_pin);	
+	#endif
+	
+	#if defined(RF24_RPi)
+	  switch(csn_pin){     //Ensure valid hardware CS pin
 		case 0: break;
 		case 1: break;
 		case 8: csn_pin = 0; break;
 		case 7: csn_pin = 1; break;
 		default: csn_pin = 0; break;
-	}	
-	_SPI.begin();	
-	// Initialise the CE pin of NRF24 (chip enable) after the CSN pin, so that
-	// The input mode is not changed if using one of the hardware CE pins
-	bcm2835_gpio_fsel(ce_pin, BCM2835_GPIO_FSEL_OUTP);	
- 	ce(LOW);
+	  }
+	#else	
+	  pinMode(csn_pin,OUTPUT);
+	  csn(HIGH);
+	#endif
+	
+	#if !defined (RF24_BBB)
+	_SPI.begin();
+	#endif
+	
+	pinMode(ce_pin,OUTPUT);
+	ce(LOW);    
+
 	delay(100);
   
   #elif defined(LITTLEWIRE)

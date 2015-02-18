@@ -44,7 +44,13 @@ using namespace std;
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
-// Setup for ARM(Linux) devices like BBB using spidev
+//RPi Alternate, with mraa
+//RF24 radio(15,24);
+
+//RPi Alternate, with SPIDEV - Note: Edit RF24/arch/RPi/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' 
+//RF24 radio(22,8);
+
+// Setup for ARM(Linux) devices like BBB using spidev (default is "/dev/spidev1.0" )
 //RF24 radio(115,117);
 
 /********** User Config *********/

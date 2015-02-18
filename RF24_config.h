@@ -26,12 +26,13 @@
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
 
+	
+//Generic Linux/ARM and //http://iotdk.intel.com/docs/master/mraa/
+#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined MRAA // BeagleBone Black running GNU/Linux or any other ARM-based linux device
 
-//Generic Linux/ARM
-#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
-
-  // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /arch/includes.h
-  // The includes.h file defines either RF24_RPi or RF24_BBB and includes the correct RF24_arch_config.h file
+  // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /arch/includes.h (Default is spidev config)
+  // This behaviour can be overridden by calling 'make RF24_SPIDEV=1' or 'make RF24_MRAA=1'
+  // The includes.h file defines either RF24_RPi, MRAA or RF24_BBB and includes the correct RF24_arch_config.h file
   #include "arch/includes.h"
 
 //Arduino Due
