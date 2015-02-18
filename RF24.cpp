@@ -24,8 +24,9 @@ void RF24::csn(bool mode)
   			_SPI.setDataMode(SPI_MODE0);
 			_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
+#endif
 
-#elif defined (RF24_RPi)
+#if defined (RF24_RPi)
     if(!mode){
 
 	  _SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
