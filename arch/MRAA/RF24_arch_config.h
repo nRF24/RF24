@@ -4,7 +4,8 @@
   #include "mraa.h"
   #include "spi.h"
   #include "gpio.h"
-  #include "compatibility.h"
+  //#include "compatibility.h"
+  #include <UtilTime.h>
   #include <stdint.h>
   #include <stdio.h>
   #include <time.h>
@@ -30,6 +31,7 @@
   //typedef uint16_t prog_uint16_t;
   #define PSTR(x) (x)
   #define printf_P printf
+  #define sprintf_P sprintf
   #define strlen_P strlen
   #define PROGMEM
   #define PRIPSTR "%s"
@@ -44,9 +46,9 @@
   #define digitalWrite(pin, value) gpio.write(pin, value)
   #define digitalRead(pin) GPIO::read(pin)
   #define pinMode(pin, direction) gpio.open(pin, direction)
-  #define delay(milisec) __msleep(milisec)
-  #define delayMicroseconds(usec) __usleep(usec)
-  #define millis() __millis()
+  //#define delay(milisec) __msleep(milisec)
+  //#define delayMicroseconds(usec) __usleep(usec)
+  //#define millis() __millis()
   
   #define INPUT mraa::DIR_IN
   #define OUTPUT mraa::DIR_OUT  

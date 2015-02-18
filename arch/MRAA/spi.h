@@ -21,7 +21,9 @@ public:
   inline void transfernb(char* tbuf, char* rbuf, uint32_t len);
   inline void transfern(char* buf, uint32_t len);  
 
-  void begin();
+  void begin(void);
+  // Prophet: A customized SPI::begin can be used with parameters defined as macro in RF24_arch_config.h
+  void begin(int bus, int frequency);
   void end();
 
   void setBitOrder(uint8_t bit_order);

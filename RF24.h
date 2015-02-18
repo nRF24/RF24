@@ -114,6 +114,9 @@ public:
   
   RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
+
+  virtual ~RF24() {};
+
   /**
    * Begin operation of the chip
    * 
