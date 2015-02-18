@@ -14,26 +14,26 @@
 
 void RF24::csn(bool mode)
 {
-  // Minimum ideal SPI bus speed is 2x data rate
-  // If we assume 2Mbs data rate and 16Mhz clock, a
-  // divider of 4 is the minimum we want.
-  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-#ifdef ARDUINO
+	// Minimum ideal SPI bus speed is 2x data rate
+	// If we assume 2Mbs data rate and 16Mhz clock, a
+	// divider of 4 is the minimum we want.
+	// CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+#if defined(ARDUINO)
 	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
- 			_SPI.setBitOrder(MSBFIRST);
-  			_SPI.setDataMode(SPI_MODE0);
-			_SPI.setClockDivider(SPI_CLOCK_DIV2);
+		_SPI.setBitOrder(MSBFIRST);
+		_SPI.setDataMode(SPI_MODE0);
+		_SPI.setClockDivider(SPI_CLOCK_DIV2);
 	#endif
 #endif
 
 #if defined (RF24_RPi)
-    if(!mode){
+	if(!mode){
 
-	  _SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
-	  _SPI.setDataMode(BCM2835_SPI_MODE0);
-	  _SPI.setClockDivider(spi_speed);
-      _SPI.chipSelect(csn_pin);
-      delayMicroseconds(5);
+		_SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
+		_SPI.setDataMode(BCM2835_SPI_MODE0);
+		_SPI.setClockDivider(spi_speed);
+		_SPI.chipSelect(csn_pin);
+		delayMicroseconds(5);
 	}
 #elif defined (RF24_TINY)
 	if (ce_pin != csn_pin) {
@@ -52,7 +52,7 @@ void RF24::csn(bool mode)
 #elif !defined (ARDUINO_SAM_DUE)
 	digitalWrite(csn_pin,mode);
 	#if !defined (RF24_BBB)
-    delayMicroseconds(5);
+		delayMicroseconds(5);
 	#endif
 #endif
 
