@@ -13,6 +13,7 @@ extern "C" {
 #endif
 	
 #include <stddef.h>
+#include <time.h>
 #include <sys/time.h>
 
 static struct timeval start, end;
