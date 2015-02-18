@@ -5,6 +5,7 @@
   #include "spi.h"
   #include "gpio.h"
   #include "compatibility.h"
+
   #include <stdint.h>
   #include <stdio.h>
   #include <time.h>
@@ -15,7 +16,7 @@
   #include <unistd.h>
   #include <stdlib.h>
   
- // #include <UtilTime.h> // Precompiled arduino x86 based utiltime for timing functions
+  //#include <UtilTime.h> // Precompiled arduino x86 based utiltime for timing functions
 
   // GCC a Arduino Missing
   #define HIGH	1
@@ -30,6 +31,7 @@
   //typedef uint16_t prog_uint16_t;
   #define PSTR(x) (x)
   #define printf_P printf
+  #define sprintf_P sprintf
   #define strlen_P strlen
   #define PROGMEM
   #define PRIPSTR "%s"
@@ -40,15 +42,23 @@
 	#define IF_SERIAL_DEBUG(x)
   #endif
   
-  //#define digitalWrite(pin, value) mraa_gpio_write((mraa_gpio_context)pin, value)
   #define digitalWrite(pin, value) gpio.write(pin, value)
   #define digitalRead(pin) GPIO::read(pin)
   #define pinMode(pin, direction) gpio.open(pin, direction)
-  #define delay(milisec) __msleep(milisec)
-  #define delayMicroseconds(usec) __usleep(usec)
-  #define millis() __millis()
+
+  #ifndef __TIME_H__
+    // Prophet: Redefine time functions only if precompiled arduino time is not included
+	#define delay(milisec) __msleep(milisec)
+	#define delayMicroseconds(usec) __usleep(usec)
+	#define millis() __millis()
+  #endif
   
   #define INPUT mraa::DIR_IN
   #define OUTPUT mraa::DIR_OUT  
+
+  // SPI defines for ARDUINO API
+  #define MSBFIRST 1
+  #define SPI_MODE0 mraa::SPI_MODE0
+  #define SPI_CLOCK_DIV2 8000000
 
 #endif

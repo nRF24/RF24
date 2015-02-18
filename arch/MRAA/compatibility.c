@@ -1,5 +1,9 @@
 
 #include "compatibility.h"
+
+static struct timeval start, end;
+//static long mtime, seconds, useconds;
+
 /**********************************************************************/
 /**
  * This function is added in order to simulate arduino delay() function

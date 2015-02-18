@@ -3,8 +3,8 @@
  * 
  */
 
-#ifndef H
-#define	H
+#ifndef RF24_ARCH_GPIO_H
+#define	RF24_ARCH_GPIO_H
 
 #include <cstdio>
 #include <stdio.h>
@@ -16,7 +16,8 @@ public:
 
 	/* Constants */
 		
-	GPIO();		
+	GPIO();
+	virtual ~GPIO();
 	
 	/**
 	 * Sets up GPIO on the CE & CS pins
@@ -48,9 +49,7 @@ public:
 	* @param value
 	*/	
 	void write(int port,int value);	
-	
-	virtual ~GPIO();
-	
+
 private:
 	int gpio_ce_pin; /** ce_pin value of the RF24 device **/
 	int gpio_cs_pin; /** cs_pin value of the RF24 device **/
@@ -58,5 +57,5 @@ private:
 	mraa::Gpio* gpio_1; /** gpio object for cs_pin **/
 };
 
-#endif	/* H */
+#endif	/* RF24_ARCH_GPIO_H */
 
