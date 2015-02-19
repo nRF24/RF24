@@ -497,20 +497,6 @@ s   *
   void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
   /**
-   * Enable dynamic ACKs (single write multicast or unicast) for chosen messages
-   *
-   * @note To enable full multicast or per-pipe multicast, use setAutoAck()
-   *
-   * @warning This MUST be called prior to attempting single write NOACK calls
-   * @code
-   * radio.enableDynamicAck();
-   * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
-   * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
-   * @endcode
-   */
-  void enableDynamicAck();
-
-  /**
    * Determine if an ack payload was received in the most recent call to
    * write(). The regular available() can also be used.
    *
@@ -642,33 +628,6 @@ s   *
    * @return true if this is a legitimate radio
    */
   bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
-
-  /**
-  * The radio will generate interrupt signals when a transmission is complete,
-  * a transmission fails, or a payload is received. This allows users to mask
-  * those interrupts to prevent them from generating a signal on the interrupt
-  * pin. Interrupts are enabled on the radio chip by default.
-  *
-  * @code
-  * 	Mask all interrupts except the receive interrupt:
-  *
-  *		radio.maskIRQ(1,1,0);
-  * @endcode
-  *
-  * @param tx_ok  Mask transmission complete interrupts
-  * @param tx_fail  Mask transmit failure interrupts
-  * @param rx_ready Mask payload received interrupts
-  */
-  void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready);
-  
-  /**
-  * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
-  *
-  * @param a_width The address width to use: 3,4 or 5
-  */
-
-  void setAddressWidth(uint8_t a_width);
-
   
    /**
    * Close a pipe after it has been previously opened.
@@ -676,7 +635,31 @@ s   *
    * @param pipe Which pipe # to close, 0-5.
    */
   void closeReadingPipe( uint8_t pipe ) ;
-  
+
+   /**
+   * Enable error detection by un-commenting #define FAILURE_HANDLING in RF24_config.h
+   * If a failure has been detected, it usually indicates a hardware issue. By default the library
+   * will cease operation when a failure is detected.  
+   * This should allow advanced users to detect and resolve intermittent hardware issues.  
+   *   
+   * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
+   * applied after a failure occurs, if wanting to re-enable the device immediately.
+   * 
+   * Usage: (Failure handling must be enabled per above)
+   *  @code
+   *  if(radio.failureDetected){ 
+   *    radio.begin();                       // Attempt to re-configure the radio with defaults
+   *    radio.failureDetected = 0;           // Reset the detection value
+   *	radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
+   *    radio.openReadingPipe(1,addresses[0]);
+   *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
+   *  }
+   * @endcode
+  */
+  //#if defined (FAILURE_HANDLING)
+    bool failureDetected; 
+  //#endif
+    
   /**@}*/
 
   /**@}*/
@@ -689,6 +672,14 @@ s   *
    */
   /**@{*/
 
+  /**
+  * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
+  *
+  * @param a_width The address width to use: 3,4 or 5
+  */
+
+  void setAddressWidth(uint8_t a_width);
+  
   /**
    * Set the number and delay of retries upon failed submit
    *
@@ -767,7 +758,21 @@ s   *
    *
    */
   void enableDynamicPayloads(void);
-
+  
+  /**
+   * Enable dynamic ACKs (single write multicast or unicast) for chosen messages
+   *
+   * @note To enable full multicast or per-pipe multicast, use setAutoAck()
+   *
+   * @warning This MUST be called prior to attempting single write NOACK calls
+   * @code
+   * radio.enableDynamicAck();
+   * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
+   * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
+   * @endcode
+   */
+  void enableDynamicAck();
+  
   /**
    * Determine whether the hardware is an nRF24L01+ or not.
    *
@@ -859,31 +864,24 @@ s   *
    * @warning CRC cannot be disabled if auto-ack/ESB is enabled.
    */
   void disableCRC( void ) ;
-  
-   /**
-   * Enable error detection by un-commenting #define FAILURE_HANDLING in RF24_config.h
-   * If a failure has been detected, it usually indicates a hardware issue. By default the library
-   * will cease operation when a failure is detected.  
-   * This should allow advanced users to detect and resolve intermittent hardware issues.  
-   *   
-   * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
-   * applied after a failure occurs, if wanting to re-enable the device immediately.
-   * 
-   * Usage: (Failure handling must be enabled per above)
-   *  @code
-   *  if(radio.failureDetected){ 
-   *    radio.begin();                       // Attempt to re-configure the radio with defaults
-   *    radio.failureDetected = 0;           // Reset the detection value
-   *	radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
-   *    radio.openReadingPipe(1,addresses[0]);
-   *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
-   *  }
-   * @endcode
+
+  /**
+  * The radio will generate interrupt signals when a transmission is complete,
+  * a transmission fails, or a payload is received. This allows users to mask
+  * those interrupts to prevent them from generating a signal on the interrupt
+  * pin. Interrupts are enabled on the radio chip by default.
+  *
+  * @code
+  * 	Mask all interrupts except the receive interrupt:
+  *
+  *		radio.maskIRQ(1,1,0);
+  * @endcode
+  *
+  * @param tx_ok  Mask transmission complete interrupts
+  * @param tx_fail  Mask transmit failure interrupts
+  * @param rx_ready Mask payload received interrupts
   */
-  //#if defined (FAILURE_HANDLING)
-    bool failureDetected; 
-  //#endif
-  
+  void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready);
   
   /**@}*/
   /**
