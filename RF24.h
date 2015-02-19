@@ -1366,12 +1366,14 @@ private:
  * @li http://highlowtech.org/?p=1695
  * @li http://littlewire.cc/ 
  *
- * @section More More Information
- *
- * @section Info and Projects
+ * @section More More Information and RF24 Based Projects
  *
  * @li <a href="http://TMRh20.blogspot.com"> Project Blog: TMRh20.blogspot.com </a>
  * @li <a href="http://maniacalbits.blogspot.ca/"> Maniacal Bits Blog</a>
+ * @li <a href="http://www.mysensors.org/">MySensors.org (User friendly sensor networks/IoT)</a>
+ * @li <a href="https://github.com/mannkind/RF24Node_MsgProto"> RF24Node_MsgProto (MQTT)</a>
+ * @li <a href="https://bitbucket.org/pjhardy/rf24sensornet/"> RF24SensorNet </a>
+ * @li <a href="http://www.homeautomationforgeeks.com/rf24software.shtml">Home Automation for Geeks</a>
  * @li <a href="https://maniacbug.wordpress.com/2012/03/30/rf24network/"> Original Maniacbug RF24Network Blog Post</a>
  * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
  * 
