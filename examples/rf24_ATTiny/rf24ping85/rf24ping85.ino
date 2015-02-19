@@ -31,8 +31,8 @@ version 2 as published by the Free Software Foundation.
                                  +-\/-+           nRF24L01   CE, pin3 ------|              //
                            PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 ------x----------x--|<|-- 5V
                    NC      PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5 --|<|---x-[22k]--|  LED
-                   NC      PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin7  1n4148 |
-    nRF24L01 GND, pin1 -x- GND  4|    |5  PB0 --- nRF24L01 MISO, pin6         |
+                   NC      PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6  1n4148 |
+    nRF24L01 GND, pin1 -x- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7         |
                         |        +----+                                       |
                         |-----------------------------------------------||----x-- nRF24L01 CSN, pin4 
                                                                        10nF

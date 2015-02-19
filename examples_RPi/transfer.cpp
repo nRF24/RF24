@@ -62,7 +62,7 @@ int main(int argc, char** argv){
   radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
   radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
-  radio.setCRCLength(RF24_CRC_8);
+  radio.setCRCLength(RF24_CRC_16);         //Note: The original Transfer.ino example used 8-bit CRC which was found to result in data corruption over time.
   radio.printDetails();
 /********* Role chooser ***********/
 

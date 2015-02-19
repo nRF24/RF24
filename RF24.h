@@ -1321,14 +1321,14 @@ private:
  *
  * If issues are discovered with the documentation, please report them <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  *
- * @section Refs References
+ * @section Useful Useful References
  *
  * Please refer to:
  *
  * @li <a href="http://tmrh20.github.io/RF24/classRF24.html"><b>RF24</b> Class Documentation</a>
  * @li <a href="https://github.com/TMRh20/RF24/archive/master.zip"><b>Download</b></a>
  * @li <a href="http://tmrh20.blogspot.com/2014/03/high-speed-data-transfers-and-wireless.html"><b>My Blog:</b> RF24 Optimization Overview</a>
- * @li <a href="https://github.com/tmrh20/RF24/"><b>Source Code</b></a>
+  * @li <a href="https://github.com/tmrh20/RF24/"><b>Source Code</b></a>
  * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
  *
  * **Additional Information and Add-ons**
@@ -1340,14 +1340,33 @@ private:
  * @li <a href="https://github.com/maniacbug/RF24">Original Library</a>
  *
  *
- * @section Platform_Support Platform Support
+ * @section Platform_Support Platform Support Pages
  *
- * @li <a href="Arduino.html">Arduino</a> (Uno, Nano, Mega, Due, etc)
- * @li Intel Galileo 
+ * @li <a href="Arduino.html">Arduino</a> (Uno, Nano, Mega, Due, Galileo, etc)
  * @li <a href="ATTiny.html">ATTiny</a>
- * @li Linux ( <a href="RPi.html">RPi</a> , BBB, etc)
- * @li Python wrapper available for RPi
- * @li <a href="MRAA.html">MRAA</a> supported boards ( Galileo, Edison, etc)
+ * @li Linux ( <a href="RPi.html">RPi</a> , <a href="BBB.html">BBB</a>, <a href="MRAA.html">MRAA</a> supported boards ( Galileo, Edison, etc))
+ * @li <a href="Python.html">Python</a> wrapper available
+ *
+ * <br>
+ * **General µC Pin layout** (See the individual board support pages for more info)
+ *
+ * The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
+ * CE and CSN are configurable.
+ *
+ * | PIN | NRF24L01 | Arduino UNO | ATtiny25/45/85 [0] | ATtiny44/84 [1] | LittleWire [2]
+ * |-----|----------|-------------|--------------------|-----------------|--------------
+ * |  1  |   GND    |   GND       |     pin 4          |    pin 14       | GND
+ * |  2  |   VCC    |   3.3V      |     pin 8          |    pin  1       | regulator 3.3V required
+ * |  3  |   CE     |   digIO 7   |     pin 2          |    pin 12       | pin to 3.3V
+ * |  4  |   CSN    |   digIO 8   |     pin 3          |    pin 11       | RESET
+ * |  5  |   SCK    |   digIO 13  |     pin 7          |    pin  9       | SCK
+ * |  6  |   MOSI   |   digIO 11  |     pin 6          |    pin  7       | MOSI
+ * |  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       | MISO
+ * |  8  |   IRQ    |      -      |        -           |         -       | -
+ *
+ * @li https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
+ * @li http://highlowtech.org/?p=1695
+ * @li http://littlewire.cc/ 
  *
  * @section More More Information
  *
@@ -1358,18 +1377,22 @@ private:
  * @li <a href="https://maniacbug.wordpress.com/2012/03/30/rf24network/"> Original Maniacbug RF24Network Blog Post</a>
  * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
  * 
+ * <br><br><br>
+ *
+ *
  *
  *
  * @page Arduino Arduino
  * 
- * RF24 is fully compatible with Arduino boards
- * See http://www.arduino.cc/en/Reference/Board and http://arduino.cc/en/Reference/SPI for more information
+ * RF24 is fully compatible with Arduino boards <br>
+ * See <b> http://www.arduino.cc/en/Reference/Board </b> and <b> http://arduino.cc/en/Reference/SPI </b> for more information
  * 
- * RF24 makes use of the standard SPI pins (MISO,MOSI,SCK) and requires two additional pins, to control
+ * RF24 makes use of the standard hardware SPI pins (MISO,MOSI,SCK) and requires two additional pins, to control
  * the chip-select and chip-enable functions.<br>
  * These pins must be chosen and designated by the user, in RF24 radio(ce_pin,cs_pin); and can use any 
  * available pins.
- *
+ * 
+ * <br>
  * @section ARD_DUE Arduino Due
  * 
  * RF24 makes use of the extended SPI functionality available on the Arduino Due, and requires one of the
@@ -1378,11 +1401,12 @@ private:
  *
  * Initial Due support taken from https://github.com/mcrosson/RF24/tree/due
  *
- * 
+ * <br>
  * @section Alternate_SPI Alternate SPI Support
  *
  * RF24 supports alternate SPI methods, in case the standard hardware SPI pins are otherwise unavailable.
- *
+ * 
+ * <br>
  * **Software Driven SPI**
  *
  * Software driven SPI is provided by the <a href=https://github.com/greiman/DigitalIO>DigitalIO</a> library
@@ -1398,7 +1422,7 @@ private:
  *     const uint8_t SOFT_SPI_MOSI_PIN = 15;
  *     const uint8_t SOFT_SPI_SCK_PIN = 14;
  *
- * 
+ * <br>
  * **Alternate Hardware (UART) Driven  SPI**
  *
  * The Serial Port (UART) on Arduino can also function in SPI mode, and can double-buffer data, while the 
@@ -1421,8 +1445,8 @@ private:
  * | CSN | User Specified|
  *
  *
- * @note SPI_UART on Mega boards requires soldering to an unused pin on the chip. See
- * https://github.com/TMRh20/RF24/issues/24 for more information.
+ * @note SPI_UART on Mega boards requires soldering to an unused pin on the chip. <br>See
+ * https://github.com/TMRh20/RF24/issues/24 for more information on SPI_UART.
  * 
  * @page ATTiny ATTiny
  *
@@ -1434,7 +1458,149 @@ private:
  *
  * ATTiny board support initially added from https://github.com/jscrane/RF24
  *
- * @page RPi Raspberry Pi
+ * @section Hardware Hardware Configuration
+ * By tong67 ( https://github.com/tong67 )
+ * 
+ *    **ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4**
+ * @code
+ *                                 +-\/-+
+ *                   NC      PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 --- LED --- 5V
+ *    nRF24L01  CE, pin3 --- PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5
+ *    nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin7
+ *    nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin6 
+ *                                 +----+ 
+ * @endcode
+ *
+ * <br>
+ *    **ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3** => PB3 and PB4 are free to use for application <br>
+ *    Circuit idea from http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html <br>
+ *   Original RC combination was 1K/100nF. 22K/10nF combination worked better.                          <br>
+ *	For best settletime delay value in RF24::csn() the timingSearch3pin.ino sketch can be used.         <br>
+ *    This configuration is enabled when CE_PIN and CSN_PIN are equal, e.g. both 3                      <br>
+ *    Because CE is always high the power consumption is higher than for 5 pins solution                <br>
+ * @code
+ *                                                                                           ^^         
+ *                                 +-\/-+           nRF24L01   CE, pin3 ------|              //         
+ *                           PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 ------x----------x--|<|-- 5V    
+ *                   NC      PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5 --|<|---x-[22k]--|  LED         
+ *                   NC      PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6  1n4148 |                       
+ *    nRF24L01 GND, pin1 -x- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7         |                       
+ *                        |        +----+                                       |                       
+ *                        |-----------------------------------------------||----x-- nRF24L01 CSN, pin4  
+ *                                                                      10nF                            
+ * @endcode
+ *
+ * <br>
+ *    **ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7** <br>
+ *	Schematic provided and successfully tested by Carmine Pastore (https://github.com/Carminepz) <br>
+ * @code
+ *                                  +-\/-+                                                              
+ *    nRF24L01  VCC, pin2 --- VCC  1|o   |14 GND --- nRF24L01  GND, pin1
+ *                            PB0  2|    |13 AREF
+ *                            PB1  3|    |12 PA1
+ *                            PB3  4|    |11 PA2 --- nRF24L01   CE, pin3
+ *                            PB2  5|    |10 PA3 --- nRF24L01  CSN, pin4
+ *                            PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5
+ *    nRF24L01 MOSI, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MISO, pin6
+ *                                  +----+
+ *	@endcode					 
+ *	
+ * <br><br><br>
+ *
+ *
+ * 
+ * 
+ *
+ *
+ * @page BBB BeagleBone Black
+ *
+ * BeagleBone Black is supported via MRAA or SPIDev, with MRAA being the preferred choice due to performance.
+ * 
+ * <br>
+ * @section AutoInstall Automated Install 
+ *(**Designed & Tested on RPi** - Defaults to SPIDev on BBB)
+ *
+ * 1. Download the install.sh file from http://tmrh20.github.io/RF24Installer/RPi/install.sh
+ * @code wget http://tmrh20.github.io/RF24Installer/RPi/install.sh @endcode
+ * 2. Make it executable:
+ * @code chmod +x install.sh @endcode
+ * 3. Run it and choose your options
+ * @code ./install.sh @endcode
+ * 4. Run an example from one of the libraries
+ * @code 
+ * cd rf24libs/RF24/examples_RPi  
+ * @endcode
+ * Edit the gettingstarted example, to set your pin configuration
+ * @code nano gettingstarted.cpp
+ * make  
+ * sudo ./gettingstarted  
+ * @endcode
+ *
+ * <br>
+ * @section ManInstall Manual Install
+ * 1. Make a directory to contain the RF24 and possibly RF24Network lib and enter it: 
+ * @code
+ *  mkdir ~/rf24libs 
+ *  cd ~/rf24libs
+*  @endcode
+ * 2. Clone the RF24 repo:
+ *    @code git clone https://github.com/tmrh20/RF24.git RF24 @endcode
+ * 3. Change to the new RF24 directory
+ *    @code cd RF24 @endcode
+ * 4. Build the library, and run an example file: 
+ *    @code sudo make install  OR  sudo make install RF24_MRAA=1 @endcode
+ * **Note:** See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA </a> documentation for more info on installing MRAA
+ * @code
+ * cd examples_RPi  
+ * @endcode
+ * Edit the gettingstarted example, to set your pin configuration
+ * @code nano gettingstarted.cpp 
+ *    make 
+ *    sudo ./gettingstarted
+ * @endcode
+ *
+ * <br><br>
+ *   
+ * @page MRAA MRAA
+ *  
+ * MRAA is a Low Level Skeleton Library for Communication on GNU/Linux platforms
+ *
+ * See http://iotdk.intel.com/docs/master/mraa/index.html for more information
+ *
+ * @section Setup Setup
+ * 1. Install the MRAA lib
+ * 2. As per your device, SPI may need to be enabled
+ * 
+ * @section MRAA_Install Install 
+ *
+ * 1. Make a directory to contain the RF24 and possibly RF24Network lib and enter it: 
+ * @code
+ *  mkdir ~/rf24libs 
+ *  cd ~/rf24libs
+*  @endcode
+ * 2. Clone the RF24 repo:
+ *    @code git clone https://github.com/tmrh20/RF24.git RF24 @endcode
+ * 3. Change to the new RF24 directory
+ *    @code cd RF24 @endcode
+ * 4. Build the library: 
+ *    @code sudo make install -B RF24_MRAA=1 @endcode
+ * 5. Configure the correct pins in gettingstarted.cpp (See http://iotdk.intel.com/docs/master/mraa/index.html )
+ *    @code
+ *    cd examples_RPi  
+ *    nano gettingstarted.cpp 
+ *    @endcode
+ * 6. Build an example
+ *    @code
+ *    make  
+ *    sudo ./gettingstarted
+ *    @endcode
+ *
+ * <br><br><br>
+ *
+ * 
+ *
+ *
+ * * @page RPi Raspberry Pi
  *
  * RF24 supports a variety of Linux based devices via various drivers. Some boards like RPi can utilize multiple methods
  * to drive the GPIO and SPI functionality.
@@ -1476,20 +1642,38 @@ private:
  * 3. Change to the new RF24 directory
  *    @code cd RF24 @endcode
  * 4. Build the library, and run an example file: 
- *    @code sudo make install
- *    cd examples_RPi  
- *    make  
- *    sudo ./gettingstarted
- *    @endcode
+ * @code sudo make install
+ * cd examples_RPi  
+ * make  
+ * sudo ./gettingstarted
+ * @endcode
  *
  * <br><br>
  * @section Build Build Options
- * The default build on Raspberry Pi utilizes the **BCM2835** driver from http://www.airspayce.com/mikem/bcm2835
+ * The default build on Raspberry Pi utilizes the included **BCM2835** driver from http://www.airspayce.com/mikem/bcm2835
  * 1. @code sudo make install -B @endcode
  *
- * Build using the **MRAA** library from http://iotdk.intel.com/docs/master/mraa/index.html
- * 1. @code sudo make install -B RF24_MRAA=1 @endcode
- * 2. See the gettingstarted example for an example of pin configuration
+ * Build using the **MRAA** library from http://iotdk.intel.com/docs/master/mraa/index.html <br>
+ * MRAA is not included. See the <a href="MRAA.html">MRAA</a> platform page for more information.
+ *
+ * 1. Install, and build MRAA:
+ * @code
+ * git clone https://github.com/intel-iot-devkit/mraa.git
+ * cd mraa
+ * mkdir build
+ * cd build
+ * cmake .. -DBUILDSWIGNODE=OFF
+ * sudo make install
+ * @endcode
+ *
+ * 2. Complete the install <br>
+ * @code nano /etc/ld.so.conf @endcode
+ * Add the line @code /usr/local/lib/arm-linux-gnueabihf @endcode
+ * Run @code sudo ldconfig @endcode
+ *
+ * 3. Install RF24, using MRAA
+ * @code sudo make install -B RF24_MRAA=1 @endcode
+ * See the gettingstarted example for an example of pin configuration
  *
  * Build using **spidev**:
  *
@@ -1557,41 +1741,47 @@ private:
  * the library was berryfied by Purinda Gunasekara <purinda@gmail.com> <br>  
  * then forked from github stanleyseow/RF24 to https://github.com/jscrane/RF24-rpi  <br>
  * Network lib also based on https://github.com/farconada/RF24Network
+ *
  * 
+ *
  * 
- * @page MRAA MRAA
+ * <br><br><br>
+ * 
+ *
  *  
- * MRAA is a Low Level Skeleton Library for Communication on GNU/Linux platforms
- *
- * See http://iotdk.intel.com/docs/master/mraa/index.html for more information
- *
- * @section Setup Setup
- * 1. Install the MRAA lib
- * 2. As per your device, SPI may need to be enabled
+ * @page Python Python Wrapper (by https://github.com/mz-fuzzy)
  * 
- * @section MRAA_Install Install 
+ * @section Install Installation:  
+ * 
+ * Install the boost libraries:  (Note: Only the python libraries should be needed, this is just for simplicity)
  *
- * 1. Make a directory to contain the RF24 and possibly RF24Network lib and enter it: 
- * @code
- *  mkdir ~/rf24libs 
- *  cd ~/rf24libs
-*  @endcode
- * 2. Clone the RF24 repo:
- *    @code git clone https://github.com/tmrh20/RF24.git RF24 @endcode
- * 3. Change to the new RF24 directory
- *    @code cd RF24 @endcode
- * 4. Build the library: 
- *    @code sudo make install -B RF24_MRAA=1 @endcode
- * 5. Configure the correct pins in gettingstarted.cpp (See http://iotdk.intel.com/docs/master/mraa/index.html )
- *    @code
- *    cd examples_RPi  
- *    nano gettingstarted.cpp 
- *    @endcode
- * 6. Build an example
- *    @code
- *    make  
- *    sudo ./gettingstarted
- *    @endcode
+ * @code sudo apt-get install libboost1.50-all @endcode
+ *
+ * Build the library:  
+ *
+ * @code ./setup.py build   @endcode
+ *
+ * Install the library 
+ *
+ * @code ./setup.py install  @endcode
+ *
+ * 
+ * See the additional <a href="pages.html">Platform Support</a> pages for information on connecting your hardware  <br>
+ * See the included <a href="pingpair_dyn_8py-example.html">example </a> for usage information.   
+ * 
+ * Running the Example:  
+ * 
+ * Edit the pingpair_dyn.py example to configure the appropriate pins per the above documentation:  
+ *
+ * @code nano pingpair_dyn.py   @endcode
+ *
+ * Configure another device, Arduino or RPi with the pingpair_dyn example  
+ *
+ * Run the example  
+ *
+ * @code sudo ./pingpair_dyn.py  @endcode
+ *
+ * <br><br><br>
  */
 
 #endif // __RF24_H__
