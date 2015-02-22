@@ -41,9 +41,9 @@ void setup(void) {
   radio.setPALevel(RF24_PA_MAX);
   radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
-  radio.setRetries(2,15);                   // Optionally, increase the delay between retries & # of retries
+  radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
   
-  //radio.setCRCLength(RF24_CRC_8); Note: The original Transfer.ino example used 8-bit CRC which was found to result in data corruption over time.
+  radio.setCRCLength(RF24_CRC_8);          // Use 8-bit CRC for performance
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
   
@@ -114,10 +114,12 @@ if(role == RX){
      }
    if(millis() - rxTimer > 1000){
      rxTimer = millis();     
-     float numBytes = (counter*32)/1000.0;
+     unsigned long numBytes = counter*32;
      Serial.print("Rate: ");
-     Serial.print(numBytes);
-     printf("KB/s \n Payload Count: %d \n\r", counter);
+     //Prevent dividing into 0, which will cause issues over a period of time
+     Serial.println(numBytes > 0 ? numBytes/1000.0:0);
+     Serial.print("Payload Count: ");
+     Serial.println(counter);
      counter = 0;
    }
   }
