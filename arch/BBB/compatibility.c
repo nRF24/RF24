@@ -1,5 +1,10 @@
 
 #include "compatibility.h"
+
+
+static long mtime, seconds, useconds;
+static struct timeval start, end;
+
 /**********************************************************************/
 /**
  * This function is added in order to simulate arduino delay() function
@@ -24,6 +29,8 @@ void __usleep(int milisec)
 /**
  * This function is added in order to simulate arduino millis() function
  */
+
+ 
 void __start_timer()
 {
 	gettimeofday(&start, NULL);

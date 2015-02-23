@@ -642,10 +642,7 @@ void RF24::begin(void)
 	  csn(HIGH);
 	#endif
 	
-	#if !defined (RF24_BBB)
-	_SPI.begin();
-	#endif
-	
+	_SPI.begin();	
 	pinMode(ce_pin,OUTPUT);
 	ce(LOW);    
 
