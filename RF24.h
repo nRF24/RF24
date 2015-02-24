@@ -1801,7 +1801,7 @@ private:
  * <br>
  * @section Hardware_Templates Basic Hardware Template
  *
- * **RF24/arch/**
+ * **RF24/arch**
  *
  * The RF24 library now includes a basic hardware template to assist in porting to various platforms. <br> The following files can be included
  * to replicate standard Arduino functions as needed, allowing devices from ATTiny to Raspberry Pi to utilize the same core RF24 driver.
@@ -1816,7 +1816,7 @@ private:
  * | your_custom_file.h | Provides access to custom drivers for spi,gpio, etc                          | 
  *
  * <br>
- * Examples are provided via the included hardware support templates in **RF24/arch/** <br>
+ * Examples are provided via the included hardware support templates in **RF24/arch** <br>
  * See **RF24/arch/BBB** for a general Linux template.
  *
  *<br>
