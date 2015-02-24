@@ -1136,7 +1136,7 @@ private:
  */
  
  /**
- * @example GettingStarted_CallResponse.cpp
+ * @example GettingStarted_Call_Response.cpp
  * <b>For Raspberry Pi</b><br>
  * <b>New: TMRh20 2014</b><br>
  *
@@ -1308,7 +1308,7 @@ private:
  *
  * **Feb 2015**<br>
  * - MRAA supported added ( Galileo, Edison, etc)
- * - BBB/Linux support via spidev
+ * - BBB/Linux support via spidev & MRAA
  *
  * <b>Dec 2014 </b><br>
  * - New: Intel Galileo now supported
@@ -1319,31 +1319,44 @@ private:
  *
  * If issues are discovered with the documentation, please report them <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  *
+ * <br>
  * @section Useful Useful References
  *
- * Please refer to:
  *
  * @li <a href="http://tmrh20.github.io/RF24/classRF24.html"><b>RF24</b> Class Documentation</a>
  * @li <a href="https://github.com/TMRh20/RF24/archive/master.zip"><b>Download</b></a>
- * @li <a href="http://tmrh20.blogspot.com/2014/03/high-speed-data-transfers-and-wireless.html"><b>My Blog:</b> RF24 Optimization Overview</a>
-  * @li <a href="https://github.com/tmrh20/RF24/"><b>Source Code</b></a>
+ * @li <a href="https://github.com/tmrh20/RF24/"><b>Source Code</b></a>
+ * @li <a href="http://tmrh20.blogspot.com/2014/03/high-speed-data-transfers-and-wireless.html"><b>My Blog:</b> RF24 Optimization Overview</a> 
  * @li <a href="http://www.nordicsemi.com/files/Product/data_sheet/nRF24L01_Product_Specification_v2_0.pdf">Chip Datasheet</a>
  *
  * **Additional Information and Add-ons**
+ *
  * @li <a href="http://tmrh20.github.io/RF24Network"> <b>RF24Network:</b> OSI Network Layer for multi-device communication. Create a home sensor network.</a>
  * @li <a href="http://tmrh20.github.io/RF24Mesh"> <b>RF24Mesh:</b> Dynamic Mesh Layer for RF24Network</a>
  * @li <a href="http://tmrh20.github.io/RF24Ethernet"> <b>RF24Ethernet:</b> TCP/IP over RF24Network </a>
  * @li <a href="http://tmrh20.github.io/RF24Audio"> <b>RF24Audio:</b> Realtime Wireless Audio streaming</a>
  * @li <a href="http://tmrh20.github.io/">All TMRh20 Documentation Main Page</a>
- * @li <a href="https://github.com/maniacbug/RF24">Original Library</a>
  *
+ * **More Information and RF24 Based Projects**
+ *
+ * @li <a href="http://TMRh20.blogspot.com"> Project Blog: TMRh20.blogspot.com </a>
+ * @li <a href="http://maniacalbits.blogspot.ca/"> Maniacal Bits Blog</a>
+ * @li <a href="http://www.mysensors.org/">MySensors.org (User friendly sensor networks/IoT)</a>
+ * @li <a href="https://github.com/mannkind/RF24Node_MsgProto"> RF24Node_MsgProto (MQTT)</a>
+ * @li <a href="https://bitbucket.org/pjhardy/rf24sensornet/"> RF24SensorNet </a>
+ * @li <a href="http://www.homeautomationforgeeks.com/rf24software.shtml">Home Automation for Geeks</a>
+ * @li <a href="https://maniacbug.wordpress.com/2012/03/30/rf24network/"> Original Maniacbug RF24Network Blog Post</a>
+ * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
+ * 
+ *
+ * <br>
  *
  * @section Platform_Support Platform Support Pages
  *
- * @li <a href="Arduino.html">Arduino</a> (Uno, Nano, Mega, Due, Galileo, etc)
- * @li <a href="ATTiny.html">ATTiny</a>
- * @li Linux ( <a href="RPi.html">RPi</a> , <a href="BBB.html">BBB</a>, <a href="MRAA.html">MRAA</a> supported boards ( Galileo, Edison, etc))
- * @li <a href="Python.html">Python</a> wrapper available
+ * @li <a href="Arduino.html"><b>Arduino</b></a> (Uno, Nano, Mega, Due, Galileo, etc)
+ * @li <a href="ATTiny.html"><b>ATTiny</b></a>
+ * @li Linux ( <a href="RPi.html"><b>RPi</b></a> , <a href="BBB.html"><b>BBB</b></a>, <a href="MRAA.html"><b>MRAA</b></a> supported boards ( Galileo, Edison, etc))
+ * @li <a href="Python.html"><b>Python</b></a> wrapper available for RPi
  *
  * <br>
  * **General µC Pin layout** (See the individual board support pages for more info)
@@ -1362,21 +1375,9 @@ private:
  * |  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       | MISO
  * |  8  |   IRQ    |      -      |        -           |         -       | -
  *
- * @li https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
- * @li http://highlowtech.org/?p=1695
- * @li http://littlewire.cc/ 
- *
- * @section More More Information and RF24 Based Projects
- *
- * @li <a href="http://TMRh20.blogspot.com"> Project Blog: TMRh20.blogspot.com </a>
- * @li <a href="http://maniacalbits.blogspot.ca/"> Maniacal Bits Blog</a>
- * @li <a href="http://www.mysensors.org/">MySensors.org (User friendly sensor networks/IoT)</a>
- * @li <a href="https://github.com/mannkind/RF24Node_MsgProto"> RF24Node_MsgProto (MQTT)</a>
- * @li <a href="https://bitbucket.org/pjhardy/rf24sensornet/"> RF24SensorNet </a>
- * @li <a href="http://www.homeautomationforgeeks.com/rf24software.shtml">Home Automation for Geeks</a>
- * @li <a href="https://maniacbug.wordpress.com/2012/03/30/rf24network/"> Original Maniacbug RF24Network Blog Post</a>
- * @li <a href="https://github.com/maniacbug/RF24"> ManiacBug on GitHub (Original Library Author)</a>
- * 
+ * @li [0] https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
+ * @li [1] http://highlowtech.org/?p=1695
+ * @li [2] http://littlewire.cc/   
  * <br><br><br>
  *
  *
@@ -1514,12 +1515,19 @@ private:
  *
  * @page BBB BeagleBone Black
  *
- * BeagleBone Black is supported via MRAA or SPIDev, with MRAA being the preferred choice due to performance.
- * 
+ * BeagleBone Black is supported via MRAA or SPIDEV, with MRAA being the preferred choice due to performance.
+ *
+ * @warning At the time of this writing MRAA support for BBB is not yet completed. RF24 support for MRAA via BBB is included
+ * but is untested.
+ *
+ *  @note With SPIDEV, Users may need to edit the RF24/arch/BBB/spi.cpp file to configure the spi device. (Default:
+ * "/dev/spidev1.0";; )
+ *
  * <br>
  * @section AutoInstall Automated Install 
- *(**Designed & Tested on RPi** - Defaults to SPIDev on BBB)
+ *(**Designed & Tested on RPi** - Defaults to SPIDEV on BBB)
  *
+ * 
  * 1. Download the install.sh file from http://tmrh20.github.io/RF24Installer/RPi/install.sh
  * @code wget http://tmrh20.github.io/RF24Installer/RPi/install.sh @endcode
  * 2. Make it executable:
@@ -1600,7 +1608,7 @@ private:
  * 
  *
  *
- * * @page RPi Raspberry Pi
+ * @page RPi Raspberry Pi
  *
  * RF24 supports a variety of Linux based devices via various drivers. Some boards like RPi can utilize multiple methods
  * to drive the GPIO and SPI functionality.
@@ -1763,7 +1771,7 @@ private:
  *
  * Install the library 
  *
- * @code ./setup.py install  @endcode
+ * @code sudo ./setup.py install  @endcode
  *
  * 
  * See the additional <a href="pages.html">Platform Support</a> pages for information on connecting your hardware  <br>
@@ -1775,13 +1783,55 @@ private:
  *
  * @code nano pingpair_dyn.py   @endcode
  *
- * Configure another device, Arduino or RPi with the pingpair_dyn example  
+ * Configure another device, Arduino or RPi with the <a href="pingpair_dyn_8py-example.html">pingpair_dyn</a> example  
  *
  * Run the example  
  *
  * @code sudo ./pingpair_dyn.py  @endcode
  *
  * <br><br><br>
+ *
+ *
+ * @page Portability RF24 Portability
+ *
+ * The RF24 radio driver mainly utilizes the <a href="http://arduino.cc/en/reference/homePage">Arduino API</a> for GPIO, SPI, and timing functions, which are easily replicated
+ * on various platforms. <br>Support files for these platforms are stored under RF24/arch, and can be modified to provide 
+ * the required functionality.
+ * 
+ * <br>
+ * @section Hardware_Templates Basic Hardware Template
+ *
+ * **RF24/arch/**
+ *
+ * The RF24 library now includes a basic hardware template to assist in porting to various platforms. <br> The following files can be included
+ * to replicate standard Arduino functions as needed, allowing devices from ATTiny to Raspberry Pi to utilize the same core RF24 driver.
+ *
+ * | File               |                   Purpose                                                    | 
+ * |--------------------|------------------------------------------------------------------------------| 
+ * | RF24_arch_config.h | Basic Arduino/AVR compatibility, includes for remaining support files, etc   | 
+ * | includes.h         | Linux only. Defines specific platform, include correct RF24_arch_config file | 
+ * | spi.h              | Provides standardized SPI ( spi.transfer() ) methods                         | 
+ * | gpio.h             | Provides standardized GPIO ( digitalWrite() ) methods                        | 
+ * | compatibility.h    | Provides standardized timing (millis(), delay()) methods                     | 
+ * | your_custom_file.h | Provides access to custom drivers for spi,gpio, etc                          | 
+ *
+ * <br>
+ * Examples are provided via the included hardware support templates in **RF24/arch/** <br>
+ * See **RF24/arch/BBB** for a general Linux template.
+ *
+ *<br>
+ * @section Device_Detection Device Detection
+ *
+ * 1. The main detection for Linux devices is done in the Makefile, with the includes.h from the proper hardware directory copied to RF24/arch/includes.h <br>
+ * 2. Secondary detection is completed in RF24_config.h, causing the include.h file to be included for all supported Linux devices <br>
+ * 3. RF24.h contains the declaration for SPI and GPIO objects 'spi' and 'gpio' to be used for porting-in related functions.
+ *
+ * <br>
+ * @section Ported_Code Code
+ * To have your ported code included in this library, or for assistance in porting, create a pull request or open an issue at https://github.com/TMRh20/RF24
+ * 
+ *
+ *<br><br><br>
  */
 
 #endif // __RF24_H__

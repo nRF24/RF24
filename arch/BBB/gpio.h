@@ -14,6 +14,23 @@
 
 #include <cstdio>
 
+/**
+ * @file gpio.h
+ * \cond HIDDEN_SYMBOLS
+ * Class declaration for GPIO helper files
+ */
+ 
+ 
+/**
+ * Example GPIO.h file
+ *
+ * @defgroup GPIO GPIO Example
+ *
+ * See RF24_arch_config.h for additional information
+ * @{
+ */
+ 
+
 class GPIO {
 public:
 
@@ -27,7 +44,7 @@ public:
 	GPIO();
 	
 	/**
-	 * 
+	 * Similar to Arduino pinMode(pin,mode);
      * @param port
      * @param DDR
      */
@@ -38,13 +55,13 @@ public:
      */
 	static void close(int port);
 	/**
-	 * 
+	 * Similar to Arduino digitalRead(pin);
      * @param port
      * @param value
      */
 	static int read(int port);
 	/**
-	* 
+	* Similar to Arduino digitalWrite(pin,state);
 	* @param port
 	* @param value
 	*/	
@@ -55,6 +72,9 @@ public:
 private:
 
 };
-
+/**
+ * \endcond
+ */
+/*@}*/
 #endif	/* H */
 

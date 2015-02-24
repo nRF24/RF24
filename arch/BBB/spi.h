@@ -8,6 +8,21 @@
 #ifndef SPI_H
 #define	SPI_H
 
+/**
+ * @file spi.h
+ * \cond HIDDEN_SYMBOLS
+ * Class declaration for SPI helper files
+ */
+ 
+ /**
+ * Example GPIO.h file
+ *
+ * @defgroup SPI SPI Example
+ *
+ * See RF24_arch_config.h for additional information
+ * @{
+ */
+ 
 #include <string>
 #include <stdint.h>
 #include <unistd.h>
@@ -27,27 +42,58 @@ using namespace std;
 class SPI {
 public:
 	
+	/**
+	* SPI constructor
+	*/	 
 	SPI();
+	
+	/**
+	* Start SPI
+	*/
 	void begin();
+	
+	/**
+	* Transfer a single byte
+	* @param tx_ Byte to send
+	* @return Data returned via spi
+	*/
 	uint8_t transfer(uint8_t tx_);
+	
+	/**
+	* Transfer a buffer of data
+	* @param tbuf Transmit buffer
+	* @param rbuf Receive buffer
+	* @param len Length of the data
+	*/
 	void transfernb(char* tbuf, char* rbuf, uint32_t len);
+
+	/**
+	* Transfer a buffer of data without an rx buffer
+	* @param buf Pointer to a buffer of data
+	* @param len Length of the data
+	*/	
 	void transfern(char* buf, uint32_t len);
+	
 	virtual ~SPI();
 
 private:
 
-	// Default SPI device
+	/** Default SPI device */
 	string device;
-	// SPI Mode set 
+	/** SPI Mode set */
 	uint8_t mode;
-	// word size
+	/** word size*/
 	uint8_t bits;
-	// Set SPI speed
+	/** Set SPI speed*/
 	uint32_t speed;
 	int fd;
 
 	void init();	
 };
 
+/**
+ * \endcond
+ */
+/*@}*/
 #endif	/* SPI_H */
 

@@ -5,7 +5,11 @@
 
 #ifndef _SPI_H_INCLUDED
 #define _SPI_H_INCLUDED
-
+ /**
+ * @file spi.h
+ * \cond HIDDEN_SYMBOLS
+ * Class declaration for SPI helper files
+ */
 #include <stdio.h>
 #include "mraa.hpp"
 
@@ -45,5 +49,7 @@ void SPI::transfern(char* buf, uint32_t len)
     transfernb(buf, buf, len);
 }
 
-
+/**
+ * \endcond
+ */
 #endif

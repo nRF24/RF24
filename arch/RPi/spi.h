@@ -2,7 +2,11 @@
  * TMRh20 2015
  * SPI layer for RF24 <-> BCM2835
  */
-
+/**
+ * @file spi.h
+ * \cond HIDDEN_SYMBOLS
+ * Class declaration for SPI helper files
+ */
 #ifndef _SPI_H_INCLUDED
 #define _SPI_H_INCLUDED
 
@@ -41,5 +45,7 @@ void SPI::transfern(char* buf, uint32_t len)
 {
     transfernb(buf, buf, len);
 }
-
+/**
+ * \endcond
+ */
 #endif

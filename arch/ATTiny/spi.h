@@ -1,5 +1,11 @@
 // ATTiny support code is from https://github.com/jscrane/RF24
 
+/**
+ * @file spi.h
+ * \cond HIDDEN_SYMBOLS
+ * Class declaration for SPI helper files
+ */
+ 
 #include <stdio.h>
 #include <Arduino.h>
 #include <avr/pgmspace.h>
@@ -41,3 +47,7 @@ public:
   static void setClockDivider(uint8_t);
 };
 extern SPIClass SPI;
+
+/**
+ * \endcond
+ */

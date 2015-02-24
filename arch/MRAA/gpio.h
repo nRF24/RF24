@@ -5,7 +5,11 @@
 
 #ifndef RF24_ARCH_GPIO_H
 #define	RF24_ARCH_GPIO_H
-
+ /**
+ * @file spi.h
+ * \cond HIDDEN_SYMBOLS
+ * Class declaration for GPIO helper files
+ */
 #include <cstdio>
 #include <stdio.h>
 #include "mraa.hpp"
@@ -56,6 +60,8 @@ private:
 	mraa::Gpio* gpio_0; /** gpio object for ce_pin **/
 	mraa::Gpio* gpio_1; /** gpio object for cs_pin **/
 };
-
+/**
+ * \endcond
+ */
 #endif	/* RF24_ARCH_GPIO_H */
 
