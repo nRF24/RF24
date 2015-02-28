@@ -1810,14 +1810,14 @@ private:
  * |--------------------|------------------------------------------------------------------------------| 
  * | RF24_arch_config.h | Basic Arduino/AVR compatibility, includes for remaining support files, etc   | 
  * | includes.h         | Linux only. Defines specific platform, include correct RF24_arch_config file | 
- * | spi.h              | Provides standardized SPI ( spi.transfer() ) methods                         | 
+ * | spi.h              | Provides standardized SPI ( transfer() ) methods                         | 
  * | gpio.h             | Provides standardized GPIO ( digitalWrite() ) methods                        | 
  * | compatibility.h    | Provides standardized timing (millis(), delay()) methods                     | 
  * | your_custom_file.h | Provides access to custom drivers for spi,gpio, etc                          | 
  *
  * <br>
  * Examples are provided via the included hardware support templates in **RF24/arch** <br>
- * See **RF24/arch/BBB** for a general Linux template.
+ * See the <a href="modules.html">modules</a> page for examples of class declarations 
  *
  *<br>
  * @section Device_Detection Device Detection
