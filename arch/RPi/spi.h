@@ -23,7 +23,7 @@ public:
   inline static void transfernb(char* tbuf, char* rbuf, uint32_t len);
   inline static void transfern(char* buf, uint32_t len);  
 
-  static void begin();
+  static void begin(int busNo);
   static void end();
 
   static void setBitOrder(uint8_t bit_order);

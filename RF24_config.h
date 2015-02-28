@@ -28,7 +28,7 @@
 
 	
 //Generic Linux/ARM and //http://iotdk.intel.com/docs/master/mraa/
-#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(RF24_MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
+#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
 
   // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /arch/includes.h (Default is spidev config)
   // This behavior can be overridden by calling 'make RF24_SPIDEV=1' or 'make RF24_MRAA=1'

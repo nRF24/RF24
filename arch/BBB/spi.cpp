@@ -14,13 +14,23 @@ SPI::SPI() {
 	
 }
 
-void SPI::begin(){
+void SPI::begin(int busNo){
+
 
 	//BBB:
-	this->device = "/dev/spidev1.0";;
-	
+	if(!busNo){
+	  this->device = "/dev/spidev1.0";;
+	}else{
+	  this->device = "/dev/spidev1.1";;
+    }
+
 	//RPi:
-	//this->device = "/dev/spidev0.0";;
+	/*  if(!busNo){
+	    this->device = "/dev/spidev0.0";;
+	  }else{
+	    this->device = "/dev/spidev0.1";;
+	  }*/
+
 	
 	this->bits = 8;
 //	this->speed = 24000000; // 24Mhz - proly doesnt work
@@ -106,6 +116,7 @@ uint8_t SPI::transfer(uint8_t tx_)
 	tr.rx_buf = (unsigned long)&rx[0],
 	tr.len = 1,//ARRAY_SIZE(tx),
 	tr.delay_usecs = 0,
+	tr.cs_change=1,
 	tr.speed_hz = this->speed,
 	tr.bits_per_word = this->bits,
 	};
@@ -145,6 +156,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 		tr.tx_buf = (unsigned long)tbuf,
 		tr.rx_buf = (unsigned long)rbuf,
 		tr.len = len,//ARRAY_SIZE(tx),
+		tr.cs_change=1,
 		tr.delay_usecs = 0,
 		tr.speed_hz = this->speed,
 		tr.bits_per_word = this->bits,

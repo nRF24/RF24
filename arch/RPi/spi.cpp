@@ -7,7 +7,7 @@ SPI::SPI() {
 }
 
 
-void SPI::begin( ) {
+void SPI::begin( int busNo ) {
 	
 	if (!bcm2835_init()){
 		return;

@@ -49,11 +49,9 @@ void RF24::csn(bool mode)
 			delayMicroseconds(11);  // allow csn to settle
 		}
 	}		
-#elif !defined (ARDUINO_SAM_DUE)
+#elif !defined (ARDUINO_SAM_DUE) && !defined (RF24_LINUX)
 	digitalWrite(csn_pin,mode);
-	#if !defined (RF24_BBB)
-		delayMicroseconds(5);
-	#endif
+	delayMicroseconds(5);
 #endif
 
 }
@@ -629,20 +627,17 @@ void RF24::begin(void)
 	  gpio.begin(ce_pin,csn_pin);	
 	#endif
 	
-	#if defined(RF24_RPi)
-	  switch(csn_pin){     //Ensure valid hardware CS pin
-		case 0: break;
-		case 1: break;
-		case 8: csn_pin = 0; break;
-		case 7: csn_pin = 1; break;
-		default: csn_pin = 0; break;
-	  }
-	#else	
-	  pinMode(csn_pin,OUTPUT);
-	  csn(HIGH);
-	#endif
+
+	switch(csn_pin){     //Ensure valid hardware CS pin
+	  case 0: break;
+	  case 1: break;
+	  case 8: csn_pin = 0; break;
+	  case 7: csn_pin = 1; break;
+	  default: csn_pin = 0; break;
+	}	
 	
-	_SPI.begin();	
+    _SPI.begin(csn_pin);
+
 	pinMode(ce_pin,OUTPUT);
 	ce(LOW);    
 
