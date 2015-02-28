@@ -9,11 +9,7 @@ SPI::SPI() {
 
 
 void SPI::begin(int busNo) {
-	// Prophet: this is only a suggestion, but can update begin with SPI bus number for devices with multiple SPI ports,
-	// and then #define _SPI_BUS_NUMBER in config, so for non MRAA platforms it will state as SPI.beign(),
-	// while for MRAA ones it will go SPI.begin(0) or any other valid bus number
-
-	mspi = new mraa::Spi(0);
+	mspi = new mraa::Spi(busNo); // init mraa spi bus, it will handle chip select internally. For CS pin wiring user must check SPI details in hardware manual
 
 	mspi->mode(mraa::SPI_MODE0);
 	mspi->bitPerWord(8);
