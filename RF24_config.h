@@ -52,8 +52,10 @@
   
   #include "arch/LittleWire/RF24_arch_config.h"
 
-  
-  
+//Teensy  
+#elif defined (TEENSYDUINO)
+
+  #include "arch/Teensy/RF24_arch_config.h"  
 //Everything else
 #else 
 
@@ -68,12 +70,6 @@
  
   // Define _BV for non-Arduino platforms and for Arduino DUE
 #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
-	#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-		#define RF24_TINY
-		#define _SPI SPI
-		#include "arch/ATTiny/RF24_arch_config.h"
-		
-	#else
       #if defined SPI_UART
 		#include <SPI_UART.h>
 		#define _SPI uspi
@@ -90,25 +86,22 @@
 		#include <SPI.h>
 		#define _SPI SPI
 	  #endif
-	#endif
 #else
   #include <stdint.h>
   #include <stdio.h>
   #include <string.h>
 
 
- #if defined(__arm__) || defined (CORE_TEENSY) || defined (__ARDUINO_X86__)
+ #if defined(__arm__) || defined (__ARDUINO_X86__)
    #include <SPI.h>
  #endif
 
- #if !defined(CORE_TEENSY)	
-   #define _BV(x) (1<<(x))
-   #if !defined(__arm__) && !defined (__ARDUINO_X86__)
-     extern HardwareSPI SPI;
-   #endif
- #else
-    #define printf Serial.printf
+ 
+ #define _BV(x) (1<<(x))
+ #if !defined(__arm__) && !defined (__ARDUINO_X86__)
+   extern HardwareSPI SPI;
  #endif
+
 
   #define _SPI SPI
 #endif
@@ -131,7 +124,7 @@
 // Avoid spurious warnings
 // Arduino DUE is arm and uses traditional PROGMEM constructs
 #if 1
-#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)  && ! defined( CORE_TEENSY3 )
+#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)
 #undef PROGMEM
 #define PROGMEM __attribute__(( section(".progmem.data") ))
 #undef PSTR
@@ -145,26 +138,25 @@
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
 #else
-#if ! defined(ARDUINO) // This doesn't work on Arduino DUE
+  #if ! defined(ARDUINO) // This doesn't work on Arduino DUE
 	typedef char const char;
-#else // Fill in pgm_read_byte that is used, but missing from DUE
+  #else // Fill in pgm_read_byte that is used, but missing from DUE
 	#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+  #endif
+
+
+  typedef uint16_t prog_uint16_t;
+  #define PSTR(x) (x)
+  #define printf_P printf
+  #define strlen_P strlen
+  #define PROGMEM
+  #define pgm_read_word(p) (*(p))
+
+  #define PRIPSTR "%s"
+
 #endif
 
-#if !defined ( CORE_TEENSY )
-	typedef uint16_t prog_uint16_t;
-	#define PSTR(x) (x)
-	#define printf_P printf
-	#define strlen_P strlen
-	#define PROGMEM
-	#define pgm_read_word(p) (*(p))
 #endif
-
-	#define PRIPSTR "%s"
-
-#endif
-
-#endif //Defined Linux 
 
 
 
