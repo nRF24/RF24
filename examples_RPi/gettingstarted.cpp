@@ -30,10 +30,10 @@ using namespace std;
 // Hardware configuration
 // Configure the appropriate pins for your connections
 
-// Radio CE Pin, CSN Pin, SPI Speed
+/****************** Raspberry Pi ***********************/
 
-// Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 1Mhz
-//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_26, BCM2835_SPI_SPEED_1MHZ);
+// Radio CE Pin, CSN Pin, SPI Speed
+// See http://www.airspayce.com/mikem/bcm2835/group__constants.html#ga63c029bd6500167152db4e57736d0939 and the related enumerations for pin information.
 
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
 //RF24 radio(RPI_V2_GPIO_P1_22, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ);
@@ -44,15 +44,30 @@ using namespace std;
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
-//Note: Specify SPI BUS 0 or 1 instead of CS pin number. RPi can also use 0 or 1 to specify BUS/CSN pin.
-//RPi Alternate, with mraa
+/*** RPi Alternate ***/
+//Note: Specify SPI BUS 0 or 1 instead of CS pin number.
+// See http://tmrh20.github.io/RF24/RPi.html for more information on usage
+
+//RPi Alternate, with MRAA
 //RF24 radio(15,0);
 
-//RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' 
+//RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 //RF24 radio(22,0);
+
+
+/****************** Linux (BBB,x86,etc) ***********************/
+
+// See http://tmrh20.github.io/RF24/pages.html for more information on usage
+// See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
+// See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
 // Setup for ARM(Linux) devices like BBB using spidev (default is "/dev/spidev1.0" )
 //RF24 radio(115,0);
+
+//BBB Alternate, with mraa
+// CE pin = (Header P9, Pin 13) = 59 = 13 + 46 
+//Note: Specify SPI BUS 0 or 1 instead of CS pin number. 
+//RF24 radio(59,0);
 
 /********** User Config *********/
 // Assign a unique identifier for this node, 0 or 1
