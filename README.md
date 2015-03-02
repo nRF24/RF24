@@ -2,8 +2,7 @@
   
 Design Goals: This library is designed to be...  
   
-* More compliant with the manufacturer specified operation of the chip, while allowing advanced users
-* to work outside the reccommended operation. 
+* More compliant with the manufacturer specified operation of the chip, while allowing advanced users to work outside the reccommended operation. 
 * Utilize the capabilities of the radio to their full potential via Arduino
 * More reliable and feature rich  
 * Easy for beginners to use, with well documented examples and features 
