@@ -102,7 +102,7 @@ public:
   //#if defined (RF24_LINUX)
   
     /**
-  * Raspberry Pi Constructor
+  * Optional Raspberry Pi Constructor
   *
   * Creates a new instance of this driver.  Before using, you create an instance
   * and send in the unique pins that this chip is connected to.
@@ -115,7 +115,9 @@ public:
   RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
 
+  #if !defined (RF24_TINY)
   virtual ~RF24() {};
+  #endif
 
   /**
    * Begin operation of the chip
@@ -1307,8 +1309,10 @@ private:
  * @section News News
  *
  * **Feb 2015**<br>
- * - MRAA supported added ( Galileo, Edison, etc)
- * - BBB/Linux support via spidev & MRAA
+ * - <a href="MRAA.html">MRAA</a> support added ( Galileo, Edison, etc)
+ * - <a href="BBB.html">BBB/Linux </a> support via spidev & MRAA
+ * - Break out requirements for individual platforms to RF24/arch
+ * - Documentation cleanup & update
  *
  * <b>Dec 2014 </b><br>
  * - New: Intel Galileo now supported
@@ -1515,13 +1519,10 @@ private:
  *
  * @page BBB BeagleBone Black
  *
- * BeagleBone Black is supported via MRAA or SPIDEV, with MRAA being the preferred choice due to performance.
+ * BeagleBone Black is supported via MRAA or SPIDEV.
  *
- * @warning At the time of this writing MRAA support for BBB is not yet completed. RF24 support for MRAA via BBB is included
- * but is untested.
- *
- *  @note With SPIDEV, Users may need to edit the RF24/arch/BBB/spi.cpp file to configure the spi device. (Default:
- * "/dev/spidev1.0";; )
+ *  @note The SPIDEV option should to work with most Linux systems supporting SPIDEV. <br>
+ *  Users may need to edit the RF24/arch/BBB/spi.cpp file to configure the spi device. (Defaults: "/dev/spidev1.0";  or  "/dev/spidev1.1"; )
  *
  * <br>
  * @section AutoInstall Automated Install 
@@ -1556,24 +1557,26 @@ private:
  * 3. Change to the new RF24 directory
  *    @code cd RF24 @endcode
  * 4. Build the library, and run an example file: 
- *    @code sudo make install  OR  sudo make install RF24_MRAA=1 @endcode
  * **Note:** See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA </a> documentation for more info on installing MRAA
+ *    @code sudo make install  OR  sudo make install RF24_MRAA=1 @endcode
  * @code
  * cd examples_RPi  
  * @endcode
  * Edit the gettingstarted example, to set your pin configuration
  * @code nano gettingstarted.cpp 
- *    make 
- *    sudo ./gettingstarted
+ * make 
+ * sudo ./gettingstarted
  * @endcode
  *
  * <br><br>
  *   
  * @page MRAA MRAA
  *  
- * MRAA is a Low Level Skeleton Library for Communication on GNU/Linux platforms
- *
+ * MRAA is a Low Level Skeleton Library for Communication on GNU/Linux platforms <br>
  * See http://iotdk.intel.com/docs/master/mraa/index.html for more information
+ *
+ * RF24 supports all MRAA supported platforms, but might not be tested on each individual platform due to the wide range of hardware support:<br>
+ * <a href="https://github.com/TMRh20/RF24/issues">Report an RF24 bug or issue </a>
  *
  * @section Setup Setup
  * 1. Install the MRAA lib
@@ -1618,8 +1621,8 @@ private:
  *
  * If SPI is not already enabled, load it on boot:
  * @code sudo raspi-config  @endcode
- * A. Update the tool via the menu as required
- * B. Select Advanced and enable the SPI kernel module
+ * A. Update the tool via the menu as required<br>
+ * B. Select **Advanced** and **enable the SPI kernel module** <br>
  * C. Update other software and libraries:
  * @code sudo apt-get update @endcode
  * @code sudo apt-get upgrade @endcode 
@@ -1705,10 +1708,16 @@ private:
  *   or
  *  RF24 radio(RPI_V2_GPIO_P1_15,BCM2835_SPI_CS1, BCM2835_SPI_SPEED_8MHZ);
  *	
- *	RPi B+:
- *	RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
- *	or
- *	RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_26, BCM2835_SPI_SPEED_8MHZ);
+ *  RPi B+:
+ *  RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
+ *  or
+ *  RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_26, BCM2835_SPI_SPEED_8MHZ);
+ *
+ *  General:
+ *  RF24 radio(22,0);
+ *  or
+ *  RF24 radio(22,1);
+ *
  * @endcode
  * See the gettingstarted example for an example of pin configuration
  *
@@ -1716,13 +1725,13 @@ private:
  * <br><br>
  * **MRAA Constructor:**
  *
- * @code RF24 radio(15,24); @endcode
+ * @code RF24 radio(15,0); @endcode
  *
  * See http://iotdk.intel.com/docs/master/mraa/rasppi.html
  * <br><br>
  * **SPI_DEV Constructor**
  *
- * @code RF24 radio(22,8); @endcode
+ * @code RF24 radio(22,0); @endcode
  *
  * See http://pi.gadgetoid.com/pinout
  *

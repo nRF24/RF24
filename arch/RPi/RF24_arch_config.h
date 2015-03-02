@@ -14,7 +14,10 @@
   #include "bcm2835.h"
   #include "spi.h"
   #define _SPI spi
-
+    #define RF24_BIT_ORDER BCM2835_SPI_BIT_ORDER_MSBFIRST
+	#define RF24_DATA_MODE BCM2835_SPI_MODE0
+	#define RF24_CLOCK_DIVIDER BCM2835_SPI_SPEED_8MHZ
+		
   // GCC a Arduino Missing
   #define _BV(x) (1<<(x))
   #define pgm_read_word(p) (*(p))

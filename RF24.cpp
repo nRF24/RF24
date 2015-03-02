@@ -14,28 +14,8 @@
 
 void RF24::csn(bool mode)
 {
-	// Minimum ideal SPI bus speed is 2x data rate
-	// If we assume 2Mbs data rate and 16Mhz clock, a
-	// divider of 4 is the minimum we want.
-	// CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-#if defined(ARDUINO)
-	#if  ( !defined(RF24_TINY) && !defined (__arm__)  && !defined (SOFTSPI)) || defined (CORE_TEENSY)
-		_SPI.setBitOrder(MSBFIRST);
-		_SPI.setDataMode(SPI_MODE0);
-		_SPI.setClockDivider(SPI_CLOCK_DIV2);
-	#endif
-#endif
 
-#if defined (RF24_RPi)
-	if(!mode){
-
-		_SPI.setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
-		_SPI.setDataMode(BCM2835_SPI_MODE0);
-		_SPI.setClockDivider(spi_speed);
-		_SPI.chipSelect(csn_pin);
-		delayMicroseconds(5);
-	}
-#elif defined (RF24_TINY)
+#if defined (RF24_TINY)
 	if (ce_pin != csn_pin) {
 		digitalWrite(csn_pin,mode);
 	} 
@@ -48,8 +28,31 @@ void RF24::csn(bool mode)
 			PORTB &= ~(1<<PINB2);	// SCK->CSN LOW
 			delayMicroseconds(11);  // allow csn to settle
 		}
-	}		
-#elif !defined (ARDUINO_SAM_DUE) && !defined (RF24_LINUX)
+	}
+	// Return, CSN toggle complete
+	return;
+	
+#elif defined(ARDUINO)
+	// Minimum ideal SPI bus speed is 2x data rate
+	// If we assume 2Mbs data rate and 16Mhz clock, a
+	// divider of 4 is the minimum we want.
+	// CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+	
+      #if !defined (SOFTSPI)	
+		_SPI.setBitOrder(MSBFIRST);
+		_SPI.setDataMode(SPI_MODE0);
+		_SPI.setClockDivider(SPI_CLOCK_DIV2);
+      #endif
+
+#elif defined (RF24_RPi)
+	  _SPI.setBitOrder(RF24_BIT_ORDER);
+	  _SPI.setDataMode(RF24_DATA_MODE);
+	  _SPI.setClockDivider(spi_speed ? spi_speed : RF24_CLOCK_DIVIDER);
+	  _SPI.chipSelect(csn_pin);
+	  delayMicroseconds(5);
+#endif
+
+#if !defined (RF24_LINUX)
 	digitalWrite(csn_pin,mode);
 	delayMicroseconds(5);
 #endif
@@ -71,7 +74,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   uint8_t status;
 
   #if defined (RF24_LINUX)
-  csn(LOW); //In this case, calling csn(LOW) configures the spi settings 
+  csn(LOW); //In this case, calling csn(LOW) configures the spi settings for RPi
   uint8_t * prx = spi_rxbuff;
   uint8_t * ptx = spi_txbuff;
   uint8_t size = len + 1; // Add register value to transmit buffer
@@ -86,7 +89,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 
   // decrement before to skip status byte
   while ( --size ){ *buf++ = *prx++; } 
-  csn(HIGH);
+
 #elif defined (RF24_DUE)
   status = _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
   while ( len-- > 1 ){
@@ -124,7 +127,7 @@ uint8_t RF24::read_register(uint8_t reg)
   
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = *++prx;   // result is 2nd byte of receive buffer  
-  csn(HIGH);
+
   #elif defined (RF24_DUE)
   _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ) , SPI_CONTINUE);
   result = _SPI.transfer(csn_pin,0xff);
@@ -158,7 +161,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
   status = *prx; // status is 1st byte of receive buffer
-  csn(HIGH);
+
   #elif defined (RF24_DUE)
   	status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
     while ( --len){
@@ -196,7 +199,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   	
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 	status = *prx++; // status is 1st byte of receive buffer
-	csn(HIGH);
+
   #elif defined (RF24_DUE)
   status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE);
   _SPI.transfer(csn_pin,value);
@@ -240,7 +243,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
 	
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 	status = *prx; // status is 1st byte of receive buffer
-	csn(HIGH);
+
  #elif defined (RF24_DUE)
 
   status = _SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
@@ -312,7 +315,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
         *current++ = *prx++;
 		
 	*current = *prx;
-    csn(HIGH);
+
   #elif defined (RF24_DUE)
 
   status = _SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
@@ -372,7 +375,6 @@ uint8_t RF24::spiTrans(uint8_t cmd){
   #if defined (RF24_LINUX)
     csn(LOW);
     status = _SPI.transfer( cmd );
-	csn(HIGH);
   #elif defined (RF24_DUE)
 	status = _SPI.transfer(csn_pin, cmd );
   #else
@@ -578,7 +580,7 @@ void RF24::printDetails(void)
 		case BCM2835_SPI_SPEED_32KHZ : printf("32 KHz");	break ;
 		case BCM2835_SPI_SPEED_16KHZ : printf("16 KHz");	break ;
 		case BCM2835_SPI_SPEED_8KHZ  : printf("8 KHz");	break ;
-		default : printf("Probably Bad !!!");	break ;
+		default : printf("8 Mhz");	break ;
 	}
 	printf("\n================ NRF Configuration ================\n");
  
@@ -631,6 +633,7 @@ void RF24::begin(void)
 	switch(csn_pin){     //Ensure valid hardware CS pin
 	  case 0: break;
 	  case 1: break;
+	  // Allow BCM2835 enums for RPi
 	  case 8: csn_pin = 0; break;
 	  case 7: csn_pin = 1; break;
 	  default: csn_pin = 0; break;
@@ -657,7 +660,6 @@ void RF24::begin(void)
 	_SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
   	_SPI.setDataMode(csn_pin,SPI_MODE0);
 	ce(LOW);
-  	//csn(HIGH);
   #else
     #if ! defined(LITTLEWIRE)
     if (ce_pin != csn_pin)
