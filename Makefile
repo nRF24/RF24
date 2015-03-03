@@ -32,12 +32,18 @@ OBJECTS=RF24.o spi.o
 
 SHARED_LINKER_FLAGS=-shared -Wl,-soname,$@.so.1
 
-# Detect the Raspberry Pi by the existence of the bcm_host.h file
+
+
+# Detect the Raspberry Pi from cpuinfo
 # Allow users to override the use of BCM2835 driver and force use of SPIDEV by specifying " sudo make install -B RF24_SPIDEV=1 "
 ifeq "$(RF24_SPIDEV)" "1"
-BCMLOC=/opt/vc/include/bcm_host.none
+RPI=0
 else
-BCMLOC=/opt/vc/include/bcm_host.h
+#Count the matches for BCM2708 or BCM2709 in cpuinfo
+RPI=$(shell cat /proc/cpuinfo | grep Hardware | grep -c BCM2708)
+  ifneq "${RPI}" "1"
+  RPI=$(shell cat /proc/cpuinfo | grep Hardware | grep -c BCM2709)
+  endif
 endif
 
 ifeq "$(RF24_MRAA)" "1"
@@ -45,7 +51,7 @@ SHARED_LINKER_FLAGS+=-lmraa
 DRIVER_DIR=$(ARCH_DIR)/MRAA
 OBJECTS+=gpio.o compatibility.o
 
-else ifneq ("$(wildcard $(BCMLOC))","")
+else ifeq "$(RPI)" "1"
 DRIVER_DIR=$(ARCH_DIR)/RPi
 OBJECTS+=bcm2835.o	
 # The recommended compiler flags for the Raspberry Pi
@@ -63,7 +69,6 @@ all: test librf24-bcm
 
 test:
 	cp ${DRIVER_DIR}/includes.h $(ARCH_DIR)/includes.h
-	
 # Make the library
 librf24-bcm: $(OBJECTS)
 	g++ ${SHARED_LINKER_FLAGS} ${CCFLAGS} -o ${LIBNAME} $^
