@@ -1383,7 +1383,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
 bool RF24::isAckPayloadAvailable(void)
 {
-  return ! read_register(FIFO_STATUS) & _BV(RX_EMPTY);
+  return ! (read_register(FIFO_STATUS) & _BV(RX_EMPTY));
 }
 
 /****************************************************************************/
