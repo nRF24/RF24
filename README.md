@@ -1,4 +1,4 @@
-# Optimized High Speed Arduino/Rapsberry Pi/LittleWire driver for nRF24L01 2.4GHz Wireless Transceiver
+# Optimized High Speed Arduino/Raspberry Pi/LittleWire driver for nRF24L01 2.4GHz Wireless Transceiver
   
 Design Goals: This library is designed to be...  
   
