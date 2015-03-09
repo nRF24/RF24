@@ -40,7 +40,9 @@
   #include <sys/time.h>
   #include <stddef.h>
   #ifdef __arm__
-    #include "RPi/bcm2835.h"
+    #ifndef RF24_SPIDEV
+      #include "RPi/bcm2835.h"
+    #endif
   #endif
 
   // Additional fixes for LittleWire
@@ -69,6 +71,11 @@
 	#if defined(RF24_TINY)
 	  #define printf_P(...)
     #endif
+  #endif
+
+  #ifdef RF24_SPIDEV
+    #include "spidev/SPIClass.h"
+    #define _SPI SPI
   #endif
 
 #else //Everything else

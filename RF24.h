@@ -17,7 +17,9 @@
 
 #include "RF24_config.h"
 #if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ )
-  #include "RPi/bcm2835.h"
+  #ifndef RF24_SPIDEV
+    #include "RPi/bcm2835.h"
+  #endif
 #elif LITTLEWIRE
   #include <LittleWireSPI/LittleWireSPI.h>
 #elif defined SOFTSPI
@@ -60,7 +62,7 @@ private:
 
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
-#if defined (__linux)
+#if defined (RF24_LINUX)
   uint16_t spi_speed; /**< SPI Bus Speed */
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
@@ -106,13 +108,31 @@ public:
   
   RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
+
+  #if defined (RF24_LINUX)
+  /**
+  * Generic linux spidev constructor
+  *
+  * Creates a new instance of this driver.  Before using, you create an instance
+  * and send in the unique pins that this chip is connected to. The device to use
+  * will be specified when calling begin, eg. radio.begin("/dev/spidev1.0");
+  *
+  * @param _cepin The pin attached to Chip Enable on the RF module
+  */  
+  RF24(uint8_t _cepin);
+  #endif
+
   /**
    * Begin operation of the chip
    * 
    * Call this in setup(), before calling any other methods.
    * @code radio.begin() @endcode
    */
+  #if defined (RF24_SPIDEV)
+  void begin(const char* device);
+  #else
   void begin(void);
+  #endif
 
   /**
    * Start listening on the pipes opened for reading.
