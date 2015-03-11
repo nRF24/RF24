@@ -27,6 +27,8 @@ void setup() {
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
   
   radio.begin();
+  radio.setAutoAck(0);  // Disable autoACK (which is true by default). This example does not use it and it may be the cause of failure.
+  radio.setPayloadSize(sizeof(unsigned long)); // Here we are sending fixed payloads, and this was not set yet, nor we are yet using DPL feature.
 
   // Set the PA Level low to prevent power supply related issues since this is a
  // getting_started sketch, and the likelihood of close proximity of the devices. RF24_PA_MAX is default.
