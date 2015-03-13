@@ -1304,15 +1304,16 @@ private:
  * @li Utilize the capabilities of the radio to their full potential via Arduino
  * @li More reliable, responsive, bug-free and feature rich
  * @li Easy for beginners to use, with well documented examples and features
- * @li Consumed with a public interface that's similiar to other Arduino standard libraries
+ * @li Consumed with a public interface that's similar to other Arduino standard libraries
  *
  * @section News News
  *
- * **Feb 2015**<br>
+ * **March 2015**<br>
+ * - New layout for easier portability: Break out defines & includes for individual platforms to RF24/arch
  * - <a href="MRAA.html">MRAA</a> support added ( Galileo, Edison, etc)
- * - <a href="BBB.html">BBB/Linux </a> support via spidev & MRAA
- * - Break out requirements for individual platforms to RF24/arch
- * - Documentation cleanup & update
+ * - <a href="BBB.html">BBB/Generic Linux </a> support via spidev & MRAA
+ * - Support for RPi 2 added
+ * - Major Documentation cleanup & update (Move all docs to github.io)
  *
  * <b>Dec 2014 </b><br>
  * - New: Intel Galileo now supported
@@ -1337,7 +1338,7 @@ private:
  *
  * @li <a href="http://tmrh20.github.io/RF24Network"> <b>RF24Network:</b> OSI Network Layer for multi-device communication. Create a home sensor network.</a>
  * @li <a href="http://tmrh20.github.io/RF24Mesh"> <b>RF24Mesh:</b> Dynamic Mesh Layer for RF24Network</a>
- * @li <a href="http://tmrh20.github.io/RF24Ethernet"> <b>RF24Ethernet:</b> TCP/IP over RF24Network </a>
+ * @li <a href="http://tmrh20.github.io/RF24Ethernet"> <b>RF24Ethernet:</b> TCP/IP Radio Mesh Networking (shares Arduino Ethernet API)</a>
  * @li <a href="http://tmrh20.github.io/RF24Audio"> <b>RF24Audio:</b> Realtime Wireless Audio streaming</a>
  * @li <a href="http://tmrh20.github.io/">All TMRh20 Documentation Main Page</a>
  *
@@ -1521,7 +1522,7 @@ private:
  *
  * BeagleBone Black is supported via MRAA or SPIDEV.
  *
- *  @note The SPIDEV option should to work with most Linux systems supporting SPIDEV. <br>
+ *  @note The SPIDEV option should work with most Linux systems supporting SPIDEV. <br>
  *  Users may need to edit the RF24/arch/BBB/spi.cpp file to configure the spi device. (Defaults: "/dev/spidev1.0";  or  "/dev/spidev1.1"; )
  *
  * <br>
