@@ -5,8 +5,6 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
-
- Added Arduino Due support from https://github.com/mcrosson/
  */
  
  /* spaniakos <spaniakos@gmail.com>
@@ -35,12 +33,6 @@
   // The includes.h file defines either RF24_RPi, MRAA or RF24_BBB and includes the correct RF24_arch_config.h file
   #include "arch/includes.h"
 
-//Arduino Due
-#elif defined ARDUINO_SAM_DUE 
-  
-  #define RF24_DUE
-  #include "arch/Due/RF24_arch_config.h"
-
 //ATTiny  
 #elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
   
@@ -59,16 +51,11 @@
 //Everything else
 #else 
 
-  #if ARDUINO < 100
-	#include <WProgram.h>
-  #else
-	#include <Arduino.h>
-  #endif
-
-  #include <stddef.h>
+  #include <Arduino.h>
   
- 
-  // Define _BV for non-Arduino platforms and for Arduino DUE
+  // RF modules support 10 Mhz SPI bus speed
+  const uint32_t RF_SPI_SPEED = 10000000;  
+
 #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
       #if defined SPI_UART
 		#include <SPI_UART.h>
@@ -87,6 +74,7 @@
 		#define _SPI SPI
 	  #endif
 #else
+  // Define _BV for non-Arduino platforms and for Arduino DUE
   #include <stdint.h>
   #include <stdio.h>
   #include <string.h>
