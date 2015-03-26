@@ -115,7 +115,7 @@ public:
   RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
 
-  #if !defined (RF24_TINY)
+  #if defined (RF24_LINUX)
   virtual ~RF24() {};
   #endif
 
@@ -1309,7 +1309,7 @@ private:
  * @section News News
  *
  * **March 2015**<br>
- * - New layout for easier portability: Break out defines & includes for individual platforms to RF24/arch
+ * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/arch
  * - <a href="MRAA.html">MRAA</a> support added ( Galileo, Edison, etc)
  * - <a href="BBB.html">BBB/Generic Linux </a> support via spidev & MRAA
  * - Support for RPi 2 added
@@ -1369,16 +1369,16 @@ private:
  * The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
  * CE and CSN are configurable.
  *
- * | PIN | NRF24L01 | Arduino UNO | ATtiny25/45/85 [0] | ATtiny44/84 [1] | LittleWire [2]
- * |-----|----------|-------------|--------------------|-----------------|--------------
- * |  1  |   GND    |   GND       |     pin 4          |    pin 14       | GND
- * |  2  |   VCC    |   3.3V      |     pin 8          |    pin  1       | regulator 3.3V required
- * |  3  |   CE     |   digIO 7   |     pin 2          |    pin 12       | pin to 3.3V
- * |  4  |   CSN    |   digIO 8   |     pin 3          |    pin 11       | RESET
- * |  5  |   SCK    |   digIO 13  |     pin 7          |    pin  9       | SCK
- * |  6  |   MOSI   |   digIO 11  |     pin 6          |    pin  7       | MOSI
- * |  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       | MISO
- * |  8  |   IRQ    |      -      |        -           |         -       | -
+ * | PIN | NRF24L01 | Arduino UNO | ATtiny25/45/85 [0] | ATtiny44/84 [1] | LittleWire [2]          |    RPI     | RPi -P1 Connector |
+ * |-----|----------|-------------|--------------------|-----------------|-------------------------|------------|-------------------|
+ * |  1  |   GND    |   GND       |     pin 4          |    pin 14       | GND                     | rpi-gnd    |     (25)          |
+ * |  2  |   VCC    |   3.3V      |     pin 8          |    pin  1       | regulator 3.3V required | rpi-3v3    |     (17)          |
+ * |  3  |   CE     |   digIO 7   |     pin 2          |    pin 12       | pin to 3.3V             | rpi-gpio22 |     (15)          |
+ * |  4  |   CSN    |   digIO 8   |     pin 3          |    pin 11       | RESET                   | rpi-gpio8  |     (24)          |
+ * |  5  |   SCK    |   digIO 13  |     pin 7          |    pin  9       | SCK                     | rpi-sckl   |     (23)          |
+ * |  6  |   MOSI   |   digIO 11  |     pin 6          |    pin  7       | MOSI                    | rpi-mosi   |     (19)          |
+ * |  7  |   MISO   |   digIO 12  |     pin 5          |    pin  8       | MISO                    | rpi-miso   |     (21)          |
+ * |  8  |   IRQ    |      -      |        -           |         -       | -                       |    -       |       -           |
  *
  * @li [0] https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
  * @li [1] http://highlowtech.org/?p=1695
