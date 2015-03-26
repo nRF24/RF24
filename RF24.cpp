@@ -565,7 +565,7 @@ void RF24::printDetails(void)
 bool RF24::begin(void)
 {
 
-  uint8_t setup;
+  uint8_t setup=0;
 
   #if defined (RF24_LINUX)
 
