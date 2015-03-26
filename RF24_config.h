@@ -53,7 +53,7 @@
 
   #include <Arduino.h>
   
-  #if ARDUINO > 10600
+  #if ARDUINO >= 10600
     #define RF24_SPI_TRANSACTIONS
   #endif
   
