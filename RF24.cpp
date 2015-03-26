@@ -367,7 +367,7 @@ void RF24::print_observe_tx(uint8_t value)
 
 void RF24::print_byte_register(const char* name, uint8_t reg, uint8_t qty)
 {
-  //char extra_tab = strlen_P(name) < 8 ? '\t' : '\a';
+  //char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
   //printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
   #if defined (RF24_LINUX)
     char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
@@ -642,12 +642,16 @@ bool RF24::begin(void)
   //setPALevel( RF24_PA_MAX ) ;
 
   // check for connected module and if this is a p nRF24l01 variant
-  //  
-  setup = read_register(RF_SETUP);
-  if( setup == 0b00001110 )     // register default for nRF24L01P
+  //
+  if( setDataRate( RF24_250KBPS ) )
   {
     p_variant = true ;
   }
+  /*setup = read_register(RF_SETUP);
+  if( setup == 0b00001110 )     // register default for nRF24L01P
+  {
+    p_variant = true ;
+  }*/
   
   // Then set the data rate to the slowest (and most reliable) speed supported by all
   // hardware.

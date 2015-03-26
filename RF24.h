@@ -90,13 +90,17 @@ protected:
    *
    */
   inline void beginTransaction() {
+    #if defined (RF24_SPI_TRANSACTIONS)
     _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
+	#endif
     csn(LOW);
   }
 
   inline void endTransaction() {
     csn(HIGH);
+	#if defined (RF24_SPI_TRANSACTIONS)
     _SPI.endTransaction();
+	#endif
   }
 
 #endif   /* ARDUINO */
