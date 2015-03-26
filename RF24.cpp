@@ -601,14 +601,7 @@ bool RF24::begin(void)
     // Initialize pins
   if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
   
-  #if defined (RF24_DUE)
-  	_SPI.begin(csn_pin);					// Using the extended SPI features of the DUE
-	_SPI.setClockDivider(csn_pin, 11);   // Set the bus speed to just under 8mhz on Due
-	_SPI.setBitOrder(csn_pin,MSBFIRST);	// Set the bit order and mode specific to this device
-  	_SPI.setDataMode(csn_pin,SPI_MODE0);
-	ce(LOW);
-  #else
-    #if ! defined(LITTLEWIRE)
+  #if ! defined(LITTLEWIRE)
     if (ce_pin != csn_pin)
     #endif
         pinMode(csn_pin,OUTPUT);
@@ -619,7 +612,6 @@ bool RF24::begin(void)
   	#if defined (__ARDUINO_X86__)
 		delay(100);
   	#endif
-  #endif
   #endif //Linux
 
   // Must allow the radio time to settle else configuration bits will not necessarily stick.
@@ -1036,15 +1028,11 @@ uint8_t RF24::getDynamicPayloadSize(void)
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = spi_rxbuff[1];  
   csn(HIGH);
-  #elif defined (RF24_DUE)
-  _SPI.transfer(csn_pin, R_RX_PL_WID, SPI_CONTINUE );
-  result = _SPI.transfer(csn_pin,0xff);
   #else
-  csn(LOW);
+  beginTransaction();
   _SPI.transfer( R_RX_PL_WID );
   result = _SPI.transfer(0xff);
-  csn(HIGH);
-
+  endTransaction();
   #endif
 
   if(result > 32) { flush_rx(); delay(2); return 0; }
@@ -1226,15 +1214,13 @@ void RF24::toggle_features(void)
     _SPI.transfer( ACTIVATE );
     _SPI.transfer( 0x73 );
 	csn(HIGH);
-  #elif defined (RF24_DUE)
-  _SPI.transfer(csn_pin, ACTIVATE, SPI_CONTINUE );
-  _SPI.transfer(csn_pin, 0x73 );
   #else
-  csn(LOW);
-  _SPI.transfer( ACTIVATE );
-  _SPI.transfer( 0x73 );
-  csn(HIGH);
+    beginTransaction();
+	_SPI.transfer( ACTIVATE );
+    _SPI.transfer( 0x73 );
+	endTransaction();
   #endif
+
 }
 
 /****************************************************************************/
@@ -1312,23 +1298,16 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 	
     _SPI.transfern( (char *) spi_txbuff, size);
 	csn(HIGH);
-  #elif defined (RF24_DUE)
-	_SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & 0b111 ), SPI_CONTINUE);
-	while ( data_len-- > 1 ){
-		_SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
-	}
-	_SPI.transfer(csn_pin,*current++);
-
   #else
-  csn(LOW);
+  beginTransaction();
   _SPI.transfer(W_ACK_PAYLOAD | ( pipe & 0b111 ) );
 
   while ( data_len-- )
     _SPI.transfer(*current++);
+  endTransaction();
+  	
+  #endif  
 
-  csn(HIGH);
-
-  #endif
 }
 
 /****************************************************************************/
