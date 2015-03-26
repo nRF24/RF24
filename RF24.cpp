@@ -90,20 +90,14 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   // decrement before to skip status byte
   while ( --size ){ *buf++ = *prx++; } 
 
-#elif defined (RF24_DUE)
-  status = _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
-  while ( len-- > 1 ){
-    *buf++ = _SPI.transfer(csn_pin,0xff, SPI_CONTINUE);
-  }
-  *buf++ = _SPI.transfer(csn_pin,0xff);
-
 #else
-  csn(LOW);
+
+  beginTransaction();
   status = _SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- ){
     *buf++ = _SPI.transfer(0xff);
   }
-  csn(HIGH);
+  endTransaction();
 
 #endif
 
@@ -128,15 +122,13 @@ uint8_t RF24::read_register(uint8_t reg)
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = *++prx;   // result is 2nd byte of receive buffer  
 
-  #elif defined (RF24_DUE)
-  _SPI.transfer(csn_pin, R_REGISTER | ( REGISTER_MASK & reg ) , SPI_CONTINUE);
-  result = _SPI.transfer(csn_pin,0xff);
   #else
-  csn(LOW);
+
+  beginTransaction();
   _SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   result = _SPI.transfer(0xff);
+  endTransaction();
 
-  csn(HIGH);
   #endif
 
   return result;
@@ -162,20 +154,13 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
   status = *prx; // status is 1st byte of receive buffer
 
-  #elif defined (RF24_DUE)
-  	status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE );
-    while ( --len){
-    	_SPI.transfer(csn_pin,*buf++, SPI_CONTINUE);
-	}
-	_SPI.transfer(csn_pin,*buf++);
   #else
 
-  csn(LOW);
+  beginTransaction();
   status = _SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
     _SPI.transfer(*buf++);
-
-  csn(HIGH);
+  endTransaction();
 
   #endif
 
@@ -200,15 +185,12 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 	status = *prx++; // status is 1st byte of receive buffer
 
-  #elif defined (RF24_DUE)
-  status = _SPI.transfer(csn_pin, W_REGISTER | ( REGISTER_MASK & reg ), SPI_CONTINUE);
-  _SPI.transfer(csn_pin,value);
   #else
 
-  csn(LOW);
+  beginTransaction();
   status = _SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   _SPI.transfer(value);
-  csn(HIGH);
+  endTransaction();
 
   #endif
 
@@ -244,28 +226,10 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 	status = *prx; // status is 1st byte of receive buffer
 
- #elif defined (RF24_DUE)
-
-  status = _SPI.transfer(csn_pin, writeType , SPI_CONTINUE);
-
-  if(blank_len){
-    while ( data_len--){
-      _SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
-    }
-    while ( --blank_len ){
-      _SPI.transfer(csn_pin,0, SPI_CONTINUE);
-    }
-    _SPI.transfer(csn_pin,0);
-  }else{
-    while( --data_len ){
-      _SPI.transfer(csn_pin,*current++, SPI_CONTINUE);
-    }
-    _SPI.transfer(csn_pin,*current);
-  }
 
   #else
 
-  csn(LOW);
+  beginTransaction();
   status = _SPI.transfer( writeType );
   while ( data_len-- ) {
     _SPI.transfer(*current++);
@@ -273,7 +237,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   while ( blank_len-- ) {
     _SPI.transfer(0);
   }  
-  csn(HIGH);
+  endTransaction();
 
   #endif
 
@@ -316,29 +280,9 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 		
 	*current = *prx;
 
-  #elif defined (RF24_DUE)
-
-  status = _SPI.transfer(csn_pin, R_RX_PAYLOAD, SPI_CONTINUE );
-
-  if( blank_len ){
-	while ( data_len-- ){
-      *current++ = _SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
-	}
-
-	while ( --blank_len ){
-	  _SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
-	}
-	_SPI.transfer(csn_pin,0xFF);
-  }else{
-	while ( --data_len ){
-	  *current++ = _SPI.transfer(csn_pin,0xFF, SPI_CONTINUE);
-	}
-	*current = _SPI.transfer(csn_pin,0xFF);
-  }
-
   #else
 
-  csn(LOW);
+  beginTransaction();
   status = _SPI.transfer( R_RX_PAYLOAD );
   while ( data_len-- ) {
     *current++ = _SPI.transfer(0xFF);
@@ -346,7 +290,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   while ( blank_len-- ) {
     _SPI.transfer(0xff);
   }
-  csn(HIGH);
+  endTransaction();
 
   #endif
 
@@ -375,14 +319,15 @@ uint8_t RF24::spiTrans(uint8_t cmd){
   #if defined (RF24_LINUX)
     csn(LOW);
     status = _SPI.transfer( cmd );
-  #elif defined (RF24_DUE)
-	status = _SPI.transfer(csn_pin, cmd );
+
   #else
 
-  csn(LOW);
+  beginTransaction();
   status = _SPI.transfer( cmd );
-  csn(HIGH);
+  endTransaction();
+
   #endif
+
   return status;
 }
 
@@ -617,8 +562,10 @@ void RF24::printDetails(void)
 #endif
 /****************************************************************************/
 
-void RF24::begin(void)
+bool RF24::begin(void)
 {
+
+  uint8_t setup;
 
   #if defined (RF24_LINUX)
 
@@ -694,11 +641,10 @@ void RF24::begin(void)
   // Reset value is MAX
   //setPALevel( RF24_PA_MAX ) ;
 
-  // Determine if this is a p or non-p RF24 module and then
-  // reset our data rate back to default value. This works
-  // because a non-P variant won't allow the data rate to
-  // be set to 250Kbps.
-  if( setDataRate( RF24_250KBPS ) )
+  // check for connected module and if this is a p nRF24l01 variant
+  //  
+  setup = read_register(RF_SETUP);
+  if( setup == 0b00001110 )     // register default for nRF24L01P
   {
     p_variant = true ;
   }
@@ -734,6 +680,8 @@ void RF24::begin(void)
   // PTX should use only 22uA of power
   write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
 
+  // if setup is 0 or ff then there was no response from module
+  return ( setup != 0 && setup != 0xff );
 }
 
 /****************************************************************************/
