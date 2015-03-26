@@ -115,7 +115,7 @@ public:
   RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
 
-  #if !defined (RF24_TINY)
+  #if defined (RF24_LINUX)
   virtual ~RF24() {};
   #endif
 
