@@ -53,10 +53,6 @@
 
   #include <Arduino.h>
   
-  #if ARDUINO >= 10600
-    #define RF24_SPI_TRANSACTIONS
-  #endif
-  
   // RF modules support 10 Mhz SPI bus speed
   const uint32_t RF_SPI_SPEED = 10000000;  
 
@@ -98,6 +94,9 @@
   #define _SPI SPI
 #endif
 
+  #if defined SPI_HAS_TRANSACTION
+    #define RF24_SPI_TRANSACTIONS
+  #endif
   
   #ifdef SERIAL_DEBUG
 	#define IF_SERIAL_DEBUG(x) ({x;})

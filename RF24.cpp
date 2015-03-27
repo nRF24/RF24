@@ -599,10 +599,10 @@ bool RF24::begin(void)
     csn(HIGH);
   #else
     // Initialize pins
-  if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
+    if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
   
-  #if ! defined(LITTLEWIRE)
-    if (ce_pin != csn_pin)
+    #if ! defined(LITTLEWIRE)
+      if (ce_pin != csn_pin)
     #endif
         pinMode(csn_pin,OUTPUT);
     
