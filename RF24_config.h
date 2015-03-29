@@ -94,10 +94,6 @@
   #define _SPI SPI
 #endif
 
-  #if defined SPI_HAS_TRANSACTION
-    #define RF24_SPI_TRANSACTIONS
-  #endif
-  
   #ifdef SERIAL_DEBUG
 	#define IF_SERIAL_DEBUG(x) ({x;})
   #else

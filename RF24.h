@@ -90,7 +90,7 @@ protected:
    *
    */
   inline void beginTransaction() {
-    #if defined (RF24_SPI_TRANSACTIONS)
+    #if defined (SPI_HAS_TRANSACTION)
     _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
 	#endif
     csn(LOW);
@@ -98,7 +98,7 @@ protected:
 
   inline void endTransaction() {
     csn(HIGH);
-	#if defined (RF24_SPI_TRANSACTIONS)
+	#if defined (SPI_HAS_TRANSACTION)
     _SPI.endTransaction();
 	#endif
   }
