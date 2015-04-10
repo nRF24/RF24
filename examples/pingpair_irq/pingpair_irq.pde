@@ -22,7 +22,7 @@
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
+// Set up nRF24L01 radio on SPI bus plus pins 8 & 9
 
 RF24 radio(8,9);
 
