@@ -26,7 +26,7 @@
 #include "printf.h"
 
 // Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 
-RF24 radio(7,8);
+RF24 radio(7,8); // 7,8 defaults instead of 9,10 permit to reuse the precious PWM outputs
 
 byte addresses[][6] = {"1Node","2Node"};
 
@@ -106,7 +106,8 @@ void loop(void){
       radio.stopListening();                                        // First, stop listening so we can talk   
       radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
       radio.startListening();                                       // Now, resume listening so we catch the next packets.     
-      printf("Sent response %lu \n\r", got_time);  
+      Serial.print("Sent response ");
+      Serial.println(got_time);  
    }
  }
 
