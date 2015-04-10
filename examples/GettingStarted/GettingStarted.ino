@@ -106,7 +106,7 @@ void loop(void){
       radio.stopListening();                                        // First, stop listening so we can talk   
       radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
       radio.startListening();                                       // Now, resume listening so we catch the next packets.     
-      Serial.print("Sent response ");
+      Serial.print(F("Sent response "));
       Serial.println(got_time);  
    }
  }
