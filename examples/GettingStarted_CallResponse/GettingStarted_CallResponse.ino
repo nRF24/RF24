@@ -35,9 +35,10 @@ void setup(){
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/GettingStarted/\n\r");
+  
+  Serial.println(F("\n\rRF24/examples/GettingStarted/"));
   printf("ROLE: %s\n\r",role_friendly_name[role]);
-  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Setup and configure radio
 
@@ -67,17 +68,20 @@ void loop(void) {
     unsigned long time = micros();                          // Record the current microsecond count   
                                                             
     if ( radio.write(&counter,1) ){                         // Send the counter variable to the other radio 
-        if(!radio.available()){                             // If nothing in the buffer, we got an ack but it is blank
-            printf("Got blank response. round-trip delay: %lu microseconds\n\r",micros()-time);     
+        Serial.print(F("Got response "));
+        if(!radio.available()) {    
+          // If nothing in the buffer, we got an ack but it is blank
+            Serial.print(F("<null>"));
         }else{      
             while(radio.available() ){                      // If an ack with payload was received
                 radio.read( &gotByte, 1 );                  // Read it, and display the response time
-                printf("Got response %d, round-trip delay: %lu microseconds\n\r",gotByte,micros()-time);
+                Serial.print(gotByte);
                 counter++;                                  // Increment the counter variable
             }
         }
+        printf(". round-trip delay: %lu microseconds\n", micros()-time);     
     
-    }else{        printf("Sending failed.\n\r"); }          // If no ack response, sending failed
+    }else{ Serial.println(F("Sending failed.")); }          // If no ack response, sending failed
     
     delay(1000);  // Try again later
   }
@@ -92,7 +96,8 @@ void loop(void) {
                                                    // Since this is a call-response. Respond directly with an ack payload.
                                                    // Ack payloads are much more efficient than switching to transmit mode to respond to a call
       radio.writeAckPayload(pipeNo,&gotByte, 1 );  // This can be commented out to send empty payloads.
-      printf("Sent response %d \n\r", gotByte);  
+      Serial.print(F("Sent response "));
+      Serial.println(gotByte);  
    }
  }
 
@@ -105,7 +110,7 @@ void loop(void) {
     char c = toupper(Serial.read());
     if ( c == 'T' && role == role_pong_back )
     {
-      printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
+      Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
 
       role = role_ping_out;                      // Change roles (ping out)
       radio.openWritingPipe(addresses[0]);       // Open different pipes when writing. Write on pipe 0, address 0
@@ -113,7 +118,7 @@ void loop(void) {
     }
     else if ( c == 'R' && role == role_ping_out )
     {
-      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
       
        role = role_pong_back;                    // Become the primary receiver (pong back)
        radio.openWritingPipe(addresses[1]);      // Since only two radios involved, both listen on the same addresses and pipe numbers in RX mode
