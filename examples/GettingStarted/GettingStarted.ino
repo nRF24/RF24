@@ -40,9 +40,8 @@ void setup() {
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/GettingStarted/\n\r");
-  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
-
+  Serial.println(F("\nRF24/examples/GettingStarted/"));
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node or 'R' to switch back to receiving."));
   // Setup and configure rf radio
   radio.begin();                          // Start up the radio
   radio.setAutoAck(1);                    // Ensure autoACK is enabled
@@ -63,10 +62,10 @@ void loop(void){
     radio.stopListening();                                    // First, stop listening so we can talk.
     
     
-    printf("Now sending \n\r");
+    Serial.println(F("Now sending"));
 
     unsigned long time = micros();                             // Take the time, and send it.  This will block until complete
-     if (!radio.write( &time, sizeof(unsigned long) )){  printf("failed.\n\r");  }
+     if (!radio.write( &time, sizeof(unsigned long) )) { Serial.println(F("failed.")); }
         
     radio.startListening();                                    // Now, continue listening
     
@@ -81,7 +80,7 @@ void loop(void){
     }
         
     if ( timeout ){                                             // Describe the results
-        printf("Failed, response timed out.\n\r");
+        Serial.println(F("Failed, response timed out."));
     }else{
         unsigned long got_time;                                 // Grab the response, compare, and send to debugging spew
         radio.read( &got_time, sizeof(unsigned long) );
@@ -119,7 +118,7 @@ void loop(void){
     char c = toupper(Serial.read());
     if ( c == 'T' && role == role_pong_back )
     {
-      printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
+      Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
 
       role = role_ping_out;                  // Become the primary transmitter (ping out)
       radio.openWritingPipe(addresses[0]);
@@ -128,7 +127,7 @@ void loop(void){
     }
     else if ( c == 'R' && role == role_ping_out )
     {
-      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
       
        role = role_pong_back;                // Become the primary receiver (pong back)
        radio.openWritingPipe(addresses[1]);
