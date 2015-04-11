@@ -6,7 +6,7 @@
  * Example for efficient call-response using ack-payloads 
  *
  * This example continues to make use of all the normal functionality of the radios including
- * the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well.
+ * the auto-ack and auto-retry features, but allows ack-payloads to be written optionally as well.
  * This allows very fast call-response communication, with the responding radio never having to 
  * switch out of Primary Receiver mode to send back a payload, but having the option to if wanting
  * to initiate communication instead of respond to a commmunication.
@@ -46,9 +46,9 @@ void setup(){
 
   Serial.begin(57600);
   printf_begin();
-  printf("\n\rRF24/examples/GettingStarted/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
-  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
+  Serial.print(F("\nRF24/examples/GettingStarted\nROLE: "));
+  Serial.println(role_friendly_name[role]);
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Setup and configure rf radio
 
@@ -78,7 +78,7 @@ void loop(void) {
     }else{
 
       if(!radio.available()){ 
-        printf("Blank Payload Received\n\r"); 
+        Serial.println(F("Blank Payload Received")); 
       }else{
         while(radio.available() ){
           unsigned long tim = micros();
@@ -95,11 +95,13 @@ void loop(void) {
 
   // Pong back role.  Receive each packet, dump it out, and send it back
 
-  if ( role == role_pong_back ) {
+  else if ( role == role_pong_back ) {
     byte pipeNo;
     byte gotByte;                                       // Dump the payloads until we've gotten everything
     while( radio.available(&pipeNo)){
       radio.read( &gotByte, 1 );
+      Serial.print(F("Got Byte and now responding with "));
+      Serial.println(gotByte);
       radio.writeAckPayload(pipeNo,&gotByte, 1 );    
    }
  }
@@ -111,7 +113,7 @@ void loop(void) {
     char c = toupper(Serial.read());
     if ( c == 'T' && role == role_pong_back )
     {
-      printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
+      Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
 
       role = role_ping_out;                  // Become the primary transmitter (ping out)
       radio.openWritingPipe(pipes[0]);
@@ -119,7 +121,7 @@ void loop(void) {
     }
     else if ( c == 'R' && role == role_ping_out )
     {
-      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
       
        role = role_pong_back;                // Become the primary receiver (pong back)
        radio.openWritingPipe(pipes[1]);
