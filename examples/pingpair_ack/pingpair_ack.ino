@@ -12,16 +12,17 @@
  * to initiate communication instead of respond to a commmunication.
  */
  
-
+// SET to 1 if using UNO_nRF
+#define UNO_nRF 0
 
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
 
-// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins CE 8, CSN 9
+// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins CE 7, CSN 8
 // This is for UNO Adapter, pin 10 is Vcc
-RF24 radio(8,9);
+RF24 radio(7,8);
 
 // Topology
 const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };              // Radio pipe addresses for the 2 nodes to communicate.
@@ -39,10 +40,11 @@ byte counter = 1;
 void setup(){
 
 // Simple codes for UNO nRF adapter that uses pin 10 as Vcc
+#if (UNO_nRF)
   pinMode(10,OUTPUT);
   digitalWrite(10,HIGH);
   delay(500);
-  
+#endif
 
   Serial.begin(57600);
   printf_begin();
@@ -83,7 +85,7 @@ void loop(void) {
         while(radio.available() ){
           unsigned long tim = micros();
           radio.read( &gotByte, 1 );
-          printf("Got response %d, round-trip delay: %lu microseconds\n\r",gotByte,tim-time);
+          printf("Got response %d, round-trip delay: %lu microseconds\n\r",(int)gotByte,tim-time);
           counter++;
         }
       }
@@ -100,9 +102,9 @@ void loop(void) {
     byte gotByte;                                       // Dump the payloads until we've gotten everything
     while( radio.available(&pipeNo)){
       radio.read( &gotByte, 1 );
-      Serial.print(F("Got Byte and now responding with "));
-      Serial.println(gotByte);
       radio.writeAckPayload(pipeNo,&gotByte, 1 );    
+      Serial.print(F("Got it, responding with "));
+      Serial.println(gotByte);
    }
  }
 
