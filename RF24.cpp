@@ -266,7 +266,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
     size = data_len + blank_len + 1; // Add register value to transmit buffer
 
 	*ptx++ =  R_RX_PAYLOAD;
-	while(size--) 
+	while(--size) 
 		*ptx++ = NOP;
 		
 	size = data_len + blank_len + 1; // Size has been lost during while, re affect
