@@ -99,8 +99,8 @@ void loop(void){
    float numBytes = cycles*32;
    float rate = numBytes / (stopTime - startTime);
     
-   Serial.print("Transfer complete at "); Serial.print(rate); printf(" KB/s \n\r");
-   Serial.print(counter); Serial.print(" of "); Serial.print(cycles); printf(" Packets Failed to Send\n\r");
+   Serial.print("Transfer complete at "); Serial.print(rate); Serial.println(" KB/s");
+   Serial.print(counter); Serial.print(" of "); Serial.print(cycles); Serial.println(" Packets Failed to Send");
    counter = 0;   
     
    }

@@ -80,6 +80,31 @@ private:
   uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
   uint32_t txRxDelay; /**< Var for adjusting delays depending on datarate */
   
+
+#if defined (ARDUINO)
+protected:
+  /**
+   * SPI transactions
+   *
+   * Common code for SPI transactions including CSN toggle
+   *
+   */
+  inline void beginTransaction() {
+    #if defined (SPI_HAS_TRANSACTION)
+    _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
+	#endif
+    csn(LOW);
+  }
+
+  inline void endTransaction() {
+    csn(HIGH);
+	#if defined (SPI_HAS_TRANSACTION)
+    _SPI.endTransaction();
+	#endif
+  }
+
+#endif   /* ARDUINO */
+
 public:
 
   /**
@@ -125,7 +150,7 @@ public:
    * Call this in setup(), before calling any other methods.
    * @code radio.begin() @endcode
    */
-  void begin(void);
+  bool begin(void);
 
   /**
    * Start listening on the pipes opened for reading.
@@ -1309,6 +1334,7 @@ private:
  * @section News News
  *
  * **March 2015**<br>
+ * - Uses SPI transactions on Arduino
  * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/arch
  * - <a href="MRAA.html">MRAA</a> support added ( Galileo, Edison, etc)
  * - <a href="BBB.html">BBB/Generic Linux </a> support via spidev & MRAA
