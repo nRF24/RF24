@@ -22,7 +22,7 @@ byte addresses[][6] = {"1Node","2Node"};
 bool role = 0;
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.println(F("RF24/examples/GettingStarted"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
   
