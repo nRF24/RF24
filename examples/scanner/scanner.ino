@@ -47,7 +47,7 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(57600);
+  Serial.begin(115200);
   printf_begin();
   printf("\n\rRF24/examples/scanner/\n\r");
 
