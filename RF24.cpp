@@ -69,6 +69,24 @@ void RF24::ce(bool level)
 
 /****************************************************************************/
 
+  inline void RF24::beginTransaction() {
+    #if defined (RF24_SPI_TRANSACTIONS)
+    _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
+	#endif
+    csn(LOW);
+  }
+
+/****************************************************************************/
+
+  inline void RF24::endTransaction() {
+    csn(HIGH);
+	#if defined (RF24_SPI_TRANSACTIONS)
+    _SPI.endTransaction();
+	#endif
+  }
+
+/****************************************************************************/
+
 uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
   uint8_t status;

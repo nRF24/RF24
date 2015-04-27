@@ -20,11 +20,15 @@
   //#define MINIMAL
   //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
   //#define SOFTSPI   // Requires library from https://github.com/greiman/DigitalIO
+  
   /**********************/
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
 
-	
+  #if defined SPI_HAS_TRANSACTION && !defined SPI_UART && !defined SOFTSPI
+    #define RF24_SPI_TRANSACTIONS
+  #endif
+  
 //Generic Linux/ARM and //http://iotdk.intel.com/docs/master/mraa/
 #if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
 

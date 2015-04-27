@@ -81,7 +81,6 @@ private:
   uint32_t txRxDelay; /**< Var for adjusting delays depending on datarate */
   
 
-#if defined (ARDUINO)
 protected:
   /**
    * SPI transactions
@@ -89,21 +88,9 @@ protected:
    * Common code for SPI transactions including CSN toggle
    *
    */
-  inline void beginTransaction() {
-    #if defined (SPI_HAS_TRANSACTION)
-    _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
-	#endif
-    csn(LOW);
-  }
+  inline void beginTransaction();
 
-  inline void endTransaction() {
-    csn(HIGH);
-	#if defined (SPI_HAS_TRANSACTION)
-    _SPI.endTransaction();
-	#endif
-  }
-
-#endif   /* ARDUINO */
+  inline void endTransaction();
 
 public:
 
