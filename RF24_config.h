@@ -112,17 +112,6 @@
 	#define _BV(bit) (1<<(bit))
 #endif
   
-// Avoid spurious warnings
-// Arduino DUE is arm and uses traditional PROGMEM constructs
-#if 1
-#if ! defined( NATIVE ) && defined( ARDUINO ) && ! defined(__arm__)
-#undef PROGMEM
-#define PROGMEM __attribute__(( section(".progmem.data") ))
-#undef PSTR
-#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
-#endif
-#endif
-
 // Progmem is Arduino-specific
 // Arduino DUE is arm and does not include avr/pgmspace
 #if defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__)

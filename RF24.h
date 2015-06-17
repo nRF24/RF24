@@ -502,6 +502,8 @@ s   *
    * @warning Only three of these can be pending at any time as there are only 3 FIFO buffers.<br> Dynamic payloads must be enabled.
    * @note Ack payloads are handled automatically by the radio chip when a payload is received. Users should generally
    * write an ack payload as soon as startListening() is called, so one is available when a regular payload is received.
+   * @note Ack payloads are dynamic payloads. This only works on pipes 0&1 by default. Call 
+   * enableDynamicPayloads() to enable on all pipes.
    *
    * @param pipe Which pipe# (typically 1-5) will get this response.
    * @param buf Pointer to data that is sent
@@ -761,6 +763,8 @@ s   *
    * Ack payloads are a handy way to return data back to senders without
    * manually changing the radio modes on both units.
    *
+   * @note Ack payloads are dynamic payloads. This only works on pipes 0&1 by default. Call 
+   * enableDynamicPayloads() to enable on all pipes.
    */
   void enableAckPayload(void);
 
