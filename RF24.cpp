@@ -388,11 +388,9 @@ void RF24::print_byte_register(const char* name, uint8_t reg, uint8_t qty)
   //char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
   //printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
   #if defined (RF24_LINUX)
-    char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-    printf("%s\t%c =", name, extra_tab);
+    printf("%s\t =", name);
   #else
-    char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-    printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
+    printf_P(PSTR(PRIPSTR"\t ="),name);
   #endif
   while (qty--)
     printf_P(PSTR(" 0x%02x"),read_register(reg++));
@@ -405,11 +403,9 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 {
 
   #if defined (RF24_LINUX)
-    char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-    printf("%s\t%c =",name,extra_tab);
+    printf("%s\t =",name);
   #else
-    char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-    printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
+    printf_P(PSTR(PRIPSTR"\t ="),name);
   #endif
   while (qty--)
   {
@@ -555,14 +551,14 @@ void RF24::printDetails(void)
 
   print_address_register(PSTR("RX_ADDR_P0-1"),RX_ADDR_P0,2);
   print_byte_register(PSTR("RX_ADDR_P2-5"),RX_ADDR_P2,4);
-  print_address_register(PSTR("TX_ADDR"),TX_ADDR);
+  print_address_register(PSTR("TX_ADDR\t"),TX_ADDR);
 
   print_byte_register(PSTR("RX_PW_P0-6"),RX_PW_P0,6);
-  print_byte_register(PSTR("EN_AA"),EN_AA);
+  print_byte_register(PSTR("EN_AA\t"),EN_AA);
   print_byte_register(PSTR("EN_RXADDR"),EN_RXADDR);
-  print_byte_register(PSTR("RF_CH"),RF_CH);
+  print_byte_register(PSTR("RF_CH\t"),RF_CH);
   print_byte_register(PSTR("RF_SETUP"),RF_SETUP);
-  print_byte_register(PSTR("CONFIG"),CONFIG);
+  print_byte_register(PSTR("CONFIG\t"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
 #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__) || defined(LITTLEWIRE) || defined (RF24_BBB)
