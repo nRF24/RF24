@@ -1,0 +1,25 @@
+{
+  "name": "RF24",
+  "keywords": "rf, radio, wireless, spi",
+  "description": "Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/TMRh20/RF24.git"
+  },
+  "include": [
+    "*.h",
+    "*.c",
+    "*.cpp",
+    "arch/ATTiny/*",
+    "arch/Due/*",
+    "arch/Teensy/*",
+    "examples/*/*.ino"
+  ],
+  "frameworks": "arduino",
+  "platforms": [
+    "atmelavr",
+    "atmelsam",
+    "teensy"
+  ]
+}
