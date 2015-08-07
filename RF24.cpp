@@ -675,7 +675,7 @@ bool RF24::begin(void)
 
   // Reset current status
   // Notice reset and flush is the last thing we do
-  write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+  write_register(NRF_STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Set up default configuration.  Callers can always change it later.
   // This channel should be universally safe and not bleed over into adjacent
@@ -704,7 +704,7 @@ void RF24::startListening(void)
   powerUp();
  #endif
   write_register(CONFIG, read_register(CONFIG) | _BV(PRIM_RX));
-  write_register(STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+  write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
   ce(HIGH);
   // Restore the pipe0 adddress, if exists
   if (pipe0_reading_address[0] > 0){
@@ -822,7 +822,7 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
     
 	ce(LOW);
 
-	uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+	uint8_t status = write_register(NRF_STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   //Max retries exceeded
   if( status & _BV(MAX_RT)){
@@ -874,7 +874,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 /****************************************************************************/
 
 void RF24::reUseTX(){
-		write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
+		write_register(NRF_STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 		spiTrans( REUSE_TX_PL );
 		ce(LOW);										  //Re-Transfer packet
 		ce(HIGH);
@@ -897,7 +897,7 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 
 		if( get_status() & _BV(MAX_RT)){
 			//reUseTX();										  //Set re-transmit
-			write_register(STATUS,_BV(MAX_RT) );			  //Clear max retry flag
+			write_register(NRF_STATUS,_BV(MAX_RT) );			  //Clear max retry flag
 			return 0;										  //Return 0. The previous payload has been retransmitted
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
@@ -970,7 +970,7 @@ bool RF24::txStandBy(){
 	#endif
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
-			write_register(STATUS,_BV(MAX_RT) );
+			write_register(NRF_STATUS,_BV(MAX_RT) );
 			ce(LOW);
 			flush_tx();    //Non blocking, flush the data
 			return 0;
@@ -1001,7 +1001,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx){
 
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
-			write_register(STATUS,_BV(MAX_RT) );
+			write_register(NRF_STATUS,_BV(MAX_RT) );
 				ce(LOW);										  //Set re-transmit
 				ce(HIGH);
 				if(millis() - start >= timeout){
@@ -1090,7 +1090,7 @@ void RF24::read( void* buf, uint8_t len ){
   read_payload( buf, len );
 
   //Clear the two possible interrupt flags with one command
-  write_register(STATUS,_BV(RX_DR) | _BV(MAX_RT) | _BV(TX_DS) );
+  write_register(NRF_STATUS,_BV(RX_DR) | _BV(MAX_RT) | _BV(TX_DS) );
 
 }
 
@@ -1100,7 +1100,7 @@ void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
 {
   // Read the status & reset the status in one easy call
   // Or is that such a good idea?
-  uint8_t status = write_register(STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+  uint8_t status = write_register(NRF_STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
   // Report to the user what happened
   tx_ok = status & _BV(TX_DS);
