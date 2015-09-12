@@ -80,10 +80,10 @@ void setup(){
   else
     role = role_pong_back;
 
-  Serial.begin(57600);
+  Serial.begin(115200);
   printf_begin();
-  printf("\n\rRF24/examples/pingpair_sleepy/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
+  Serial.print(F("\n\rRF24/examples/pingpair_sleepy/\n\rROLE: "));
+  Serial.println(role_friendly_name[role]);
 
   // Prepare sleep parameters
   // Only the ping out role uses WDT.  Wake up every 4s to send a ping
@@ -124,7 +124,8 @@ void loop(){
     radio.stopListening();                          // First, stop listening so we can talk.
                          
     unsigned long time = millis();                  // Take the time, and send it.                     
-    printf("Now sending... %lu \n\r",time);
+    Serial.print(F("Now sending... "));
+    Serial.println(time);
     
     radio.write( &time, sizeof(unsigned long) );
 
@@ -140,8 +141,8 @@ void loop(){
     }
     
     if ( timeout ) {                                // Describe the results
-        printf("Failed, response timed out.\n\r");
-    }else{        
+        Serial.println(F("Failed, response timed out."));
+    } else {
         unsigned long got_time;                     // Grab the response, compare, and send to debugging spew
         radio.read( &got_time, sizeof(unsigned long) );
     
@@ -174,10 +175,10 @@ void loop(){
      
         radio.stopListening();                                  // First, stop listening so we can talk
         radio.write( &got_time, sizeof(unsigned long) );        // Send the final one back.
-        printf("Sent response.\n\r");
+        Serial.println(F("Sent response."));
         radio.startListening();                                 // Now, resume listening so we catch the next packets.
-    }else{
-        Serial.println("Sleeping");
+    } else {
+        Serial.println(F("Sleeping"));
         delay(50);                                             // Delay so the serial data can print out
         do_sleep();
 
@@ -208,7 +209,7 @@ void setup_watchdog(uint8_t prescalar){
 ISR(WDT_vect)
 {
   //--sleep_cycles_remaining;
-  Serial.println("WDT");
+  Serial.println(F("WDT"));
 }
 
 void do_sleep(void)
