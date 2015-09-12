@@ -26,9 +26,9 @@
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
+// Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
-RF24 radio(9,10);
+RF24 radio(7,8);
 
 //
 // Channel info
@@ -47,7 +47,7 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(57600);
+  Serial.begin(115200);
   printf_begin();
   printf("\n\rRF24/examples/scanner/\n\r");
 
