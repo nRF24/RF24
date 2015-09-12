@@ -1,63 +1,55 @@
+
 /*
- Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
-
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- version 2 as published by the Free Software Foundation.
-//2014 - TMRh20 - Updated along with Optimized RF24 Library fork
- */
-
-/**
- * Example for Getting Started with nRF24L01+ radios. 
- *
- * This is an example of how to use the RF24 class to communicate on a basic level.  Write this sketch to two 
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting with the serial monitor and
- * sending a 'T'.  The ping node sends the current time to the pong node, which responds by sending the value
- * back.  The ping node can then see how long the whole cycle took. 
- * Note: For a more efficient call-response scenario see the GettingStarted_CallResponse.ino example.
- * Note: When switching between sketches, the radio may need to be powered down to clear settings that are not "un-set" otherwise
- */
-
+* Getting Started example sketch for nRF24L01+ radios
+* This is a very basic example of how to send data from one node to another
+* Updated: Dec 2014 by TMRh20
+*/
 
 #include <SPI.h>
-#include "nRF24L01.h"
 #include "RF24.h"
 
-#include "printf.h"
+/****************** User Config ***************************/
+/***      Set this radio as radio number 0 or 1         ***/
+bool radioNumber = 0;
 
-// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 
-RF24 radio(7,8); // 7,8 defaults instead of 9,10 permit to reuse the precious PWM outputs
+/* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
+RF24 radio(7,8);
+/**********************************************************/
 
 byte addresses[][6] = {"1Node","2Node"};
 
-
-// Set up roles to simplify testing 
-boolean role;                                    // The main role variable, holds the current role identifier
-boolean role_ping_out = 1, role_pong_back = 0;   // The two different roles.
+// Used to control whether this node is sending or receiving
+bool role = 0;
 
 void setup() {
-
-
-  Serial.begin(57600);
-  printf_begin();
-  Serial.println(F("\nRF24/examples/GettingStarted/"));
-  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node or 'R' to switch back to receiving."));
-  // Setup and configure rf radio
-  radio.begin();                          // Start up the radio
-  radio.setAutoAck(1);                    // Ensure autoACK is enabled
-  radio.setRetries(15,15);                // Max delay between retries & number of retries
-  radio.openWritingPipe(addresses[1]);
-  radio.openReadingPipe(1,addresses[0]);
+  Serial.begin(115200);
+  Serial.println(F("RF24/examples/GettingStarted"));
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
   
-  radio.startListening();                 // Start listening
-  radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+  radio.begin();
+
+  // Set the PA Level low to prevent power supply related issues since this is a
+ // getting_started sketch, and the likelihood of close proximity of the devices. RF24_PA_MAX is default.
+  radio.setPALevel(RF24_PA_LOW);
+  
+  // Open a writing and reading pipe on each radio, with opposite addresses
+  if(radioNumber){
+    radio.openWritingPipe(addresses[1]);
+    radio.openReadingPipe(1,addresses[0]);
+  }else{
+    radio.openWritingPipe(addresses[0]);
+    radio.openReadingPipe(1,addresses[1]);
+  }
+  
+  // Start the radio listening for data
+  radio.startListening();
 }
 
-void loop(void){
-    
-
-/****************** Ping Out Role ***************************/
-  if (role == role_ping_out)  {
+void loop() {
+  
+  
+/****************** Ping Out Role ***************************/  
+if (role == 1)  {
     
     radio.stopListening();                                    // First, stop listening so we can talk.
     
@@ -65,7 +57,9 @@ void loop(void){
     Serial.println(F("Now sending"));
 
     unsigned long time = micros();                             // Take the time, and send it.  This will block until complete
-     if (!radio.write( &time, sizeof(unsigned long) )) { Serial.println(F("failed.")); }
+     if (!radio.write( &time, sizeof(unsigned long) )){
+       Serial.println(F("failed"));
+     }
         
     radio.startListening();                                    // Now, continue listening
     
@@ -84,24 +78,35 @@ void loop(void){
     }else{
         unsigned long got_time;                                 // Grab the response, compare, and send to debugging spew
         radio.read( &got_time, sizeof(unsigned long) );
-
+        unsigned long time = micros();
+        
         // Spew it
-        printf("Sent %lu, Got response %lu, round-trip delay: %lu microseconds\n\r",time,got_time,micros()-got_time);
+        Serial.print(F("Sent "));
+        Serial.print(time);
+        Serial.print(F(", Got response "));
+        Serial.print(got_time);
+        Serial.print(F(", Round-trip delay "));
+        Serial.print(time-got_time);
+        Serial.println(F(" microseconds"));
     }
 
     // Try again 1s later
     delay(1000);
   }
 
+
+
 /****************** Pong Back Role ***************************/
 
-  if ( role == role_pong_back )
+  if ( role == 0 )
   {
+    unsigned long got_time;
+    
     if( radio.available()){
-      unsigned long got_time;                                       // Variable for the received timestamp
+                                                                    // Variable for the received timestamp
       while (radio.available()) {                                   // While there is data ready
         radio.read( &got_time, sizeof(unsigned long) );             // Get the payload
-      }    
+      }
      
       radio.stopListening();                                        // First, stop listening so we can talk   
       radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
@@ -112,27 +117,26 @@ void loop(void){
  }
 
 
+
+
 /****************** Change Roles via Serial Commands ***************************/
 
   if ( Serial.available() )
   {
     char c = toupper(Serial.read());
-    if ( c == 'T' && role == role_pong_back )
-    {
+    if ( c == 'T' && role == 0 ){      
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
-
-      role = role_ping_out;                  // Become the primary transmitter (ping out)
-      radio.openWritingPipe(addresses[0]);
-      radio.openReadingPipe(1,addresses[1]);
-  
-    }
-    else if ( c == 'R' && role == role_ping_out )
-    {
-      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
-      
-       role = role_pong_back;                // Become the primary receiver (pong back)
-       radio.openWritingPipe(addresses[1]);
-       radio.openReadingPipe(1,addresses[0]);
+      role = 1;                  // Become the primary transmitter (ping out)
+    
+   }else
+    if ( c == 'R' && role == 1 ){
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));      
+       role = 0;                // Become the primary receiver (pong back)
+       radio.startListening();
+       
     }
   }
-}
+
+
+} // Loop
+

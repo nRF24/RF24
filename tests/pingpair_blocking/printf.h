@@ -16,11 +16,8 @@
 #ifndef __PRINTF_H__
 #define __PRINTF_H__
 
-<<<<<<< HEAD
 #ifdef ARDUINO
 
-=======
->>>>>>> 828add79a5375479cd29a7433c598b8ce56ee60b
 int serial_putc( char c, FILE * ) 
 {
   Serial.write( c );
