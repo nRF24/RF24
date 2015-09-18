@@ -448,6 +448,11 @@ void RF24::setChannel(uint8_t channel)
   write_register(RF_CH,rf24_min(channel,max_channel));
 }
 
+uint8_t RF24::getChannel()
+{
+  
+  return read_register(RF_CH);
+}
 /****************************************************************************/
 
 void RF24::setPayloadSize(uint8_t size)

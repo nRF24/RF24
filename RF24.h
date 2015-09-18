@@ -711,6 +711,13 @@ s   *
    * @param channel Which RF channel to communicate on, 0-127
    */
   void setChannel(uint8_t channel);
+  
+    /**
+   * Get RF communication channel
+   *
+   * @return The currently configured RF Channel
+   */
+  uint8_t getChannel(void);
 
   /**
    * Set Static Payload Size
