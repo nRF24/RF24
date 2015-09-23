@@ -18,18 +18,18 @@ void SPI::begin(int busNo){
 
 
 	//BBB:
-	/*if(!busNo){
+	if(!busNo){
 	  this->device = "/dev/spidev1.0";;
 	}else{
 	  this->device = "/dev/spidev1.1";;
-    }*/
+    }
 
 	//RPi:
-	  if(!busNo){
+	  /*if(!busNo){
 	    this->device = "/dev/spidev0.0";;
 	  }else{
 	    this->device = "/dev/spidev0.1";;
-	  }
+	  }*/
 
 	
 	this->bits = 8;
