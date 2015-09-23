@@ -18,18 +18,18 @@ void SPI::begin(int busNo){
 
 
 	//BBB:
-	if(!busNo){
+	/*if(!busNo){
 	  this->device = "/dev/spidev1.0";;
 	}else{
 	  this->device = "/dev/spidev1.1";;
-    }
+    }*/
 
 	//RPi:
-	/*  if(!busNo){
+	  if(!busNo){
 	    this->device = "/dev/spidev0.0";;
 	  }else{
 	    this->device = "/dev/spidev0.1";;
-	  }*/
+	  }
 
 	
 	this->bits = 8;
@@ -110,7 +110,8 @@ uint8_t SPI::transfer(uint8_t tx_)
 	int ret;
   	uint8_t tx[1] = {tx_};
 	uint8_t rx[1];
-
+     
+    this->init();
 	struct spi_ioc_transfer tr = {
 	tr.tx_buf = (unsigned long)&tx[0],
 	tr.rx_buf = (unsigned long)&rx[0],
@@ -151,7 +152,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
 	
 	int ret;
-	
+	this->init();
 	struct spi_ioc_transfer tr = {
 		tr.tx_buf = (unsigned long)tbuf,
 		tr.rx_buf = (unsigned long)rbuf,
