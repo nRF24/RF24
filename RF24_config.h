@@ -115,9 +115,17 @@
 // Progmem is Arduino-specific
 // Arduino DUE is arm and does not include avr/pgmspace
 #if defined (ARDUINO_ARCH_ESP8266)
-  #include <pgmspace.h>
-  #define PRIPSTR "%s"
+  #include <pgmspace.h>  
+  
+  typedef uint16_t prog_uint16_t;
+  #define PSTR(x) (x)
   #define printf_P printf
+  #define strlen_P strlen  
+  #define PROGMEM
+  #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+  #define pgm_read_word(p) (*(p))
+  #define PRIPSTR "%s"
+  
 #elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
