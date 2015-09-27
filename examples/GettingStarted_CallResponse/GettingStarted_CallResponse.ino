@@ -14,7 +14,6 @@
  
 #include <SPI.h>
 #include "RF24.h"
-//#include "printf.h"
 
 /****************** User Config ***************************/
 /***      Set this radio as radio number 0 or 1         ***/
@@ -40,7 +39,7 @@ void setup(){
   Serial.begin(115200);
   Serial.println(F("RF24/examples/GettingStarted_CallResponse"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
-  //printf_begin();
+ 
   // Setup and configure radio
 
   radio.begin();

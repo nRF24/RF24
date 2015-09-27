@@ -60,8 +60,8 @@ void setup(){
 
   Serial.begin(115200);
   printf_begin();
-  printf("\n\rRF24/examples/pingpair_irq/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
+  Serial.print(F("\n\rRF24/examples/pingpair_irq\n\rROLE: "));
+  Serial.println(role_friendly_name[role]);
 
   // Setup and configure rf radio
   radio.begin();  
@@ -92,7 +92,8 @@ void loop() {
 
   if (role == role_sender)  {                        // Sender role.  Repeatedly send the current time 
     unsigned long time = millis();                   // Take the time, and send it.
-    printf("Now sending %lu\n\r",time);
+      Serial.print(F("Now sending "));
+      Serial.println(time);
     radio.startWrite( &time, sizeof(unsigned long) ,0);
     delay(2000);                                     // Try again soon
   }
@@ -112,30 +113,31 @@ void check_radio(void)                                // Receiver role: Does not
   radio.whatHappened(tx,fail,rx);                     // What happened?
   
   if ( tx ) {                                         // Have we successfully transmitted?
-      if ( role == role_sender ){   printf("Send:OK\n\r"); }
-      if ( role == role_receiver ){ printf("Ack Payload:Sent\n\r"); }
+      if ( role == role_sender ){   Serial.println(F("Send:OK")); }
+      if ( role == role_receiver ){ Serial.println(F("Ack Payload:Sent")); }
   }
   
   if ( fail ) {                                       // Have we failed to transmit?
-      if ( role == role_sender ){   printf("Send:Failed\n\r");  }
-      if ( role == role_receiver ){ printf("Ack Payload:Failed\n\r");  }
+      if ( role == role_sender ){   Serial.println(F("Send:Failed"));  }
+      if ( role == role_receiver ){ Serial.println(F("Ack Payload:Failed"));  }
   }
   
   if ( rx || radio.available()){                      // Did we receive a message?
     
     if ( role == role_sender ) {                      // If we're the sender, we've received an ack payload
         radio.read(&message_count,sizeof(message_count));
-        printf("Ack:%lu\n\r",message_count);
+        Serial.print(F("Ack: "));
+        Serial.println(message_count);
     }
 
     
     if ( role == role_receiver ) {                    // If we're the receiver, we've received a time message
       static unsigned long got_time;                  // Get this payload and dump it
       radio.read( &got_time, sizeof(got_time) );
-      printf("Got payload %lu\n\r",got_time);
+      Serial.print(F("Got payload "));
+      Serial.println(got_time);
       radio.writeAckPayload( 1, &message_count, sizeof(message_count) );  // Add an ack packet for the next time around.  This is a simple
       ++message_count;                                // packet counter
-  
     }
   }
 }

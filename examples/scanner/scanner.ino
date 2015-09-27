@@ -49,7 +49,7 @@ void setup(void)
 
   Serial.begin(115200);
   printf_begin();
-  printf("\n\rRF24/examples/scanner/\n\r");
+  Serial.println(F("\n\rRF24/examples/scanner/"));
 
   //
   // Setup and configure rf radio
@@ -69,14 +69,14 @@ void setup(void)
     printf("%x",i>>4);
     ++i;
   }
-  printf("\n\r");
+  Serial.println();
   i = 0;
   while ( i < num_channels )
   {
     printf("%x",i&0xf);
     ++i;
   }
-  printf("\n\r");
+  Serial.println();
 }
 
 //
@@ -120,7 +120,7 @@ void loop(void)
     printf("%x",min(0xf,values[i]&0xf));
     ++i;
   }
-  printf("\n\r");
+  Serial.println();
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp

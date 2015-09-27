@@ -15,7 +15,6 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-//#include <printf.h>  // Printf is used for debug 
 
 //
 // Hardware configuration
@@ -88,7 +87,6 @@ void setup(void)
   //
 
   Serial.begin(115200);
-  //printf_begin(); //Printf is used for debug
   
   Serial.println(F("RF24/examples/pingpair_dyn/"));
   Serial.print(F("ROLE: "));
