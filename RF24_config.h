@@ -20,7 +20,7 @@
   //#define MINIMAL
   //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
   //#define SOFTSPI   // Requires library from https://github.com/greiman/DigitalIO
-  
+
   /**********************/
   #define rf24_max(a,b) (a>b?a:b)
   #define rf24_min(a,b) (a<b?a:b)
@@ -51,7 +51,13 @@
 //Teensy  
 #elif defined (TEENSYDUINO)
 
-  #include "arch/Teensy/RF24_arch_config.h"  
+  #include "arch/Teensy/RF24_arch_config.h"
+
+// STM32F1
+#elif defined (__STM32F1__)
+
+  #include "arch/STM32F1/RF24_arch_config.h"
+
 //Everything else
 #else 
 
