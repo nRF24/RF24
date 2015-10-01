@@ -25,7 +25,7 @@ LIBNAME=$(LIB).so.1.0
 HEADER_DIR=${PREFIX}/include/RF24
 
 # The base location of support files for different devices
-ARCH_DIR=arch
+ARCH_DIR=utility
 
 # The default objects to compile
 OBJECTS=RF24.o spi.o

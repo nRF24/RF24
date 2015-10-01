@@ -18,7 +18,7 @@
 #include "RF24_config.h"
 
 #if defined (RF24_LINUX)
-  #include "arch/includes.h"
+  #include "utility/includes.h"
 #elif LITTLEWIRE
   #include <LittleWireSPI/LittleWireSPI.h>
 #elif defined SOFTSPI
@@ -1333,7 +1333,7 @@ private:
  *
  * **March 2015**<br>
  * - Uses SPI transactions on Arduino
- * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/arch
+ * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/utility
  * - <a href="MRAA.html">MRAA</a> support added ( Galileo, Edison, etc)
  * - <a href="BBB.html">BBB/Generic Linux </a> support via spidev & MRAA
  * - Support for RPi 2 added
@@ -1547,7 +1547,7 @@ private:
  * BeagleBone Black is supported via MRAA or SPIDEV.
  *
  *  @note The SPIDEV option should work with most Linux systems supporting SPIDEV. <br>
- *  Users may need to edit the RF24/arch/BBB/spi.cpp file to configure the spi device. (Defaults: "/dev/spidev1.0";  or  "/dev/spidev1.1"; )
+ *  Users may need to edit the RF24/utility/BBB/spi.cpp file to configure the spi device. (Defaults: "/dev/spidev1.0";  or  "/dev/spidev1.1"; )
  *
  * <br>
  * @section AutoInstall Automated Install 
@@ -1713,7 +1713,7 @@ private:
  *
  * Build using **spidev**:
  *
- * 1. Edit the RF24/arch/BBB/spi.cpp file
+ * 1. Edit the RF24/utility/BBB/spi.cpp file
  * 2. Change the default device definition to @code this->device = "/dev/spidev0.0";; @endcode
  * 3. Run @code sudo make install -B RF24_SPIDEV=1 @endcode
  * 4. See the gettingstarted example for an example of pin configuration
@@ -1829,13 +1829,13 @@ private:
  * @page Portability RF24 Portability
  *
  * The RF24 radio driver mainly utilizes the <a href="http://arduino.cc/en/reference/homePage">Arduino API</a> for GPIO, SPI, and timing functions, which are easily replicated
- * on various platforms. <br>Support files for these platforms are stored under RF24/arch, and can be modified to provide 
+ * on various platforms. <br>Support files for these platforms are stored under RF24/utility, and can be modified to provide 
  * the required functionality.
  * 
  * <br>
  * @section Hardware_Templates Basic Hardware Template
  *
- * **RF24/arch**
+ * **RF24/utility**
  *
  * The RF24 library now includes a basic hardware template to assist in porting to various platforms. <br> The following files can be included
  * to replicate standard Arduino functions as needed, allowing devices from ATTiny to Raspberry Pi to utilize the same core RF24 driver.
@@ -1850,13 +1850,13 @@ private:
  * | your_custom_file.h | Provides access to custom drivers for spi,gpio, etc                          | 
  *
  * <br>
- * Examples are provided via the included hardware support templates in **RF24/arch** <br>
+ * Examples are provided via the included hardware support templates in **RF24/utility** <br>
  * See the <a href="modules.html">modules</a> page for examples of class declarations 
  *
  *<br>
  * @section Device_Detection Device Detection
  *
- * 1. The main detection for Linux devices is done in the Makefile, with the includes.h from the proper hardware directory copied to RF24/arch/includes.h <br>
+ * 1. The main detection for Linux devices is done in the Makefile, with the includes.h from the proper hardware directory copied to RF24/utility/includes.h <br>
  * 2. Secondary detection is completed in RF24_config.h, causing the include.h file to be included for all supported Linux devices <br>
  * 3. RF24.h contains the declaration for SPI and GPIO objects 'spi' and 'gpio' to be used for porting-in related functions.
  *
