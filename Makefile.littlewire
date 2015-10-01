@@ -18,7 +18,7 @@ LIB=librf24
 
 HEADER_DIR=${PREFIX}/include/RF24
 LIB_DIR=$(PREFIX)/lib
-DRIVER_DIR=arch/LittleWire
+DRIVER_DIR=utility/LittleWire
 
 ifeq ($(shell uname), Linux)
 	DYN_SUFFIX=so
