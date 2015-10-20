@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+ Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -13,27 +13,31 @@
  */
 
 #include <SPI.h>
-#include "nRF24L01.h"
 #include "RF24.h"
 
 //
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 7 & 8
+// Set up nRF24L01 radio on SPI bus plus pins 8 & 9
+RF24 radio(8,9);
 
-RF24 radio(7,8);
+// Use multicast?
+// sets the multicast behavior this unit in hardware.  Connect to GND to use unicast
+// Leave open (default) to use multicast.
+const int multicast_pin = 6 ;
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 5;
+const int role_pin = 7;
+bool multicast = true ;
 
 //
 // Topology
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+const uint64_t pipes[2] = { 0xEEFAFDFDEELL, 0xEEFDFAF50DFLL };
 
 //
 // Role management
@@ -58,7 +62,7 @@ role_e role;
 // Payload
 //
 
-const int min_payload_size = 4;
+const int min_payload_size = 1;
 const int max_payload_size = 32;
 const int payload_size_increments_by = 1;
 int next_payload_size = min_payload_size;
@@ -68,13 +72,27 @@ char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating 
 void setup(void)
 {
   //
+  // Multicast
+  //
+  pinMode(multicast_pin, INPUT);
+  digitalWrite(multicast_pin,HIGH);
+  delay( 20 ) ;
+
+  // read multicast role, LOW for unicast
+  if( digitalRead( multicast_pin ) )
+    multicast = true ;
+  else
+    multicast = false ;
+
+
+ //
   // Role
   //
 
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
-  delay(20); // Just to get a solid reading on the role pin
+  delay( 20 ); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
   if ( digitalRead(role_pin) )
@@ -88,10 +106,13 @@ void setup(void)
 
   Serial.begin(115200);
   
-  Serial.println(F("RF24/examples/pingpair_dyn/"));
+  Serial.println(F("RF24/examples/pingpair_multi_dyn/"));
   Serial.print(F("ROLE: "));
   Serial.println(role_friendly_name[role]);
-
+  
+  Serial.print(F("MULTICAST: "));
+  Serial.println(multicast ? F("true (unreliable)") : F("false (reliable)"));
+  
   //
   // Setup and configure rf radio
   //
@@ -100,9 +121,12 @@ void setup(void)
 
   // enable dynamic payloads
   radio.enableDynamicPayloads();
+  radio.setCRCLength( RF24_CRC_16 ) ;
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(5,15);
+  radio.setRetries( 15, 5 ) ;
+  radio.setAutoAck( true ) ;
+  //radio.setPALevel( RF24_PA_LOW ) ;
 
   //
   // Open pipes to other nodes for communication
@@ -127,7 +151,7 @@ void setup(void)
   //
   // Start listening
   //
-
+  radio.powerUp() ;
   radio.startListening();
 
   //
@@ -154,7 +178,7 @@ void loop(void)
     // Take the time, and send it.  This will block until complete
     Serial.print(F("Now sending length "));
     Serial.println(next_payload_size);
-    radio.write( send_payload, next_payload_size );
+    radio.write( send_payload, next_payload_size, multicast );
 
     // Now, continue listening
     radio.startListening();
@@ -169,18 +193,12 @@ void loop(void)
     // Describe the results
     if ( timeout )
     {
-      Serial.println(F("Failed, response timed out."));
+       Serial.println(F("Failed, response timed out."));
     }
     else
     {
       // Grab the response, compare, and send to debugging spew
       uint8_t len = radio.getDynamicPayloadSize();
-      
-      // If a corrupt dynamic payload is received, it will be flushed
-      if(!len){
-        return; 
-      }
-      
       radio.read( receive_payload, len );
 
       // Put a zero at the end for easy printing
@@ -199,7 +217,7 @@ void loop(void)
       next_payload_size = min_payload_size;
 
     // Try again 1s later
-    delay(100);
+    delay(250);
   }
 
   //
@@ -209,33 +227,32 @@ void loop(void)
   if ( role == role_pong_back )
   {
     // if there is data ready
-    while ( radio.available() )
+    if ( radio.available() )
     {
+      // Dump the payloads until we've gotten everything
+      uint8_t len;
+      bool done = false;
+      while (radio.available())
+      {
+        // Fetch the payload, and see if this was the last one.
+	len = radio.getDynamicPayloadSize();
+	radio.read( receive_payload, len );
 
-      // Fetch the payload, and see if this was the last one.
-      uint8_t len = radio.getDynamicPayloadSize();
-      
-      // If a corrupt dynamic payload is received, it will be flushed
-      if(!len){
-        continue; 
+	// Put a zero at the end for easy printing
+	receive_payload[len] = 0;
+
+	// Spew it
+        Serial.print(F("Got response size="));
+        Serial.print(len);
+        Serial.print(F(" value="));
+        Serial.println(receive_payload);
       }
-      
-      radio.read( receive_payload, len );
-
-      // Put a zero at the end for easy printing
-      receive_payload[len] = 0;
-
-      // Spew it
-      Serial.print(F("Got response size="));
-      Serial.print(len);
-      Serial.print(F(" value="));
-      Serial.println(receive_payload);
 
       // First, stop listening so we can talk
       radio.stopListening();
 
       // Send the final one back.
-      radio.write( receive_payload, len );
+      radio.write( receive_payload, len, multicast );
       Serial.println(F("Sent response."));
 
       // Now, resume listening so we catch the next packets.

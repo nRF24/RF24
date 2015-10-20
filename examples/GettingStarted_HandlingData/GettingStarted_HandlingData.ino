@@ -36,7 +36,7 @@ struct dataStruct{
 void setup() {
 
   Serial.begin(115200);
-  Serial.println(F("RF24/examples/GettingStarted"));
+  Serial.println(F("RF24/examples/GettingStarted_HandlingData"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
   
   radio.begin();
@@ -131,7 +131,7 @@ if (role == 1)  {
       radio.startListening();                              // Now, resume listening so we catch the next packets.     
       Serial.print(F("Sent response "));
       Serial.print(myData._micros);  
-      Serial.print(" : ");
+      Serial.print(F(" : "));
       Serial.println(myData.value);
    }
  }
