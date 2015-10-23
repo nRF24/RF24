@@ -6,6 +6,7 @@
 #  This is an example of how to use payloads of a varying (dynamic) size.
 # 
 
+from __future__ import print_function
 import time
 from RF24 import *
 
@@ -37,26 +38,26 @@ max_payload_size = 32
 payload_size_increments_by = 1
 next_payload_size = min_payload_size
 inp_role = 'none'
-send_payload = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
+send_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
 millis = lambda: int(round(time.time() * 1000))
 
-print 'pyRF24/examples/pingpair_dyn/'
+print('pyRF24/examples/pingpair_dyn/')
 radio.begin()
 radio.enableDynamicPayloads()
 radio.setRetries(5,15)
 radio.printDetails()
 
-print ' ************ Role Setup *********** '
+print(' ************ Role Setup *********** ')
 while (inp_role !='0') and (inp_role !='1'):
-    inp_role = raw_input('Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit) ')
+    inp_role = str(input('Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit) '))
 
 if inp_role == '0':
-    print 'Role: Pong Back, awaiting transmission'
+    print('Role: Pong Back, awaiting transmission')
     radio.openWritingPipe(pipes[1])
     radio.openReadingPipe(1,pipes[0])
     radio.startListening()
 else:
-    print 'Role: Ping Out, starting transmission'
+    print('Role: Ping Out, starting transmission')
     radio.openWritingPipe(pipes[0])
     radio.openReadingPipe(1,pipes[1])
 
@@ -69,7 +70,7 @@ while 1:
         radio.stopListening()
 
         # Take the time, and send it.  This will block until complete
-        print 'Now sending length ', next_payload_size, ' ... ',
+        print('Now sending length {} ... '.format(next_payload_size), end="")
         radio.write(send_payload[:next_payload_size])
 
         # Now, continue listening
@@ -84,14 +85,14 @@ while 1:
 
         # Describe the results
         if timeout:
-            print 'failed, response timed out.'
+            print('failed, response timed out.')
         else:
             # Grab the response, compare, and send to debugging spew
             len = radio.getDynamicPayloadSize()
             receive_payload = radio.read(len)
 
             # Spew it
-            print 'got response size=', len, ' value="', receive_payload, '"'
+            print('got response size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
 
         # Update size for next time.
         next_payload_size += payload_size_increments_by
@@ -109,14 +110,14 @@ while 1:
 	            receive_payload = radio.read(len)
 
 	            # Spew it
-	            print 'Got payload size=', len, ' value="', receive_payload, '"'
+	            print('Got payload size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
 
             # First, stop listening so we can talk
             radio.stopListening()
 
             # Send the final one back.
             radio.write(receive_payload)
-            print 'Sent response.'
+            print('Sent response.')
 
             # Now, resume listening so we catch the next packets.
             radio.startListening()
