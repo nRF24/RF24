@@ -1576,10 +1576,8 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 
 void SPIClass::begin() {
 
-  digitalWrite(SS, HIGH);
   pinMode(USCK, OUTPUT);
   pinMode(DO, OUTPUT);
-  pinMode(SS, OUTPUT);
   pinMode(DI, INPUT);
   USICR = _BV(USIWM0);
 
