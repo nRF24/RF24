@@ -1556,16 +1556,21 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 #	define DO   5   // PA5
 #	define USCK 6   // PA4
 #	define SS   3   // PA7
+#elif defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
+// these depend on the core used (check pins_arduino.h)
+// tested with google-code core
+#	define DI   14  // PB5
+#	define DO   15  // PB6
+#	define USCK 16  // PB7
+#	define SS   13  // PB4
 #endif
 
 #if defined(RF24_TINY)
 
 void SPIClass::begin() {
 
-  digitalWrite(SS, HIGH);
   pinMode(USCK, OUTPUT);
   pinMode(DO, OUTPUT);
-  pinMode(SS, OUTPUT);
   pinMode(DI, INPUT);
   USICR = _BV(USIWM0);
 
