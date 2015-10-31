@@ -47,8 +47,14 @@ void SPI::begin(int busNo){
 void SPI::init()
 {
 	int ret;
+    
+    if(this->fd > 0) {
+        close(this->fd);
+    }
+    
 	this->fd = open(this->device.c_str(), O_RDWR);
-	if (this->fd < 0)
+	
+    if (this->fd < 0)
 	{
 		perror("can't open device");
 		abort();

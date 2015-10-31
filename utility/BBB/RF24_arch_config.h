@@ -25,7 +25,7 @@
 #define _BV(x) (1<<(x))
 #define _SPI spi
 
-#undef SERIAL_DEBUG
+//#undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
 #define IF_SERIAL_DEBUG(x) ({x;})
 #else

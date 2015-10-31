@@ -79,7 +79,7 @@ int main(int argc, char** argv){
   bool role = 0;
 
   // Print preamble:
-  printf("RF24/examples/pingpair_dyn/\n");
+  cout << "RF24/examples/pingpair_dyn/\n";
 
   // Setup and configure rf radio
   radio.begin();

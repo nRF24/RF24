@@ -82,7 +82,7 @@ uint8_t counter = 1;                                                          //
 int main(int argc, char** argv){
 
 
-  printf("RPi/RF24/examples/gettingstarted_call_response\n");
+  cout << "RPi/RF24/examples/gettingstarted_call_response\n";
   radio.begin();
   radio.enableAckPayload();               // Allow optional ack payloads
   radio.enableDynamicPayloads();

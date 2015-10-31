@@ -88,7 +88,7 @@ int main(int argc, char** argv){
   bool role_ping_out = true, role_pong_back = false;
   bool role = role_pong_back;
 
-  printf("RF24/examples/GettingStarted/\n");
+  cout << "RF24/examples/GettingStarted/\n";
 
   // Setup and configure rf radio
   radio.begin();
