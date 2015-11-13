@@ -7,69 +7,101 @@ namespace bp = boost::python;
 // for methods which need it - mostly for buffer operations
 // 
 
-std::string read_wrap(RF24& ref, int maxlen)
+void throw_ba_exception(void)
+{
+    PyErr_SetString(PyExc_TypeError, "buf parameter must be bytes or bytearray");
+    bp::throw_error_already_set();
+}
+
+char *get_bytes_or_bytearray_str(bp::object buf)
+{
+    PyObject *py_ba;
+    py_ba = buf.ptr();
+    if (PyByteArray_Check(py_ba))
+        return PyByteArray_AsString(py_ba);
+    else if (PyBytes_Check(py_ba))
+        return PyBytes_AsString(py_ba);
+    else
+        throw_ba_exception();
+    return NULL;
+}
+
+int get_bytes_or_bytearray_ln(bp::object buf)
+{
+    PyObject *py_ba;
+    py_ba = buf.ptr();
+    if (PyByteArray_Check(py_ba))
+        return PyByteArray_Size(py_ba);
+    else if (PyBytes_Check(py_ba))
+        return PyBytes_Size(py_ba);
+    else
+        throw_ba_exception();
+    return 0;
+}
+
+bp::object read_wrap(RF24& ref, int maxlen)
 {
     char *buf = new char[maxlen+1];
     ref.read(buf, maxlen);
-    std::string str(buf, maxlen<ref.getPayloadSize()?maxlen:ref.getPayloadSize());
+    bp::object py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen<ref.getPayloadSize()?maxlen:ref.getPayloadSize())));
     delete[] buf;
-    return str;
+    return py_ba;
 }
 
-bool write_wrap1(RF24& ref, std::string buf)
+bool write_wrap1(RF24& ref, bp::object buf)
 {
-    return ref.write(buf.c_str(), buf.length());
+    return ref.write(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
 }
 
-bool write_wrap2(RF24& ref, std::string buf, const bool multicast)
+bool write_wrap2(RF24& ref, bp::object buf, const bool multicast)
 {
-    return ref.write(buf.c_str(), buf.length(), multicast);
+    return ref.write(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast);
 }
 
-void writeAckPayload_wrap(RF24& ref, uint8_t pipe, std::string buf)
+void writeAckPayload_wrap(RF24& ref, uint8_t pipe, bp::object buf)
 {
-    ref.writeAckPayload(pipe, buf.c_str(), buf.length());
+    ref.writeAckPayload(pipe, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
 
 }
 
-bool writeFast_wrap1(RF24& ref, std::string buf)
+bool writeFast_wrap1(RF24& ref, bp::object buf)
 {
-    return ref.writeFast(buf.c_str(), buf.length());
+    return ref.writeFast(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
 }
 
-bool writeFast_wrap2(RF24& ref, std::string buf, const bool multicast)
+bool writeFast_wrap2(RF24& ref, bp::object buf, const bool multicast)
 {
-    return ref.writeFast(buf.c_str(), buf.length(), multicast);
+    return ref.writeFast(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast);
 }
 
-bool writeBlocking_wrap(RF24& ref, std::string buf, uint32_t timeout)
+bool writeBlocking_wrap(RF24& ref, bp::object buf, uint32_t timeout)
 {
-    return ref.writeBlocking(buf.c_str(), buf.length(), timeout);
+    return ref.writeBlocking(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), timeout);
 }
 
-void startFastWrite_wrap1(RF24& ref, std::string buf, const bool multicast)
+void startFastWrite_wrap1(RF24& ref, bp::object buf, const bool multicast)
 {
-    ref.startFastWrite(buf.c_str(), buf.length(), multicast);
+    ref.startFastWrite(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast);
 }
 
-void startFastWrite_wrap2(RF24& ref, std::string buf, const bool multicast, bool startTx)
+void startFastWrite_wrap2(RF24& ref, bp::object buf, const bool multicast, bool startTx)
 {
-    ref.startFastWrite(buf.c_str(), buf.length(), multicast, startTx);
+    ref.startFastWrite(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast, startTx);
 }
 
-void startWrite_wrap(RF24& ref, std::string buf, const bool multicast)
+void startWrite_wrap(RF24& ref, bp::object buf, const bool multicast)
 {
-    ref.startWrite(buf.c_str(), buf.length(), multicast);
+    ref.startWrite(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast);
 }
 
-void openWritingPipe_wrap(RF24& ref, const std::string address)
+void openWritingPipe_wrap(RF24& ref, const bp::object address)
 {
-    ref.openWritingPipe((const uint8_t *)(address.c_str()));
+    ref.openWritingPipe((const uint8_t *)(get_bytes_or_bytearray_str(address)));
 }
 
-void openReadingPipe_wrap(RF24& ref, uint8_t number, const std::string address)
+void openReadingPipe_wrap(RF24& ref, uint8_t number, const bp::object address)
 {
-    ref.openReadingPipe(number, (const uint8_t *)(address.c_str()));
+    ref.openReadingPipe(number, (const uint8_t *)(get_bytes_or_bytearray_str(address)));
 }
 
 bp::tuple whatHappened_wrap(RF24& ref)
