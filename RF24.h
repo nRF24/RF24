@@ -871,21 +871,21 @@ s   *
 
   /**
    * Set the CRC length
-   *
+   * <br>CRC checking cannot be disabled if auto-ack is enabled
    * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
   void setCRCLength(rf24_crclength_e length);
 
   /**
    * Get the CRC length
-   *
+   * <br>CRC checking cannot be disabled if auto-ack is enabled
    * @return RF24_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
   rf24_crclength_e getCRCLength(void);
 
   /**
    * Disable CRC validation
-   *
+   * 
    * @warning CRC cannot be disabled if auto-ack/ESB is enabled.
    */
   void disableCRC( void ) ;
@@ -1886,5 +1886,4 @@ private:
  */
 
 #endif // __RF24_H__
-
 
