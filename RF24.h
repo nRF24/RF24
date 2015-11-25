@@ -1331,6 +1331,14 @@ private:
  *
  * @section News News
  *
+ * **Dec 2015**<br>
+ * - ESP8266 support via Arduino IDE
+ * - <a href="https://github.com/stewarthou/Particle-RF24">Particle Photon/Core</a> fork available
+ * - ATTiny2313/4313 support added
+ * - Python 3 support added
+ * - RF24 added to Arduino library manager
+ * - RF24 added to PlatformIO library manager
+ *
  * **March 2015**<br>
  * - Uses SPI transactions on Arduino
  * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/utility
@@ -1339,12 +1347,6 @@ private:
  * - Support for RPi 2 added
  * - Major Documentation cleanup & update (Move all docs to github.io)
  *
- * <b>Dec 2014 </b><br>
- * - New: Intel Galileo now supported
- * - New: Python wrapper for RPi included
- * - Documentation updated
- * - Example files have been updated
- * - See the links below and class documentation for more info.
  *
  * If issues are discovered with the documentation, please report them <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  *
