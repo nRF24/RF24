@@ -1496,8 +1496,8 @@ private:
  *                                 +-\/-+
  *                   NC      PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 --- LED --- 5V
  *    nRF24L01  CE, pin3 --- PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5
- *    nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin7
- *    nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin6 
+ *    nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6
+ *    nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7
  *                                 +----+ 
  * @endcode
  *
@@ -1531,10 +1531,27 @@ private:
  *                            PB3  4|    |11 PA2 --- nRF24L01   CE, pin3
  *                            PB2  5|    |10 PA3 --- nRF24L01  CSN, pin4
  *                            PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5
- *    nRF24L01 MOSI, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MISO, pin6
+ *    nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6
  *                                  +----+
  *	@endcode					 
  *	
+ * <br>
+ *    **ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13** <br>
+ * @code
+ *                                  +-\/-+                                                              
+ *                            PA2  1|o   |20 VCC --- nRF24L01  VCC, pin2
+ *                            PD0  2|    |19 PB7 --- nRF24L01  SCK, pin5
+ *                            PD1  3|    |18 PB6 --- nRF24L01 MOSI, pin6
+ *                            PA1  4|    |17 PB5 --- nRF24L01 MISO, pin7
+ *                            PA0  5|    |16 PB4 --- nRF24L01  CSN, pin4
+ *                            PD2  6|    |15 PB3 --- nRF24L01   CE, pin3
+ *                            PD3  7|    |14 PB2
+ *                            PD4  8|    |13 PB1
+ *                            PD5  9|    |12 PB0
+ *    nRF24L01  GND, pin1 --- GND 10|    |11 PD6
+ *                                  +----+
+ *	@endcode					 
+ *
  * <br><br><br>
  *
  *
