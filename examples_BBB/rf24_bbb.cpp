@@ -28,6 +28,7 @@ using namespace std;
 // CE pin = (Header P9, Pin 13) = 59 = 13 + 46 
 //Note: Specify SPI BUS 0 or 1 instead of CS pin number. 
 //RF24 radio(59,0);
+// CE pin = P9_16
 RF24 radio(51,0);
 
 /********** User Config *********/
