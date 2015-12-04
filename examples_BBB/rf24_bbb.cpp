@@ -66,6 +66,7 @@ void sendData(char *data)
     if(!isSent) 
     {
         printf("{\"status\":\"failed\"}");
+        return;
     }
     
     radio.startListening();
@@ -160,11 +161,8 @@ int main(int argc, char** argv)
     radio.setRetries(15,15);
     
     int c;
-    fprintf(stderr, "argc:%d\n", argc);
     while((c = getopt( argc, argv, "Dhw:r:S:c:R::"))!=-1) 
-    {
-        //fprintf(stdout, "proces index:%d\n", optind);
-        
+    {   
         switch(c) 
         {
             case 'w': setWritingPipe(optarg);
@@ -181,7 +179,7 @@ int main(int argc, char** argv)
                       break;
             case 'c': channel = 1;
                       break;
-            case '?': fprintf(stdout, "Illegal option:-%c\n", isprint(optopt)?optopt:'#');
+            case '?': fprintf(stderr, "Illegal option:-%c\n", isprint(optopt)?optopt:'#');
                       showHelp();
                       break;
             default: showHelp();
@@ -189,7 +187,6 @@ int main(int argc, char** argv)
         }
     }
 
-    //radio.printDetails();
     fflush(stdout);
     radio.startListening();
     
