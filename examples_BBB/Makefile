@@ -23,7 +23,7 @@ endif
 
 # define all programs
 #PROGRAMS = gettingstarted gettingstarted_call_response transfer pingpair_dyn
-PROGRAMS = rf24lib
+PROGRAMS = rf24_bbb
 SOURCES = ${PROGRAMS:=.cpp}
 
 all: ${PROGRAMS}
