@@ -177,15 +177,16 @@ int main(int argc, char** argv){
 
 	if(role == role_pong_back)
 	{
-		counter = 0;
-		delay(10000);
-		rxTimer = millis();
-		printf("Rate: ");
-		float numBytes = counter*32;
-		printf("%.2f KB/s \n\r",numBytes/100);
-		printf("Payload Count: %lu \n\r", counter);
+        if(millis() - rxTimer > 1000){
+		  rxTimer = millis();
+		  printf("Rate: ");
+		  float numBytes = counter*32;
+		  printf("%.2f KB/s \n\r",numBytes/1000);
+		  printf("Payload Count: %lu \n\r", counter);
+  		  counter = 0;
+        }
+        delay(2);
 	}
 	
 } // loop
 } // main
-
