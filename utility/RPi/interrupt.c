@@ -82,7 +82,7 @@ int piHiPri (const int pri)
 }
 
 
-static void *interruptHandler (void *arg)
+void *interruptHandler (void *arg)
 {
   int myPin ;
 

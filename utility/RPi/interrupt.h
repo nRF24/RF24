@@ -21,7 +21,7 @@ see <http://www.gnu.org/licenses/>
  *      fires.
  *********************************************************************************
  */
-static void *interruptHandler (void *arg);
+void *interruptHandler (void *arg);
 
 #ifdef __cplusplus
 extern "C" {
