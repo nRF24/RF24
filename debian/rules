@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_build:
+	echo "Debian Auto Build"
+	make -f Makefile.Debian all
+
+override_dh_auto_clean:
+	echo "Debian Auto Clean"
+	make -f Makefile.Debian clean
+
+override_dh_auto_install:
+	echo "Debian Auto Install"
+	make -f Makefile.Debian install DESTDIR=$(PWD)/debian/librf24-bcm

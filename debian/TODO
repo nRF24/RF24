@@ -1,0 +1,5 @@
+* Include LittleWire (i386, amd64 at least)
+* Fix lintian bugs:
+  W: librf24-bcm: new-package-should-close-itp-bug
+  W: librf24-bcm: shlib-without-versioned-soname usr/lib/librf24-bcm.so librf24-bcm.so
+  E: librf24-bcm: pkg-has-shlibs-control-file-but-no-actual-shared-libs
