@@ -8,14 +8,13 @@ SPI::SPI() {
 
 
 void SPI::begin( int busNo ) {
-	rfNoInterrupts();
+    spiNoInterrupts();
 	if (!bcm2835_init()){
 		return;
 	}
 	
 	bcm2835_spi_begin();
-    rfInterrupts();
-	
+	spiInterrupts();
 }
 
 void SPI::end() {
@@ -23,27 +22,27 @@ void SPI::end() {
 }
 
 void SPI::setBitOrder(uint8_t bit_order) {
-    rfNoInterrupts();
+    spiNoInterrupts();
 	bcm2835_spi_setBitOrder(bit_order);
-    rfInterrupts();
+    spiInterrupts();
 }
 
 void SPI::setDataMode(uint8_t data_mode) {
-  rfNoInterrupts();
+  spiNoInterrupts();
   bcm2835_spi_setDataMode(data_mode);
-  rfInterrupts();
+  spiInterrupts();
 }
 
 void SPI::setClockDivider(uint16_t spi_speed) {
-    rfNoInterrupts();
+    spiNoInterrupts();
 	bcm2835_spi_setClockDivider(spi_speed);
-    rfInterrupts();
+    spiInterrupts();
 }
 
 void SPI::chipSelect(int csn_pin){
-    rfNoInterrupts();
+    spiNoInterrupts();
 	bcm2835_spi_chipSelect(csn_pin);
-    rfInterrupts();
+    spiInterrupts();
 }
 
 SPI::~SPI() {

@@ -14,6 +14,7 @@
 #include "bcm2835.h"
 #include "interrupt.h"
 
+
 class SPI {
 public:
 
@@ -35,23 +36,23 @@ public:
 
 
 uint8_t SPI::transfer(uint8_t _data) {
-    rfNoInterrupts();
+    spiNoInterrupts();
     uint8_t data = bcm2835_spi_transfer(_data);	
-    rfInterrupts();
+    spiInterrupts();
     return data;
 }
 
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len){
-   rfNoInterrupts();
+   spiNoInterrupts();
    bcm2835_spi_transfernb( tbuf, rbuf, len);
-   rfInterrupts();
+   spiInterrupts();
 }
 
 void SPI::transfern(char* buf, uint32_t len)
 {
-    rfNoInterrupts();
+    spiNoInterrupts();
     transfernb(buf, buf, len);
-    rfInterrupts();
+    spiInterrupts();
 }
 /**
  * \endcond
