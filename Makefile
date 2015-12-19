@@ -53,7 +53,9 @@ OBJECTS+=gpio.o compatibility.o
 
 else ifeq "$(RPI)" "1"
 DRIVER_DIR=$(ARCH_DIR)/RPi
-OBJECTS+=bcm2835.o	
+OBJECTS+=bcm2835.o
+OBJECTS+=interrupt.o
+SHARED_LINKER_FLAGS+=-pthread
 # The recommended compiler flags for the Raspberry Pi
 CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
 
@@ -88,6 +90,9 @@ compatibility.o: $(DRIVER_DIR)/compatibility.c
 
 gpio.o: $(DRIVER_DIR)/gpio.cpp
 	g++ -Wall -fPIC ${CCFLAGS} -c $(DRIVER_DIR)/gpio.cpp
+
+interrupt.o: $(DRIVER_DIR)/interrupt.c
+	g++ -Wall -fPIC ${CCFLAGS} -c $(DRIVER_DIR)/interrupt.c
 	
 # clear build files
 clean:
