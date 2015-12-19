@@ -50,9 +50,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len){
 
 void SPI::transfern(char* buf, uint32_t len)
 {
-    spiNoInterrupts();
     transfernb(buf, buf, len);
-    spiInterrupts();
 }
 /**
  * \endcond

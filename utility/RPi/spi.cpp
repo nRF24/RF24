@@ -10,6 +10,7 @@ SPI::SPI() {
 void SPI::begin( int busNo ) {
     spiNoInterrupts();
 	if (!bcm2835_init()){
+        spiInterrupts();
 		return;
 	}
 	
