@@ -43,7 +43,6 @@ const uint8_t addresses[][6] = {"1Node","2Node"};
 bool role_ping_out = 1, role_pong_back = 0, role = 0;
 uint8_t counter = 1;                                                          // A single byte to keep track of the data being sent back and forth
 uint32_t timer = 0;
-volatile bool gotAck = false;
 
 void intHandler(){
   
@@ -55,10 +54,12 @@ void intHandler(){
   }
   
   if(role == role_ping_out && tx_ok){
-    gotAck=true;
+    if(!radio.available()){
+      printf("Got blank response. round-trip delay: %u ms\n\r",millis()-timer);
+    }
   }
   
-  if(role == role_ping_out && rx){
+  if(role == role_ping_out ){
     while(radio.available() ){
       uint8_t gotByte;
       radio.read( &gotByte, 1 );
@@ -134,22 +135,13 @@ while (1){
 
   if (role == role_ping_out){                               // Radio is in ping mode
 
-    //uint8_t gotByte;                                        // Initialize a variable for the incoming response
+    //uint8_t gotByte;                                      // Initialize a variable for the incoming response
 
     radio.stopListening();                                  // First, stop listening so we can talk.
     printf("Now sending %d as payload. ",counter);          // Use a simple byte counter as payload
-    timer = millis();                          // Record the current microsecond count
+    timer = millis();                                       // Record the current microsecond count
 
-    gotAck = false;
     radio.startWrite(&counter,1,false);                         // Send the counter variable to the other radio
-        while(!gotAck){
-            if(millis()-timer > 100){break;}
-        }
-        if(!gotAck){                             // If nothing in the buffer, we got an ack but it is blank
-            printf("Got blank response. round-trip delay: %u ms\n\r",millis()-timer);
-        }
-
-
     sleep(1);  // Try again later
   }
 
