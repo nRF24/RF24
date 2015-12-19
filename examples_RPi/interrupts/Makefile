@@ -23,7 +23,7 @@ endif
 
 # define all programs
 #PROGRAMS = scanner pingtest gettingstarted
-PROGRAMS = gettingstarted gettingstarted_call_response transfer pingpair_dyn
+PROGRAMS = gettingstarted_call_response_int gettingstarted_call_response_int2 transfer_interrupt pingpair_dyn_int
 SOURCES = ${PROGRAMS:=.cpp}
 
 all: ${PROGRAMS}
