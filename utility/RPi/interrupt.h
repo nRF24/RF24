@@ -52,6 +52,8 @@ extern int piHiPri (const int pri);
  *********************************************************************************
  */
 extern int attachInterrupt (int pin, int mode, void (*function)(void));
+extern void rfNoInterrupts();
+extern void rfInterrupts();
 #ifdef __cplusplus
 }
 #endif

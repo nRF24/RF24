@@ -168,3 +168,11 @@ int attachInterrupt (int pin, int mode, void (*function)(void))
   return 0 ;
 }
 
+void rfNoInterrupts(){
+  pthread_mutex_lock (&pinMutex) ;
+}
+
+void rfInterrupts(){
+  pthread_mutex_unlock (&pinMutex) ;
+}
+
