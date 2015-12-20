@@ -52,10 +52,18 @@ extern int piHiPri (const int pri);
  *********************************************************************************
  */
 extern int attachInterrupt (int pin, int mode, void (*function)(void));
+
+/*
+ * detachInterrupt:
+ *      Pi Specific detachInterrupt.
+ *      Will cancel the interrupt thread, close the filehandle and 
+ *		setting wiringPi back to 'none' mode.
+ *********************************************************************************
+ */
+extern int detachInterrupt (int pin);
+
 extern void rfNoInterrupts();
 extern void rfInterrupts();
-extern void spiNoInterrupts();
-extern void spiInterrupts();
 #ifdef __cplusplus
 }
 #endif

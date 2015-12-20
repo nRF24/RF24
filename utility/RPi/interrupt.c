@@ -25,9 +25,11 @@ see <http://www.gnu.org/licenses/>
 
 static pthread_mutex_t pinMutex ;
 static volatile int    pinPass = -1 ;
+
+pthread_t threadId [64];
+
 // sysFds:
 //      Map a file descriptor from the /sys/class/gpio/gpioX/value
-
 static int sysFds [64] =
 {
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -96,6 +98,7 @@ void *interruptHandler (void *arg)
       pthread_mutex_lock (&pinMutex) ;
       isrFunctions [myPin] () ;
       pthread_mutex_unlock (&pinMutex) ;
+	  pthread_testcancel(); //Cancel at this point if we have an cancellation request.
     }
 
   return NULL ;
@@ -104,7 +107,6 @@ void *interruptHandler (void *arg)
 
 int attachInterrupt (int pin, int mode, void (*function)(void))
 {
-  pthread_t threadId ;
   const char *modeS ;
   char fName   [64] ;
   char  pinS [8] ;
@@ -150,7 +152,7 @@ int attachInterrupt (int pin, int mode, void (*function)(void))
 
   if (sysFds [bcmGpioPin] == -1)
   {
-    sprintf (fName, "/sys/class/gpio/gpio%d/value",bcmGpioPin) ; //WRONG
+    sprintf (fName, "/sys/class/gpio/gpio%d/value",bcmGpioPin);
     if ((sysFds [bcmGpioPin] = open (fName, O_RDWR)) < 0)
       return printf ("wiringPiISR: unable to open %s: %s\n", fName, strerror (errno)) ;
   }
@@ -163,12 +165,56 @@ int attachInterrupt (int pin, int mode, void (*function)(void))
 
   pthread_mutex_lock (&pinMutex) ;
     pinPass = pin ;
-    pthread_create (&threadId, NULL, interruptHandler, NULL) ;
+    pthread_create (&threadId[bcmGpioPin], NULL, interruptHandler, NULL) ;
     while (pinPass != -1)
       delay (1) ;
   pthread_mutex_unlock (&pinMutex) ;
 
   return 0 ;
+}
+
+int detachInterrupt (int pin)
+{
+	char  pinS [8];
+    const char *modeS = "none";
+	pid_t pid ;
+	
+	if (!pthread_cancel(threadId[pin])) //Cancel the thread
+	{
+	 return 0;
+	}
+	
+	if (!close(sysFds[pin])) //Close filehandle
+	{
+		return 0;
+	}
+	
+	/* Set wiringPi to 'none' interrupt mode */
+
+    sprintf (pinS, "%d", pin) ;
+
+    if ((pid = fork ()) < 0)    // Fail
+      return printf("wiringPiISR: fork failed: %s\n", strerror (errno)) ;
+
+    if (pid == 0)       // Child, exec
+    {
+      /**/ if (access ("/usr/local/bin/gpio", X_OK) == 0)
+      {
+        execl ("/usr/local/bin/gpio", "gpio", "edge", pinS, modeS, (char *)NULL) ;
+        return printf ("wiringPiISR: execl failed: %s\n", strerror (errno)) ;
+      }
+      else if (access ("/usr/bin/gpio", X_OK) == 0)
+      {
+        execl ("/usr/bin/gpio", "gpio", "edge", pinS, modeS, (char *)NULL) ;
+        return printf ("wiringPiISR: execl failed: %s\n", strerror (errno)) ;
+      }
+      else
+        return printf ("wiringPiISR: Can't find gpio program\n") ;
+    }
+    else                // Parent, wait
+      wait (NULL) ;
+	  
+	return 1;
 }
 
 void rfNoInterrupts(){
