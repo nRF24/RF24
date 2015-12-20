@@ -24,7 +24,6 @@ see <http://www.gnu.org/licenses/>
 #define delay(x) bcm2835_delay(x)
 
 static pthread_mutex_t pinMutex ;
-static pthread_mutex_t spiMutex ;
 static volatile int    pinPass = -1 ;
 // sysFds:
 //      Map a file descriptor from the /sys/class/gpio/gpioX/value
@@ -179,13 +178,3 @@ void rfNoInterrupts(){
 void rfInterrupts(){
   pthread_mutex_unlock (&pinMutex) ;
 }
-
-void spiNoInterrupts(){
-  pthread_mutex_lock (&spiMutex) ;
-}
-
-void spiInterrupts(){
-  pthread_mutex_unlock (&spiMutex) ;
-}
-
-

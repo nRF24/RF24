@@ -32,20 +32,19 @@ public:
   static void setDataMode(uint8_t data_mode);
   static void setClockDivider(uint16_t spi_speed);
   static void chipSelect(int csn_pin);
+  
+  static void beginTransaction(int clock_divider, uint8_t csn_pin);
+  static void endTransaction();
 };
 
 
 uint8_t SPI::transfer(uint8_t _data) {
-    spiNoInterrupts();
-    uint8_t data = bcm2835_spi_transfer(_data);	
-    spiInterrupts();
+    uint8_t data = bcm2835_spi_transfer(_data);
     return data;
 }
 
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len){
-   spiNoInterrupts();
    bcm2835_spi_transfernb( tbuf, rbuf, len);
-   spiInterrupts();
 }
 
 void SPI::transfern(char* buf, uint32_t len)

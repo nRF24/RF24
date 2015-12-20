@@ -43,13 +43,6 @@ void RF24::csn(bool mode)
 		_SPI.setDataMode(SPI_MODE0);
 		_SPI.setClockDivider(SPI_CLOCK_DIV2);
       #endif
-
-#elif defined (RF24_RPi)
-	  _SPI.setBitOrder(RF24_BIT_ORDER);
-	  _SPI.setDataMode(RF24_DATA_MODE);
-	  _SPI.setClockDivider(spi_speed ? spi_speed : RF24_CLOCK_DIVIDER);
-	  _SPI.chipSelect(csn_pin);
-	  delayMicroseconds(5);
 #endif
 
 #if !defined (RF24_LINUX)
@@ -73,6 +66,9 @@ void RF24::ce(bool level)
     #if defined (RF24_SPI_TRANSACTIONS)
     _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
 	#endif
+	#if defined (RF24_LINUX)
+	_SPI.beginTransaction(spi_speed ? spi_speed : RF24_CLOCK_DIVIDER, csn_pin);
+	#endif
     csn(LOW);
   }
 
@@ -83,6 +79,9 @@ void RF24::ce(bool level)
 	#if defined (RF24_SPI_TRANSACTIONS)
     _SPI.endTransaction();
 	#endif
+	#if defined (RF24_LINUX)
+	_SPI.endTransaction();
+	#endif
   }
 
 /****************************************************************************/
@@ -92,7 +91,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   uint8_t status;
 
   #if defined (RF24_LINUX)
-  csn(LOW); //In this case, calling csn(LOW) configures the spi settings for RPi
+  beginTransaction(); //configures the spi settings for RPi, locks mutex and setting csn low
   uint8_t * prx = spi_rxbuff;
   uint8_t * ptx = spi_txbuff;
   uint8_t size = len + 1; // Add register value to transmit buffer
@@ -107,6 +106,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 
   // decrement before to skip status byte
   while ( --size ){ *buf++ = *prx++; } 
+  endTransaction(); //unlocks mutex and setting csn high
 
 #else
 
@@ -130,7 +130,7 @@ uint8_t RF24::read_register(uint8_t reg)
   
   #if defined (RF24_LINUX)
 	
-  csn(LOW);
+  beginTransaction();
   
   uint8_t * prx = spi_rxbuff;
   uint8_t * ptx = spi_txbuff;	
@@ -138,8 +138,9 @@ uint8_t RF24::read_register(uint8_t reg)
   *ptx++ = NOP ; // Dummy operation, just for reading
   
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
-  result = *++prx;   // result is 2nd byte of receive buffer  
-
+  result = *++prx;   // result is 2nd byte of receive buffer
+  
+  endTransaction();
   #else
 
   beginTransaction();
@@ -159,8 +160,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   uint8_t status;
 
   #if defined (RF24_LINUX) 
-
-  csn(LOW);
+  beginTransaction();
   uint8_t * prx = spi_rxbuff;
   uint8_t * ptx = spi_txbuff;
   uint8_t size = len + 1; // Add register value to transmit buffer
@@ -171,7 +171,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
   status = *prx; // status is 1st byte of receive buffer
-
+  endTransaction();
   #else
 
   beginTransaction();
@@ -194,7 +194,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
   #if defined (RF24_LINUX)
-    csn(LOW);
+    beginTransaction();
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
 	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
@@ -202,7 +202,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   	
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
 	status = *prx++; // status is 1st byte of receive buffer
-
+	endTransaction();
   #else
 
   beginTransaction();
@@ -229,7 +229,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   IF_SERIAL_DEBUG( printf("[Writing %u bytes %u blanks]\n",data_len,blank_len); );
   
  #if defined (RF24_LINUX)
-    csn(LOW);
+	beginTransaction();
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
     uint8_t size;
@@ -243,7 +243,7 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
 	
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 	status = *prx; // status is 1st byte of receive buffer
-
+	endTransaction();
 
   #else
 
@@ -277,7 +277,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   IF_SERIAL_DEBUG( printf("[Reading %u bytes %u blanks]\n",data_len,blank_len); );
   
   #if defined (RF24_LINUX)
-    csn(LOW);
+	beginTransaction();
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
     uint8_t size;
@@ -297,7 +297,7 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
         *current++ = *prx++;
 		
 	*current = *prx;
-
+	endTransaction();
   #else
 
   beginTransaction();
@@ -334,18 +334,11 @@ uint8_t RF24::flush_tx(void)
 uint8_t RF24::spiTrans(uint8_t cmd){
 
   uint8_t status;
-  #if defined (RF24_LINUX)
-    csn(LOW);
-    status = _SPI.transfer( cmd );
-
-  #else
-
+  
   beginTransaction();
   status = _SPI.transfer( cmd );
   endTransaction();
-
-  #endif
-
+  
   return status;
 }
 
@@ -1038,10 +1031,10 @@ uint8_t RF24::getDynamicPayloadSize(void)
   #if defined (RF24_LINUX)  
   spi_txbuff[0] = R_RX_PL_WID;
   spi_rxbuff[1] = 0xff;
-  csn(LOW);
+  beginTransaction();
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = spi_rxbuff[1];  
-  csn(HIGH);
+  endTransaction();
   #else
   beginTransaction();
   _SPI.transfer( R_RX_PL_WID );
@@ -1222,19 +1215,10 @@ void RF24::closeReadingPipe( uint8_t pipe )
 
 void RF24::toggle_features(void)
 {
-
-  #if defined (RF24_LINUX)
-    csn(LOW);
-    _SPI.transfer( ACTIVATE );
-    _SPI.transfer( 0x73 );
-	csn(HIGH);
-  #else
     beginTransaction();
 	_SPI.transfer( ACTIVATE );
     _SPI.transfer( 0x73 );
 	endTransaction();
-  #endif
-
 }
 
 /****************************************************************************/
@@ -1302,7 +1286,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   uint8_t data_len = rf24_min(len,32);
 
   #if defined (RF24_LINUX)
-    csn(LOW);
+    beginTransaction();
     uint8_t * ptx = spi_txbuff;
     uint8_t size = data_len + 1 ; // Add register value to transmit buffer
 	*ptx++ =  W_ACK_PAYLOAD | ( pipe & 0b111 );
@@ -1311,7 +1295,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
     }
 	
     _SPI.transfern( (char *) spi_txbuff, size);
-	csn(HIGH);
+	endTransaction();
   #else
   beginTransaction();
   _SPI.transfer(W_ACK_PAYLOAD | ( pipe & 0b111 ) );
