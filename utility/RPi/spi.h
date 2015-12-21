@@ -15,6 +15,30 @@
 #include "interrupt.h"
 
 #define SPI_HAS_TRANSACTION
+#define MSBFIRST BCM2835_SPI_BIT_ORDER_MSBFIRST
+#define SPI_MODE0 BCM2835_SPI_MODE0
+#define RF24_SPI_SPEED BCM2835_SPI_SPEED_8MHZ
+    
+class SPISettings {
+public:
+	SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) {
+        init(clock,bitOrder,dataMode);
+	}
+    SPISettings() { init(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0); }
+
+	uint32_t clck;
+	uint8_t border;
+    uint8_t dmode;
+private:
+
+	void init(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) {
+                clck = clock;
+                border = bitOrder;
+                dmode = dataMode;
+	}
+	friend class SPIClass;
+};
+
 
 class SPI {
 public:
@@ -34,8 +58,10 @@ public:
   static void setClockDivider(uint16_t spi_speed);
   static void chipSelect(int csn_pin);
   
-  static void beginTransaction(int clock_divider, uint8_t bitOrder, uint8_t mode);
+  void beginTransaction(SPISettings settings);
   static void endTransaction();
+  
+  
 };
 
 

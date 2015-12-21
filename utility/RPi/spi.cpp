@@ -16,12 +16,12 @@ void SPI::begin( int busNo ) {
 	bcm2835_spi_begin();
 }
 
-void SPI::beginTransaction(int clock_divider, uint8_t bitOrder, uint8_t mode) {
+void SPI::beginTransaction(SPISettings settings){
    
 	pthread_mutex_lock (&spiMutex);
-	setBitOrder(bitOrder);
-	setDataMode(mode);
-	setClockDivider(clock_divider);
+	setBitOrder(settings.border);
+	setDataMode(settings.dmode);
+	setClockDivider(settings.clck);
 }
 
 void SPI::endTransaction() {
