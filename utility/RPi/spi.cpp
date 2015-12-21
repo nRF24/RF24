@@ -16,13 +16,12 @@ void SPI::begin( int busNo ) {
 	bcm2835_spi_begin();
 }
 
-void SPI::beginTransaction(int clock_divider, uint8_t csn_pin) {
+void SPI::beginTransaction(int clock_divider, uint8_t bitOrder, uint8_t mode) {
+   
 	pthread_mutex_lock (&spiMutex);
-	setBitOrder(RF24_BIT_ORDER);
-	setDataMode(RF24_DATA_MODE);
+	setBitOrder(bitOrder);
+	setDataMode(mode);
 	setClockDivider(clock_divider);
-	chipSelect(csn_pin);
-	delayMicroseconds(5);
 }
 
 void SPI::endTransaction() {
@@ -43,6 +42,7 @@ void SPI::setClockDivider(uint16_t spi_speed) {
 
 void SPI::chipSelect(int csn_pin){
 	bcm2835_spi_chipSelect(csn_pin);
+	delayMicroseconds(5);
 }
 
 SPI::~SPI() {

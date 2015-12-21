@@ -14,6 +14,7 @@
 #include "bcm2835.h"
 #include "interrupt.h"
 
+#define SPI_HAS_TRANSACTION
 
 class SPI {
 public:
@@ -33,7 +34,7 @@ public:
   static void setClockDivider(uint16_t spi_speed);
   static void chipSelect(int csn_pin);
   
-  static void beginTransaction(int clock_divider, uint8_t csn_pin);
+  static void beginTransaction(int clock_divider, uint8_t bitOrder, uint8_t mode);
   static void endTransaction();
 };
 

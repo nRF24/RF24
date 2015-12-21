@@ -43,6 +43,9 @@ void RF24::csn(bool mode)
 		_SPI.setDataMode(SPI_MODE0);
 		_SPI.setClockDivider(SPI_CLOCK_DIV2);
       #endif
+#elif defined (RF24_RPi)
+      if(!mode)
+	    _SPI.chipSelect(csn_pin);
 #endif
 
 #if !defined (RF24_LINUX)
@@ -66,9 +69,6 @@ void RF24::ce(bool level)
     #if defined (RF24_SPI_TRANSACTIONS)
     _SPI.beginTransaction(SPISettings(RF_SPI_SPEED, MSBFIRST, SPI_MODE0));
 	#endif
-	#if defined (RF24_LINUX)
-	_SPI.beginTransaction(spi_speed ? spi_speed : RF24_CLOCK_DIVIDER, csn_pin);
-	#endif
     csn(LOW);
   }
 
@@ -78,9 +78,6 @@ void RF24::ce(bool level)
     csn(HIGH);
 	#if defined (RF24_SPI_TRANSACTIONS)
     _SPI.endTransaction();
-	#endif
-	#if defined (RF24_LINUX)
-	_SPI.endTransaction();
 	#endif
   }
 
