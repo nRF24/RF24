@@ -26,8 +26,8 @@ public:
 	}
     SPISettings() { init(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0); }
 
-	uint32_t clck;
-	uint8_t border;
+    uint32_t clck;
+    uint8_t border;
     uint8_t dmode;
 private:
 
@@ -58,7 +58,7 @@ public:
   static void setClockDivider(uint16_t spi_speed);
   static void chipSelect(int csn_pin);
   
-  void beginTransaction(SPISettings settings);
+  static void beginTransaction(SPISettings settings);
   static void endTransaction();
   
   
