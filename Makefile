@@ -27,6 +27,11 @@ HEADER_DIR=${PREFIX}/include/RF24
 # The base location of support files for different devices
 ARCH_DIR=utility
 
+ARCH=armv6zk
+ifeq "$(shell uname -m)" "armv7l"
+ARCH=armv7-a
+endif
+
 # The default objects to compile
 OBJECTS=RF24.o spi.o
 
@@ -57,7 +62,7 @@ OBJECTS+=bcm2835.o
 OBJECTS+=interrupt.o
 SHARED_LINKER_FLAGS+=-pthread
 # The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
+CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=$(ARCH) -mtune=arm1176jzf-s
 
 else
 DRIVER_DIR=$(ARCH_DIR)/BBB
