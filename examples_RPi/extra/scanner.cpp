@@ -48,8 +48,7 @@ RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 //
 // Channel info
 //
-//const uint8_t num_channels = 128;
-const uint8_t num_channels = 120;
+const uint8_t num_channels = 126;
 uint8_t values[num_channels];
 
 

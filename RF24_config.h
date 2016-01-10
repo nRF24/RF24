@@ -58,7 +58,7 @@
   #include <Arduino.h>
   
   // RF modules support 10 Mhz SPI bus speed
-  const uint32_t RF_SPI_SPEED = 10000000;  
+  const uint32_t RF24_SPI_SPEED = 10000000;  
 
 #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
       #if defined SPI_UART
