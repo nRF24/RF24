@@ -62,7 +62,7 @@ int main(int argc, char** argv)
   // Print preamble
   //
 
-  //Serial.begin(57600);
+  //Serial.begin(115200);
   //printf_begin();
   printf("RF24/examples/scanner/\n");
 

@@ -114,7 +114,7 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(57600);
+  Serial.begin(115200);
   printf_begin();
   printf("\n\rRF24/tests/pingpair_blocking/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
