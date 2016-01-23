@@ -43,7 +43,7 @@ bool TX=1,RX=0,role=0, transferInProgress = 0;
 
 void setup(void) {
 
-  Serial.begin(57600);
+  Serial.begin(115200);
   printf_begin();
 
   radio.begin();                           // Setup and configure rf radio
