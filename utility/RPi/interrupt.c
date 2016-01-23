@@ -179,12 +179,12 @@ int detachInterrupt (int pin)
     const char *modeS = "none";
 	pid_t pid ;
 	
-	if (!pthread_cancel(threadId[pin])) //Cancel the thread
+	if (pthread_cancel(threadId[pin]) != 0) //Cancel the thread
 	{
 	 return 0;
 	}
 	
-	if (!close(sysFds[pin])) //Close filehandle
+	if (close(sysFds[pin]) != 0) //Close filehandle
 	{
 		return 0;
 	}
