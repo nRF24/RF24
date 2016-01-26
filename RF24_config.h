@@ -15,7 +15,7 @@
 #define __RF24_CONFIG_H__
 
   /*** USER DEFINES:  ***/  
-  //#define FAILURE_HANDLING
+  #define FAILURE_HANDLING
   //#define SERIAL_DEBUG
   //#define MINIMAL
   //#define SPI_UART  // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
@@ -43,6 +43,10 @@
   #define RF24_TINY
   #include "utility/ATTiny/RF24_arch_config.h"
 
+//ATXMega
+#elif defined(__AVR_ATxmega256D3__)
+  #define XMEGA_D3
+  #include "utility/ATXMegaD3/RF24_arch_config.h"
 //LittleWire  
 #elif defined(LITTLEWIRE)
   
