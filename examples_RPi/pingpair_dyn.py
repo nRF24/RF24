@@ -27,10 +27,15 @@ irq_gpio_pin = None
 
 #RPi B+
 # Setup for GPIO 22 CE and CE0 CSN for RPi B+ with SPI Speed @ 8Mhz
-radio = RF24(RPI_BPLUS_GPIO_J8_15, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ)
+#radio = RF24(RPI_BPLUS_GPIO_J8_15, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ)
+
+# RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
+radio = RF24(22, 0);
+
 
 # Setup for connected IRQ pin, GPIO 24 on RPi B+; uncomment to activate
 #irq_gpio_pin = RPI_BPLUS_GPIO_J8_18
+#irq_gpio_pin = 24
 
 ##########################################
 def try_read_data(channel=0):
