@@ -132,6 +132,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
 
 BOOST_PYTHON_MODULE(RF24){
 
+#ifdef BCM2835_H
     bp::enum_< RPiGPIOPin>("RPiGPIOPin")
         .value("RPI_GPIO_P1_03", RPI_GPIO_P1_03)
         .value("RPI_GPIO_P1_05", RPI_GPIO_P1_05)
@@ -243,6 +244,7 @@ BOOST_PYTHON_MODULE(RF24){
     bp::scope().attr("BCM2835_SPI_SPEED_32KHZ") = BCM2835_SPI_SPEED_32KHZ;
     bp::scope().attr("BCM2835_SPI_SPEED_16KHZ") = BCM2835_SPI_SPEED_16KHZ;
     bp::scope().attr("BCM2835_SPI_SPEED_8KHZ") = BCM2835_SPI_SPEED_8KHZ;
+#endif  // BCM2835_H
 
     bp::enum_< rf24_crclength_e>("rf24_crclength_e")
         .value("RF24_CRC_DISABLED", RF24_CRC_DISABLED)
