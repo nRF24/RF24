@@ -1393,6 +1393,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
 {
   bool result = false;
   uint8_t setup = read_register(RF_SETUP) ;
+
   // HIGH and LOW '00' is 1Mbs - our default
   setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ;
   
