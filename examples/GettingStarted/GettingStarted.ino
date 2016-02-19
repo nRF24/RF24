@@ -9,9 +9,6 @@
 #include "RF24.h"
 
 /****************** User Config ***************************/
-/***      Set this radio as radio number 0 or 1         ***/
-bool radioNumber = 0;
-
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
 RF24 radio(7,8);
 /**********************************************************/
@@ -20,6 +17,11 @@ byte addresses[][6] = {"1Node","2Node"};
 
 // Used to control whether this node is sending or receiving
 bool role = 0;
+
+/**
+ * Set the role (sending or receiving) and configure the transmission pipes.
+ */
+void setRole(bool role);
 
 void setup() {
   Serial.begin(115200);
@@ -33,13 +35,7 @@ void setup() {
   radio.setPALevel(RF24_PA_LOW);
   
   // Open a writing and reading pipe on each radio, with opposite addresses
-  if(radioNumber){
-    radio.openWritingPipe(addresses[1]);
-    radio.openReadingPipe(1,addresses[0]);
-  }else{
-    radio.openWritingPipe(addresses[0]);
-    radio.openReadingPipe(1,addresses[1]);
-  }
+  setRole(0);
   
   // Start the radio listening for data
   radio.startListening();
@@ -126,12 +122,12 @@ if (role == 1)  {
     char c = toupper(Serial.read());
     if ( c == 'T' && role == 0 ){      
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
-      role = 1;                  // Become the primary transmitter (ping out)
+      setRole(1);                  // Become the primary transmitter (ping out)
     
    }else
     if ( c == 'R' && role == 1 ){
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));      
-       role = 0;                // Become the primary receiver (pong back)
+       setRole(0);                // Become the primary receiver (pong back)
        radio.startListening();
        
     }
@@ -139,4 +135,17 @@ if (role == 1)  {
 
 
 } // Loop
+
+void setRole(bool newRole)
+{
+  role = newRole;
+
+  if(role){
+	radio.openWritingPipe(addresses[1]);
+	radio.openReadingPipe(1,addresses[0]);
+  }else{
+	radio.openWritingPipe(addresses[0]);
+	radio.openReadingPipe(1,addresses[1]);
+  }
+}
 
