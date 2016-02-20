@@ -643,8 +643,8 @@ bool RF24::begin(void)
   {
     p_variant = true ;
   }
-  /*setup = read_register(RF_SETUP);
-  if( setup == 0b00001110 )     // register default for nRF24L01P
+  setup = read_register(RF_SETUP);
+  /*if( setup == 0b00001110 )     // register default for nRF24L01P
   {
     p_variant = true ;
   }*/
