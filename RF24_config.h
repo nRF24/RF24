@@ -43,6 +43,10 @@
   #define RF24_TINY
   #include "utility/ATTiny/RF24_arch_config.h"
 
+//ATXMega
+#elif defined(__AVR_ATxmega256D3__)
+  #define XMEGA_D3
+  #include "utility/ATXMegaD3/RF24_arch_config.h"
 //LittleWire  
 #elif defined(LITTLEWIRE)
   
