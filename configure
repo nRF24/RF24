@@ -1,0 +1,219 @@
+#!/bin/bash
+# set -x
+
+CROSS_CC=arm-linux-gnueabihf-gcc
+CROSS_CXX=arm-linux-gnueabihf-g++
+
+function help {
+    echo "configure script for RF24 library."
+    echo "Parameters:"
+    echo "OS=[LINUX|DARWIN] - Operating system."
+    echo "ARCH=<arch> - cpu architecture as passed to --arch to gcc"
+
+}
+
+function execute_check {
+    if [ "${REMOTE}" ]; then
+        ssh -o 'PreferredAuthentications=publickey' -o 'ConnectTimeout=30' -o 'BatchMode=yes' -o 'StrictHostKeyChecking=no' -p ${REMOTE_PORT} ${REMOTE} $1
+    else
+        eval $1
+    fi
+}
+
+params="OS ARCH DRIVER CFLAGS PREFIX REMOTE_PREFIX LIB LIBNAME CC CXX LIB_DIR REMOTE_LIB_DIR HEADER_DIR REMOTE_HEADER_DIR DRIVER_DIR ARCH_DIR REMOTE REMOTE_HOST REMOTE_USER REMOTE_PORT SHARED_LINKER_FLAGS LDCONFIG REMOTE_LDCONFIG EXAMPLES_DIR REMOTE_EXAMPLES_DIR"
+for i in "$@"; do
+    if [ "$i" = "-h" ] || [ "$i" = "--help" ]; then
+        help
+        exit 0
+    fi
+    found=0
+    for param in ${params}; do
+        if [[ "$i" = ${param}=* ]]; then
+            eval ${param}="${i#*=}"
+            shift
+            found=1
+            break
+        fi
+    done
+    if [ "$found" = "0" ]; then
+        echo "[ERROR] Unknown option detected: ${i}"
+        exit 1
+    fi
+done
+
+#*******************************************
+# remote machine verification
+if [ "${REMOTE_HOST}" ]; then
+    if [ "${REMOTE_USER}" ]; then
+        REMOTE=${REMOTE_USER}@${REMOTE_HOST}
+    else
+        REMOTE=${REMOTE_HOST}
+    fi
+    if [ -z "${REMOTE_PORT}" ]; then
+        REMOTE_PORT=22
+    fi
+    echo "[SECTION] Checking remote host."
+    if [ "$(nmap ${REMOTE_HOST} -Pn  --host-timeout 30s -p ${REMOTE_PORT} 2>/dev/null | grep open)" ]; then
+        echo "  [OK] ssh daemon on ${REMOTE_HOST} port ${REMOTE_PORT} seems to be listening."
+    else
+        echo "  [WARNING] ssh on ${REMOTE_HOST} port ${REMOTE_PORT} seems not to be listening or nmap not installed."
+    fi
+    if [[ "$(execute_check 'echo ok 2>/dev/null')" ]]; then
+        echo "  [OK] Remote machine ssh passwordless login configured fine."
+    else
+        echo "  [WARNING] Remote machine ssh and/or passwordless login check failed."
+    fi
+    if [[ $(execute_check "sudo echo ok 2>/dev/null") ]]; then
+        echo "  [OK] Remote machine sudo configured fine."
+    else
+        echo "  [WARNING] Remote machine sudo test failed."
+    fi
+fi
+
+if [ -z "${CC}" ]; then
+    echo "[SECTION] Detecting arm compilation environment."
+    if [[ $(command -v ${CROSS_CC} 2>/dev/null) ]]; then
+        echo "  [OK] ${CROSS_CC} detected."
+        CC=${CROSS_CC}
+        CROSS_SYSROOT="$(${CC} --print-sysroot)"
+        if [ "${CROSS_SYSROOT}" = "/" ]; then
+            CROSS_SYSROOT=""
+        fi
+    else
+        echo "  [INFO] ${CROSS_CC} not found."
+    fi
+    if [[ $(command -v ${CROSS_CXX} 2>/dev/null) ]]; then
+        echo "  [OK] ${CROSS_CXX} detected."
+        CXX=${CROSS_CXX}
+    else
+        echo "  [INFO] ${CROSS_CXX} not found."
+    fi
+fi
+
+if [ "${CROSS_SYSROOT}" ]; then
+    PREFIX="${CROSS_SYSROOT}/usr/local"
+fi
+
+PREFIX=${PREFIX:-/usr/local}
+REMOTE_PREFIX=${REMOTE_PREFIX:-/usr/local}
+LIB_DIR=${LIB_DIR:-${PREFIX}/lib}
+REMOTE_LIB_DIR=${REMOTE_LIB_DIR:-${REMOTE_PREFIX}/lib}
+HEADER_DIR=${HEADER_DIR:-${PREFIX}/include/RF24}
+REMOTE_HEADER_DIR=${REMOTE_HEADER_DIR:-${REMOTE_PREFIX}/include/RF24}
+EXAMPLES_DIR=${EXAMPLES_DIR:-${PREFIX}/bin}
+REMOTE_EXAMPLES_DIR=${REMOTE_EXAMPLES_DIR:-${REMOTE_PREFIX}/bin}
+LDCONFIG=${LDCONFIG:-ldconfig}
+REMOTE_LDCONFIG=${REMOTE_LDCONFIG:-/sbin/ldconfig}
+LIB=${LIB:-rf24}
+CC=${CC:-gcc}
+CXX=${CXX:-g++}
+ARCH_DIR=${ARCH_DIR:-utility}
+
+#*******************************************
+# CPU detection
+if [ -z "${ARCH}" ]; then
+    echo "[SECTION] Detecting CPU architecture."
+    ARCH_DETECT=$(execute_check "uname -m")
+    echo "  [INFO] ${ARCH_DETECT} detected."
+    case ${ARCH_DETECT} in
+    armv6l)
+        echo "  [OK] Using armv6zk as ARCH."
+        ARCH=armv6zk
+        ;;
+    armv7l)
+        echo "  [OK] Using armv7-a as ARCH."
+        ARCH=armv7-a
+        ;;
+    *)
+        echo "  [INFO] No explicit ARCH set."
+        ;;
+    esac
+fi
+
+if [ "${ARCH}" ]; then
+    CFLAGS+=" -march=${ARCH}"
+fi
+
+#*******************************************
+# DRIVER detection
+if [ -z "${DRIVER}" ]; then
+    echo "[SECTION] Detecting DRIVER"
+    if [[ $(execute_check 'ls /dev/spidev* 2>/dev/null') ]]; then
+        DRIVER=SPIDEV
+    elif [[ $(execute_check "cat /proc/cpuinfo | grep Hardware | grep 'BCM2708\|BCM2709'") ]]; then
+        DRIVER=RPi
+    elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep libmraa") ]]; then
+        DRIVER=MRAA
+    elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep liblittlewire-spi") ]]; then
+        DRIVER=LittleWire
+   else
+        echo "  [ERROR] No supported platform detected. Run configure with DRIVER=<platform> to set a platform explicitly."
+        exit 1
+    fi
+    echo "  [OK] DRIVER detected:${DRIVER}."
+fi
+
+
+
+case ${DRIVER} in
+SPIDEV)
+    ;;
+RPi)
+    SHARED_LINKER_FLAGS+=" -pthread"
+    ;;
+MRAA)
+    SHARED_LINKER_FLAGS+=" -lmraa"
+    ;;
+LittleWire)
+    SHARED_LINKER_FLAGS+=" -llittlewire-spi"
+    ;;
+*)
+    echo "[ERROR] Unsupported DRIVER: ${DRIVER}."
+    exit 1
+    ;;
+esac
+
+#*******************************************
+# OS detection
+if [ -z "${OS}" ]; then
+    echo "[SECTION] Detecting OS."
+    OS=$(execute_check "uname")
+    OS=${OS^^}
+    echo "  [INFO] OS detected:${OS}."
+fi
+
+case ${OS} in
+LINUX)
+    DYN_SUFFIX=so
+    SHARED_LINKER_FLAGS+=" -shared -Wl,-soname,lib${LIB}.${DYN_SUFFIX}"
+    ;;
+DARWIN)
+    DYN_SUFFIX=dylib
+    SHARED_LINKER_FLAGS+=" -dynamiclib -install_name ${LIB_DIR}/lib${LIB}.${DYN_SUFFIX}"
+    ;;
+*)
+    echo "[ERROR] Unsupported OS: ${OS}."
+    exit 1
+    ;;
+esac
+
+
+LIBNAME=${LIBNAME:-lib${LIB}.${DYN_SUFFIX}}
+DRIVER_DIR=${DRIVER_DIR:-${ARCH_DIR}/${DRIVER}}
+CFLAGS+=" -O2 -Wall -g"
+
+echo "[SECTION] Preparing configuration."
+cp ${DRIVER_DIR}/includes.h ${ARCH_DIR}/includes.h
+
+echo "[SECTION] Saving configuration."
+echo -n "" > Makefile.inc
+for param in ${params}; do
+    if [[ ${!param} ]]; then
+        echo ${param}=${!param} >> Makefile.inc
+    fi
+done
+
+echo "[SECTION] Cleaning previous builds."
+make clean >/dev/null
+
+echo "[OK] Finished."

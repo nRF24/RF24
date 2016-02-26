@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Makefile for librf24-bcm on Raspberry Pi
+# Makefile for librf24
 #
 # License: GPL (General Public License)
 # Author:  Charles-Henri Hallard 
@@ -8,117 +8,88 @@
 #
 # Description:
 # ------------
-# use make all and mak install to install the library 
-# You can change the install directory by editing the LIBDIR line
+# use make all and make install to install the library 
 #
-PREFIX=/usr/local
 
-# Library parameters
-# where to put the lib
-LIBDIR=$(PREFIX)/lib
-# lib name 
-LIB=librf24-bcm
-# shared library name
-LIBNAME=$(LIB).so.1.0
+ifeq ($(wildcard Makefile.inc), )
+$(error Configuration not found. Run ./configure first)
+endif	
 
-# Where to put the header files
-HEADER_DIR=${PREFIX}/include/RF24
+include Makefile.inc
 
-# The base location of support files for different devices
-ARCH_DIR=utility
-
-ARCH=armv6zk
-ifeq "$(shell uname -m)" "armv7l"
-ARCH=armv7-a
+# Objects to compile
+OBJECTS=RF24.o
+ifeq ($(DRIVER), MRAA)
+OBJECTS+=spi.o gpio.o compatibility.o
+else ifeq ($(DRIVER), RPi)
+OBJECTS+=spi.o bcm2835.o interrupt.o
+else ifeq ($(DRIVER), SPIDEV)
+OBJECTS+=spi.o gpio.o compatibility.o
 endif
-
-# The default objects to compile
-OBJECTS=RF24.o spi.o
-
-SHARED_LINKER_FLAGS=-shared -Wl,-soname,$@.so.1
-
-
-
-# Detect the Raspberry Pi from cpuinfo
-# Allow users to override the use of BCM2835 driver and force use of SPIDEV by specifying " sudo make install -B RF24_SPIDEV=1 "
-ifeq "$(RF24_SPIDEV)" "1"
-RPI=0
-else
-#Count the matches for BCM2708 or BCM2709 in cpuinfo
-RPI=$(shell cat /proc/cpuinfo | grep Hardware | grep -c BCM2708)
-  ifneq "${RPI}" "1"
-  RPI=$(shell cat /proc/cpuinfo | grep Hardware | grep -c BCM2709)
-  endif
-endif
-
-ifeq "$(RF24_MRAA)" "1"
-SHARED_LINKER_FLAGS+=-lmraa 
-DRIVER_DIR=$(ARCH_DIR)/MRAA
-OBJECTS+=gpio.o compatibility.o
-
-else ifeq "$(RPI)" "1"
-DRIVER_DIR=$(ARCH_DIR)/RPi
-OBJECTS+=bcm2835.o
-OBJECTS+=interrupt.o
-SHARED_LINKER_FLAGS+=-pthread
-# The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=$(ARCH) -mtune=arm1176jzf-s
-
-else
-DRIVER_DIR=$(ARCH_DIR)/BBB
-OBJECTS+=gpio.o compatibility.o interrupt.o
-SHARED_LINKER_FLAGS+=-pthread
-endif
-
 
 # make all
 # reinstall the library after each recompilation
-all: test librf24-bcm
+all: $(LIBNAME)
 
-test:
-	cp ${DRIVER_DIR}/includes.h $(ARCH_DIR)/includes.h
 # Make the library
-librf24-bcm: $(OBJECTS)
-	g++ ${SHARED_LINKER_FLAGS} ${CCFLAGS} -o ${LIBNAME} $^
-	
+$(LIBNAME): $(OBJECTS)
+	@echo "[Linking]"
+	${CC} ${SHARED_LINKER_FLAGS} ${CFLAGS} -o ${LIBNAME} $^
+
 # Library parts
 RF24.o: RF24.cpp	
-	g++ -Wall -fPIC ${CCFLAGS} -c $^
+	${CXX} -Wall -fPIC ${CFLAGS} -c $^
 
 bcm2835.o: $(DRIVER_DIR)/bcm2835.c
-	gcc -Wall -fPIC ${CCFLAGS} -c $^
+	${CC} -Wall -fPIC ${CFLAGS} -c $^
 
 spi.o: $(DRIVER_DIR)/spi.cpp
-	g++ -Wall -fPIC ${CCFLAGS} -c $^
+	${CXX} -Wall -fPIC ${CFLAGS} -c $^
 
 compatibility.o: $(DRIVER_DIR)/compatibility.c
-	gcc -Wall -fPIC  ${CCFLAGS} -c $(DRIVER_DIR)/compatibility.c
+	${CC} -Wall -fPIC  ${CFLAGS} -c $(DRIVER_DIR)/compatibility.c
 
 gpio.o: $(DRIVER_DIR)/gpio.cpp
-	g++ -Wall -fPIC ${CCFLAGS} -c $(DRIVER_DIR)/gpio.cpp
+	${CXX} -Wall -fPIC ${CFLAGS} -c $(DRIVER_DIR)/gpio.cpp
 
 interrupt.o: $(DRIVER_DIR)/interrupt.c
-	g++ -Wall -fPIC ${CCFLAGS} -c $(DRIVER_DIR)/interrupt.c
+	${CXX} -Wall -fPIC ${CFLAGS} -c $(DRIVER_DIR)/interrupt.c
 	
 # clear build files
 clean:
-	rm -rf *.o ${LIB}.*
+	@echo "[Cleaning]"
+	rm -rf *.o ${LIBNAME}.*
 
 install: all install-libs install-headers
+upload: all upload-libs upload-headers
 
 # Install the library to LIBPATH
-install-libs: 
+install-libs:
 	@echo "[Installing Libs]"
 	@if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
-	@install -m 0755 ${LIBNAME} ${LIBDIR}
-	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so.1
-	@ln -sf ${LIBDIR}/${LIBNAME} ${LIBDIR}/${LIB}.so
-	@ldconfig
+	@install -m 0755 ${LIBNAME} ${LIB_DIR}
+	@ln -sf ${LIB_DIR}/${LIBNAME} ${LIB_DIR}/${LIBNAME}.1
+	# @${LDCONFIG}
+
+upload-libs:
+	@echo "[Uploading Libs to ${REMOTE}]"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p ${REMOTE_LIB_DIR}"
+	@scp -q -P ${REMOTE_PORT} ${LIBNAME} ${REMOTE}:/tmp
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0755 /tmp/${LIBNAME} ${REMOTE_LIB_DIR} && rm /tmp/${LIBNAME} && sudo ln -sf ${REMOTE_LIB_DIR}/${LIBNAME} ${REMOTE_LIB_DIR}/${LIBNAME}.1 && sudo ldconfig"
 
 install-headers:
 	@echo "[Installing Headers]"
-	@if ( test ! -d ${HEADER_DIR} ) ; then mkdir -p ${HEADER_DIR} ; fi
+	@mkdir -p ${HEADER_DIR}/${DRIVER_DIR}
 	@install -m 0644 *.h ${HEADER_DIR}
-	@if ( test ! -d ${HEADER_DIR}/${DRIVER_DIR} ) ; then mkdir -p ${HEADER_DIR}/${DRIVER_DIR} ; fi
 	@install -m 0644 ${DRIVER_DIR}/*.h ${HEADER_DIR}/${DRIVER_DIR}
 	@install -m 0644 ${ARCH_DIR}/*.h ${HEADER_DIR}/${ARCH_DIR}
+
+upload-headers:
+	@echo "[Uploading Headers to ${REMOTE}]"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo mkdir -p ${REMOTE_HEADER_DIR}/${DRIVER_DIR}"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p /tmp/RF24 && rm -rf /tmp/RF24/*"
+	@rsync -a --include="*.h" --include="*/" --exclude="*" -e "ssh -p ${REMOTE_PORT}" . ${REMOTE}:/tmp/RF24
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0644 /tmp/RF24/*.h ${REMOTE_HEADER_DIR}"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0644 /tmp/RF24/${DRIVER_DIR}/*.h ${REMOTE_HEADER_DIR}/${DRIVER_DIR}"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0644 /tmp/RF24/${ARCH_DIR}/*.h ${REMOTE_HEADER_DIR}/${ARCH_DIR}"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "rm -rf /tmp/RF24"

@@ -30,7 +30,8 @@
   #endif
   
 //Generic Linux/ARM and //http://iotdk.intel.com/docs/master/mraa/
-#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
+//#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
+#if ( defined (__linux) || defined (LINUX) ) || defined(LITTLEWIRE) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
 
   // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /utility/includes.h (Default is spidev config)
   // This behavior can be overridden by calling 'make RF24_SPIDEV=1' or 'make RF24_MRAA=1'
@@ -41,11 +42,6 @@
 #elif defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__) || defined(__AVR_ATtiny861__)  
   #define RF24_TINY
   #include "utility/ATTiny/RF24_arch_config.h"
-
-//LittleWire  
-#elif defined(LITTLEWIRE)
-  
-  #include "utility/LittleWire/RF24_arch_config.h"
 
 //Teensy  
 #elif defined (TEENSYDUINO)

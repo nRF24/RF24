@@ -16,32 +16,19 @@ SPI::SPI() {
 
 void SPI::begin(int busNo){
 
-
-	//BBB:
-	if(!busNo){
-	  this->device = "/dev/spidev1.0";;
-	}else{
-	  this->device = "/dev/spidev1.1";;
-    }
-
-	//RPi:
-	  /*if(!busNo){
-	    this->device = "/dev/spidev0.0";;
-	  }else{
-	    this->device = "/dev/spidev0.1";;
-	  }*/
-
-	
+	this->device = "/dev/spidev0.0";
+    /* set spidev accordingly to busNo like:
+     * busNo = 23 -> /dev/spidev2.3
+     *
+     * a bit messy but simple
+     * */
+    this->device[11] += (busNo / 10) % 10;
+    this->device[13] += busNo % 10;
 	this->bits = 8;
-//	this->speed = 24000000; // 24Mhz - proly doesnt work
-//	this->speed = 16000000; // 16Mhz 
-	this->speed = 8000000; // 8Mhz 
-//	this->speed = 4000000;
-//	this->speed = 2000000; // 2Mhz 
+	this->speed = RF24_SPIDEV_SPEED;
 	this->mode=0;
     //this->mode |= SPI_NO_CS;
 	this->init();
-	
 }
 
 void SPI::init()

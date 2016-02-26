@@ -580,15 +580,16 @@ bool RF24::begin(void)
 	  gpio.begin(ce_pin,csn_pin);	
 	#endif
 	
-
-	switch(csn_pin){     //Ensure valid hardware CS pin
-	  case 0: break;
-	  case 1: break;
-	  // Allow BCM2835 enums for RPi
-	  case 8: csn_pin = 0; break;
-	  case 7: csn_pin = 1; break;
-	  default: csn_pin = 0; break;
-	}	
+    #ifdef RF24_RPi
+	  switch(csn_pin){     //Ensure valid hardware CS pin
+	    case 0: break;
+	    case 1: break;
+	    // Allow BCM2835 enums for RPi
+	    case 8: csn_pin = 0; break;
+	    case 7: csn_pin = 1; break;
+	    default: csn_pin = 0; break;
+	  }
+    #endif
 	
     _SPI.begin(csn_pin);
 
@@ -936,7 +937,7 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
   //write_payload( buf, len );
   write_payload( buf, len,multicast? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
   ce(HIGH);
-  #if defined(CORE_TEENSY) || !defined(ARDUINO) || defined (RF24_BBB) || defined (RF24_DUE)
+  #if defined(CORE_TEENSY) || !defined(ARDUINO) || defined (RF24_SPIDEV) || defined (RF24_DUE)
 	delayMicroseconds(10);
   #endif
   ce(LOW);
