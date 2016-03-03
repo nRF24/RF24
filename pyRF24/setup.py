@@ -20,6 +20,8 @@ def process_configparams():
             cflags += " -I" + os.path.dirname(value)
         elif identifier == "LIB_DIR":
             cflags += " -L" + value
+        elif identifier in ("CC", "CXX"):
+            os.environ[identifier] = value
 
     os.environ["CFLAGS"] = cflags
 
