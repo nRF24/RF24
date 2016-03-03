@@ -69,7 +69,7 @@ install-libs:
 	@if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
 	@install -m 0755 ${LIBNAME} ${LIB_DIR}
 	@ln -sf ${LIB_DIR}/${LIBNAME} ${LIB_DIR}/${LIBNAME}.1
-	# @${LDCONFIG}
+	@${LDCONFIG}
 
 upload-libs:
 	@echo "[Uploading Libs to ${REMOTE}]"

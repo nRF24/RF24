@@ -21,7 +21,7 @@ if sys.version_info >= (3,):
 else:
     BOOST_LIB = 'boost_python'
 
-process_configparams()
+#process_configparams()
 crossunixccompiler.register()
 
 # module_RF24 = distutils.core.Extension('RF24',

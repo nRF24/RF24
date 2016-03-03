@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Makefile for librf24 examples on Raspberry Pi
+# Makefile for librf24 examples on Linux
 #
 # License: GPL (General Public License)
 # Author:  gnulnulf <arco@appeltaart.mine.nu>
@@ -9,41 +9,40 @@
 # Description:
 # ------------
 # use make all and make install to install the examples
-# You can change the install directory by editing the prefix line
 #
-prefix := /usr/local
 
-# Detect the Raspberry Pi by the existence of the bcm_host.h file
-BCMLOC=/opt/vc/include/bcm_host.h
-
-ARCH=armv6zk
-ifeq "$(shell uname -m)" "armv7l"
-ARCH=armv7-a
+ifeq ($(wildcard ../Makefile.inc), )
+	$(error Configuration not found. Run ./configure first)
 endif
 
-ifneq ("$(wildcard $(BCMLOC))","")
-# The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=$(ARCH) -mtune=arm1176jzf-s
-endif
+include ../Makefile.inc
 
 # define all programs
-#PROGRAMS = scanner pingtest gettingstarted
 PROGRAMS = gettingstarted gettingstarted_call_response transfer pingpair_dyn
 SOURCES = ${PROGRAMS:=.cpp}
 
 all: ${PROGRAMS}
 
 ${PROGRAMS}: ${SOURCES}
-	g++ ${CCFLAGS} -Wall -I../ -lrf24-bcm $@.cpp -o $@
+	${CXX} ${CFLAGS} -I${HEADER_DIR}/.. -I.. -L${LIB_DIR} -lrf24 $@.cpp -o $@
 
 clean:
 	rm -rf $(PROGRAMS)
 
 install: all
-	test -d $(prefix) || mkdir $(prefix)
-	test -d $(prefix)/bin || mkdir $(prefix)/bin
+	mkdir -p $(EXAMPLES_DIR)
 	for prog in $(PROGRAMS); do \
-	  install -m 0755 $$prog $(prefix)/bin; \
+	  install -m 0755 $$prog $(EXAMPLES_DIR); \
 	done
 
-.PHONY: install
+upload: all
+	@echo "[Uploading examples to ${REMOTE}:${REMOTE_EXAMPLES_DIR}]"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p ${REMOTE_EXAMPLES_DIR}"
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p /tmp/RF24_examples"
+	@scp -q -P ${REMOTE_PORT} ${PROGRAMS} ${REMOTE}:/tmp/RF24_examples
+	for prog in $(PROGRAMS); do \
+		ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0755 /tmp/RF24_examples/$${prog} ${REMOTE_EXAMPLES_DIR}"; \
+	done
+	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "rm -rf /tmp/RF24_examples"
+
+.PHONY: install upload
