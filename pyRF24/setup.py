@@ -11,9 +11,17 @@ def process_configparams():
     with open('../Makefile.inc') as f:
         config_lines = f.readlines()
 
+    cflags=os.getenv("CFLAGS", "")
     for line in config_lines:
         identifier, value = line.split('=', 1)
-        os.environ[identifier] = value
+        if identifier == "CPUFLAGS":
+            cflags += " " + value
+        elif identifier == "HEADER_DIR":
+            cflags += " -I" + os.path.dirname(value)
+        elif identifier == "LIB_DIR":
+            cflags += " -L" + value
+
+    os.environ["CFLAGS"] = cflags
 
 
 if sys.version_info >= (3,):
@@ -21,7 +29,7 @@ if sys.version_info >= (3,):
 else:
     BOOST_LIB = 'boost_python'
 
-#process_configparams()
+process_configparams()
 crossunixccompiler.register()
 
 # module_RF24 = distutils.core.Extension('RF24',

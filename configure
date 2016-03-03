@@ -1,5 +1,4 @@
 #!/bin/bash
-# set -x
 
 CROSS_CC=arm-linux-gnueabihf-gcc
 CROSS_CXX=arm-linux-gnueabihf-g++
@@ -67,7 +66,7 @@ function detect_machine {
     local hardware=$(execute_check "grep Hardware /proc/cpuinfo 2>/dev/null")
     local soc="unknown"
     local tp="unknown"
-    hardware=${hardware/*:/}
+    hardware=$(echo ${hardware/*:/} | sed 's/^ *//g')
 
     if [ -z "$cpu" ]; then
         cpu="unknown"
@@ -149,10 +148,10 @@ function gcc_cpu_flags {
 }
 
 function detect_driver {
-    if [[ $(execute_check 'ls /dev/spidev* 2>/dev/null') ]]; then
-        result=SPIDEV
-    elif [[ $(execute_check "cat /proc/cpuinfo | grep Hardware | grep 'BCM2708\|BCM2709'") ]]; then
+    if [[ $(execute_check "cat /proc/cpuinfo | grep Hardware | grep 'BCM2708\|BCM2709'") ]]; then
         result=RPi
+    elif [[ $(execute_check 'ls /dev/spidev* 2>/dev/null') ]]; then
+        result=SPIDEV
     elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep libmraa") ]]; then
         result=MRAA
     elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep liblittlewire-spi") ]]; then
@@ -341,7 +340,7 @@ if [ -z "${DRIVER}" ]; then
     echo "[SECTION] Detecting DRIVER"
     DRIVER=$(detect_driver)
     if [ -z "${DRIVER}" ]; then
-        die "No supported driver detected. Run configure with DRIVER=<driver> to set a driver explicitly."
+        die "No supported driver detected. Run configure with --driver=<driver> to set a driver explicitly."
     fi
     echo "  [OK] DRIVER detected:${DRIVER}."
 fi
