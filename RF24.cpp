@@ -1549,6 +1549,13 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 #	define DO   15  // PB6
 #	define USCK 16  // PB7
 #	define SS   13  // PB4
+#elif defined(__AVR_ATtiny861__)
+// these depend on the core used (check pins_arduino.h)
+// tested with google-code core
+#    define DI   9   // PB0
+#    define DO   8   // PB1
+#    define USCK 7   // PB2
+#    define SS   6   // PB3
 #endif
 
 #if defined(RF24_TINY)
