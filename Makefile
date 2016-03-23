@@ -66,7 +66,8 @@ CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=$(ARCH) -mtune=arm1176jzf-s
 
 else
 DRIVER_DIR=$(ARCH_DIR)/BBB
-OBJECTS+=gpio.o compatibility.o
+OBJECTS+=gpio.o compatibility.o interrupt.o
+SHARED_LINKER_FLAGS+=-pthread
 endif
 
 

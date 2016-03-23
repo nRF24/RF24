@@ -4,5 +4,6 @@
 
   #define RF24_BBB
   #include "BBB/RF24_arch_config.h"
+  #include "BBB/interrupt.h"
   
 #endif

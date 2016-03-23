@@ -48,12 +48,9 @@ void SPI::init()
 {
 	int ret;
     
-    if(this->fd > 0) {
-        close(this->fd);
-    }
-    
-	this->fd = open(this->device.c_str(), O_RDWR);
-	
+    if( !(this->fd > 0)){
+	  this->fd = open(this->device.c_str(), O_RDWR);
+	}
     if (this->fd < 0)
 	{
 		perror("can't open device");
@@ -124,10 +121,10 @@ uint8_t SPI::transfer(uint8_t tx_)
 	tr.len = 1,//ARRAY_SIZE(tx),
 	tr.delay_usecs = 0,
 	tr.cs_change=1,
-	tr.speed_hz = this->speed,
 	tr.bits_per_word = this->bits,
 	};
 	
+    tr.speed_hz = this->speed,	
 	//Note: On RPi, for some reason I started getting 'bad message' errors, and changing the struct as below fixed it, until an update...??
 	//
 	/*	// One byte is transfered at once
@@ -165,9 +162,9 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 		tr.len = len,//ARRAY_SIZE(tx),
 		tr.cs_change=1,
 		tr.delay_usecs = 0,
-		tr.speed_hz = this->speed,
 		tr.bits_per_word = this->bits,
 	};
+        tr.speed_hz = this->speed,    
 	
 	//Note: On RPi, for some reason I started getting 'bad message' errors, and changing the struct as below fixed it, until an update...??
 	// One byte is transfered at once
