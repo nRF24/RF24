@@ -798,7 +798,7 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 	
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { 
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if(millis() - timer > 85){			
+			if(millis() - timer > 95){			
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				  return 0;		
@@ -844,7 +844,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 			if(millis() - timer > timeout){ return 0; }		  //If this payload has exceeded the user-defined timeout, exit and return 0
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if(millis() - timer > (timeout+85) ){			
+			if(millis() - timer > (timeout+95) ){			
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;			
@@ -891,7 +891,7 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if(millis() - timer > 85 ){			
+			if(millis() - timer > 95 ){			
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;							
@@ -965,7 +965,7 @@ bool RF24::txStandBy(){
 			return 0;
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if( millis() - timeout > 85){
+			if( millis() - timeout > 95){
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;	
@@ -998,7 +998,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx){
 				}
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if( millis() - start > (timeout+85)){
+			if( millis() - start > (timeout+95)){
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;	
