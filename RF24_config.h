@@ -29,13 +29,11 @@
     #define RF24_SPI_TRANSACTIONS
   #endif
   
-//Generic Linux/ARM and //http://iotdk.intel.com/docs/master/mraa/
-//#if ( defined (__linux) || defined (LINUX) ) && defined( __arm__ ) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
-#if ( defined (__linux) || defined (LINUX) ) || defined(LITTLEWIRE) || defined(MRAA) // BeagleBone Black running GNU/Linux or any other ARM-based linux device
+#if ( !defined (ARDUINO) ) // Any non-arduino device is handled via configure/Makefile
 
-  // The Makefile checks for bcm2835 (RPi) and copies the correct includes.h file to /utility/includes.h (Default is spidev config)
-  // This behavior can be overridden by calling 'make RF24_SPIDEV=1' or 'make RF24_MRAA=1'
-  // The includes.h file defines either RF24_RPi, MRAA or RF24_BBB and includes the correct RF24_arch_config.h file
+  // The configure script detects device and copies the correct includes.h file to /utility/includes.h
+  // This behavior can be overridden by calling configure with respective parameters
+  // The includes.h file defines either RF24_RPi, MRAA, LITTLEWIRE or RF24_SPIDEV and includes the correct RF24_arch_config.h file
   #include "utility/includes.h"
 
 //ATTiny  

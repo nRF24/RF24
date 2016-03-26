@@ -271,12 +271,12 @@ if [ "${REMOTE}" ]; then
     if [[ "$(execute_check 'echo ok 2>/dev/null' 2>/dev/null)" ]]; then
         echo "  [OK] Remote machine ssh passwordless login configured fine."
     else
-        die "Remote machine ssh and/or passwordless login check failed." 1
+        die "Remote machine ssh and/or passwordless login check failed." 4
     fi
     if [[ $(execute_check "sudo echo ok 2>/dev/null") ]]; then
         echo "  [OK] Remote machine sudo configured fine."
     else
-        die "Remote machine sudo test failed." 1
+        die "Remote machine sudo test failed." 5
     fi
 fi
 
@@ -340,7 +340,7 @@ if [ -z "${DRIVER}" ]; then
     echo "[SECTION] Detecting DRIVER"
     DRIVER=$(detect_driver)
     if [ -z "${DRIVER}" ]; then
-        die "No supported driver detected. Run configure with --driver=<driver> to set a driver explicitly."
+        die "No supported driver detected. Run configure with --driver=<driver> to set a driver explicitly." 1
     fi
     echo "  [OK] DRIVER detected:${DRIVER}."
 fi
@@ -358,7 +358,7 @@ LittleWire)
     SHARED_LINKER_FLAGS+=" -llittlewire-spi"
     ;;
 *)
-    die "Unsupported DRIVER: ${DRIVER}." 1
+    die "Unsupported DRIVER: ${DRIVER}." 2
     ;;
 esac
 
@@ -381,7 +381,7 @@ DARWIN)
     SHARED_LINKER_FLAGS+=" -dynamiclib -install_name ${LIB_DIR}/lib${LIB}.${DYN_SUFFIX}"
     ;;
 *)
-    die "Unsupported OS: ${OS}." 1
+    die "Unsupported OS: ${OS}." 3
     ;;
 esac
 
