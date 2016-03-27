@@ -553,7 +553,7 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("EN_RXADDR"),EN_RXADDR);
   print_byte_register(PSTR("RF_CH\t"),RF_CH);
   print_byte_register(PSTR("RF_SETUP"),RF_SETUP);
-  print_byte_register(PSTR("NRF_CONFIG\t"),NRF_CONFIG);
+  print_byte_register(PSTR("CONFIG\t"),NRF_CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
   printf_P(PSTR("Data Rate\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
