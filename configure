@@ -40,7 +40,7 @@ Cross-compilation options:
     --remote=<USER@HOST>        Remote ssh host identification for installation [REMOTE_USER@REMOTE_HOST]
     --remote-prefix=<RPREFIX>   Remote host installation prefix path. [/usr/local]
     --remote-lib-dir=<DIR>      Remote library target installation directory [RPREFIX/lib]
-    --remote-header-dir=<DIR>  Remote header files target installation directory. [RPREFIX/include]
+    --remote-header-dir=<DIR>   Remote header files target installation directory. [RPREFIX/include]
     --remote-ldconfig=<RLDCON>  Remote ldconfig binary filename. Can be set to '' to skip ldconfig call. [ldconfig]
     --remote-examples-dir=<DIR> Example files remote installation directory. Default: [REMOTE_PREFIX/bin]
 
@@ -162,7 +162,23 @@ function detect_driver {
     echo $result
 }
 
-params="OS SOC DRIVER CPUFLAGS CFLAGS PREFIX REMOTE_PREFIX LIB LIBNAME CC CXX LIB_DIR REMOTE_LIB_DIR HEADER_DIR REMOTE_HEADER_DIR DRIVER_DIR ARCH_DIR REMOTE REMOTE_HOST REMOTE_USER REMOTE_PORT SHARED_LINKER_FLAGS LDCONFIG REMOTE_LDCONFIG EXAMPLES_DIR REMOTE_EXAMPLES_DIR"
+function gen_symlink_names {
+    base_name="$1"
+    version="$2"
+
+    IFS='.' read -r -a ver <<< "$version"
+    versions=""
+    for index in "${!ver[@]}" ; do
+        verstr=""
+        for ind in `seq 0 $(expr $index - 1)` ; do
+            verstr="${verstr}.${ver[$ind]}"
+        done
+        versions="${base_name}${verstr} $versions"
+    done
+    echo ${versions}
+}
+
+params="OS SOC DRIVER CPUFLAGS CFLAGS PREFIX REMOTE_PREFIX LIB LIBNAME LIB_VERSION LIBSYMLINKS LIBDEPRECATE CC CXX LIB_DIR REMOTE_LIB_DIR HEADER_DIR REMOTE_HEADER_DIR DRIVER_DIR ARCH_DIR REMOTE REMOTE_HOST REMOTE_USER REMOTE_PORT SHARED_LINKER_FLAGS LDCONFIG REMOTE_LDCONFIG EXAMPLES_DIR REMOTE_EXAMPLES_DIR"
 
 for opt do
     if [ "$opt" = "-h" ] || [ "$opt" = "--help" ]; then
@@ -312,9 +328,12 @@ HEADER_DIR=${HEADER_DIR:-${PREFIX}/include/RF24}
 REMOTE_HEADER_DIR=${REMOTE_HEADER_DIR:-${REMOTE_PREFIX}/include/RF24}
 EXAMPLES_DIR=${EXAMPLES_DIR:-${PREFIX}/bin}
 REMOTE_EXAMPLES_DIR=${REMOTE_EXAMPLES_DIR:-${REMOTE_PREFIX}/bin}
-LDCONFIG=${LDCONFIG:-ldconfig}
-REMOTE_LDCONFIG=${REMOTE_LDCONFIG:-/sbin/ldconfig}
+LDCONFIG=${LDCONFIG-ldconfig}
+REMOTE_LDCONFIG=${REMOTE_LDCONFIG-/sbin/ldconfig}
 LIB=${LIB:-rf24}
+LIB_VERSION=${LIB_VERSION:-$(awk -F "=" '/version/ {print $2}' library.properties)}
+LIB_DEPRECATE_NAME=${LIB_DEPRECATE_NAME:-"rf24-bcm"}
+LIB_DEPRECATE_VERSION=${LIB_DEPRECATE_VERSION:-""}
 CC=${CC:-gcc}
 CXX=${CXX:-g++}
 ARCH_DIR=${ARCH_DIR:-utility}
@@ -386,7 +405,14 @@ DARWIN)
 esac
 
 
-LIBNAME=${LIBNAME:-lib${LIB}.${DYN_SUFFIX}}
+LIBNAME=${LIBNAME:-lib${LIB}.${DYN_SUFFIX}.${LIB_VERSION}}
+LIBSYMLINKS="${LIBSYMLINKS:-$(gen_symlink_names lib${LIB}.${DYN_SUFFIX} ${LIB_VERSION})}"
+if [ "${LIB_DEPRECATE_NAME}" ]; then
+    LIBDEPRECATE="${LIBDEPRECATE:-lib${LIB_DEPRECATE_NAME}.${DYN_SUFFIX}}"
+    if [ "${LIB_DEPRECATE_VERSION}" ]; then
+        LIBDEPRECATE="${LIBDEPRECATE}.${LIB_DEPRECATE_VERSION}"
+    fi
+fi
 DRIVER_DIR=${DRIVER_DIR:-${ARCH_DIR}/${DRIVER}}
 CFLAGS="$CPUFLAGS -O2 -Wall -g $CFLAGS"
 
@@ -397,7 +423,7 @@ echo "[SECTION] Saving configuration."
 echo -n "" > Makefile.inc
 for param in ${params}; do
     if [[ ${!param} ]]; then
-        echo ${param}=${!param} >> Makefile.inc
+        echo "${param}=${!param}" >> Makefile.inc
     fi
 done
 

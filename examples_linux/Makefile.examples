@@ -11,12 +11,13 @@
 # use make all and make install to install the examples
 #
 
-SOURCES = ${PROGRAMS:=.cpp}
+BINARY_PREFIX = rf24
+SOURCES = $(PROGRAMS:=.cpp)
 
-all: ${PROGRAMS}
+all: $(PROGRAMS)
 
-${PROGRAMS}: ${SOURCES}
-	${CXX} ${CFLAGS} -I${HEADER_DIR}/.. -I.. -L${LIB_DIR} -l${LIB} $@.cpp -o $@
+$(PROGRAMS): $(SOURCES)
+	$(CXX) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) -l$(LIB) $@.cpp -o $@
 
 clean:
 	@echo "[Cleaning]"
@@ -26,21 +27,21 @@ install: all
 	@echo "[Installing examples to $(EXAMPLES_DIR)]"
 	@mkdir -p $(EXAMPLES_DIR)
 	@for prog in $(PROGRAMS); do \
-		install -m 0755 $$prog $(EXAMPLES_DIR); \
+		install -m 0755 $${prog} $(EXAMPLES_DIR)/$(BINARY_PREFIX)-$${prog}; \
 	done
 
 upload: all
-	@echo "[Uploading examples to ${REMOTE}:${REMOTE_EXAMPLES_DIR}]"
+	@echo "[Uploading examples to $(REMOTE):$(REMOTE_EXAMPLES_DIR)]"
 ifeq ($(REMOTE),)
 	@echo "[ERROR] Remote machine not configured. Run configure with respective arguments."
 	@exit 1
 endif
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p ${REMOTE_EXAMPLES_DIR}"
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p /tmp/RF24_examples"
-	@scp -q -P ${REMOTE_PORT} ${PROGRAMS} ${REMOTE}:/tmp/RF24_examples
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p $(REMOTE_EXAMPLES_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p /tmp/RF24_examples"
+	@scp -q -P $(REMOTE_PORT) $(PROGRAMS) $(REMOTE):/tmp/RF24_examples
 	@for prog in $(PROGRAMS); do \
-		ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0755 /tmp/RF24_examples/$${prog} ${REMOTE_EXAMPLES_DIR}"; \
+		ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0755 /tmp/RF24_examples/$${prog} $(REMOTE_EXAMPLES_DIR)/$(BINARY_PREFIX)-$${prog}"; \
 	done
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "rm -rf /tmp/RF24_examples"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "rm -rf /tmp/RF24_examples"
 
 .PHONY: install upload

@@ -33,36 +33,36 @@ all: $(LIBNAME)
 # Make the library
 $(LIBNAME): $(OBJECTS)
 	@echo "[Linking]"
-	${CC} ${SHARED_LINKER_FLAGS} ${CFLAGS} -o ${LIBNAME} $^
+	$(CC) $(SHARED_LINKER_FLAGS) $(CFLAGS) -o $(LIBNAME) $^
 
 # Library parts
 RF24.o: RF24.cpp	
-	${CXX} -Wall -fPIC ${CFLAGS} -c $^
+	$(CXX) -Wall -fPIC $(CFLAGS) -c $^
 
 bcm2835.o: $(DRIVER_DIR)/bcm2835.c
-	${CC} -Wall -fPIC ${CFLAGS} -c $^
+	$(CC) -Wall -fPIC $(CFLAGS) -c $^
 
 spi.o: $(DRIVER_DIR)/spi.cpp
-	${CXX} -Wall -fPIC ${CFLAGS} -c $^
+	$(CXX) -Wall -fPIC $(CFLAGS) -c $^
 
 compatibility.o: $(DRIVER_DIR)/compatibility.c
-	${CC} -Wall -fPIC  ${CFLAGS} -c $(DRIVER_DIR)/compatibility.c
+	$(CC) -Wall -fPIC  $(CFLAGS) -c $(DRIVER_DIR)/compatibility.c
 
 gpio.o: $(DRIVER_DIR)/gpio.cpp
-	${CXX} -Wall -fPIC ${CFLAGS} -c $(DRIVER_DIR)/gpio.cpp
+	$(CXX) -Wall -fPIC $(CFLAGS) -c $(DRIVER_DIR)/gpio.cpp
 
 interrupt.o: $(DRIVER_DIR)/interrupt.c
-	${CXX} -Wall -fPIC ${CFLAGS} -c $(DRIVER_DIR)/interrupt.c
+	$(CXX) -Wall -fPIC $(CFLAGS) -c $(DRIVER_DIR)/interrupt.c
 	
 # clear configuration files
 cleanconfig:
 	@echo "[Cleaning configuration]"
-	rm -rf ${CONFIG_FILE} utility/includes.h
+	rm -rf $(CONFIG_FILE) utility/includes.h
 
 # clear build files
 clean:
 	@echo "[Cleaning]"
-	rm -rf *.o ${LIBNAME}.*
+	rm -rf *.o $(LIBNAME).*
 
 $(CONFIG_FILE):
 	@echo "[Running configure]"
@@ -73,39 +73,52 @@ upload: all upload-libs upload-headers
 
 # Install the library to LIBPATH
 install-libs:
-	@echo "[Installing Libs to ${LIB_DIR}]"
-	@if ( test ! -d ${LIB_DIR} ) ; then mkdir -p $(LIB_DIR) ; fi
-	@install -m 0755 ${LIBNAME} ${LIB_DIR}
-	@ln -sf ${LIB_DIR}/${LIBNAME} ${LIB_DIR}/${LIBNAME}.1
-	@${LDCONFIG}
+	@echo "[Installing Libs to $(LIB_DIR)]"
+	@if ( test ! -d $(LIB_DIR) ); then mkdir -p $(LIB_DIR); fi
+	@install -m 0755 $(LIBNAME) $(LIB_DIR)
+	@orig=$(LIBNAME) && \
+	for sl in $(LIBSYMLINKS); do \
+		ln -sf $(LIB_DIR)/$${orig} $(LIB_DIR)/$${sl}; \
+		orig=$${sl}; \
+	done && \
+	if [ "$(LIBDEPRECATE)" ]; then ln -sf $(LIB_DIR)/$${orig} $(LIB_DIR)/$(LIBDEPRECATE); fi
+ifneq ($(LDCONFIG),)
+	@$(LDCONFIG)
+endif
 
 upload-libs:
-	@echo "[Uploading Libs to ${REMOTE}:${REMOTE_LIB_DIR}]"
+	@echo "[Uploading Libs to $(REMOTE):$(REMOTE_LIB_DIR)]"
 ifeq ($(REMOTE),)
-	@echo "${REMOTE_ERROR}"
+	@echo "$(REMOTE_ERROR)"
 	@exit 1
 endif
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p ${REMOTE_LIB_DIR}"
-	@scp -q -P ${REMOTE_PORT} ${LIBNAME} ${REMOTE}:/tmp
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0755 /tmp/${LIBNAME} ${REMOTE_LIB_DIR} && rm /tmp/${LIBNAME} && sudo ln -sf ${REMOTE_LIB_DIR}/${LIBNAME} ${REMOTE_LIB_DIR}/${LIBNAME}.1 && sudo ldconfig"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p $(REMOTE_LIB_DIR)"
+	@scp -q -P $(REMOTE_PORT) $(LIBNAME) $(REMOTE):/tmp
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0755 /tmp/$(LIBNAME) $(REMOTE_LIB_DIR) &&" \
+		" orig=$(LIBNAME) && for sl in $(LIBSYMLINKS); do sudo ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/\$${sl}; orig=\$${sl}; done &&" \
+		" if [ "$(LIBDEPRECATE)" ]; then ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/$(LIBDEPRECATE); fi &&" \
+		" rm /tmp/$(LIBNAME)"
+ifneq ($(REMOTE_LDCONFIG),)
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo $(REMOTE_LDCONFIG)"
+endif
 
 install-headers:
-	@echo "[Installing Headers to ${HEADER_DIR}]"
-	@mkdir -p ${HEADER_DIR}/${DRIVER_DIR}
-	@install -m 0644 *.h ${HEADER_DIR}
-	@install -m 0644 ${DRIVER_DIR}/*.h ${HEADER_DIR}/${DRIVER_DIR}
-	@install -m 0644 ${ARCH_DIR}/*.h ${HEADER_DIR}/${ARCH_DIR}
+	@echo "[Installing Headers to $(HEADER_DIR)]"
+	@mkdir -p $(HEADER_DIR)/$(DRIVER_DIR)
+	@install -m 0644 *.h $(HEADER_DIR)
+	@install -m 0644 $(DRIVER_DIR)/*.h $(HEADER_DIR)/$(DRIVER_DIR)
+	@install -m 0644 $(ARCH_DIR)/*.h $(HEADER_DIR)/$(ARCH_DIR)
 
 upload-headers:
-	@echo "[Uploading Headers to ${REMOTE}:${REMOTE_HEADER_DIR}]"
+	@echo "[Uploading Headers to $(REMOTE):$(REMOTE_HEADER_DIR)]"
 ifeq ($(REMOTE),)
-	@echo "${REMOTE_ERROR}"
+	@echo "$(REMOTE_ERROR)"
 	@exit 1
 endif
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo mkdir -p ${REMOTE_HEADER_DIR}/${DRIVER_DIR}"
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "mkdir -p /tmp/RF24 && rm -rf /tmp/RF24/*"
-	@rsync -a --include="*.h" --include="*/" --exclude="*" -e "ssh -p ${REMOTE_PORT}" . ${REMOTE}:/tmp/RF24
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0644 /tmp/RF24/*.h ${REMOTE_HEADER_DIR}"
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0644 /tmp/RF24/${DRIVER_DIR}/*.h ${REMOTE_HEADER_DIR}/${DRIVER_DIR}"
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "sudo install -m 0644 /tmp/RF24/${ARCH_DIR}/*.h ${REMOTE_HEADER_DIR}/${ARCH_DIR}"
-	@ssh -q -t -p ${REMOTE_PORT} ${REMOTE} "rm -rf /tmp/RF24"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo mkdir -p $(REMOTE_HEADER_DIR)/$(DRIVER_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p /tmp/RF24 && rm -rf /tmp/RF24/*"
+	@rsync -a --include="*.h" --include="*/" --exclude="*" -e "ssh -p $(REMOTE_PORT)" . $(REMOTE):/tmp/RF24
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/*.h $(REMOTE_HEADER_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/$(DRIVER_DIR)/*.h $(REMOTE_HEADER_DIR)/$(DRIVER_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/$(ARCH_DIR)/*.h $(REMOTE_HEADER_DIR)/$(ARCH_DIR)"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "rm -rf /tmp/RF24"
