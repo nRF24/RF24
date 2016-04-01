@@ -290,10 +290,12 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 	
 	status = *prx++; // 1st byte is status	
     
-	while ( --data_len ) // Decrement before to skip 1st status byte
-        *current++ = *prx++;
+    if (data_len > 0) {
+      while ( --data_len ) // Decrement before to skip 1st status byte
+          *current++ = *prx++;
 		
-	*current = *prx;
+      *current = *prx;
+    }
 	endTransaction();
   #else
 
