@@ -23,7 +23,7 @@ OBJECTS+=spi.o gpio.o compatibility.o
 else ifeq ($(DRIVER), RPi)
 OBJECTS+=spi.o bcm2835.o interrupt.o
 else ifeq ($(DRIVER), SPIDEV)
-OBJECTS+=spi.o gpio.o compatibility.o
+OBJECTS+=spi.o gpio.o compatibility.o interrupt.o
 endif
 
 # make all
@@ -37,22 +37,22 @@ $(LIBNAME): $(OBJECTS)
 
 # Library parts
 RF24.o: RF24.cpp	
-	$(CXX) -Wall -fPIC $(CFLAGS) -c $^
+	$(CXX) -fPIC $(CFLAGS) -c $^
 
 bcm2835.o: $(DRIVER_DIR)/bcm2835.c
-	$(CC) -Wall -fPIC $(CFLAGS) -c $^
+	$(CC) -fPIC $(CFLAGS) -c $^
 
 spi.o: $(DRIVER_DIR)/spi.cpp
-	$(CXX) -Wall -fPIC $(CFLAGS) -c $^
+	$(CXX) -fPIC $(CFLAGS) -c $^
 
 compatibility.o: $(DRIVER_DIR)/compatibility.c
-	$(CC) -Wall -fPIC  $(CFLAGS) -c $(DRIVER_DIR)/compatibility.c
+	$(CC) -fPIC  $(CFLAGS) -c $(DRIVER_DIR)/compatibility.c
 
 gpio.o: $(DRIVER_DIR)/gpio.cpp
-	$(CXX) -Wall -fPIC $(CFLAGS) -c $(DRIVER_DIR)/gpio.cpp
+	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/gpio.cpp
 
 interrupt.o: $(DRIVER_DIR)/interrupt.c
-	$(CXX) -Wall -fPIC $(CFLAGS) -c $(DRIVER_DIR)/interrupt.c
+	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/interrupt.c
 	
 # clear configuration files
 cleanconfig:

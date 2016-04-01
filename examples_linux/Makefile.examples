@@ -14,10 +14,15 @@
 BINARY_PREFIX = rf24
 SOURCES = $(PROGRAMS:=.cpp)
 
+LIBS=-l$(LIB)
+ifeq ($(DRIVER), LittleWire)
+	LIBS+= -llittlewire-spi
+endif
+
 all: $(PROGRAMS)
 
 $(PROGRAMS): $(SOURCES)
-	$(CXX) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) -l$(LIB) $@.cpp -o $@
+	$(CXX) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) $(LIBS) $@.cpp -o $@
 
 clean:
 	@echo "[Cleaning]"
