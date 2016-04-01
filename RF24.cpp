@@ -573,8 +573,6 @@ bool RF24::begin(void)
 
   #if defined (RF24_LINUX)
 
-	SPI();
-    
 	#if defined (MRAA)
 	  GPIO();	
 	  gpio.begin(ce_pin,csn_pin);	
