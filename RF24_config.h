@@ -44,6 +44,7 @@
 
 //ATXMega
 #elif defined(__AVR_ATxmega256D3__)
+  #define XMEGA
   #define XMEGA_D3
   #include "utility/ATXMegaD3/RF24_arch_config.h"
 //LittleWire  
@@ -129,7 +130,7 @@
   #define pgm_read_word(p) (*(p))
   #define PRIPSTR "%s"
 
-#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__)
+#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__) && defined(XMEGA)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
 #else
