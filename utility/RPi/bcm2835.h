@@ -23,7 +23,7 @@
   BCM 2835).
   
   The version of the package that this documentation refers to can be downloaded 
-  from http://www.airspayce.com/mikem/bcm2835/bcm2835-1.48.tar.gz
+  from http://www.airspayce.com/mikem/bcm2835/bcm2835-1.50.tar.gz
   You can find the latest version at http://www.airspayce.com/mikem/bcm2835
   
   Several example programs are provided.
@@ -38,7 +38,7 @@
   Before asking a question or reporting a bug, please read http://www.catb.org/esr/faqs/smart-questions.html
   
   Tested on debian6-19-04-2012, 2012-07-15-wheezy-raspbian, 2013-07-26-wheezy-raspbian
-  and Occidentalisv01
+  and Occidentalisv01, 2016-02-09 Raspbian Jessie.
   CAUTION: it has been observed that when detect enables such as bcm2835_gpio_len() 
   are used and the pin is pulled LOW
   it can cause temporary hangs on 2012-07-15-wheezy-raspbian, 2013-07-26-wheezy-raspbian
@@ -48,6 +48,24 @@
   If you must use bcm2835_gpio_len() and friends, make sure you disable the pins with 
   bcm2835_gpio_clr_len() and friends after use. 
   
+  \par Running as root
+
+  Prior to the release of Raspbian Jessie in Feb 2016, access to any
+  peripheral device via /dev/mem on the RPi required the process to
+  run as root. Raspbian Jessie permits non-root users to access the
+  GPIO peripheral (only) via /dev/gpiomem, and this library supports
+  that limited mode of operation.
+
+  If the library runs with effective UID of 0 (ie root), then
+  bcm2835_init() will attempt to open /dev/mem, and, if successful, it
+  will permit use of all peripherals and library functions.
+
+  If the library runs with any other effective UID (ie not root), then
+  bcm2835_init() will attempt to open /dev/gpiomem, and, if
+  successful, will only permit GPIO operations. In particular,
+  bcm2835_spi_begin() and bcm2835_i2c_begin() will return false and all
+  other non-gpio operations may fail silently or crash.
+
   \par Installation
   
   This library consists of a single non-shared library and header file, which will be
@@ -421,6 +439,15 @@
   Added patch from Eckhardt Ulrich that fixed problems that could cause hanging with bcm2835_i2c_read_register_rs
   and others.
 
+  \version 1.49 2016-01-05
+  Added patch from Jonathan Perkin with new functions bcm2835_gpio_eds_multi() and bcm2835_gpio_set_eds_multi().
+
+  \version 1.50 2016-02-28
+  Added support for running as non-root, permitting access to GPIO only. Functions
+  bcm2835_spi_begin() and bcm2835_i2c_begin() will now return 0 if not running as root 
+  (which prevents access to the SPI and I2C peripherals, amongst others). 
+  Testing on Raspbian Jessie.
+
   \author  Mike McCauley (mikem@airspayce.com) DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS
 */
 
@@ -431,7 +458,7 @@
 
 #include <stdint.h>
 
-#define BCM2835_VERSION 10048 /* Version 1.48 */
+#define BCM2835_VERSION 10050 /* Version 1.50 */
 
 /* RPi 2 is ARM v7, and has DMB instruction for memory barriers.
    Older RPis are ARM v6 and don't, so a coprocessor instruction must be used instead.
@@ -503,7 +530,7 @@ extern uint32_t bcm2835_peripherals_size;
 extern uint32_t *bcm2835_peripherals;
 
 /*! Base of the ST (System Timer) registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_st;
 
@@ -513,32 +540,32 @@ extern volatile uint32_t *bcm2835_st;
 extern volatile uint32_t *bcm2835_gpio;
 
 /*! Base of the PWM registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_pwm;
 
 /*! Base of the CLK registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_clk;
 
 /*! Base of the PADS registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_pads;
 
 /*! Base of the SPI0 registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_spi0;
 
 /*! Base of the BSC0 registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_bsc0;
 
 /*! Base of the BSC1 registers.
-  Available after bcm2835_init has been called
+  Available after bcm2835_init has been called (as root)
 */
 extern volatile uint32_t *bcm2835_bsc1;
 
@@ -552,7 +579,7 @@ typedef enum
     BCM2835_REGBASE_PWM  = 3, /*!< Base of the PWM registers. */
     BCM2835_REGBASE_CLK  = 4, /*!< Base of the CLK registers. */
     BCM2835_REGBASE_PADS = 5, /*!< Base of the PADS registers. */
-    BCM2835_REGBASE_SPI0 = 6, /*! Base of the SPI0 registers. */
+    BCM2835_REGBASE_SPI0 = 6, /*!< Base of the SPI0 registers. */
     BCM2835_REGBASE_BSC0 = 7, /*!< Base of the BSC0 registers. */
     BCM2835_REGBASE_BSC1 = 8  /*!< Base of the BSC1 registers. */
 } bcm2835RegisterBase;
@@ -826,7 +853,7 @@ typedef enum
   Figures below give the divider, clock period and clock frequency.
   Clock divided is based on nominal base clock rate of 250MHz
   It is reported that (contrary to the documentation) any even divider may used.
-  The frequencies shown for each divider have been confirmed by measurement
+  The frequencies shown for each divider have been confirmed by measurement.
 */
 typedef enum
 {
@@ -1015,12 +1042,16 @@ extern "C" {
       @{
     */
 
-    /*! Initialise the library by opening /dev/mem and getting pointers to the 
+    /*! Initialise the library by opening /dev/mem (if you are root) 
+      or /dev/gpiomem (if you are not)
+      and getting pointers to the 
       internal memory for BCM 2835 device registers. You must call this (successfully)
       before calling any other 
       functions in this library (except bcm2835_set_debug). 
       If bcm2835_init() fails by returning 0, 
       calling any other function may result in crashes or other failures.
+      If bcm2835_init() succeeds but you are not running as root, then only gpio operations
+      are permitted, and calling any other functions may result in crashes or other failures. .
       Prints messages to stderr in case of errors.
       \return 1 if successful else 0
     */
@@ -1186,6 +1217,13 @@ extern "C" {
     */
     extern uint8_t bcm2835_gpio_eds(uint8_t pin);
 
+    /*! Same as bcm2835_gpio_eds() but checks if any of the pins specified in
+      the mask have detected a level or edge.
+      \param[in] mask Mask of pins to check. Use eg: (1 << RPI_GPIO_P1_03) | (1 << RPI_GPIO_P1_05)
+      \return Mask of pins HIGH if the event detect status for the given pin is true.
+    */
+    extern uint32_t bcm2835_gpio_eds_multi(uint32_t mask);
+
     /*! Sets the Event Detect Status register for a given pin to 1, 
       which has the effect of clearing the flag. Use this afer seeing
       an Event Detect Status on the pin.
@@ -1193,6 +1231,12 @@ extern "C" {
     */
     extern void bcm2835_gpio_set_eds(uint8_t pin);
 
+    /*! Same as bcm2835_gpio_set_eds() but clears the flag for any pin which
+      is set in the mask.
+      \param[in] mask Mask of pins to clear. Use eg: (1 << RPI_GPIO_P1_03) | (1 << RPI_GPIO_P1_05)
+    */
+    extern void bcm2835_gpio_set_eds_multi(uint32_t mask);
+    
     /*! Enable Rising Edge Detect Enable for the specified pin.
       When a rising edge is detected, sets the appropriate pin in Event Detect Status.
       The GPRENn registers use
@@ -1370,10 +1414,11 @@ extern "C" {
       Forces RPi SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
       to alternate function ALT0, which enables those pins for SPI interface.
       You should call bcm2835_spi_end() when all SPI funcitons are complete to return the pins to 
-      their default functions
+      their default functions.
       \sa  bcm2835_spi_end()
+      \return 1 if successful, 0 otherwise (perhaps because you are not running as root)
     */
-    extern void bcm2835_spi_begin(void);
+    extern int bcm2835_spi_begin(void);
 
     /*! End SPI operations.
       SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
@@ -1476,9 +1521,10 @@ extern "C" {
       to alternate function ALT0, which enables those pins for I2C interface.
       You should call bcm2835_i2c_end() when all I2C functions are complete to return the pins to
       their default functions
+      \return 1 if successful, 0 otherwise (perhaps because you are not running as root)
       \sa  bcm2835_i2c_end()
     */
-    extern void bcm2835_i2c_begin(void);
+    extern int bcm2835_i2c_begin(void);
 
     /*! End I2C operations.
       I2C pins P1-03 (SDA) and P1-05 (SCL)

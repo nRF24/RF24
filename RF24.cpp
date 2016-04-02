@@ -290,10 +290,12 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 	
 	status = *prx++; // 1st byte is status	
     
-	while ( --data_len ) // Decrement before to skip 1st status byte
-        *current++ = *prx++;
+    if (data_len > 0) {
+      while ( --data_len ) // Decrement before to skip 1st status byte
+          *current++ = *prx++;
 		
-	*current = *prx;
+      *current = *prx;
+    }
 	endTransaction();
   #else
 
@@ -553,13 +555,13 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("EN_RXADDR"),EN_RXADDR);
   print_byte_register(PSTR("RF_CH\t"),RF_CH);
   print_byte_register(PSTR("RF_SETUP"),RF_SETUP);
-  print_byte_register(PSTR("CONFIG\t"),CONFIG);
+  print_byte_register(PSTR("CONFIG\t"),NRF_CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  printf_P(PSTR("Data Rate\t = "PRIPSTR"\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
-  printf_P(PSTR("Model\t\t = "PRIPSTR"\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
-  printf_P(PSTR("CRC Length\t = "PRIPSTR"\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
-  printf_P(PSTR("PA Power\t = "PRIPSTR"\r\n"),  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  printf_P(PSTR("Data Rate\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
+  printf_P(PSTR("Model\t\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
+  printf_P(PSTR("CRC Length\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
+  printf_P(PSTR("PA Power\t = " PRIPSTR "\r\n"),  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 
 }
 
@@ -573,8 +575,6 @@ bool RF24::begin(void)
 
   #if defined (RF24_LINUX)
 
-	SPI();
-    
 	#if defined (MRAA)
 	  GPIO();	
 	  gpio.begin(ce_pin,csn_pin);	
@@ -632,8 +632,8 @@ bool RF24::begin(void)
   // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
   delay( 5 ) ;
 
-  // Reset CONFIG and enable 16-bit CRC.
-  write_register( CONFIG, 0b00001100 ) ;
+  // Reset NRF_CONFIG and enable 16-bit CRC.
+  write_register( NRF_CONFIG, 0b00001100 ) ;
 
   // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
   // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
@@ -649,8 +649,8 @@ bool RF24::begin(void)
   {
     p_variant = true ;
   }
-  /*setup = read_register(RF_SETUP);
-  if( setup == 0b00001110 )     // register default for nRF24L01P
+  setup = read_register(RF_SETUP);
+  /*if( setup == 0b00001110 )     // register default for nRF24L01P
   {
     p_variant = true ;
   }*/
@@ -684,7 +684,7 @@ bool RF24::begin(void)
 
   // Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
   // PTX should use only 22uA of power
-  write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
+  write_register(NRF_CONFIG, ( read_register(NRF_CONFIG) ) & ~_BV(PRIM_RX) );
 
   // if setup is 0 or ff then there was no response from module
   return ( setup != 0 && setup != 0xff );
@@ -697,7 +697,7 @@ void RF24::startListening(void)
  #if !defined (RF24_TINY) && ! defined(LITTLEWIRE)
   powerUp();
  #endif
-  write_register(CONFIG, read_register(CONFIG) | _BV(PRIM_RX));
+  write_register(NRF_CONFIG, read_register(NRF_CONFIG) | _BV(PRIM_RX));
   write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
   ce(HIGH);
   // Restore the pipe0 adddress, if exists
@@ -734,7 +734,7 @@ void RF24::stopListening(void)
 	flush_tx();
   }
   //flush_rx();
-  write_register(CONFIG, ( read_register(CONFIG) ) & ~_BV(PRIM_RX) );
+  write_register(NRF_CONFIG, ( read_register(NRF_CONFIG) ) & ~_BV(PRIM_RX) );
  
   #if defined (RF24_TINY) || defined (LITTLEWIRE)
   // for 3 pins solution TX mode is only left with additonal powerDown/powerUp cycle
@@ -754,7 +754,7 @@ void RF24::stopListening(void)
 void RF24::powerDown(void)
 {
   ce(LOW); // Guarantee CE is low on powerDown
-  write_register(CONFIG,read_register(CONFIG) & ~_BV(PWR_UP));
+  write_register(NRF_CONFIG,read_register(NRF_CONFIG) & ~_BV(PWR_UP));
 }
 
 /****************************************************************************/
@@ -762,11 +762,11 @@ void RF24::powerDown(void)
 //Power up now. Radio will not power down unless instructed by MCU for config changes etc.
 void RF24::powerUp(void)
 {
-   uint8_t cfg = read_register(CONFIG);
+   uint8_t cfg = read_register(NRF_CONFIG);
 
    // if not powered up then power up and wait for the radio to initialize
    if (!(cfg & _BV(PWR_UP))){
-      write_register(CONFIG,read_register(CONFIG) | _BV(PWR_UP));
+      write_register(NRF_CONFIG, cfg | _BV(PWR_UP));
 
       // For nRF24L01+ to go from power down mode to TX or RX mode it must first pass through stand-by mode.
 	  // There must be a delay of Tpd2stby (see Table 16.) after the nRF24L01+ leaves power down mode before
@@ -803,7 +803,7 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 	
 	while( ! ( get_status()  & ( _BV(TX_DS) | _BV(MAX_RT) ))) { 
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if(millis() - timer > 85){			
+			if(millis() - timer > 95){			
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				  return 0;		
@@ -849,7 +849,7 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 			if(millis() - timer > timeout){ return 0; }		  //If this payload has exceeded the user-defined timeout, exit and return 0
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if(millis() - timer > (timeout+85) ){			
+			if(millis() - timer > (timeout+95) ){			
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;			
@@ -896,7 +896,7 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 															  //From the user perspective, if you get a 0, just keep trying to send the same payload
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if(millis() - timer > 85 ){			
+			if(millis() - timer > 95 ){			
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;							
@@ -970,7 +970,7 @@ bool RF24::txStandBy(){
 			return 0;
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if( millis() - timeout > 85){
+			if( millis() - timeout > 95){
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;	
@@ -1003,7 +1003,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx){
 				}
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-			if( millis() - start > (timeout+85)){
+			if( millis() - start > (timeout+95)){
 				errNotify();
 				#if defined (FAILURE_HANDLING)
 				return 0;	
@@ -1022,7 +1022,12 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx){
 
 void RF24::maskIRQ(bool tx, bool fail, bool rx){
 
-	write_register(CONFIG, ( read_register(CONFIG) ) | fail << MASK_MAX_RT | tx << MASK_TX_DS | rx << MASK_RX_DR  );
+	uint8_t config = read_register(NRF_CONFIG);
+	/* clear the interrupt flags */
+	config &= ~(1 << MASK_MAX_RT | 1 << MASK_TX_DS | 1 << MASK_RX_DR);
+	/* set the specified interrupt flags */
+	config |= fail << MASK_MAX_RT | tx << MASK_TX_DS | rx << MASK_RX_DR;
+	write_register(NRF_CONFIG, config);
 }
 
 /****************************************************************************/
@@ -1474,7 +1479,7 @@ rf24_datarate_e RF24::getDataRate( void )
 
 void RF24::setCRCLength(rf24_crclength_e length)
 {
-  uint8_t config = read_register(CONFIG) & ~( _BV(CRCO) | _BV(EN_CRC)) ;
+  uint8_t config = read_register(NRF_CONFIG) & ~( _BV(CRCO) | _BV(EN_CRC)) ;
 
   // switch uses RAM (evil!)
   if ( length == RF24_CRC_DISABLED )
@@ -1490,7 +1495,7 @@ void RF24::setCRCLength(rf24_crclength_e length)
     config |= _BV(EN_CRC);
     config |= _BV( CRCO );
   }
-  write_register( CONFIG, config ) ;
+  write_register( NRF_CONFIG, config ) ;
 }
 
 /****************************************************************************/
@@ -1499,7 +1504,7 @@ rf24_crclength_e RF24::getCRCLength(void)
 {
   rf24_crclength_e result = RF24_CRC_DISABLED;
   
-  uint8_t config = read_register(CONFIG) & ( _BV(CRCO) | _BV(EN_CRC)) ;
+  uint8_t config = read_register(NRF_CONFIG) & ( _BV(CRCO) | _BV(EN_CRC)) ;
   uint8_t AA = read_register(EN_AA);
   
   if ( config & _BV(EN_CRC ) || AA)
@@ -1517,8 +1522,8 @@ rf24_crclength_e RF24::getCRCLength(void)
 
 void RF24::disableCRC( void )
 {
-  uint8_t disable = read_register(CONFIG) & ~_BV(EN_CRC) ;
-  write_register( CONFIG, disable ) ;
+  uint8_t disable = read_register(NRF_CONFIG) & ~_BV(EN_CRC) ;
+  write_register( NRF_CONFIG, disable ) ;
 }
 
 /****************************************************************************/
@@ -1550,6 +1555,13 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 #	define DO   15  // PB6
 #	define USCK 16  // PB7
 #	define SS   13  // PB4
+#elif defined(__AVR_ATtiny861__)
+// these depend on the core used (check pins_arduino.h)
+// tested with google-code core
+#    define DI   9   // PB0
+#    define DO   8   // PB1
+#    define USCK 7   // PB2
+#    define SS   6   // PB3
 #endif
 
 #if defined(RF24_TINY)

@@ -10,8 +10,10 @@
 
 #include "spi.h"
 
-SPI::SPI() {
-	
+#include <pthread.h>
+static pthread_mutex_t spiMutex;
+
+SPI::SPI():fd(-1) {
 }
 
 void SPI::begin(int busNo){
@@ -48,17 +50,16 @@ void SPI::init()
 {
 	int ret;
     
-    if(this->fd > 0) {
-        close(this->fd);
+    if (this->fd < 0)  // check whether spi is already open
+    {
+	  this->fd = open(this->device.c_str(), O_RDWR);
+
+      if (this->fd < 0)
+      {
+        perror("can't open device");
+        abort();
+      }
     }
-    
-	this->fd = open(this->device.c_str(), O_RDWR);
-	
-    if (this->fd < 0)
-	{
-		perror("can't open device");
-		abort();
-	}
 
 	/*
 	 * spi mode
@@ -113,6 +114,7 @@ void SPI::init()
 
 uint8_t SPI::transfer(uint8_t tx_)
 {
+    pthread_mutex_lock (&spiMutex);
 	int ret;
   	uint8_t tx[1] = {tx_};
 	uint8_t rx[1];
@@ -124,10 +126,10 @@ uint8_t SPI::transfer(uint8_t tx_)
 	tr.len = 1,//ARRAY_SIZE(tx),
 	tr.delay_usecs = 0,
 	tr.cs_change=1,
-	tr.speed_hz = this->speed,
 	tr.bits_per_word = this->bits,
 	};
 	
+    tr.speed_hz = this->speed,	
 	//Note: On RPi, for some reason I started getting 'bad message' errors, and changing the struct as below fixed it, until an update...??
 	//
 	/*	// One byte is transfered at once
@@ -146,10 +148,12 @@ uint8_t SPI::transfer(uint8_t tx_)
 	ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
 	if (ret < 1)
 	{
+        pthread_mutex_unlock (&spiMutex);
 		perror("can't send spi message");
 		abort();		
 	}
 
+    pthread_mutex_unlock (&spiMutex);
 	return rx[0];
 }
 
@@ -157,6 +161,7 @@ uint8_t SPI::transfer(uint8_t tx_)
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
 	
+	pthread_mutex_lock (&spiMutex);
 	int ret;
 	this->init();
 	struct spi_ioc_transfer tr = {
@@ -165,9 +170,9 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 		tr.len = len,//ARRAY_SIZE(tx),
 		tr.cs_change=1,
 		tr.delay_usecs = 0,
-		tr.speed_hz = this->speed,
 		tr.bits_per_word = this->bits,
 	};
+        tr.speed_hz = this->speed,    
 	
 	//Note: On RPi, for some reason I started getting 'bad message' errors, and changing the struct as below fixed it, until an update...??
 	// One byte is transfered at once
@@ -187,10 +192,11 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 	ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
 	if (ret < 1)
 	{
+        pthread_mutex_unlock (&spiMutex);
 		perror("can't send spi message");
 		abort();		
 	}
-
+    pthread_mutex_unlock (&spiMutex);
 	//return rx[0];
 }
 
@@ -201,6 +207,7 @@ void SPI::transfern(char* buf, uint32_t len)
 
 
 SPI::~SPI() {
-	close(this->fd);
+    if (!(this->fd < 0))
+	    close(this->fd);
 }
 
