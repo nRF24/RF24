@@ -96,7 +96,7 @@ endif
 	@scp -q -P $(REMOTE_PORT) $(LIBNAME) $(REMOTE):/tmp
 	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0755 /tmp/$(LIBNAME) $(REMOTE_LIB_DIR) &&" \
 		" orig=$(LIBNAME) && for sl in $(LIBSYMLINKS); do sudo ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/\$${sl}; orig=\$${sl}; done &&" \
-		" if [ "$(LIBDEPRECATE)" ]; then ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/$(LIBDEPRECATE); fi &&" \
+		" if [ "$(LIBDEPRECATE)" ]; then sudo ln -sf $(REMOTE_LIB_DIR)/\$${orig} $(REMOTE_LIB_DIR)/$(LIBDEPRECATE); fi &&" \
 		" rm /tmp/$(LIBNAME)"
 ifneq ($(REMOTE_LDCONFIG),)
 	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo $(REMOTE_LDCONFIG)"
