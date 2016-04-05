@@ -22,7 +22,7 @@ endif
 all: $(PROGRAMS)
 
 $(PROGRAMS): $(SOURCES)
-	$(CXX) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) $(LIBS) $@.cpp -o $@
+	$(CXX) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) $@.cpp $(LIBS) -o $@
 
 clean:
 	@echo "[Cleaning]"
