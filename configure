@@ -25,6 +25,7 @@ Building options:
     --libname=<LIBNAME>         Library name. [rf24]
     --c_compiler=<CC>           C compiler. [arm-linux-gnueabihf-gcc][gcc]
     --cxx_compiler=<CXX>        C++ compiler [arm-linux-gnueabihf-g++][g++]
+    --no-clean                  Don't clean previous build artifacts
 
 Installation options:
     --prefix=<PREFIX>           Installation prefix path. [/usr/local]
@@ -210,6 +211,9 @@ for opt do
         ;;
     --cxx_compiler=*)
         CXX="$optarg"
+        ;;
+    --no-clean*)
+        NO_CLEAN="1"
         ;;
     --prefix=*)
         PREFIX="$optarg"
@@ -428,7 +432,10 @@ for param in ${params}; do
     fi
 done
 
-echo "[SECTION] Cleaning previous builds."
-make clean >/dev/null
+if [ -z "${NO_CLEAN}" ]; then
+    echo "[SECTION] Cleaning previous builds."
+    make clean >/dev/null
+fi
+
 
 echo "[OK] Finished."

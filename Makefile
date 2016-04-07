@@ -62,11 +62,11 @@ cleanconfig:
 # clear build files
 clean:
 	@echo "[Cleaning]"
-	rm -rf *.o $(LIBNAME).*
+	rm -rf *.o $(LIBNAME)
 
 $(CONFIG_FILE):
 	@echo "[Running configure]"
-	@./configure
+	@./configure --no-clean
 
 install: all install-libs install-headers
 upload: all upload-libs upload-headers
