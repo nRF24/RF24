@@ -41,6 +41,16 @@
   #define RF24_TINY
   #include "utility/ATTiny/RF24_arch_config.h"
 
+//ATXMega
+#elif defined(__AVR_ATxmega256D3__)
+  #define XMEGA
+  #define XMEGA_D3
+  #include "utility/ATXMegaD3/RF24_arch_config.h"
+//LittleWire  
+#elif defined(LITTLEWIRE)
+  
+  #include "utility/LittleWire/RF24_arch_config.h"
+
 //Teensy  
 #elif defined (TEENSYDUINO)
 
@@ -119,7 +129,7 @@
   #define pgm_read_word(p) (*(p))
   #define PRIPSTR "%s"
 
-#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__)
+#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__) && defined(XMEGA)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
 #else

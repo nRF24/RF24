@@ -602,6 +602,12 @@ bool RF24::begin(void)
     pinMode(csn_pin,OUTPUT);
     _SPI.begin();
     csn(HIGH);
+  #elif defined(XMEGA_D3)
+	if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);
+	_SPI.begin(csn_pin);
+	ce(LOW);
+	csn(HIGH);
+	delay(200);
   #else
     // Initialize pins
     if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
