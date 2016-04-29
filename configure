@@ -398,11 +398,11 @@ fi
 case ${OS} in
 LINUX)
     DYN_SUFFIX=so
-    SHARED_LINKER_FLAGS+=" -shared -Wl,-soname,lib${LIB}.${DYN_SUFFIX}"
+    SHARED_LINKER_FLAGS+=" -shared -Wl,-soname,lib${LIB}.${DYN_SUFFIX}.${LIB_VERSION%%.*}"
     ;;
 DARWIN)
     DYN_SUFFIX=dylib
-    SHARED_LINKER_FLAGS+=" -dynamiclib -install_name ${LIB_DIR}/lib${LIB}.${DYN_SUFFIX}"
+    SHARED_LINKER_FLAGS+=" -dynamiclib -install_name ${LIB_DIR}/lib${LIB}.${DYN_SUFFIX}.${LIB_VERSION%%.*}"
     ;;
 *)
     die "Unsupported OS: ${OS}." 3
