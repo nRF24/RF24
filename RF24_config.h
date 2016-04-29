@@ -29,7 +29,12 @@
     #define RF24_SPI_TRANSACTIONS
   #endif
   
-#if ( !defined (ARDUINO) ) // Any non-arduino device is handled via configure/Makefile
+//ATXMega
+#if defined(__AVR_ATxmega256D3__) // In order to be available both in windows and linux this should take presence here.
+  #define XMEGA
+  #define XMEGA_D3
+  #include "utility/ATXMegaD3/RF24_arch_config.h"
+#elif ( !defined (ARDUINO) ) // Any non-arduino device is handled via configure/Makefile
 
   // The configure script detects device and copies the correct includes.h file to /utility/includes.h
   // This behavior can be overridden by calling configure with respective parameters
@@ -41,11 +46,7 @@
   #define RF24_TINY
   #include "utility/ATTiny/RF24_arch_config.h"
 
-//ATXMega
-#elif defined(__AVR_ATxmega256D3__)
-  #define XMEGA
-  #define XMEGA_D3
-  #include "utility/ATXMegaD3/RF24_arch_config.h"
+
 //LittleWire  
 #elif defined(LITTLEWIRE)
   
