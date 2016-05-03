@@ -1847,7 +1847,7 @@ private:
  * 
  * The RF24 driver can be build as a static library with Atmel Studio 7 in order to be included as any other library in another program for the XMEGA family.
  *
- * Currently only the </b>ATXMEGA256D3</b> is implemented.
+ * Currently only the </b>ATXMEGA D3</b> family is implemented.
  * 
  * @section Preparation 
  * 
@@ -1856,7 +1856,7 @@ private:
  * 
  * @code
  * utility\
- *   ATXMega256D3\
+ *   ATXMegaD3\
  *     compatibility.c
  *     compatibility.h
  *     gpio.cpp

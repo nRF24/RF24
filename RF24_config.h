@@ -28,9 +28,10 @@
   #if defined SPI_HAS_TRANSACTION && !defined SPI_UART && !defined SOFTSPI
     #define RF24_SPI_TRANSACTIONS
   #endif
-  
+ 
+ 
 //ATXMega
-#if defined(__AVR_ATxmega256D3__) // In order to be available both in windows and linux this should take presence here.
+#if defined(__AVR_ATxmega64D3__) || defined(__AVR_ATxmega128D3__) || defined(__AVR_ATxmega192D3__) || defined(__AVR_ATxmega256D3__) || defined(__AVR_ATxmega384D3__) // In order to be available both in windows and linux this should take presence here.
   #define XMEGA
   #define XMEGA_D3
   #include "utility/ATXMegaD3/RF24_arch_config.h"
