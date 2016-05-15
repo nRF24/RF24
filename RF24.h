@@ -1579,7 +1579,7 @@ private:
  * @code ./install.sh @endcode
  * 4. Run an example from one of the libraries
  * @code 
- * cd rf24libs/RF24/examples_RPi  
+ * cd rf24libs/RF24/examples_linux  
  * @endcode
  * Edit the gettingstarted example, to set your pin configuration
  * @code nano gettingstarted.cpp
@@ -1602,7 +1602,7 @@ private:
  * **Note:** See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA </a> documentation for more info on installing MRAA
  *    @code sudo make install  OR  sudo make install RF24_MRAA=1 @endcode
  * @code
- * cd examples_RPi  
+ * cd examples_linux  
  * @endcode
  * Edit the gettingstarted example, to set your pin configuration
  * @code nano gettingstarted.cpp 
@@ -1639,7 +1639,7 @@ private:
  *    @code sudo make install -B RF24_MRAA=1 @endcode
  * 5. Configure the correct pins in gettingstarted.cpp (See http://iotdk.intel.com/docs/master/mraa/index.html )
  *    @code
- *    cd examples_RPi  
+ *    cd examples_linux  
  *    nano gettingstarted.cpp 
  *    @endcode
  * 6. Build an example
@@ -1679,7 +1679,7 @@ private:
  * @code ./install.sh @endcode
  * 4. Run an example from one of the libraries
  * @code 
- * cd rf24libs/RF24/examples_RPi  
+ * cd rf24libs/RF24/examples_linux  
  * make  
  * sudo ./gettingstarted  
  * @endcode
@@ -1696,7 +1696,7 @@ private:
  *    @code cd RF24 @endcode
  * 4. Build the library, and run an example file: 
  * @code sudo make install
- * cd examples_RPi  
+ * cd examples_linux  
  * make  
  * sudo ./gettingstarted
  * @endcode
