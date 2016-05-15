@@ -17,7 +17,7 @@ Driver options:
 
 Building options:
     --os=[LINUX|DARWIN]         Operating system. [configure autodetected]
-    --soc=[BCM2835|BCM2836|AM33XX|A10|A13|A20]
+    --soc=[BCM2835|BCM2836|AM33XX|A10|A13|A20|H3]
                                 SoC type to be used. [configure autodetected]
     --cpu-flags=<CFLAGS>        CPU defining/optimizing flags to be used. [configure autodetected]
     --extra-cflags=<CFLAGS>     Extra C flags passed to C/C++ compilation. []
@@ -64,10 +64,12 @@ function die {
 function detect_machine {
     local cpu=$(execute_check "uname -m 2>/dev/null")
     local machine=$(execute_check "cat /sys/firmware/devicetree/base/model 2>/dev/null")
-    local hardware=$(execute_check "grep Hardware /proc/cpuinfo 2>/dev/null")
+    local hardware=$(execute_check "grep sunxi_platform /sys/class/sunxi_info/sys_info 2>/dev/null | sed 's/^.*: \(.*\)$/\1/'")
+    if [ -z "$hardware" ]; then
+        local hardware=$(execute_check "grep Hardware /proc/cpuinfo 2>/dev/null | sed 's/^.*: \(.*\)$/\1/'")
+    fi
     local soc="unknown"
     local tp="unknown"
-    hardware=$(echo ${hardware/*:/} | sed 's/^ *//g')
 
     if [ -z "$cpu" ]; then
         cpu="unknown"
@@ -86,16 +88,25 @@ function detect_machine {
             tp="RPi2"
         fi
         ;;
-    sun4i)
+    sun4i|Sun4iw1p1)
         soc="A10"
         ;;
-    sun5i)
+    sun5i|Sun4iw2p1)
         soc="A13"
         ;;
-    sun6i)
+    Sun4iw2p2)
+        soc="A12"
+        ;;
+    Sun4iw2p3)
+        soc="A10s"
+        ;;
+    sun6i|Sun8iw1p1)
         soc="A31"
         ;;
-    sun7i)
+    Sun8iw1p2)
+        soc="A31s"
+        ;;
+    sun7i|Sun8iw2p1)
         soc="A20"
         if [[ $machine == "Banana Pi"* ]]; then
             tp="BananaPi"
@@ -103,13 +114,25 @@ function detect_machine {
             tp="BananaPro"
         fi
         ;;
-    sun8i)
+    sun8i|Sun8iw7p1)
+        soc="H3"
+        ;;
+    Sun8iw3p1)
         soc="A23"
         ;;
-    sun9i)
+    Sun8iw5p1)
+        soc="A33"
+        ;;
+    Sun8iw6p1)
+        soc="A83t"
+        ;;
+    sun9i|Sun9iw1p1)
         soc="A80"
         ;;
-    sun50i)
+    Sun9iw1p2)
+        soc="A80t"
+        ;;
+    sun50i|Sun50iw1p1)
         soc="A64"
         ;;
     'Generic AM33XX'*)
@@ -141,6 +164,9 @@ function gcc_cpu_flags {
         ;;
     A20)
         flags="-march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard"
+        ;;
+    H3)
+        flags="-march=armv8-a -mtune=cortex-a53 -mfpu=neon-vfpv4 -mfloat-abi=hard"
         ;;
     *)
         flags=""
