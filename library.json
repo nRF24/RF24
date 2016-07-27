@@ -11,9 +11,7 @@
     "*.h",
     "*.c",
     "*.cpp",
-    "arch/ATTiny/*",
-    "arch/Due/*",
-    "arch/Teensy/*",
+    "utility/*",
     "examples/*/*.ino"
   ],
   "frameworks": "arduino",
