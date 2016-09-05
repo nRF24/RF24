@@ -7,13 +7,6 @@
     "type": "git",
     "url": "https://github.com/TMRh20/RF24.git"
   },
-  "build": {
-    "srcFilter": [
-        "+<*.c>",
-        "+<*.cpp>",
-        "+<*.h>"
-    ]
-  },
   "version": "1.1.7",
   "frameworks": "arduino",
   "platforms": [
