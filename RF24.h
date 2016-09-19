@@ -877,7 +877,7 @@ s   *
   /**
    * Get the CRC length
    * <br>CRC checking cannot be disabled if auto-ack is enabled
-   * @return RF24_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
+   * @return RF24_CRC_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
   rf24_crclength_e getCRCLength(void);
 
