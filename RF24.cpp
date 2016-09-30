@@ -693,6 +693,19 @@ bool RF24::begin(void)
 
 /****************************************************************************/
 
+bool RF24::isChipConnected()
+{
+  uint8_t setup = read_register(SETUP_AW);
+  if(setup >= 1 && setup <= 3)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+/****************************************************************************/
+
 void RF24::startListening(void)
 {
  #if !defined (RF24_TINY) && ! defined(LITTLEWIRE)

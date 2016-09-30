@@ -138,6 +138,11 @@ public:
   bool begin(void);
 
   /**
+   * Checks if the chip is connected to the SPI bus
+   */
+  bool isChipConnected();
+
+  /**
    * Start listening on the pipes opened for reading.
    *
    * 1. Be sure to call openReadingPipe() first.  
