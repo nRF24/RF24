@@ -50,7 +50,7 @@ void RF24::csn(bool mode)
 
 #if !defined (RF24_LINUX)
 	digitalWrite(csn_pin,mode);
-	delayMicroseconds(5);
+	delayMicroseconds(csDelay);
 #endif
 
 }
@@ -728,10 +728,10 @@ void RF24::stopListening(void)
 {  
   ce(LOW);
 
-  delayMicroseconds(txRxDelay);
+  delayMicroseconds(txDelay);
   
   if(read_register(FEATURE) & _BV(EN_ACK_PAY)){
-    delayMicroseconds(txRxDelay); //200
+    delayMicroseconds(txDelay); //200
 	flush_tx();
   }
   //flush_rx();
@@ -1410,9 +1410,9 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ;
   
   #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
-    txRxDelay=250;
+    txDelay=250;
   #else //16Mhz Arduino
-    txRxDelay=85;
+    txDelay=85;
   #endif
   if( speed == RF24_250KBPS )
   {
@@ -1420,9 +1420,9 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     // Making it '10'.
     setup |= _BV( RF_DR_LOW ) ;
   #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
-    txRxDelay=450;
+    txDelay=450;
   #else //16Mhz Arduino
-	txRxDelay=155;
+	txDelay=155;
   #endif
   }
   else
@@ -1433,9 +1433,9 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     {
       setup |= _BV(RF_DR_HIGH);
       #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
-      txRxDelay=190;
+      txDelay=190;
       #else //16Mhz Arduino	  
-	  txRxDelay=65;
+	  txDelay=65;
 	  #endif
     }
   }
