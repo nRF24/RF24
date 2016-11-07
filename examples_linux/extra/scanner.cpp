@@ -42,8 +42,10 @@ using namespace std;
 //RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ); 
 
 // Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
-RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);  
+//RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);  
 
+// Generic setup
+RF24 radio(22, 0);
 
 //
 // Channel info
@@ -97,49 +99,44 @@ int main(int argc, char** argv)
   }
   printf("\n");       
 	
-	// forever loop
+  // forever loop
   while(1)
-	{
-		if ( reset_array == 1 )
-		{	
-			// Clear measurement values
-			memset(values,0,sizeof(values));
-			printf("\n");
-		}
+  {
+    // Clear measurement values
+    memset(values,0,sizeof(values));
 
-		// Scan all channels num_reps times
-		int i = num_channels;
-		while (i--)
-		{
-			// Select this channel
-			radio.setChannel(i);
+    // Scan all channels num_reps times
+    int rep_counter = num_reps;
+    while(rep_counter--)
+    {
 
-			// Listen for a little
-			radio.startListening();
-			delayMicroseconds(128);
-			//radio.stopListening();
+      int i = num_channels;
+      while (i--)
+      {
 
-			// Did we get a carrier?
-			if ( radio.testCarrier() )
-					++values[i];
-			if ( values[i] == 0xf ) 
-			{
-				reset_array = 2;
-			}
-			radio.stopListening();
-		}
+        // Select this channel
+	radio.setChannel(i);
 
-		// Print out channel measurements, clamped to a single hex digit
-		i = 0;
-		while ( i < num_channels )
-		{
-			printf("%x",min(0xf,(values[i]&0xf)));
-			++i;
-		}
-		
-		printf("\n");
-	}
-	
+	// Listen for a little
+	radio.startListening();
+	delayMicroseconds(128);
+	radio.stopListening();
+
+	// Did we get a carrier?
+	if ( radio.testCarrier() ) ++values[i];
+      }
+    }
+
+    // Print out channel measurements, clamped to a single hex digit
+    i = 0;
+    while ( i < num_channels )
+    {
+      printf("%x",min(0xf,(values[i]&0xf)));
+      ++i;
+    }
+    printf("\n");
+  }
+
   return 0;
 }
 
