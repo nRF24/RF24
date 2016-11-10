@@ -1,7 +1,7 @@
 #include "spi.h"
 #include <pthread.h>
 
-static pthread_mutex_t spiMutex;
+static pthread_mutex_t spiMutex = PTHREAD_MUTEX_INITIALIZER;
 
 SPI::SPI() {
 
