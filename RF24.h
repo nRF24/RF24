@@ -928,7 +928,7 @@ s   *
   * If using interrupts or timed requests, this can be set to 0 Default:5
   */
   
-  uint32_t csDelay=5;
+  uint32_t csDelay;
   
   /**@}*/
   /**
