@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 CROSS_CC=arm-linux-gnueabihf-gcc
 CROSS_CXX=arm-linux-gnueabihf-g++
@@ -11,8 +11,8 @@ Options:
 Help:
     -h, --help                  print this message
 
-Driver options:
-    --driver=[SPIDEV|MRAA|RPi|LittleWire]
+
+    --driver=[SPIDEV|MRAA|RPi|LittleWire|sbridge]
                                 Driver for RF24 library. [configure autodetected]
 
 Building options:
@@ -406,6 +406,9 @@ MRAA)
     ;;
 LittleWire)
     SHARED_LINKER_FLAGS+=" -llittlewire-spi"
+    ;;
+sbridge)
+    SHARED_LINKER_FLAGS+=" -pthread"
     ;;
 *)
     die "Unsupported DRIVER: ${DRIVER}." 2

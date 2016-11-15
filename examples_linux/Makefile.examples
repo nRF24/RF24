@@ -12,7 +12,7 @@
 #
 
 BINARY_PREFIX = rf24
-SOURCES = $(PROGRAMS:=.cpp)
+SOURCES = $(PROGRAMS:=.c)
 
 LIBS=-l$(LIB)
 ifeq ($(DRIVER), LittleWire)
@@ -22,7 +22,7 @@ endif
 all: $(PROGRAMS)
 
 $(PROGRAMS): $(SOURCES)
-	$(CXX) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) $@.cpp $(LIBS) -o $@
+	$(CC) $(CFLAGS) -I$(HEADER_DIR)/.. -I.. -L$(LIB_DIR) $@.c $(LIBS) -o $@
 
 clean:
 	@echo "[Cleaning]"

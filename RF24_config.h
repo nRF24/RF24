@@ -11,6 +11,8 @@
   Added __ARDUINO_X86__ support
 */
 
+typedef unsigned char bool;
+
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
 

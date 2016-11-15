@@ -62,8 +62,6 @@ void setup(void)
   radio.startListening();
   radio.stopListening();
 
-  radio.printDetails();
-
   // Print out header, high then low digit
   int i = 0;
   while ( i < num_channels )
@@ -104,13 +102,14 @@ void loop(void)
 
       // Listen for a little
       radio.startListening();
-      delayMicroseconds(128);
-      radio.stopListening();
+      delayMicroseconds(225);
+      
 
       // Did we get a carrier?
       if ( radio.testCarrier() ){
         ++values[i];
       }
+      radio.stopListening();
     }
   }
 

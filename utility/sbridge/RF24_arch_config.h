@@ -13,7 +13,7 @@
   
   #include "bcm2835.h"
   #include "spi.h"
-  //#define _SPI spi
+  #define _SPI spi
 	
   #if defined SPI_HAS_TRANSACTION && !defined SPI_UART && !defined SOFTSPI
     #define RF24_SPI_TRANSACTIONS

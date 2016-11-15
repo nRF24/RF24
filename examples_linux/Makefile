@@ -18,6 +18,7 @@ endif
 include ../Makefile.inc
 
 # define all programs
-PROGRAMS = gettingstarted gettingstarted_call_response transfer pingpair_dyn
+#PROGRAMS = gettingstarted gettingstarted_call_response transfer pingpair_dyn
+PROGRAMS = pingpair_dyn
 
 include Makefile.examples
