@@ -54,7 +54,7 @@ gpio.o: $(DRIVER_DIR)/gpio.cpp
 	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/gpio.cpp
 
 interrupt.o: $(DRIVER_DIR)/interrupt.c
-	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/interrupt.c
+	$(CC) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/interrupt.c
 	
 # clear configuration files
 cleanconfig:
