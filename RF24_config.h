@@ -90,17 +90,19 @@
 
 
  #if defined(__arm__) || defined (__ARDUINO_X86__)
-   #include <SPI.h>
- #endif
-
- 
- #define _BV(x) (1<<(x))
- #if !defined(__arm__) && !defined (__ARDUINO_X86__)
+   #if defined (__arm__) && defined (SPI_UART)
+		#include <SPI_UART.h>
+		#define _SPI uspi
+   #else
+     #include <SPI.h>
+     #define _SPI SPI
+   #endif
+ #elif !defined(__arm__) && !defined (__ARDUINO_X86__)
    extern HardwareSPI SPI;
  #endif
-
-
-  #define _SPI SPI
+ 
+ #define _BV(x) (1<<(x))
+  
 #endif
 
   #ifdef SERIAL_DEBUG
