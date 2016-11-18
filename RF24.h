@@ -15,16 +15,18 @@
 #ifndef __RF24_H__
 #define __RF24_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "RF24_config.h"
+
 
 #if defined (RF24_LINUX) || defined (LITTLEWIRE)
   #include "utility/includes.h"
 #elif defined SOFTSPI
   #include <DigitalIO.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**
@@ -48,68 +50,8 @@ typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
  */
 typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e;
 
-/**
- * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
- */
 
-//RF24 struct
-typedef struct
-{
-#ifdef SOFTSPI
-  SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
-#elif defined (SPI_UART)
-  SPIUARTClass uspi;
-#endif
 
-#if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
-  SPISettings spi; 
-#endif
-#if defined (MRAA)
-  GPIO gpio;
-#endif
-
-  uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-  uint8_t csn_pin; /**< SPI Chip select */
-  uint16_t spi_speed; /**< SPI Bus Speed */
-#if defined (RF24_LINUX) || defined (XMEGA_D3)
-  uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
-  uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
-#endif  
-  bool p_variant; /* False for RF24L01 and true for RF24L01P */
-  uint8_t payload_size; /**< Fixed size of payloads */
-  bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
-  uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
-  uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
-  /**
-  * 
-  * The driver will delay for this duration when stopListening() is called
-  * 
-  * When responding to payloads, faster devices like ARM(RPi) are much faster than Arduino:
-  * 1. Arduino sends data to RPi, switches to RX mode
-  * 2. The RPi receives the data, switches to TX mode and sends before the Arduino radio is in RX mode
-  * 3. If AutoACK is disabled, this can be set as low as 0. If AA/ESB enabled, set to 100uS minimum on RPi
-  *
-  * @warning If set to 0, ensure 130uS delay after stopListening() and before any sends
-  */
-  
-  uint32_t txDelay;
-
-  /**
-  * 
-  * On all devices but Linux and ATTiny, a small delay is added to the CSN toggling function
-  * 
-  * This is intended to minimise the speed of SPI polling due to radio commands
-  *
-  * If using interrupts or timed requests, this can be set to 0 Default:5
-  */
-  
-  uint32_t csDelay;
-
-  //#if defined (FAILURE_HANDLING)
-    bool RF24_failureDetected; 
-  //#endif
-
-  }RF24;
 
 
   /**
@@ -669,7 +611,7 @@ s   *
    *
    * @return true if this is a legitimate radio
    */
-  bool RF24_isValid(RF24 *rf) { return rf->ce_pin != 0xff && rf->csn_pin != 0xff; }
+  bool RF24_isValid(RF24 *rf); 
   
    /**
    * Close a pipe after it has been previously opened.

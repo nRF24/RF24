@@ -39,9 +39,9 @@ void RF24_csn_d(RF24 *rf, bool mode)
 	// CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
 	
       #if !defined (SOFTSPI)	
-		_SPI.setBitOrder(MSBFIRST);
-		_SPI.setDataMode(SPI_MODE0);
-		_SPI.setClockDivider(SPI_CLOCK_DIV2);
+		SPI_setBitOrder(MSBFIRST);
+		SPI_setDataMode(SPI_MODE0);
+		SPI_setClockDivider(SPI_CLOCK_DIV2);
       #endif
 #elif defined (RF24_RPi)
       if(!mode)
@@ -110,7 +110,7 @@ uint8_t RF24_read_register_m_d(RF24 *rf, uint8_t reg, uint8_t* buf, uint8_t len)
   RF24_beginTransaction(rf);
   status = SPI_transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- ){
-    *buf++ = _SPI.transfer(0xff);
+    *buf++ = SPI_transfer(0xff);
   }
   RF24_endTransaction(rf);
 
@@ -141,8 +141,8 @@ uint8_t RF24_read_register_d(RF24 *rf, uint8_t reg)
   #else
 
   RF24_beginTransaction(rf);
-  _SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
-  result = _SPI.transfer(0xff);
+  SPI_transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  result = SPI_transfer(0xff);
   RF24_endTransaction(rf);
 
   #endif
@@ -172,7 +172,7 @@ uint8_t RF24_write_register_c_d(RF24 *rf, uint8_t reg, const uint8_t* buf, uint8
   #else
 
   RF24_beginTransaction(rf);
-  status = _SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
+  status = SPI_transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
   while ( len-- )
     SPI_transfer(*buf++);
   RF24_endTransaction(rf);
@@ -300,12 +300,12 @@ uint8_t RF24_read_payload(RF24 *rf, void* buf, uint8_t data_len)
   #else
 
   RF24_beginTransaction(rf);
-  status = _SPI.transfer( R_RX_PAYLOAD );
+  status = SPI_transfer( R_RX_PAYLOAD );
   while ( data_len-- ) {
-    *current++ = _SPI.transfer(0xFF);
+    *current++ = SPI_transfer(0xFF);
   }
   while ( blank_len-- ) {
-    _SPI.transfer(0xff);
+    SPI_transfer(0xff);
   }
   RF24_endTransaction(rf);
 
@@ -612,24 +612,24 @@ bool RF24_begin(RF24 *rf )
   
   #elif defined(LITTLEWIRE)
     pinMode(csn_pin,OUTPUT);
-    _SPI.begin();
+    SPI_begin();
     RF24_csn_d(rf,HIGH);
   #elif defined(XMEGA_D3)
 	if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);
-	_SPI.begin(csn_pin);
+	SPI_begin(csn_pin);
 	RF24_ce_d(rf,LOW);
 	RF24_csn_d(rf,HIGH);
 	delay(200);
   #else
     // Initialize pins
-    if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
+    if (rf->ce_pin != rf->csn_pin) pinMode(rf->ce_pin,OUTPUT);  
   
     #if ! defined(LITTLEWIRE)
-      if (ce_pin != csn_pin)
+      if (rf->ce_pin != rf->csn_pin)
     #endif
-        pinMode(csn_pin,OUTPUT);
+        pinMode(rf->csn_pin,OUTPUT);
     
-    _SPI.begin();
+    SPI_begin();
     RF24_ce_d(rf,LOW);
   	RF24_csn_d(rf,HIGH);
   	#if defined (__ARDUINO_X86__)
@@ -1058,8 +1058,8 @@ uint8_t RF24_getDynamicPayloadSize(RF24 *rf )
   RF24_endTransaction(rf);
   #else
   RF24_beginTransaction(rf);
-  _SPI.transfer( R_RX_PL_WID );
-  result = _SPI.transfer(0xff);
+  SPI_transfer( R_RX_PL_WID );
+  result = SPI_transfer(0xff);
   RF24_endTransaction(rf);
   #endif
 
@@ -1384,6 +1384,14 @@ bool RF24_testCarrier(RF24 *rf )
 bool RF24_testRPD(RF24 *rf )
 {
   return ( RF24_read_register_d(rf,RPD) & 1 ) ;
+}
+
+/****************************************************************************/
+  
+bool RF24_isValid(RF24 *rf) 
+{ 
+  return rf->ce_pin != 0xff && rf->csn_pin != 0xff; 
+
 }
 
 /****************************************************************************/

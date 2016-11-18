@@ -12,7 +12,6 @@
  * This is an example of how to use payloads of a varying (dynamic) size. 
  */
 
-#include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 
@@ -22,7 +21,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
-RF24 radio(7,8);
+RF24 radio;
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -71,6 +70,7 @@ void setup(void)
   // Role
   //
 
+  RF24_init(&radio,7,8);
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
@@ -96,13 +96,13 @@ void setup(void)
   // Setup and configure rf radio
   //
 
-  radio.begin();
+  RF24_begin(&radio);
 
   // enable dynamic payloads
-  radio.enableDynamicPayloads();
+  RF24_enableDynamicPayloads(&radio);
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(5,15);
+  RF24_setRetries(&radio,5,15);
 
   //
   // Open pipes to other nodes for communication
@@ -115,26 +115,26 @@ void setup(void)
 
   if ( role == role_ping_out )
   {
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
+    RF24_openWritingPipe_d(&radio,pipes[0]);
+    RF24_openReadingPipe_d(&radio,1,pipes[1]);
   }
   else
   {
-    radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1,pipes[0]);
+    RF24_openWritingPipe_d(&radio,pipes[1]);
+    RF24_openReadingPipe_d(&radio,1,pipes[0]);
   }
 
   //
   // Start listening
   //
 
-  radio.startListening();
+  RF24_startListening(&radio);
 
   //
   // Dump the configuration of the rf unit for debugging
   //
 
-  radio.printDetails();
+  RF24_printDetails(&radio);
 }
 
 void loop(void)
@@ -149,20 +149,20 @@ void loop(void)
     static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
 
     // First, stop listening so we can talk.
-    radio.stopListening();
+    RF24_stopListening(&radio);
 
     // Take the time, and send it.  This will block until complete
     Serial.print(F("Now sending length "));
     Serial.println(next_payload_size);
-    radio.write( send_payload, next_payload_size );
+    RF24_write(&radio,send_payload, next_payload_size );
 
     // Now, continue listening
-    radio.startListening();
+    RF24_startListening(&radio);
 
     // Wait here until we get a response, or timeout
     unsigned long started_waiting_at = millis();
     bool timeout = false;
-    while ( ! radio.available() && ! timeout )
+    while ( ! RF24_available(&radio) && ! timeout )
       if (millis() - started_waiting_at > 500 )
         timeout = true;
 
@@ -174,14 +174,14 @@ void loop(void)
     else
     {
       // Grab the response, compare, and send to debugging spew
-      uint8_t len = radio.getDynamicPayloadSize();
+      uint8_t len = RF24_getDynamicPayloadSize(&radio);
       
       // If a corrupt dynamic payload is received, it will be flushed
       if(!len){
         return; 
       }
       
-      radio.read( receive_payload, len );
+      RF24_read(&radio,receive_payload, len );
 
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
@@ -209,18 +209,18 @@ void loop(void)
   if ( role == role_pong_back )
   {
     // if there is data ready
-    while ( radio.available() )
+    while ( RF24_available(&radio) )
     {
 
       // Fetch the payload, and see if this was the last one.
-      uint8_t len = radio.getDynamicPayloadSize();
+      uint8_t len = RF24_getDynamicPayloadSize(&radio);
       
       // If a corrupt dynamic payload is received, it will be flushed
       if(!len){
         continue; 
       }
       
-      radio.read( receive_payload, len );
+      RF24_read(&radio,receive_payload, len );
 
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
@@ -232,14 +232,14 @@ void loop(void)
       Serial.println(receive_payload);
 
       // First, stop listening so we can talk
-      radio.stopListening();
+      RF24_stopListening(&radio);
 
       // Send the final one back.
-      radio.write( receive_payload, len );
+      RF24_write(&radio,receive_payload, len );
       Serial.println(F("Sent response."));
 
       // Now, resume listening so we catch the next packets.
-      radio.startListening();
+      RF24_startListening(&radio);
     }
   }
 }
