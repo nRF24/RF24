@@ -13,14 +13,10 @@ TMRh20 2014 - Updated to work with optimized RF24 Arduino library
  * primary transmitter if wanting to initiate communication instead of respond to a commmunication.
  */
 
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <string>
+#include <string.h>
 #include <unistd.h>
 #include <RF24/RF24.h>
 
-using namespace std;
 
 //
 // Hardware configuration
@@ -38,7 +34,7 @@ using namespace std;
 //RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
 
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
-RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
+RF24 radio;
 
 /*** RPi Alternate ***/
 //Note: Specify SPI BUS 0 or 1 instead of CS pin number.
@@ -81,27 +77,29 @@ uint8_t counter = 1;                                                          //
 
 int main(int argc, char** argv){
 
+  RF24_init2(&radio,RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
-  cout << "RPi/RF24/examples/gettingstarted_call_response\n";
-  radio.begin();
-  radio.enableAckPayload();               // Allow optional ack payloads
-  radio.enableDynamicPayloads();
-  radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+  printf("RPi/RF24/examples/gettingstarted_call_response\n");
+  RF24_begin(&radio);
+  RF24_enableAckPayload(&radio);               // Allow optional ack payloads
+  RF24_enableDynamicPayloads(&radio);
+  RF24_printDetails(&radio);                   // Dump the configuration of the rf unit for debugging
 
 
 /********* Role chooser ***********/
 
   printf("\n ************ Role Setup ***********\n");
-  string input = "";
+  char input[40];
   char myChar = {0};
-  cout << "Choose a role: Enter 0 for pong_back, 1 for ping_out (CTRL+C to exit)\n>";
-  getline(cin,input);
+  printf("Choose a role: Enter 0 for pong_back, 1 for ping_out (CTRL+C to exit)\n>");
+  input[0]=getchar();
+  input[1]=0;
 
-  if(input.length() == 1) {
+  if(strlen(input) == 1) {
 	myChar = input[0];
 	if(myChar == '0'){
-		cout << "Role: Pong Back, awaiting transmission " << endl << endl;
-	}else{  cout << "Role: Ping Out, starting transmission " << endl << endl;
+		printf("Role: Pong Back, awaiting transmission \n\n");
+	}else{  printf("Role: Ping Out, starting transmission \n\n");
 		role = role_ping_out;
 	}
   }
@@ -109,14 +107,14 @@ int main(int argc, char** argv){
   // This opens two pipes for these two nodes to communicate
   // back and forth.
     if ( !radioNumber )    {
-      radio.openWritingPipe(addresses[0]);
-      radio.openReadingPipe(1,addresses[1]);
+      RF24_openWritingPipe(&radio,addresses[0]);
+      RF24_openReadingPipe(&radio,1,addresses[1]);
     }else{
-      radio.openWritingPipe(addresses[1]);
-      radio.openReadingPipe(1,addresses[0]);
+      RF24_openWritingPipe(&radio,addresses[1]);
+      RF24_openReadingPipe(&radio,1,addresses[0]);
     }
-	radio.startListening();
-	radio.writeAckPayload(1,&counter,1);
+	RF24_startListening(&radio);
+	RF24_writeAckPayload(&radio,1,&counter,1);
 
 // forever loop
 while (1){
@@ -128,16 +126,16 @@ while (1){
 
     uint8_t gotByte;                                        // Initialize a variable for the incoming response
 
-    radio.stopListening();                                  // First, stop listening so we can talk.
+    RF24_stopListening(&radio);                                  // First, stop listening so we can talk.
     printf("Now sending %d as payload. ",counter);          // Use a simple byte counter as payload
     unsigned long time = millis();                          // Record the current microsecond count
 
-    if ( radio.write(&counter,1) ){                         // Send the counter variable to the other radio
-        if(!radio.available()){                             // If nothing in the buffer, we got an ack but it is blank
+    if ( RF24_write(&radio,&counter,1) ){                         // Send the counter variable to the other radio
+        if(!RF24_available(&radio)){                             // If nothing in the buffer, we got an ack but it is blank
             printf("Got blank response. round-trip delay: %lu ms\n\r",millis()-time);
         }else{
-            while(radio.available() ){                      // If an ack with payload was received
-                radio.read( &gotByte, 1 );                  // Read it, and display the response time
+            while(RF24_available(&radio) ){                      // If an ack with payload was received
+                RF24_read(&radio, &gotByte, 1 );                  // Read it, and display the response time
                 printf("Got response %d, round-trip delay: %lu ms\n\r",gotByte,millis()-time);
                 counter++;                                  // Increment the counter variable
             }
@@ -152,11 +150,11 @@ while (1){
 
   if ( role == role_pong_back ) {
     uint8_t pipeNo, gotByte;           		        // Declare variables for the pipe and the byte received
-    if( radio.available(&pipeNo)){               	// Read all available payloads      
-      radio.read( &gotByte, 1 );
+    if( RF24_available_p(&radio,&pipeNo)){               	// Read all available payloads      
+      RF24_read(&radio, &gotByte, 1 );
 													// Since this is a call-response. Respond directly with an ack payload.
 	  gotByte += 1;  								// Ack payloads are much more efficient than switching to transmit mode to respond to a call
-	  radio.writeAckPayload(pipeNo,&gotByte, 1 );   // This can be commented out to send empty payloads.	  
+	  RF24_writeAckPayload(&radio,pipeNo,&gotByte, 1 );   // This can be commented out to send empty payloads.	  
       printf("Loaded next response %d \n\r", gotByte);
 	  delay(900); //Delay after a response to minimize CPU usage on RPi
 				  //Expects a payload every second      

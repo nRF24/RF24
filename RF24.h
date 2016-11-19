@@ -60,9 +60,9 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * Common code for SPI transactions including CSN toggle
    *
    */
-   void RF24_beginTransaction();
+   void RF24_beginTransaction(RF24 *rf );
 
-   void RF24_endTransaction();
+   void RF24_endTransaction(RF24 *rf );
 
 
   /**
@@ -912,8 +912,8 @@ s   *
    *
    * @param address The 40-bit address of the pipe to open.
    */
-  void RF24_openWritingPipe_d(RF24 *rf, uint64_t address);
 
+  void RF24_openWritingPipe_d(RF24 *rf, uint64_t address);
 
   /**
    * @name Low-level internal interface.

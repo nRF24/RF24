@@ -10,6 +10,9 @@
 #include "RF24_config.h"
 #include "RF24.h"
 
+//for XC8 compatibility
+#define ADDR_WIDTH 5
+
 /****************************************************************************/
 
 void RF24_csn_d(RF24 *rf, bool mode)
@@ -95,7 +98,7 @@ uint8_t RF24_read_register_m_d(RF24 *rf, uint8_t reg, uint8_t* buf, uint8_t len)
 
   *ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
 
-  while (len--){ *ptx++ = NOP; } // Dummy operation, just for reading
+  while (len--){ *ptx++ = NOP_; } // Dummy operation, just for reading
   
   SPI_transfernb( (char *) rf->spi_txbuff, (char *) rf->spi_rxbuff, size);
   
@@ -132,7 +135,7 @@ uint8_t RF24_read_register_d(RF24 *rf, uint8_t reg)
   uint8_t * prx = rf->spi_rxbuff;
   uint8_t * ptx = rf->spi_txbuff;	
   *ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
-  *ptx++ = NOP ; // Dummy operation, just for reading
+  *ptx++ = NOP_ ; // Dummy operation, just for reading
   
   SPI_transfernb( (char *) rf->spi_txbuff, (char *) rf->spi_rxbuff, 2);
   result = *++prx;   // result is 2nd byte of receive buffer
@@ -282,7 +285,7 @@ uint8_t RF24_read_payload(RF24 *rf, void* buf, uint8_t data_len)
 
 	*ptx++ =  R_RX_PAYLOAD;
 	while(--size) 
-		*ptx++ = NOP;
+		*ptx++ = NOP_;
 		
 	size = data_len + blank_len + 1; // Size has been lost during while, re affect
 	
@@ -345,7 +348,7 @@ uint8_t RF24_flush_tx(RF24 *rf )
 
 uint8_t RF24_get_status(RF24 *rf )
 {
-  return RF24_spiTrans(rf,NOP);
+  return RF24_spiTrans(rf,NOP_);
 }
 
 /****************************************************************************/
@@ -401,7 +404,11 @@ void RF24_print_address_register_d(RF24 *rf, const char* name, uint8_t reg, uint
   #endif
   while (qty--)
   {
+    #ifdef __XC8
+    uint8_t buffer[ADDR_WIDTH];
+    #else
     uint8_t buffer[rf->addr_width];
+    #endif
     RF24_read_register_m_d(rf,reg++,buffer,sizeof buffer);
 
     printf_P(PSTR(" 0x"));
@@ -422,7 +429,7 @@ void RF24_init(RF24 *rf, uint8_t _cepin, uint8_t _cspin)
   rf->p_variant=0;
   rf->payload_size=32;
   rf->dynamic_payloads_enabled=0;
-  rf->addr_width=5;
+  rf->addr_width=ADDR_WIDTH;
   rf->csDelay=5;
   rf->pipe0_reading_address[0]=0;
 }
@@ -438,7 +445,7 @@ void RF24_init2(RF24 *rf, uint8_t _cepin, uint8_t _cspin, uint32_t _spi_speed)
   rf->p_variant=0;
   rf->payload_size=32;
   rf->dynamic_payloads_enabled=0;
-  rf->addr_width=5;
+  rf->addr_width=ADDR_WIDTH;
   rf->csDelay=5;
   rf->pipe0_reading_address[0]=0;
 }
@@ -1122,7 +1129,7 @@ void RF24_whatHappened(RF24 *rf, bool * tx_ok,bool * tx_fail,bool * rx_ready)
 
 /****************************************************************************/
 
-void RF24_openWritingPipe_d(RF24 *rf, uint64_t value)
+void RF24_openWritingPipe_d(RF24 *rf, uint64_t  value)
 {
   // Note that AVR 8-bit uC's store this LSB first, and the NRF24L01(+)
   // expects it LSB first too, so we're good.
@@ -1137,7 +1144,7 @@ void RF24_openWritingPipe_d(RF24 *rf, uint64_t value)
 }
 
 /****************************************************************************/
-void RF24_openWritingPipe_a(RF24 *rf, const uint8_t *address)
+void RF24_openWritingPipe(RF24 *rf, const uint8_t *address)
 {
   // Note that AVR 8-bit uC's store this LSB first, and the NRF24L01(+)
   // expects it LSB first too, so we're good.

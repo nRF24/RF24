@@ -12,14 +12,10 @@ TMRh20 2014
  the slower form of high-speed transfer using blocking-writes.
  */
 
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <string>
+#include <string.h>
 #include <RF24/RF24.h>
 #include <unistd.h>
 
-using namespace std;
 //
 // Hardware configuration
 //
@@ -36,7 +32,7 @@ using namespace std;
 //RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
 
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
-RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
+RF24 radio;
 
 /*** RPi Alternate ***/
 //Note: Specify SPI BUS 0 or 1 instead of CS pin number.
@@ -77,44 +73,47 @@ int main(int argc, char** argv){
   bool role_ping_out = 1, role_pong_back = 0;
   bool role = 0;
 
+  RF24_init2(&radio,RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
+
   // Print preamble:
 
-  cout << "RF24/examples/Transfer/\n";
+  printf("RF24/examples/Transfer/\n");
 
-  radio.begin();                           // Setup and configure rf radio
-  radio.setChannel(1);
-  radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_1MBPS);
-  radio.setAutoAck(1);                     // Ensure autoACK is enabled
-  radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
-  radio.setCRCLength(RF24_CRC_8);          // Use 8-bit CRC for performance
-  radio.printDetails();
+  RF24_begin(&radio);                           // Setup and configure rf radio
+  RF24_setChannel(&radio,1);
+  RF24_setPALevel(&radio,RF24_PA_MAX);
+  RF24_setDataRate(&radio,RF24_1MBPS);
+  RF24_setAutoAck(&radio,1);                     // Ensure autoACK is enabled
+  RF24_setRetries(&radio,2,15);                  // Optionally, increase the delay between retries & # of retries
+  RF24_setCRCLength(&radio,RF24_CRC_8);          // Use 8-bit CRC for performance
+  RF24_printDetails(&radio);
 /********* Role chooser ***********/
 
   printf("\n ************ Role Setup ***********\n");
-  string input = "";
+  char input[40];
   char myChar = {0};
-  cout << "Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit)\n>";
-  getline(cin,input);
+  printf("Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit)\n>");
+  input[0]=getchar();
+  input[1]=0;
 
-  if(input.length() == 1) {
+  if(strlen(input) == 1) {
 	myChar = input[0];
 	if(myChar == '0'){
-		cout << "Role: Pong Back, awaiting transmission " << endl << endl;
-	}else{  cout << "Role: Ping Out, starting transmission " << endl << endl;
+		printf(" Role: Pong Back, awaiting transmission \n\n");
+	}else{  printf("Role: Ping Out, starting transmission \n\n");
 		role = role_ping_out;
 	}
   }
 /***********************************/
 
     if ( role == role_ping_out )    {
-      radio.openWritingPipe(addresses[1]);
-      radio.openReadingPipe(1,addresses[0]);
-	  radio.stopListening();
+      RF24_openWritingPipe_d(&radio,addresses[1]);
+      RF24_openReadingPipe_d(&radio,1,addresses[0]);
+	  RF24_stopListening(&radio);
     } else {
-      radio.openWritingPipe(addresses[0]);
-      radio.openReadingPipe(1,addresses[1]);
-      radio.startListening();
+      RF24_openWritingPipe_d(&radio,addresses[0]);
+      RF24_openReadingPipe_d(&radio,1,addresses[1]);
+      RF24_startListening(&radio);
     }
 
 
@@ -136,7 +135,7 @@ int main(int argc, char** argv){
 	
 		for(int i=0; i<cycles; i++){        		//Loop through a number of cycles
       			data[0] = i;                        //Change the first byte of the payload for identification
-      			if(!radio.writeFast(&data,32)){     //Write to the FIFO buffers
+      			if(!RF24_writeFast(&radio,&data,32)){     //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
 
@@ -144,13 +143,13 @@ int main(int argc, char** argv){
 				//This is only required when NO ACK ( enableAutoAck(0) ) payloads are used
 		/*		if(millis() - pauseTime > 3){       // Need to drop out of TX mode every 4ms if sending a steady stream of multicast data
 					pauseTime = millis();		    
-					radio.txStandBy();				// This gives the PLL time to sync back up	
+					RF24_txStandBy();				// This gives the PLL time to sync back up	
 				}
 		*/
 		}
 		stopTime = millis();
 
-		if(!radio.txStandBy()){ counter+=3; }
+		if(!RF24_txStandBy(&radio)){ counter+=3; }
 
   		float numBytes = cycles*32;
    		float rate = numBytes / (stopTime - startTime);
@@ -163,8 +162,8 @@ int main(int argc, char** argv){
 
 
 if(role == role_pong_back){
-     while(radio.available()){
-      radio.read(&data,32);
+     while(RF24_available(&radio)){
+      RF24_read(&radio,&data,32);
       counter++;
      }
    if(millis() - rxTimer > 1000){

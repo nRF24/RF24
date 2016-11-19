@@ -98,7 +98,7 @@ int main(int argc, char** argv){
   char input[40];
   char myChar = 0;
   printf("Choose a role: Enter 0 for receiver, 1 for transmitter (CTRL+C to exit) \n>");
-  input[0]='0';//getchar();
+  input[0]=getchar();
   input[1]=0;
 
   if(strlen(input) == 1) {

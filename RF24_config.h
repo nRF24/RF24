@@ -40,6 +40,11 @@ typedef unsigned char bool;
   #define XMEGA
   #define XMEGA_D3
   #include "utility/ATXMegaD3/RF24_arch_config.h"
+#elif ( defined (__XC8) ) // microchip XC8 compiler
+
+  #include "utility/XC8/xc8_config.h"
+  #include "utility/XC8/spi.h"
+
 #elif ( !defined (ARDUINO) ) // Any non-arduino device is handled via configure/Makefile
 
   // The configure script detects device and copies the correct includes.h file to /utility/includes.h

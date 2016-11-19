@@ -22,3 +22,6 @@ utility/includes.h
 examples_linux/*
 !examples_linux/**/
 !examples_linux/*.*
+/examples_xc8/pingpair_dyn.X/nbproject/private/
+/examples_xc8/pingpair_dyn.X/build/default/
+/examples_xc8/pingpair_dyn.X/dist/default/
