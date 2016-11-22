@@ -1,5 +1,5 @@
 {
-  "name": "RF24",
+  "name": "RF24_c",
   "keywords": "rf, radio, wireless, spi",
   "description": "Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver",
   "repository":

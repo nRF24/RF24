@@ -7,8 +7,8 @@
  */
 
 #include "nRF24L01.h"
-#include "RF24_config.h"
-#include "RF24.h"
+#include "RF24_c_config.h"
+#include "RF24_c.h"
 
 //for XC8 compatibility
 #define ADDR_WIDTH 5

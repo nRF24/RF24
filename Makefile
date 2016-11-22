@@ -17,7 +17,7 @@ REMOTE_ERROR="[ERROR] Remote machine not configured. Run configure with respecti
 include $(CONFIG_FILE)
 
 # Objects to compile
-OBJECTS=RF24.o
+OBJECTS=RF24_c.o
 ifeq ($(DRIVER), MRAA)
 OBJECTS+=spi.o gpio.o compatibility.o
 else ifeq ($(DRIVER), RPi)
@@ -38,7 +38,7 @@ $(LIBNAME): $(OBJECTS)
 	$(CC) $(SHARED_LINKER_FLAGS) $(CFLAGS) -o $(LIBNAME) $^
 
 # Library parts
-RF24.o: RF24.c	
+RF24_c.o: RF24_c.c	
 	$(CC) -fPIC $(CFLAGS) -c $^
 
 bcm2835.o: $(DRIVER_DIR)/bcm2835.c
@@ -118,7 +118,7 @@ ifeq ($(REMOTE),)
 	@exit 1
 endif
 	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo mkdir -p $(REMOTE_HEADER_DIR)/$(DRIVER_DIR)"
-	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p /tmp/RF24 && rm -rf /tmp/RF24/*"
+	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "mkdir -p /tmp/RF24_c && rm -rf /tmp/RF24/*"
 	@rsync -a --include="*.h" --include="*/" --exclude="*" -e "ssh -p $(REMOTE_PORT)" . $(REMOTE):/tmp/RF24
 	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/*.h $(REMOTE_HEADER_DIR)"
 	@ssh -q -t -p $(REMOTE_PORT) $(REMOTE) "sudo install -m 0644 /tmp/RF24/$(DRIVER_DIR)/*.h $(REMOTE_HEADER_DIR)/$(DRIVER_DIR)"

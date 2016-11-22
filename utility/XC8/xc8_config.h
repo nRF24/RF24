@@ -1,7 +1,7 @@
 
 #define _XTAL_FREQ  32000000
 
-#include<xc.h>
+//#include<xc.h>
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>

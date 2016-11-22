@@ -13,7 +13,7 @@ TMRh20 2014
  */
 
 #include <string.h>
-#include <RF24/RF24.h>
+#include <RF24_c/RF24_c.h>
 #include <unistd.h>
 
 //
