@@ -1,5 +1,6 @@
 
 /*
+ Copyright (c) 2016 Luis Claudio Gamboa Lopes <lcgamboa@yahoo.com>
  Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
 
  This program is free software; you can redistribute it and/or
@@ -16,7 +17,7 @@
 #define __RF24_CONFIG_H__
 
 #ifndef __cplusplus
-typedef unsigned char bool;
+//typedef unsigned char bool;
 #endif
 
   /*** USER DEFINES:  ***/  
