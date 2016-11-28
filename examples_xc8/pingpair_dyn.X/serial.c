@@ -26,30 +26,30 @@
 #include"xc8_config.h"
 
 
-#define B9600H ((_XTAL_FREQ/(16l*9600))-1)
-#define B9600L ((_XTAL_FREQ/(64l*9600))-1)
-
 
 void Serial_begin(unsigned long baud)
 {
-               //  brgh=1 baud=FOSC/16(X+1)
-               //  brgh=0 baud=FOSC/64(X+1)
-#if B9600H < 255   
-    SPBRG=B9600H; 
-    TXSTAbits.BRGH=1;  //high baud rate
-#else
-    SPBRG=B9600L; 
-    TXSTAbits.BRGH=0;  //low baud rate   
-#endif    
-      
+    TRISCbits.TRISC6=1;
+    TRISCbits.TRISC7=1;
+   
+    baud=((_XTAL_FREQ/(4*baud))-1);
+    
+    //          BRG16=0         BRG16=1
+    //BRGH=0 FOSC/[64(n+1)]    FOSC/[16(n+1)]
+    //BRGH=1 FOSC/[16(n+1)]    FOSC/[4(n+1)]
+ 
+    SPBRG= (0x00FF & baud); //baud rate de 115200 - 32MHz
+    SPBRGH=(0xFF00 & baud)>>8; 
+
 	//Configuracao da serial
     TXSTAbits.TX9=0;    //transmissao em 8 bits
-    TXSTAbits.TXEN=1;  //habilita transmissao
     TXSTAbits.SYNC=0;  //modo assincrono
-    RCSTAbits.SPEN=1;  //habilita porta serial - rx
+    TXSTAbits.BRGH=1;  //high baud rate
+    BAUDCONbits.BRG16=1; //16 bits baud rate
     RCSTAbits.RX9=0;   //recepcao em 8 bits
     RCSTAbits.CREN=1;  //recepcao continua
-
+    TXSTAbits.TXEN=1;  //habilita transmissao
+    RCSTAbits.SPEN=1;  //habilita porta serial - rx
 
 }
 
@@ -90,11 +90,24 @@ unsigned char Serial_rx(unsigned int timeout)
 
   while(((to < timeout)||(!timeout))&&(!PIR1bits.RCIF))
   {
-    __delay_ms(20);
+    delay(20);
     to+=20; 
   }
   if(PIR1bits.RCIF)
     return RCREG;
   else
     return 0xA5;
+}
+
+
+char buff[10];//for itoa
+
+const char * itoa_(uint32_t val)
+{
+#ifdef __XC8
+    ultoa(buff,val,10);
+#else
+    ultoa(val,buff,10);
+#endif    
+  return buff;
 }

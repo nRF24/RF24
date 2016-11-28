@@ -109,7 +109,7 @@ void SPI_notUsingInterrupt(uint8_t interruptNumber);
   // Before using SPI.transfer() or asserting chip select pins,
   // this function is used to gain exclusive access to the SPI bus
   // and configure the correct settings.
-void SPI_beginTransaction(SPISettings settings);
+void SPI_beginTransaction(SPISettings* settings);
 
   // Write to the SPI bus (MOSI pin) and also receive (MISO pin)
 uint8_t SPI_transfer(uint8_t data);
@@ -141,15 +141,6 @@ void SPI_setClockDivider(uint8_t clockDiv);
 void SPI_attachInterrupt();
 void SPI_detachInterrupt(); 
 
-//others
 
-void digitalWrite(uint8_t pin,uint8_t mode);
-void pinMode(uint8_t pin,uint8_t mode);
-
-uint8_t digitalRead(uint8_t pin);
-long millis(void);
-
-void delay(uint8_t d);
-void delayMicroseconds(uint8_t d);
 
 #endif

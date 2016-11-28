@@ -1,0 +1,48 @@
+// File: 18f4620_g.lkr
+// Generic linker script for the PIC18F4620 processor
+// Build date : Aug 07 2014
+
+LIBPATH .
+
+FILES libc18f.lib
+ 
+
+CODEPAGE   NAME=page       START=0x0               END=0xFFFF
+CODEPAGE   NAME=idlocs     START=0x200000          END=0x200007       PROTECTED
+CODEPAGE   NAME=config     START=0x300000          END=0x30000D       PROTECTED
+CODEPAGE   NAME=devid      START=0x3FFFFE          END=0x3FFFFF       PROTECTED
+CODEPAGE   NAME=eedata     START=0xF00000          END=0xF003FF       PROTECTED
+
+#IFDEF _EXTENDEDMODE
+  DATABANK   NAME=gpre       START=0x0               END=0x5F
+  ACCESSBANK NAME=accessram  START=0x60              END=0x7F
+#ELSE
+  ACCESSBANK NAME=accessram  START=0x0               END=0x7F
+#FI
+
+DATABANK   NAME=gpr0       START=0x80              END=0xFF
+DATABANK   NAME=gpr1       START=0x100             END=0x1FF
+DATABANK   NAME=gpr2       START=0x200             END=0x2FF
+DATABANK   NAME=gpr3       START=0x300             END=0x3FF
+DATABANK   NAME=gpr4       START=0x400             END=0x4FF
+DATABANK   NAME=gpr5       START=0x500             END=0x5FF
+DATABANK   NAME=gpr6       START=0x600             END=0x6FF
+DATABANK   NAME=gpr7       START=0x700             END=0x7FF
+DATABANK   NAME=gpr8       START=0x800             END=0x8FF
+DATABANK   NAME=gpr9       START=0x900             END=0x9FF
+DATABANK   NAME=gpr10      START=0xA00             END=0xAFF
+DATABANK   NAME=gpr11      START=0xB00             END=0xBFF
+DATABANK   NAME=gpr12      START=0xC00             END=0xCFF
+DATABANK   NAME=gpr13      START=0xD00             END=0xDFF
+DATABANK   NAME=gpr14      START=0xE00             END=0xEFF
+DATABANK   NAME=gpr15      START=0xF00             END=0xF7F
+ACCESSBANK NAME=accesssfr  START=0xF80             END=0xFFF          PROTECTED
+
+#IFDEF _CRUNTIME
+  SECTION    NAME=CONFIG     ROM=config
+  #IFDEF _DEBUGSTACK
+    STACK SIZE=0x100 RAM=gpr13
+  #ELSE
+    STACK SIZE=0x100 RAM=gpr14
+  #FI
+#FI

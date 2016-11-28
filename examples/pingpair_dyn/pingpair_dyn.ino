@@ -13,7 +13,7 @@
  */
 
 #include "nRF24L01.h"
-#include "RF24.h"
+#include "RF24_c.h"
 
 //
 // Hardware configuration
@@ -32,7 +32,7 @@ const int role_pin = 5;
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+const raddr_t pipes[2] = {{{0xF0,0xF0,0xF0,0xF0,0xE1}}, {{0xF0,0xF0,0xF0,0xF0,0xD2}}};
 
 //
 // Role management
@@ -66,6 +66,7 @@ char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating 
 
 void setup(void)
 {
+  
   //
   // Role
   //
@@ -87,7 +88,7 @@ void setup(void)
   //
 
   Serial.begin(115200);
-  
+   
   Serial.println(F("RF24/examples/pingpair_dyn/"));
   Serial.print(F("ROLE: "));
   Serial.println(role_friendly_name[role]);
@@ -135,10 +136,12 @@ void setup(void)
   //
 
   RF24_printDetails(&radio);
+
 }
 
 void loop(void)
 {
+
   //
   // Ping out role.  Repeatedly send the current time
   //

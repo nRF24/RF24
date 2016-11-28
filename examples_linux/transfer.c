@@ -62,7 +62,7 @@ RF24 radio;
 /**************************************************************/
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
+const raddr_t addresses[2][5] = { {0xAB,0xCD,0xAB,0xCD,0x71}, {0x54,0x4d,0x52,0x68,0x7C} };
 
 
 uint8_t data[32];
@@ -70,8 +70,9 @@ unsigned long startTime, stopTime, counter, rxTimer=0;
 
 int main(int argc, char** argv){
 
-  bool role_ping_out = 1, role_pong_back = 0;
-  bool role = 0;
+  uint8_t role_ping_out = 1, role_pong_back = 0;
+  uint8_t role = 0;
+  uint8_t i;
 
   RF24_init2(&radio,RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
@@ -117,7 +118,7 @@ int main(int argc, char** argv){
     }
 
 
-  for(int i=0; i<32; i++){
+  for(i=0; i<32; i++){
      data[i] = rand() % 255;               			//Load the buffer with random data
   }
 
@@ -133,7 +134,7 @@ int main(int argc, char** argv){
 		// unsigned long pauseTime = millis();		//Uncomment if autoAck == 1 ( NOACK )
 		startTime = millis();
 	
-		for(int i=0; i<cycles; i++){        		//Loop through a number of cycles
+		for(i=0; i<cycles; i++){        		//Loop through a number of cycles
       			data[0] = i;                        //Change the first byte of the payload for identification
       			if(!RF24_writeFast(&radio,&data,32)){     //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads

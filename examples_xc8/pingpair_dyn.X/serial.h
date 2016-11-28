@@ -28,3 +28,5 @@ void Serial_tx(const unsigned char val);
 void Serial_print(const char* val);
 void Serial_println(const char* val);
 unsigned char Serial_rx(unsigned int timeout);  /*timeout=0 no time out*/ 
+
+const char * itoa_(uint32_t val);

@@ -13,11 +13,11 @@
  */
 
 #include "nRF24L01.h"
-#include "RF24.h"
+#include "RF24_c.h"
 
 #include "serial.h"
 
-char buff[10];//for itoa
+
 
 //for serial printf
 void 
@@ -25,6 +25,9 @@ putch(char c)
 {
   Serial_tx(c);  
 }
+
+
+
 
 //
 // Hardware configuration
@@ -45,7 +48,7 @@ const char role_pin = 34;
 // Radio pipe addresses for the 2 nodes to communicate.
 
 //LSB first for xc8!
-const uint8_t pipes[2][5] = { {0xE1, 0xF0, 0xF0, 0xF0, 0xF0},{0xD2, 0xF0, 0xF0, 0xF0, 0xF0} };
+const raddr_t pipes[2][5]= { {0xF0, 0xF0, 0xF0, 0xF0,0xE1},{0xF0, 0xF0, 0xF0, 0xF0, 0xD2} };
 
 //
 // Role management
@@ -75,7 +78,8 @@ const int max_payload_size = 32;
 const int payload_size_increments_by = 1;
 int next_payload_size = 4;//min_payload_size;
 
-char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
+//char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
+char receive_payload[32+1];
 
 void setup(void)
 {
@@ -130,13 +134,13 @@ void setup(void)
 
   if ( role == role_ping_out )
   {
-    RF24_openWritingPipe(&radio,pipes[0]);
-    RF24_openReadingPipe(&radio,1,pipes[1]);
+    RF24_openWritingPipe_d(&radio,pipes[0]);
+    RF24_openReadingPipe_d(&radio,1,pipes[1]);
   }
   else
   {
-    RF24_openWritingPipe(&radio,pipes[1]);
-    RF24_openReadingPipe(&radio,1,pipes[0]);
+    RF24_openWritingPipe_d(&radio,pipes[1]);
+    RF24_openReadingPipe_d(&radio,1,pipes[0]);
   }
 
   //
@@ -162,21 +166,23 @@ void loop(void)
   {
     // The payload will always be the same, what will change is how much of it we send.
     static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
-
+    unsigned long started_waiting_at;
+    unsigned char timeout;
+    
     // First, stop listening so we can talk.
     RF24_stopListening(&radio);
 
     // Take the time, and send it.  This will block until complete
     Serial_print(F("Now sending length "));
-    Serial_println(itoa(buff,next_payload_size,10));
+    Serial_println(itoa_(next_payload_size));
     RF24_write(&radio,send_payload, next_payload_size );
 
     // Now, continue listening
     RF24_startListening(&radio);
 
     // Wait here until we get a response, or timeout
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
+    started_waiting_at = millis();
+    timeout = false;
     while ( ! RF24_available(&radio) && ! timeout )
       if (millis() - started_waiting_at > 500 )
         timeout = true;
@@ -203,9 +209,9 @@ void loop(void)
 
       // Spew it
       Serial_print(F("Got response size="));
-      Serial_print(itoa(buff,len,10));
+      Serial_print(itoa_(len));
       Serial_print(F(" value="));
-      Serial_println(itoa(buff,receive_payload[0],10));
+      Serial_println(itoa_(receive_payload[0]));
     }
     
     // Update size for next time.
@@ -242,7 +248,7 @@ void loop(void)
 
       // Spew it
       Serial_print(F("Got response size="));
-      Serial_print(itoa(buff,len,10));
+      Serial_print(itoa_(len));
       Serial_print(F(" value="));
       Serial_println(receive_payload);
 

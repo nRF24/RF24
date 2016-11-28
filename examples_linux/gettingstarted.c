@@ -74,7 +74,7 @@ RF24 radio;
 
 /********** User Config *********/
 // Assign a unique identifier for this node, 0 or 1
-bool radioNumber = 1;
+uint8_t radioNumber = 1;
 
 /********************************/
 
@@ -84,8 +84,8 @@ const uint8_t pipes[][6] = {"1Node","2Node"};
 
 int main(int argc, char** argv){
 
-  bool role_ping_out = 1, role_pong_back = 0;
-  bool role = role_pong_back;
+  uint8_t role_ping_out = 1, role_pong_back = 0;
+  uint8_t role = role_pong_back;
 
   RF24_init(&radio,22,0);
 
@@ -144,7 +144,7 @@ int main(int argc, char** argv){
 			printf("Now sending...\n");
 			unsigned long time = millis();
 
-			bool ok = RF24_write(&radio, &time, sizeof(unsigned long) );
+			uint8_t ok = RF24_write(&radio, &time, sizeof(unsigned long) );
 
 			if (!ok){
 				printf("failed.\n");
@@ -154,7 +154,7 @@ int main(int argc, char** argv){
 
 			// Wait here until we get a response, or timeout (250ms)
 			unsigned long started_waiting_at = millis();
-			bool timeout = 0;
+			uint8_t timeout = 0;
 			while ( ! RF24_available(&radio) && ! timeout ) {
 				if (millis() - started_waiting_at > 200 )
 					timeout = 1;

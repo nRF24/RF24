@@ -6,7 +6,7 @@
 
 # Macros
 TOP=`pwd`
-CND_CONF=default
+CND_CONF=sdcc
 CND_DISTDIR=dist
 TMPDIR=build/${CND_CONF}/${IMAGE_TYPE}/tmp-packaging
 TMPDIRNAME=tmp-packaging

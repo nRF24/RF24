@@ -55,10 +55,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
 /*
  * 5 bytes Radio Address
  */
-typedef struct
-{
-unsigned char bytes[5];
-}raddr_t;
+typedef unsigned char raddr_t;
 
 
   /**
@@ -905,7 +902,7 @@ s   *
    * @param number Which pipe# to open, 0-5.
    * @param address The 40-bit address of the pipe to open.
    */
-  void RF24_openReadingPipe_d(RF24 *rf, uint8_t number, raddr_t address);
+  void RF24_openReadingPipe_d(RF24 *rf, uint8_t number,const  raddr_t* address);
 
   /**
    * Open a pipe for writing
@@ -920,7 +917,7 @@ s   *
    * @param address The 40-bit address of the pipe to open.
    */
 
-  void RF24_openWritingPipe_d(RF24 *rf, raddr_t address);
+  void RF24_openWritingPipe_d(RF24 *rf, const raddr_t* address);
 
   /**
    * @name Low-level internal interface.

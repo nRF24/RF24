@@ -1,12 +1,11 @@
 
 #define _XTAL_FREQ  32000000
 
-//#include<xc.h>
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#ifdef __XC8 
+#include<xc.h>
 
 typedef  unsigned char bool;
+
 typedef  char int8_t;
 typedef  unsigned char uint8_t;
 
@@ -16,11 +15,24 @@ typedef  unsigned int uint16_t;
 typedef  long int32_t;
 typedef  unsigned long uint32_t;
 
-typedef  long long int64_t;
-typedef  unsigned long long uint64_t;
-
 
 typedef unsigned int size_t;
+#define __asm #asm
+#define __endasm  #endasm
+
+#else
+#include <pic18fregs.h>
+#define _18F4620
+void *malloc(unsigned int size);
+void free(void *dat);
+void *realloc(void *dat, unsigned int size);
+#endif
+
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+
+
 
 #define LOW  0
 #define HIGH 1
@@ -55,3 +67,15 @@ typedef unsigned int size_t;
   #endif
   
 extern unsigned long mtime;//for millis
+
+
+//functions below in spi.c
+
+void digitalWrite(uint8_t pin,uint8_t mode);
+void pinMode(uint8_t pin,uint8_t mode);
+
+uint8_t digitalRead(uint8_t pin);
+long millis(void);
+
+void delay(uint16_t d);
+void delayMicroseconds(uint8_t d);

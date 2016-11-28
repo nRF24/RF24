@@ -63,7 +63,7 @@ RF24 radio;
 
 /********** User Config *********/
 // Assign a unique identifier for this node, 0 or 1. Arduino example uses radioNumber 0 by default.
-bool radioNumber = 1;
+uint8_t radioNumber = 1;
 
 /********************************/
 
@@ -71,7 +71,7 @@ bool radioNumber = 1;
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint8_t addresses[][6] = {"1Node","2Node"};
 
-bool role_ping_out = 1, role_pong_back = 0, role = 0;
+uint8_t role_ping_out = 1, role_pong_back = 0, role = 0;
 uint8_t counter = 1;                                                          // A single byte to keep track of the data being sent back and forth
 
 

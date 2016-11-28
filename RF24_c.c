@@ -1138,17 +1138,17 @@ void RF24_whatHappened(RF24 *rf, uint8_t * tx_ok,uint8_t * tx_fail,uint8_t * rx_
 
 /****************************************************************************/
 
-void RF24_openWritingPipe_d(RF24 *rf, raddr_t  value_)
+void RF24_openWritingPipe_d(RF24 *rf, const raddr_t*  value_)
 {
   uint8_t i;
-  raddr_t value;
+  raddr_t value[5];
   for(i=0;i<5;i++)
   {
-    value.bytes[i]=value_.bytes[4-i];
+    value[i]=value_[4-i];
   }
   
-  RF24_write_register_c_d(rf,RX_ADDR_P0, ((uint8_t*)(value.bytes)), rf->addr_width);
-  RF24_write_register_c_d(rf,TX_ADDR, ((uint8_t*)(value.bytes)), rf->addr_width);
+  RF24_write_register_c_d(rf,RX_ADDR_P0, ((uint8_t*)(value)), rf->addr_width);
+  RF24_write_register_c_d(rf,TX_ADDR, ((uint8_t*)(value)), rf->addr_width);
   
   
   //const uint8_t max_payload_size = 32;
@@ -1181,28 +1181,28 @@ static const uint8_t child_payload_size[] PROGMEM =
 };
 
 
-void RF24_openReadingPipe_d(RF24 *rf, uint8_t child, raddr_t address_)
+void RF24_openReadingPipe_d(RF24 *rf, uint8_t child, const raddr_t* address_)
 {
   uint8_t i;
-  raddr_t address;
+  raddr_t address[5];
   for(i=0;i<5;i++)
   {
-    address.bytes[i]=address_.bytes[4-i];
+    address[i]=address_[4-i];
   }
   // If this is pipe 0, cache the address.  This is needed because
   // openWritingPipe() will overwrite the pipe 0 address, so
   // startListening() will have to restore it.
   if (child == 0){
-    memcpy(rf->pipe0_reading_address,address.bytes,rf->addr_width);
+    memcpy(rf->pipe0_reading_address,address,rf->addr_width);
   }
 
   if (child <= 6)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      RF24_write_register_c_d(rf,pgm_read_byte(&child_pipe[child]), (const uint8_t*)(address.bytes), rf->addr_width);
+      RF24_write_register_c_d(rf,pgm_read_byte(&child_pipe[child]), (const uint8_t*)(address), rf->addr_width);
     else
-      RF24_write_register_c_d(rf,pgm_read_byte(&child_pipe[child]), (const uint8_t*)(address.bytes), 1);
+      RF24_write_register_c_d(rf,pgm_read_byte(&child_pipe[child]), (const uint8_t*)(address), 1);
 
     RF24_write_register_d(rf,pgm_read_byte(&child_payload_size[child]),rf->payload_size);
 

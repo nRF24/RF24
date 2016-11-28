@@ -64,7 +64,7 @@ RF24 radio;
 /**************************************************************/
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+const raddr_t pipes[2][5] = { {0xF0,0xF0,0xF0,0xF0,0xE1}, {0xF0,0xF0,0xF0,0xF0,0xD2} };
 
 
 
@@ -77,8 +77,8 @@ char receive_payload[33/*max_payload_size+1*/]; // +1 to allow room for a termin
 
 int main(int argc, char** argv){
 
-  bool role_ping_out = 1, role_pong_back = 0;
-  bool role = 0;
+  uint8_t role_ping_out = 1, role_pong_back = 0;
+  uint8_t role = 0;
 
   RF24_init(&radio,RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24/*, BCM2835_SPI_SPEED_8MHZ*/ );
 
@@ -142,7 +142,7 @@ if (role == role_ping_out)
 
     // Wait here until we get a response, or timeout
     unsigned long started_waiting_at = millis();
-    bool timeout = 0;
+    uint8_t timeout = 0;
     while ( ! RF24_available(&radio) && ! timeout )
       if (millis() - started_waiting_at > 500 )
         timeout = 1;

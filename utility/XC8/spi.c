@@ -49,8 +49,9 @@ void pinMode(uint8_t pin,uint8_t mode)
     case 38: TRISBbits.RB5=mode; break;
     case 39: TRISBbits.RB6=mode; break;
     case 40: TRISBbits.RB7=mode; break;
+    default: break;
   }
-};
+}
 
 void digitalWrite(uint8_t pin,uint8_t mode)
 {
@@ -96,13 +97,15 @@ void digitalWrite(uint8_t pin,uint8_t mode)
     case 38: LATBbits.LATB5=mode; break;
     case 39: LATBbits.LATB6=mode; break;
     case 40: LATBbits.LATB7=mode; break;
+    default: break;
   }
-};
+}
 
 
 uint8_t digitalRead(uint8_t pin)
 {
   uint8_t ret =0;  
+  
   switch(pin)
   {
     case 1: ret= PORTEbits.RE3; break;
@@ -145,56 +148,60 @@ uint8_t digitalRead(uint8_t pin)
     case 38: ret= PORTBbits.RB5; break;
     case 39: ret= PORTBbits.RB6; break;
     case 40: ret= PORTBbits.RB7; break;
+    default: break;
   }
   
-  return ret;
-};
+  return ret;  
+}
 
 long millis(void)
 {
     return mtime;
-};
+}
 
 
-#define NREP (_XTAL_FREQ/(4000l*50)) //ciclos para 1 ms usando 50 instruções
-
+#define NREP (_XTAL_FREQ/(4000l*10)) 
 //ms delay
-void delay(uint8_t val)
+void delay(uint16_t val)
 {
 unsigned int  i;
-volatile unsigned char j1;
-volatile unsigned char j2=0;
+unsigned int j;
 
  for (i =0; i< val; i++)
- {  
-    j1=NREP; //2 ciclos
-    #asm                      ; para j2=9 e j1 =20 numero de execuções e ciclos
-l1: MOVLW 9                   ; 20                j1  
-    MOVWF delay@j2        ; 20                j1 
-    NOP                       ; 180       j2j1
-    NOP                       ; 180       j2j1
-    DECFSZ delay@j2, F    ; 160       j2j1   -j1
-                              ; 40               2j1
-    GOTO $-3                  ; 320      2j2j1  -2j1 
-    NOP                       ; 20                j1 
-    DECFSZ delay@j1, F    ; 19                j1    -1
-                              ; 2                        2
-    GOTO l1                   ; 38               2j1    -2 
-    NOP                       ; 1                        1
-    #endasm;
-//                                            5j2j1+5J1-0=ciclos
-//                              para j2=9     50j1=ciclos 
+ {
+ 
+  for (j =0 ; j < NREP; j++)
+   {
+    __asm
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+    NOP
+	NOP
+	NOP
+	NOP
+	NOP
+    __endasm;
+   }
  }
 }
 
 
+#define UNREP (_XTAL_FREQ/(4000000l))
 
 void delayMicroseconds(uint8_t d)
 {
-    int i; 
+    unsigned int i,j; 
     for(i=0;i<d;i++)
-      __delay_us(1);  
-};
+      for (j =0 ; j < UNREP; j++)
+      {
+       __asm
+	   NOP
+      __endasm;
+   }
+}
 
 
 
@@ -213,7 +220,7 @@ void SPI_begin(void)
     SSPSTATbits.SMP=0;//0
     SSPCON1bits.SSPM=1;// FOSC/16
     SSPCON1bits.SSPEN=1;
-};
+}
 
 uint8_t SPI_transfer(uint8_t data)
 {
@@ -221,5 +228,5 @@ uint8_t SPI_transfer(uint8_t data)
     SSPBUF = data;  // Put value into SPI buffer
     while (!SSPSTATbits.BF);         // Wait for the transfer to finish
     return SSPBUF;
-};
+}
         
