@@ -16,10 +16,6 @@
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
 
-#ifndef __cplusplus
-//typedef unsigned char bool;
-#endif
-
   /*** USER DEFINES:  ***/  
   //#define FAILURE_HANDLING
   //#define SERIAL_DEBUG
@@ -41,7 +37,7 @@
   #define XMEGA
   #define XMEGA_D3
   #include "utility/ATXMegaD3/RF24_arch_config.h"
-#elif ( defined (__XC8) ) // microchip XC8 compiler
+#elif ( defined (__XC8) || defined (__SDCC_pic16)) // microchip XC8 compiler ans sdcc
 
   #include "utility/XC8/xc8_config.h"
   #include "utility/XC8/spi.h"
@@ -197,9 +193,9 @@ typedef struct RF24
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
 #endif  
-  bool p_variant; /* False for RF24L01 and true for RF24L01P */
+  uint8_t p_variant; /* False for RF24L01 and true for RF24L01P */
   uint8_t payload_size; /**< Fixed size of payloads */
-  bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
+  uint8_t dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
   uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
   uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
   /**
@@ -228,10 +224,11 @@ typedef struct RF24
   uint32_t csDelay;
 
   //#if defined (FAILURE_HANDLING)
-    bool RF24_failureDetected; 
+    uint8_t RF24_failureDetected; 
   //#endif
 
   }RF24;
+  
 
 #endif // __RF24_CONFIG_H__
 
