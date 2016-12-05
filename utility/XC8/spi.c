@@ -9,7 +9,7 @@ void pinMode(uint8_t pin,uint8_t mode)
 {
   switch(pin)
   {
-    case 1: TRISEbits.RE3=mode; break;
+    //case 1: TRISEbits.RE3=mode; break;
     case 2: TRISAbits.RA0=mode; break;
     case 3: TRISAbits.RA1=mode; break;
     case 4: TRISAbits.RA2=mode; break;
@@ -21,18 +21,24 @@ void pinMode(uint8_t pin,uint8_t mode)
     case 10: TRISEbits.RE2=mode; break;
     //case 11: VDD; break;
     //case 12: VSS; break;
+    #ifdef _18F4620
     case 13: TRISAbits.RA7=mode; break;
+    #endif
     case 14: TRISAbits.RA6=mode; break;
     case 15: TRISCbits.RC0=mode; break;
     case 16: TRISCbits.RC1=mode; break;
     case 17: TRISCbits.RC2=mode; break;
+    #ifdef _18F4620
     case 18: TRISCbits.RC3=mode; break;
+    #endif 
     case 19: TRISDbits.RD0=mode; break;
     case 20: TRISDbits.RD1=mode; break;
     case 21: TRISDbits.RD2=mode; break;
     case 22: TRISDbits.RD3=mode; break;
+    #ifdef _18F4620
     case 23: TRISCbits.RC4=mode; break;
-    case 24: TRISCbits.RC5=mode; break;
+    case 24: TRISCbits.RC5=mode; break; 
+    #endif
     case 25: TRISCbits.RC6=mode; break;
     case 26: TRISCbits.RC7=mode; break;
     case 27: TRISDbits.RD4=mode; break;
@@ -69,18 +75,24 @@ void digitalWrite(uint8_t pin,uint8_t mode)
     case 10: LATEbits.LATE2=mode; break;
     //case 11: VDD; break;
     //case 12: VSS; break;
+    #ifdef _18F4620
     case 13: LATAbits.LATA7=mode; break;
+    #endif
     case 14: LATAbits.LATA6=mode; break;
     case 15: LATCbits.LATC0=mode; break;
     case 16: LATCbits.LATC1=mode; break;
     case 17: LATCbits.LATC2=mode; break;
+    #ifdef _18F4620
     case 18: LATCbits.LATC3=mode; break;
+    #endif
     case 19: LATDbits.LATD0=mode; break;
     case 20: LATDbits.LATD1=mode; break;
     case 21: LATDbits.LATD2=mode; break;
     case 22: LATDbits.LATD3=mode; break;
+    #ifdef _18F4620
     case 23: LATCbits.LATC4=mode; break;
     case 24: LATCbits.LATC5=mode; break;
+    #endif
     case 25: LATCbits.LATC6=mode; break;
     case 26: LATCbits.LATC7=mode; break;
     case 27: LATDbits.LATD4=mode; break;
@@ -120,12 +132,16 @@ uint8_t digitalRead(uint8_t pin)
     case 10: ret= PORTEbits.RE2; break;
     //case 11: VDD; break;
     //case 12: VSS; break;
+    #ifdef _18F4620
     case 13: ret= PORTAbits.RA7; break;
+    #endif 
     case 14: ret= PORTAbits.RA6; break;
     case 15: ret= PORTCbits.RC0; break;
     case 16: ret= PORTCbits.RC1; break;
     case 17: ret= PORTCbits.RC2; break;
+    #ifdef _18F4620
     case 18: ret= PORTCbits.RC3; break;
+    #endif
     case 19: ret= PORTDbits.RD0; break;
     case 20: ret= PORTDbits.RD1; break;
     case 21: ret= PORTDbits.RD2; break;
@@ -207,12 +223,21 @@ void delayMicroseconds(uint8_t d)
 
 void SPI_begin(void)
 {
+#ifdef _18F4550
+//RF_MISO 
+    TRISBbits.TRISB0=1; //33
+//RF_CLK  
+    TRISBbits.TRISB1=0; //34
+//RF_MOSI 
+    TRISCbits.TRISC7=0; //26   
+#else  //PIC18F4620  
 //RF_MISO 
     TRISCbits.TRISC4=1; 
 //RF_CLK  
     TRISCbits.TRISC3=0;
 //RF_MOSI 
     TRISCbits.TRISC5=0;
+#endif
     
     SSPCON1bits.SSPEN=0;
     SSPSTATbits.CKE=1;

@@ -1,6 +1,8 @@
 
 #define _XTAL_FREQ  32000000
 
+#define MINIMAL
+
 #ifdef __XC8 
 #include<xc.h>
 
@@ -31,8 +33,6 @@ void *realloc(void *dat, unsigned int size);
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-
-
 
 #define LOW  0
 #define HIGH 1
@@ -79,3 +79,5 @@ long millis(void);
 
 void delay(uint16_t d);
 void delayMicroseconds(uint8_t d);
+
+

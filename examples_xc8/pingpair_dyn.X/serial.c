@@ -25,7 +25,8 @@
 
 #include"xc8_config.h"
 
-
+#include<stdio.h>
+#include<stdlib.h>
 
 void Serial_begin(unsigned long baud)
 {
