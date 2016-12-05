@@ -4,7 +4,7 @@
 
 LIBPATH .
 
-FILES libc18f.lib
+FILES libc18f.lib 
  
 
 CODEPAGE   NAME=page       START=0x0               END=0xFFFF

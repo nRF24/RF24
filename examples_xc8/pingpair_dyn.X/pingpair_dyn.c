@@ -13,19 +13,19 @@
  */
 
 #include "nRF24L01.h"
-#include "RF24_c.h"
+#include "RF24_cg.h"
 
 #include "serial.h"
 
 
-
+/*
 //for serial printf
 void 
 putch(char c)
 {
   Serial_tx(c);  
 }
-
+*/
 
 
 
@@ -35,7 +35,7 @@ putch(char c)
 
 // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
-RF24 radio;
+//RF24 radio;
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -87,7 +87,7 @@ void setup(void)
   // Role
   //
 
-  RF24_init(&radio,36,35);
+  RF24_init(36,35);
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin,HIGH);
@@ -114,13 +114,13 @@ void setup(void)
   // Setup and configure rf radio
   //
 
-  RF24_begin(&radio);
+  RF24_begin();
 
   // enable dynamic payloads
-  RF24_enableDynamicPayloads(&radio);
+  RF24_enableDynamicPayloads();
 
   // optionally, increase the delay between retries & # of retries
-  RF24_setRetries(&radio,5,15);
+  RF24_setRetries(5,15);
 
 
   //
@@ -134,26 +134,26 @@ void setup(void)
 
   if ( role == role_ping_out )
   {
-    RF24_openWritingPipe_d(&radio,pipes[0]);
-    RF24_openReadingPipe_d(&radio,1,pipes[1]);
+    RF24_openWritingPipe_d(pipes[0]);
+    RF24_openReadingPipe_d(1,pipes[1]);
   }
   else
   {
-    RF24_openWritingPipe_d(&radio,pipes[1]);
-    RF24_openReadingPipe_d(&radio,1,pipes[0]);
+    RF24_openWritingPipe_d(pipes[1]);
+    RF24_openReadingPipe_d(1,pipes[0]);
   }
 
   //
   // Start listening
   //
 
-  RF24_startListening(&radio);
+  RF24_startListening();
 
   //
   // Dump the configuration of the rf unit for debugging
   //
 
-  RF24_printDetails(&radio);
+  //RF24_printDetails();
 }
 
 void loop(void)
@@ -170,20 +170,20 @@ void loop(void)
     unsigned char timeout;
     
     // First, stop listening so we can talk.
-    RF24_stopListening(&radio);
+    RF24_stopListening();
 
     // Take the time, and send it.  This will block until complete
     Serial_print(F("Now sending length "));
     Serial_println(itoa_(next_payload_size));
-    RF24_write(&radio,send_payload, next_payload_size );
+    RF24_write(send_payload, next_payload_size );
 
     // Now, continue listening
-    RF24_startListening(&radio);
+    RF24_startListening();
 
     // Wait here until we get a response, or timeout
     started_waiting_at = millis();
     timeout = false;
-    while ( ! RF24_available(&radio) && ! timeout )
+    while ( ! RF24_available() && ! timeout )
       if (millis() - started_waiting_at > 500 )
         timeout = true;
 
@@ -195,14 +195,14 @@ void loop(void)
     else
     {
       // Grab the response, compare, and send to debugging spew
-      uint8_t len = RF24_getDynamicPayloadSize(&radio);
+      uint8_t len = RF24_getDynamicPayloadSize();
       
       // If a corrupt dynamic payload is received, it will be flushed
       if(!len){
         return; 
       }
       
-      RF24_read(&radio,receive_payload, len );
+      RF24_read(receive_payload, len );
 
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
@@ -230,18 +230,18 @@ void loop(void)
   if ( role == role_pong_back )
   {
     // if there is data ready
-    while ( RF24_available(&radio) )
+    while ( RF24_available() )
     {
 
       // Fetch the payload, and see if this was the last one.
-      uint8_t len = RF24_getDynamicPayloadSize(&radio);
+      uint8_t len = RF24_getDynamicPayloadSize();
       
       // If a corrupt dynamic payload is received, it will be flushed
       if(!len){
         continue; 
       }
       
-      RF24_read(&radio,receive_payload, len );
+      RF24_read(receive_payload, len );
 
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
@@ -253,14 +253,14 @@ void loop(void)
       Serial_println(receive_payload);
 
       // First, stop listening so we can talk
-      RF24_stopListening(&radio);
+      RF24_stopListening();
 
       // Send the final one back.
-      RF24_write(&radio,receive_payload, len );
+      RF24_write(receive_payload, len );
       Serial_println(F("Sent response."));
 
       // Now, resume listening so we catch the next packets.
-      RF24_startListening(&radio);
+      RF24_startListening();
     }
   }
 }
