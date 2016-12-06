@@ -34,7 +34,7 @@
 //RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
 
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
-RF24 radio;
+//RF24 radio;
 
 /*** RPi Alternate ***/
 //Note: Specify SPI BUS 0 or 1 instead of CS pin number.
@@ -80,16 +80,16 @@ int main(int argc, char** argv){
   uint8_t role_ping_out = 1, role_pong_back = 0;
   uint8_t role = 0;
 
-  RF24_init(&radio,RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24/*, BCM2835_SPI_SPEED_8MHZ*/ );
+  RF24_init(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24/*, BCM2835_SPI_SPEED_8MHZ*/ );
 
   // Print preamble:
   printf( "RF24/examples/pingpair_dyn/\n");
 
   // Setup and configure rf radio
-  RF24_begin(&radio);
-  RF24_enableDynamicPayloads(&radio);
-  RF24_setRetries(&radio,5,15);
-  RF24_printDetails(&radio);
+  RF24_begin();
+  RF24_enableDynamicPayloads();
+  RF24_setRetries(5,15);
+  RF24_printDetails();
 
 
 /********* Role chooser ***********/
@@ -112,12 +112,12 @@ int main(int argc, char** argv){
 /***********************************/
 
     if ( role == role_ping_out )    {
-      RF24_openWritingPipe_d(&radio,pipes[0]);
-      RF24_openReadingPipe_d(&radio,1,pipes[1]);
+      RF24_openWritingPipe_d(pipes[0]);
+      RF24_openReadingPipe_d(1,pipes[1]);
     } else {
-      RF24_openWritingPipe_d(&radio,pipes[1]);
-      RF24_openReadingPipe_d(&radio,1,pipes[0]);
-      RF24_startListening(&radio);
+      RF24_openWritingPipe_d(pipes[1]);
+      RF24_openReadingPipe_d(1,pipes[0]);
+      RF24_startListening();
     }
 
 
@@ -131,19 +131,19 @@ if (role == role_ping_out)
     static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
 
     // First, stop listening so we can talk.
-    RF24_stopListening(&radio);
+    RF24_stopListening();
 
     // Take the time, and send it.  This will block until complete
     printf("Now sending length %i...",next_payload_size);
-    RF24_write(&radio, send_payload, next_payload_size );
+    RF24_write(send_payload, next_payload_size );
 
     // Now, continue listening
-    RF24_startListening(&radio);
+    RF24_startListening();
 
     // Wait here until we get a response, or timeout
     unsigned long started_waiting_at = millis();
     uint8_t timeout = 0;
-    while ( ! RF24_available(&radio) && ! timeout )
+    while ( ! RF24_available() && ! timeout )
       if (millis() - started_waiting_at > 500 )
         timeout = 1;
 
@@ -155,8 +155,8 @@ if (role == role_ping_out)
     else
     {
       // Grab the response, compare, and send to debugging spew
-      uint8_t len = RF24_getDynamicPayloadSize(&radio);
-      RF24_read(&radio, receive_payload, len );
+      uint8_t len = RF24_getDynamicPayloadSize();
+      RF24_read( receive_payload, len );
 
       // Put a zero at the end for easy printing
       receive_payload[len] = 0;
@@ -181,16 +181,16 @@ if (role == role_ping_out)
   if ( role == role_pong_back )
   {
     // if there is data ready
-    if ( RF24_available(&radio) )
+    if ( RF24_available() )
     {
       // Dump the payloads until we've gotten everything
       uint8_t len;
 
-      while (RF24_available(&radio))
+      while (RF24_available())
       {
         // Fetch the payload, and see if this was the last one.
-	len = RF24_getDynamicPayloadSize(&radio);
-	RF24_read(&radio, receive_payload, len );
+	len = RF24_getDynamicPayloadSize();
+	RF24_read( receive_payload, len );
 
 	// Put a zero at the end for easy printing
 	receive_payload[len] = 0;
@@ -200,14 +200,14 @@ if (role == role_ping_out)
       }
 
       // First, stop listening so we can talk
-      RF24_stopListening(&radio);
+      RF24_stopListening();
 
       // Send the final one back.
-      RF24_write(&radio, receive_payload, len );
+      RF24_write( receive_payload, len );
       printf("Sent response.\n\r");
 
       // Now, resume listening so we catch the next packets.
-      RF24_startListening(&radio);
+      RF24_startListening();
     }
   }
 }

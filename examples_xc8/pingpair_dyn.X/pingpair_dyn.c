@@ -13,7 +13,7 @@
  */
 
 #include "nRF24L01.h"
-#include "RF24_cg.h"
+#include "RF24_c.h"
 
 #include "serial.h"
 

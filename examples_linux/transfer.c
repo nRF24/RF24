@@ -32,7 +32,7 @@ TMRh20 2014
 //RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
 
 // Setup for GPIO 15 CE and CE0 CSN with SPI Speed @ 8Mhz
-RF24 radio;
+//RF24 radio;
 
 /*** RPi Alternate ***/
 //Note: Specify SPI BUS 0 or 1 instead of CS pin number.
@@ -74,20 +74,20 @@ int main(int argc, char** argv){
   uint8_t role = 0;
   uint8_t i;
 
-  RF24_init2(&radio,RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
+  RF24_init2(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
   // Print preamble:
 
   printf("RF24/examples/Transfer/\n");
 
-  RF24_begin(&radio);                           // Setup and configure rf radio
-  RF24_setChannel(&radio,1);
-  RF24_setPALevel(&radio,RF24_PA_MAX);
-  RF24_setDataRate(&radio,RF24_1MBPS);
-  RF24_setAutoAck(&radio,1);                     // Ensure autoACK is enabled
-  RF24_setRetries(&radio,2,15);                  // Optionally, increase the delay between retries & # of retries
-  RF24_setCRCLength(&radio,RF24_CRC_8);          // Use 8-bit CRC for performance
-  RF24_printDetails(&radio);
+  RF24_begin();                           // Setup and configure rf radio
+  RF24_setChannel(1);
+  RF24_setPALevel(RF24_PA_MAX);
+  RF24_setDataRate(RF24_1MBPS);
+  RF24_setAutoAck(1);                     // Ensure autoACK is enabled
+  RF24_setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
+  RF24_setCRCLength(RF24_CRC_8);          // Use 8-bit CRC for performance
+  RF24_printDetails();
 /********* Role chooser ***********/
 
   printf("\n ************ Role Setup ***********\n");
@@ -108,13 +108,13 @@ int main(int argc, char** argv){
 /***********************************/
 
     if ( role == role_ping_out )    {
-      RF24_openWritingPipe_d(&radio,addresses[1]);
-      RF24_openReadingPipe_d(&radio,1,addresses[0]);
-	  RF24_stopListening(&radio);
+      RF24_openWritingPipe_d(addresses[1]);
+      RF24_openReadingPipe_d(1,addresses[0]);
+	  RF24_stopListening();
     } else {
-      RF24_openWritingPipe_d(&radio,addresses[0]);
-      RF24_openReadingPipe_d(&radio,1,addresses[1]);
-      RF24_startListening(&radio);
+      RF24_openWritingPipe_d(addresses[0]);
+      RF24_openReadingPipe_d(1,addresses[1]);
+      RF24_startListening();
     }
 
 
@@ -136,7 +136,7 @@ int main(int argc, char** argv){
 	
 		for(i=0; i<cycles; i++){        		//Loop through a number of cycles
       			data[0] = i;                        //Change the first byte of the payload for identification
-      			if(!RF24_writeFast(&radio,&data,32)){     //Write to the FIFO buffers
+      			if(!RF24_writeFast(&data,32)){     //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
 
@@ -150,7 +150,7 @@ int main(int argc, char** argv){
 		}
 		stopTime = millis();
 
-		if(!RF24_txStandBy(&radio)){ counter+=3; }
+		if(!RF24_txStandBy()){ counter+=3; }
 
   		float numBytes = cycles*32;
    		float rate = numBytes / (stopTime - startTime);
@@ -163,8 +163,8 @@ int main(int argc, char** argv){
 
 
 if(role == role_pong_back){
-     while(RF24_available(&radio)){
-      RF24_read(&radio,&data,32);
+     while(RF24_available()){
+      RF24_read(&data,32);
       counter++;
      }
    if(millis() - rxTimer > 1000){

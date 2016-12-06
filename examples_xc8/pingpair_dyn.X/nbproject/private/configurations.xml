@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="62">
   <projectmakefile>Makefile</projectmakefile>
-  <defaultConf>1</defaultConf>
+  <defaultConf>0</defaultConf>
   <confs>
     <conf name="xc8" type="2">
       <platformToolSN></platformToolSN>

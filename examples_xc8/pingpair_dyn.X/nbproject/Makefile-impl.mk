@@ -27,7 +27,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 PROJECTNAME=pingpair_dyn.X
 
 # Active Configuration
-DEFAULTCONF=sdcc
+DEFAULTCONF=xc8
 CONF=${DEFAULTCONF}
 
 # All Configurations
