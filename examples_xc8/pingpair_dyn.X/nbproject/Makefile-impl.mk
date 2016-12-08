@@ -31,7 +31,7 @@ DEFAULTCONF=xc8
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=xc8 sdcc 
+ALLCONFS=xc8 sdcc xc8_P16F877A 
 
 
 # build
@@ -47,6 +47,7 @@ ALLCONFS=xc8 sdcc
 .clobber-impl: .clobber-pre .depcheck-impl
 	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=xc8 clean
 	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=sdcc clean
+	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=xc8_P16F877A clean
 
 
 
@@ -54,6 +55,7 @@ ALLCONFS=xc8 sdcc
 .all-impl: .all-pre .depcheck-impl
 	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=xc8 build
 	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=sdcc build
+	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=xc8_P16F877A build
 
 
 

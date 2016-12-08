@@ -18,3 +18,10 @@ CND_ARTIFACT_PATH_sdcc=dist/sdcc/production/pingpair_dyn.X.production.hex
 CND_PACKAGE_DIR_sdcc=${CND_DISTDIR}/sdcc/package
 CND_PACKAGE_NAME_sdcc=pingpairdyn.x.tar
 CND_PACKAGE_PATH_sdcc=${CND_DISTDIR}/sdcc/package/pingpairdyn.x.tar
+# xc8_P16F877A configuration
+CND_ARTIFACT_DIR_xc8_P16F877A=dist/xc8_P16F877A/production
+CND_ARTIFACT_NAME_xc8_P16F877A=pingpair_dyn.X.production.hex
+CND_ARTIFACT_PATH_xc8_P16F877A=dist/xc8_P16F877A/production/pingpair_dyn.X.production.hex
+CND_PACKAGE_DIR_xc8_P16F877A=${CND_DISTDIR}/xc8_P16F877A/package
+CND_PACKAGE_NAME_xc8_P16F877A=pingpairdyn.x.tar
+CND_PACKAGE_PATH_xc8_P16F877A=${CND_DISTDIR}/xc8_P16F877A/package/pingpairdyn.x.tar

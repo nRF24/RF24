@@ -28,30 +28,31 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void Serial_begin(unsigned long baud)
+void Serial_begin_(unsigned char baud)
 {
     TRISCbits.TRISC6=1;
     TRISCbits.TRISC7=1;
-   
-    baud=((_XTAL_FREQ/(4*baud))-1);
     
     //          BRG16=0         BRG16=1
     //BRGH=0 FOSC/[64(n+1)]    FOSC/[16(n+1)]
     //BRGH=1 FOSC/[16(n+1)]    FOSC/[4(n+1)]
  
-    SPBRG= (0x00FF & baud); //baud rate de 115200 - 32MHz
-    SPBRGH=(0xFF00 & baud)>>8; 
-
+    SPBRG=  baud; //baud rate de 115200 - 32MHz
+    //SPBRGH=(0xFF00 & baud)>>8; 
+    //BAUDCONbits.BRG16=1; //16 bits baud rate
+    
 	//Configuracao da serial
-    TXSTAbits.TX9=0;    //transmissao em 8 bits
-    TXSTAbits.SYNC=0;  //modo assincrono
-    TXSTAbits.BRGH=1;  //high baud rate
-    BAUDCONbits.BRG16=1; //16 bits baud rate
-    RCSTAbits.RX9=0;   //recepcao em 8 bits
-    RCSTAbits.CREN=1;  //recepcao continua
-    TXSTAbits.TXEN=1;  //habilita transmissao
-    RCSTAbits.SPEN=1;  //habilita porta serial - rx
-
+    //TXSTAbits.TX9=0;    //transmissao em 8 bits
+    //TXSTAbits.SYNC=0;  //modo assincrono
+    //TXSTAbits.BRGH=1;  //high baud rate
+    //TXSTAbits.TXEN=1;  //habilita transmissao
+    //CSRC TX9 TXEN SYNC SENDB BRGH TRMT TX9D
+    TXSTA=0b00100100; 
+    //RCSTAbits.RX9=0;   //recepcao em 8 bits
+    //RCSTAbits.CREN=1;  //recepcao continua
+    //RCSTAbits.SPEN=1;  //habilita porta serial - rx
+    //SPEN RX9 SREN CREN ADDEN FERR OERR RX9D
+    RCSTA=0b10010000;
 }
 
 

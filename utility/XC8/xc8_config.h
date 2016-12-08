@@ -23,12 +23,23 @@ typedef unsigned int size_t;
 #define __endasm  #endasm
 
 #else
+#ifdef __SDCC_pic16
 #include <pic18fregs.h>
-#define _18F4620
+#else
+#include <pic16fregs.h>
+#endif
 void *malloc(unsigned int size);
 void free(void *dat);
 void *realloc(void *dat, unsigned int size);
 #endif
+
+//hard coded pins
+#define csn_pin PORTBbits.RB2
+#define ce_pin PORTBbits.RB3
+
+#define csn_pin_t TRISBbits.TRISB2
+#define ce_pin_t TRISBbits.TRISB3
+
 
 #include<stdio.h>
 #include<string.h>
@@ -71,13 +82,14 @@ extern unsigned long mtime;//for millis
 
 //functions below in spi.c
 
-void digitalWrite(uint8_t pin,uint8_t mode);
-void pinMode(uint8_t pin,uint8_t mode);
+//void digitalWrite(uint8_t pin,uint8_t value);
+//void pinMode(uint8_t pin,uint8_t mode);
+//uint8_t digitalRead(uint8_t pin);
 
-uint8_t digitalRead(uint8_t pin);
 long millis(void);
 
 void delay(uint16_t d);
 void delayMicroseconds(uint8_t d);
+
 
 

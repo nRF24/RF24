@@ -23,7 +23,9 @@
    For e-mail suggestions :  lcgamboa@yahoo.com
    ######################################################################## */
 
-void Serial_begin(unsigned long baud);
+#define Serial_begin(x) Serial_begin_((_XTAL_FREQ/(16*x))-1)
+
+void Serial_begin_(unsigned char baud);
 void Serial_tx(const unsigned char val);
 void Serial_print(const char* val);
 void Serial_println(const char* val);

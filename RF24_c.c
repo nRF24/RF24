@@ -19,6 +19,7 @@
 //global object
 static RF24 rf;
 
+#if !defined(__XC8) && !defined(__SDCC)
 void RF24_csn_d( uint8_t mode)
 {
 
@@ -56,7 +57,7 @@ void RF24_csn_d( uint8_t mode)
 #endif
 
 #if !defined (RF24_LINUX)
-	digitalWrite(rf.csn_pin,mode);
+    digitalWrite(rf.csn_pin,mode);
 	delayMicroseconds(rf.csDelay);
 #endif
 
@@ -64,10 +65,12 @@ void RF24_csn_d( uint8_t mode)
 
 /****************************************************************************/
 
+
 void RF24_ce_d(uint8_t level)
 {
   //Allow for 3-pin use on ATTiny
   if (rf.ce_pin != rf.csn_pin) digitalWrite(rf.ce_pin,level);
+ 
 }
 
 /****************************************************************************/
@@ -88,6 +91,7 @@ void RF24_ce_d(uint8_t level)
 	#endif
   }
 
+ #endif //__XC8
 /****************************************************************************/
 
 uint8_t RF24_read_register_m_d(uint8_t reg, uint8_t* buf, uint8_t len)
@@ -412,7 +416,7 @@ void RF24_print_address_register_d( const char* name, uint8_t reg, uint8_t qty)
   {
     uint8_t* bufptr;
     
-#if defined(__XC8) || defined (__SDCC_pic16)
+#if defined(__XC8) || defined (__SDCC)
     uint8_t buffer[ADDR_WIDTH];
     #else
     uint8_t buffer[rf.addr_width];
@@ -430,10 +434,16 @@ void RF24_print_address_register_d( const char* name, uint8_t reg, uint8_t qty)
 #endif
 /****************************************************************************/
 
+#if defined(__XC8) || defined(__SDCC)   
+void RF24_init(void)
+{
+#else
 void RF24_init( uint8_t _cepin, uint8_t _cspin)
 {
+ 
   rf.ce_pin=_cepin;
   rf.csn_pin=_cspin;
+#endif  
   rf.p_variant=0;
   rf.payload_size=32;
   rf.dynamic_payloads_enabled=0;
@@ -637,13 +647,17 @@ uint8_t RF24_begin(void )
 	delay(200);
   #else
     // Initialize pins
+#if  defined(__XC8) || defined(__SDCC)
+    ce_pin_t=OUTPUT;
+    csn_pin_t=OUTPUT;
+#else    
     if (rf.ce_pin != rf.csn_pin) pinMode(rf.ce_pin,OUTPUT);  
   
     #if ! defined(LITTLEWIRE)
       if (rf.ce_pin != rf.csn_pin)
     #endif
         pinMode(rf.csn_pin,OUTPUT);
-    
+#endif    
     SPI_begin();
     RF24_ce_d(LOW);
   	RF24_csn_d(HIGH);
@@ -1419,8 +1433,11 @@ uint8_t RF24_testRPD(void)
   
 uint8_t RF24_isValid(void) 
 { 
+#if defined (__XC8) || defined(__SDCC)
+  return 1;
+#else    
   return rf.ce_pin != 0xff && rf.csn_pin != 0xff; 
-
+#endif
 }
 
 /****************************************************************************/

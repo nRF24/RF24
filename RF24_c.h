@@ -31,6 +31,71 @@ extern "C" {
 #endif
 
 /**
+ * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
+ */
+
+//RF24 struct
+typedef struct RF24
+{
+#ifdef SOFTSPI
+  SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
+#elif defined (SPI_UART)
+  SPIUARTClass uspi;
+#endif
+
+#if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
+  SPISettings spi; 
+#endif
+#if defined (MRAA)
+  GPIO gpio;
+#endif
+#if !defined(__XC8) && !defined(__SDCC)
+  uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
+  uint8_t csn_pin; /**< SPI Chip select */
+#endif
+  uint16_t spi_speed; /**< SPI Bus Speed */
+#if defined (RF24_LINUX) || defined (XMEGA_D3)
+  uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
+  uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
+#endif  
+  uint8_t p_variant; /* False for RF24L01 and true for RF24L01P */
+  uint8_t payload_size; /**< Fixed size of payloads */
+  uint8_t dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
+  uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
+  uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
+  /**
+  * 
+  * The driver will delay for this duration when stopListening() is called
+  * 
+  * When responding to payloads, faster devices like ARM(RPi) are much faster than Arduino:
+  * 1. Arduino sends data to RPi, switches to RX mode
+  * 2. The RPi receives the data, switches to TX mode and sends before the Arduino radio is in RX mode
+  * 3. If AutoACK is disabled, this can be set as low as 0. If AA/ESB enabled, set to 100uS minimum on RPi
+  *
+  * @warning If set to 0, ensure 130uS delay after stopListening() and before any sends
+  */
+  
+  uint32_t txDelay;
+
+  /**
+  * 
+  * On all devices but Linux and ATTiny, a small delay is added to the CSN toggling function
+  * 
+  * This is intended to minimise the speed of SPI polling due to radio commands
+  *
+  * If using interrupts or timed requests, this can be set to 0 Default:5
+  */
+  
+  uint32_t csDelay;
+
+  //#if defined (FAILURE_HANDLING)
+    uint8_t RF24_failureDetected; 
+  //#endif
+
+  }RF24;
+  
+
+/**
  * Power Amplifier level.
  *
  * For use with setPALevel()
@@ -58,16 +123,6 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
 typedef unsigned char raddr_t;
 
 
-  /**
-   * SPI transactions
-   *
-   * Common code for SPI transactions including CSN toggle
-   *
-   */
-   void RF24_beginTransaction(void);
-
-   void RF24_endTransaction(void);
-
 
   /**
    * @name Primary public interface
@@ -84,7 +139,11 @@ typedef unsigned char raddr_t;
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
    */
+#if defined(__XC8) || defined(__SDCC) 
+  void RF24_init(void);
+#else
   void RF24_init( uint8_t _cepin, uint8_t _cspin);
+#endif  
   //#if defined (RF24_LINUX)
   
     /**
@@ -927,6 +986,14 @@ s   *
    *  may want to extend this class.
    */
 
+
+
+#if defined(__XC8) || defined(__SDCC) 
+  #define RF24_csn_d(val) csn_pin=val
+  #define RF24_ce_d(val)  ce_pin=val
+  #define RF24_beginTransaction() csn_pin=LOW;
+  #define RF24_endTransaction()  csn_pin=HIGH; 
+#else
   /**
    * Set chip select pin
    *
@@ -946,6 +1013,18 @@ s   *
    * for a much more detailed description of this pin.
    */
   void RF24_ce_d( uint8_t level);
+  
+  /**
+   * SPI transactions
+   *
+   * Common code for SPI transactions including CSN toggle
+   *
+   */
+   void RF24_beginTransaction(void);
+
+   void RF24_endTransaction(void);
+
+#endif //__XC8
 
   /**
    * Read a chunk of data in from a register

@@ -27,26 +27,29 @@
 #ifndef CONFIG_H
 #define	CONFIG_H
 
+#if defined(__SDCC_PIC18F4620)
+#define _18F4620
+#endif
 
-#ifdef _18F452
+#if defined(_18F452)
 #include"config_452.h"
 #endif
-#ifdef _18F4520
+#if defined(_18F4520)
 #include"config_4520.h"
 #endif
-#ifdef _18F4620
+#if defined(_18F4620)  
 #include"config_4620.h"
 #endif
-#ifdef _18F4550
+#if defined(_18F4550)
 #include"config_4550.h"
 #endif
-#ifdef _16F877A
+#if defined(_16F877A)
 #include"config_877A.h"
 #endif
-#ifdef _16F777
+#if defined(_16F777)
 #include"config_777.h"
 #endif
-#ifdef _18F45K50
+#if defined(_18F45K50)
 #include"config_45k50.h"
 #endif
 

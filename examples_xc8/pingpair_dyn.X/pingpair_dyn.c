@@ -39,7 +39,7 @@ putch(char c)
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const char role_pin = 34;
+//const char role_pin = 34;
 
 //
 // Topology
@@ -47,7 +47,6 @@ const char role_pin = 34;
 
 // Radio pipe addresses for the 2 nodes to communicate.
 
-//LSB first for xc8!
 const raddr_t pipes[2][5]= { {0xF0, 0xF0, 0xF0, 0xF0,0xE1},{0xF0, 0xF0, 0xF0, 0xF0, 0xD2} };
 
 //
@@ -73,28 +72,29 @@ role_e role;
 // Payload
 //
 
-const int min_payload_size = 4;
-const int max_payload_size = 32;
-const int payload_size_increments_by = 1;
-int next_payload_size = 4;//min_payload_size;
+#define min_payload_size  4
+#define max_payload_size  32
+#define payload_size_increments_by  1
 
-//char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
-char receive_payload[32+1];
+char next_payload_size = min_payload_size;
+
+char receive_payload[max_payload_size+1]; // +1 to allow room for a terminating NULL char
 
 void setup(void)
 {
   //
   // Role
   //
-
-  RF24_init(36,35);
+  RF24_init();//pins are defined in xc8_config.h
   // set up the role pin
-  pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,HIGH);
+  //pinMode(role_pin, INPUT);
+  TRISBbits.TRISB1=INPUT;
+  //digitalWrite(role_pin,HIGH);
+  PORTBbits.RB1=HIGH;
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
-  if ( digitalRead(role_pin) )
+  if ( PORTBbits.RB1/*digitalRead(role_pin)*/ )
     role = role_ping_out;
   else
     role = role_pong_back;
