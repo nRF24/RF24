@@ -40,10 +40,6 @@
 #define RF24_SPIDEV_SPEED 8000000
 #endif
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-
-using namespace std;
-
 class SPI {
 public:
 	
@@ -59,10 +55,10 @@ public:
 	
 	/**
 	* Transfer a single byte
-	* @param tx_ Byte to send
+	* @param tx Byte to send
 	* @return Data returned via spi
 	*/
-	uint8_t transfer(uint8_t tx_);
+	uint8_t transfer(uint8_t tx);
 	
 	/**
 	* Transfer a buffer of data
@@ -84,7 +80,7 @@ public:
 private:
 
 	/** Default SPI device */
-	string device;
+    std::string device;
 	/** SPI Mode set */
 	uint8_t mode;
 	/** word size*/
