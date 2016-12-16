@@ -782,6 +782,15 @@ s   *
   void enableDynamicPayloads(void);
   
   /**
+   * Disable dynamically-sized payloads
+   *
+   * This disables dynamic payloads on ALL pipes. Since Ack Payloads
+   * requires Dynamic Payloads, Ack Payloads are also disabled.
+   *
+   */
+  void disableDynamicPayloads(void);
+  
+  /**
    * Enable dynamic ACKs (single write multicast or unicast) for chosen messages
    *
    * @note To enable full multicast or per-pipe multicast, use setAutoAck()
