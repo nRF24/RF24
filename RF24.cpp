@@ -667,6 +667,7 @@ bool RF24::begin(void)
   toggle_features();
   write_register(FEATURE,0 );
   write_register(DYNPD,0);
+  dynamic_payloads_enabled = false;
 
   // Reset current status
   // Notice reset and flush is the last thing we do
