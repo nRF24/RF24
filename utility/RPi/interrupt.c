@@ -23,7 +23,7 @@ see <http://www.gnu.org/licenses/>
 
 #define delay(x) bcm2835_delay(x)
 
-static pthread_mutex_t pinMutex ;
+static pthread_mutex_t pinMutex = PTHREAD_MUTEX_INITIALIZER;
 static volatile int    pinPass = -1 ;
 
 pthread_t threadId [64];

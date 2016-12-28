@@ -7,15 +7,7 @@
     "type": "git",
     "url": "https://github.com/TMRh20/RF24.git"
   },
-  "include": [
-    "*.h",
-    "*.c",
-    "*.cpp",
-    "arch/ATTiny/*",
-    "arch/Due/*",
-    "arch/Teensy/*",
-    "examples/*/*.ino"
-  ],
+  "version": "1.1.7",
   "frameworks": "arduino",
   "platforms": [
     "atmelavr",
