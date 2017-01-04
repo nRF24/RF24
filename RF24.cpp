@@ -1259,8 +1259,8 @@ void RF24::disableDynamicPayloads(void)
 {
   // Disables dynamic payload throughout the system.  Also disables Ack Payloads
 
-    //toggle_features();
-    write_register(FEATURE,read_register(FEATURE) & ~(_BV(EN_DPL) | _BV(EN_ACK_PAY)));
+  //toggle_features();
+  write_register(FEATURE,read_register(FEATURE) & ~(_BV(EN_DPL) | _BV(EN_ACK_PAY)));
 
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
