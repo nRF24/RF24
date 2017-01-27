@@ -13,122 +13,24 @@
  * Class declaration for RF24 and helper enums
  */
 
-#ifndef __RF24_H__
-#define __RF24_H__
-
-
-#include "RF24_c_config.h"
-
-
-#if defined (RF24_LINUX) || defined (LITTLEWIRE)
-  #include "utility/includes.h"
-#elif defined SOFTSPI
-  #include <DigitalIO.h>
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
-//RF24 struct
-typedef struct RF24
+class RF24_c
 {
-#ifdef SOFTSPI
-  SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
-#elif defined (SPI_UART)
-  SPIUARTClass uspi;
-#endif
+private:
 
-#if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
-  SPISettings spi; 
-#endif
-#if defined (MRAA)
-  GPIO gpio;
-#endif
-#if !defined(__XC8) && !defined(__SDCC)
-  uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-  uint8_t csn_pin; /**< SPI Chip select */
-#endif
-  uint16_t spi_speed; /**< SPI Bus Speed */
-#if defined (RF24_LINUX) || defined (XMEGA_D3)
-  uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
-  uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
-#endif  
-  uint8_t p_variant; /* False for RF24L01 and true for RF24L01P */
-  uint8_t payload_size; /**< Fixed size of payloads */
-  uint8_t dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
-  uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
-  uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
-  /**
-  * 
-  * The driver will delay for this duration when stopListening() is called
-  * 
-  * When responding to payloads, faster devices like ARM(RPi) are much faster than Arduino:
-  * 1. Arduino sends data to RPi, switches to RX mode
-  * 2. The RPi receives the data, switches to TX mode and sends before the Arduino radio is in RX mode
-  * 3. If AutoACK is disabled, this can be set as low as 0. If AA/ESB enabled, set to 100uS minimum on RPi
-  *
-  * @warning If set to 0, ensure 130uS delay after stopListening() and before any sends
-  */
-  
-  uint32_t txDelay;
+protected:
 
-  /**
-  * 
-  * On all devices but Linux and ATTiny, a small delay is added to the CSN toggling function
-  * 
-  * This is intended to minimise the speed of SPI polling due to radio commands
-  *
-  * If using interrupts or timed requests, this can be set to 0 Default:5
-  */
-  
-  uint32_t csDelay;
-
-  //#if defined (FAILURE_HANDLING)
-    uint8_t RF24_failureDetected; 
-  //#endif
-
-  }RF24;
-  
-
-/**
- * Power Amplifier level.
- *
- * For use with setPALevel()
- */
-typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
-
-/**
- * Data rate.  How fast data moves through the air.
- *
- * For use with setDataRate()
- */
-typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
-
-/**
- * CRC Length.  How big (if any) of a CRC is included.
- *
- * For use with setCRCLength()
- */
-typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e;
-
-
-/*
- * 5 bytes Radio Address
- */
-typedef unsigned char raddr_t;
-
-
+public:
 
   /**
    * @name Primary public interface
    *
    *  These are the main methods you need to operate the chip
    */
+  /**@{*/
 
   /**
    * Arduino Constructor
@@ -139,11 +41,10 @@ typedef unsigned char raddr_t;
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
    */
-#if defined(__XC8) || defined(__SDCC) 
-  void RF24_init(void);
-#else
-  void RF24_init( uint8_t _cepin, uint8_t _cspin);
-#endif  
+  RF24_c(uint8_t _cepin, uint8_t _cspin)
+  {
+     RF24_init(_cepin,_cspin);
+  };
   //#if defined (RF24_LINUX)
   
     /**
@@ -157,11 +58,14 @@ typedef unsigned char raddr_t;
   * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
   */
   
-  void RF24_init2( uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
+  RF24_c(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed )
+  {
+    RF24_init2(_cepin,_cspin,spispeed);
+  };
   //#endif
 
   #if defined (RF24_LINUX)
-  void RF24_end(void ) {};
+  virtual ~RF24_c() {};
   #endif
 
   /**
@@ -170,7 +74,10 @@ typedef unsigned char raddr_t;
    * Call this in setup(), before calling any other methods.
    * @code radio.begin() @endcode
    */
-  uint8_t RF24_begin(void);
+  bool begin(void)
+  {
+    return RF24_begin();
+  };
 
   /**
    * Start listening on the pipes opened for reading.
@@ -187,7 +94,10 @@ typedef unsigned char raddr_t;
    * radio.startListening();
    * @endcode
    */
-  void RF24_startListening(void);
+  void startListening(void)
+  {
+    RF24_startListening();
+  };
 
   /**
    * Stop listening for incoming messages, and switch to transmit mode.
@@ -198,7 +108,10 @@ typedef unsigned char raddr_t;
    * radio.write(&data,sizeof(data));
    * @endcode
    */
-  void RF24_stopListening(void);
+  void stopListening(void) 
+  {
+    RF24_stopListening();
+  };
 
   /**
    * Check whether there are bytes available to be read
@@ -209,7 +122,11 @@ typedef unsigned char raddr_t;
    * @endcode
    * @return True if there is a payload available, false if none is
    */
-  uint8_t RF24_available(void);
+  bool available(void)
+  {
+    return RF24_available();
+  };
+
 
   /**
    * Read the available payload
@@ -219,7 +136,7 @@ typedef unsigned char raddr_t;
    * @note I specifically chose 'void*' as a data type to make it easier
    * for beginners to use.  No casting needed.
    *
-   * @note No longer uint8_tean. Use available to determine if packets are
+   * @note No longer boolean. Use available to determine if packets are
    * available. Interrupt flags are now cleared during reads instead of
    * when calling available().
    *
@@ -233,7 +150,11 @@ typedef unsigned char raddr_t;
    * @endcode
    * @return No return value. Use available().
    */
-  void RF24_read( void* buf, uint8_t len );
+  void read( void* buf, uint8_t len )
+  {
+    RF24_read(buf,len );
+  };
+
 
   /**
    * Be sure to call openWritingPipe() first to set the destination
@@ -258,7 +179,11 @@ typedef unsigned char raddr_t;
    * @endcode
    * @return True if the payload was delivered successfully false if not
    */
-  uint8_t RF24_write( const void* buf, uint8_t len );
+  bool write( const void* buf, uint8_t len )
+  {
+    return RF24_write( buf, len );
+  };
+
 
   /**
    * New: Open a pipe for writing via byte array. Old addressing format retained
@@ -285,7 +210,11 @@ s   *
    * addresses amongst nodes on the network.
    */
 
-  void RF24_openWritingPipe(const uint8_t *address);
+  void openWritingPipe(const uint8_t *address)
+  {
+    RF24_openWritingPipe(address);
+  };
+
 
   /**
    * Open a pipe for reading
@@ -315,13 +244,19 @@ s   *
    * @param address The 24, 32 or 40 bit address of the pipe to open.
    */
 
-  void RF24_openReadingPipe(uint8_t number, const uint8_t *address);
+  void openReadingPipe(uint8_t number, const uint8_t *address)
+  {
+    RF24_openReadingPipe(number, address);
+  };
 
+
+   /**@}*/
   /**
    * @name Advanced Operation
    *
    *  Methods you can use to drive the chip in more advanced ways
    */
+  /**@{*/
 
   /**
    * Print a giant block of debugging information to stdout
@@ -337,7 +272,11 @@ s   *
    * }
    * @endcode
    */
-  void RF24_printDetails(void);
+  void printDetails(void)
+  {
+    RF24_printDetails();
+  };
+
 
   /**
    * Test whether there are bytes available to be read in the
@@ -355,13 +294,21 @@ s   *
    * @endcode
    * @return True if there is a payload available, false if none is
    */
-  uint8_t RF24_available_p( uint8_t* pipe_num);
+  bool available(uint8_t* pipe_num)
+  {
+    return RF24_available_p(pipe_num);
+  };
+
 
   /**
    * Check if the radio needs to be read. Can be used to prevent data loss
    * @return True if all three 32-byte radio buffers are full
    */
-  uint8_t RF24_rxFifoFull(void);
+  bool rxFifoFull()
+  {
+    return RF24_rxFifoFull();
+  };
+
 
   /**
    * Enter low-power mode
@@ -380,7 +327,11 @@ s   *
    * radio.powerUp();
    * @endcode
    */
-  void RF24_powerDown(void);
+  void powerDown(void)
+  {
+    RF24_powerDown();
+  };
+
 
   /**
    * Leave low-power mode - required for normal radio operation after calling powerDown()
@@ -388,7 +339,11 @@ s   *
    * To return to low power mode, call powerDown().
    * @note This will take up to 5ms for maximum compatibility 
    */
-  void RF24_powerUp(void) ;
+  void powerUp(void) 
+  {
+    RF24_powerUp(); 
+  };
+
 
   /**
   * Write for single NOACK writes. Optionally disables acknowledgements/autoretries for a single write.
@@ -404,7 +359,11 @@ s   *
   * @param len Number of bytes to be sent
   * @param multicast Request ACK (0), NOACK (1)
   */
-  uint8_t RF24_write_m(const void* buf, uint8_t len, const uint8_t multicast );
+  bool write( const void* buf, uint8_t len, const bool multicast )
+  {
+    return RF24_write_m(buf, len, multicast );
+  };
+
 
   /**
    * This will not block until the 3 FIFO buffers are filled with data.
@@ -434,7 +393,11 @@ s   *
    * @param len Number of bytes to be sent
    * @return True if the payload was delivered successfully false if not
    */
-  uint8_t RF24_writeFast(const void* buf, uint8_t len );
+  bool writeFast( const void* buf, uint8_t len )
+  {
+    return RF24_writeFast(buf,len );
+  };
+
 
   /**
   * WriteFast for single NOACK writes. Disables acknowledgements/autoretries for a single write.
@@ -447,7 +410,11 @@ s   *
   * @param len Number of bytes to be sent
   * @param multicast Request ACK (0) or NOACK (1)
   */
-  uint8_t RF24_writeFast_m( const void* buf, uint8_t len, const uint8_t multicast );
+  bool writeFast( const void* buf, uint8_t len, const bool multicast )
+  {
+    return RF24_writeFast_m(buf, len, multicast );
+  };
+
 
   /**
    * This function extends the auto-retry mechanism to any specified duration.
@@ -475,7 +442,11 @@ s   *
    * @param timeout User defined timeout in milliseconds.
    * @return True if the payload was loaded into the buffer successfully false if not
    */
-  uint8_t RF24_writeBlocking(const void* buf, uint8_t len, uint32_t timeout );
+  bool writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
+  {
+    return RF24_writeBlocking(buf, len, timeout );
+  };
+
 
   /**
    * This function should be called as soon as transmission is finished to
@@ -496,14 +467,18 @@ s   *
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-   *			uint8_t ok = txStandBy();     //Returns 0 if failed. 1 if success.
+   *			bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
    *					  				   //Blocks only until MAX_RT timeout or success. Data flushed on fail.
    * @endcode
    * @see txStandBy(unsigned long timeout)
    * @return True if transmission is successful
    *
    */
-   uint8_t RF24_txStandBy(void);
+   bool txStandBy()
+  {
+    return RF24_txStandBy();
+  };
+
 
   /**
    * This function allows extended blocking and auto-retries per a user defined timeout
@@ -513,7 +488,7 @@ s   *
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);
    *			radio.writeFast(&buf,32);   //Fills the FIFO buffers up
-   *			uint8_t ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
+   *			bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
    *					  				    //Blocks only until user defined timeout or success. Data flushed on fail.
    * @endcode
    * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
@@ -521,7 +496,11 @@ s   *
    * @return True if transmission is successful
    *
    */
-   uint8_t RF24_txStandBy_t( uint32_t timeout, uint8_t startTx);
+   bool txStandBy(uint32_t timeout, bool startTx = 0)
+  {
+    return RF24_txStandBy_t(timeout,startTx);
+  };
+
 
   /**
    * Write an ack payload for the specified pipe
@@ -541,7 +520,11 @@ s   *
    * @param len Length of the data to send, up to 32 bytes max.  Not affected
    * by the static payload set by setPayloadSize().
    */
-  void RF24_writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+  void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
+  {
+    RF24_writeAckPayload(pipe, buf, len);
+  };
+
 
   /**
    * Determine if an ack payload was received in the most recent call to
@@ -551,7 +534,11 @@ s   *
    *
    * @return True if an ack payload is available.
    */
-  uint8_t RF24_isAckPayloadAvailable(void);
+  bool isAckPayloadAvailable(void)
+  {
+    return RF24_isAckPayloadAvailable();
+  };
+
 
   /**
    * Call this when you get an interrupt to find out why
@@ -563,7 +550,11 @@ s   *
    * @param[out] tx_fail The send failed, too many retries (MAX_RT)
    * @param[out] rx_ready There is a message waiting to be read (RX_DS)
    */
-  void RF24_whatHappened(uint8_t * tx_ok, uint8_t * tx_fail, uint8_t * rx_ready);
+  void whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
+  {
+    RF24_whatHappened((uint8_t *)&tx_ok,(uint8_t *) &tx_fail,(uint8_t *) &rx_ready);
+  };
+
 
   /**
    * Non-blocking write to the open writing pipe used for buffered writes
@@ -589,7 +580,11 @@ s   *
    * @param multicast Request ACK (0) or NOACK (1)
    * @return True if the payload was delivered successfully false if not
    */
-  void RF24_startFastWrite(const void* buf, uint8_t len, const uint8_t multicast, uint8_t startTx );
+  void startFastWrite( const void* buf, uint8_t len, const bool multicast, bool startTx = 1 )  
+  {
+    RF24_startFastWrite(buf, len, multicast, startTx );  
+  };
+
 
   /**
    * Non-blocking write to the open writing pipe
@@ -611,7 +606,11 @@ s   *
    * @param multicast Request ACK (0) or NOACK (1)
    *
    */
-  void RF24_startWrite(const void* buf, uint8_t len, const uint8_t multicast );
+  void startWrite( const void* buf, uint8_t len, const bool multicast )
+  {
+    RF24_startWrite( buf, len, multicast );
+  };
+
   
   /**
    * This function is mainly used internally to take advantage of the auto payload
@@ -628,7 +627,11 @@ s   *
    * After issuing reUseTX(), it will keep reending the same payload forever or until
    * a payload is written to the FIFO, or a flush_tx command is given.
    */
-   void RF24_reUseTX(void);
+   void reUseTX()  
+   {
+    RF24_reUseTX();  
+   };
+
 
   /**
    * Empty the transmit buffer. This is generally not required in standard operation.
@@ -636,7 +639,11 @@ s   *
    *
    * @return Current value of status register
    */
-  uint8_t RF24_flush_tx(void);
+  uint8_t flush_tx(void)
+  {
+    return RF24_flush_tx();
+  };
+
 
   /**
    * Test whether there was a carrier on the line for the
@@ -646,7 +653,11 @@ s   *
    *
    * @return true if was carrier, false if not
    */
-  uint8_t RF24_testCarrier(void);
+  bool testCarrier(void)
+  {
+    return RF24_testCarrier();
+  };
+
 
   /**
    * Test whether a signal (carrier or otherwise) greater than
@@ -657,7 +668,7 @@ s   *
    * channel hopping strategies.
    *
    * @code
-   * uint8_t goodSignal = radio.testRPD();
+   * bool goodSignal = radio.testRPD();
    * if(radio.available()){
    *    Serial.println(goodSignal ? "Strong signal > 64dBm" : "Weak signal < 64dBm" );
    *    radio.read(0,0);
@@ -665,7 +676,11 @@ s   *
    * @endcode
    * @return true if signal => -64dBm, false if not
    */
-  uint8_t RF24_testRPD(void) ;
+  bool testRPD(void) 
+  {
+    return RF24_testRPD();
+  };
+
 
   /**
    * Test whether this is a real radio, or a mock shim for
@@ -674,14 +689,22 @@ s   *
    *
    * @return true if this is a legitimate radio
    */
-  uint8_t RF24_isValid(void); 
+  bool isValid()
+  {
+    return RF24_isValid();
+  };
+
   
    /**
    * Close a pipe after it has been previously opened.
    * Can be safely called without having previously opened a pipe.
    * @param pipe Which pipe # to close, 0-5.
    */
-  void RF24_closeReadingPipe( uint8_t pipe ) ;
+  void closeReadingPipe( uint8_t pipe )
+  {
+    RF24_closeReadingPipe(pipe );
+  };
+
 
    /**
    * Enable error detection by un-commenting #define FAILURE_HANDLING in RF24_config.h
@@ -703,9 +726,13 @@ s   *
    *  }
    * @endcode
   */
-
+  //#if defined (FAILURE_HANDLING)
+   // bool failureDetected; 
+  //#endif
     
+  /**@}*/
 
+  /**@}*/
   /**
    * @name Optional Configurators
    *
@@ -713,6 +740,7 @@ s   *
    *  None are required.  Calling begin() sets up a reasonable set of
    *  defaults.
    */
+  /**@{*/
 
   /**
   * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
@@ -720,7 +748,11 @@ s   *
   * @param a_width The address width to use: 3,4 or 5
   */
 
-  void RF24_setAddressWidth(uint8_t a_width);
+  void setAddressWidth(uint8_t a_width)
+  {
+    RF24_setAddressWidth(a_width);
+  };
+
   
   /**
    * Set the number and delay of retries upon failed submit
@@ -729,21 +761,33 @@ s   *
    * max is 15.  0 means 250us, 15 means 4000us.
    * @param count How many retries before giving up, max 15
    */
-  void RF24_setRetries(uint8_t delay, uint8_t count);
+  void setRetries(uint8_t delay, uint8_t count)
+  {
+    RF24_setRetries(delay,count);
+  };
+
 
   /**
    * Set RF communication channel
    *
    * @param channel Which RF channel to communicate on, 0-125
    */
-  void RF24_setChannel( uint8_t channel);
+  void setChannel(uint8_t channel)
+  {
+    RF24_setChannel(channel);
+  };
+
   
     /**
    * Get RF communication channel
    *
    * @return The currently configured RF Channel
    */
-  uint8_t RF24_getChannel(void);
+  uint8_t getChannel(void)
+  {
+    return RF24_getChannel();
+  };
+
 
   /**
    * Set Static Payload Size
@@ -757,7 +801,11 @@ s   *
    *
    * @param size The number of bytes in the payload
    */
-  void RF24_setPayloadSize( uint8_t size);
+  void setPayloadSize(uint8_t size)
+  {
+    RF24_setPayloadSize(size);
+  };
+
 
   /**
    * Get Static Payload Size
@@ -766,7 +814,11 @@ s   *
    *
    * @return The number of bytes in the payload
    */
-  uint8_t RF24_getPayloadSize(void);
+  uint8_t getPayloadSize(void)
+  {
+    return RF24_getPayloadSize();
+  };
+
 
   /**
    * Get Dynamic Payload Size
@@ -788,7 +840,11 @@ s   *
    *
    * @return Payload length of last-received dynamic payload
    */
-  uint8_t RF24_getDynamicPayloadSize(void);
+  uint8_t getDynamicPayloadSize(void)
+  {
+    return RF24_getDynamicPayloadSize();
+  };
+
 
   /**
    * Enable custom payloads on the acknowledge packets
@@ -799,7 +855,11 @@ s   *
    * @note Ack payloads are dynamic payloads. This only works on pipes 0&1 by default. Call 
    * enableDynamicPayloads() to enable on all pipes.
    */
-  void RF24_enableAckPayload(void);
+  void enableAckPayload(void)
+  {
+    RF24_enableAckPayload();
+  };
+
 
   /**
    * Enable dynamically-sized payloads
@@ -808,7 +868,11 @@ s   *
    * once in a while.  This enables dynamic payloads on ALL pipes.
    *
    */
-  void RF24_enableDynamicPayloads(void);
+  void enableDynamicPayloads(void)
+  {
+    RF24_enableDynamicPayloads();
+  };
+
   
   /**
    * Enable dynamic ACKs (single write multicast or unicast) for chosen messages
@@ -822,7 +886,11 @@ s   *
    * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
    * @endcode
    */
-  void RF24_enableDynamicAck(void);
+  void enableDynamicAck()
+  {
+    RF24_enableDynamicAck();
+  };
+
   
   /**
    * Determine whether the hardware is an nRF24L01+ or not.
@@ -830,7 +898,11 @@ s   *
    * @return true if the hardware is nRF24L01+ (or compatible) and false
    * if its not.
    */
-  uint8_t RF24_isPVariant(void) ;
+  bool isPVariant(void) 
+  {
+    return RF24_isPVariant(); 
+  };
+
 
   /**
    * Enable or disable auto-acknowlede packets
@@ -840,7 +912,11 @@ s   *
    *
    * @param enable Whether to enable (true) or disable (false) auto-acks
    */
-  void RF24_setAutoAck(uint8_t enable);
+  void setAutoAck(bool enable)
+  {
+    RF24_setAutoAck(enable);
+  };
+
 
   /**
    * Enable or disable auto-acknowlede packets on a per pipeline basis.
@@ -851,7 +927,11 @@ s   *
    * @param pipe Which pipeline to modify
    * @param enable Whether to enable (true) or disable (false) auto-acks
    */
-  void RF24_setAutoAck_p( uint8_t pipe, uint8_t enable ) ;
+  void setAutoAck( uint8_t pipe, bool enable ) 
+  {
+    RF24_setAutoAck_p(pipe,enable ); 
+  };
+
 
   /**
    * Set Power Amplifier (PA) level to one of four levels:
@@ -864,7 +944,11 @@ s   *
    *
    * @param level Desired PA level.
    */
-  void RF24_setPALevel ( uint8_t level );
+  void setPALevel ( uint8_t level )
+  {
+    RF24_setPALevel (level );
+  };
+
 
   /**
    * Fetches the current PA level.
@@ -874,7 +958,11 @@ s   *
    *
    * @return Returns values 0 to 3 representing the PA Level.
    */
-   uint8_t RF24_getPALevel(void);
+   uint8_t getPALevel( void )
+  {
+    return RF24_getPALevel();
+  };
+
 
   /**
    * Set the transmission data rate
@@ -884,7 +972,11 @@ s   *
    * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
    * @return true if the change was successful
    */
-  uint8_t RF24_setDataRate(rf24_datarate_e speed);
+  bool setDataRate(rf24_datarate_e speed)
+  {
+    return RF24_setDataRate(speed);
+  };
+
 
   /**
    * Fetches the transmission data rate
@@ -893,28 +985,44 @@ s   *
    * is one of 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS, as defined in the
    * rf24_datarate_e enum.
    */
-  rf24_datarate_e RF24_getDataRate(void) ;
+  rf24_datarate_e getDataRate( void ) 
+  {
+    return RF24_getDataRate();
+  };
+
 
   /**
    * Set the CRC length
    * <br>CRC checking cannot be disabled if auto-ack is enabled
    * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
-  void RF24_setCRCLength( rf24_crclength_e length);
+  void setCRCLength(rf24_crclength_e length)
+  {
+    RF24_setCRCLength(length);
+  };
+
 
   /**
    * Get the CRC length
    * <br>CRC checking cannot be disabled if auto-ack is enabled
    * @return RF24_CRC_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
-  rf24_crclength_e RF24_getCRCLength(void);
+  rf24_crclength_e getCRCLength(void)
+  {
+    return RF24_getCRCLength();
+  };
+
 
   /**
    * Disable CRC validation
    * 
    * @warning CRC cannot be disabled if auto-ack/ESB is enabled.
    */
-  void RF24_disableCRC(void) ;
+  void disableCRC( void ) 
+  {
+    RF24_disableCRC();
+  };
+
 
   /**
   * The radio will generate interrupt signals when a transmission is complete,
@@ -932,15 +1040,44 @@ s   *
   * @param tx_fail  Mask transmit failure interrupts
   * @param rx_ready Mask payload received interrupts
   */
-  void RF24_maskIRQ( uint8_t tx_ok,uint8_t tx_fail,uint8_t rx_ready);
-  
+  void maskIRQ(bool tx_ok,bool tx_fail,bool rx_ready)
+  {
+    RF24_maskIRQ(tx_ok,tx_fail,rx_ready);
+  };
 
   
+  /**
+  * 
+  * The driver will delay for this duration when stopListening() is called
+  * 
+  * When responding to payloads, faster devices like ARM(RPi) are much faster than Arduino:
+  * 1. Arduino sends data to RPi, switches to RX mode
+  * 2. The RPi receives the data, switches to TX mode and sends before the Arduino radio is in RX mode
+  * 3. If AutoACK is disabled, this can be set as low as 0. If AA/ESB enabled, set to 100uS minimum on RPi
+  *
+  * @warning If set to 0, ensure 130uS delay after stopListening() and before any sends
+  */
+  
+  //uint32_t txDelay;
+
+  /**
+  * 
+  * On all devices but Linux and ATTiny, a small delay is added to the CSN toggling function
+  * 
+  * This is intended to minimise the speed of SPI polling due to radio commands
+  *
+  * If using interrupts or timed requests, this can be set to 0 Default:5
+  */
+  
+  //uint32_t csDelay=5;
+  
+  /**@}*/
   /**
    * @name Deprecated
    *
    *  Methods provided for backwards compabibility.
    */
+  /**@{*/
 
 
   /**
@@ -961,7 +1098,12 @@ s   *
    * @param number Which pipe# to open, 0-5.
    * @param address The 40-bit address of the pipe to open.
    */
-  void RF24_openReadingPipe_d( uint8_t number,const  raddr_t* address);
+  void openReadingPipe(uint8_t number, uint64_t address)
+  {
+    raddr_t *address_= (raddr_t*) &address; 
+    RF24_openReadingPipe(number, address_);
+  };
+
 
   /**
    * Open a pipe for writing
@@ -975,8 +1117,14 @@ s   *
    *
    * @param address The 40-bit address of the pipe to open.
    */
+  void openWritingPipe(uint64_t address)
+  {
+    raddr_t *address_= (raddr_t*) &address; 
+    RF24_openWritingPipe(address_);
+  };
 
-  void RF24_openWritingPipe_d( const raddr_t* address);
+
+private:
 
   /**
    * @name Low-level internal interface.
@@ -985,15 +1133,8 @@ s   *
    *  ever call these.  They are documented for completeness and for developers who
    *  may want to extend this class.
    */
+  /**@{*/
 
-
-
-#if defined(__XC8) || defined(__SDCC) 
-  #define RF24_csn_d(val) csn_pin=val
-  #define RF24_ce_d(val)  ce_pin=val
-  #define RF24_beginTransaction() csn_pin=LOW;
-  #define RF24_endTransaction()  csn_pin=HIGH; 
-#else
   /**
    * Set chip select pin
    *
@@ -1004,7 +1145,7 @@ s   *
    *
    * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
    */
-  void RF24_csn_d( uint8_t mode);
+  //void csn(bool mode);
 
   /**
    * Set chip enable
@@ -1012,19 +1153,7 @@ s   *
    * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
    * for a much more detailed description of this pin.
    */
-  void RF24_ce_d( uint8_t level);
-  
-  /**
-   * SPI transactions
-   *
-   * Common code for SPI transactions including CSN toggle
-   *
-   */
-   void RF24_beginTransaction(void);
-
-   void RF24_endTransaction(void);
-
-#endif //__XC8
+  //void ce(bool level);
 
   /**
    * Read a chunk of data in from a register
@@ -1034,7 +1163,7 @@ s   *
    * @param len How many bytes of data to transfer
    * @return Current value of status register
    */
-  uint8_t RF24_read_register_m_d( uint8_t reg, uint8_t* buf, uint8_t len);
+  //uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
 
   /**
    * Read single byte from a register
@@ -1042,7 +1171,7 @@ s   *
    * @param reg Which register. Use constants from nRF24L01.h
    * @return Current value of register @p reg
    */
-  uint8_t RF24_read_register_d(uint8_t reg);
+  //uint8_t read_register(uint8_t reg);
 
   /**
    * Write a chunk of data to a register
@@ -1052,7 +1181,7 @@ s   *
    * @param len How many bytes of data to transfer
    * @return Current value of status register
    */
-  uint8_t RF24_write_register_c_d(uint8_t reg, const uint8_t* buf, uint8_t len);
+  //uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
 
   /**
    * Write a single byte to a register
@@ -1061,7 +1190,7 @@ s   *
    * @param value The new value to write
    * @return Current value of status register
    */
-  uint8_t RF24_write_register_d(uint8_t reg, uint8_t value);
+  //uint8_t write_register(uint8_t reg, uint8_t value);
 
   /**
    * Write the transmit payload
@@ -1072,7 +1201,7 @@ s   *
    * @param len Number of bytes to be sent
    * @return Current value of status register
    */
-  uint8_t RF24_write_payload_d(const void* buf, uint8_t len, const uint8_t writeType);
+  //uint8_t write_payload(const void* buf, uint8_t len, const uint8_t writeType);
 
   /**
    * Read the receive payload
@@ -1083,23 +1212,23 @@ s   *
    * @param len Maximum number of bytes to read
    * @return Current value of status register
    */
-  uint8_t RF24_read_payload_d(void* buf, uint8_t len);
+  //uint8_t read_payload(void* buf, uint8_t len);
 
   /**
    * Empty the receive buffer
    *
    * @return Current value of status register
    */
-  uint8_t RF24_flush_rx_d(void);
+  //uint8_t flush_rx(void);
 
   /**
    * Retrieve the current status of the chip
    *
    * @return Current value of status register
    */
-  uint8_t RF24_get_status_d(void);
+  //uint8_t get_status(void);
 
-  #if !defined (MINIMAL)
+  //#if !defined (MINIMAL)
   /**
    * Decode and print the given status to stdout
    *
@@ -1107,7 +1236,7 @@ s   *
    *
    * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
    */
-  void RF24_print_status_d(uint8_t status);
+  //void print_status(uint8_t status);
 
   /**
    * Decode and print the given 'observe_tx' value to stdout
@@ -1116,7 +1245,7 @@ s   *
    *
    * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
    */
-  void RF24_print_observe_tx_d(uint8_t value);
+  //void print_observe_tx(uint8_t value);
 
   /**
    * Print the name and value of an 8-bit register to stdout
@@ -1129,7 +1258,7 @@ s   *
    * @param reg Which register. Use constants from nRF24L01.h
    * @param qty How many successive registers to print
    */
-  void RF24_print_byte_register_d(const char* name, uint8_t reg, uint8_t qty);
+  //void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
   /**
    * Print the name and value of a 40-bit address register to stdout
@@ -1142,27 +1271,29 @@ s   *
    * @param reg Which register. Use constants from nRF24L01.h
    * @param qty How many successive registers to print
    */
-  void RF24_print_address_register_d(const char* name, uint8_t reg, uint8_t qty);
-#endif
+  //void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
+//#endif
   /**
    * Turn on or off the special features of the chip
    *
    * The chip has certain 'features' which are only available when the 'features'
    * are enabled.  See the datasheet for details.
    */
-  void RF24_toggle_features_d(void);
+  //void toggle_features(void);
 
   /**
    * Built in spi transfer function to simplify repeating code repeating code
    */
 
-  uint8_t RF24_spiTrans_d( uint8_t cmd);
+  //uint8_t spiTrans(uint8_t cmd);
   
-  #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
-	void RF24_errNotify_d(void);
-  #endif
+  //#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
+//	void errNotify(void);
+  //#endif
   
+  /**@}*/
 
+};
 
 
 /**
@@ -2000,13 +2131,5 @@ s   *
  *<br><br><br>
  */
 
+//#endif // __RF24_H__
 
-#ifdef __cplusplus
-}
-#endif 
-
-#ifdef __cplusplus
-#include"cpp_wrapper.h" 
-#endif
-
-#endif // __RF24_H__
