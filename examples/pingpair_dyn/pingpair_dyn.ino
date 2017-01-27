@@ -10,9 +10,11 @@
  * Example using Dynamic Payloads 
  *
  * This is an example of how to use payloads of a varying (dynamic) size. 
- */
 
-#include "RF24_c.h"
+ */
+ 
+#include "nRF24L01.h"
+#include "RF24.h"
 
 //
 // Hardware configuration
@@ -20,7 +22,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
-RF24_c radio(7,8);
+RF24 radio(7,8);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter

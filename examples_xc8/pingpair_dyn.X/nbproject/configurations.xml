@@ -21,7 +21,7 @@
       <itemPath>pingpair_dyn.c</itemPath>
       <itemPath>serial.c</itemPath>
       <itemPath>../../utility/XC8/spi.c</itemPath>
-      <itemPath>../../RF24_c.c</itemPath>
+      <itemPath>../../RF24.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

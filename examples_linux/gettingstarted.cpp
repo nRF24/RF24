@@ -24,7 +24,7 @@ TMRh20 2014 - Updated to work with optimized RF24 Arduino library
 #include <sstream>
 #include <string>
 #include <unistd.h>
-#include <RF24_c/RF24_c.h>
+#include <RF24/RF24.h>
 
 using namespace std;
 //
@@ -46,7 +46,7 @@ using namespace std;
 //RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
 
 // RPi generic:
-RF24_c radio(22,0);
+RF24 radio(22,0);
 
 /*** RPi Alternate ***/
 //Note: Specify SPI BUS 0 or 1 instead of CS pin number.

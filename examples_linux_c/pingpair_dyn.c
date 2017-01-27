@@ -14,7 +14,7 @@
 //#include <string>
 #include <stdio.h>
 #include <string.h>
-#include "./RF24_c.h"
+#include "./RF24.h"
 
 
 //using namespace std;

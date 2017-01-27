@@ -17,7 +17,7 @@
 #define __RF24_H__
 
 
-#include "RF24_c_config.h"
+#include "RF24_config.h"
 
 
 #if defined (RF24_LINUX) || defined (LITTLEWIRE)
@@ -35,7 +35,7 @@ extern "C" {
  */
 
 //RF24 struct
-typedef struct RF24
+typedef struct 
 {
 #ifdef SOFTSPI
   SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
@@ -92,7 +92,7 @@ typedef struct RF24
     uint8_t RF24_failureDetected; 
   //#endif
 
-  }RF24;
+  }RF24_;
   
 
 /**

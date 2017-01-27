@@ -17,7 +17,7 @@
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
-class RF24_c
+class RF24
 {
 private:
 
@@ -41,7 +41,7 @@ public:
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
    */
-  RF24_c(uint8_t _cepin, uint8_t _cspin)
+  RF24(uint8_t _cepin, uint8_t _cspin)
   {
      RF24_init(_cepin,_cspin);
   };
@@ -58,14 +58,14 @@ public:
   * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
   */
   
-  RF24_c(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed )
+  RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed )
   {
     RF24_init2(_cepin,_cspin,spispeed);
   };
   //#endif
 
   #if defined (RF24_LINUX)
-  virtual ~RF24_c() {};
+  virtual ~RF24() {};
   #endif
 
   /**

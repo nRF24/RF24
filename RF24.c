@@ -8,8 +8,8 @@
  */
 
 #include "nRF24L01.h"
-#include "RF24_c_config.h"
-#include "RF24_c.h"
+#include "RF24_config.h"
+#include "RF24.h"
 
 //for XC8 compatibility
 #define ADDR_WIDTH 5
@@ -17,7 +17,7 @@
 /****************************************************************************/
 
 //global object
-static RF24 rf;
+static RF24_ rf;
 
 #if !defined(__XC8) && !defined(__SDCC)
 void RF24_csn_d( uint8_t mode)
