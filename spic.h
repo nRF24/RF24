@@ -141,5 +141,8 @@ void SPI_setClockDivider(uint8_t clockDiv);
 void SPI_attachInterrupt();
 void SPI_detachInterrupt(); 
 
+void init_AlwaysInline(uint32_t clock, uint8_t bitOrder, uint8_t dataMode);
+void init_MightInline(uint32_t clock, uint8_t bitOrder, uint8_t dataMode);
+
 
 #endif

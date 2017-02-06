@@ -144,6 +144,8 @@
 #elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__) || defined(XMEGA)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
+        #include <stdio.h>
+        #define printf_P printf
 #else
   #if ! defined(ARDUINO) // This doesn't work on Arduino DUE
 	typedef char const char;
