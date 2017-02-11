@@ -437,7 +437,7 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed):
 
 void RF24::setChannel(uint8_t channel)
 {
-  const uint8_t max_channel = 125;
+  const uint8_t max_channel = 126;
   write_register(RF_CH,rf24_min(channel,max_channel));
 }
 
