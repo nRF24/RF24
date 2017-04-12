@@ -12,7 +12,7 @@ Help:
     -h, --help                  print this message
 
 Driver options:
-    --driver=[SPIDEV|MRAA|RPi|LittleWire]
+    --driver=[wiringPi|SPIDEV|MRAA|RPi|LittleWire]
                                 Driver for RF24 library. [configure autodetected]
 
 Building options:
@@ -179,6 +179,8 @@ function detect_driver {
         result=RPi
     elif [[ $(execute_check 'ls /dev/spidev* 2>/dev/null') ]]; then
         result=SPIDEV
+    elif [[ $(execute_check "file /usr/lib/libwiringPi.so*") ]]; then
+        result=wiringPi
     elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep libmraa") ]]; then
         result=MRAA
     elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep liblittlewire-spi") ]]; then
@@ -395,6 +397,10 @@ if [ -z "${DRIVER}" ]; then
 fi
 
 case ${DRIVER} in
+wiringPi)
+    SHARED_LINKER_FLAGS+=" -pthread -lwiringPi"
+    CFLAGS+=" -lwiringPi"
+    ;;
 SPIDEV)
     SHARED_LINKER_FLAGS+=" -pthread"
     ;;
