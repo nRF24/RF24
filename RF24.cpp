@@ -830,7 +830,7 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
   return 1;
 }
 
-bool RF24::write( const void* buf, uint8_t len ){
+bool RF24::write( const void* buf, uint16_t len ){
 	return write(buf,len,0);
 }
 /****************************************************************************/
@@ -1035,7 +1035,7 @@ void RF24::maskIRQ(bool tx, bool fail, bool rx){
 
 /****************************************************************************/
 
-uint8_t RF24::getDynamicPayloadSize(void)
+uint16_t RF24::getDynamicPayloadSize(void)
 {
   uint8_t result = 0;
 
@@ -1086,7 +1086,7 @@ bool RF24::available(uint8_t* pipe_num)
 
 /****************************************************************************/
 
-void RF24::read( void* buf, uint8_t len ){
+void RF24::read( void* buf, uint16_t len ){
 
   // Fetch the payload
   read_payload( buf, len );

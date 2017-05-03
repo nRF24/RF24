@@ -173,7 +173,7 @@ public:
    * @endcode
    * @return True if there is a payload available, false if none is
    */
-  bool available(void);
+  virtual bool available(void);
 
   /**
    * Read the available payload
@@ -197,7 +197,7 @@ public:
    * @endcode
    * @return No return value. Use available().
    */
-  void read( void* buf, uint8_t len );
+  virtual void read( void* buf, uint16_t len );
 
   /**
    * Be sure to call openWritingPipe() first to set the destination
@@ -222,7 +222,7 @@ public:
    * @endcode
    * @return True if the payload was delivered successfully false if not
    */
-  bool write( const void* buf, uint8_t len );
+  virtual bool write( const void* buf, uint16_t len );
 
   /**
    * New: Open a pipe for writing via byte array. Old addressing format retained
@@ -759,7 +759,7 @@ s   *
    *
    * @return Payload length of last-received dynamic payload
    */
-  uint8_t getDynamicPayloadSize(void);
+  virtual uint16_t getDynamicPayloadSize(void);
 
   /**
    * Enable custom payloads on the acknowledge packets
