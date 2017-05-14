@@ -989,6 +989,13 @@ s   *
    */
   void openWritingPipe(uint64_t address);
 
+  /**
+   * Empty the receive buffer
+   *
+   * @return Current value of status register
+   */
+  uint8_t flush_rx(void);
+
 private:
 
   /**
@@ -1078,13 +1085,6 @@ private:
    * @return Current value of status register
    */
   uint8_t read_payload(void* buf, uint8_t len);
-
-  /**
-   * Empty the receive buffer
-   *
-   * @return Current value of status register
-   */
-  uint8_t flush_rx(void);
 
   /**
    * Retrieve the current status of the chip
