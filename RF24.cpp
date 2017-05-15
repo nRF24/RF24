@@ -695,6 +695,19 @@ bool RF24::begin(void)
 
 /****************************************************************************/
 
+bool RF24::isChipConnected()
+{
+  uint8_t setup = read_register(SETUP_AW);
+  if(setup >= 1 && setup <= 3)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+/****************************************************************************/
+
 void RF24::startListening(void)
 {
  #if !defined (RF24_TINY) && ! defined(LITTLEWIRE)
@@ -1262,7 +1275,7 @@ void RF24::disableDynamicPayloads(void)
   // Disables dynamic payload throughout the system.  Also disables Ack Payloads
 
   //toggle_features();
-  write_register(FEATURE,read_register(FEATURE) & ~(_BV(EN_DPL) | _BV(EN_ACK_PAY)));
+  write_register(FEATURE, 0);
 
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
@@ -1271,7 +1284,7 @@ void RF24::disableDynamicPayloads(void)
   //
   // Not sure the use case of only having dynamic payload on certain
   // pipes, so the library does not support it.
-  write_register(DYNPD,read_register(DYNPD) & ~( _BV(DPL_P5) | _BV(DPL_P4) | _BV(DPL_P3) | _BV(DPL_P2) | _BV(DPL_P1) | _BV(DPL_P0)));
+  write_register(DYNPD, 0);
 
   dynamic_payloads_enabled = false;
 }
