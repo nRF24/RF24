@@ -12,6 +12,7 @@
   "platforms": [
     "atmelavr",
     "atmelsam",
-    "teensy"
+    "teensy",
+    "espressif"
   ]
 }
