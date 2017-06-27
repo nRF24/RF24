@@ -76,7 +76,7 @@ function detect_machine {
     fi
 
     case $hardware in
-    BCM2708)
+    BCM2708|BCM2835)
         soc="BCM2835"
         if [[ $machine == "Raspberry"* ]]; then
             tp="RPi"
@@ -175,7 +175,7 @@ function gcc_cpu_flags {
 }
 
 function detect_driver {
-    if [[ $(execute_check "cat /proc/cpuinfo | grep Hardware | grep 'BCM2708\|BCM2709'") ]]; then
+    if [[ $(execute_check "cat /proc/cpuinfo | grep Hardware | grep 'BCM2708\|BCM2709\|BCM2835'") ]]; then
         result=RPi
     elif [[ $(execute_check 'ls /dev/spidev* 2>/dev/null') ]]; then
         result=SPIDEV
