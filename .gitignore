@@ -25,9 +25,6 @@ examples_linux/*
 examples_linux_c/*
 !examples_linux_c/**/
 !examples_linux_c/*.*
-/examples_xc8/pingpair_dyn.X/build/sdcc/
-/examples_xc8/pingpair_dyn.X/dist/sdcc/
-/examples_xc8/pingpair_dyn.X/build/xc8/
-/examples_xc8/pingpair_dyn.X/dist/xc8/
-/examples_xc8/pingpair_dyn.X/dist/xc8_P16F877A/
-/examples_xc8/pingpair_dyn.X/build/xc8_P16F877A/
+*/dist/*
+*/build/*
+Jamfile
