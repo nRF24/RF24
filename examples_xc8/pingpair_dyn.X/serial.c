@@ -23,10 +23,10 @@
    For e-mail suggestions :  lcgamboa@yahoo.com
    ######################################################################## */
 
-#include"xc8_config.h"
+#include "xc8_config.h"
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void Serial_begin_(unsigned char baud)
 {
@@ -37,22 +37,22 @@ void Serial_begin_(unsigned char baud)
     //BRGH=0 FOSC/[64(n+1)]    FOSC/[16(n+1)]
     //BRGH=1 FOSC/[16(n+1)]    FOSC/[4(n+1)]
  
-    SPBRG=  baud; //baud rate de 115200 - 32MHz
+    SPBRG = baud; //baud rate de 115200 - 32MHz
     //SPBRGH=(0xFF00 & baud)>>8; 
     //BAUDCONbits.BRG16=1; //16 bits baud rate
     
-	//Configuracao da serial
+	  //Serial configuration
     //TXSTAbits.TX9=0;    //transmissao em 8 bits
     //TXSTAbits.SYNC=0;  //modo assincrono
     //TXSTAbits.BRGH=1;  //high baud rate
     //TXSTAbits.TXEN=1;  //habilita transmissao
     //CSRC TX9 TXEN SYNC SENDB BRGH TRMT TX9D
-    TXSTA=0b00100100; 
+    TXSTA = 0b00100100; 
     //RCSTAbits.RX9=0;   //recepcao em 8 bits
     //RCSTAbits.CREN=1;  //recepcao continua
     //RCSTAbits.SPEN=1;  //habilita porta serial - rx
     //SPEN RX9 SREN CREN ADDEN FERR OERR RX9D
-    RCSTA=0b10010000;
+    RCSTA = 0b10010000;
 }
 
 
