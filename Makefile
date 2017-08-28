@@ -24,6 +24,8 @@ else ifeq ($(DRIVER), RPi)
 OBJECTS+=spi.o bcm2835.o interrupt.o
 else ifeq ($(DRIVER), SPIDEV)
 OBJECTS+=spi.o gpio.o compatibility.o interrupt.o
+else ifeq ($(DRIVER), wiringPi)
+OBJECTS+=spi.o
 endif
 
 # make all
