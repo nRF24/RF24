@@ -123,14 +123,7 @@
 // Arduino DUE is arm and does not include avr/pgmspace
 #if defined (ARDUINO_ARCH_ESP8266)
 
-  #define PSTR(x) (x)
-  #define printf Serial.printf
-  #define sprintf(...) os_sprintf( __VA_ARGS__ )
-  #define printf_P printf
-  #define strlen_P strlen  
-  #define PROGMEM
-  #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-  #define pgm_read_word(p) (*(p))
+  #include <pgmspace.h>
   #define PRIPSTR "%s"
 
 #elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__) || defined(XMEGA)
