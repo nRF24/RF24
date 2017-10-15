@@ -410,8 +410,7 @@ void bcm2835_gpio_pudclk(uint8_t pin, uint8_t on)
 /* Read GPIO pad behaviour for groups of GPIOs */
 uint32_t bcm2835_gpio_pad(uint8_t group)
 {
-  if (bcm2835_pads == MAP_FAILED)
-    return 0;
+  if (bcm2835_pads == MAP_FAILED) return 0;
   
     volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
     return bcm2835_peri_read(paddr);
@@ -423,8 +422,7 @@ uint32_t bcm2835_gpio_pad(uint8_t group)
 */
 void bcm2835_gpio_set_pad(uint8_t group, uint32_t control)
 {
-  if (bcm2835_pads == MAP_FAILED)
-    return;
+  if (bcm2835_pads == MAP_FAILED) return;
   
     volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
     bcm2835_peri_write(paddr, control | BCM2835_PAD_PASSWRD);
@@ -450,9 +448,9 @@ void bcm2835_delayMicroseconds(uint64_t micros)
 	
     if (debug)
     {
-	/* Cant access sytem timers in debug mode */
-	printf("bcm2835_delayMicroseconds %lld\n", micros);
-	return;
+      /* Cant access sytem timers in debug mode */
+      printf("bcm2835_delayMicroseconds %lld\n", micros);
+      return;
     }
 
     /* Calling nanosleep() takes at least 100-200 us, so use it for
@@ -462,9 +460,9 @@ void bcm2835_delayMicroseconds(uint64_t micros)
     
     if (micros > 450)
     {
-	t1.tv_sec = 0;
-	t1.tv_nsec = 1000 * (long)(micros - 200);
-	nanosleep(&t1, NULL);
+      t1.tv_sec = 0;
+      t1.tv_nsec = 1000 * (long)(micros - 200);
+      nanosleep(&t1, NULL);
     }    
   
     bcm2835_st_delay(start, micros);
@@ -473,14 +471,14 @@ void bcm2835_delayMicroseconds(uint64_t micros)
 // This function is added in order to simulate arduino millis() function
 unsigned int bcm2835_millis(void)
 {
-struct timeval now;
-unsigned long long ms;
-
-gettimeofday(&now, NULL);
-
-ms = (now.tv_sec * 1000000 + now.tv_usec) / 1000 ;
-
-return ((uint32_t) (ms - epoch ));
+  struct timeval now;
+  unsigned long long ms;
+  
+  gettimeofday(&now, NULL);
+  
+  ms = (now.tv_sec * 1000000 + now.tv_usec) / 1000 ;
+  
+  return ((uint32_t) (ms - epoch ));
 }
 
 /*
@@ -490,19 +488,15 @@ return ((uint32_t) (ms - epoch ));
 /* Set the state of an output */
 void bcm2835_gpio_write(uint8_t pin, uint8_t on)
 {
-    if (on)
-	bcm2835_gpio_set(pin);
-    else
-	bcm2835_gpio_clr(pin);
+    if (on) bcm2835_gpio_set(pin);
+    else bcm2835_gpio_clr(pin);
 }
 
 /* Set the state of a all 32 outputs in the mask to on or off */
 void bcm2835_gpio_write_multi(uint32_t mask, uint8_t on)
 {
-    if (on)
-	bcm2835_gpio_set_multi(mask);
-    else
-	bcm2835_gpio_clr_multi(mask);
+    if (on) 	bcm2835_gpio_set_multi(mask);
+    else bcm2835_gpio_clr_multi(mask);
 }
 
 /* Set the state of a all 32 outputs in the mask to the values in value */
