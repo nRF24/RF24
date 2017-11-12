@@ -614,7 +614,7 @@ bool RF24::begin(void)
     if (ce_pin != csn_pin) pinMode(ce_pin,OUTPUT);  
   
     #if ! defined(LITTLEWIRE)
-      if (ce_pin != csn_pin)
+      if ((ce_pin != csn_pin) && (csn_pin != 0))
     #endif
         pinMode(csn_pin,OUTPUT);
     
