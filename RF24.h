@@ -225,7 +225,6 @@ public:
    * radio.stopListening();
    * radio.write(&data,sizeof(data));
    * @endcode
-   * @return True if the payload was delivered successfully false if not
    */
   bool write( const void* buf, uint8_t len );
 
