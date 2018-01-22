@@ -134,7 +134,7 @@
   #include <pgmspace.h>
   #define PRIPSTR "%s"
 
-#elif defined(ARDUINO) && ! defined(__arm__) && !defined (__ARDUINO_X86__) || defined(XMEGA)
+#elif defined(ARDUINO) && !defined(ESP_PLATFORM) && ! defined(__arm__) && !defined (__ARDUINO_X86__) || defined(XMEGA)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
 #else
