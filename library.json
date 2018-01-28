@@ -12,6 +12,9 @@
   "platforms": [
     "atmelavr",
     "atmelsam",
-    "teensy"
+    "teensy",
+    "espressif32",
+    "espressif8266",
+    "linux_arm",
   ]
 }
