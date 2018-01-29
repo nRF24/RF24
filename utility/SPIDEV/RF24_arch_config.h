@@ -22,6 +22,8 @@
 #include <string.h>
 #include <sys/time.h>
 
+#define RF24_SPI_SPEED RF24_SPIDEV_SPEED
+
 #define _BV(x) (1<<(x))
 #define _SPI spi
 
@@ -47,7 +49,7 @@ typedef uint16_t prog_uint16_t;
 #define printf_P printf
 #define strlen_P strlen
 #define PROGMEM
-#define pgm_read_word(p) (*(p)) 
+#define pgm_read_word(p) (*(p))
 #define PRIPSTR "%s"
 #define pgm_read_byte(p) (*(p))
 
