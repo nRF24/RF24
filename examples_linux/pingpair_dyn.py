@@ -14,7 +14,7 @@ import RPi.GPIO as GPIO
 irq_gpio_pin = None
 
 ########### USER CONFIGURATION ###########
-# See https://github.com/TMRh20/RF24/blob/master/RPi/pyRF24/readme.md
+# See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
 
 # CE Pin, CSN Pin, SPI Speed
 
