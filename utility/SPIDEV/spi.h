@@ -24,13 +24,22 @@
  */
 
 #include <inttypes.h>
+#include <stdexcept>
 
 #ifndef RF24_SPIDEV_SPEED
 /* 8MHz as default */
 #define RF24_SPIDEV_SPEED 8000000
 #endif
 
+/** Specific excpetion for SPI errors */
+class SPIException : public std::runtime_error {
+	public:
+		explicit SPIException(const std::string& msg) :  std::runtime_error(msg) { }
+};
+
+
 class SPI {
+
 public:
 
 	/**
@@ -41,7 +50,7 @@ public:
 	/**
 	* Start SPI
 	*/
-	void begin(int busNo);
+	void begin(int busNo,uint32_t spi_speed=RF24_SPIDEV_SPEED);
 
 	/**
 	* Transfer a single byte
@@ -72,8 +81,9 @@ public:
 private:
 
 	int fd;
+	uint32_t _spi_speed;
 
-	void init();
+	void init(uint32_t spi_speed=RF24_SPIDEV_SPEED);
 };
 
 /**
@@ -81,4 +91,3 @@ private:
  */
 /*@}*/
 #endif	/* SPI_H */
-
