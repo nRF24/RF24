@@ -9,6 +9,8 @@
 #include "nRF24L01.h"
 #include "RF24_config.h"
 #include "RF24.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 /****************************************************************************/
 
@@ -67,8 +69,13 @@ void RF24::ce(bool level)
 
   inline void RF24::beginTransaction() {
     #if defined (RF24_SPI_TRANSACTIONS)
-    _SPI.beginTransaction(SPISettings(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0));
-	#endif
+    if (geteuid() == 0){
+        _SPI.beginTransaction(SPISettings(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0));
+    }else{
+        fprintf(stderr, "Root access required!\n") ;
+        exit(-1);
+    }
+    #endif
     csn(LOW);
   }
 
