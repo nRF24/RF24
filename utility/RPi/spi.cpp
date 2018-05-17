@@ -1,5 +1,6 @@
 #include "spi.h"
 #include <pthread.h>
+#include <unistd.h>
 
 static pthread_mutex_t spiMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -17,7 +18,9 @@ void SPI::begin( int busNo ) {
 }
 
 void SPI::beginTransaction(SPISettings settings){
-   
+	if (geteuid() != 0){
+		throw -1;
+	}
 	pthread_mutex_lock (&spiMutex);
 	setBitOrder(settings.border);
 	setDataMode(settings.dmode);

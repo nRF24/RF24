@@ -68,7 +68,7 @@ void RF24::ce(bool level)
   inline void RF24::beginTransaction() {
     #if defined (RF24_SPI_TRANSACTIONS)
     _SPI.beginTransaction(SPISettings(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0));
-	#endif
+    #endif
     csn(LOW);
   }
 
