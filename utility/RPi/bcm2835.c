@@ -420,8 +420,8 @@ uint32_t bcm2835_gpio_pad(uint8_t group)
   if (bcm2835_pads == MAP_FAILED)
     return 0;
   
-    volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
-    return bcm2835_peri_read(paddr);
+  volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
+  return bcm2835_peri_read(paddr);
 }
 
 /* Set GPIO pad behaviour for groups of GPIOs
@@ -433,8 +433,8 @@ void bcm2835_gpio_set_pad(uint8_t group, uint32_t control)
   if (bcm2835_pads == MAP_FAILED)
     return;
   
-    volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
-    bcm2835_peri_write(paddr, control | BCM2835_PAD_PASSWRD);
+  volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
+  bcm2835_peri_write(paddr, control | BCM2835_PAD_PASSWRD);
 }
 
 /* Some convenient arduino-like functions
