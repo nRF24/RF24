@@ -2,8 +2,9 @@
 #include "compatibility.h"
 
 
-static long mtime, seconds, useconds;
-static struct timeval start, end;
+static uint32_t mtime, seconds, useconds;
+//static struct timeval start, end;
+struct timespec start, end;
 
 /**********************************************************************/
 /**
@@ -12,18 +13,20 @@ static struct timeval start, end;
  */
 void __msleep(int milisec)
 {
-	struct timespec req = {0};
-	req.tv_sec = 0;
-	req.tv_nsec = milisec * 1000000L;
-	nanosleep(&req, (struct timespec *)NULL);	
+	struct timespec req;// = {0};
+	req.tv_sec = (time_t) milisec / 1000;
+	req.tv_nsec = (milisec % 1000 ) * 1000000L;
+	//nanosleep(&req, (struct timespec *)NULL);	
+	clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, NULL);
 }
 
-void __usleep(int milisec)
+void __usleep(int microsec)
 {
-	struct timespec req = {0};
-	req.tv_sec = 0;
-	req.tv_nsec = milisec * 1000L;
-	nanosleep(&req, (struct timespec *)NULL);	
+	struct timespec req;// = {0};
+	req.tv_sec = (time_t) microsec/ 1000000;
+	req.tv_nsec = (microsec / 1000000) * 1000;
+	//nanosleep(&req, (struct timespec *)NULL);
+	clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, NULL);	
 }
 
 /**
@@ -33,14 +36,16 @@ void __usleep(int milisec)
  
 void __start_timer()
 {
-	gettimeofday(&start, NULL);
+	//gettimeofday(&start, NULL);
+	clock_gettime(CLOCK_MONOTONIC, &start);
 }
 
-long __millis()
+uint32_t __millis()
 {
-	gettimeofday(&end, NULL);
+	//gettimeofday(&end, NULL);
+	clock_gettime(CLOCK_MONOTONIC,&end);
     seconds  = end.tv_sec  - start.tv_sec;
-    useconds = end.tv_usec - start.tv_usec;
+    useconds = (end.tv_nsec - start.tv_nsec)/1000;
 
     mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;	
 	return mtime;
