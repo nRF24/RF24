@@ -36,7 +36,7 @@ void setup(void) {
 
   radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
-  radio.setPALevel(RF24_PA_MAX);
+  radio.setPALevel(RF24_PA_MAX);           //if you wanna save power and you do not need the whole range, just use "RF24_PA_MIN"
   radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
   radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
