@@ -1,15 +1,17 @@
 /*
-TMRh20 2014
+ TMRh20 2014
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  */
 
-/** General Data Transfer Rate Test
- * This example demonstrates basic data transfer functionality with the 
- updated library. This example will display the transfer rates acheived using
- the slower form of high-speed transfer using blocking-writes.
+/*
+ General Data Transfer Rate Test
+ 
+ This example demonstrates basic data transfer functionality with the 
+ updated library. This example will display the transfer rates acheived 
+ using the slower form of high-speed transfer using blocking-writes.
  */
 
 
@@ -17,16 +19,16 @@ TMRh20 2014
 #include "RF24.h"
 
 /*************  USER Configuration *****************************/
-                                          // Hardware configuration
-RF24 radio(7,8);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
+                                           // Hardware configuration
+RF24 radio(7,8);                           // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
 /***************************************************************/
 
 const uint64_t pipes[2] = { 0xABCDABCD71LL, 0x544d52687CLL };   // Radio pipe addresses for the 2 nodes to communicate.
 
-byte data[32];                           //Data buffer for testing data transfer speeds
+byte data[32];                             //Data buffer for testing data transfer speeds
 
-unsigned long counter, rxTimer;          //Counter and timer for keeping track transfer info
+unsigned long counter, rxTimer;            //Counter and timer for keeping track transfer info
 unsigned long startTime, stopTime;  
 bool TX=1,RX=0,role=0;
 
@@ -36,7 +38,7 @@ void setup(void) {
 
   radio.begin();                           // Setup and configure rf radio
   radio.setChannel(1);
-  radio.setPALevel(RF24_PA_MAX);           //if you wanna save power and you do not need the whole range, just use "RF24_PA_MIN"
+  radio.setPALevel(RF24_PA_MAX);           // If you want to save power use "RF24_PA_MIN" but keep in mind that reduces the module's range
   radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(1);                     // Ensure autoACK is enabled
   radio.setRetries(2,15);                  // Optionally, increase the delay between retries & # of retries
@@ -45,25 +47,24 @@ void setup(void) {
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
   
-  radio.startListening();                 // Start listening
-  radio.printDetails();                   // Dump the configuration of the rf unit for debugging
+  radio.startListening();                  // Start listening
+  radio.printDetails();                    // Dump the configuration of the rf unit for debugging
   
   Serial.println(F("\n\rRF24/examples/Transfer/"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
   
-  randomSeed(analogRead(0));              //Seed for random number generation
+  randomSeed(analogRead(0));               //Seed for random number generation
   
-  for(int i=0; i<32; i++){
-     data[i] = random(255);               //Load the buffer with random data
+  for(int i = 0; i < 32; i++){
+     data[i] = random(255);                //Load the buffer with random data
   }
-  radio.powerUp();                        //Power up the radio
+  radio.powerUp();                         //Power up the radio
 }
 
 void loop(void){
 
 
   if(role == TX){
-    
     delay(2000);
     
     Serial.println(F("Initiating Basic Data Transfer"));
