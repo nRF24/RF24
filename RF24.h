@@ -864,6 +864,13 @@ s   *
    uint8_t getPALevel( void );
 
   /**
+   * Get retransmitted packets count. Resets with new transmission.
+   *
+   * @return Returns values 0 to 15.
+   */
+   uint8_t getArcCount( void );
+
+  /**
    * Set the transmission data rate
    *
    * @warning setting RF24_250KBPS will fail for non-plus units
