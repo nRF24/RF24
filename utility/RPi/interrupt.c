@@ -163,6 +163,11 @@ int attachInterrupt (int pin, int mode, void (*function)(void))
 
   isrFunctions [pin] = function ;
 
+  if (pthread_mutex_init(&pinMutex, NULL) != 0)
+  {
+	return printf("wiringPiISR: Init mutex failed: %s\n", strerror (errno)) ;
+  }
+
   pthread_mutex_lock (&pinMutex) ;
     pinPass = pin ;
     pthread_create (&threadId[bcmGpioPin], NULL, interruptHandler, NULL) ;
@@ -213,7 +218,9 @@ int detachInterrupt (int pin)
     }
     else                // Parent, wait
       wait (NULL) ;
-	  
+
+	pthread_mutex_destroy(&pinMutex);
+ 
 	return 1;
 }
 
