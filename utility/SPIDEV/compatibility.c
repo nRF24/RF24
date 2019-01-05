@@ -17,7 +17,7 @@ void __msleep(int milisec)
 	req.tv_sec = (time_t) milisec / 1000;
 	req.tv_nsec = (milisec % 1000 ) * 1000000L;
 	//nanosleep(&req, (struct timespec *)NULL);	
-	clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, NULL);
+	clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
 
 void __usleep(int microsec)
@@ -26,7 +26,7 @@ void __usleep(int microsec)
 	req.tv_sec = (time_t) microsec/ 1000000;
 	req.tv_nsec = (microsec / 1000000) * 1000;
 	//nanosleep(&req, (struct timespec *)NULL);
-	clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, NULL);	
+	clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);	
 }
 
 /**
