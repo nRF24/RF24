@@ -975,7 +975,7 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
   //write_payload( buf, len );
   write_payload( buf, len,multicast? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
   ce(HIGH);
-  #if defined(CORE_TEENSY) || !defined(ARDUINO) || defined (RF24_SPIDEV) || defined (RF24_DUE)
+  #if !defined(F_CPU) || F_CPU > 20000000
 	delayMicroseconds(10);
   #endif
   ce(LOW);
@@ -1464,7 +1464,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   // HIGH and LOW '00' is 1Mbs - our default
   setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ;
   
-  #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
+  #if !defined(F_CPU) || F_CPU > 20000000
     txDelay=250;
   #else //16Mhz Arduino
     txDelay=85;
@@ -1474,7 +1474,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
     // Making it '10'.
     setup |= _BV( RF_DR_LOW ) ;
-  #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
+  #if !defined(F_CPU) || F_CPU > 20000000
     txDelay=450;
   #else //16Mhz Arduino
 	txDelay=155;
@@ -1487,7 +1487,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     if ( speed == RF24_2MBPS )
     {
       setup |= _BV(RF_DR_HIGH);
-      #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
+      #if !defined(F_CPU) || F_CPU > 20000000
       txDelay=190;
       #else //16Mhz Arduino	  
 	  txDelay=65;
