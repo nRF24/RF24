@@ -49,7 +49,7 @@ typedef uint16_t prog_uint16_t;
 #define pgm_read_word(p) (*(p))
 #define PRIPSTR "%s"
 #define pgm_read_byte(p) (*(p))
-
+#define pgm_read_ptr(p) (*(p))
 #endif // __ARCH_CONFIG_H__
 
 
