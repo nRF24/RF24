@@ -151,7 +151,7 @@
   #define strlen_P strlen
   #define PROGMEM
   #define pgm_read_word(p) (*(p))
-
+  #define pgm_read_ptr(p) (*(p))
   #define PRIPSTR "%s"
 
 #endif
