@@ -12,8 +12,6 @@
 
 #include "spi.h"
 
-#include "compatibility.h"
-#include "RF24_arch_config.h"
 #include <fcntl.h>
 #include <linux/spi/spidev.h>
 #include <memory.h>
@@ -31,6 +29,10 @@ bool spiIsInitialized = 0;
 
 void SPI::begin(int busNo,uint32_t spi_speed){
 
+    if(spiIsInitialized){
+       return; 
+    }
+    
     /* set spidev accordingly to busNo like:
      * busNo = 23 -> /dev/spidev2.3
      *
@@ -44,7 +46,6 @@ void SPI::begin(int busNo,uint32_t spi_speed){
 	{
 		close(this->fd);
 		this->fd=-1;
-        delay(1000);
 	}
 
 	this->fd = open(device, O_RDWR);
@@ -55,6 +56,7 @@ void SPI::begin(int busNo,uint32_t spi_speed){
         abort();
 
   }*/
+    spiIsInitialized = true;
 	init(spi_speed);
 }
 
