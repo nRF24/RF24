@@ -1218,6 +1218,14 @@ private:
  * generally important to include an incrementing value like millis() in the payloads to prevent errors.
  */
  
+ /**
+ * @example GettingStarted_HandlingFailures.ino
+ *
+ * This example demonstrates the basic getting started functionality, but with failure handling for the radio chip.
+ * Addresses random radio failures etc, potentially due to loose wiring on breadboards etc.
+ */
+ 
+ 
 /**
  * @example Transfer.ino
  * <b>For Arduino</b><br>
