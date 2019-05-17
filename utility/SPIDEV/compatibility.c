@@ -37,13 +37,13 @@ void __usleep(int microsec)
 void __start_timer()
 {
 	//gettimeofday(&start, NULL);
-	clock_gettime(CLOCK_MONOTONIC, &start);
+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 }
 
 uint32_t __millis()
 {
 	//gettimeofday(&end, NULL);
-	clock_gettime(CLOCK_MONOTONIC,&end);
+	clock_gettime(CLOCK_MONOTONIC_RAW,&end);
     seconds  = end.tv_sec  - start.tv_sec;
     useconds = (end.tv_nsec - start.tv_nsec)/1000;
 
