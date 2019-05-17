@@ -145,6 +145,7 @@ if (role == 1)  {
           if(millis() - failTimer > 250){
             radio.failureDetected = true;
             Serial.println("Radio available failure detected");
+            break;
           }
           radio.read( &got_time, sizeof(unsigned long) );
         }
