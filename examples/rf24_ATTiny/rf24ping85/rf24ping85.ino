@@ -3,6 +3,8 @@ This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 version 2 as published by the Free Software Foundation.
 
+    Verify DI, DO, and USCK defines in RF24.cpp are correct for your ATtiny core.
+
     rf24ping85.ino by tong67 ( https://github.com/tong67 )
     This is an example of how to use the RF24 class to communicate with ATtiny85 and other node.
     Write this sketch to an ATtiny85. It will act like the 'transmit' mode of GettingStarted.ino
@@ -37,7 +39,7 @@ version 2 as published by the Free Software Foundation.
                         |-----------------------------------------------||----x-- nRF24L01 CSN, pin4 
                                                                        10nF
 
-    ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7
+    ATtiny24/44/84 Pin map
 	Schematic provided and successfully tested by Carmine Pastore (https://github.com/Carminepz)
                                        +-\/-+
          nRF24L01  VCC, pin2 --- VCC  1|o   |14 GND --- nRF24L01  GND, pin1
