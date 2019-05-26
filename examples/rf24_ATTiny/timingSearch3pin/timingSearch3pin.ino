@@ -126,11 +126,17 @@ version 2 as published by the Free Software Foundation.
 #	define SS   3  // D3, pin 2  Slave Select
 #elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
 // these depend on the core used (check pins_arduino.h)
-// this is for jeelabs' one (based on google-code core)
+// tested with google-code core
 #	define DI   4   // PA6
 #	define DO   5   // PA5
 #	define USCK 6   // PA4
 #	define SS   3   // PA7
+// tested with spencekonde core (https://github.com/SpenceKonde/ATTinyCore)
+// and mit high-low tech core (https://github.com/damellis/attiny)
+// #	define DI   6   // PA6 - USI Data Input  - Radio MISO
+// #	define DO   5   // PA5 - USI Data Output - Radio MOSI
+// #	define USCK 4   // PA4 - USI Clock       - Radio SCK
+// #	define SS   3   // (not used by USI, user configured in RF24 constructor)
 #endif
 
 #if defined (ARDUINO) && !defined (__arm__)

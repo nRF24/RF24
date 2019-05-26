@@ -1585,15 +1585,15 @@ private:
  *    **ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7** <br>
  *	Schematic provided and successfully tested by Carmine Pastore (https://github.com/Carminepz) <br>
  * @code
- *                                  +-\/-+                                                              
- *    nRF24L01  VCC, pin2 --- VCC  1|o   |14 GND --- nRF24L01  GND, pin1
- *                            PB0  2|    |13 AREF
- *                            PB1  3|    |12 PA1
- *                            PB3  4|    |11 PA2 --- nRF24L01   CE, pin3
- *                            PB2  5|    |10 PA3 --- nRF24L01  CSN, pin4
- *                            PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5
- *    nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6
- *                                  +----+
+ *                                        +-\/-+                                                              
+ *          nRF24L01  VCC, pin2 --- VCC  1|o   |14 GND --- nRF24L01  GND, pin1
+ *                                  PB0  2|    |13 AREF
+ *                                  PB1  3|    |12 PA1
+ *                                  PB3  4|    |11 PA2 --- nRF24L01   CE, pin3
+ *                                  PB2  5|    |10 PA3 --- nRF24L01  CSN, pin4
+ *                                  PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5 (USI CK) 
+ * (USI DI) nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6 (USI DO)
+ *                                        +----+
  *	@endcode					 
  *	
  * <br>
