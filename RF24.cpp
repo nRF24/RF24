@@ -1590,43 +1590,24 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 
 
 //ATTiny support code pulled in from https://github.com/jscrane/RF24
-
-#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-// see http://gammon.com.au/spi
-#	define DI   0  // D0, pin 5  Data In
-#	define DO   1  // D1, pin 6  Data Out (this is *not* MOSI)
-#	define USCK 2  // D2, pin 7  Universal Serial Interface clock
-#	define SS   3  // D3, pin 2  Slave Select
-#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-// these depend on the core used (check pins_arduino.h)
-// this is for jeelabs' one (based on google-code core)
-#	define DI   4   // PA6
-#	define DO   5   // PA5
-#	define USCK 6   // PA4
-#	define SS   3   // PA7
-#elif defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
-// these depend on the core used (check pins_arduino.h)
-// tested with google-code core
-#	define DI   14  // PB5
-#	define DO   15  // PB6
-#	define USCK 16  // PB7
-#	define SS   13  // PB4
-#elif defined(__AVR_ATtiny861__)
-// these depend on the core used (check pins_arduino.h)
-// tested with google-code core
-#    define DI   9   // PB0
-#    define DO   8   // PB1
-#    define USCK 7   // PB2
-#    define SS   6   // PB3
-#endif
-
 #if defined(RF24_TINY)
 
 void SPIClass::begin() {
-
-  pinMode(USCK, OUTPUT);
-  pinMode(DO, OUTPUT);
-  pinMode(DI, INPUT);
+	// set USCK and DO for output
+	// set DI for input
+#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+	DDRB |= (1 << PB2) | (1 << PB1);
+	DDRB &= ~(1 << PB0);
+#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+	DDRA |= (1 << PA4) | (1 << PA5);
+	DDRA &= ~(1 << PA6);
+#elif defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
+	DDRB |= (1 << PB7) | (1 << PB6);
+	DDRB &= ~(1 << PB5);
+#elif defined(__AVR_ATtiny861__)
+	DDRB |= (1 << PB2) | (1 << PB1);
+	DDRB &= ~(1 << PB0);
+#endif
   USICR = _BV(USIWM0);
 
 }
