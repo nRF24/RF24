@@ -225,7 +225,7 @@ public:
    * radio.stopListening();
    * radio.write(&data,sizeof(data));
    * @endcode
-   * @return True if the payload was delivered successfully false if not
+   * @return True if the payload was delivered successfully and an ACK was received, or upon successfull transmission if auto-ack is disabled.
    */
   bool write( const void* buf, uint8_t len );
 
