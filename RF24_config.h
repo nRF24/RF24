@@ -134,6 +134,10 @@
   #include <pgmspace.h>
   #define PRIPSTR "%s"
 
+#elif defined (ESP32)
+#include <pgmspace.h>
+#define PRIPSTR "%s"
+
 #elif defined(ARDUINO) && !defined(ESP_PLATFORM) && ! defined(__arm__) && !defined (__ARDUINO_X86__) || defined(XMEGA)
 	#include <avr/pgmspace.h>
 	#define PRIPSTR "%S"
