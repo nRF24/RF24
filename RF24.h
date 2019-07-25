@@ -225,7 +225,7 @@ public:
    * radio.stopListening();
    * radio.write(&data,sizeof(data));
    * @endcode
-   * @return True if the payload was delivered successfully false if not
+   * @return True if the payload was delivered successfully and an ACK was received, or upon successfull transmission if auto-ack is disabled.
    */
   bool write( const void* buf, uint8_t len );
 
@@ -655,15 +655,24 @@ s   *
   void closeReadingPipe( uint8_t pipe ) ;
 
    /**
-   * Enable error detection by un-commenting #define FAILURE_HANDLING in RF24_config.h
+   * 
    * If a failure has been detected, it usually indicates a hardware issue. By default the library
    * will cease operation when a failure is detected.  
    * This should allow advanced users to detect and resolve intermittent hardware issues.  
    *   
    * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
    * applied after a failure occurs, if wanting to re-enable the device immediately.
+   *
+   * The three main failure modes of the radio include:
+   *
+   * Writing to radio: Radio unresponsive - Fixed internally by adding a timeout to the internal write functions in RF24 (failure handling)
+   *
+   * Reading from radio: Available returns true always - Fixed by adding a timeout to available functions by the user. This is implemented internally in  RF24Network.
+   *
+   * Radio configuration settings are lost - Fixed by monitoring a value that is different from the default, and re-configuring the radio if this setting reverts to the default.
    * 
-   * Usage: (Failure handling must be enabled per above)
+   * See the included example, GettingStarted_HandlingFailures
+   *    
    *  @code
    *  if(radio.failureDetected){ 
    *    radio.begin();                       // Attempt to re-configure the radio with defaults
@@ -1217,6 +1226,14 @@ private:
  * This example demonstrates how to send multiple variables in a single payload and work with data. As usual, it is
  * generally important to include an incrementing value like millis() in the payloads to prevent errors.
  */
+ 
+ /**
+ * @example GettingStarted_HandlingFailures.ino
+ *
+ * This example demonstrates the basic getting started functionality, but with failure handling for the radio chip.
+ * Addresses random radio failures etc, potentially due to loose wiring on breadboards etc.
+ */
+ 
  
 /**
  * @example Transfer.ino

@@ -41,7 +41,24 @@ void RF24::csn(bool mode)
       #if !defined (SOFTSPI)	
 		_SPI.setBitOrder(MSBFIRST);
 		_SPI.setDataMode(SPI_MODE0);
-		_SPI.setClockDivider(SPI_CLOCK_DIV2);
+		#if !defined(F_CPU) || F_CPU < 20000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV2);
+		#elif F_CPU < 40000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV4);
+		#elif F_CPU < 80000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV8);
+		#elif F_CPU < 160000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV16);
+		#elif F_CPU < 320000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV32);
+		#elif F_CPU < 640000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV64);
+		#elif F_CPU < 1280000000
+			_SPI.setClockDivider(SPI_CLOCK_DIV128);
+		#else
+			#error "Unsupported CPU frequency. Please set correct SPI divider."
+		#endif
+
       #endif
 #elif defined (RF24_RPi)
       if(!mode)
@@ -559,10 +576,10 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("CONFIG\t"),NRF_CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  printf_P(PSTR("Data Rate\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
-  printf_P(PSTR("Model\t\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
-  printf_P(PSTR("CRC Length\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
-  printf_P(PSTR("PA Power\t = " PRIPSTR "\r\n"),  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  printf_P(PSTR("Data Rate\t = " PRIPSTR "\r\n"),pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()]));
+  printf_P(PSTR("Model\t\t = " PRIPSTR "\r\n"),pgm_read_ptr(&rf24_model_e_str_P[isPVariant()]));
+  printf_P(PSTR("CRC Length\t = " PRIPSTR "\r\n"),pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()]));
+  printf_P(PSTR("PA Power\t = " PRIPSTR "\r\n"),  pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()]));
 
 }
 
@@ -958,7 +975,7 @@ void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
   //write_payload( buf, len );
   write_payload( buf, len,multicast? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
   ce(HIGH);
-  #if defined(CORE_TEENSY) || !defined(ARDUINO) || defined (RF24_SPIDEV) || defined (RF24_DUE)
+  #if !defined(F_CPU) || F_CPU > 20000000
 	delayMicroseconds(10);
   #endif
   ce(LOW);
@@ -1447,7 +1464,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
   // HIGH and LOW '00' is 1Mbs - our default
   setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)) ;
   
-  #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
+  #if !defined(F_CPU) || F_CPU > 20000000
     txDelay=250;
   #else //16Mhz Arduino
     txDelay=85;
@@ -1457,7 +1474,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
     // Making it '10'.
     setup |= _BV( RF_DR_LOW ) ;
-  #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
+  #if !defined(F_CPU) || F_CPU > 20000000
     txDelay=450;
   #else //16Mhz Arduino
 	txDelay=155;
@@ -1470,7 +1487,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     if ( speed == RF24_2MBPS )
     {
       setup |= _BV(RF_DR_HIGH);
-      #if defined(__arm__) || defined (RF24_LINUX) || defined (__ARDUINO_X86__)
+      #if !defined(F_CPU) || F_CPU > 20000000
       txDelay=190;
       #else //16Mhz Arduino	  
 	  txDelay=65;
@@ -1573,43 +1590,24 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 
 
 //ATTiny support code pulled in from https://github.com/jscrane/RF24
-
-#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-// see http://gammon.com.au/spi
-#	define DI   0  // D0, pin 5  Data In
-#	define DO   1  // D1, pin 6  Data Out (this is *not* MOSI)
-#	define USCK 2  // D2, pin 7  Universal Serial Interface clock
-#	define SS   3  // D3, pin 2  Slave Select
-#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-// these depend on the core used (check pins_arduino.h)
-// this is for jeelabs' one (based on google-code core)
-#	define DI   4   // PA6
-#	define DO   5   // PA5
-#	define USCK 6   // PA4
-#	define SS   3   // PA7
-#elif defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
-// these depend on the core used (check pins_arduino.h)
-// tested with google-code core
-#	define DI   14  // PB5
-#	define DO   15  // PB6
-#	define USCK 16  // PB7
-#	define SS   13  // PB4
-#elif defined(__AVR_ATtiny861__)
-// these depend on the core used (check pins_arduino.h)
-// tested with google-code core
-#    define DI   9   // PB0
-#    define DO   8   // PB1
-#    define USCK 7   // PB2
-#    define SS   6   // PB3
-#endif
-
 #if defined(RF24_TINY)
 
 void SPIClass::begin() {
-
-  pinMode(USCK, OUTPUT);
-  pinMode(DO, OUTPUT);
-  pinMode(DI, INPUT);
+	// set USCK and DO for output
+	// set DI for input
+#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+	DDRB |= (1 << PB2) | (1 << PB1);
+	DDRB &= ~(1 << PB0);
+#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+	DDRA |= (1 << PA4) | (1 << PA5);
+	DDRA &= ~(1 << PA6);
+#elif defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
+	DDRB |= (1 << PB7) | (1 << PB6);
+	DDRB &= ~(1 << PB5);
+#elif defined(__AVR_ATtiny861__)
+	DDRB |= (1 << PB2) | (1 << PB1);
+	DDRB &= ~(1 << PB0);
+#endif
   USICR = _BV(USIWM0);
 
 }

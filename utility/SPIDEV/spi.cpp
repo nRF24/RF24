@@ -25,8 +25,14 @@
 SPI::SPI():fd(-1), _spi_speed(RF24_SPIDEV_SPEED) {
 }
 
+bool spiIsInitialized = 0;
+
 void SPI::begin(int busNo,uint32_t spi_speed){
 
+    if(spiIsInitialized){
+       return; 
+    }
+    
     /* set spidev accordingly to busNo like:
      * busNo = 23 -> /dev/spidev2.3
      *
@@ -50,7 +56,7 @@ void SPI::begin(int busNo,uint32_t spi_speed){
         abort();
 
   }*/
-
+    spiIsInitialized = true;
 	init(spi_speed);
 }
 

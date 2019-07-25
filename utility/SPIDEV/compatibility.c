@@ -17,7 +17,7 @@ void __msleep(int milisec)
 	req.tv_sec = (time_t) milisec / 1000;
 	req.tv_nsec = (milisec % 1000 ) * 1000000L;
 	//nanosleep(&req, (struct timespec *)NULL);	
-	clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, NULL);
+	clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
 
 void __usleep(int microsec)
@@ -26,7 +26,7 @@ void __usleep(int microsec)
 	req.tv_sec = (time_t) microsec/ 1000000;
 	req.tv_nsec = (microsec / 1000000) * 1000;
 	//nanosleep(&req, (struct timespec *)NULL);
-	clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, NULL);	
+	clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);	
 }
 
 /**
@@ -37,13 +37,13 @@ void __usleep(int microsec)
 void __start_timer()
 {
 	//gettimeofday(&start, NULL);
-	clock_gettime(CLOCK_MONOTONIC, &start);
+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 }
 
 uint32_t __millis()
 {
 	//gettimeofday(&end, NULL);
-	clock_gettime(CLOCK_MONOTONIC,&end);
+	clock_gettime(CLOCK_MONOTONIC_RAW,&end);
     seconds  = end.tv_sec  - start.tv_sec;
     useconds = (end.tv_nsec - start.tv_nsec)/1000;
 
