@@ -1071,7 +1071,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
   #if defined (RF24_LINUX)  
   spi_txbuff[0] = R_RX_PL_WID;
-  spi_rxbuff[1] = 0xff;
+  spi_txbuff[1] = 0xff;
   beginTransaction();
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = spi_rxbuff[1];  
