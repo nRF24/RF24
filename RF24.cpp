@@ -605,6 +605,9 @@ bool RF24::begin(void)
 	    // Allow BCM2835 enums for RPi
 	    case 8: csn_pin = 0; break;
 	    case 7: csn_pin = 1; break;
+	    case 18: csn_pin = 10; break;	//to make it work on SPI1
+	    case 17: csn_pin = 11; break;
+	    case 16: csn_pin = 12; break;
 	    default: csn_pin = 0; break;
 	  }
     #endif
