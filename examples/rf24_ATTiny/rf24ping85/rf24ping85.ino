@@ -36,6 +36,18 @@ version 2 as published by the Free Software Foundation.
                         |        +----+                                       |
                         |-----------------------------------------------||----x-- nRF24L01 CSN, pin4 
                                                                        10nF
+    ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 0 => PB4 is free to use for application and you can use ackPayload funtionallity
+    and you will save power as RF24 could get into sleep between writings as we control CE_PIN
+    
+                                                                                            ^^
+                                 +-\/-+                                                    //
+                           PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 -----------------x--|<|-- 5V
+    nRF24L01  CE, pin3 --- PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5 --|<|---x-[22k]--|  LED
+                   NC      PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin7  1n4148 |
+    nRF24L01 GND, pin1 -x- GND  4|    |5  PB0 --- nRF24L01 MISO, pin6         |
+                        |        +----+                                       |
+                        |-----------------------------------------------||----x-- nRF24L01 CSN, pin4 
+                                                                       10nF    
 
     ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7
 	Schematic provided and successfully tested by Carmine Pastore (https://github.com/Carminepz)
@@ -54,6 +66,7 @@ version 2 as published by the Free Software Foundation.
 #define CE_PIN 3
 #define CSN_PIN 4
 //#define CSN_PIN 3 // uncomment for ATtiny85 3 pins solution
+//#define CSN_PIN 0 // uncomment for ATtiny85 4 pins solution
 
 #include "RF24.h"
 
