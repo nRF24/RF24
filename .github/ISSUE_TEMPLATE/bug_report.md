@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Having issues with ACK not working correctly? Please see [common issues](COMMON_ISSUES.md).
+Having issues with ACK not working correctly? Please see [common issues](https://github.com/nRF24/RF24/blob/master/COMMON_ISSUES.md).
 
 **Describe the bug**
 A clear and concise description of what the bug is.
