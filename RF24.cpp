@@ -10,6 +10,11 @@
 #include "RF24_config.h"
 #include "RF24.h"
 
+// For some reason, the ESP32 compiler refuses to define this correctly in RF24_config.h, so we have to brute force it here
+#ifdef HAL_ESP32_HAL_H_
+#define RF24_SPI_TRANSACTIONS
+#endif
+
 /****************************************************************************/
 
 void RF24::csn(bool mode)
