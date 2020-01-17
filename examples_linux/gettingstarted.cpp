@@ -120,7 +120,7 @@ int main(int argc, char** argv)
     // This simple sketch opens two pipes for these two nodes to communicate
     // back and forth.
 
-    if (! radioNumber) {
+    if (!radioNumber) {
         radio.openWritingPipe(pipes[0]);
         radio.openReadingPipe(1, pipes[1]);
     } else {
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 
             bool ok = radio.write(&time, sizeof(unsigned long));
 
-            if (! ok) {
+            if (!ok) {
                 printf("failed.\n");
             }
             // Now, continue listening
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
             // Wait here until we get a response, or timeout (250ms)
             unsigned long started_waiting_at = millis();
             bool timeout = false;
-            while (! radio.available() && ! timeout) {
+            while (!radio.available() && !timeout) {
                 if (millis() - started_waiting_at > 200) {
                     timeout = true;
                 }

@@ -23,7 +23,7 @@
 #define RF24_SPIDEV_BITS 8
 
 SPI::SPI()
-        :fd(- 1), _spi_speed(RF24_SPIDEV_SPEED)
+        :fd(-1), _spi_speed(RF24_SPIDEV_SPEED)
 {
 }
 
@@ -48,7 +48,7 @@ void SPI::begin(int busNo, uint32_t spi_speed)
     if (this->fd >= 0) // check whether spi is already open
     {
         close(this->fd);
-        this->fd = - 1;
+        this->fd = -1;
     }
 
     this->fd = open(device, O_RDWR);
@@ -75,7 +75,7 @@ void SPI::init(uint32_t speed)
      * spi mode
      */
     ret = ioctl(this->fd, SPI_IOC_WR_MODE, &mode);
-    if (ret == - 1) {
+    if (ret == -1) {
         throw SPIException("cant set WR spi mode");
     }
     /*{
@@ -84,7 +84,7 @@ void SPI::init(uint32_t speed)
     }*/
 
     ret = ioctl(this->fd, SPI_IOC_RD_MODE, &mode);
-    if (ret == - 1) {
+    if (ret == -1) {
         throw SPIException("can't set RD spi mode");
     }
     /*{
@@ -96,7 +96,7 @@ void SPI::init(uint32_t speed)
      * bits per word
      */
     ret = ioctl(this->fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
-    if (ret == - 1) {
+    if (ret == -1) {
         throw SPIException("can't set WR bits per word");
     }
     /*{
@@ -105,7 +105,7 @@ void SPI::init(uint32_t speed)
     }*/
 
     ret = ioctl(this->fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
-    if (ret == - 1) {
+    if (ret == -1) {
         throw SPIException("can't set RD bits per word");
     }
     /*{
@@ -116,7 +116,7 @@ void SPI::init(uint32_t speed)
      * max speed hz
      */
     ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
-    if (ret == - 1) {
+    if (ret == -1) {
         throw SPIException("can't WR set max speed hz");
     }
     /*{
@@ -125,7 +125,7 @@ void SPI::init(uint32_t speed)
     }*/
 
     ret = ioctl(this->fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
-    if (ret == - 1) {
+    if (ret == -1) {
         throw SPIException("can't RD set max speed hz");
     }
     /*{

@@ -8,7 +8,7 @@
 GPIO::GPIO()
 {
     // Prophet: basic members initialization
-    gpio_ce_pin = - 1;
+    gpio_ce_pin = -1;
     //gpio_cs_pin = -1;
     gpio_0 = NULL;
     //gpio_1 = NULL;
@@ -71,7 +71,7 @@ int GPIO::read(int port)
 	if(port == gpio_cs_pin){
 		return gpio_1->read();
 	}*/
-    return - 1;
+    return -1;
 }
 
 void GPIO::write(int port, int value)

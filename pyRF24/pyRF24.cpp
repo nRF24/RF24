@@ -271,7 +271,7 @@ bp::scope().attr("BCM2835_SPI_SPEED_8KHZ") = BCM2835_SPI_SPEED_8KHZ;
         // ******************** RF24 class  **************************
         //
         bp::class_< RF24 >( "RF24", bp::init< uint8_t, uint8_t >(( bp::arg("_cepin"), bp::arg("_cspin"))))
-        #if defined (RF24_LINUX) && ! defined (MRAA)
+        #if defined (RF24_LINUX) && !defined (MRAA)
         .def( bp::init< uint8_t, uint8_t, uint32_t >(( bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed") )) )
         #endif
         .def("available", (bool (::RF24::* )(  ))( &::RF24::available ))

@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     /***********************************/
     // This opens two pipes for these two nodes to communicate
     // back and forth.
-    if (! radioNumber) {
+    if (!radioNumber) {
         radio.openWritingPipe(addresses[0]);
         radio.openReadingPipe(1, addresses[1]);
     } else {
@@ -134,13 +134,13 @@ int main(int argc, char** argv)
             unsigned long time = millis();                          // Record the current microsecond count
 
             if (radio.write(&counter, 1)) {                         // Send the counter variable to the other radio
-                if (! radio.available()) {                             // If nothing in the buffer, we got an ack but it is blank
+                if (!radio.available()) {                             // If nothing in the buffer, we got an ack but it is blank
                     printf("Got blank response. round-trip delay: %lu ms\n\r", millis() - time);
                 } else {
                     while (radio.available()) {                      // If an ack with payload was received
                         radio.read(&gotByte, 1);                  // Read it, and display the response time
                         printf("Got response %d, round-trip delay: %lu ms\n\r", gotByte, millis() - time);
-                        counter ++;                                  // Increment the counter variable
+                        counter++;                                  // Increment the counter variable
                     }
                 }
 

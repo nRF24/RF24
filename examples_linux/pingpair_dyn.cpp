@@ -135,10 +135,11 @@ int main(int argc, char** argv)
             // Wait here until we get a response, or timeout
             unsigned long started_waiting_at = millis();
             bool timeout = false;
-            while (! radio.available() && ! timeout)
+            while (!radio.available() && !timeout) {
                 if (millis() - started_waiting_at > 500) {
                     timeout = true;
                 }
+            }
 
             // Describe the results
             if (timeout) {

@@ -24,15 +24,15 @@ see <http://www.gnu.org/licenses/>
 #define delay(x) bcm2835_delay(x)
 
 static pthread_mutex_t pinMutex = PTHREAD_MUTEX_INITIALIZER;
-static volatile int pinPass = - 1;
+static volatile int pinPass = -1;
 
 pthread_t threadId[64];
 
 // sysFds:
 //      Map a file descriptor from the /sys/class/gpio/gpioX/value
-static int sysFds[64] = {- 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
-                         - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
-                         - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,};
+static int sysFds[64] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                         -1, -1, -1, -1, -1, -1,};
 
 // ISR Data
 static void (* isrFunctions[64])(void);
@@ -43,8 +43,8 @@ int waitForInterrupt(int pin, int mS)
     uint8_t c;
     struct pollfd polls;
 
-    if ((fd = sysFds[pin]) == - 1) {
-        return - 2;
+    if ((fd = sysFds[pin]) == -1) {
+        return -2;
     }
 
     // Setup poll structure
@@ -87,15 +87,16 @@ void* interruptHandler(void* arg)
     (void) piHiPri(55);  // Only effective if we run as root
 
     myPin = pinPass;
-    pinPass = - 1;
+    pinPass = -1;
 
-    for (;;)
-        if (waitForInterrupt(myPin, - 1) > 0) {
+    for (;;) {
+        if (waitForInterrupt(myPin, -1) > 0) {
             pthread_mutex_lock(&pinMutex);
             isrFunctions[myPin]();
             pthread_mutex_unlock(&pinMutex);
             pthread_testcancel(); //Cancel at this point if we have an cancellation request.
         }
+    }
 
     return NULL;
 }
@@ -143,7 +144,7 @@ int attachInterrupt(int pin, int mode, void (* function)(void))
         }
     }
 
-    if (sysFds[bcmGpioPin] == - 1) {
+    if (sysFds[bcmGpioPin] == -1) {
         sprintf(fName, "/sys/class/gpio/gpio%d/value", bcmGpioPin);
         if ((sysFds[bcmGpioPin] = open(fName, O_RDWR)) < 0) {
             return printf("wiringPiISR: unable to open %s: %s\n", fName, strerror(errno));
@@ -151,15 +152,16 @@ int attachInterrupt(int pin, int mode, void (* function)(void))
     }
 
     ioctl(sysFds[bcmGpioPin], FIONREAD, &count);
-    for (i = 0; i < count; ++ i)
+    for (i = 0; i < count; ++i) {
         read(sysFds[bcmGpioPin], &c, 1);
+    }
 
     isrFunctions[pin] = function;
 
     pthread_mutex_lock(&pinMutex);
     pinPass = pin;
     pthread_create(&threadId[bcmGpioPin], NULL, interruptHandler, NULL);
-    while (pinPass != - 1)
+    while (pinPass != -1)
         delay (1);
     pthread_mutex_unlock(&pinMutex);
 

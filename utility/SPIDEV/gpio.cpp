@@ -43,7 +43,7 @@ void GPIO::open(int port, int DDR)
 
     while ((f = fopen(file, "w")) == NULL) { //Wait 10 seconds for the file to be accessible if not open on first attempt
         sleep(1);
-        counter ++;
+        counter++;
         if (counter > 10) {
             throw GPIOException("can't access /sys/class/gpio/gpio%d/direction GPIO pin. check access rights");
             /*perror("Could not open /sys/class/gpio/gpio%d/direction");
@@ -51,7 +51,7 @@ void GPIO::open(int port, int DDR)
         }
     }
     int l = (DDR == 0) ? fprintf(f, "in\n") : fprintf(f, "out\n");
-    if (! (l == 3 || l == 4)) {
+    if (!(l == 3 || l == 4)) {
         fclose(f);
         throw GPIOException("can't set direction on GPIO pin. check access rights");
     }

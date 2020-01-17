@@ -219,7 +219,7 @@ void bcm2835_peri_write_nb(volatile uint32_t* paddr, uint32_t value)
 void bcm2835_peri_set_bits(volatile uint32_t* paddr, uint32_t value, uint32_t mask)
 {
     uint32_t v = bcm2835_peri_read(paddr);
-    v = (v & ~ mask) | (value & mask);
+    v = (v & ~mask) | (value & mask);
     bcm2835_peri_write(paddr, v);
 }
 
@@ -568,7 +568,7 @@ void bcm2835_gpio_write_multi(uint32_t mask, uint8_t on)
 void bcm2835_gpio_write_mask(uint32_t value, uint32_t mask)
 {
     bcm2835_gpio_set_multi(value & mask);
-    bcm2835_gpio_clr_multi((~ value) & mask);
+    bcm2835_gpio_clr_multi((~value) & mask);
 }
 
 /* Set the pullup/down resistor for a pin
@@ -616,7 +616,7 @@ void bcm2835_gpio_set_pud(uint8_t pin, uint8_t pud)
         volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPPUPPDN0 / 4 + (pin >> 4);
 
         bits = bcm2835_peri_read_nb(paddr);
-        bits &= ~ (3 << shiftbits);
+        bits &= ~(3 << shiftbits);
         bits |= (pull << shiftbits);
 
         bcm2835_peri_write_nb(paddr, bits);
@@ -742,13 +742,15 @@ uint8_t bcm2835_spi_transfer(uint8_t value)
     bcm2835_peri_set_bits(paddr, BCM2835_SPI0_CS_TA, BCM2835_SPI0_CS_TA);
 
     /* Maybe wait for TXD */
-    while (! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD));
+    while (!(bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD)) {
+    }
 
     /* Write to FIFO, no barrier */
     bcm2835_peri_write_nb(fifo, bcm2835_correct_order(value));
 
     /* Wait for DONE to be set */
-    while (! (bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE));
+    while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)) {
+    }
 
     /* Read any byte that was sent back by the slave while we sere sending to it */
     ret = bcm2835_correct_order(bcm2835_peri_read_nb(fifo));
@@ -783,16 +785,17 @@ void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
         /* TX fifo not full, so add some more bytes */
         while (((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD)) && (TXCnt < len)) {
             bcm2835_peri_write_nb(fifo, bcm2835_correct_order(tbuf[TXCnt]));
-            TXCnt ++;
+            TXCnt++;
         }
         /* Rx fifo not empty, so get the next received bytes */
         while (((bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD)) && (RXCnt < len)) {
             rbuf[RXCnt] = bcm2835_correct_order(bcm2835_peri_read_nb(fifo));
-            RXCnt ++;
+            RXCnt++;
         }
     }
     /* Wait for DONE to be set */
-    while (! (bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE));
+    while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)) {
+    }
 
     /* Set TA = 0, and also set the barrier */
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
@@ -817,22 +820,25 @@ void bcm2835_spi_writenb(const char* tbuf, uint32_t len)
     /* Set TA = 1 */
     bcm2835_peri_set_bits(paddr, BCM2835_SPI0_CS_TA, BCM2835_SPI0_CS_TA);
 
-    for (i = 0; i < len; i ++) {
+    for (i = 0; i < len; i++) {
         /* Maybe wait for TXD */
-        while (! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD));
+        while (!(bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD)) {
+        }
 
         /* Write to FIFO, no barrier */
         bcm2835_peri_write_nb(fifo, bcm2835_correct_order(tbuf[i]));
 
         /* Read from FIFO to prevent stalling */
-        while (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD)
+        while (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD) {
             (void) bcm2835_peri_read_nb(fifo);
+        }
     }
 
     /* Wait for DONE to be set */
-    while (! (bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)) {
-        while (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD)
+    while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)) {
+        while (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_RXD) {
             (void) bcm2835_peri_read_nb(fifo);
+        }
     };
 
     /* Set TA = 0, and also set the barrier */
@@ -882,7 +888,8 @@ void bcm2835_spi_write(uint16_t data)
     bcm2835_peri_set_bits(paddr, BCM2835_SPI0_CS_TA, BCM2835_SPI0_CS_TA);
 
     /* Maybe wait for TXD */
-    while (! (bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD));
+    while (!(bcm2835_peri_read(paddr) & BCM2835_SPI0_CS_TXD)) {
+    }
 
     /* Write to FIFO */
     bcm2835_peri_write_nb(fifo, (uint32_t) data >> 8);
@@ -890,7 +897,8 @@ void bcm2835_spi_write(uint16_t data)
 
 
     /* Wait for DONE to be set */
-    while (! (bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE));
+    while (!(bcm2835_peri_read_nb(paddr) & BCM2835_SPI0_CS_DONE)) {
+    }
 
     /* Set TA = 0, and also set the barrier */
     bcm2835_peri_set_bits(paddr, 0, BCM2835_SPI0_CS_TA);
@@ -975,7 +983,8 @@ void bcm2835_aux_spi_write(uint16_t data)
     bcm2835_peri_write(cntl0, _cntl0);
     bcm2835_peri_write(cntl1, BCM2835_AUX_SPI_CNTL1_MSBF_IN);
 
-    while (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL);
+    while (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL) {
+    }
 
     bcm2835_peri_write(io, (uint32_t) data << 16);
 }
@@ -1006,13 +1015,14 @@ void bcm2835_aux_spi_writenb(const char* tbuf, uint32_t len)
 
     while (tx_len > 0) {
 
-        while (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL);
+        while (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL) {
+        }
 
         count = MIN(tx_len, 3);
         data = 0;
 
-        for (i = 0; i < count; i ++) {
-            byte = (tx != NULL) ? (uint8_t) * tx ++ : (uint8_t) 0;
+        for (i = 0; i < count; i++) {
+            byte = (tx != NULL) ? (uint8_t) * tx++ : (uint8_t) 0;
             data |= byte << (8 * (2 - i));
         }
 
@@ -1025,7 +1035,8 @@ void bcm2835_aux_spi_writenb(const char* tbuf, uint32_t len)
             bcm2835_peri_write(io, data);
         }
 
-        while (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_BUSY);
+        while (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_BUSY) {
+        }
 
         (void) bcm2835_peri_read(io);
     }
@@ -1059,12 +1070,12 @@ void bcm2835_aux_spi_transfernb(const char* tbuf, char* rbuf, uint32_t len)
 
     while ((tx_len > 0) || (rx_len > 0)) {
 
-        while (! (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL) && (tx_len > 0)) {
+        while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL) && (tx_len > 0)) {
             count = MIN(tx_len, 3);
             data = 0;
 
-            for (i = 0; i < count; i ++) {
-                byte = (tx != NULL) ? (uint8_t) * tx ++ : (uint8_t) 0;
+            for (i = 0; i < count; i++) {
+                byte = (tx != NULL) ? (uint8_t) * tx++ : (uint8_t) 0;
                 data |= byte << (8 * (2 - i));
             }
 
@@ -1079,44 +1090,44 @@ void bcm2835_aux_spi_transfernb(const char* tbuf, char* rbuf, uint32_t len)
 
         }
 
-        while (! (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_RX_EMPTY) && (rx_len > 0)) {
+        while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_RX_EMPTY) && (rx_len > 0)) {
             count = MIN(rx_len, 3);
             data = bcm2835_peri_read(io);
 
             if (rbuf != NULL) {
                 switch (count) {
                     case 3:
-                        *rx ++ = (char) ((data >> 16) & 0xFF);
+                        *rx++ = (char) ((data >> 16) & 0xFF);
                         /*@fallthrough@*/
                         /* no break */
                     case 2:
-                        *rx ++ = (char) ((data >> 8) & 0xFF);
+                        *rx++ = (char) ((data >> 8) & 0xFF);
                         /*@fallthrough@*/
                         /* no break */
                     case 1:
-                        *rx ++ = (char) ((data >> 0) & 0xFF);
+                        *rx++ = (char) ((data >> 0) & 0xFF);
                 }
             }
 
             rx_len -= count;
         }
 
-        while (! (bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_BUSY) && (rx_len > 0)) {
+        while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_BUSY) && (rx_len > 0)) {
             count = MIN(rx_len, 3);
             data = bcm2835_peri_read(io);
 
             if (rbuf != NULL) {
                 switch (count) {
                     case 3:
-                        *rx ++ = (char) ((data >> 16) & 0xFF);
+                        *rx++ = (char) ((data >> 16) & 0xFF);
                         /*@fallthrough@*/
                         /* no break */
                     case 2:
-                        *rx ++ = (char) ((data >> 8) & 0xFF);
+                        *rx++ = (char) ((data >> 8) & 0xFF);
                         /*@fallthrough@*/
                         /* no break */
                     case 1:
-                        *rx ++ = (char) ((data >> 0) & 0xFF);
+                        *rx++ = (char) ((data >> 0) & 0xFF);
                 }
             }
 
@@ -1241,20 +1252,20 @@ uint8_t bcm2835_i2c_write(const char* buf, uint32_t len)
     /* pre populate FIFO with max buffer */
     while (remaining && (i < BCM2835_BSC_FIFO_SIZE)) {
         bcm2835_peri_write_nb(fifo, buf[i]);
-        i ++;
-        remaining --;
+        i++;
+        remaining--;
     }
 
     /* Enable device and start transfer */
     bcm2835_peri_write(control, BCM2835_BSC_C_I2CEN | BCM2835_BSC_C_ST);
 
     /* Transfer is over when BCM2835_BSC_S_DONE */
-    while (! (bcm2835_peri_read(status) & BCM2835_BSC_S_DONE)) {
+    while (!(bcm2835_peri_read(status) & BCM2835_BSC_S_DONE)) {
         while (remaining && (bcm2835_peri_read(status) & BCM2835_BSC_S_TXD)) {
             /* Write to FIFO */
             bcm2835_peri_write(fifo, buf[i]);
-            i ++;
-            remaining --;
+            i++;
+            remaining--;
         }
     }
 
@@ -1307,13 +1318,13 @@ uint8_t bcm2835_i2c_read(char* buf, uint32_t len)
     bcm2835_peri_write_nb(control, BCM2835_BSC_C_I2CEN | BCM2835_BSC_C_ST | BCM2835_BSC_C_READ);
 
     /* wait for transfer to complete */
-    while (! (bcm2835_peri_read_nb(status) & BCM2835_BSC_S_DONE)) {
+    while (!(bcm2835_peri_read_nb(status) & BCM2835_BSC_S_DONE)) {
         /* we must empty the FIFO as it is populated and not use any delay */
         while (remaining && bcm2835_peri_read_nb(status) & BCM2835_BSC_S_RXD) {
             /* Read from FIFO, no barrier */
             buf[i] = bcm2835_peri_read_nb(fifo);
-            i ++;
-            remaining --;
+            i++;
+            remaining--;
         }
     }
 
@@ -1321,8 +1332,8 @@ uint8_t bcm2835_i2c_read(char* buf, uint32_t len)
     while (remaining && (bcm2835_peri_read_nb(status) & BCM2835_BSC_S_RXD)) {
         /* Read from FIFO, no barrier */
         buf[i] = bcm2835_peri_read_nb(fifo);
-        i ++;
-        remaining --;
+        i++;
+        remaining--;
     }
 
     /* Received a NACK */
@@ -1377,7 +1388,7 @@ uint8_t bcm2835_i2c_read_register_rs(char* regaddr, char* buf, uint32_t len)
     bcm2835_peri_write(control, BCM2835_BSC_C_I2CEN | BCM2835_BSC_C_ST);
 
     /* poll for transfer has started */
-    while (! (bcm2835_peri_read(status) & BCM2835_BSC_S_TA)) {
+    while (!(bcm2835_peri_read(status) & BCM2835_BSC_S_TA)) {
         /* Linux may cause us to miss entire transfer stage */
         if (bcm2835_peri_read(status) & BCM2835_BSC_S_DONE) {
             break;
@@ -1392,13 +1403,13 @@ uint8_t bcm2835_i2c_read_register_rs(char* regaddr, char* buf, uint32_t len)
     bcm2835_delayMicroseconds(i2c_byte_wait_us * 3);
 
     /* wait for transfer to complete */
-    while (! (bcm2835_peri_read(status) & BCM2835_BSC_S_DONE)) {
+    while (!(bcm2835_peri_read(status) & BCM2835_BSC_S_DONE)) {
         /* we must empty the FIFO as it is populated and not use any delay */
         while (remaining && bcm2835_peri_read(status) & BCM2835_BSC_S_RXD) {
             /* Read from FIFO */
             buf[i] = bcm2835_peri_read(fifo);
-            i ++;
-            remaining --;
+            i++;
+            remaining--;
         }
     }
 
@@ -1406,8 +1417,8 @@ uint8_t bcm2835_i2c_read_register_rs(char* regaddr, char* buf, uint32_t len)
     while (remaining && (bcm2835_peri_read(status) & BCM2835_BSC_S_RXD)) {
         /* Read from FIFO */
         buf[i] = bcm2835_peri_read(fifo);
-        i ++;
-        remaining --;
+        i++;
+        remaining--;
     }
 
     /* Received a NACK */
@@ -1463,15 +1474,15 @@ uint8_t bcm2835_i2c_write_read_rs(char* cmds, uint32_t cmds_len, char* buf, uint
     /* pre populate FIFO with max buffer */
     while (remaining && (i < BCM2835_BSC_FIFO_SIZE)) {
         bcm2835_peri_write_nb(fifo, cmds[i]);
-        i ++;
-        remaining --;
+        i++;
+        remaining--;
     }
 
     /* Enable device and start transfer */
     bcm2835_peri_write(control, BCM2835_BSC_C_I2CEN | BCM2835_BSC_C_ST);
 
     /* poll for transfer has started (way to do repeated start, from BCM2835 datasheet) */
-    while (! (bcm2835_peri_read(status) & BCM2835_BSC_S_TA)) {
+    while (!(bcm2835_peri_read(status) & BCM2835_BSC_S_TA)) {
         /* Linux may cause us to miss entire transfer stage */
         if (bcm2835_peri_read_nb(status) & BCM2835_BSC_S_DONE) {
             break;
@@ -1489,13 +1500,13 @@ uint8_t bcm2835_i2c_write_read_rs(char* cmds, uint32_t cmds_len, char* buf, uint
     bcm2835_delayMicroseconds(i2c_byte_wait_us * (cmds_len + 1));
 
     /* wait for transfer to complete */
-    while (! (bcm2835_peri_read_nb(status) & BCM2835_BSC_S_DONE)) {
+    while (!(bcm2835_peri_read_nb(status) & BCM2835_BSC_S_DONE)) {
         /* we must empty the FIFO as it is populated and not use any delay */
         while (remaining && bcm2835_peri_read(status) & BCM2835_BSC_S_RXD) {
             /* Read from FIFO, no barrier */
             buf[i] = bcm2835_peri_read_nb(fifo);
-            i ++;
-            remaining --;
+            i++;
+            remaining--;
         }
     }
 
@@ -1503,8 +1514,8 @@ uint8_t bcm2835_i2c_write_read_rs(char* cmds, uint32_t cmds_len, char* buf, uint
     while (remaining && (bcm2835_peri_read(status) & BCM2835_BSC_S_RXD)) {
         /* Read from FIFO */
         buf[i] = bcm2835_peri_read(fifo);
-        i ++;
-        remaining --;
+        i++;
+        remaining--;
     }
 
     /* Received a NACK */
@@ -1564,7 +1575,8 @@ void bcm2835_st_delay(uint64_t offset_micros, uint64_t micros)
 {
     uint64_t compare = offset_micros + micros;
 
-    while (bcm2835_st_read() < compare);
+    while (bcm2835_st_read() < compare) {
+    }
 }
 
 /* PWM */
@@ -1581,8 +1593,9 @@ void bcm2835_pwm_set_clock(uint32_t divisor)
     bcm2835_peri_write(bcm2835_clk + BCM2835_PWMCLK_CNTL, BCM2835_PWM_PASSWRD | 0x01);
     bcm2835_delay(110); /* Prevents clock going slow */
     /* Wait for the clock to be not busy */
-    while ((bcm2835_peri_read(bcm2835_clk + BCM2835_PWMCLK_CNTL) & 0x80) != 0)
+    while ((bcm2835_peri_read(bcm2835_clk + BCM2835_PWMCLK_CNTL) & 0x80) != 0) {
         bcm2835_delay(1);
+    }
     /* set the clock divider and enable PWM clock */
     bcm2835_peri_write(bcm2835_clk + BCM2835_PWMCLK_DIV, BCM2835_PWM_PASSWRD | (divisor << 12));
     bcm2835_peri_write(bcm2835_clk + BCM2835_PWMCLK_CNTL, BCM2835_PWM_PASSWRD | 0x11); /* Source=osc and enable */
@@ -1597,23 +1610,27 @@ void bcm2835_pwm_set_mode(uint8_t channel, uint8_t markspace, uint8_t enabled)
     uint32_t control = bcm2835_peri_read(bcm2835_pwm + BCM2835_PWM_CONTROL);
 
     if (channel == 0) {
-        if (markspace)
+        if (markspace) {
             control |= BCM2835_PWM0_MS_MODE;
-        else
-            control &= ~ BCM2835_PWM0_MS_MODE;
-        if (enabled)
+        } else {
+            control &= ~BCM2835_PWM0_MS_MODE;
+        }
+        if (enabled) {
             control |= BCM2835_PWM0_ENABLE;
-        else
-            control &= ~ BCM2835_PWM0_ENABLE;
+        } else {
+            control &= ~BCM2835_PWM0_ENABLE;
+        }
     } else if (channel == 1) {
-        if (markspace)
+        if (markspace) {
             control |= BCM2835_PWM1_MS_MODE;
-        else
-            control &= ~ BCM2835_PWM1_MS_MODE;
-        if (enabled)
+        } else {
+            control &= ~BCM2835_PWM1_MS_MODE;
+        }
+        if (enabled) {
             control |= BCM2835_PWM1_ENABLE;
-        else
-            control &= ~ BCM2835_PWM1_ENABLE;
+        } else {
+            control &= ~BCM2835_PWM1_ENABLE;
+        }
     }
 
     /* If you use the barrier here, wierd things happen, and the commands dont work */
@@ -1628,10 +1645,11 @@ void bcm2835_pwm_set_range(uint8_t channel, uint32_t range)
         return;
     } /* bcm2835_init() failed or not root */
 
-    if (channel == 0)
+    if (channel == 0) {
         bcm2835_peri_write_nb(bcm2835_pwm + BCM2835_PWM0_RANGE, range);
-    else if (channel == 1)
+    } else if (channel == 1) {
         bcm2835_peri_write_nb(bcm2835_pwm + BCM2835_PWM1_RANGE, range);
+    }
 }
 
 void bcm2835_pwm_set_data(uint8_t channel, uint32_t data)
@@ -1640,10 +1658,11 @@ void bcm2835_pwm_set_data(uint8_t channel, uint32_t data)
         return;
     } /* bcm2835_init() failed or not root */
 
-    if (channel == 0)
+    if (channel == 0) {
         bcm2835_peri_write_nb(bcm2835_pwm + BCM2835_PWM0_DATA, data);
-    else if (channel == 1)
+    } else if (channel == 1) {
         bcm2835_peri_write_nb(bcm2835_pwm + BCM2835_PWM1_DATA, data);
+    }
 }
 
 /* Allocate page-aligned memory. */
@@ -1712,7 +1731,7 @@ int bcm2835_init(void)
 
             peri_size = (buf[8] << 24) | (buf[9] << 16) | (buf[10] << 8) | (buf[11] << 0);
 
-            if (! base_address) {
+            if (!base_address) {
                 /* looks like RPI 4 */
                 base_address = (buf[8] << 24) | (buf[9] << 16) | (buf[10] << 8) | (buf[11] << 0);
 
@@ -1740,7 +1759,7 @@ int bcm2835_init(void)
      * the fact that we can only access GPIO
      * else try for the /dev/mem interface and get access to everything
      */
-    memfd = - 1;
+    memfd = -1;
     ok = 0;
     if (geteuid() == 0) {
         /* Open the master /dev/mem device */
@@ -1794,7 +1813,7 @@ int bcm2835_init(void)
         close(memfd);
     }
 
-    if (! ok) {
+    if (!ok) {
         bcm2835_close();
     }
 

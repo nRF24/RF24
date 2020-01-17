@@ -35,7 +35,7 @@
 
 // Avoid spurious warnings
 #if 1
-    #if ! defined( NATIVE ) && defined( ARDUINO )
+    #if !defined( NATIVE ) && defined( ARDUINO )
         #undef PROGMEM
         #define PROGMEM __attribute__(( section(".progmem.data") ))
         #undef PSTR

@@ -55,7 +55,7 @@ void intHandler()
     }
 
     if (role == role_ping_out && tx_ok) {
-        if (! radio.available()) {
+        if (!radio.available()) {
             printf("Got blank response. round-trip delay: %u ms\n\r", millis() - timer);
         }
     }
@@ -65,7 +65,7 @@ void intHandler()
             uint8_t gotByte;
             radio.read(&gotByte, 1);
             printf("Got response %d, round-trip delay: %u ms\n\r", gotByte, millis() - timer);
-            counter ++;
+            counter++;
         }
     }
 
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
     /***********************************/
     // This opens two pipes for these two nodes to communicate
     // back and forth.
-    if (! radioNumber) {
+    if (!radioNumber) {
         radio.openWritingPipe(addresses[0]);
         radio.openReadingPipe(1, addresses[1]);
     } else {

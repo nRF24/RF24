@@ -12,8 +12,8 @@ SPI::SPI()
 
 void SPI::begin(int busNo)
 {
-    if (! bcmIsInitialized) {
-        if (! bcm2835_init()) {
+    if (!bcmIsInitialized) {
+        if (!bcm2835_init()) {
             return;
         }
     }
@@ -24,7 +24,7 @@ void SPI::begin(int busNo)
 void SPI::beginTransaction(SPISettings settings)
 {
     if (geteuid() != 0) {
-        throw - 1;
+        throw -1;
     }
     pthread_mutex_lock(&spiMutex);
     setBitOrder(settings.border);
