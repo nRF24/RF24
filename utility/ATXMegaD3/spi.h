@@ -1,17 +1,16 @@
-
 /**
  * @file spi.h
  * Class declaration for SPI helper files
  */
 
- /**
- * Example of spi.h class declaration for SPI portability
- *
- * @defgroup Porting_SPI Porting: SPI
- *
- * 
- * @{
- */
+/**
+* Example of spi.h class declaration for SPI portability
+*
+* @defgroup Porting_SPI Porting: SPI
+*
+*
+* @{
+*/
 
 #ifndef __XMEGASPI_H__
 #define __XMEGASPI_H__
@@ -36,53 +35,52 @@
 
 using namespace std;
 
-
-
 class SPI {
 public:
 
-	/**
-	* SPI constructor
-	*/	 
-	SPI();
-	
-	/**
-	* Start SPI
-	* @param port is the SPI port (XMEGA_SPI_PORT_C for SPI on PORTC, XMEGA_SPI_PORT_D on PORTD etc).
-	*/
-	void begin(uint8_t port);
-	/**
-	* Transfer a single byte
-	* @param tx_ Byte to send
-	* @return Data returned via spi
-	*/
-	uint8_t transfer(uint8_t tx_);
-	
-	/**
-	* Transfer a buffer of data
-	* @param tbuf Transmit buffer
-	* @param rbuf Receive buffer
-	* @param len Length of the data
-	*/
-	void transfernb(char* tbuf, char* rbuf, uint32_t len);
+    /**
+    * SPI constructor
+    */
+    SPI();
 
-	/**
-	* Transfer a buffer of data without an rx buffer
-	* @param buf Pointer to a buffer of data
-	* @param len Length of the data
-	*/	
-	void transfern(char* buf, uint32_t len);
-	
-	virtual ~SPI();
+    /**
+    * Start SPI
+    * @param port is the SPI port (XMEGA_SPI_PORT_C for SPI on PORTC, XMEGA_SPI_PORT_D on PORTD etc).
+    */
+    void begin(uint8_t port);
+
+    /**
+    * Transfer a single byte
+    * @param tx_ Byte to send
+    * @return Data returned via spi
+    */
+    uint8_t transfer(uint8_t tx_);
+
+    /**
+    * Transfer a buffer of data
+    * @param tbuf Transmit buffer
+    * @param rbuf Receive buffer
+    * @param len Length of the data
+    */
+    void transfernb(char* tbuf, char* rbuf, uint32_t len);
+
+    /**
+    * Transfer a buffer of data without an rx buffer
+    * @param buf Pointer to a buffer of data
+    * @param len Length of the data
+    */
+    void transfern(char* buf, uint32_t len);
+
+    virtual ~SPI();
 
 private:
-    
-	/** Default SPI device */
-	SPI_t * device;
-	/* Port of the SPI */
-	PORT_t * port;
 
-	void init();	
+    /** Default SPI device */
+    SPI_t* device;
+    /* Port of the SPI */
+    PORT_t* port;
+
+    void init();
 };
 
 #endif /*__XMEGASPI_H__*/
