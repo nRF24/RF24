@@ -864,11 +864,11 @@ s   *
    uint8_t getPALevel( void );
 
   /**
-   * Get retransmitted packets count. Resets with new transmission.
+   * Returns Automated Retransmitted Count. Resets with each new transmission.
    *
-   * @return Returns values 0 to 15.
+   * @return Returns values from 0 to 15.
    */
-   uint8_t getArcCount( void );
+   uint8_t getARCCount(void);
 
   /**
    * Set the transmission data rate
