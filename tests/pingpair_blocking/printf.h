@@ -5,7 +5,7 @@
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  */
- 
+
 /**
  * @file printf.h
  *
@@ -18,7 +18,7 @@
 
 #ifdef ARDUINO
 
-int serial_putc( char c, FILE * ) 
+int serial_putc( char c, FILE * )
 {
   Serial.write( c );
 
@@ -31,7 +31,7 @@ void printf_begin(void)
 }
 
 #else
-#error This example is only for use on Arduino.
+    #error This example is only for use on Arduino.
 #endif // ARDUINO
 
 #endif // __PRINTF_H__

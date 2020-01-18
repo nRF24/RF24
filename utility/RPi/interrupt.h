@@ -21,11 +21,12 @@ see <http://www.gnu.org/licenses/>
  *      fires.
  *********************************************************************************
  */
-void *interruptHandler (void *arg);
+void* interruptHandler(void* arg);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * waitForInterrupt:
  *      Pi Specific.
@@ -35,14 +36,14 @@ extern "C" {
  *      way for a bit more efficiency.
  *********************************************************************************
  */
-extern int waitForInterrupt (int pin, int mS);
+extern int waitForInterrupt(int pin, int mS);
 
 /*
  * piHiPri:
  *      Attempt to set a high priority schedulling for the running program
  *********************************************************************************
  */
-extern int piHiPri (const int pri);
+extern int piHiPri(const int pri);
 
 /*
  * attachInterrupt (Original: wiringPiISR):
@@ -51,7 +52,7 @@ extern int piHiPri (const int pri);
  *      back to the user supplied function.
  *********************************************************************************
  */
-extern int attachInterrupt (int pin, int mode, void (*function)(void));
+extern int attachInterrupt(int pin, int mode, void (* function)(void));
 
 /*
  * detachInterrupt:
@@ -60,10 +61,12 @@ extern int attachInterrupt (int pin, int mode, void (*function)(void));
  *		setting wiringPi back to 'none' mode.
  *********************************************************************************
  */
-extern int detachInterrupt (int pin);
+extern int detachInterrupt(int pin);
 
 extern void rfNoInterrupts();
+
 extern void rfInterrupts();
+
 #ifdef __cplusplus
 }
 #endif

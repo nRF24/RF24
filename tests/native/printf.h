@@ -5,7 +5,7 @@
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  */
- 
+
 /**
  * @file printf.h
  *
@@ -18,16 +18,16 @@
 
 #include "WProgram.h"
 
-int serial_putc( char c, FILE * ) 
+int serial_putc(char c, FILE*)
 {
-  Serial.write( c );
+    Serial.write(c);
 
-  return c;
-} 
+    return c;
+}
 
 void printf_begin(void)
 {
-  fdevopen( &serial_putc, 0 );
+    fdevopen(&serial_putc, 0);
 }
 
 #endif // __PRINTF_H__
