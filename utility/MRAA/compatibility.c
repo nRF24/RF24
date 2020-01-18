@@ -1,4 +1,3 @@
-
 #include "compatibility.h"
 
 static struct timeval start, end;
@@ -11,20 +10,20 @@ static struct timeval start, end;
  */
 void __msleep(int milisec)
 {
-	struct timespec req = {0};
-	req.tv_sec = 0;
-	req.tv_nsec = milisec * 1000000L;
-	nanosleep(&req, (struct timespec *)NULL);	
-	//usleep(milisec*1000);
+    struct timespec req = {0};
+    req.tv_sec = 0;
+    req.tv_nsec = milisec * 1000000L;
+    nanosleep(&req, (struct timespec*) NULL);
+    //usleep(milisec*1000);
 }
 
 void __usleep(int milisec)
 {
-	struct timespec req = {0};
-	req.tv_sec = 0;
-	req.tv_nsec = milisec * 1000L;
-	nanosleep(&req, (struct timespec *)NULL);	
-	//usleep(milisec);
+    struct timespec req = {0};
+    req.tv_sec = 0;
+    req.tv_nsec = milisec * 1000L;
+    nanosleep(&req, (struct timespec*) NULL);
+    //usleep(milisec);
 }
 
 /**
@@ -32,17 +31,17 @@ void __usleep(int milisec)
  */
 void __start_timer()
 {
-	gettimeofday(&start, NULL);
+    gettimeofday(&start, NULL);
 }
 
 long __millis()
 {
     static long mtime, seconds, useconds;
-	
-	gettimeofday(&end, NULL);
-    seconds  = end.tv_sec  - start.tv_sec;
+
+    gettimeofday(&end, NULL);
+    seconds = end.tv_sec - start.tv_sec;
     useconds = end.tv_usec - start.tv_usec;
 
-    mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;	
-	return mtime;
+    mtime = ((seconds) * 1000 + useconds / 1000.0) + 0.5;
+    return mtime;
 }

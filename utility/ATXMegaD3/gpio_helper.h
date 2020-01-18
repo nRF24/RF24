@@ -3,7 +3,7 @@
  *
  * Created: 22/1/2016 15:29:12
  *  Author: akatran
- */ 
+ */
 
 
 #ifndef GPIO_HELPER_H_
@@ -11,7 +11,7 @@
 
 #include <avr/io.h>
 
-#ifdef	__cplusplus
+#ifdef    __cplusplus
 extern "C" {
 #endif
 
@@ -72,17 +72,14 @@ extern "C" {
 #define XMEGA_PORTF_PIN6  46
 #define XMEGA_PORTF_PIN7  47
 
-
-
 #define XMEGA_SPI_PORT_C 20
 #define XMEGA_SPI_PORT_D 28
 
-
 //void GPIO_getPort(int pinnum, PORT_t * port, uint8_t pin);
 //void GPIO_getPort(int pinnum, PORT_t * port, uint8_t * pin_bm);
-PORT_t * GPIO_getPort(int pinnum, uint8_t * pin_bm);
+PORT_t* GPIO_getPort(int pinnum, uint8_t* pin_bm);
 
-#ifdef	__cplusplus
+#ifdef    __cplusplus
 }
 #endif
 
