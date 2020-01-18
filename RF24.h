@@ -889,11 +889,13 @@ public:
     uint8_t getPALevel(void);
 
     /**
-   * Returns Automated Retransmitted Count. Resets with each new transmission.
-   *
-   * @return Returns values from 0 to 15.
-   */
-    uint8_t getARCCount(void);
+     * Returns automatic retransmission count (ARC_CNT)
+     *
+     * Value resets with each new transmission. Allows roughly estimating signal strength.
+     *
+     * @return Returns values from 0 to 15.
+     */
+    uint8_t getARC(void);
 
     /**
     * Set the transmission data rate
