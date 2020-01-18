@@ -1478,6 +1478,14 @@ uint8_t RF24::getPALevel(void)
 
 /****************************************************************************/
 
+uint8_t RF24::getARC(void)
+{
+
+    return read_register(OBSERVE_TX) & 0x0F;
+}
+
+/****************************************************************************/
+
 bool RF24::setDataRate(rf24_datarate_e speed)
 {
     bool result = false;

@@ -889,13 +889,22 @@ public:
     uint8_t getPALevel(void);
 
     /**
-     * Set the transmission data rate
+     * Returns automatic retransmission count (ARC_CNT)
      *
-     * @warning setting RF24_250KBPS will fail for non-plus units
+     * Value resets with each new transmission. Allows roughly estimating signal strength.
      *
-     * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
-     * @return true if the change was successful
+     * @return Returns values from 0 to 15.
      */
+    uint8_t getARC(void);
+
+    /**
+    * Set the transmission data rate
+    *
+    * @warning setting RF24_250KBPS will fail for non-plus units
+    *
+    * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+    * @return true if the change was successful
+    */
     bool setDataRate(rf24_datarate_e speed);
 
     /**
@@ -1118,7 +1127,7 @@ private:
      */
     uint8_t get_status(void);
 
-    #if ! defined (MINIMAL)
+    #if !defined (MINIMAL)
 
     /**
      * Decode and print the given status to stdout
