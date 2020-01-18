@@ -1478,10 +1478,10 @@ uint8_t RF24::getPALevel(void)
 
 /****************************************************************************/
 
-uint8_t RF24::getArcCount(void)
+uint8_t RF24::getARCCount(void)
 {
 
-  return read_register(OBSERVE_TX) & 0x0F;
+    return read_register(OBSERVE_TX) & 0x0F;
 }
 
 /****************************************************************************/

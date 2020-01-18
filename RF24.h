@@ -893,7 +893,7 @@ public:
    *
    * @return Returns values from 0 to 15.
    */
-   uint8_t getARCCount(void);
+    uint8_t getARCCount(void);
 
     /**
     * Set the transmission data rate
@@ -1125,7 +1125,7 @@ private:
      */
     uint8_t get_status(void);
 
-    #if ! defined (MINIMAL)
+    #if !defined (MINIMAL)
 
     /**
      * Decode and print the given status to stdout
