@@ -3,7 +3,7 @@ name: C/C++ CI
 on: [push]
 
 jobs:
-  build-RPi:
+  build-RPi-BCM2835:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,25 @@ jobs:
       - name: make
         run: sudo make install
 
-  build-wiringPi:
+  build-RPi-BCM2836:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: provide toolchain
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf &&
+          arm-linux-gnueabihf-gcc -v &&
+          arm-linux-gnueabihf-g++ -v
+      - name: configure
+        run: ./configure --soc=BCM2836 --driver=RPi
+      - name: make
+        run: make
+      - name: make
+        run: sudo make install
+
+  build-wiringPi-BCM2835:
     runs-on: ubuntu-latest
 
     steps:
