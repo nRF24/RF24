@@ -605,7 +605,7 @@ bool RF24::begin(void)
     gpio.begin(ce_pin,csn_pin);
         #endif
 
-        #ifdef defined(RF24_RPi)
+        #if defined(RF24_RPi)
     switch(csn_pin){     //Ensure valid hardware CS pin
       case 0: break;
       case 1: break;
