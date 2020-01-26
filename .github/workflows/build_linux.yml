@@ -1,0 +1,64 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build-RPi-BCM2835:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: provide toolchain
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf &&
+          arm-linux-gnueabihf-gcc -v &&
+          arm-linux-gnueabihf-g++ -v
+      - name: configure
+        run: ./configure --soc=BCM2835 --driver=RPi
+      - name: make
+        run: make
+      - name: make
+        run: sudo make install
+
+  build-RPi-BCM2836:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: provide toolchain
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf &&
+          arm-linux-gnueabihf-gcc -v &&
+          arm-linux-gnueabihf-g++ -v
+      - name: configure
+        run: ./configure --soc=BCM2836 --driver=RPi
+      - name: make
+        run: make
+      - name: make
+        run: sudo make install
+
+  build-wiringPi-BCM2835:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: provide toolchain
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf &&
+          arm-linux-gnueabihf-gcc -v &&
+          arm-linux-gnueabihf-g++ -v
+      - name: provide wiringPi
+        run: |
+          git clone https://github.com/CoRfr/WiringPi &&
+          cd WiringPi/wiringPi &&
+          CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5 &&
+          sudo make install
+      - name: configure
+        run: ./configure --soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include
+      - name: make
+        run: make
+      - name: make
+        run: sudo make install
