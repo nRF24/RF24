@@ -10,6 +10,13 @@
 #include "RF24_config.h"
 #include "RF24.h"
 
+
+#if ARDUINO_API_VERSION >= 10000 && !defined(__DOXYGEN__)
+inline void digitalWrite(uint8_t pin, bool val) {
+  digitalWrite(pin, val ? HIGH : LOW);
+}
+#endif
+
 /****************************************************************************/
 
 void RF24::csn(bool mode)
