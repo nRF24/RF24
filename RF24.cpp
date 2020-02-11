@@ -12,8 +12,9 @@
 
 
 #if ARDUINO_API_VERSION >= 10000 && !defined(__DOXYGEN__)
-inline void digitalWrite(uint8_t pin, bool val) {
-  digitalWrite(pin, val ? HIGH : LOW);
+inline void digitalWrite(uint8_t pin, bool value) 
+{
+    digitalWrite(pin, value ? HIGH : LOW);
 }
 #endif
 
@@ -23,7 +24,7 @@ void RF24::csn(bool mode)
 {
     #if defined(RF24_TINY)
     if (ce_pin != csn_pin) {
-        digitalWrite(csn_pin,mode);
+        digitalWrite(csn_pin, mode);
     }
     else {
         if (mode == HIGH) {
