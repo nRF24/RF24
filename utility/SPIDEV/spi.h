@@ -85,7 +85,7 @@ private:
 
     int fd;
     uint32_t _spi_speed;
-
+    bool spiIsInitialized = false;
     void init(uint32_t spi_speed = RF24_SPIDEV_SPEED);
 };
 
