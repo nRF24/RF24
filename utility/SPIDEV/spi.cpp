@@ -27,12 +27,11 @@ SPI::SPI()
 {
 }
 
-bool spiIsInitialized = 0;
 
 void SPI::begin(int busNo, uint32_t spi_speed)
 {
 
-    if (spiIsInitialized) {
+    if (this->spiIsInitialized) {
         return;
     }
 
@@ -61,7 +60,7 @@ void SPI::begin(int busNo, uint32_t spi_speed)
         abort();
 
   }*/
-    spiIsInitialized = true;
+    this->spiIsInitialized = true;
     init(spi_speed);
 }
 
