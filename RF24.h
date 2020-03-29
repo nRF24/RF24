@@ -1681,7 +1681,7 @@ private:
  *    @code cd RF24 @endcode
  * 5. Configure build environment using @code ./configure @endcode script. It auto detectes device and build environment. For overriding autodetections, use command-line switches, see @code ./configure --help @endcode for description.
  * 6. Build the library, and run an example file
- * @code sudo make install @endcode
+ * @code make; sudo make install @endcode
  * @code
  * cd examples_linux  
  * @endcode
@@ -1731,7 +1731,7 @@ private:
  *
  * @section Build Build Options
  * The default build on Raspberry Pi utilizes the included **BCM2835** driver from http://www.airspayce.com/mikem/bcm2835
- * 1. @code sudo make install -B @endcode
+ * 1. @code make; sudo make install @endcode
  *
  * Build using the **MRAA** library from http://iotdk.intel.com/docs/master/mraa/index.html <br>
  * MRAA is not included. See the <a href="MRAA.html">MRAA</a> platform page for more information.
@@ -1754,7 +1754,7 @@ private:
  * 3. Install RF24, using MRAA
  * @code
  * ./configure --driver=MRAA
- * sudo make install -B
+ * make; sudo make install
  * @endcode
  * See the gettingstarted example for an example of pin configuration
  *
@@ -1764,7 +1764,7 @@ private:
  * 2. Install RF24, using SPIDEV
  * @code
  * ./configure --driver=SPIDEV
- * sudo make install -B
+ * make; sudo make install
  * @endcode
  * 3. See the gettingstarted example for an example of pin configuration
  *
