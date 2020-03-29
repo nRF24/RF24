@@ -1404,26 +1404,14 @@ private:
  *
  * @section News News
  *
- * **Dec 2015**<br>
- * - ESP8266 support via Arduino IDE
- * - <a href="https://github.com/stewarthou/Particle-RF24">Particle Photon/Core</a> fork available
- * - ATTiny2313/4313 support added
- * - Python 3 support added
- * - RF24 added to Arduino library manager
- * - RF24 added to PlatformIO library manager
+ * **Feb 2020**<br>
+ * - MegaAVR fixes
+ * - Raspberry Pi 4 & 1 fixes
+ * - Added function to get ARC
+ * - Made RF24 return an exception when not ran as privileged user
+ * - Other small improvements
  *
- * **March 2015**<br>
- * - Uses SPI transactions on Arduino
- * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/utility
- * - <a href="MRAA.html">MRAA</a> support added ( Galileo, Edison, etc)
- * - <a href="Linux.html">Generic Linux support (SPIDEV)</a> support
- * - Support for RPi 2 added
- * - Major Documentation cleanup & update (Move all docs to github.io)
- *
- *
- * If issues are discovered with the documentation, please report them <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
- *
- * <br>
+ * 
  * @section Useful Useful References
  *
  *
@@ -1863,17 +1851,17 @@ private:
  * 1. Install the python-dev (or python3-dev) and boost libraries
  * @code sudo apt-get install python-dev libboost-python-dev @endcode
  * @note For python3 in Raspbian, it's needed to manually link python boost library, like this:
- * @code sudo ln -s /usr/lib/arm-linux-gnueabihf/libboost_python-py34.so /usr/lib/arm-linux-gnueabihf/libboost_python3.so @endcode
+ * @code sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so @endcode
  *
  * 2. Install python-setuptools (or python3-setuptools)
  * @code sudo apt-get install python-setuptools @endcode
  *
  * 3. Build the library
- * @code ./setup.py build   @endcode
+ * @code ./setup.py build   @endcode or @code python3 setup.py build @endcode
  * @note Build takes several minutes on arm-based machines. Machines with RAM <1GB may need to increase amount of swap for build.
  *
  * 4. Install the library
- * @code sudo ./setup.py install  @endcode
+ * @code sudo ./setup.py install  @endcode or @code sudo python3 setup.py install @endcode
  * See the additional <a href="pages.html">Platform Support</a> pages for information on connecting your hardware  <br>
  * See the included <a href="pingpair_dyn_8py-example.html">example </a> for usage information.   
  * 
@@ -1882,7 +1870,7 @@ private:
  * @code nano pingpair_dyn.py   @endcode
  * Configure another device, Arduino or RPi with the <a href="pingpair_dyn_8py-example.html">pingpair_dyn</a> example <br>
  * Run the example  
- * @code sudo ./pingpair_dyn.py  @endcode
+ * @code sudo ./pingpair_dyn.py  @endcode or @code sudo python3 pingpair_dyn.py @endcode
  *
  * <br><br><br>
  *
