@@ -375,6 +375,41 @@ public:
     void powerUp(void);
 
     /**
+     * should be call before any access to RF24 if disableSPI() is used
+     */
+    inline void enableSPI();
+
+    /**
+     * allow digital.write(G13,LedStatus) to access the Built In LED
+     * enableSPI() must be call before any access to RF24
+     * see example below
+     */
+    inline void disableSPI();
+
+    /************ exemple of use of G13 with radio.read **************
+     * On your setup() add a radio.disableSPI() after your radio initialization
+     * radio.startListening();
+     * radio.disableSPI();             // disable SPI after init
+     * digitalWrite(13, LOW);          // setup G13 as you want
+     *
+     * On your loop :
+     *
+     * bool saveG13 = digitalRead(13); // save G13 state
+     * radio.enableSPI();              // enable SPI
+     *
+     * // RF24 read job
+     * if ( radio.available() ) {
+     *   radio.read( &receveRadioMessage, sizeof(receveRadioMessage) );
+     *   gotRadioMessage = true;
+     * }
+     * radio.disableSPI(); // disable SPI
+     * digitalWrite(13, saveG13); // set G13 back
+     *
+     * NOTE : this exemple is with no interrupt and only one RF24 on SPI (no other device)
+     */
+
+
+    /**
     * Write for single NOACK writes. Optionally disables acknowledgements/autoretries for a single write.
     *
     * @note enableDynamicAck() must be called to enable this feature

@@ -110,6 +110,19 @@ inline void RF24::endTransaction()
 
 /****************************************************************************/
 
+inline void RF24::enableSPI()
+{
+_SPI.begin();
+}
+
+/****************************************************************************/
+
+inline void RF24::disableSPI()
+{
+_SPI.end();
+}
+/****************************************************************************/
+
 uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
     uint8_t status;
