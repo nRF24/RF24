@@ -376,6 +376,8 @@ public:
 
     /**
      * Should be called before any other function of RF24 is used if disableSPI has been used.
+     *
+     * @see disableSPI()
      */
     void enableSPI();
 
