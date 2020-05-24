@@ -121,6 +121,7 @@ void RF24::disableSPI()
 {
     _SPI.end();
 }
+
 /****************************************************************************/
 
 uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
