@@ -377,14 +377,14 @@ public:
     /**
      * should be call before any access to RF24 if disableSPI() is used
      */
-    inline void enableSPI();
+     void enableSPI();
 
     /**
      * allow digital.write(G13,LedStatus) to access the Built In LED
      * enableSPI() must be call before any access to RF24
      * see example below
      */
-    inline void disableSPI();
+     void disableSPI();
 
     /************ exemple of use of G13 with radio.read **************
      * On your setup() add a radio.disableSPI() after your radio initialization
