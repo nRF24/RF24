@@ -117,6 +117,8 @@ public:
      * Creates a new instance of this driver.  Before using, you create an instance
      * and send in the unique pins that this chip is connected to.
      *
+     * See http://tmrh20.github.io/RF24/pages.html for device specific information
+     *
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select
      */
@@ -128,6 +130,8 @@ public:
   *
   * Creates a new instance of this driver.  Before using, you create an instance
   * and send in the unique pins that this chip is connected to.
+  *
+  * See http://tmrh20.github.io/RF24/pages.html for device specific information
   *
   * @param _cepin The pin attached to Chip Enable on the RF module
   * @param _cspin The pin attached to Chip Select
