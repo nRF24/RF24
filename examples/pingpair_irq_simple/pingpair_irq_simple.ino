@@ -38,7 +38,7 @@ void setup(){
   Serial.begin(115200);
   Serial.println(F("Simple pingpair example"));
   Serial.println(F("Send a 'T' via Serial to transmit a single 'ping' "));
-  //printf_begin();
+  //printf_begin(); You must uncomment this if you wish to use printDetails()
   
   // Setup and configure rf radio
   radio.begin();
