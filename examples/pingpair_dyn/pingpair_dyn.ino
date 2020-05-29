@@ -15,6 +15,7 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
+#include "printf.h"
 
 //
 // Hardware configuration
@@ -22,7 +23,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
-RF24 radio(7,8);
+RF24 radio(7, 8);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
@@ -87,6 +88,7 @@ void setup(void)
   //
 
   Serial.begin(115200);
+  printf_begin();
   
   Serial.println(F("RF24/examples/pingpair_dyn/"));
   Serial.print(F("ROLE: "));
