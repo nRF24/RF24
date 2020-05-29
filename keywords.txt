@@ -3,7 +3,6 @@
   setChannel	KEYWORD2
   setPayloadSize	KEYWORD2
   getPayloadSize	KEYWORD2
-  print_details	KEYWORD2
   startListening	KEYWORD2
   stopListening	KEYWORD2
   write	KEYWORD2
@@ -14,3 +13,10 @@
   read	KEYWORD2
   openWritingPipe	KEYWORD2
   openReadingPipe	KEYWORD2
+  setPALevel	KEYWORD2
+  setAutoAck	KEYWORD2
+  setRetries	KEYWORD2
+  setCRCLength	KEYWORD2
+  printDetails	KEYWORD2
+  powerUp	KEYWORD2
+  printf_begin	KEYWORD2
