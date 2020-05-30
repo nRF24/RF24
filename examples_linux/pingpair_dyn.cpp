@@ -114,7 +114,6 @@ int main(int argc, char** argv)
         radio.startListening();
     }
 
-
     // forever loop
     while (1) {
 
@@ -174,7 +173,7 @@ int main(int argc, char** argv)
             // if there is data ready
             if (radio.available()) {
                 // Dump the payloads until we've gotten everything
-                uint8_t len;
+                uint8_t len = 0;
 
                 while (radio.available()) {
                     // Fetch the payload, and see if this was the last one.
