@@ -35,7 +35,7 @@ all: $(LIBNAME)
 # Make the library
 $(LIBNAME): $(OBJECTS)
 	@echo "[Linking]"
-	$(CC) $(SHARED_LINKER_FLAGS) $(CFLAGS) -o $(LIBNAME) $^
+	$(CC) $(SHARED_LINKER_FLAGS) $(CFLAGS) -o $(LIBNAME) $^ $(SHARED_LINKER_LIBS)
 
 # Library parts
 RF24.o: RF24.cpp	

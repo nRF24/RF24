@@ -15,6 +15,9 @@
 #include <SPI.h>
 #include "RF24.h"
 
+// You must include printf and run printf_begin() if you wish to use radio.printDetails();
+//#include "printf.h"
+
 /****************** User Config ***************************/
 /***      Set this radio as radio number 0 or 1         ***/
 bool radioNumber = 0;
@@ -37,6 +40,7 @@ byte counter = 1;                                                          // A 
 void setup(){
 
   Serial.begin(115200);
+  // printf_begin(); // This is for initializing printf that is used by printDetails()
   Serial.println(F("RF24/examples/GettingStarted_CallResponse"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
  
@@ -57,7 +61,7 @@ void setup(){
   radio.startListening();                       // Start listening  
   
   radio.writeAckPayload(1,&counter,1);          // Pre-load an ack-paylod into the FIFO buffer for pipe 1
-  //radio.printDetails();
+  //radio.printDetails(); 
 }
 
 void loop(void) {
