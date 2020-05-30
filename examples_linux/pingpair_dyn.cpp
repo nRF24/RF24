@@ -179,7 +179,7 @@ if (role == role_ping_out)
     if ( radio.available() )
     {
       // Dump the payloads until we've gotten everything
-      uint8_t len=0;
+      uint8_t len = 0;
 
       while (radio.available())
       {
