@@ -1,5 +1,4 @@
 
-
 #include "spi.h"
 #include "mraa.h"
 
@@ -8,7 +7,7 @@ SPI::SPI()
     mspi = NULL;
 }
 
-void SPI::begin(int busNo)
+void SPI::begin(int busNo, uint32_t spi_speed)
 {
     mspi = new mraa::Spi(
             busNo); // init mraa spi bus, it will handle chip select internally. For CS pin wiring user must check SPI details in hardware manual
@@ -16,7 +15,7 @@ void SPI::begin(int busNo)
     mspi->mode(mraa::SPI_MODE0);
     mspi->bitPerWord(8);
     mspi->frequency(
-            8000000); // Prophet: this will try to set 8MHz, however MRAA will reset to max platform speed and syslog a message of it
+            spi_speed); // Prophet: this will try to set 8MHz, however MRAA will reset to max platform speed and syslog a message of it
 }
 
 void SPI::end()

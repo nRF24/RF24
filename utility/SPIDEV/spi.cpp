@@ -23,7 +23,7 @@
 #define RF24_SPIDEV_BITS 8
 
 SPI::SPI()
-        :fd(-1), _spi_speed(RF24_SPIDEV_SPEED)
+        :fd(-1), _spi_speed(RF24_SPI_SPEED)
 {
 }
 
@@ -142,7 +142,7 @@ uint8_t SPI::transfer(uint8_t tx)
     uint8_t rx;
     tr.rx_buf = (unsigned long) &rx;
     tr.len = sizeof(tx);
-    tr.speed_hz = _spi_speed; //RF24_SPIDEV_SPEED;
+    tr.speed_hz = _spi_speed; //RF24_SPI_SPEED;
     tr.delay_usecs = 0;
     tr.bits_per_word = RF24_SPIDEV_BITS;
     tr.cs_change = 0;
@@ -167,7 +167,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
     tr.tx_buf = (unsigned long) tbuf;
     tr.rx_buf = (unsigned long) rbuf;
     tr.len = len;
-    tr.speed_hz = _spi_speed; //RF24_SPIDEV_SPEED;
+    tr.speed_hz = _spi_speed; //RF24_SPI_SPEED;
     tr.delay_usecs = 0;
     tr.bits_per_word = RF24_SPIDEV_BITS;
     tr.cs_change = 0;

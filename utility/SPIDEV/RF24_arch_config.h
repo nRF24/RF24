@@ -21,7 +21,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#define RF24_SPI_SPEED RF24_SPIDEV_SPEED
+//#define RF24_SPI_SPEED RF24_SPIDEV_SPEED
 
 #define _BV(x) (1<<(x))
 #define _SPI spi

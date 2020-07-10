@@ -11,7 +11,7 @@ SPI::SPI()
 
 }
 
-void SPI::begin(int busNo)
+void SPI::begin(int busNo, uint32_t spi_speed)
 {
     if (!bcmIsInitialized) {
         if (!bcm2835_init()) {
@@ -48,9 +48,10 @@ void SPI::setDataMode(uint8_t data_mode)
     bcm2835_spi_setDataMode(data_mode);
 }
 
-void SPI::setClockDivider(uint16_t spi_speed)
+void SPI::setClockDivider(uint32_t spi_speed)
 {
-    bcm2835_spi_setClockDivider(spi_speed);
+    //bcm2835_spi_setClockDivider(spi_speed);
+    bcm2835_spi_set_speed_hz(spi_speed);
 }
 
 void SPI::chipSelect(int csn_pin)

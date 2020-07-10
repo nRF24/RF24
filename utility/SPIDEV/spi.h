@@ -26,10 +26,7 @@
 #include <inttypes.h>
 #include <stdexcept>
 
-#ifndef RF24_SPIDEV_SPEED
-/* 8MHz as default */
-    #define RF24_SPIDEV_SPEED 8000000
-#endif
+#include "../../RF24_config.h"
 
 /** Specific excpetion for SPI errors */
 class SPIException : public std::runtime_error {
@@ -52,7 +49,7 @@ public:
     /**
     * Start SPI
     */
-    void begin(int busNo, uint32_t spi_speed = RF24_SPIDEV_SPEED);
+    void begin(int busNo, uint32_t spi_speed = RF24_SPI_SPEED);
 
     /**
     * Transfer a single byte
@@ -86,7 +83,7 @@ private:
     int fd;
     uint32_t _spi_speed;
     bool spiIsInitialized = false;
-    void init(uint32_t spi_speed = RF24_SPIDEV_SPEED);
+    void init(uint32_t spi_speed = RF24_SPI_SPEED);
 };
 
 /**

@@ -58,7 +58,7 @@
 
 // SPI defines for ARDUINO API
 #define MSBFIRST 1
-#define SPI_MODE0 mraa::SPI_MODE0
-#define SPI_CLOCK_DIV2 8000000
+//#define SPI_MODE0 mraa::SPI_MODE0
+#define SPI_CLOCK_DIV2 RF24_SPI_SPEED
 
 #endif

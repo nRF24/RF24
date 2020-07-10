@@ -10,8 +10,12 @@
 * \cond HIDDEN_SYMBOLS
 * Class declaration for SPI helper files
 */
+
 #include <stdio.h>
+#include "mraa.h"
 #include "mraa.hpp"
+
+#include "../../RF24_config.h"
 
 class SPI {
 public:
@@ -28,7 +32,7 @@ public:
 
     inline void transfern(char* buf, uint32_t len);
 
-    void begin(int busNo);
+    void begin(int busNo, uint32_t spi_speed = RF24_SPI_SPEED);
 
     void end();
 

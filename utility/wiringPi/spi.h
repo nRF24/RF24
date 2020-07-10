@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#include "../../RF24_config.h"
+
 using namespace std;
 
 class SPI {
@@ -30,7 +32,7 @@ public:
     * Start SPI communication
     * @param pin used for SPI
     */
-    void begin(int);
+    void begin(int csn_pin, uint32_t spi_speed = RF24_SPI_SPEED);
 
     /**
     * Transfer a single byte of data

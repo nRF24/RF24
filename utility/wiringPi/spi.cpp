@@ -19,7 +19,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define RF24_SPI_SPEED      8 * 1000000 // 8Mhz
 #define RF24_SPI_CHANNEL    0
 
 SPI::SPI():fd(-1)
@@ -27,10 +26,10 @@ SPI::SPI():fd(-1)
     printf("wiringPi RF24 DRIVER\n");
 }
 
-void SPI::begin(int csn_pin)
+void SPI::begin(int csn_pin, uint32_t spi_speed)
 {
     // initialize the wiringPiSPI
-    if ((this->fd = wiringPiSPISetup(RF24_SPI_CHANNEL, RF24_SPI_SPEED)) < 0) {
+    if ((this->fd = wiringPiSPISetup(RF24_SPI_CHANNEL, spi_speed)) < 0) {
         printf("Cannot configure the SPI device!\n");
         fflush(stdout);
         abort();

@@ -86,7 +86,7 @@ void RF24::ce(bool level)
 inline void RF24::beginTransaction()
 {
     #if defined(RF24_SPI_TRANSACTIONS)
-    _SPI.beginTransaction(SPISettings(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0));
+    _SPI.beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE0));
     #endif // defined(RF24_SPI_TRANSACTIONS)
     csn(LOW);
 }
@@ -435,16 +435,20 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin)
          csDelay(5)//,pipe0_reading_address(0)
 {
     pipe0_reading_address[0] = 0;
+    spi_speed = RF24_SPI_SPEED;
 }
 
 /****************************************************************************/
 
-#if defined(RF24_LINUX) && !defined(MRAA)//RPi constructor
+#if defined(RF24_LINUX)//RPi constructor
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed):
   ce_pin(_cepin),csn_pin(_cspin),spi_speed(_spi_speed),p_variant(false), payload_size(32), dynamic_payloads_enabled(false),addr_width(5)//,pipe0_reading_address(0) 
 {
   pipe0_reading_address[0]=0;
+  if(spi_speed <= 35000){ //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
+      spi_speed = RF24_SPI_SPEED;
+  }
 }
 #endif
 
@@ -555,7 +559,7 @@ void RF24::printDetails(void)
           case BCM2835_SPI_SPEED_32KHZ : printf("32 KHz");	break ;
           case BCM2835_SPI_SPEED_16KHZ : printf("16 KHz");	break ;
           case BCM2835_SPI_SPEED_8KHZ  : printf("8 KHz");	break ;
-          default : printf("8 Mhz");	break ;
+          default : printf("%d Mhz",spi_speed/1000000);	break ;
       }
       printf("\n================ NRF Configuration ================\n");
 
@@ -620,7 +624,7 @@ bool RF24::begin(void)
     }
         #endif // RF24_RPi
 
-    _SPI.begin(csn_pin);
+    _SPI.begin(csn_pin,spi_speed);
 
     pinMode(ce_pin,OUTPUT);
     ce(LOW);

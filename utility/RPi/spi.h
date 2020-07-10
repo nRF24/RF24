@@ -13,11 +13,12 @@
 #include <stdio.h>
 #include "bcm2835.h"
 #include "interrupt.h"
+#include "../../RF24_config.h"
 
 #define SPI_HAS_TRANSACTION
 #define MSBFIRST BCM2835_SPI_BIT_ORDER_MSBFIRST
 #define SPI_MODE0 BCM2835_SPI_MODE0
-#define RF24_SPI_SPEED BCM2835_SPI_SPEED_8MHZ
+//#define RF24_SPI_SPEED 10000000 //BCM2835_SPI_SPEED_4MHZ
 
 class SPISettings {
 public:
@@ -59,7 +60,7 @@ public:
 
     inline static void transfern(char* buf, uint32_t len);
 
-    static void begin(int busNo);
+    static void begin(int busNo, uint32_t spi_speed = RF24_SPI_SPEED);
 
     static void end();
 
@@ -67,7 +68,7 @@ public:
 
     static void setDataMode(uint8_t data_mode);
 
-    static void setClockDivider(uint16_t spi_speed);
+    static void setClockDivider(uint32_t spi_speed);
 
     static void chipSelect(int csn_pin);
 
