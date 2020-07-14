@@ -117,7 +117,11 @@ public:
      * Creates a new instance of this driver.  Before using, you create an instance
      * and send in the unique pins that this chip is connected to.
      *
-     * See http://tmrh20.github.io/RF24/pages.html for device specific information
+     * See http://tmrh20.github.io/RF24/pages.html for device specific information <br>
+     *
+     * @note Users can specify default SPI speed by modifying #define RF24_SPI_SPEED in RF24_config.h <br>
+       SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
+     * Older/Unsupported devices will use a default clock divider & settings configuration
      *
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select
@@ -133,9 +137,15 @@ public:
   *
   * See http://tmrh20.github.io/RF24/pages.html for device specific information
   *
+  * Users can specify default SPI speed by modifying #define RF24_SPI_SPEED in RF24_config.h
+  *
+  * @note The old way of setting SPI speeds using BCM2835 driver enums has been removed <br>
+  * Specify SPI speed in Hz per below:
+  *
   * @param _cepin The pin attached to Chip Enable on the RF module
   * @param _cspin The pin attached to Chip Select
-  * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
+  * @param spispeed For RPi, the SPI speed in Hz ie: 1000000 == 1Mhz
+  *
   */
 
     RF24(uint16_t _cepin, uint16_t _cspin, uint32_t spispeed);
@@ -1407,6 +1417,12 @@ private:
  * @li Consumed with a public interface that's similar to other Arduino standard libraries
  *
  * @section News News
+ *
+ * **March-July 2020**
+ * - Fixes for SPI_HAS_TRANSACTION detection (Affecting many devices)
+ * - Add ability to configure SPI speed properly in Linux constructor
+ * - Support multiple instances of SPIDEV on Linux
+ * - Minor fixes & changes
  *
  * **Feb 2020**<br>
  * - MegaAVR fixes
