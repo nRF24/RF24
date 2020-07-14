@@ -120,7 +120,7 @@ public:
      * See http://tmrh20.github.io/RF24/pages.html for device specific information <br>
      *
      * @note Users can specify default SPI speed by modifying #define RF24_SPI_SPEED in RF24_config.h <br>
-       For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
+     * For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
      * Older/Unsupported Arduino devices will use a default clock divider & settings configuration <br>
      * Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed <br>
      *
