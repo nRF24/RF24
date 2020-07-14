@@ -112,7 +112,7 @@ public:
     /**@{*/
 
     /**
-     * Arduino Constructor
+     * RF24 Constructor
      *
      * Creates a new instance of this driver.  Before using, you create an instance
      * and send in the unique pins that this chip is connected to.
@@ -120,36 +120,15 @@ public:
      * See http://tmrh20.github.io/RF24/pages.html for device specific information <br>
      *
      * @note Users can specify default SPI speed by modifying #define RF24_SPI_SPEED in RF24_config.h <br>
-       SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
-     * Older/Unsupported devices will use a default clock divider & settings configuration
+       For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
+     * Older/Unsupported Arduino devices will use a default clock divider & settings configuration <br>
+     * Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed <br>
      *
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select
+     * @param spispeed The SPI speed in Hz ie: 1000000 == 1Mhz
      */
-    RF24(uint16_t _cepin, uint16_t _cspin);
-    //#if defined (RF24_LINUX)
-
-    /**
-  * Optional Linux Constructor
-  *
-  * Creates a new instance of this driver.  Before using, you create an instance
-  * and send in the unique pins that this chip is connected to.
-  *
-  * See http://tmrh20.github.io/RF24/pages.html for device specific information
-  *
-  * Users can specify default SPI speed by modifying #define RF24_SPI_SPEED in RF24_config.h
-  *
-  * @note The old way of setting SPI speeds using BCM2835 driver enums has been removed <br>
-  * Specify SPI speed in Hz per below:
-  *
-  * @param _cepin The pin attached to Chip Enable on the RF module
-  * @param _cspin The pin attached to Chip Select
-  * @param spispeed For RPi, the SPI speed in Hz ie: 1000000 == 1Mhz
-  *
-  */
-
-    RF24(uint16_t _cepin, uint16_t _cspin, uint32_t spispeed);
-    //#endif
+    RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spispeed = RF24_SPI_SPEED);
 
     #if defined (RF24_LINUX)
     virtual ~RF24() {};
