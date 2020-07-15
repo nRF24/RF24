@@ -521,37 +521,15 @@ static const char * const rf24_csn_e_str_P[] = {
 void RF24::printDetails(void)
 {
 
-    #if defined(RF24_RPi)
+    #if defined(RF24_LINUX)
     printf("================ SPI Configuration ================\n" );
-    if (csn_pin < BCM2835_SPI_CS_NONE ){
-      printf("CSN Pin  \t = %s\n",rf24_csn_e_str_P[csn_pin]);
-    }else{
-      printf("CSN Pin  \t = Custom GPIO%d%s\n", csn_pin,
-      csn_pin==RPI_V2_GPIO_P1_26 ? " (CE1) Software Driven" : "" );
-    }
+    printf("CSN Pin  \t = %d\n", csn_pin);
     printf("CE Pin  \t = Custom GPIO%d\n", ce_pin );
-    printf("Clock Speed\t = " );
-      switch (spi_speed)
-      {
-          case BCM2835_SPI_SPEED_64MHZ : printf("64 Mhz");	break ;
-          case BCM2835_SPI_SPEED_32MHZ : printf("32 Mhz");	break ;
-          case BCM2835_SPI_SPEED_16MHZ : printf("16 Mhz");	break ;
-          case BCM2835_SPI_SPEED_8MHZ  : printf("8 Mhz");	break ;
-          case BCM2835_SPI_SPEED_4MHZ  : printf("4 Mhz");	break ;
-          case BCM2835_SPI_SPEED_2MHZ  : printf("2 Mhz");	break ;
-          case BCM2835_SPI_SPEED_1MHZ  : printf("1 Mhz");	break ;
-          case BCM2835_SPI_SPEED_512KHZ: printf("512 KHz");	break ;
-          case BCM2835_SPI_SPEED_256KHZ: printf("256 KHz");	break ;
-          case BCM2835_SPI_SPEED_128KHZ: printf("128 KHz");	break ;
-          case BCM2835_SPI_SPEED_64KHZ : printf("64 KHz");	break ;
-          case BCM2835_SPI_SPEED_32KHZ : printf("32 KHz");	break ;
-          case BCM2835_SPI_SPEED_16KHZ : printf("16 KHz");	break ;
-          case BCM2835_SPI_SPEED_8KHZ  : printf("8 KHz");	break ;
-          default : printf("%d Mhz",spi_speed/1000000);	break ;
-      }
-      printf("\n================ NRF Configuration ================\n");
-
-    #endif // defined(RF24_RPi)
+    #endif
+    printf("SPI Speed\t = %d Mhz\n",spi_speed/1000000); //Print the SPI speed on non-Linux devices
+    #if defined(RF24_LINUX)
+    printf("================ NRF Configuration ================\n");
+    #endif // defined(RF24_LINUX)
 
     print_status(get_status());
 
