@@ -1711,12 +1711,12 @@ private:
  * 
  *
  *
- * @page RPi Raspberry Pi
+ * @page RPi Linux General/Raspberry Pi 
  *
  * RF24 supports a variety of Linux based devices via various drivers. Some boards like RPi can utilize multiple methods
  * to drive the GPIO and SPI functionality.
  *
- * <br>
+ * 
  * @section PreConfig Potential PreConfiguration
  *
  * If SPI is not already enabled, load it on boot:
@@ -1726,7 +1726,7 @@ private:
  * C. Update other software and libraries
  * @code sudo apt-get update @endcode
  * @code sudo apt-get upgrade @endcode 
- * <br><br>
+ * <br>
  *
  * @section Build Build Options
  * The default build on Raspberry Pi utilizes the included **BCM2835** driver from http://www.airspayce.com/mikem/bcm2835
@@ -1773,30 +1773,15 @@ private:
  *
  * Using pin 15/GPIO 22 for CE, pin 24/GPIO8 (CE0) for CSN
  *
- * Can use either RPi CE0 or CE1 pins for radio CSN.<br>
- * Choose any RPi output pin for radio CE pin.
+ * Can use any available SPI BUS for CSN.<br>
+ * In general, use @code RF24 radio(<ce_pin>, <a>*10+<b>); @endcode for proper constructor to 
+ * address correct spi device at /dev/spidev\<a\>.\<b\> 
+ * <br>
+ * Choose any GPIO output pin for radio CE pin.
+ * 
+ * **General:**
+ * @code RF24 radio(22,0); @endcode
  *
- * **BCM2835 Constructor:**
- * @code
- *  RF24 radio(RPI_V2_GPIO_P1_15,BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ);
- *   or
- *  RF24 radio(RPI_V2_GPIO_P1_15,BCM2835_SPI_CS1, BCM2835_SPI_SPEED_8MHZ);
- *	
- *  RPi B+:
- *  RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ);
- *  or
- *  RF24 radio(RPI_BPLUS_GPIO_J8_15,RPI_BPLUS_GPIO_J8_26, BCM2835_SPI_SPEED_8MHZ);
- *
- *  General:
- *  RF24 radio(22,0);
- *  or
- *  RF24 radio(22,1);
- *
- * @endcode
- * See the gettingstarted example for an example of pin configuration
- *
- * See http://www.airspayce.com/mikem/bcm2835/index.html for BCM2835 class documentation.
- * <br><br>
  * **MRAA Constructor:**
  *
  * @code RF24 radio(15,0); @endcode
@@ -1806,9 +1791,9 @@ private:
  * **SPI_DEV Constructor**
  *
  * @code RF24 radio(22,0); @endcode
- * In general, use @code RF24 radio(<ce_pin>, <a>*10+<b>); @endcode for proper SPIDEV constructor to address correct spi device at /dev/spidev\<a\>.\<b\>
+ * 
  *
- * See http://pi.gadgetoid.com/pinout
+ * https://www.raspberrypi.org/documentation/usage/gpio/
  *
  * **Pins:**  
  *
