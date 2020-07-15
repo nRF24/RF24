@@ -21,7 +21,7 @@ OBJECTS=RF24.o
 ifeq ($(DRIVER), MRAA)
 OBJECTS+=spi.o gpio.o compatibility.o
 else ifeq ($(DRIVER), RPi)
-OBJECTS+=spi.o bcm2835.o interrupt.o
+OBJECTS+=spi.o bcm2835.o interrupt.o compatibility.o
 else ifeq ($(DRIVER), SPIDEV)
 OBJECTS+=spi.o gpio.o compatibility.o interrupt.o
 else ifeq ($(DRIVER), wiringPi)

@@ -12,6 +12,7 @@
 
 #include "bcm2835.h"
 #include "spi.h"
+#include "compatibility.h"
 
 #define _SPI spi
 
