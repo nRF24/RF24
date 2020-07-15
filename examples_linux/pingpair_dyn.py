@@ -15,26 +15,19 @@ irq_gpio_pin = None
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
+# Radio CE Pin, CSN Pin, SPI Speed
+# CE Pin uses GPIO number with BCM and SPIDEV drivers, other platforms use their own pin numbering
+# CS Pin addresses the SPI bus number at /dev/spidev<a>.<b>
+# ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
 
-# CE Pin, CSN Pin, SPI Speed
-
-# Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 8Mhz
-# radio = RF24(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ)
-
-# RPi B
-# Setup for GPIO 15 CE and CE1 CSN with SPI Speed @ 8Mhz
-# radio = RF24(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ)
-
-# RPi B+
-# Setup for GPIO 22 CE and CE0 CSN for RPi B+ with SPI Speed @ 8Mhz
-# radio = RF24(RPI_BPLUS_GPIO_J8_15, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ)
+# Generic:
+RF24 radio(22,0);
 
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
-radio = RF24(22, 0);
+#radio = RF24(22, 0);
 
 
 # Setup for connected IRQ pin, GPIO 24 on RPi B+; uncomment to activate
-# irq_gpio_pin = RPI_BPLUS_GPIO_J8_18
 # irq_gpio_pin = 24
 
 ##########################################
