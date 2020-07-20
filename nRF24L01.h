@@ -75,6 +75,7 @@
 #define ARD         4
 #define ARC         0
 #define PLL_LOCK    4
+#define CONT_WAVE   7
 #define RF_DR       3
 #define RF_PWR      6
 #define RX_DR       6

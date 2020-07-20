@@ -1574,6 +1574,24 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
     write_register(SETUP_RETR, (delay & 0xf) << ARD | (count & 0xf) << ARC);
 }
 
+/****************************************************************************/
+void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel )
+{
+    write_register(RF_SETUP, (read_register(RF_SETUP)) | _BV(CONT_WAVE));
+    write_register(RF_SETUP, (read_register(RF_SETUP)) | _BV(PLL_LOCK));
+    setPALevel(level);
+    setChannel(channel);
+    IF_SERIAL_DEBUG( printf_P(PSTR("RF_SETUP=%02x\r\n"), read_register(RF_SETUP)  ) );
+    ce(HIGH);
+}
+
+/****************************************************************************/
+void RF24::stopConstCarrier()
+{   
+    write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(CONT_WAVE));
+    write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(PLL_LOCK));
+    ce(LOW);
+}
 
 //ATTiny support code pulled in from https://github.com/jscrane/RF24
 #if defined(RF24_TINY)
