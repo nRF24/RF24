@@ -1028,7 +1028,7 @@ public:
      * @param address The 40-bit address of the pipe to open.
      */
     void openWritingPipe(uint64_t address);
-    
+
     /**
      * Empty the receive buffer
      *
