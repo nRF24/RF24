@@ -17,10 +17,10 @@
 
 #include "RF24_config.h"
 
-#if defined(RF24_LINUX) || defined(LITTLEWIRE)
-#include "utility/includes.h"
+#if defined (RF24_LINUX) || defined (LITTLEWIRE)
+    #include "utility/includes.h"
 #elif defined SOFTSPI
-#include <DigitalIO.h>
+    #include <DigitalIO.h>
 #endif
 
 /**
@@ -28,8 +28,7 @@
  *
  * For use with setPALevel()
  */
-typedef enum
-{
+typedef enum {
     RF24_PA_MIN = 0,
     RF24_PA_LOW,
     RF24_PA_HIGH,
@@ -42,8 +41,7 @@ typedef enum
  *
  * For use with setDataRate()
  */
-typedef enum
-{
+typedef enum {
     RF24_1MBPS = 0,
     RF24_2MBPS,
     RF24_250KBPS
@@ -54,8 +52,7 @@ typedef enum
  *
  * For use with setCRCLength()
  */
-typedef enum
-{
+typedef enum {
     RF24_CRC_DISABLED = 0,
     RF24_CRC_8,
     RF24_CRC_16
@@ -65,34 +62,34 @@ typedef enum
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
-class RF24
-{
+class RF24 {
 private:
-#ifdef SOFTSPI
+    #ifdef SOFTSPI
     SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
-#elif defined(SPI_UART)
+    #elif defined (SPI_UART)
     SPIUARTClass uspi;
-#endif
+    #endif
 
-#if defined(RF24_LINUX) || defined(XMEGA_D3) /* XMEGA can use SPI class */
+    #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
-#endif
-#if defined(MRAA)
+    #endif
+    #if defined (MRAA)
     GPIO gpio;
-#endif
+    #endif
 
-    uint16_t ce_pin;    /**< "Chip Enable" pin, activates the RX or TX role */
-    uint16_t csn_pin;   /**< SPI Chip select */
+    uint16_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
+    uint16_t csn_pin; /**< SPI Chip select */
     uint32_t spi_speed; /**< SPI Bus Speed */
-#if defined(RF24_LINUX) || defined(XMEGA_D3)
-    uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
-    uint8_t spi_txbuff[32 + 1]; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
-#endif
-    bool p_variant;                   /* False for RF24L01 and true for RF24L01P */
-    uint8_t payload_size;             /**< Fixed size of payloads */
-    bool dynamic_payloads_enabled;    /**< Whether dynamic payloads are enabled. */
+    #if defined (RF24_LINUX) || defined (XMEGA_D3)
+    uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
+    uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
+    #endif
+    bool p_variant; /* False for RF24L01 and true for RF24L01P */
+    uint8_t payload_size; /**< Fixed size of payloads */
+    bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
     uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
-    uint8_t addr_width;               /**< The address width to use - 3,4 or 5 bytes. */
+    uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
+
 
 protected:
     /**
@@ -106,6 +103,7 @@ protected:
     inline void endTransaction();
 
 public:
+
     /**
      * @name Primary public interface
      *
@@ -132,9 +130,9 @@ public:
      */
     RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spispeed = RF24_SPI_SPEED);
 
-#if defined(RF24_LINUX)
-    virtual ~RF24(){};
-#endif
+    #if defined (RF24_LINUX)
+    virtual ~RF24() {};
+    #endif
 
     /**
      * Begin operation of the chip
@@ -210,7 +208,7 @@ public:
      * @endcode
      * @return No return value. Use available().
      */
-    void read(void *buf, uint8_t len);
+    void read(void* buf, uint8_t len);
 
     /**
      * Be sure to call openWritingPipe() first to set the destination
@@ -235,7 +233,7 @@ public:
      * @endcode
      * @return True if the payload was delivered successfully and an ACK was received, or upon successfull transmission if auto-ack is disabled.
      */
-    bool write(const void *buf, uint8_t len);
+    bool write(const void* buf, uint8_t len);
 
     /**
      * New: Open a pipe for writing via byte array. Old addressing format retained
@@ -262,7 +260,7 @@ public:
      * addresses amongst nodes on the network.
      */
 
-    void openWritingPipe(const uint8_t *address);
+    void openWritingPipe(const uint8_t* address);
 
     /**
      * Open a pipe for reading
@@ -292,7 +290,7 @@ public:
      * @param address The 24, 32 or 40 bit address of the pipe to open.
      */
 
-    void openReadingPipe(uint8_t number, const uint8_t *address);
+    void openReadingPipe(uint8_t number, const uint8_t* address);
 
     /**@}*/
     /**
@@ -334,7 +332,7 @@ public:
      * @endcode
      * @return True if there is a payload available, false if none is
      */
-    bool available(uint8_t *pipe_num);
+    bool available(uint8_t* pipe_num);
 
     /**
      * Check if the radio needs to be read. Can be used to prevent data loss
@@ -383,7 +381,7 @@ public:
     * @param len Number of bytes to be sent
     * @param multicast Request ACK (0), NOACK (1)
     */
-    bool write(const void *buf, uint8_t len, const bool multicast);
+    bool write(const void* buf, uint8_t len, const bool multicast);
 
     /**
      * This will not block until the 3 FIFO buffers are filled with data.
@@ -413,7 +411,7 @@ public:
      * @param len Number of bytes to be sent
      * @return True if the payload was delivered successfully false if not
      */
-    bool writeFast(const void *buf, uint8_t len);
+    bool writeFast(const void* buf, uint8_t len);
 
     /**
     * WriteFast for single NOACK writes. Disables acknowledgements/autoretries for a single write.
@@ -426,7 +424,7 @@ public:
     * @param len Number of bytes to be sent
     * @param multicast Request ACK (0) or NOACK (1)
     */
-    bool writeFast(const void *buf, uint8_t len, const bool multicast);
+    bool writeFast(const void* buf, uint8_t len, const bool multicast);
 
     /**
      * This function extends the auto-retry mechanism to any specified duration.
@@ -454,7 +452,7 @@ public:
      * @param timeout User defined timeout in milliseconds.
      * @return True if the payload was loaded into the buffer successfully false if not
      */
-    bool writeBlocking(const void *buf, uint8_t len, uint32_t timeout);
+    bool writeBlocking(const void* buf, uint8_t len, uint32_t timeout);
 
     /**
      * This function should be called as soon as transmission is finished to
@@ -520,7 +518,7 @@ public:
      * @param len Length of the data to send, up to 32 bytes max.  Not affected
      * by the static payload set by setPayloadSize().
      */
-    void writeAckPayload(uint8_t pipe, const void *buf, uint8_t len);
+    void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
     /**
      * Determine if an ack payload was received in the most recent call to
@@ -542,7 +540,7 @@ public:
      * @param[out] tx_fail The send failed, too many retries (MAX_RT)
      * @param[out] rx_ready There is a message waiting to be read (RX_DS)
      */
-    void whatHappened(bool &tx_ok, bool &tx_fail, bool &rx_ready);
+    void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
 
     /**
      * Non-blocking write to the open writing pipe used for buffered writes
@@ -568,7 +566,7 @@ public:
      * @param multicast Request ACK (0) or NOACK (1)
      * @return True if the payload was delivered successfully false if not
      */
-    void startFastWrite(const void *buf, uint8_t len, const bool multicast, bool startTx = 1);
+    void startFastWrite(const void* buf, uint8_t len, const bool multicast, bool startTx = 1);
 
     /**
      * Non-blocking write to the open writing pipe
@@ -590,7 +588,7 @@ public:
      * @param multicast Request ACK (0) or NOACK (1)
      *
      */
-    void startWrite(const void *buf, uint8_t len, const bool multicast);
+    void startWrite(const void* buf, uint8_t len, const bool multicast);
 
     /**
      * This function is mainly used internally to take advantage of the auto payload
@@ -983,6 +981,7 @@ public:
      */
     /**@{*/
 
+
     /**
      * Open a pipe for reading
      * @note For compatibility with old code only, see new function
@@ -1016,21 +1015,21 @@ public:
      * @param address The 40-bit address of the pipe to open.
      */
     void openWritingPipe(uint64_t address);
-
+    
     /**
      * Transmission of constant carrier wave with defined frequency and output power
      * 
      *     
-     */
-    void startConstCarrier(uint8_t level, uint8_t channel);
-
+     */    
+    void startConstCarrier(rf24_pa_dbm_e level, uint8_t channel );
+    
     /**
-     * Stop transmission of constant wave
+     * Stop transmission of constant wave and reset PLL and CONT registers
      *
      *     
      */
     void stopConstCarrier(void);
-
+    
     /**
      * Empty the receive buffer
      *
@@ -1039,6 +1038,7 @@ public:
     uint8_t flush_rx(void);
 
 private:
+
     /**
      * @name Low-level internal interface.
      *
@@ -1076,7 +1076,7 @@ private:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t read_register(uint8_t reg, uint8_t *buf, uint8_t len);
+    uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
 
     /**
      * Read single byte from a register
@@ -1094,7 +1094,7 @@ private:
      * @param len How many bytes of data to transfer
      * @return Current value of status register
      */
-    uint8_t write_register(uint8_t reg, const uint8_t *buf, uint8_t len);
+    uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
 
     /**
      * Write a single byte to a register
@@ -1114,7 +1114,7 @@ private:
      * @param len Number of bytes to be sent
      * @return Current value of status register
      */
-    uint8_t write_payload(const void *buf, uint8_t len, const uint8_t writeType);
+    uint8_t write_payload(const void* buf, uint8_t len, const uint8_t writeType);
 
     /**
      * Read the receive payload
@@ -1125,7 +1125,7 @@ private:
      * @param len Maximum number of bytes to read
      * @return Current value of status register
      */
-    uint8_t read_payload(void *buf, uint8_t len);
+    uint8_t read_payload(void* buf, uint8_t len);
 
     /**
      * Retrieve the current status of the chip
@@ -1134,7 +1134,7 @@ private:
      */
     uint8_t get_status(void);
 
-#if !defined(MINIMAL)
+    #if !defined (MINIMAL)
 
     /**
      * Decode and print the given status to stdout
@@ -1165,7 +1165,7 @@ private:
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */
-    void print_byte_register(const char *name, uint8_t reg, uint8_t qty = 1);
+    void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
     /**
      * Print the name and value of a 40-bit address register to stdout
@@ -1178,9 +1178,9 @@ private:
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */
-    void print_address_register(const char *name, uint8_t reg, uint8_t qty = 1);
+    void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
-#endif
+    #endif
 
     /**
      * Turn on or off the special features of the chip
@@ -1196,14 +1196,16 @@ private:
 
     uint8_t spiTrans(uint8_t cmd);
 
-#if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
+    #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 
     void errNotify(void);
 
-#endif
+    #endif
 
     /**@}*/
+
 };
+
 
 /**
  * @example GettingStarted.ino
@@ -1268,6 +1270,7 @@ private:
 * This example demonstrates the basic getting started functionality, but with failure handling for the radio chip.
 * Addresses random radio failures etc, potentially due to loose wiring on breadboards etc.
 */
+
 
 /**
  * @example Transfer.ino
