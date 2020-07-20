@@ -1019,9 +1019,10 @@ public:
     /**
      * Transmission of constant carrier wave with defined frequency and output power
      * 
-     *     
+     * @param level Output power to use
+     * @param channel The channel to use
      */    
-    void startConstCarrier(rf24_pa_dbm_e level, uint8_t channel );
+    void startConstCarrier(rf24_pa_dbm_e level, uint8_t channel);
     
     /**
      * Stop transmission of constant wave and reset PLL and CONT registers
