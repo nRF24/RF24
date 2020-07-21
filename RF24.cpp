@@ -526,7 +526,7 @@ void RF24::printDetails(void)
     printf("CSN Pin  \t = %d\n", csn_pin);
     printf("CE Pin  \t = Custom GPIO%d\n", ce_pin );
     #endif
-    printf("SPI Speed\t = %d Mhz\n",spi_speed/1000000); //Print the SPI speed on non-Linux devices
+    printf_P(PSTR("SPI Speedz\t = %d Mhz\n"),(uint8_t)(spi_speed/1000000)); //Print the SPI speed on non-Linux devices
     #if defined(RF24_LINUX)
     printf("================ NRF Configuration ================\n");
     #endif // defined(RF24_LINUX)
