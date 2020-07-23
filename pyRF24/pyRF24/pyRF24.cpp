@@ -233,21 +233,6 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
     .value("BCM2835_SPI_CS_NONE", BCM2835_SPI_CS_NONE)
     .export_values();
 
-// exposing '#define's for SPI speed as this is needed for RF24 constructor
-bp::scope().attr("BCM2835_SPI_SPEED_64MHZ") = BCM2835_SPI_SPEED_64MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_32MHZ") = BCM2835_SPI_SPEED_32MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_16MHZ") = BCM2835_SPI_SPEED_16MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_8MHZ") = BCM2835_SPI_SPEED_8MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_4MHZ") = BCM2835_SPI_SPEED_4MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_2MHZ") = BCM2835_SPI_SPEED_2MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_1MHZ") = BCM2835_SPI_SPEED_1MHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_512KHZ") = BCM2835_SPI_SPEED_512KHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_256KHZ") = BCM2835_SPI_SPEED_256KHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_128KHZ") = BCM2835_SPI_SPEED_128KHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_64KHZ") = BCM2835_SPI_SPEED_64KHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_32KHZ") = BCM2835_SPI_SPEED_32KHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_16KHZ") = BCM2835_SPI_SPEED_16KHZ;
-bp::scope().attr("BCM2835_SPI_SPEED_8KHZ") = BCM2835_SPI_SPEED_8KHZ;
 #endif  // BCM2835_H
 
         bp::enum_<rf24_crclength_e>("rf24_crclength_e").value("RF24_CRC_DISABLED", RF24_CRC_DISABLED).value("RF24_CRC_8", RF24_CRC_8).value(

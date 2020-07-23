@@ -21,7 +21,7 @@ irq_gpio_pin = None
 # ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
 
 # Generic:
-RF24 radio(22,0);
+radio = RF24(22,0);
 
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 #radio = RF24(22, 0);

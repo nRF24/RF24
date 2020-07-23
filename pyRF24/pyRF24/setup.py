@@ -11,7 +11,7 @@ version = ''
 def process_configparams():
     global version
 
-    with open('../Makefile.inc') as f:
+    with open('../../Makefile.inc') as f:
         config_lines = f.read().splitlines()
 
     cflags = os.getenv("CFLAGS", "")
