@@ -863,13 +863,15 @@ public:
      * RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH and RF24_PA_MAX
      *
      * The power levels correspond to the following output levels respectively:
-     * NRF24L01: -18dBm, -12dBm,-6dBM, and 0dBm
+     * NRF24L01: -18dBm, -12dBm,-6dBM, and 0dBm, lnaEnable affects modules with LNA
      *
-     * SI24R1: -6dBm, 0dBm, 3dBM, and 7dBm.
+     * SI24R1: -6dBm, 0dBm, 3dBm and 7dBm with lnaEnable = 1 
+     *        -12dBm,-4dBm, 1dBm and 4dBm with lnaEnable = 0
      *
      * @param level Desired PA level.
+     * @param lnaEnable En/Disable LNA Gain
      */
-    void setPALevel(uint8_t level);
+    void setPALevel(uint8_t level, bool lnaEnable = 1);
 
     /**
      * Fetches the current PA level.
