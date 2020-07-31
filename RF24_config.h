@@ -105,8 +105,10 @@
             extern HardwareSPI SPI;
 
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
- 
-        #define _BV(x) (1<<(x))
+        
+        #ifndef _BV
+          #define _BV(x) (1<<(x))
+        #endif
     #endif // defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
 
     #ifdef SERIAL_DEBUG
@@ -127,13 +129,12 @@
     
     // Progmem is Arduino-specific
     // Arduino DUE is arm and does not include avr/pgmspace
-    #if defined (ARDUINO_ARCH_ESP8266)
+    #if defined (ARDUINO_ARCH_ESP8266) || defined (ESP32)
         #include <pgmspace.h>
         #define PRIPSTR "%s"
-    #elif defined (ESP32)
-        #include <pgmspace.h>
-        #define PRIPSTR "%s"
-        #define pgm_read_ptr(p) (*(p))
+        #ifndef pgm_read_ptr
+          #define pgm_read_ptr(p) (*(p))
+        #endif
     #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && ! defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
         #include <avr/pgmspace.h>
         #define PRIPSTR "%S"
@@ -143,17 +144,36 @@
             typedef char const char;
 
         #else // Fill in pgm_read_byte that is used, but missing from DUE
+          #include <avr/pgmspace.h>
+          #ifndef pgm_read_byte
             #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+          #endif  
         #endif // !defined (ARDUINO)
 
-        typedef uint16_t prog_uint16_t;
-        #define PSTR(x) (x)
-        #define printf_P printf
-        #define strlen_P strlen
-        #define PROGMEM
-        #define pgm_read_word(p) (*(p))
-        #define pgm_read_ptr(p) (*(p))
-        #define PRIPSTR "%s"
+        #ifndef prog_uint16_t
+          typedef uint16_t prog_uint16_t;
+        #endif
+        #ifndef PSTR
+          #define PSTR(x) (x)
+        #endif
+        #ifndef printf_P
+          #define printf_P printf
+        #endif
+        #ifndef strlen_P
+          #define strlen_P strlen
+        #endif
+        #ifndef PROGMEM
+          #define PROGMEM
+        #endif
+        #ifndef pgm_read_word
+          #define pgm_read_word(p) (*(p))
+        #endif
+        #ifndef pgm_read_ptr
+          #define pgm_read_ptr(p) (*(p))
+        #endif
+        #ifndef PRIPSTR
+          #define PRIPSTR "%s"
+        #endif
 
     #endif // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)
 #endif //Everything else

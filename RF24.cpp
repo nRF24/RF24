@@ -547,16 +547,16 @@ void RF24::printDetails(void)
 
     printf_P(PSTR("Data Rate\t = "
     PRIPSTR
-    "\r\n"),pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()]));
+    "\r\n"),(char*)pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()]));
     printf_P(PSTR("Model\t\t = "
     PRIPSTR
-    "\r\n"),pgm_read_ptr(&rf24_model_e_str_P[isPVariant()]));
+    "\r\n"),(char*)pgm_read_ptr(&rf24_model_e_str_P[isPVariant()]));
     printf_P(PSTR("CRC Length\t = "
     PRIPSTR
-    "\r\n"),pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()]));
+    "\r\n"),(char*)pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()]));
     printf_P(PSTR("PA Power\t = "
     PRIPSTR
-    "\r\n"),  pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()]));
+    "\r\n"),(char*)pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()]));
 
 }
 
