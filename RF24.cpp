@@ -916,8 +916,6 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
     //Blocking only if FIFO is full. This will loop and block until TX is successful or fail
     while ((get_status() & (_BV(TX_FULL)))) {
         if (get_status() & _BV(MAX_RT)) {
-            //reUseTX();                                 //Set re-transmit
-            write_register(NRF_STATUS, _BV(MAX_RT));     //Clear max retry flag
             return 0;                                    //Return 0. The previous payload has been retransmitted
             // From the user perspective, if you get a 0, just keep trying to send the same payload
         }
