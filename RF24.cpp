@@ -431,7 +431,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
-        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), p_variant(false), payload_size(32), dynamic_payloads_enabled(false), addr_width(5),
+        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(false), addr_width(5),
          csDelay(5)//,pipe0_reading_address(0)
 {
     pipe0_reading_address[0] = 0;
@@ -567,70 +567,60 @@ void RF24::printDetails(void)
 bool RF24::begin(void)
 {
 
-    uint8_t setup = 0;
-
     #if defined(RF24_LINUX)
 
-        #if defined(MRAA)
-    GPIO();
-    gpio.begin(ce_pin,csn_pin);
-        #endif
+      #if defined(MRAA)
+        GPIO();
+        gpio.begin(ce_pin,csn_pin);
+      #endif
 
-        #if defined(RF24_RPi)
-    switch(csn_pin){     //Ensure valid hardware CS pin
-      case 0: break;
-      case 1: break;
-      // Allow BCM2835 enums for RPi
-      case 8: csn_pin = 0; break;
-      case 7: csn_pin = 1; break;
-      case 18: csn_pin = 10; break;	//to make it work on SPI1
-      case 17: csn_pin = 11; break;
-      case 16: csn_pin = 12; break;
-      default: csn_pin = 0; break;
-    }
-        #endif // RF24_RPi
+      #if defined(RF24_RPi)
+        switch(csn_pin){     //Ensure valid hardware CS pin
+          case 0: break;
+          case 1: break;
+          // Allow BCM2835 enums for RPi
+          case 8: csn_pin = 0; break;
+          case 7: csn_pin = 1; break;
+          case 18: csn_pin = 10; break;	//to make it work on SPI1
+          case 17: csn_pin = 11; break;
+          case 16: csn_pin = 12; break;
+          default: csn_pin = 0; break;
+        }
+      #endif // RF24_RPi
 
-    _SPI.begin(csn_pin,spi_speed);
+      _SPI.begin(csn_pin,spi_speed);
 
-    pinMode(ce_pin,OUTPUT);
-    ce(LOW);
-
-    delay(100);
+      pinMode(ce_pin,OUTPUT);
+      ce(LOW);
+      delay(100);
 
     #elif defined(LITTLEWIRE)
 
-    pinMode(csn_pin,OUTPUT);
-        _SPI.begin();
-        csn(HIGH);
+      pinMode(csn_pin,OUTPUT);
+      _SPI.begin();
+      csn(HIGH);
 
     #elif defined(XMEGA_D3)
-    if (ce_pin != csn_pin) {
+      if (ce_pin != csn_pin) {
         pinMode(ce_pin,OUTPUT);
-    };
-    _SPI.begin(csn_pin);
-    ce(LOW);
-    csn(HIGH);
-    delay(200);
+      };
+      _SPI.begin(csn_pin);
+      ce(LOW);
+      csn(HIGH);
+      delay(200);
     #else
-    // Initialize pins
-    if (ce_pin != csn_pin) {
+      // Initialize pins
+      if (ce_pin != csn_pin) {
         pinMode(ce_pin, OUTPUT);
-    }
-
-        #if !defined(LITTLEWIRE)
-    if (ce_pin != csn_pin)
-        #endif // !defined(LITTLEWIRE)
-    {
         pinMode(csn_pin, OUTPUT);
-    }
-
-    _SPI.begin();
-    ce(LOW);
-    csn(HIGH);
-            #if defined(__ARDUINO_X86__)
-    delay(100);
-            #endif
-        #endif //Linux
+      }
+      _SPI.begin();
+      ce(LOW);
+      csn(HIGH);
+      #if defined(__ARDUINO_X86__)
+        delay(100);
+      #endif
+    #endif //Linux
 
     // Must allow the radio time to settle else configuration bits will not necessarily stick.
     // This is actually only required following power up but some settling time also appears to
@@ -640,34 +630,14 @@ bool RF24::begin(void)
     // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
     delay(5);
 
-    // Reset NRF_CONFIG and enable 16-bit CRC.
-    write_register(NRF_CONFIG, 0x0C);
-
     // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
     // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
     // sizes must never be used. See documentation for a more complete explanation.
-    setRetries(5, 15);
-
-    // Reset value is MAX
-    //setPALevel( RF24_PA_MAX ) ;
-
-    // check for connected module and if this is a p nRF24l01 variant
-    //
-    if (setDataRate(RF24_250KBPS)) {
-        p_variant = true;
-    }
-    setup = read_register(RF_SETUP);
-    /*if( setup == 0b00001110 )     // register default for nRF24L01P
-    {
-      p_variant = true ;
-    }*/
-
+    setRetries(5, 15);   
+ 
     // Then set the data rate to the slowest (and most reliable) speed supported by all
     // hardware.
     setDataRate(RF24_1MBPS);
-
-    // Initialize CRC and request 2-byte (16bit) CRC
-    //setCRCLength( RF24_CRC_16 ) ;
 
     // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
     toggle_features();
@@ -688,14 +658,13 @@ bool RF24::begin(void)
     flush_rx();
     flush_tx();
 
-    powerUp(); //Power up by default when begin() is called
-
-    // Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
+    // Clear CONFIG register, Enable PTX, Power Up & 16-bit CRC
+    // Do not write CE high so radio will remain in standby I mode
     // PTX should use only 22uA of power
-    write_register(NRF_CONFIG, (read_register(NRF_CONFIG)) & ~_BV(PRIM_RX));
-
-    // if setup is 0 or ff then there was no response from module
-    return (setup != 0 && setup != 0xff);
+    write_register(NRF_CONFIG, _BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP) );
+    
+    // if config is not set correctly then there was a bad response from module
+    return read_register(NRF_CONFIG) == (_BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP)) ? true : false;
 }
 
 /****************************************************************************/
@@ -1378,7 +1347,10 @@ bool RF24::isAckPayloadAvailable(void)
 
 bool RF24::isPVariant(void)
 {
-    return p_variant;
+    rf24_datarate_e dR = getDataRate();
+    bool result = setDataRate(RF24_250KBPS);
+    setDataRate(dR);
+    return result;
 }
 
 /****************************************************************************/

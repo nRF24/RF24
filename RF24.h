@@ -84,7 +84,6 @@ private:
     uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
     #endif
-    bool p_variant; /* False for RF24L01 and true for RF24L01P */
     uint8_t payload_size; /**< Fixed size of payloads */
     bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
     uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
@@ -1412,18 +1411,22 @@ private:
  *
  * @section News News
  *
+ * **Aug 2020**
+ * - Bug fix for startWrite() function affecting RF24 stack (all RF24 libraries)
+ * - Unify Arduino & Linux constructor. Accept SPI speed in Hz as optional parameter
+ * - Removal of BCM2835 SPI speed constants due to removal from BCM library
+ * - Update to lates BCM2835 driver
+ * - Bug fix for RPi millis() code
+ * - Added Constant Carrier Wave functionality & added to scanner example
+ * - Modify setPALevel() to allow setting LNA gain via optional parameter
+ * - Cleanup of warnings, errors and old files
+ *
  * **March-July 2020**
  * - Fixes for SPI_HAS_TRANSACTION detection (Affecting many devices)
  * - Add ability to configure SPI speed properly in Linux constructor
  * - Support multiple instances of SPIDEV on Linux
  * - Minor fixes & changes
  *
- * **Feb 2020**<br>
- * - MegaAVR fixes
- * - Raspberry Pi 4 & 1 fixes
- * - Added function to get ARC
- * - Made RF24 return an exception when not ran as privileged user
- * - Other small improvements
  *
  * 
  * @section Useful Useful References
