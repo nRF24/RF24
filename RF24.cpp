@@ -644,6 +644,7 @@ bool RF24::begin(void)
     write_register(FEATURE, 0);
     write_register(DYNPD, 0);
     dynamic_payloads_enabled = false;
+    ack_payloads_enabled = false;
 
     // Reset current status
     // Notice reset and flush is the last thing we do
@@ -661,10 +662,13 @@ bool RF24::begin(void)
     // Clear CONFIG register, Enable PTX, Power Up & 16-bit CRC
     // Do not write CE high so radio will remain in standby I mode
     // PTX should use only 22uA of power
-    write_register(NRF_CONFIG, _BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP) );
-    
+    write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO)) );    
+    config_reg = read_register(NRF_CONFIG);
+
+    powerUp();
+
     // if config is not set correctly then there was a bad response from module
-    return read_register(NRF_CONFIG) == (_BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP)) ? true : false;
+    return config_reg == (_BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP)) ? true : false;
 }
 
 /****************************************************************************/
@@ -686,7 +690,13 @@ void RF24::startListening(void)
     #if !defined(RF24_TINY) && !defined(LITTLEWIRE)
     powerUp();
     #endif
-    write_register(NRF_CONFIG, read_register(NRF_CONFIG) | _BV(PRIM_RX));
+    /* Notes Once ready for next release
+    * 1. Can update stopListening() to use config_reg var and ack_payloads_enabled var instead of SPI rx/tx
+    * 2. Update txDelay defaults: 240 for 2MBPS, 280 for 1MBPS, 505 for 250KBPS per initial testing
+    * 3. Allows time for slower devices to update with the faster startListening() function prior to updating stopListening() & adjusting txDelay
+    */
+    config_reg |= _BV(PRIM_RX);
+    write_register(NRF_CONFIG,config_reg);
     write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT));
     ce(HIGH);
     // Restore the pipe0 adddress, if exists
@@ -696,14 +706,10 @@ void RF24::startListening(void)
         closeReadingPipe(0);
     }
 
-    // Flush buffers
-    //flush_rx();
-    if (read_register(FEATURE) & _BV(EN_ACK_PAY)) {
+    if(ack_payloads_enabled){
         flush_tx();
     }
 
-    // Go!
-    //delayMicroseconds(100);
 }
 
 /****************************************************************************/
@@ -721,6 +727,7 @@ void RF24::stopListening(void)
         flush_tx();
     }
     //flush_rx();
+    config_reg &= ~_BV(PRIM_RX);
     write_register(NRF_CONFIG, (read_register(NRF_CONFIG)) & ~_BV(PRIM_RX));
 
     #if defined(RF24_TINY) || defined(LITTLEWIRE)
@@ -741,7 +748,8 @@ void RF24::stopListening(void)
 void RF24::powerDown(void)
 {
     ce(LOW); // Guarantee CE is low on powerDown
-    write_register(NRF_CONFIG, read_register(NRF_CONFIG) & ~_BV(PWR_UP));
+    config_reg &= ~_BV(PWR_UP);
+    write_register(NRF_CONFIG,config_reg);
 }
 
 /****************************************************************************/
@@ -749,11 +757,10 @@ void RF24::powerDown(void)
 //Power up now. Radio will not power down unless instructed by MCU for config changes etc.
 void RF24::powerUp(void)
 {
-    uint8_t cfg = read_register(NRF_CONFIG);
-
     // if not powered up then power up and wait for the radio to initialize
-    if (!(cfg & _BV(PWR_UP))) {
-        write_register(NRF_CONFIG, cfg | _BV(PWR_UP));
+    if (!(config_reg & _BV(PWR_UP))) {
+        config_reg |= _BV(PWR_UP);
+        write_register(NRF_CONFIG, config_reg);
 
         // For nRF24L01+ to go from power down mode to TX or RX mode it must first pass through stand-by mode.
         // There must be a delay of Tpd2stby (see Table 16.) after the nRF24L01+ leaves power down mode before
@@ -1020,14 +1027,12 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
 /****************************************************************************/
 
 void RF24::maskIRQ(bool tx, bool fail, bool rx)
-{
-
-    uint8_t config = read_register(NRF_CONFIG);
+{    
     /* clear the interrupt flags */
-    config &= ~(1 << MASK_MAX_RT | 1 << MASK_TX_DS | 1 << MASK_RX_DR);
+    config_reg &= ~(1 << MASK_MAX_RT | 1 << MASK_TX_DS | 1 << MASK_RX_DR);
     /* set the specified interrupt flags */
-    config |= fail << MASK_MAX_RT | tx << MASK_TX_DS | rx << MASK_RX_DR;
-    write_register(NRF_CONFIG, config);
+    config_reg |= fail << MASK_MAX_RT | tx << MASK_TX_DS | rx << MASK_RX_DR;
+    write_register(NRF_CONFIG, config_reg);
 }
 
 /****************************************************************************/
@@ -1287,6 +1292,7 @@ void RF24::enableAckPayload(void)
     //
     write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
     dynamic_payloads_enabled = true;
+    ack_payloads_enabled = true;
 }
 
 /****************************************************************************/
@@ -1496,18 +1502,18 @@ rf24_datarate_e RF24::getDataRate(void)
 
 void RF24::setCRCLength(rf24_crclength_e length)
 {
-    uint8_t config = read_register(NRF_CONFIG) & ~(_BV(CRCO) | _BV(EN_CRC));
+    config_reg &= ~(_BV(CRCO) | _BV(EN_CRC));
 
     // switch uses RAM (evil!)
     if (length == RF24_CRC_DISABLED) {
         // Do nothing, we turned it off above.
     } else if (length == RF24_CRC_8) {
-        config |= _BV(EN_CRC);
+        config_reg |= _BV(EN_CRC);
     } else {
-        config |= _BV(EN_CRC);
-        config |= _BV(CRCO);
+        config_reg |= _BV(EN_CRC);
+        config_reg |= _BV(CRCO);
     }
-    write_register(NRF_CONFIG, config);
+    write_register(NRF_CONFIG, config_reg);
 }
 
 /****************************************************************************/
@@ -1515,12 +1521,11 @@ void RF24::setCRCLength(rf24_crclength_e length)
 rf24_crclength_e RF24::getCRCLength(void)
 {
     rf24_crclength_e result = RF24_CRC_DISABLED;
-
-    uint8_t config = read_register(NRF_CONFIG) & (_BV(CRCO) | _BV(EN_CRC));
     uint8_t AA = read_register(EN_AA);
-
-    if (config & _BV(EN_CRC) || AA) {
-        if (config & _BV(CRCO)) {
+    config_reg = read_register(NRF_CONFIG);
+    
+    if (config_reg & _BV(EN_CRC) || AA) {
+        if (config_reg & _BV(CRCO)) {
             result = RF24_CRC_16;
         } else {
             result = RF24_CRC_8;
@@ -1534,8 +1539,8 @@ rf24_crclength_e RF24::getCRCLength(void)
 
 void RF24::disableCRC(void)
 {
-    uint8_t disable = read_register(NRF_CONFIG) & ~_BV(EN_CRC);
-    write_register(NRF_CONFIG, disable);
+    config_reg &= ~_BV(EN_CRC);
+    write_register(NRF_CONFIG, config_reg);
 }
 
 /****************************************************************************/

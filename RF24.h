@@ -86,8 +86,10 @@ private:
     #endif
     uint8_t payload_size; /**< Fixed size of payloads */
     bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
+    bool ack_payloads_enabled; /**< Whether ack payloads are enabled. */
     uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
     uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
+    uint8_t config_reg; /**< For storing the value of the NRF_CONFIG register */
 
 
 protected:
