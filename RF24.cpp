@@ -1272,6 +1272,7 @@ void RF24::disableDynamicPayloads(void)
     write_register(DYNPD, 0);
 
     dynamic_payloads_enabled = false;
+    ack_payloads_enabled = false;
 }
 
 /****************************************************************************/
