@@ -1413,7 +1413,14 @@ private:
  *
  * @section News News
  *
- * **Aug 2020**
+ * **Aug 2020** <br>
+ * v1.3.8
+ * - Introduces change that mainly reduces the time required to call startListening(), powerUp(), and powerDown()
+ * - Affects speed of switching from TX->RX. Users might consider starting updates of slower devices with this<br>
+ *   release to prevent missed packets when similar changes are introduced, affecting switching from RX->TX
+ * - Clean up begin() function (reduce program size)
+ *
+ * v1.3.7
  * - Bug fix for startWrite() function affecting RF24 stack (all RF24 libraries)
  * - Unify Arduino & Linux constructor. Accept SPI speed in Hz as optional parameter
  * - Removal of BCM2835 SPI speed constants due to removal from BCM library
