@@ -1421,7 +1421,7 @@ private:
  * - Clean up begin() function (reduce program size)
  *
  * v1.3.7
- * - Bug fix for startWrite() function affecting RF24 stack (all RF24 libraries)
+ * - Bug fix for writeFast() function affecting RF24 stack (all RF24 libraries)
  * - Unify Arduino & Linux constructor. Accept SPI speed in Hz as optional parameter
  * - Removal of BCM2835 SPI speed constants due to removal from BCM library
  * - Update to latest BCM2835 driver
