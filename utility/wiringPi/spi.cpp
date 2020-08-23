@@ -29,6 +29,7 @@ SPI::SPI():fd(-1)
 void SPI::begin(int csn_pin, uint32_t spi_speed)
 {
     // initialize the wiringPiSPI
+    wiringPiSetup();
     if ((this->fd = wiringPiSPISetup(RF24_SPI_CHANNEL, spi_speed)) < 0) {
         printf("Cannot configure the SPI device!\n");
         fflush(stdout);
