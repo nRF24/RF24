@@ -12,7 +12,7 @@ def process_configparams():
     global version
     # can't access "../Makefile.inc" from working dir because it's relative.
     # brute force absolute path dynamically.
-    script_dir = os.path.split(os.path.abspath(__file__))[0]
+    script_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
     abs_file_path = os.path.join(script_dir, "Makefile.inc")
     with open(abs_file_path) as f:
         config_lines = f.read().splitlines()
@@ -43,7 +43,7 @@ process_configparams()
 crossunixccompiler.register()
 
 module_RF24 = setuptools.Extension(
-    "python-nrf24l01", libraries=["rf24", BOOST_LIB], sources=["pyRF24.cpp"]
+    "python_nrf24l01", libraries=["rf24", BOOST_LIB], sources=["pyRF24.cpp"]
 )
 
-setuptools.setup(name="python-nrf24l01", version=version, ext_modules=[module_RF24])
+setuptools.setup(name="python_nrf24l01", version=version, ext_modules=[module_RF24])
