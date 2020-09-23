@@ -45,7 +45,6 @@ static void close(int port);
 /**
  * Similar to Arduino digitalRead(pin);
  * @param port
- * @param value
  */
 static int read(int port);
 
