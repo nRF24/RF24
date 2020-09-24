@@ -80,4 +80,4 @@ typedef uint16_t prog_uint16_t;
 #endif // __ARCH_CONFIG_H__
 
 
-/*@}*/	
+/**@}*/	

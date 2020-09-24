@@ -44,4 +44,4 @@ long __millis();
 
 #endif    /* COMPATIBLITY_H */
 
-/*@}*/	
+/**@}*/	

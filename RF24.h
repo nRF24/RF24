@@ -120,14 +120,14 @@ public:
      *
      * See http://tmrh20.github.io/RF24/pages.html for device specific information <br>
      *
-     * @note Users can specify default SPI speed by modifying #define RF24_SPI_SPEED in RF24_config.h <br>
+     * @note Users can specify default SPI speed by modifying `#define RF24_SPI_SPEED` in RF24_config.h <br>
      * For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
      * Older/Unsupported Arduino devices will use a default clock divider & settings configuration <br>
      * Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed <br>
      *
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select
-     * @param spispeed The SPI speed in Hz ie: 1000000 == 1Mhz
+     * @param _spispeed The SPI speed in Hz ie: 1000000 == 1Mhz
      */
     RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spispeed = RF24_SPI_SPEED);
 
@@ -188,9 +188,10 @@ public:
     bool available(void);
 
     /**
-     * Read the available payload
+     * Read from the available payload
      *
-     * The size of data read is the fixed payload size, see getPayloadSize()
+     * The length of data read should the next available payload's length
+     * @sa getPayloadSize(), getDynamicPayloadSize()
      *
      * @note I specifically chose 'void*' as a data type to make it easier
      * for beginners to use.  No casting needed.
@@ -200,7 +201,9 @@ public:
      * when calling available().
      *
      * @param buf Pointer to a buffer where the data should be written
-     * @param len Maximum number of bytes to read into the buffer
+     * @param len Maximum number of bytes to read into the buffer. This
+     * value should match the length of the object referenced using the
+     * `buf` parameter. There is no bounds checking implemented here.
      *
      * @code
      * if(radio.available()){
@@ -208,6 +211,22 @@ public:
      * }
      * @endcode
      * @return No return value. Use available().
+     * @remark Remember that each call to read() fetches data from the
+     * RX FIFO beginning with the first byte from the first available
+     * payload. A payload is not removed from the RX FIFO until it's
+     * entire length (or more) is fetched using read().
+     * @remarks
+     * - If `len` parameter's value is less than the available payload's
+     *   length, then the payload remains in the RX FIFO.
+     * - If `len` parameter's value is greater than the first of multiple
+     *   available payloads, then the data returned to the `buf`
+     *   parameter's object will be supplemented with data from the next
+     *   available payload.
+     * - If `len` parameter's value is greater than the last available
+     *   payload's length, then the last byte in the payload is used as
+     *   padding for the data returned to the `buf` parameter's object.
+     *   The nRF24L01 will continue returning the last byte from the last
+     *   payload even when read() is called with an empty RX FIFO.
      */
     void read(void* buf, uint8_t len);
 
@@ -496,6 +515,9 @@ public:
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
      * @param timeout Number of milliseconds to retry failed payloads
+     * @param startTx If this is set to `true`, then this function puts the nRF24L01
+     * in TX Mode. `false` leaves the primary mode (TX or RX) as it is, which can
+     * prevent the mandatory wait time to change modes.
      * @return True if transmission is successful
      *
      */
@@ -565,6 +587,9 @@ public:
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @param multicast Request ACK (0) or NOACK (1)
+     * @param startTx If this is set to `true`, then this function sets the
+     * nRF24L01's CE pin to active (enabling TX transmissions). `false` has no
+     * effect on the nRF24L01's CE pin.
      * @return True if the payload was delivered successfully false if not
      */
     void startFastWrite(const void* buf, uint8_t len, const bool multicast, bool startTx = 1);
@@ -687,17 +712,15 @@ public:
     *  if(radio.failureDetected){
     *    radio.begin();                       // Attempt to re-configure the radio with defaults
     *    radio.failureDetected = 0;           // Reset the detection value
-    *	radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
+    *	 radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
     *    radio.openReadingPipe(1,addresses[0]);
     *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
     *  }
     * @endcode
-   */
+    */
     //#if defined (FAILURE_HANDLING)
     bool failureDetected;
     //#endif
-
-    /**@}*/
 
     /**@}*/
     /**
@@ -1555,7 +1578,7 @@ private:
  * 
  * Enabling:
  * 1. Install the SPI_UART library
- * 2. Edit RF24_config.h and uncomment #define SPI_UART
+ * 2. Edit RF24_config.h and uncomment `#define SPI_UART`
  * 3. In your sketch, add @code #include <SPI_UART.h> @endcode
  *
  * SPI_UART SPI Pin Connections:
@@ -1938,7 +1961,7 @@ private:
  *
  * 3. Make the egg package
  * @code ./setup.py bdist_egg --plat-name=cross @endcode
- * dist/RF24-<version>-cross.egg should be created.
+ * `dist/RF24-<version>-cross.egg` should be created.
  *
  * 4. Upload it to the target machine and install there:
  * @code
