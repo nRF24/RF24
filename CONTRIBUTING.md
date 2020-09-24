@@ -6,4 +6,4 @@ These are the current requirements for getting your code included in RF24:
 
 * Follow the [Arduino IDE formatting style](https://www.arduino.cc/en/Reference/StyleGuide) for Arduino examples
 
-* Add doxygen-compatible documentation to any new functions you add, or update existing documentation if you change behaviour
+* Add [doxygen-compatible documentation](https://www.doxygen.nl/manual/docblocks.html) to any new functions you add, or update existing documentation if you change behaviour
