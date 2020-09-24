@@ -693,17 +693,15 @@ public:
     *  if(radio.failureDetected){
     *    radio.begin();                       // Attempt to re-configure the radio with defaults
     *    radio.failureDetected = 0;           // Reset the detection value
-    *	radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
+    *	 radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
     *    radio.openReadingPipe(1,addresses[0]);
     *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
     *  }
     * @endcode
-   */
+    */
     //#if defined (FAILURE_HANDLING)
     bool failureDetected;
     //#endif
-
-    /**@}*/
 
     /**@}*/
     /**
