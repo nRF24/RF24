@@ -188,9 +188,10 @@ public:
     bool available(void);
 
     /**
-     * Read the available payload
+     * Read from the available payload
      *
-     * The size of data read is the fixed payload size, see getPayloadSize()
+     * The length of data read should the next available payload's length
+     * @sa getPayloadSize(), getDynamicPayloadSize()
      *
      * @note I specifically chose 'void*' as a data type to make it easier
      * for beginners to use.  No casting needed.
@@ -200,7 +201,9 @@ public:
      * when calling available().
      *
      * @param buf Pointer to a buffer where the data should be written
-     * @param len Maximum number of bytes to read into the buffer
+     * @param len Maximum number of bytes to read into the buffer. This
+     * value should match the length of the object referenced using the
+     * `buf` parameter. There is no bounds checking implemented here.
      *
      * @code
      * if(radio.available()){
@@ -208,6 +211,22 @@ public:
      * }
      * @endcode
      * @return No return value. Use available().
+     * @remark Remember that each call to read() fetches data from the
+     * RX FIFO beginning with the first byte from the first available
+     * payload. A payload is not removed from the RX FIFO until it's
+     * entire length (or more) is fetched using read().
+     * @remarks
+     * - If `len` parameter's value is less than the available payload's
+     *   length, then the payload remains in the RX FIFO.
+     * - If `len` parameter's value is greater than the first of multiple
+     *   available payloads, then the data returned to the `buf`
+     *   parameter's object will be supplemented with data from the next
+     *   available payload.
+     * - If `len` parameter's value is greater than the last available
+     *   payload's length, then the last byte in the payload is used as
+     *   padding for the data returned to the `buf` parameter's object.
+     *   The nRF24L01 will continue returning the last byte from the last
+     *   payload even when read() is called with an empty RX FIFO.
      */
     void read(void* buf, uint8_t len);
 
