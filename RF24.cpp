@@ -557,7 +557,7 @@ void RF24::printDetails(void)
     printf_P(PSTR("PA Power\t = "
     PRIPSTR
     "\r\n"),(char*)pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()]));
-
+    printf_P(PSTR("ARC\t\t = %d\r\n"), getARC());
 }
 
 #endif // !defined(MINIMAL)
