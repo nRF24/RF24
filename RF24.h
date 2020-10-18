@@ -575,10 +575,14 @@ public:
      * retransmit/autoAck is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
-     * @see write(), writeFast(), startWrite(), writeBlocking()
+     * @see write()
+     * @see writeFast()
+     * @see startWrite()
+     * @see writeBlocking()
      *
      * For single no-ACK writes:
-     * @see enableDynamicAck(), setAutoAck()
+     * @see enableDynamicAck()
+     * @see setAutoAck()
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
