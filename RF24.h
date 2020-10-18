@@ -887,7 +887,10 @@ public:
      * Enable or disable auto-acknowlede packets on a per pipeline basis.
      *
      * AA is enabled by default, so it's only needed if you want to turn
-     * it off/on for some reason on a per pipeline basis.
+     * it off/on for some reason on a per pipeline basis. Remember that pipe
+     * 0 is used for TX transmissions. If using the auto-ACK feature on both
+     * TX & RX nodes, then pipe 0 must have this feature enabled for the
+     * applicable nodes.
      *
      * @param pipe Which pipeline to modify
      * @param enable Whether to enable (true) or disable (false) auto-acks
