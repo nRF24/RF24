@@ -888,7 +888,7 @@ public:
      *
      * AA is enabled by default, so it's only needed if you want to turn
      * it off/on for some reason on a per pipeline basis. Remember that pipe
-     * 0 is used for TX transmissions. If using the auto-ACK feature on both
+     * 0 is used for TX transmissions. If using the auto-ack feature on both
      * TX & RX nodes, then pipe 0 must have this feature enabled for the
      * applicable nodes.
      *
