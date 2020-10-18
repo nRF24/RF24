@@ -625,7 +625,7 @@ public:
      * to enqueue the a new payload in the TX FIFO (does not overwrite the top
      * level of the TX FIFO).
      * Currently, stopListening() and startListening() also call flush_tx()
-     * when ACK payloads are enabled (via enableDynamicAckPayloads()).
+     * when ACK payloads are enabled (via enableAckPayload()).
      *
      * Upon exiting, this function will set the CE pin HIGH to initiate the
      * re-transmission process. If only 1 re-transmission is desired, then the
