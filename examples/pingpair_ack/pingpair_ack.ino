@@ -44,6 +44,7 @@ void setup() {
 
   radio.begin();
   radio.setAutoAck(1);                    // Ensure autoACK is enabled
+  radio.enableDynamicPayloads();          // needed for using ACK payloads
   radio.enableAckPayload();               // Allow optional ack payloads
   radio.setRetries(0, 15);                // Smallest time between retries, max no. of retries
   radio.setPayloadSize(1);                // Here we are sending 1-byte payloads to test the call-response speed

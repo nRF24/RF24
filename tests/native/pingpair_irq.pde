@@ -96,6 +96,7 @@ void setup(void)
     radio.begin();
 
     // We will be using the Ack Payload feature, so please enable it
+    radio.enableDynamicPayloads();  // needed for using ACK payloads
     radio.enableAckPayload();
 
     //
