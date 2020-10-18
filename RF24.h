@@ -388,11 +388,12 @@ public:
     void powerUp(void);
 
     /**
-    * Write for single NOACK writes. Optionally disable
-    * acknowledgements/auto-retries for a single payload using the
-    * multicast parameter set to true.
+    * Write for single NOACK writes. Optionally disables acknowledgements/autoretries for a single write.
+    *
+    * @note enableDynamicAck() must be called to enable this feature
     *
     * Can be used with enableAckPayload() to request a response
+    * @see enableDynamicAck()
     * @see setAutoAck()
     * @see write()
     *
@@ -433,10 +434,10 @@ public:
     bool writeFast(const void* buf, uint8_t len);
 
     /**
-    * WriteFast for single NOACK writes. Optionally disable
-    * acknowledgements/auto-retries for a single payload using the
-    * multicast parameter set to true.
+    * WriteFast for single NOACK writes. Disables acknowledgements/autoretries for a single write.
     *
+    * @note enableDynamicAck() must be called to enable this feature
+    * @see enableDynamicAck()
     * @see setAutoAck()
     *
     * @param buf Pointer to the data to be sent
@@ -574,13 +575,10 @@ public:
      * retransmit/autoAck is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
-     * @see write()
-     * @see writeFast()
-     * @see startWrite()
-     * @see writeBlocking()
+     * @see write(), writeFast(), startWrite(), writeBlocking()
      *
-     * For single noAck writes see:
-     * @see setAutoAck()
+     * For single no-ACK writes:
+     * @see enableDynamicAck(), setAutoAck()
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -604,6 +602,7 @@ public:
      * @see whatHappened()
      *
      * For single noAck writes see:
+     * @see enableDynamicAck()
      * @see setAutoAck()
      *
      * @param buf Pointer to the data to be sent
@@ -624,8 +623,9 @@ public:
      * writeBlocking(), startWrite(), or startFastWrite(). If the TX FIFO has
      * other payloads enqueued, then the aforementioned functions will attempt
      * to enqueue the a new payload in the TX FIFO (does not overwrite the top
-     * level of the TX FIFO). Currently, stopListening() also calls flush_tx()
-     * when ACK payloads are enabled (via enableAckPayload()).
+     * level of the TX FIFO).
+     * Currently, stopListening() and startListening() also call flush_tx()
+     * when ACK payloads are enabled (via enableDynamicAckPayloads()).
      *
      * Upon exiting, this function will set the CE pin HIGH to initiate the
      * re-transmission process. If only 1 re-transmission is desired, then the
@@ -821,23 +821,13 @@ public:
     uint8_t getDynamicPayloadSize(void);
 
     /**
-     * Enable custom payloads in the acknowledge packets
+     * Enable custom payloads on the acknowledge packets
      *
-     * ACK payloads are a handy way to return data back to senders without
+     * Ack payloads are a handy way to return data back to senders without
      * manually changing the radio modes on both units.
      *
-     * @remarks The ACK payload feature requires the auto-ack feature to be
-     * enabled for any pipe using ACK payloads. This function does not
-     * automatically enable the auto-ack feature on pipe 0 since the auto-ack
-     * feature is enabled for all pipes by default.
-     *
-     * @see setAutoAck()
-     *
-     * @note ACK payloads are dynamic payloads. This function automatically
-     * enables dynamic payloads on pipe 0 by default. Call
-     * enableDynamicPayloads() to enable on all pipes (especially for RX nodes
-     * that use pipes other than pipe 0 to receive transmissions expecting
-     * responses with ACK payloads).
+     * @note Ack payloads are dynamic payloads. This only works on pipes 0&1 by default. Call
+     * enableDynamicPayloads() to enable on all pipes.
      */
     void enableAckPayload(void);
 
@@ -860,6 +850,20 @@ public:
      *
      */
     void disableDynamicPayloads(void);
+
+    /**
+     * Enable dynamic ACKs (single write multicast or unicast) for chosen messages
+     *
+     * @note To enable full multicast or per-pipe multicast, use setAutoAck()
+     *
+     * @warning This MUST be called prior to attempting single write NOACK calls
+     * @code
+     * radio.enableDynamicAck();
+     * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
+     * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
+     * @endcode
+     */
+    void enableDynamicAck();
 
     /**
      * Determine whether the hardware is an nRF24L01+ or not.
@@ -1064,22 +1068,6 @@ public:
     void openWritingPipe(uint64_t address);
 
     /**
-     * Enable dynamic ACKs (single write multicast or unicast) for chosen
-     * messages.
-     *
-     * @note This function is performed in begin(), so there's no need to
-     * manually call it anymore.
-     *
-     * @note To enable full multicast or per-pipe multicast, use setAutoAck()
-     *
-     * @code
-     * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
-     * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
-     * @endcode
-     */
-    void enableDynamicAck();
-
-    /**
      * Empty the receive buffer
      *
      * @return Current value of status register
@@ -1088,7 +1076,6 @@ public:
 
 private:
 
-    /**@}*/
     /**
      * @name Low-level internal interface.
      *
