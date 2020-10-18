@@ -263,7 +263,7 @@ public:
      * you'll write to. Call stopListening() first.
      *
      * Addresses are assigned via a byte array, default is 5 byte address length
-  s   *
+     *
      * @code
      *   uint8_t addresses[][6] = {"1Node","2Node"};
      *   radio.openWritingPipe(addresses[0]);
