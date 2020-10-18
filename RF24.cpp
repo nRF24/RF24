@@ -633,8 +633,8 @@ bool RF24::begin(void)
     // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
     // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
     // sizes must never be used. See documentation for a more complete explanation.
-    setRetries(5, 15);   
- 
+    setRetries(5, 15);
+
     // Then set the data rate to the slowest (and most reliable) speed supported by all
     // hardware.
     setDataRate(RF24_1MBPS);
@@ -662,7 +662,7 @@ bool RF24::begin(void)
     // Clear CONFIG register, Enable PTX, Power Up & 16-bit CRC
     // Do not write CE high so radio will remain in standby I mode
     // PTX should use only 22uA of power
-    write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO)) );    
+    write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO)) );
     config_reg = read_register(NRF_CONFIG);
 
     powerUp();
@@ -1027,7 +1027,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
 /****************************************************************************/
 
 void RF24::maskIRQ(bool tx, bool fail, bool rx)
-{    
+{
     /* clear the interrupt flags */
     config_reg &= ~(1 << MASK_MAX_RT | 1 << MASK_TX_DS | 1 << MASK_RX_DR);
     /* set the specified interrupt flags */
@@ -1280,7 +1280,7 @@ void RF24::disableDynamicPayloads(void)
 void RF24::enableAckPayload(void)
 {
     //
-    // enable ack payload and dynamic payload features
+    // enable ack payload (and dynamic payload feature for pipe 0)
     //
 
     //toggle_features();
@@ -1288,10 +1288,8 @@ void RF24::enableAckPayload(void)
 
     IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
-    //
-    // Enable dynamic payload on pipes 0 & 1
-    //
-    write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
+    // Enable dynamic payload on pipe 0
+    write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P0));
     dynamic_payloads_enabled = true;
     ack_payloads_enabled = true;
 }
@@ -1524,7 +1522,7 @@ rf24_crclength_e RF24::getCRCLength(void)
     rf24_crclength_e result = RF24_CRC_DISABLED;
     uint8_t AA = read_register(EN_AA);
     config_reg = read_register(NRF_CONFIG);
-    
+
     if (config_reg & _BV(EN_CRC) || AA) {
         if (config_reg & _BV(CRCO)) {
             result = RF24_CRC_16;
@@ -1563,7 +1561,7 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel )
 
 /****************************************************************************/
 void RF24::stopConstCarrier()
-{   
+{
     write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(CONT_WAVE));
     write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(PLL_LOCK));
     ce(LOW);
