@@ -388,12 +388,11 @@ public:
     void powerUp(void);
 
     /**
-    * Write for single NOACK writes. Optionally disables acknowledgements/autoretries for a single write.
-    *
-    * @note enableDynamicAck() must be called to enable this feature
+    * Write for single NOACK writes. Optionally disable
+    * acknowledgements/auto-retries for a single payload using the
+    * multicast parameter set to true.
     *
     * Can be used with enableAckPayload() to request a response
-    * @see enableDynamicAck()
     * @see setAutoAck()
     * @see write()
     *
@@ -434,10 +433,10 @@ public:
     bool writeFast(const void* buf, uint8_t len);
 
     /**
-    * WriteFast for single NOACK writes. Disables acknowledgements/autoretries for a single write.
+    * WriteFast for single NOACK writes. Optionally disable
+    * acknowledgements/auto-retries for a single payload using the
+    * multicast parameter set to true.
     *
-    * @note enableDynamicAck() must be called to enable this feature
-    * @see enableDynamicAck()
     * @see setAutoAck()
     *
     * @param buf Pointer to the data to be sent
@@ -581,7 +580,6 @@ public:
      * @see writeBlocking()
      *
      * For single noAck writes see:
-     * @see enableDynamicAck()
      * @see setAutoAck()
      *
      * @param buf Pointer to the data to be sent
@@ -606,7 +604,6 @@ public:
      * @see whatHappened()
      *
      * For single noAck writes see:
-     * @see enableDynamicAck()
      * @see setAutoAck()
      *
      * @param buf Pointer to the data to be sent
@@ -865,20 +862,6 @@ public:
     void disableDynamicPayloads(void);
 
     /**
-     * Enable dynamic ACKs (single write multicast or unicast) for chosen messages
-     *
-     * @note To enable full multicast or per-pipe multicast, use setAutoAck()
-     *
-     * @warning This MUST be called prior to attempting single write NOACK calls
-     * @code
-     * radio.enableDynamicAck();
-     * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
-     * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
-     * @endcode
-     */
-    void enableDynamicAck();
-
-    /**
      * Determine whether the hardware is an nRF24L01+ or not.
      *
      * @return true if the hardware is nRF24L01+ (or compatible) and false
@@ -1081,6 +1064,22 @@ public:
     void openWritingPipe(uint64_t address);
 
     /**
+     * Enable dynamic ACKs (single write multicast or unicast) for chosen
+     * messages.
+     *
+     * @note This function is performed in begin(), so there's no need to
+     * manually call it anymore.
+     *
+     * @note To enable full multicast or per-pipe multicast, use setAutoAck()
+     *
+     * @code
+     * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
+     * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
+     * @endcode
+     */
+    void enableDynamicAck();
+
+    /**
      * Empty the receive buffer
      *
      * @return Current value of status register
@@ -1089,6 +1088,7 @@ public:
 
 private:
 
+    /**@}*/
     /**
      * @name Low-level internal interface.
      *

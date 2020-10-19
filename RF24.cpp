@@ -641,7 +641,7 @@ bool RF24::begin(void)
 
     // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
     toggle_features();
-    write_register(FEATURE, 0);
+    write_register(FEATURE, _BV(EN_DYN_ACK));  // allow use of multicast parameter by default
     write_register(DYNPD, 0);
     dynamic_payloads_enabled = false;
     ack_payloads_enabled = false;
