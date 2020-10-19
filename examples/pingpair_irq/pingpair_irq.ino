@@ -66,7 +66,6 @@ void setup(){
   // Setup and configure rf radio
   radio.begin();
   //radio.setPALevel(RF24_PA_LOW);
-  radio.enableDynamicPayloads();                    // needed for using ACK payloads
   radio.enableAckPayload();                         // We will be using the Ack Payload feature, so please enable it
   radio.enableDynamicPayloads();                    // Ack payloads are dynamic payloads
                                                     // Open pipes to other node for communication

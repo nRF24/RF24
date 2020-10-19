@@ -48,7 +48,6 @@ void setup(){
 
   radio.begin();
 
-  radio.enableDynamicPayloads();                // needed for using ACK payloads
   radio.enableAckPayload();                     // Allow optional ack payloads
   radio.enableDynamicPayloads();                // Ack payloads are dynamic payloads
 
