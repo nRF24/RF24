@@ -7,9 +7,9 @@
  */
 
 /**
- * Example using Dynamic Payloads 
+ * Example using Dynamic Payloads
  *
- * This is an example of how to use payloads of a varying (dynamic) size. 
+ * This is an example of how to use payloads of a varying (dynamic) size.
  */
 
 #include <SPI.h>
@@ -17,167 +17,114 @@
 #include "RF24.h"
 #include "printf.h"
 
-//
 // Hardware configuration
-//
-
-// Set up nRF24L01 radio on SPI bus plus pins 7 & 8
-
-RF24 radio(7, 8);
-
-// sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
-// Leave open to be the 'ping' transmitter
-const int role_pin = 5;
-
-//
-// Topology
-//
+RF24 radio(7, 8);  // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+const uint64_t addresses[2] = {0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL};
 
-//
-// Role management
-//
-// Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.  The hardware itself specifies
-// which node it is.
-//
-// This is done through the role_pin
-//
+/************************* Role management ****************************/
+// Set up role.  This sketch uses the same software for all the nodes in this
+// system.  Doing so greatly simplifies testing.
 
-// The various roles supported by this sketch
-typedef enum { role_ping_out = 1, role_pong_back } role_e;
+// The role_pin is a digital input pin used to set the role of this radio.
+// Connect the role_pin to GND to be the 'pong' receiver
+// Leave the role_pin open to be the 'ping' transmitter
+const short role_pin = 5;                                                 // use pin 5
+typedef enum { role_ping_out = 1, role_pong_back } role_e;                // The various roles supported by this sketch
+const char* role_friendly_name[] = {"invalid", "Ping out", "Pong back"};  // The debug-friendly names of those roles
+role_e role;                                                              // The role of the current running sketch
 
-// The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
 
-// The role of the current running sketch
-role_e role;
-
-//
-// Payload
-//
-
+// variables used for changing the payload size dynamically (used when role == role_ping_out)
 const int min_payload_size = 4;
 const int max_payload_size = 32;
-const int payload_size_increments_by = 1;
-int next_payload_size = min_payload_size;
+const int payload_size_increment = 1;
+int send_payload_size = min_payload_size;
 
-char receive_payload[max_payload_size + 1]; // +1 to allow room for a terminating NULL char
+char receive_payload[max_payload_size + 1];  // +1 to allow room for a terminating NULL char
 
 void setup(void)
 {
-  //
-  // Role
-  //
+  pinMode(role_pin, INPUT);       // set up the role pin
+  digitalWrite(role_pin, HIGH);
+  delay(20);                      // Just to get a solid reading on the role pin
 
-  // set up the role pin
-  pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,HIGH);
-  delay(20); // Just to get a solid reading on the role pin
-
-  // read the address pin, establish our role
+  // read the role_pin, establish our role
   if (digitalRead(role_pin)) {
     role = role_ping_out;
   } else {
     role = role_pong_back;
   }
 
-  //
-  // Print preamble
-  //
   Serial.begin(115200);
-  printf_begin();
-  
+  printf_begin();                 // needed for printDetails()
+
+  // Print preamble
   Serial.println(F("RF24/examples/pingpair_dyn/"));
   Serial.print(F("ROLE: "));
   Serial.println(role_friendly_name[role]);
 
-  //
   // Setup and configure rf radio
-  //
   radio.begin();
+  radio.enableDynamicPayloads();  // Enable dynamic payloads
+  radio.setRetries(5, 15);        // delay between retries = 5 * 250 + 250 = 1500 microseconds, number of retries = 15
 
-  // Enable dynamic payloads
-  radio.enableDynamicPayloads();
-
-  // Optionally, increase the delay between retries & # of retries
-  radio.setRetries(5, 15);
-
-  //
-  // Open pipes to other nodes for communication
-  //
-
-  // This simple sketch opens two pipes for these two nodes to communicate
-  // back and forth.
-  // Open 'our' pipe for writing
-  // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
-  if (role == role_ping_out) {
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1, pipes[1]);
-  } else {
-    radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1, pipes[0]);
+  // Open a writing and reading pipe on each radio, with opposite addresses
+  if (role == role_ping_out){
+    radio.openWritingPipe(addresses[0]);
+    radio.openReadingPipe(1, addresses[1]);
+  }else{
+    radio.openWritingPipe(addresses[1]);
+    radio.openReadingPipe(1, addresses[0]);
   }
 
-  //
-  // Start listening
-  //
-  radio.startListening();
-
-  //
-  // Dump the configuration of the rf unit for debugging
-  //
-  radio.printDetails();
+  radio.startListening();         // Start listening
+  radio.printDetails();           // Dump the configuration of the rf unit for debugging
 }
 
-void loop(void)
-{
-  //
-  // Ping out role.  Repeatedly send the current time
-  //
+void loop(){
+
+
+  /****************** Ping Out Role ***************************/
 
   if (role == role_ping_out) {
     // The payload will always be the same, what will change is how much of it we send.
     static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
 
-    // First, stop listening so we can talk.
-    radio.stopListening();
+    radio.stopListening();                          // First, stop listening so we can talk.
 
-    // Take the time, and send it.  This will block until complete
+    // Send the payload
     Serial.print(F("Now sending length "));
-    Serial.println(next_payload_size);
-    radio.write(send_payload, next_payload_size);
+    Serial.println(send_payload_size);
+    radio.write(send_payload, send_payload_size);   // This will block until complete
 
-    // Now, continue listening
-    radio.startListening();
+    radio.startListening();                         // Now, continue listening
 
-    // Wait here until we get a response, or timeout
-    unsigned long started_waiting_at = millis();
+    unsigned long started_waiting_at = millis();    // Start a timer for measuring timout
     bool timeout = false;
-    while (!radio.available() && !timeout) {
-      if (millis() - started_waiting_at > 500 ) {
+    while (!radio.available() && !timeout)          // Wait until we get a response or timeout is reached
+    {
+      if (millis() - started_waiting_at > 500)      // Only wait for 500 milliseconds
         timeout = true;
-      }
     }
 
     // Describe the results
-    if (timeout) {
+    if (timeout){
       Serial.println(F("Failed, response timed out."));
-    } else {
-      // Grab the response, compare, and send to debugging spew
-      uint8_t len = radio.getDynamicPayloadSize();
-      
-      // If a corrupt dynamic payload is received, it will be flushed
-      if (!len) {
-        return; 
-      }
-      
+    }else{
+      // Grab the response and print it
+
+      uint8_t len = radio.getDynamicPayloadSize();  // get payload's length
+
+      // If an illegal payload size was detected, all RX payloads will be flushed
+      if (!len)
+        continue;
+
       radio.read(receive_payload, len);
 
-      // Put a zero at the end for easy printing
-      receive_payload[len] = 0;
+      // Use payload as a C-string (for easy printing)
+      receive_payload[len] = 0;                     // put a NULL terminating zero at the end
 
       // Spew it
       Serial.print(F("Got response size="));
@@ -185,37 +132,32 @@ void loop(void)
       Serial.print(F(" value="));
       Serial.println(receive_payload);
     }
-    
-    // Update size for next time.
-    next_payload_size += payload_size_increments_by;
-    if (next_payload_size > max_payload_size) {
-      next_payload_size = min_payload_size;
-    }
 
-    // Try again 1s later
-    delay(100);
+    send_payload_size += payload_size_increment;    // Update size for next time.
+    if (send_payload_size > max_payload_size)       // if payload length is larger than the radio can handle
+      send_payload_size = min_payload_size;         // reset the payload length
+
+    delay(1000);                                    // Try again 1s later
   }
 
-  //
-  // Pong back role.  Receive each packet, dump it out, and send it back
-  //
 
-  if (role == role_pong_back) {
-    // if there is data ready
-    while (radio.available()) {
+  /****************** Pong Back Role ***************************/
+  // Receive each packet, send it back, and dump it out
 
-      // Fetch the payload, and see if this was the last one.
-      uint8_t len = radio.getDynamicPayloadSize();
-      
-      // If a corrupt dynamic payload is received, it will be flushed
-      if (!len) {
-        continue; 
-      }
-      
+  if (role == role_pong_back){
+    while (radio.available())                       // if there is data ready
+    {
+
+      uint8_t len = radio.getDynamicPayloadSize();  // Fetch the the payload size
+
+      // If an illegal payload size was detected, all RX payloads will be flushed
+      if (!len)
+        continue;
+
       radio.read(receive_payload, len);
 
-      // Put a zero at the end for easy printing
-      receive_payload[len] = 0;
+      // Use payload as a C-string (for easy printing)
+      receive_payload[len] = 0;                     // put a NULL terminating zero at the end
 
       // Spew it
       Serial.print(F("Got response size="));
@@ -223,21 +165,18 @@ void loop(void)
       Serial.print(F(" value="));
       Serial.println(receive_payload);
 
-      // First, stop listening so we can talk
-      radio.stopListening();
+      radio.stopListening();                        // First, stop listening so we can talk
 
       // Send a reply that the packet was received
-      // you could also use the ACK functionality
       //
-      // You might have a bit better luck delivering your message
-      // if you wait for the other side to start listening first
-      delay(20); 
+      // You will have better luck delivering your message if
+      // you wait for the other node to start listening first
+      delay(20);
       radio.write(receive_payload, len);
       Serial.println(F("Sent response."));
 
-      // Now, resume listening so we catch the next packets.
-      radio.startListening();
+      radio.startListening();                       // Now, resume listening so we catch the next packets.
     }
   }
-}
+} // loop
 // vim:cin:ai:sts=2 sw=2 ft=cpp
