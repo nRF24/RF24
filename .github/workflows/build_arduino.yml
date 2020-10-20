@@ -1,0 +1,59 @@
+name: Compile Examples for Arduino IDE
+
+on: [push, pull_request]
+  # pull_request:
+  #   paths:
+  #     - "examples/**"
+  # push:
+  #   paths:
+  #     - "examples/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        fqbn:
+          - "arduino:avr:yun"
+          - "arduino:avr:uno"
+          - "arduino:avr:diecimila"
+          - "arduino:avr:nano"
+          - "arduino:avr:mega"
+          - "arduino:avr:megaADK"
+          - "arduino:avr:leonardo"
+          - "arduino:avr:micro"
+          - "arduino:avr:esplora"
+          - "arduino:avr:mini"
+          - "arduino:avr:ethernet"
+          - "arduino:avr:fio"
+          - "arduino:avr:bt"
+          - "arduino:avr:LilyPad"
+          - "arduino:avr:pro"
+          - "arduino:avr:atmegang"
+          - "arduino:avr:robotControl"
+          - "arduino:avr:robotMotor"
+          - "arduino:avr:gemma"
+          - "arduino:avr:circuitplay32u4cat"
+          - "arduino:avr:yunmini"
+          - "arduino:avr:chiwawa"
+          - "arduino:avr:one"
+          - "arduino:avr:unowifi"
+          # - "arduino:avr:mini"
+          # - "arduino:avr:mini"
+          # - "arduino:avr:mini"
+          # - "arduino:avr:mini"
+          # - "arduino:samd:mkrvidor4000"
+          # These should be changed from the "arduino-beta" vendor to "arduino" once there is a production release of Arduino mbed-Enabled Boards
+          # - "arduino-beta:mbed:nano33ble"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@main
+        with:
+          fqbn: ${{ matrix.fqbn }}
