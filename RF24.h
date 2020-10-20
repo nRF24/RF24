@@ -173,6 +173,10 @@ public:
      * radio.stopListening();
      * radio.write(&data,sizeof(data));
      * @endcode
+     *
+     * @note The TX FIFO is flushed when calling this function. This is meant
+     * to discard any ACK payloads that were not appended to acknowledgment
+     * packets.
      */
     void stopListening(void);
 
@@ -836,6 +840,13 @@ public:
     void enableAckPayload(void);
 
     /**
+     * Disable custom payloads on the ackowledge packets
+     *
+     * @see enableAckPayload()
+     */
+    void disableAckPayload(void);
+
+    /**
      * Enable dynamically-sized payloads
      *
      * This way you don't always have to send large packets just to send them
@@ -883,12 +894,16 @@ public:
      * This is enabled by default, so it's only needed if you want to turn
      * it off for some reason.
      *
-     * @param enable Whether to enable (true) or disable (false) auto-acks
+     * @note If disabling auto-acknowledgment packets, the ACK payloads
+     * feature is also disabled.
+     *
+     * @param enable Whether to enable (true) or disable (false)
+     * auto-acknowledgments
      */
     void setAutoAck(bool enable);
 
     /**
-     * Enable or disable auto-acknowlede packets on a per pipeline basis.
+     * Enable or disable auto-acknowledgment packets on a per pipeline basis.
      *
      * AA is enabled by default, so it's only needed if you want to turn
      * it off/on for some reason on a per pipeline basis. Remember that pipe
@@ -896,8 +911,12 @@ public:
      * TX & RX nodes, then pipe 0 must have this feature enabled for the
      * applicable nodes.
      *
+     * @note If disabling auto-acknowledgment packets on pipe 0, the ACK
+     * payloads feature is also disabled.
+     *
      * @param pipe Which pipeline to modify
-     * @param enable Whether to enable (true) or disable (false) auto-acks
+     * @param enable Whether to enable (true) or disable (false)
+     * auto-acknowledgment
      */
     void setAutoAck(uint8_t pipe, bool enable);
 
