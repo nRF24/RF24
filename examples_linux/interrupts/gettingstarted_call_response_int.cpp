@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     cout << "RPi/RF24/examples/gettingstarted_call_response_int\n";
     radio.begin();
     radio.enableAckPayload();               // Allow optional ack payloads
-    radio.enableDynamicPayloads();
+    radio.enableDynamicPayloads();          // needed for using ACK payloads
     radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 
 
