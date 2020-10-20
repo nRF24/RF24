@@ -641,7 +641,7 @@ bool RF24::begin(void)
 
     // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
     toggle_features();
-    write_register(FEATURE, 0);
+    write_register(FEATURE, _BV(EN_DYN_ACK));  // allow use of multicast parameter by default
     write_register(DYNPD, 0);
     dynamic_payloads_enabled = false;
     ack_payloads_enabled = false;
@@ -696,7 +696,7 @@ void RF24::startListening(void)
      * 3. Allows time for slower devices to update with the faster startListening() function prior to updating stopListening() & adjusting txDelay
      */
     config_reg |= _BV(PRIM_RX);
-    write_register(NRF_CONFIG,config_reg);
+    write_register(NRF_CONFIG, config_reg);
     write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT));
     ce(HIGH);
     // Restore the pipe0 adddress, if exists
@@ -705,11 +705,6 @@ void RF24::startListening(void)
     } else {
         closeReadingPipe(0);
     }
-
-    if(ack_payloads_enabled){
-        flush_tx();
-    }
-
 }
 
 /****************************************************************************/
@@ -721,12 +716,10 @@ void RF24::stopListening(void)
     ce(LOW);
 
     delayMicroseconds(txDelay);
-
-    if (read_register(FEATURE) & _BV(EN_ACK_PAY)) {
-        delayMicroseconds(txDelay); //200
+    if (ack_payloads_enabled){
         flush_tx();
     }
-    //flush_rx();
+
     config_reg &= ~_BV(PRIM_RX);
     write_register(NRF_CONFIG, (read_register(NRF_CONFIG)) & ~_BV(PRIM_RX));
 
@@ -1283,15 +1276,31 @@ void RF24::enableAckPayload(void)
     // enable ack payload (and dynamic payload feature for pipe 0)
     //
 
-    //toggle_features();
-    write_register(FEATURE, read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL));
 
-    IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    if (!ack_payloads_enabled){
+        write_register(FEATURE, read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL));
 
-    // Enable dynamic payload on pipe 0
-    write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P0));
-    dynamic_payloads_enabled = true;
-    ack_payloads_enabled = true;
+        IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+
+        // Enable dynamic payload on pipe 0
+        write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P0));
+        dynamic_payloads_enabled = true;
+        ack_payloads_enabled = true;
+    }
+}
+
+/****************************************************************************/
+
+void RF24::disableAckPayload(void)
+{
+    // disable ack payloads (leave dynamic payload features as is)
+    if (ack_payloads_enabled){
+        write_register(FEATURE, read_register(FEATURE) | ~_BV(EN_ACK_PAY));
+
+        IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+
+        ack_payloads_enabled = false;
+    }
 }
 
 /****************************************************************************/
@@ -1305,40 +1314,38 @@ void RF24::enableDynamicAck(void)
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DYN_ACK));
 
     IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
-
-
 }
 
 /****************************************************************************/
 
 void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
-    const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
+    if (ack_payloads_enabled){
+        const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-    uint8_t data_len = rf24_min(len, 32);
+        uint8_t data_len = rf24_min(len, 32);
 
-    #if defined(RF24_LINUX)
-    beginTransaction();
-    uint8_t * ptx = spi_txbuff;
-    uint8_t size = data_len + 1 ; // Add register value to transmit buffer
-    *ptx++ =  W_ACK_PAYLOAD | ( pipe & 0x07 );
-    while ( data_len-- ){
-      *ptx++ =  *current++;
+        #if defined(RF24_LINUX)
+        beginTransaction();
+        uint8_t * ptx = spi_txbuff;
+        uint8_t size = data_len + 1 ; // Add register value to transmit buffer
+        *ptx++ =  W_ACK_PAYLOAD | ( pipe & 0x07 );
+        while ( data_len-- ){
+        *ptx++ =  *current++;
+        }
+
+        _SPI.transfern( (char *) spi_txbuff, size);
+        endTransaction();
+        #else
+        beginTransaction();
+        _SPI.transfer(W_ACK_PAYLOAD | (pipe & 0x07));
+
+        while (data_len--)
+            _SPI.transfer(*current++);
+
+        endTransaction();
+        #endif
     }
-
-    _SPI.transfern( (char *) spi_txbuff, size);
-    endTransaction();
-    #else
-    beginTransaction();
-    _SPI.transfer(W_ACK_PAYLOAD | (pipe & 0x07));
-
-    while (data_len--) {
-        _SPI.transfer(*current++);
-    }
-    endTransaction();
-
-    #endif
-
 }
 
 /****************************************************************************/
@@ -1362,10 +1369,14 @@ bool RF24::isPVariant(void)
 
 void RF24::setAutoAck(bool enable)
 {
-    if (enable) {
+    if (enable){
         write_register(EN_AA, 0x3F);
-    } else {
+    }else{
         write_register(EN_AA, 0);
+        // accomodate ACK payloads feature
+        if (ack_payloads_enabled){
+            disableAckPayload();
+        }
     }
 }
 
@@ -1373,12 +1384,15 @@ void RF24::setAutoAck(bool enable)
 
 void RF24::setAutoAck(uint8_t pipe, bool enable)
 {
-    if (pipe <= 6) {
+    if (pipe < 6) {
         uint8_t en_aa = read_register(EN_AA);
         if (enable) {
             en_aa |= _BV(pipe);
-        } else {
+        }else{
             en_aa &= ~_BV(pipe);
+            if (ack_payloads_enabled && !pipe){
+                disableAckPayload();
+            }
         }
         write_register(EN_AA, en_aa);
     }
