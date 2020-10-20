@@ -431,8 +431,8 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
-        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5),
-         csDelay(5), _is_p_variant(false)
+        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5), _is_p_variant(false),
+         csDelay(5)
 {
     pipe0_reading_address[0] = 0;
     if(spi_speed <= 35000){ //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
