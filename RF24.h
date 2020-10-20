@@ -173,6 +173,10 @@ public:
      * radio.stopListening();
      * radio.write(&data,sizeof(data));
      * @endcode
+     *
+     * @note The TX FIFO is flushed when calling this function. This is meant
+     * to discard any ACK payloads that were not appended to acknowledgment
+     * packets.
      */
     void stopListening(void);
 
@@ -263,7 +267,7 @@ public:
      * you'll write to. Call stopListening() first.
      *
      * Addresses are assigned via a byte array, default is 5 byte address length
-  s   *
+     *
      * @code
      *   uint8_t addresses[][6] = {"1Node","2Node"};
      *   radio.openWritingPipe(addresses[0]);
@@ -579,7 +583,7 @@ public:
      * @see startWrite()
      * @see writeBlocking()
      *
-     * For single noAck writes see:
+     * For single noAck writes:
      * @see setAutoAck()
      *
      * @param buf Pointer to the data to be sent
@@ -614,19 +618,35 @@ public:
     void startWrite(const void* buf, uint8_t len, const bool multicast);
 
     /**
-     * This function is mainly used internally to take advantage of the auto payload
-     * re-use functionality of the chip, but can be beneficial to users as well.
+     * The function will instruct the radio to re-use the payload in the
+     * top level (first out) of the TX FIFO buffers. This is used internally
+     * by writeBlocking() to initiate retries when a TX failure
+     * occurs. Retries are automatically initiated except with the standard
+     * write(). This way, data is not flushed from the buffer until calling
+     * flush_tx(). If the TX FIFO has only the one payload (in the top level),
+     * the re-used payload can be overwritten by using write(), writeFast(),
+     * writeBlocking(), startWrite(), or startFastWrite(). If the TX FIFO has
+     * other payloads enqueued, then the aforementioned functions will attempt
+     * to enqueue the a new payload in the TX FIFO (does not overwrite the top
+     * level of the TX FIFO).
+     * Currently, stopListening() and startListening() also call flush_tx()
+     * when ACK payloads are enabled (via enableAckPayload()).
      *
-     * The function will instruct the radio to re-use the data in the FIFO buffers,
-     * and instructs the radio to re-send once the timeout limit has been reached.
-     * Used by writeFast and writeBlocking to initiate retries when a TX failure
-     * occurs. Retries are automatically initiated except with the standard write().
-     * This way, data is not flushed from the buffer until switching between modes.
+     * Upon exiting, this function will set the CE pin HIGH to initiate the
+     * re-transmission process. If only 1 re-transmission is desired, then the
+     * CE pin should be set to LOW after the mandatory minumum pulse duration
+     * of 10 microseconds.
+     *
+     * @remark This function only applies when taking advantage of the
+     * auto-retry feature. See setAutoAck() and setRetries() to configure the
+     * auto-retry feature.
      *
      * @note This is to be used AFTER auto-retry fails if wanting to resend
-     * using the built-in payload reuse features.
-     * After issuing reUseTX(), it will keep reending the same payload forever or until
-     * a payload is written to the FIFO, or a flush_tx command is given.
+     * using the built-in payload reuse feature. After issuing reUseTX(), it
+     * will keep resending the same payload until a transmission failure
+     * occurs or the CE pin is set to LOW (whichever comes first). In the
+     * event of a re-transmission failure, simply call this function again to
+     * resume re-transmission of the same payload.
      */
     void reUseTX();
 
@@ -817,6 +837,13 @@ public:
     void enableAckPayload(void);
 
     /**
+     * Disable custom payloads on the ackowledge packets
+     *
+     * @see enableAckPayload()
+     */
+    void disableAckPayload(void);
+
+    /**
      * Enable dynamically-sized payloads
      *
      * This way you don't always have to send large packets just to send them
@@ -850,18 +877,29 @@ public:
      * This is enabled by default, so it's only needed if you want to turn
      * it off for some reason.
      *
-     * @param enable Whether to enable (true) or disable (false) auto-acks
+     * @note If disabling auto-acknowledgment packets, the ACK payloads
+     * feature is also disabled.
+     *
+     * @param enable Whether to enable (true) or disable (false)
+     * auto-acknowledgments
      */
     void setAutoAck(bool enable);
 
     /**
-     * Enable or disable auto-acknowlede packets on a per pipeline basis.
+     * Enable or disable auto-acknowledgment packets on a per pipeline basis.
      *
      * AA is enabled by default, so it's only needed if you want to turn
-     * it off/on for some reason on a per pipeline basis.
+     * it off/on for some reason on a per pipeline basis. Remember that pipe
+     * 0 is used for TX transmissions. If using the auto-ack feature on both
+     * TX & RX nodes, then pipe 0 must have this feature enabled for the
+     * applicable nodes.
+     *
+     * @note If disabling auto-acknowledgment packets on pipe 0, the ACK
+     * payloads feature is also disabled.
      *
      * @param pipe Which pipeline to modify
-     * @param enable Whether to enable (true) or disable (false) auto-acks
+     * @param enable Whether to enable (true) or disable (false)
+     * auto-acknowledgment
      */
     void setAutoAck(uint8_t pipe, bool enable);
 
