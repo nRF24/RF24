@@ -24,3 +24,4 @@ examples_linux/*
 !examples_linux/*.*
 .directory
 .idea
+doxygenAction
