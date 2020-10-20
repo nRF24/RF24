@@ -1,12 +1,12 @@
 name: Compile Examples for Arduino IDE
 
-on: [push, pull_request]
-  # pull_request:
-  #   paths:
-  #     - "examples/**"
-  # push:
-  #   paths:
-  #     - "examples/**"
+on:
+  pull_request:
+    paths:
+      - "examples/**"
+  push:
+    paths:
+      - "examples/**"
 
 jobs:
   build:
