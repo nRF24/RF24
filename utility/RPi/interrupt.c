@@ -153,7 +153,7 @@ int attachInterrupt(int pin, int mode, void (* function)(void))
 
     ioctl(sysFds[bcmGpioPin], FIONREAD, &count);
     for (i = 0; i < count; ++i) {
-        read(sysFds[bcmGpioPin], &c, 1);
+        (void) read(sysFds[bcmGpioPin], &c, 1);
     }
 
     isrFunctions[pin] = function;
