@@ -113,7 +113,7 @@ void one_failed(void)
 }
 
 //
-// Setup 
+// Setup
 //
 
 void setup(void)
@@ -173,6 +173,7 @@ void setup(void)
 
     // We will be using the Ack Payload feature, so please enable it
     radio.enableAckPayload();
+    radio.enableDynamicPayloads();  // needed for using ACK payloads
 
     // Config 2 is special radio config
     if (configuration == '2') {
@@ -265,7 +266,7 @@ char* prbuf_in = prbuf;
 char* prbuf_out = prbuf;
 
 //
-// Loop 
+// Loop
 //
 
 static uint32_t message_count = 0;

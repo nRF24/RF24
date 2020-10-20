@@ -826,13 +826,23 @@ public:
     uint8_t getDynamicPayloadSize(void);
 
     /**
-     * Enable custom payloads on the acknowledge packets
+     * Enable custom payloads in the acknowledge packets
      *
-     * Ack payloads are a handy way to return data back to senders without
+     * ACK payloads are a handy way to return data back to senders without
      * manually changing the radio modes on both units.
      *
-     * @note Ack payloads are dynamic payloads. This only works on pipes 0&1 by default. Call
-     * enableDynamicPayloads() to enable on all pipes.
+     * @remarks The ACK payload feature requires the auto-ack feature to be
+     * enabled for any pipe using ACK payloads. This function does not
+     * automatically enable the auto-ack feature on pipe 0 since the auto-ack
+     * feature is enabled for all pipes by default.
+     *
+     * @see setAutoAck()
+     *
+     * @note ACK payloads are dynamic payloads. This function automatically
+     * enables dynamic payloads on pipe 0 by default. Call
+     * enableDynamicPayloads() to enable on all pipes (especially for RX nodes
+     * that use pipes other than pipe 0 to receive transmissions expecting
+     * responses with ACK payloads).
      */
     void enableAckPayload(void);
 

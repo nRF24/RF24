@@ -1272,17 +1272,18 @@ void RF24::disableDynamicPayloads(void)
 
 void RF24::enableAckPayload(void)
 {
-    // enable ack payloads and dynamic payload features
+    //
+    // enable ack payload (and dynamic payload feature for pipe 0)
+    //
+
 
     if (!ack_payloads_enabled){
         write_register(FEATURE, read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL));
 
         IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
-        //
-        // Enable dynamic payload on pipes 0 & 1
-        //
-        write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
+        // Enable dynamic payload on pipe 0
+        write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P0));
         dynamic_payloads_enabled = true;
         ack_payloads_enabled = true;
     }
