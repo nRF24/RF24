@@ -658,6 +658,13 @@ public:
     uint8_t flush_tx(void);
 
     /**
+     * Empty the receive buffer
+     *
+     * @return Current value of status register
+     */
+    uint8_t flush_rx(void);
+
+    /**
      * Test whether there was a carrier on the line for the
      * previous listening period.
      *
@@ -1100,13 +1107,6 @@ public:
      * @endcode
      */
     void enableDynamicAck();
-
-    /**
-     * Empty the receive buffer
-     *
-     * @return Current value of status register
-     */
-    uint8_t flush_rx(void);
 
 private:
 
