@@ -431,8 +431,8 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
-        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(false), addr_width(5),
-         csDelay(5)//,pipe0_reading_address(0)
+        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5),
+         csDelay(5), _is_p_variant(false)
 {
     pipe0_reading_address[0] = 0;
     if(spi_speed <= 35000){ //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
@@ -639,11 +639,23 @@ bool RF24::begin(void)
     // hardware.
     setDataRate(RF24_1MBPS);
 
-    // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
+    // detect if is a plus variant & use old toggle features command accordingly
+    uint8_t before_toggle = read_register(FEATURE);
     toggle_features();
-    write_register(FEATURE, _BV(EN_DYN_ACK));  // allow use of multicast parameter by default
-    write_register(DYNPD, 0);
-    dynamic_payloads_enabled = false;
+    uint8_t after_toggle = read_register(FEATURE);
+    _is_p_variant = true ? before_toggle != after_toggle : false;
+    if (!after_toggle){
+        if (_is_p_variant){
+            toggle_features();
+        }else{
+            // allow use of multicast parameter by default
+            write_register(FEATURE, _BV(EN_DYN_ACK));
+        }
+    }
+    // enable dynamic payloads by default
+    write_register(DYNPD, 0x3F);
+    dynamic_payloads_enabled = true;
+
     ack_payloads_enabled = false;
 
     // Reset current status
@@ -1353,10 +1365,7 @@ bool RF24::isAckPayloadAvailable(void)
 
 bool RF24::isPVariant(void)
 {
-    rf24_datarate_e dR = getDataRate();
-    bool result = setDataRate(RF24_250KBPS);
-    setDataRate(dR);
-    return result;
+    return _is_p_variant;
 }
 
 /****************************************************************************/
