@@ -18,7 +18,7 @@ jobs:
         run: ./configure --soc=BCM2835 --driver=RPi
       - name: make
         run: make
-      - name: make
+      - name: make install
         run: sudo make install
 
   build-RPi-BCM2836:
@@ -36,7 +36,7 @@ jobs:
         run: ./configure --soc=BCM2836 --driver=RPi
       - name: make
         run: make
-      - name: make
+      - name: make install
         run: sudo make install
 
   build-wiringPi-BCM2835:
@@ -60,5 +60,5 @@ jobs:
         run: ./configure --soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include
       - name: make
         run: make
-      - name: make
+      - name: make install
         run: sudo make install

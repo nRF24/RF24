@@ -5,11 +5,14 @@ on: [pull_request, push]
 jobs:
   build-doxygen:
     runs-on: ubuntu-latest
-    - id: latest_ver
+
+
+    steps:
+    - name: get latest release version number
+      id: latest_ver
         uses: pozetroninc/github-action-get-latest-release@master
         with:
           repository: nRF24/RF24
-    steps:
     - name: checkout
       uses: actions/checkout@v2
     - name: overwrite doxygen tags
