@@ -1042,11 +1042,31 @@ public:
      *
      * @param level Output power to use
      * @param channel The channel to use
+     *
+     * @warning If isPVariant() returns true, then this function takes extra
+     * measures that alter some settings. These settings alterations include:
+     * - setAutoAck() to false (for all pipes)
+     * - setRetries() to retry `0` times with a delay of 250 microseconds
+     * - set the TX address to 5 bytes of `0xFF`
+     * - flush_tx()
+     * - load a 32 byte payload of `0xFF` into the TX FIFO's top level
+     * - disableCRC()
      */
     void startConstCarrier(rf24_pa_dbm_e level, uint8_t channel);
 
     /**
      * Stop transmission of constant wave and reset PLL and CONT registers
+     *
+     * @warning this function will powerDown() the radio per recommendation of
+     * datasheet.
+     * @note If isPVariant() returns true, please remember to re-configure the radio's settings
+     * @code
+     * // re-establish default settings
+     * setCRCLength(RF24_CRC_16);
+     * setAutoAck(true);
+     * setRetries(5, 15);
+     * @endcode
+     * @see startConstCarrier()
      */
     void stopConstCarrier(void);
 

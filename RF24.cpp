@@ -1568,18 +1568,40 @@ void RF24::setRetries(uint8_t delay, uint8_t count)
 /****************************************************************************/
 void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel )
 {
-    write_register(RF_SETUP, (read_register(RF_SETUP)) | _BV(CONT_WAVE));
-    write_register(RF_SETUP, (read_register(RF_SETUP)) | _BV(PLL_LOCK));
+    stopListening();
+    write_register(RF_SETUP, (read_register(RF_SETUP)) | _BV(CONT_WAVE) | _BV(PLL_LOCK));
+    if (isPVariant()){
+        setAutoAck(0);
+        setRetries(0, 0);
+        write_register(TX_ADDR, 0xFFFFFFFFFFLL, 5);
+        flush_tx();  // so we can write to top level
+        uint8_t dummy_buf[32];
+        for (uint8_t i = 0; i < 32; ++i)
+            dummy_buf[i] = 0xFF;
+        write_payload(&dummy_buf, 32, W_TX_PAYLOAD);
+        disableCRC();
+    }
     setPALevel(level);
     setChannel(channel);
     IF_SERIAL_DEBUG( printf_P(PSTR("RF_SETUP=%02x\r\n"), read_register(RF_SETUP)  ) );
     ce(HIGH);
+    if (isPVariant()){
+        delay(1);
+        ce(LOW);
+        reUseTX();
+    }
 }
 
 /****************************************************************************/
 void RF24::stopConstCarrier()
 {
-    write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(CONT_WAVE));
-    write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(PLL_LOCK));
+    /*
+     * A note from the datasheet:
+     * Do not use REUSE_TX_PL together with CONT_WAVE=1. When both these
+     * registers are set the chip does not react when setting CE low. If
+     * however, both registers are set PWR_UP = 0 will turn TX mode off.
+     */
+    powerDown();  // per datasheet recommendation (just to be safe)
+    write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(CONT_WAVE) & ~_BV(PLL_LOCK));
     ce(LOW);
 }
