@@ -1573,12 +1573,12 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel )
     if (isPVariant()){
         setAutoAck(0);
         setRetries(0, 0);
-        write_register(TX_ADDR, 0xFFFFFFFFFFLL, 5);
-        flush_tx();  // so we can write to top level
         uint8_t dummy_buf[32];
         for (uint8_t i = 0; i < 32; ++i)
             dummy_buf[i] = 0xFF;
-        write_payload(&dummy_buf, 32, W_TX_PAYLOAD);
+        write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&dummy_buf), 5);
+        flush_tx();  // so we can write to top level
+        write_payload(reinterpret_cast<const uint8_t*>(&dummy_buf), 32, W_TX_PAYLOAD);
         disableCRC();
     }
     setPALevel(level);
