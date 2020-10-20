@@ -617,19 +617,34 @@ public:
     void startWrite(const void* buf, uint8_t len, const bool multicast);
 
     /**
-     * This function is mainly used internally to take advantage of the auto payload
-     * re-use functionality of the chip, but can be beneficial to users as well.
+     * The function will instruct the radio to re-use the payload in the
+     * top level (first out) of the TX FIFO buffers. This is used internally
+     * by writeBlocking() to initiate retries when a TX failure
+     * occurs. Retries are automatically initiated except with the standard
+     * write(). This way, data is not flushed from the buffer until calling
+     * flush_tx(). If the TX FIFO has only the one payload (in the top level),
+     * the re-used payload can be overwritten by using write(), writeFast(),
+     * writeBlocking(), startWrite(), or startFastWrite(). If the TX FIFO has
+     * other payloads enqueued, then the aforementioned functions will attempt
+     * to enqueue the a new payload in the TX FIFO (does not overwrite the top
+     * level of the TX FIFO). Currently, stopListening() also calls flush_tx()
+     * when ACK payloads are enabled (via enableAckPayload()).
      *
-     * The function will instruct the radio to re-use the data in the FIFO buffers,
-     * and instructs the radio to re-send once the timeout limit has been reached.
-     * Used by writeFast and writeBlocking to initiate retries when a TX failure
-     * occurs. Retries are automatically initiated except with the standard write().
-     * This way, data is not flushed from the buffer until switching between modes.
+     * Upon exiting, this function will set the CE pin HIGH to initiate the
+     * re-transmission process. If only 1 re-transmission is desired, then the
+     * CE pin should be set to LOW after the mandatory minumum pulse duration
+     * of 10 microseconds.
+     *
+     * @remark This function only applies when taking advantage of the
+     * auto-retry feature. See setAutoAck() and setRetries() to configure the
+     * auto-retry feature.
      *
      * @note This is to be used AFTER auto-retry fails if wanting to resend
-     * using the built-in payload reuse features.
-     * After issuing reUseTX(), it will keep reending the same payload forever or until
-     * a payload is written to the FIFO, or a flush_tx command is given.
+     * using the built-in payload reuse feature. After issuing reUseTX(), it
+     * will keep resending the same payload until a transmission failure
+     * occurs or the CE pin is set to LOW (whichever comes first). In the
+     * event of a re-transmission failure, simply call this function again to
+     * resume re-transmission of the same payload.
      */
     void reUseTX();
 
