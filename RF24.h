@@ -548,16 +548,6 @@ public:
     void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
     /**
-     * Determine if an ack payload was received in the most recent call to
-     * write(). The regular available() can also be used.
-     *
-     * Call read() to retrieve the ack payload.
-     *
-     * @return True if an ack payload is available.
-     */
-    bool isAckPayloadAvailable(void);
-
-    /**
      * Call this when you get an interrupt to find out why
      *
      * Tells you what caused the interrupt, and clears the state of
@@ -1128,6 +1118,16 @@ public:
      * @endcode
      */
     void enableDynamicAck();
+
+    /**
+     * Determine if an ack payload was received in the most recent call to
+     * write(). The regular available() can also be used.
+     *
+     * Call read() to retrieve the ack payload.
+     *
+     * @return True if an ack payload is available.
+     */
+    bool isAckPayloadAvailable(void);
 
 private:
 
