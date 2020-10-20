@@ -643,16 +643,16 @@ bool RF24::begin(void)
     uint8_t before_toggle = read_register(FEATURE);
     toggle_features();
     uint8_t after_toggle = read_register(FEATURE);
-    _is_p_variant = true ? before_toggle != after_toggle : false;
-    if (!after_toggle){
+    _is_p_variant = false ? before_toggle != after_toggle : true;
+    if (after_toggle != 5){
         if (_is_p_variant){
+            // module did not experience power-on-reset (#401)
             toggle_features();
-        }else{
-            // allow use of multicast parameter by default
-            write_register(FEATURE, _BV(EN_DYN_ACK));
         }
+        // allow use of multicast parameter and dynamic payloads by default
+        write_register(FEATURE, _BV(EN_DYN_ACK) | _BV(EN_DPL));
     }
-    // enable dynamic payloads by default
+    // enable dynamic payloads by default (for all pipes)
     write_register(DYNPD, 0x3F);
     dynamic_payloads_enabled = true;
 
