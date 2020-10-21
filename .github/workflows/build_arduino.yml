@@ -1,4 +1,4 @@
-name: Compile Examples for Arduino IDE
+name: Arduino CLI build
 
 on:
   pull_request:
