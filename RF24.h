@@ -879,34 +879,70 @@ public:
     bool isPVariant(void);
 
     /**
-     * Enable or disable auto-acknowlede packets
+     * Enable or disable the auto-acknowledgement feature for all pipes. This
+     * feature is enabled by default. Auto-acknowledgement responds to every
+     * recieved payload with an empty ACK packet. These ACK packets get sent
+     * from the receiving radio back to the transmitting radio. To attach an
+     * ACK payload to a ACK packet, use writeAckPayload().
      *
-     * This is enabled by default, so it's only needed if you want to turn
-     * it off for some reason.
+     * If this feature is disabled on a transmitting radio, then the
+     * transmitting radio will always report that the payload was recieved
+     * (even if it was not). Please remember that this feature's configuration
+     * needs to match for transmitting and receiving radios.
+     *
+     * @warning When using the `multicast` parameter to write(), this feature
+     * can be disabled for an individual payload. However, if this feature is
+     * disabled, then the `multicast` parameter will have no effect.
      *
      * @note If disabling auto-acknowledgment packets, the ACK payloads
-     * feature is also disabled.
+     * feature is also disabled as this feature is required to send ACK
+     * payloads.
      *
-     * @param enable Whether to enable (true) or disable (false)
-     * auto-acknowledgments
+     * @see write()
+     * @see writeFast()
+     * @see startWriteFast()
+     * @see startWrite()
+     * @see writeAckPayload()
+     *
+     * @param enable Whether to enable (true) or disable (false) the
+     * auto-acknowledgment feature for all pipes
      */
     void setAutoAck(bool enable);
 
     /**
-     * Enable or disable auto-acknowledgment packets on a per pipeline basis.
+     * Enable or disable the auto-acknowledgement feature for a specific pipe.
+     * This feature is enabled by default for all pipes. Auto-acknowledgement
+     * responds to every recieved payload with an empty ACK packet. These ACK
+     * packets get sent from the receiving radio back to the transmitting
+     * radio. To attach an ACK payload to a ACK packet, use writeAckPayload().
      *
-     * AA is enabled by default, so it's only needed if you want to turn
-     * it off/on for some reason on a per pipeline basis. Remember that pipe
-     * 0 is used for TX transmissions. If using the auto-ack feature on both
-     * TX & RX nodes, then pipe 0 must have this feature enabled for the
-     * applicable nodes.
+     * Pipe 0 is used for TX operations, which include sending ACK packets. If
+     * using this feature on both TX & RX nodes, then pipe 0 must have this
+     * feature enabled for the RX & TX operations. If this feature is disabled
+     * on a transmitting radio's pipe 0, then the transmitting radio will
+     * always report that the payload was recieved (even if it was not).
+     * Remember to also enable this feature for any pipe that is openly
+     * listening to a transmitting radio with this feature enabled.
+     *
+     * @warning If this feature is enabled for pipe 0, then the `multicast`
+     * parameter to write() can be used to disable this feature for an
+     * individual payload. However, if this feature is disabled for pipe 0,
+     * then the `multicast` parameter will have no effect.
      *
      * @note If disabling auto-acknowledgment packets on pipe 0, the ACK
-     * payloads feature is also disabled.
+     * payloads feature is also disabled as this feature is required on pipe 0
+     * to send ACK payloads.
      *
-     * @param pipe Which pipeline to modify
-     * @param enable Whether to enable (true) or disable (false)
-     * auto-acknowledgment
+     * @see write()
+     * @see writeFast()
+     * @see startWriteFast()
+     * @see startWrite()
+     * @see writeAckPayload()
+     *
+     * @param pipe Which pipe to configure. This number should be in range
+     * [0, 5].
+     * @param enable Whether to enable (true) or disable (false) the
+     * auto-acknowledgment feature for the specified pipe
      */
     void setAutoAck(uint8_t pipe, bool enable);
 
