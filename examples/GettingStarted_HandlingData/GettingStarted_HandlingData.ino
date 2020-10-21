@@ -1,14 +1,14 @@
 
 /*
-* Getting Started example sketch for nRF24L01+ radios
-* This is an example of how to send data from one node to another using data structures
-* Updated: Dec 2014 by TMRh20
+  Getting Started example sketch for nRF24L01+ radios
+  This is an example of how to send data from one node to another using data structures
+  Updated: Dec 2014 by TMRh20
 */
 
 #include <SPI.h>
 #include "RF24.h"
 
-byte addresses[][6] = {"1Node","2Node"};
+byte addresses[][6] = {"1Node", "2Node"};
 
 
 /****************** User Config ***************************/
@@ -16,7 +16,7 @@ byte addresses[][6] = {"1Node","2Node"};
 bool radioNumber = 1;
 
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
-RF24 radio(7,8);
+RF24 radio(7, 8);
 /**********************************************************/
 
 
@@ -24,16 +24,16 @@ RF24 radio(7,8);
 bool role = 0;
 
 /**
-* Create a data structure for transmitting and receiving data
-* This allows many variables to be easily sent and received in a single transmission
-* See http://www.cplusplus.com/doc/tutorial/structures/
+  Create a data structure for transmitting and receiving data
+  This allows many variables to be easily sent and received in a single transmission
+  See http://www.cplusplus.com/doc/tutorial/structures/
 */
-struct dataStruct{
+struct dataStruct {
   unsigned long _micros;
   float value;
-}myData;
+} myData;
 
-void setup(){
+void setup() {
 
   Serial.begin(115200);
   Serial.println(F("RF24/examples/GettingStarted_HandlingData"));
@@ -46,12 +46,12 @@ void setup(){
   radio.setPALevel(RF24_PA_LOW);
 
   // Open a writing and reading pipe on each radio, with opposite addresses
-  if(radioNumber){
+  if (radioNumber) {
     radio.openWritingPipe(addresses[1]);
-    radio.openReadingPipe(1,addresses[0]);
-  }else{
+    radio.openReadingPipe(1, addresses[0]);
+  } else {
     radio.openWritingPipe(addresses[0]);
-    radio.openReadingPipe(1,addresses[1]);
+    radio.openReadingPipe(1, addresses[1]);
   }
 
   myData.value = 1.22;
@@ -62,11 +62,11 @@ void setup(){
 
 
 
-void loop(){
+void loop() {
 
 
   /****************** Ping Out Role ***************************/
-  if (role == 1){
+  if (role == 1) {
 
     radio.stopListening();                               // First, stop listening so we can talk.
 
@@ -74,7 +74,7 @@ void loop(){
     Serial.println(F("Now sending"));
 
     myData._micros = micros();
-    if (!radio.write(&myData, sizeof(myData))){
+    if (!radio.write(&myData, sizeof(myData))) {
       Serial.println(F("failed"));
     }
 
@@ -87,15 +87,15 @@ void loop(){
     {
       if (micros() - started_waiting_at > 200000)        // If waited longer than 200ms, indicate timeout and exit while loop
       {
-          timeout = true;
-          break;
+        timeout = true;
+        break;
       }
     }
 
     // Describe the results
-    if (timeout){
+    if (timeout) {
       Serial.println(F("Failed, response timed out."));
-    }else{
+    } else {
       radio.read(&myData, sizeof(myData));               // Grab the response
       unsigned long time = micros();                     // Take the time
 
@@ -117,8 +117,8 @@ void loop(){
 
   /****************** Pong Back Role ***************************/
 
-  if (role == 0){
-    if(radio.available()){
+  if (role == 0) {
+    if (radio.available()) {
       while (radio.available())               // While there is data ready
         radio.read(&myData, sizeof(myData));  // Get the payload
 
@@ -136,12 +136,12 @@ void loop(){
 
   /****************** Change Roles via Serial Commands ***************************/
 
-  if (Serial.available()){
+  if (Serial.available()) {
     char c = toupper(Serial.read());
-    if (c == 'T' && role == 0){
+    if (c == 'T' && role == 0) {
       Serial.print(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
       role = 1;                 // Become the primary transmitter (ping out)
-    }else if (c == 'R' && role == 1){
+    } else if (c == 'R' && role == 1) {
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
       role = 0;                 // Become the primary receiver (pong back)
       radio.startListening();

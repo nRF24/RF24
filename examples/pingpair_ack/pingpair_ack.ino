@@ -62,7 +62,7 @@ void loop(void){
   if (role == role_ping_out){
     radio.stopListening();                             // First, stop listening so we can talk.
 
-    Serial.print(F("Now sending ");
+    Serial.print(F("Now sending "));
     Serial.print(counter);
     Serial.println(F(" as payload."));
     byte gotByte;

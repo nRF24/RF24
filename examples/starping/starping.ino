@@ -1,25 +1,25 @@
 /*
- Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+  Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- version 2 as published by the Free Software Foundation.
- */
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  version 2 as published by the Free Software Foundation.
+*/
 
 /**
- * Example RF Radio Ping Star Group
- *
- * This sketch is a more complex example of using the RF24 library for Arduino.
- * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the
- * role_pin low, and the others will be 'ping transmit' units.  The ping units
- * unit will send out the value of millis() once a second.  The pong unit will
- * respond back with a copy of the value.  Each ping unit can get that response
- * back, and determine how long the whole cycle took.
- *
- * This example requires a bit more complexity to determine which unit is which.
- * The pong receiver is identified by having its role_pin tied to ground.
- * The ping senders are further differentiated by a byte in eeprom.
- */
+   Example RF Radio Ping Star Group
+
+   This sketch is a more complex example of using the RF24 library for Arduino.
+   Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the
+   role_pin low, and the others will be 'ping transmit' units.  The ping units
+   unit will send out the value of millis() once a second.  The pong unit will
+   respond back with a copy of the value.  Each ping unit can get that response
+   back, and determine how long the whole cycle took.
+
+   This example requires a bit more complexity to determine which unit is which.
+   The pong receiver is identified by having its role_pin tied to ground.
+   The ping senders are further differentiated by a byte in eeprom.
+*/
 
 #include <SPI.h>
 #include <EEPROM.h>
@@ -33,7 +33,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
-RF24 radio(9,10);
+RF24 radio(9, 10);
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'pong' receiver.
@@ -91,7 +91,7 @@ void setup(void)
 
   // set up the role pin
   pinMode(role_pin, INPUT);
-  digitalWrite(role_pin,HIGH);
+  digitalWrite(role_pin, HIGH);
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
@@ -131,8 +131,8 @@ void setup(void)
   Serial.begin(115200);
   printf_begin();
   printf("\n\rRF24/examples/starping/\n\r");
-  printf("ROLE: %s\n\r",role_friendly_name[role]);
-  printf("ADDRESS: %i\n\r",node_address);
+  printf("ROLE: %s\n\r", role_friendly_name[role]);
+  printf("ADDRESS: %i\n\r", node_address);
 
   //
   // Setup and configure rf radio
@@ -148,11 +148,11 @@ void setup(void)
   // and sends the pong back on the sending node's specific listening pipe.
   if ( role == role_pong_back )
   {
-    radio.openReadingPipe(1,talking_pipes[0]);
-    radio.openReadingPipe(2,talking_pipes[1]);
-    radio.openReadingPipe(3,talking_pipes[2]);
-    radio.openReadingPipe(4,talking_pipes[3]);
-    radio.openReadingPipe(5,talking_pipes[4]);
+    radio.openReadingPipe(1, talking_pipes[0]);
+    radio.openReadingPipe(2, talking_pipes[1]);
+    radio.openReadingPipe(3, talking_pipes[2]);
+    radio.openReadingPipe(4, talking_pipes[3]);
+    radio.openReadingPipe(5, talking_pipes[4]);
   }
 
   // Each ping node has a talking pipe that it will ping into, and a listening
@@ -160,9 +160,9 @@ void setup(void)
   if ( role == role_ping_out )
   {
     // Write on our talking pipe
-    radio.openWritingPipe(talking_pipes[node_address-2]);
+    radio.openWritingPipe(talking_pipes[node_address - 2]);
     // Listen on our listening pipe
-    radio.openReadingPipe(1,listening_pipes[node_address-2]);
+    radio.openReadingPipe(1, listening_pipes[node_address - 2]);
   }
 
   //
@@ -200,7 +200,7 @@ void loop(void)
 
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
-    printf("Now sending %lu...",time);
+    printf("Now sending %lu...", time);
     radio.write( &time, sizeof(unsigned long) );
 
     // Now, continue listening
@@ -225,7 +225,7 @@ void loop(void)
       radio.read( &got_time, sizeof(unsigned long) );
 
       // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+      printf("Got response %lu, round-trip delay: %lu\n\r", got_time, millis() - got_time);
     }
 
     // Try again 1s later
@@ -249,20 +249,20 @@ void loop(void)
 
 
       // Spew it
-      printf("Got payload %lu from node %i...",got_time,pipe_num+1);
+      printf("Got payload %lu from node %i...", got_time, pipe_num + 1);
 
       // First, stop listening so we can talk
       radio.stopListening();
 
       // Open the correct pipe for writing
-      radio.openWritingPipe(listening_pipes[pipe_num-1]);
+      radio.openWritingPipe(listening_pipes[pipe_num - 1]);
 
       // Retain the low 2 bytes to identify the pipe for the spew
-      uint16_t pipe_id = listening_pipes[pipe_num-1] & 0xffff;
+      uint16_t pipe_id = listening_pipes[pipe_num - 1] & 0xffff;
 
       // Send the final one back.
       radio.write( &got_time, sizeof(unsigned long) );
-      printf("Sent response to %04x.\n\r",pipe_id);
+      printf("Sent response to %04x.\n\r", pipe_id);
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
@@ -279,11 +279,11 @@ void loop(void)
     if ( c >= '1' && c <= '6' )
     {
       // It is our address
-      EEPROM.write(address_at_eeprom_location,c-'0');
+      EEPROM.write(address_at_eeprom_location, c - '0');
 
       // And we are done right now (no easy way to soft reset)
-      printf("\n\rManually reset address to: %c\n\rPress RESET to continue!",c);
-      while(1) ;
+      printf("\n\rManually reset address to: %c\n\rPress RESET to continue!", c);
+      while (1) ;
     }
   }
 }
