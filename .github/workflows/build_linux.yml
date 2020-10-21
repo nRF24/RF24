@@ -37,6 +37,8 @@ jobs:
       - name: library make install
         run: sudo make install
       - name: make examples
+        # compiling examples for wiringPi is broken see nRF24#669 issue
+        if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
         run: |
           cd examples_linux
           make
