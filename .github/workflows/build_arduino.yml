@@ -58,12 +58,21 @@ jobs:
         uses: arduino/compile-sketches@main
         with:
           sketch-paths:
-            - "examples/GettingStarted*"
-            - "examples/pingpair*"
+            - "examples/GettingStarted"
+            - "examples/GettingStarted_CallResponse"
+            - "examples/GettingStarted_HandlingData"
+            - "examples/GettingStarted_HandlingFailures"
+            - "examples/pingpair_ack"
+            - "examples/pingpair_dyn"
+            - "examples/pingpair_irq"
+            - "examples/pingpair_irq_simple"
+            - "examples/pingpair_multi_dyn"
+            - "examples/pingpair_sleepy"
             - "examples/rf24_ATTiny/rf24ping85"
             - "examples/scanner"
             - "examples/starping"
-            - "examples/Transfer*"
+            - "examples/Transfer"
+            - "examples/TransferTimeouts"
             - "examples/Usage/led_remote"
             - "examples/Usage/nordic_fob"
           fqbn: ${{ matrix.fqbn }}
