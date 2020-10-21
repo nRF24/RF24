@@ -13,7 +13,7 @@
  * Example to detect interference on the various channels available.
  * This is a good diagnostic tool to check whether you're picking a
  * good channel for your application.
- * 
+ *
  * Run this sketch on two devices. On one device, start CCW output by sending a 'g'
  * character over Serial. The other device scanning should detect the output of the sending
  * device on the given channel. Adjust channel and output power of CCW below.
@@ -31,7 +31,7 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
-RF24 radio(7,8);
+RF24 radio(7, 8);
 
 //
 // Channel info
@@ -104,7 +104,7 @@ void loop(void)
       radio.stopListening();
       delay(2);
       Serial.println("Starting Carrier Out");
-      radio.startConstCarrier(RF24_PA_LOW,40);  
+      radio.startConstCarrier(RF24_PA_LOW,40);
     }else
     if(c == 'e'){
       constCarrierMode = 0;
@@ -113,7 +113,7 @@ void loop(void)
     }
   }
   /****************************************/
-  
+
   if(constCarrierMode == 0){
     // Clear measurement values
     memset(values,0,sizeof(values));
@@ -139,7 +139,7 @@ void loop(void)
         }
       }
     }
-  
+
 
     // Print out channel measurements, clamped to a single hex digit
     int i = 0;
@@ -149,6 +149,6 @@ void loop(void)
       ++i;
     }
     Serial.println();
-    
-  }//If constCarrierMode == 0 
+
+  }//If constCarrierMode == 0
 }

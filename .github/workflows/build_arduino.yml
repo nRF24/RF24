@@ -3,17 +3,17 @@ name: Arduino CLI build
 on:
   pull_request:
     paths:
-    - ".github/workflows/build_arduino.yml"
-    - "examples/**"
-    - "!examples/Usage/pingpair_maple/**"
-    - "!examples/rf24_ATTiny/timingSearch3pin/**"
+      - ".github/workflows/build_arduino.yml"
+      - "examples/**"
+      - "!examples/Usage/pingpair_maple/**"
+      - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
   push:
     paths:
-    - ".github/workflows/build_arduino.yml"
-    - "examples/**"
-    - "!examples/Usage/pingpair_maple/**"
-    - "!examples/rf24_ATTiny/timingSearch3pin/**"
+      - ".github/workflows/build_arduino.yml"
+      - "examples/**"
+      - "!examples/Usage/pingpair_maple/**"
+      - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
 jobs:
   build:
@@ -57,4 +57,13 @@ jobs:
       - name: Compile examples
         uses: arduino/compile-sketches@main
         with:
+          sketch-paths:
+            - "examples/GettingStarted*"
+            - "examples/pingpair*"
+            - "examples/rf24_ATTiny/rf24ping85"
+            - "examples/scanner"
+            - "examples/starping"
+            - "examples/Transfer*"
+            - "examples/Usage/led_remote"
+            - "examples/Usage/nordic_fob"
           fqbn: ${{ matrix.fqbn }}
