@@ -1,4 +1,4 @@
-name: DoxyGen
+name: DoxyGen build
 
 on: [pull_request, push]
 
