@@ -57,7 +57,7 @@ jobs:
       - name: Compile examples
         uses: arduino/compile-sketches@main
         with:
-          sketch-paths:
+          sketch-paths: |
             - examples/GettingStarted
             - examples/GettingStarted_CallResponse
             - examples/GettingStarted_HandlingData
