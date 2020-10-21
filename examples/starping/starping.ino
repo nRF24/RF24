@@ -240,19 +240,16 @@ void loop(void)
   {
     // if there is data ready
     uint8_t pipe_num;
-    if ( radio.available(&pipe_num) )
+    while ( radio.available(&pipe_num) )
     {
       // Dump the payloads until we've gotten everything
-      unsigned long got_time;
-      bool done = false;
-      while (!done)
-      {
-        // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+      unsigned long got_time = 0;
+      // Fetch the payload, and see if this was the last one.
+      radio.read( &got_time, sizeof(unsigned long) );
 
-        // Spew it
-        printf("Got payload %lu from node %i...",got_time,pipe_num+1);
-      }
+
+      // Spew it
+      printf("Got payload %lu from node %i...",got_time,pipe_num+1);
 
       // First, stop listening so we can talk
       radio.stopListening();
