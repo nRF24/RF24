@@ -23,6 +23,13 @@ jobs:
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
           arm-linux-gnueabihf-gcc -v
           arm-linux-gnueabihf-g++ -v
+      - name: provide WiringPi
+        if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
+        run: |
+          git clone https://github.com/CoRfr/WiringPi
+          cd WiringPi/wiringPi
+          CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
+          sudo make install
       - name: library configure
         run: ./configure ${{ matrix.config-options }}
       - name: library make
