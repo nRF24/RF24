@@ -3,12 +3,14 @@ name: Arduino CLI build
 on:
   pull_request:
     paths:
+    - ".github/workflows/build_arduino.yml"
     - "examples/**"
     - "!examples/Usage/pingpair_maple/**"
     - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
   push:
     paths:
+    - ".github/workflows/build_arduino.yml"
     - "examples/**"
     - "!examples/Usage/pingpair_maple/**"
     - "!examples/rf24_ATTiny/timingSearch3pin/**"

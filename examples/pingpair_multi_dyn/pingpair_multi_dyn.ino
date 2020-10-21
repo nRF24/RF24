@@ -7,9 +7,9 @@
  */
 
 /**
- * Example using Dynamic Payloads 
+ * Example using Dynamic Payloads
  *
- * This is an example of how to use payloads of a varying (dynamic) size. 
+ * This is an example of how to use payloads of a varying (dynamic) size.
  */
 
 #include <SPI.h>
@@ -20,16 +20,16 @@
 //
 
 // Set up nRF24L01 radio on SPI bus plus pins 8 & 9
-RF24 radio(8,9);
+RF24 radio(7, 8);
 
 // Use multicast?
 // sets the multicast behavior this unit in hardware.  Connect to GND to use unicast
 // Leave open (default) to use multicast.
-const int multicast_pin = 6 ;
+const int multicast_pin = 6;
 
 // sets the role of this unit in hardware.  Connect to GND to be the 'pong' receiver
 // Leave open to be the 'ping' transmitter
-const int role_pin = 7;
+const int role_pin = 5;
 bool multicast = true ;
 
 //
@@ -105,14 +105,14 @@ void setup(void)
   //
 
   Serial.begin(115200);
-  
+
   Serial.println(F("RF24/examples/pingpair_multi_dyn/"));
   Serial.print(F("ROLE: "));
   Serial.println(role_friendly_name[role]);
-  
+
   Serial.print(F("MULTICAST: "));
   Serial.println(multicast ? F("true (unreliable)") : F("false (reliable)"));
-  
+
   //
   // Setup and configure rf radio
   //
@@ -210,7 +210,7 @@ void loop(void)
       Serial.print(F(" value="));
       Serial.println(receive_payload);
     }
-    
+
     // Update size for next time.
     next_payload_size += payload_size_increments_by;
     if ( next_payload_size > max_payload_size )
