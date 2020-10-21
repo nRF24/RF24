@@ -119,7 +119,7 @@ void loop(){
 
       // If an illegal payload size was detected, all RX payloads will be flushed
       if (!len)
-        continue;
+        return;
 
       radio.read(receive_payload, len);
 
