@@ -30,24 +30,18 @@ jobs:
           - "arduino:avr:ethernet"
           - "arduino:avr:fio"
           - "arduino:avr:bt"
-          - "arduino:avr:LilyPad"
+          # - "arduino:avr:LilyPad"  # board not found
+          - "arduino:avr:LilyPadUSB"
           - "arduino:avr:pro"
           - "arduino:avr:atmegang"
           - "arduino:avr:robotControl"
           - "arduino:avr:robotMotor"
-          - "arduino:avr:gemma"
+          # - "arduino:avr:gemma"  # does not support SPI
           - "arduino:avr:circuitplay32u4cat"
           - "arduino:avr:yunmini"
           - "arduino:avr:chiwawa"
           - "arduino:avr:one"
           - "arduino:avr:unowifi"
-          # - "arduino:avr:mini"
-          # - "arduino:avr:mini"
-          # - "arduino:avr:mini"
-          # - "arduino:avr:mini"
-          # - "arduino:samd:mkrvidor4000"
-          # These should be changed from the "arduino-beta" vendor to "arduino" once there is a production release of Arduino mbed-Enabled Boards
-          # - "arduino-beta:mbed:nano33ble"
 
     steps:
       - name: Checkout

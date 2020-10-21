@@ -31,7 +31,7 @@ byte data[32];                             //Data buffer for testing data transf
 
 unsigned long counter, rxTimer;            //Counter and timer for keeping track transfer info
 unsigned long startTime, stopTime;
-bool TX = 1, RX = 0, role = 0;
+bool tx = 1, rx = 0, role = 0;
 
 void setup(void) {
   Serial.begin(115200);
@@ -63,7 +63,7 @@ void setup(void) {
 }
 
 void loop(void) {
-  if (role == TX) {
+  if (role == tx) {
     delay(2000);
 
     Serial.println(F("Initiating Basic Data Transfer"));
@@ -71,9 +71,11 @@ void loop(void) {
     unsigned long cycles = 10000; //Change this to a higher or lower number.
 
     startTime = millis();
-    unsigned long pauseTime = millis();
 
-    for (int i = 0; i < cycles; i++) {  //Loop through a number of cycles
+    //This is only required when NO ACK ( enableAutoAck(0) ) payloads are used
+    // unsigned long pauseTime = millis();
+
+    for (unsigned long i = 0; i < cycles; i++) {  //Loop through a number of cycles
       data[0] = i;                      //Change the first byte of the payload for identification
       if (!radio.writeFast(&data, 32)) { //Write to the FIFO buffers
         counter++;                      //Keep count of failed payloads
@@ -106,7 +108,7 @@ void loop(void) {
 
 
 
-  if (role == RX) {
+  if (role == rx) {
     while (radio.available()) {
       radio.read(&data, 32);
       counter++;
@@ -128,19 +130,19 @@ void loop(void) {
 
   if ( Serial.available()) {
     char c = toupper(Serial.read());
-    if (c == 'T' && role == RX) {
+    if (c == 'T' && role == rx) {
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
       delay(10);
       radio.openWritingPipe(pipes[1]);
       radio.openReadingPipe(1, pipes[0]);
       radio.stopListening();
-      role = TX;                  // Become the primary transmitter (ping out)
-    } else if (c == 'R' && role == TX) {
+      role = tx;                  // Become the primary transmitter (ping out)
+    } else if (c == 'R' && role == tx) {
       radio.openWritingPipe(pipes[0]);
       radio.openReadingPipe(1, pipes[1]);
       radio.startListening();
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
-      role = RX;                // Become the primary receiver (pong back)
+      role = rx;                // Become the primary receiver (pong back)
     }
   }
 }
