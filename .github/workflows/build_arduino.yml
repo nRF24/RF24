@@ -16,7 +16,58 @@ on:
       - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
 jobs:
+  check-formatting:
+    runs-on: ubuntu-latest
+
+    env:
+      # See: https://sourceforge.net/projects/astyle/files/astyle/
+      ASTYLE_VERSION: 3.1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # See: http://astyle.sourceforge.net/
+      - name: Download Artistic Style
+        uses: carlosperate/download-file-action@v1.0.3
+        with:
+          file-url: https://iweb.dl.sourceforge.net/project/astyle/astyle/astyle%20${{ env.ASTYLE_VERSION }}/astyle_${{ env.ASTYLE_VERSION }}_linux.tar.gz
+          location: ${{ runner.temp }}/astyle
+
+      # See: http://astyle.sourceforge.net/install.html#_GCC_Makefile
+      - name: Build Artistic Style
+        run: |
+          # Build Artistic Style
+          cd "${{ runner.temp }}/astyle"
+          tar --extract --file="astyle_${{ env.ASTYLE_VERSION }}_linux.tar.gz"
+          cd "astyle/build/gcc"
+          make
+
+      # GITHUB_WORKSPACE
+      - name: Check code formatting
+        run: |
+          # Check code formatting of example sketches
+          # Don't exit on first formatting check fail
+          set +e
+          # Set default exit status
+          EXIT_STATUS=0
+          while read -r filePath; do
+            # Check if it's a file (find matches on pruned folders)
+            if [[ -f "$filePath" ]]; then
+              if ! diff --strip-trailing-cr "$filePath" <("${{ runner.temp }}/astyle/astyle/build/gcc/bin/astyle" --options="${GITHUB_WORKSPACE}/examples_formatter.conf" --dry-run <"$filePath"); then
+                echo "ERROR: Non-compliant code formatting in $filePath"
+                EXIT_STATUS=1
+              fi
+            fi
+          done <<<"$(find "${GITHUB_WORKSPACE}/examples" -regextype posix-extended \( -regex '.*\.((ino)|(h)|(cpp)|(c))$' -and -type f \))"
+          if [[ "$EXIT_STATUS" != "0" ]]; then
+            echo "Please do an Auto Format on the sketches:"
+            echo "Arduino IDE: Tools > Auto Format"
+            echo "Arduino Web Editor: Ctrl + B"
+          fi
+          exit "$EXIT_STATUS"
   build:
+    needs: check-formatting
     runs-on: ubuntu-latest
 
     strategy:
