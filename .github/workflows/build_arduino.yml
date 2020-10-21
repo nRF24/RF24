@@ -3,15 +3,15 @@ name: Arduino CLI build
 on:
   pull_request:
     paths:
-      - "examples/**"
-      - "!examples/Usage/pingpair_maple/**"
-      - "!examples/rf24_ATTiny/timingSearch3pin/**"
+    - "examples/**"
+    - "!examples/Usage/pingpair_maple/**"
+    - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
   push:
     paths:
-      - "examples/**"
-      - "!examples/Usage/pingpair_maple/**"
-      - "!examples/rf24_ATTiny/timingSearch3pin/**"
+    - "examples/**"
+    - "!examples/Usage/pingpair_maple/**"
+    - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
 jobs:
   build:
