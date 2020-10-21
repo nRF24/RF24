@@ -49,6 +49,23 @@ jobs:
           - "arduino:avr:chiwawa"
           - "arduino:avr:one"
           - "arduino:avr:unowifi"
+          - "arduino:mbed:nano33ble"
+          - "arduino:samd:mkr1000"
+          - "arduino:samd:mkrzero"
+          - "arduino:samd:mkrwifi1010"
+          - "arduino:samd:nano_33_iot"
+          - "arduino:samd:mkrfox1200"
+          - "arduino:samd:mkrwan1300"
+          - "arduino:samd:mkrwan1310"
+          - "arduino:samd:mkrgsm1400"
+          - "arduino:samd:mkrnb1500"
+          - "arduino:samd:mkrvidor4000"
+          - "arduino:samd:adafruit_circuitplayground_m0"
+          - "arduino:samd:mzero_pro_bl"
+          - "arduino:samd:mzero_bl"
+          - "arduino:samd:tian"
+          - "arduino:megaavr:uno2018"
+          - "arduino:megaavr:nano4809"
 
     steps:
       - name: Checkout
