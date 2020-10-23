@@ -146,7 +146,7 @@ void loop() {
       role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
       payload.message = "Hello"; // change payload message
-      radio.stopListening();     // this also disacrds any unused ACK payloads
+      radio.stopListening();     // this also discards any unused ACK payloads
       // address for this example doesn't change
       // radio.openWritingPipe(address);
 

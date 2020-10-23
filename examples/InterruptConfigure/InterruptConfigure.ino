@@ -129,7 +129,7 @@ void loop() {
     if (pl_iterator < 4 && pl_iterator != 2) {
       // use the non-blocking call to write a payload and begin transmission
       // the "false" argument means we are expecting an ACK packet response
-      radio.startWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
+      radio.startFastWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
 
       // To only send 1 payload at a time, there needs to be a 10 us pulse on
       // the CE_PIN. Every call to startWrite() initiates that pulse.
@@ -184,7 +184,9 @@ void loop() {
       role = true;
       pl_iterator = 0;  // reset the iterator
 
-      radio.stopListening(); // this also disacrds any unused ACK payloads
+      // startListening() clears the IRQ masks also. This is required for
+      // continued TX operations when a transmission fails.
+      radio.stopListening(); // this also discards any unused ACK payloads
       // address for this example doesn't change
       // radio.openWritingPipe(address);
 
@@ -215,6 +217,9 @@ void interruptHandler() {
 
     bool tx_ds, tx_df, rx_dr;                   // declare variables for IRQ masks
     radio.whatHappened(tx_ds, tx_df, rx_dr);    // get values for IRQ masks
+    // whatHappened() clears the IRQ masks also. This is required for
+    // continued TX operations when a transmission fails.
+
     Serial.print(F("data_sent: "));
     Serial.print(tx_ds);                        // print "data sent" mask state
     Serial.print(F(", data_fail: "));
