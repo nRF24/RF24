@@ -65,7 +65,7 @@ jobs:
           - "arduino:samd:mzero_bl"
           - "arduino:samd:tian"
           - "arduino:megaavr:uno2018"
-          - "arduino:megaavr:nano4809"
+          # - "arduino:megaavr:nano4809"  # board not found
 
     steps:
       - name: Checkout
@@ -75,21 +75,21 @@ jobs:
         uses: arduino/compile-sketches@main
         with:
           # sketch-paths: |
-          #   - examples/GettingStarted
-          #   - examples/GettingStarted_CallResponse
-          #   - examples/GettingStarted_HandlingData
-          #   - examples/GettingStarted_HandlingFailures
-          #   - examples/pingpair_ack
-          #   - examples/pingpair_dyn
-          #   - examples/pingpair_irq
-          #   - examples/pingpair_irq_simple
-          #   - examples/pingpair_multi_dyn
-          #   - examples/pingpair_sleepy
-          #   - examples/rf24_ATTiny/rf24ping85
-          #   - examples/scanner
-          #   - examples/starping
-          #   - examples/Transfer
-          #   - examples/TransferTimeouts
-          #   - examples/Usage/led_remote
-          #   - examples/Usage/nordic_fob
+          #   - examples_backup/GettingStarted
+          #   - examples_backup/GettingStarted_CallResponse
+          #   - examples_backup/GettingStarted_HandlingData
+          #   - examples_backup/GettingStarted_HandlingFailures
+          #   - examples_backup/pingpair_ack
+          #   - examples_backup/pingpair_dyn
+          #   - examples_backup/pingpair_irq
+          #   - examples_backup/pingpair_irq_simple
+          #   - examples_backup/pingpair_multi_dyn
+          #   - examples_backup/pingpair_sleepy
+          #   - examples_backup/rf24_ATTiny/rf24ping85
+          #   - examples_backup/scanner
+          #   - examples_backup/starping
+          #   - examples_backup/Transfer
+          #   - examples_backup/TransferTimeouts
+          #   - examples_backup/Usage/led_remote
+          #   - examples_backup/Usage/nordic_fob
           fqbn: ${{ matrix.fqbn }}

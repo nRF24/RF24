@@ -47,34 +47,36 @@ void setup() {
   // each other.
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
-  // Assign the address to a pipe
+  // Fot this example, we use the same address to send data back and forth
+  // set the address of the RX node to the TX pipe
+  radio.openWritingPipe(address);    // always uses pipe 0
+  // set the address of the TX node to an RX pipe
+  radio.openReadingPipe(0, address); // using pipe 0
+
+  // additional setup specific to the node's role
   if (role) {
-    // set the address of the RX node to the TX pipe
-    radio.openWritingPipe(address);    // always uses pipe 0
-    radio.stopListening();             // powerUp() into TX mode
+    radio.stopListening();  // powerUp() into TX mode
   } else {
-    // set the address of the TX node to the RX pipe
-    radio.openReadingPipe(0, address); // using pipe 0
-    radio.startListening();            // powerUp() into RX mode
+    radio.startListening(); // powerUp() into RX mode
   }
-}
+} // setup
 
 void loop() {
 
   if (role) {
     // This device is a TX node
 
-    unsigned long start_timer = millis();                     // start the timer
-    bool report = radio.write(&payload, sizeof(float));       // transmit & save the report
-    unsigned long end_timer = millis();                       // end the timer
+    unsigned long start_timer = millis();                    // start the timer
+    bool report = radio.write(&payload, sizeof(float));      // transmit & save the report
+    unsigned long end_timer = millis();                      // end the timer
 
     if (report){
-      Serial.print(F("Transmission successful!"));            // payload was delivered
+      Serial.print(F("Transmission successful!"));           // payload was delivered
       Serial.print(F("Time to transmit = "));
-      Serial.println(end_timer - start_timer);                // print the timer result
-      payload += 0.01;                                        // increment float payload
+      Serial.println(end_timer - start_timer);               // print the timer result
+      payload += 0.01;                                       // increment float payload
     } else {
-      Serial.println(F("Transmission failed or timed out"));  // payload was not delivered
+      Serial.println(F("Transmission failed or timed out")); // payload was not delivered
     }
 
   } else {
@@ -95,22 +97,28 @@ void loop() {
 
   if (Serial.available()) {
     // change the role via the serial monitor
+
     char c = toupper(Serial.read());
     if (c == 'T' && !role) {
       // Become the TX node
 
+      role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
       radio.stopListening();
-      role = true;
-      radio.openWritingPipe(address);
+      // address for this example doesn't change
+      // radio.openWritingPipe(address);
 
     } else if (c == 'R' && role) {
       // Become the RX node
 
-      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
       role = false;
-      radio.openReadingPipe(0, address);
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
+      // address for this example doesn't change
+      // radio.openReadingPipe(0, address);
       radio.startListening();
     }
   }
+
+  // to make this example readable in the serial monitor
+  delay(1000);  // slow it down by 1 second
 } // loop
