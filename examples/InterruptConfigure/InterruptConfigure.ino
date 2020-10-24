@@ -49,7 +49,7 @@ void interruptHandler(); // see definition below loop()
 
 void setup() {
 
-  // print example's introdictory prompt
+  // print example's introductory prompt
   Serial.begin(115200);
   Serial.println(F("RF24/examples/InterruptConfigure"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));

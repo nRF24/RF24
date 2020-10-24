@@ -40,7 +40,7 @@ PayloadStruct payload;
 
 void setup() {
 
-  // print example's introdictory prompt
+  // print example's introductory prompt
   Serial.begin(115200);
   Serial.println(F("RF24/examples/AcknowledgementPayloads"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
