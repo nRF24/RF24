@@ -33,27 +33,13 @@ bool role = false;  // true = TX node, flase = RX node
 // monitor. The TX node will use the 2D array, but the RX node needs only a
 // single buffer to fetch and print the data.
 #define SIZE 32
-char buffer[32];         // for the RX node
-uint8_t counter = 0;     // for counting the number of received payloads
-char stream[SIZE][SIZE]; // for the TX node
+char buffer[32];           // for the RX node
+uint8_t counter = 0;       // for counting the number of received payloads
+char stream[SIZE];         // a buffer for the TX node
+void makePayload(uint8_t); // prototype to construct payload dynamically
+
 
 void setup() {
-
-  // lets fill our 2D array with data to stream
-  for (uint8_t i = 0; i < SIZE; ++i) {
-    for (uint8_t j = 0; j < SIZE; ++j) {
-      char chr;
-      if (!j) {
-        // let the first character be an identifying alphanumeric prefix
-        // this lets us see which payload didn't get received
-        stream[i][j] = i + (i < 26 ? 65 : 71);
-      } else {
-        chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
-        chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
-        stream[i][j] = chr + 48;
-      }
-    }
-  }
 
   // print example's introductory prompt
   Serial.begin(115200);
@@ -91,7 +77,8 @@ void loop() {
     uint8_t failures = 0;
     unsigned long start_timer = millis();       // start the timer
     while (i < SIZE){
-      if (!radio.writeFast(&stream[i], SIZE)) {
+      makePayload(i);                           // make the payload
+      if (!radio.writeFast(&stream, SIZE)) {
         failures++;
         radio.reUseTX();
       } else {
@@ -105,6 +92,9 @@ void loop() {
     Serial.print(F(" with "));
     Serial.print(failures);                     // print failures detected
     Serial.println(F(" failures detected"));
+
+    // to make this example readable in the serial monitor
+    delay(1000);  // slow transmissions down by 1 second
 
   } else {
     // This device is a RX node
@@ -143,6 +133,21 @@ void loop() {
     }
   }
 
-  // to make this example readable in the serial monitor
-  delay(1000);  // slow it down by 1 second
 } // loop
+
+void makePayload(uint8_t i) {
+  // Make a single payload based on position in stream.
+  // This example employs function to save memory on certain boards.
+  for (uint8_t j = 0; j < SIZE; ++j) {
+    char chr;
+    if (!j) {
+      // let the first character be an identifying alphanumeric prefix
+      // this lets us see which payload didn't get received
+      stream[j] = i + (i < 26 ? 65 : 71);
+    } else {
+      chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
+      chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
+      stream[j] = chr + 48;
+    }
+  }
+}

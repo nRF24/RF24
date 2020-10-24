@@ -112,6 +112,9 @@ void loop() {
       Serial.println(F("Transmission failed or timed out"));    // payload was not delivered
     }
 
+    // to make this example readable in the serial monitor
+    delay(1000);  // slow transmissions down by 1 second
+
   } else {
     // This device is a RX node
 
