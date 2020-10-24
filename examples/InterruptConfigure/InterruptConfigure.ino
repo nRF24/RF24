@@ -51,15 +51,23 @@ void setup() {
 
   // print example's introductory prompt
   Serial.begin(115200);
+  while (!Serial) {
+    // some boards need to wait to ensure access to serial over USB
+  }
+
+  // initialize the transceiver on the SPI bus
+  if (!radio.begin()) {
+    Serial.println(F("nRF24L01 is not responding!!"));
+    while(1) {} // hold in infinite loop
+  }
+
+  // print example's introductory prompt
   Serial.println(F("RF24/examples/InterruptConfigure"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // setup the IRQ_PIN
   pinMode(IRQ_PIN, INPUT);
   // pinMode(CE_PIN, OUTPUT); // performed by radio.begin()
-
-  // initialize the transceiver on the SPI bus
-  radio.begin();
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity of

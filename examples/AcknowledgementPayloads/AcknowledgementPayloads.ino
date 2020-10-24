@@ -33,20 +33,27 @@ bool role = false;  // true = TX node, flase = RX node
 // on every successful transmission.
 // Make a data structure to store the entire payload of different datatypes
 struct PayloadStruct{
-  char* message;          // only using 6 characters for TX & ACK payloads
-  int counter;
+  char message[7];          // only using 6 characters for TX & ACK payloads
+  uint8_t counter;
 };
 PayloadStruct payload;
 
 void setup() {
 
-  // print example's introductory prompt
   Serial.begin(115200);
-  Serial.println(F("RF24/examples/AcknowledgementPayloads"));
-  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
+  while (!Serial) {
+    // some boards need to wait to ensure access to serial over USB
+  }
 
   // initialize the transceiver on the SPI bus
-  radio.begin();
+  if (!radio.begin()) {
+    Serial.println(F("nRF24L01 is not responding!!"));
+    while(1) {} // hold in infinite loop
+  }
+
+  // print example's introductory prompt
+  Serial.println(F("RF24/examples/AcknowledgementPayloads"));
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity of
@@ -67,15 +74,14 @@ void setup() {
   if (role) {
     // setup the TX payload
 
-    payload.message = "Hello";                                  // set the payload message
+    memcpy(payload.message, "Hello ", 6);                       // set the payload message
     radio.stopListening();                                      // powerUp() into TX mode
   } else {
     // setup the ACK payload & load the first response into the FIFO
 
-    payload.message = "World";                                  // set the payload message
+    memcpy(payload.message, "World ", 6);                       // set the payload message
     // load the payload for the first received transmission on pipe 0
     radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
-    payload.counter++;                                          // increment payload counter
 
     radio.startListening();                                     // powerUp() into RX mode
   }
@@ -86,15 +92,15 @@ void loop() {
   if (role) {
     // This device is a TX node
 
-    unsigned long start_timer = millis();                       // start the timer
+    unsigned long start_timer = micros();                       // start the timer
     bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
-    unsigned long end_timer = millis();                         // end the timer
+    unsigned long end_timer = micros();                         // end the timer
 
     if (report){
       Serial.print(F("Transmission successful!"));              // payload was delivered
       Serial.print(F("Time to transmit = "));
       Serial.println(end_timer - start_timer);                  // print the timer result
-      Serial.print(F("Sent: "));
+      Serial.print(F("us. Sent: "));
       Serial.print(payload.message);                            // print the payload message
       Serial.print(payload.counter);                            // print the payload counter
       if (radio.available()) {                                  // is there an ACK payload?
@@ -102,9 +108,9 @@ void loop() {
         radio.read(&ack, sizeof(PayloadStruct));                // get ACK payload from FIFO
         Serial.print(F(" Recieved: "));
         Serial.print(ack.message);                              // print ACK message
-        Serial.print(ack.counter);                              // print ACK counter
+        Serial.println(ack.counter);                              // print ACK counter
       } else {
-        Serial.print(F(" Recieved: a blank ACK packet"));       // empty ACK packet received
+        Serial.println(F(" Recieved: a blank ACK packet"));       // empty ACK packet received
       }
       payload.counter++;                                        // increment payload counter
 
@@ -132,8 +138,10 @@ void loop() {
       Serial.print(tx.counter);                      // print payload counter
       Serial.print(F(" Sent: "));
       Serial.print(payload.message);                 // print ACK message
-      Serial.print(payload.counter);                 // print ACK counter
+      Serial.println(payload.counter);               // print ACK counter
 
+      // increment payload counter
+      payload.counter++;
       // load the payload for the first received transmission on pipe 0
       radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
     }
@@ -148,8 +156,8 @@ void loop() {
 
       role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
-      payload.message = "Hello"; // change payload message
-      radio.stopListening();     // this also discards any unused ACK payloads
+      memcpy(payload.message, "Hello ", 6); // change payload message
+      radio.stopListening();                // this also discards any unused ACK payloads
       // address for this example doesn't change
       // radio.openWritingPipe(address);
 
@@ -160,7 +168,7 @@ void loop() {
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
 
 
-      payload.message = "World";                                 // change payload message
+      memcpy(payload.message, "World ", 6);                      // change payload message
       // load the payload for the first received transmission on pipe 0
       radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
       payload.counter++;                                         // increment payload counter

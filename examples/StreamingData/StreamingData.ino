@@ -28,26 +28,35 @@ uint8_t address[6] = "1Node";
 // Used to control whether this node is sending or receiving
 bool role = false;  // true = TX node, flase = RX node
 
-// For this example, we'll be using a 2D array of 32 payloads each containing
+// For this example, we'll be sending 32 payloads each containing
 // 32 bytes of data that looks like ASCII art when printed to the serial
-// monitor. The TX node will use the 2D array, but the RX node needs only a
-// single buffer to fetch and print the data.
+// monitor. The TX node and RX node needs only a single 32 byte buffer.
 #define SIZE 32
-char buffer[32];           // for the RX node
+char buffer[SIZE + 1];     // for the RX node
 uint8_t counter = 0;       // for counting the number of received payloads
-char stream[SIZE];         // a buffer for the TX node
 void makePayload(uint8_t); // prototype to construct payload dynamically
 
 
 void setup() {
 
+
+  buffer[SIZE] = 0;        // add a NULL terminating charcter (for easy printing)
+
   // print example's introductory prompt
   Serial.begin(115200);
-  Serial.println(F("RF24/examples/StreamingData"));
-  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
+  while (!Serial) {
+    // some boards need to wait to ensure access to serial over USB
+  }
 
   // initialize the transceiver on the SPI bus
-  radio.begin();
+  if (!radio.begin()) {
+    Serial.println(F("nRF24L01 is not responding!!"));
+    while(1) {} // hold in infinite loop
+  }
+
+  // print example's introductory prompt
+  Serial.println(F("RF24/examples/StreamingData"));
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity of
@@ -78,7 +87,7 @@ void loop() {
     unsigned long start_timer = millis();       // start the timer
     while (i < SIZE){
       makePayload(i);                           // make the payload
-      if (!radio.writeFast(&stream, SIZE)) {
+      if (!radio.writeFast(&buffer, SIZE)) {
         failures++;
         radio.reUseTX();
       } else {
@@ -89,7 +98,7 @@ void loop() {
 
     Serial.print(F("Time to transmit = "));
     Serial.print(end_timer - start_timer);      // print the timer result
-    Serial.print(F(" with "));
+    Serial.print(F(" ms with "));
     Serial.print(failures);                     // print failures detected
     Serial.println(F(" failures detected"));
 
@@ -138,16 +147,13 @@ void loop() {
 void makePayload(uint8_t i) {
   // Make a single payload based on position in stream.
   // This example employs function to save memory on certain boards.
-  for (uint8_t j = 0; j < SIZE; ++j) {
-    char chr;
-    if (!j) {
-      // let the first character be an identifying alphanumeric prefix
-      // this lets us see which payload didn't get received
-      stream[j] = i + (i < 26 ? 65 : 71);
-    } else {
-      chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
-      chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
-      stream[j] = chr + 48;
-    }
+
+  // let the first character be an identifying alphanumeric prefix
+  // this lets us see which payload didn't get received
+  buffer[0] = i + (i < 26 ? 65 : 71);
+  for (uint8_t j = 0; j < SIZE - 1; ++j) {
+    char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
+    chr |= j <= (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
+    buffer[j + 1] = chr + 48;
   }
 }

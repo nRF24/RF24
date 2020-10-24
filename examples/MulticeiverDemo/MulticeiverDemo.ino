@@ -62,11 +62,19 @@ void setup() {
 
   // print example's introductory prompt
   Serial.begin(115200);
-  Serial.println(F("RF24/examples/MulticeiverDemo"));
-  Serial.println(F("*** PRESS a number between 0 and 5 (inclusive) to act as a unique node that transmits to the RX node"));
+  while (!Serial) {
+    // some boards need to wait to ensure access to serial over USB
+  }
 
   // initialize the transceiver on the SPI bus
-  radio.begin();
+  if (!radio.begin()) {
+    Serial.println(F("nRF24L01 is not responding!!"));
+    while(1) {} // hold in infinite loop
+  }
+
+  // print example's introductory prompt
+  Serial.println(F("RF24/examples/MulticeiverDemo"));
+  Serial.println(F("*** PRESS a number between 0 and 5 (inclusive) to act as a unique node that transmits to the RX node"));
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity of

@@ -1,7 +1,7 @@
 /*
  * See documentation at https://tmrh20.github.io/RF24
  * See License information at root directory of this library
- * Author: Brendan Doherty 2bndy5
+ * Author: Brendan Doherty (2bndy5)
  */
 
 /**
@@ -34,13 +34,20 @@ float payload = 0.0;
 
 void setup() {
 
-  // print example's introductory prompt
   Serial.begin(115200);
-  Serial.println(F("RF24/examples/GettingStarted"));
-  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
+  while (!Serial) {
+    // some boards need to wait to ensure access to serial over USB
+  }
 
   // initialize the transceiver on the SPI bus
-  radio.begin();
+  if (!radio.begin()) {
+    Serial.println(F("nRF24L01 is not responding!!"));
+    while(1) {} // hold in infinite loop
+  }
+
+  // print example's introductory prompt
+  Serial.println(F("RF24/examples/GettingStarted"));
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity of
@@ -59,6 +66,7 @@ void setup() {
   } else {
     radio.startListening(); // powerUp() into RX mode
   }
+
 } // setup
 
 void loop() {
@@ -66,12 +74,12 @@ void loop() {
   if (role) {
     // This device is a TX node
 
-    unsigned long start_timer = millis();                    // start the timer
+    unsigned long start_timer = micros();                    // start the timer
     bool report = radio.write(&payload, sizeof(float));      // transmit & save the report
-    unsigned long end_timer = millis();                      // end the timer
+    unsigned long end_timer = micros();                      // end the timer
 
     if (report){
-      Serial.print(F("Transmission successful!"));           // payload was delivered
+      Serial.print(F("Transmission successful! "));           // payload was delivered
       Serial.print(F("Time to transmit = "));
       Serial.println(end_timer - start_timer);               // print the timer result
       payload += 0.01;                                       // increment float payload
