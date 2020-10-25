@@ -25,31 +25,31 @@
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // For this example, we'll be using 6 addresses; 1 for each TX node
-// It helps to think of addresses as paths instead of destinations.
+// HINT: It helps to think of addresses as paths instead of destinations.
 // Notice that the last byte is the only byte that changes in the last 5
 // addresses. This is a limitation of the nRF24L01 transceiver for pipes 2-5
 // because they use the same first 4 bytes from pipe 1.
-uint64_t address[6] = { 0x7878787878LL,
-                        0xB3B4B5B6F1LL,
-                        0xB3B4B5B6CDLL,
-                        0xB3B4B5B6A3LL,
-                        0xB3B4B5B60FLL,
-                        0xB3B4B5B605LL };
-
+uint64_t address[6] = {0x7878787878LL,
+                       0xB3B4B5B6F1LL,
+                       0xB3B4B5B6CDLL,
+                       0xB3B4B5B6A3LL,
+                       0xB3B4B5B60FLL,
+                       0xB3B4B5B605LL};
 
 // Because this example allow up to 6 nodes (specified by numbers 0-5) to
 // transmit and only 1 node to receive, we will use a negative value in our
 // role variable to signify this node is a receiver.
-// Used to control whether this node is sending or receiving
-int8_t role = -1;  // 0-5 = TX node; any negative number = RX node
+// role variable is used to control whether this node is sending or receiving
+int8_t role = -1; // 0-5 = TX node; any negative number = RX node
 
 // For this example, we'll be using a payload containing
 // a node ID number and a single integer number that will be incremented
 // on every successful transmission.
 // Make a data structure to use as a payload.
-struct PayloadStruct {
-    uint8_t nodeID;
-    uint8_t payloadID = 0;
+struct PayloadStruct
+{
+  byte nodeID;
+  unsigned int payloadID = 0;
 };
 PayloadStruct payload;
 
@@ -60,26 +60,25 @@ void setRole(); // declare a prototype; definition is found after the loop()
 
 void setup() {
 
-  // print example's introductory prompt
   Serial.begin(115200);
   while (!Serial) {
     // some boards need to wait to ensure access to serial over USB
   }
 
   // initialize the transceiver on the SPI bus
-  if (!radio.begin()) {
+  if (!radio.begin()){
     Serial.println(F("nRF24L01 is not responding!!"));
-    while(1) {} // hold in infinite loop
+    while (1) {} // hold in infinite loop
   }
 
   // print example's introductory prompt
   Serial.println(F("RF24/examples/MulticeiverDemo"));
-  Serial.println(F("*** PRESS a number between 0 and 5 (inclusive) to act as a unique node that transmits to the RX node"));
+  Serial.println(F("*** Enter a number between 0 and 5 (inclusive) to act as a unique node that transmits to the RX node"));
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity of
   // each other.
-  radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+  radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
   // Set the pipe addresses accordingly. This function additionally also
   // calls startListening() or stopListening() and sets the payload's nodeID
@@ -88,24 +87,25 @@ void setup() {
 
 void loop() {
 
-  if (role <= 0) {
+  if (role >= 0) {
     // This device is a TX node
 
-    unsigned long start_timer = millis();                    // start the timer
-    bool report = radio.write(&payload, sizeof(float));      // transmit & save the report
-    unsigned long end_timer = millis();                      // end the timer
+    unsigned long start_timer = micros();                       // start the timer
+    bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
+    unsigned long end_timer = micros();                         // end the timer
 
-    if (report){
-      Serial.print(F("Transmission successful!"));           // payload was delivered
-      Serial.print(F("Time to transmit = "));
-      Serial.println(end_timer - start_timer);               // print the timer result
-      payload.payloadID++;                                   // increment payload number
+    if (report) {
+      Serial.print(F("Transmission successful!")); // payload was delivered
+      Serial.print(F(" Time to transmit = "));
+      Serial.print(end_timer - start_timer);   // print the timer result
+      Serial.println(F(" us"));
+      payload.payloadID++;                     // increment payload number
     } else {
       Serial.println(F("Transmission failed or timed out")); // payload was not delivered
     }
 
     // to make this example readable in the serial monitor
-    delay(1000);  // slow transmissions down by 1 second
+    delay(500); // slow transmissions down by 1 second
 
   } else if (role < 0) {
     // This device is the RX node
@@ -115,35 +115,40 @@ void loop() {
       uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
       radio.read(&payload, bytes);                   // fetch payload from FIFO
       Serial.print(F("Received "));
-      Serial.print(bytes);                           // print the size of the payload
+      Serial.print(bytes); // print the size of the payload
       Serial.print(F(" bytes on pipe "));
-      Serial.print(pipe);                            // print the pipe number
+      Serial.print(pipe); // print the pipe number
       Serial.print(F(" from node "));
-      Serial.print(payload.nodeID);                  // print the payload's origin
+      Serial.print(payload.nodeID); // print the payload's origin
       Serial.print(F(". PayloadID: "));
-      Serial.println(payload.payloadID);             // print the payload's number
+      Serial.println(payload.payloadID); // print the payload's number
     }
   } // role
 
   if (Serial.available()) {
     // change the role via the serial monitor
 
-    char c = Serial.parseInt();
-    if ((c >= 0 || c <= 5) && role < 0) {
+    int8_t c = Serial.parseInt();
+    if (c < 0 && role >= 0) {
+      // Become the RX node
+
+      role = c;
+      Serial.println(F("*** CHANGING ROLE TO RECEIVER ***"));
+      Serial.println(F("--- Enter a number between 0 and 5 (inclusive) to act as"));
+      Serial.println(F("--- a unique node number that transmits  to the RX node."));
+      setRole(); // change address on all pipes to TX nodes
+
+    } else if (c >= 0 || c <= 5) {
       // Become a TX node with identifier 'c'
 
       role = c;
       Serial.print(F("*** CHANGING ROLE TO NODE "));
       Serial.print(c);
       Serial.println(F(" ***"));
+      Serial.println(F("--- Enter a number between 0 and 5 (inclusive) to change"));
+      Serial.println(F("--- the identifying node number that transmits."));
+      Serial.println(F("--- Enter a negative number to act as the RX node."));
       setRole(); // change address on pipe 0 to the RX node
-
-    } else if (c < 0  && role > 0) {
-      // Become the RX node
-
-      role = c;
-      Serial.println(F("*** CHANGING ROLE TO RECEIVER ***"));
-      setRole(); // change address on all pipes to TX nodes
     }
   }
 
@@ -154,9 +159,9 @@ void setRole() {
     // For the RX node
 
     // Set the addresses for all pipes to TX nodes
-    for (uint8_t i = 0; i < 6; ++i) {
+    for (uint8_t i = 0; i < 6; ++i)
       radio.openReadingPipe(i, address[i]);
-    }
+
     radio.startListening(); // put radio in RX mode
 
   } else {
@@ -175,4 +180,4 @@ void setRole() {
     // So, use varying delay between retry attempts and 15 (at most) retry attempts
     radio.setRetries(((role * 3) % 12) + 3, 15); // maximum value is 15 for both args
   }
-}
+} // setRole

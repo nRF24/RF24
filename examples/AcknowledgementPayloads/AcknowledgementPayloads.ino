@@ -56,7 +56,7 @@ void setup() {
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Set the PA Level low to try preventing power supply related problems
-  // because these examples are likely run with nodes in close proximity of
+  // because these examples are likely run with nodes in close proximity to
   // each other.
   radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
 
