@@ -99,6 +99,8 @@ jobs:
           #   - examples_backup/Usage/nordic_fob
           fqbn: ${{ matrix.fqbn }}
   attiny:
+    runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
 
