@@ -106,8 +106,8 @@ jobs:
 
       matrix:
         fqbn:
-          - arduino:avr:ATtinyX5
-          - arduino:avr:ATtinyX4
+          - arduino:attiny:ATtinyX5
+          - arduino:attiny:ATtinyX4
 
     steps:
       - name: Checkout
