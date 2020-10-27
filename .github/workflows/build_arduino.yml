@@ -106,28 +106,28 @@ jobs:
 
       matrix:
         fqbn:
-          - ATTinyCore:avr:attinyx4
-          - ATTinyCore:avr:attinyx4opti
-          - ATTinyCore:avr:attinyx4micr
-          - ATTinyCore:avr:attinyx5
-          - ATTinyCore:avr:attinyx5micr
-          - ATTinyCore:avr:attinyx8
-          - ATTinyCore:avr:attinyx8opti
-          - ATTinyCore:avr:attinyx8micr
-          - ATTinyCore:avr:attinyx7
-          - ATTinyCore:avr:attinyx7opti
-          - ATTinyCore:avr:attinyx7micr
-          - ATTinyCore:avr:attinyx61
-          - ATTinyCore:avr:attinyx61opti
-          - ATTinyCore:avr:attinyx41
-          - ATTinyCore:avr:attinyx41opti
-          - ATTinyCore:avr:attinyx41micr
-          - ATTinyCore:avr:attiny43
-          - ATTinyCore:avr:attiny828
-          - ATTinyCore:avr:attiny828opti
-          - ATTinyCore:avr:attiny1634
-          - ATTinyCore:avr:attiny1634opti
-          - ATTinyCore:avr:attinyx313
+          - attinyCore:avr:attinyx4
+          - attinyCore:avr:attinyx4opti
+          - attinyCore:avr:attinyx4micr
+          - attinyCore:avr:attinyx5
+          - attinyCore:avr:attinyx5micr
+          - attinyCore:avr:attinyx8
+          - attinyCore:avr:attinyx8opti
+          - attinyCore:avr:attinyx8micr
+          - attinyCore:avr:attinyx7
+          - attinyCore:avr:attinyx7opti
+          - attinyCore:avr:attinyx7micr
+          - attinyCore:avr:attinyx61
+          - attinyCore:avr:attinyx61opti
+          - attinyCore:avr:attinyx41
+          - attinyCore:avr:attinyx41opti
+          - attinyCore:avr:attinyx41micr
+          - attinyCore:avr:attiny43
+          - attinyCore:avr:attiny828
+          - attinyCore:avr:attiny828opti
+          - attinyCore:avr:attiny1634
+          - attinyCore:avr:attiny1634opti
+          - attinyCore:avr:attinyx313
 
     steps:
       - name: Checkout
