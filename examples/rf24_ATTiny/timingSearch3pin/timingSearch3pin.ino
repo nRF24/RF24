@@ -141,8 +141,8 @@
 #endif
 #endif
 
-#if defined(RF24_TINY)
 #include <stdio.h>
+#if defined(RF24_TINY)
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 
