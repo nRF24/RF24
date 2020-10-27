@@ -23,7 +23,7 @@
 #include "RF24.h"
 
 // We will be using the nRF24L01's IRQ pin for this example
-// #define IRQ_PIN 6 // this needs to be a digital input capable pin
+#define IRQ_PIN 6 // this needs to be a digital input capable pin
 
 // We will be using the nRF24L01's CE pin to control transmissions
 #define CE_PIN 7
