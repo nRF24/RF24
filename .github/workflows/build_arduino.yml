@@ -6,14 +6,13 @@ on:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/Usage/pingpair_maple/**"
-      - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
   push:
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/Usage/pingpair_maple/**"
-      - "!examples/rf24_ATTiny/timingSearch3pin/**"
+      # - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
 jobs:
   build:
@@ -66,46 +65,6 @@ jobs:
           - "arduino:samd:tian"
           - "arduino:megaavr:uno2018"
           # - "arduino:megaavr:nano4809"  # board not found
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Compile examples
-        uses: arduino/compile-sketches@main
-        with:
-          sketch-paths: |
-            - examples/GettingStarted
-            - examples/GettingStarted_CallResponse
-            - examples/AcknowledgementPayloads
-            - examples/StreamingData
-            - examples/InterruptConfigure
-            - examples/MulticeiverDemo
-            - examples/FakeBLE
-          #   - examples_backup/GettingStarted_HandlingData
-          #   - examples_backup/GettingStarted_HandlingFailures
-          #   - examples_backup/pingpair_ack
-          #   - examples_backup/pingpair_dyn
-          #   - examples_backup/pingpair_irq
-          #   - examples_backup/pingpair_irq_simple
-          #   - examples_backup/pingpair_multi_dyn
-          #   - examples_backup/pingpair_sleepy
-          #   - examples_backup/rf24_ATTiny/rf24ping85
-          #   - examples_backup/scanner
-          #   - examples_backup/starping
-          #   - examples_backup/Transfer
-          #   - examples_backup/TransferTimeouts
-          #   - examples_backup/Usage/led_remote
-          #   - examples_backup/Usage/nordic_fob
-          fqbn: ${{ matrix.fqbn }}
-  attiny:
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        fqbn:
           - ATTinyCore:avr:attinyx4
           - ATTinyCore:avr:attinyx4opti
           - ATTinyCore:avr:attinyx4micr
@@ -140,7 +99,29 @@ jobs:
             - source-url: "https://github.com/SpenceKonde/ATTinyCore/archive/1.4.1.zip"
               name: "ATTinyCore:avr"
             - name: "arduino:avr"
+
           sketch-paths: |
+            - examples/GettingStarted
+            - examples/GettingStarted_CallResponse
+            - examples/AcknowledgementPayloads
+            - examples/StreamingData
+            - examples/InterruptConfigure
+            - examples/MulticeiverDemo
+            - examples/FakeBLE
             - examples/rf24_ATTiny
           # - examples/rf24_ATTiny/rf24ping85
+          # - examples_backup/GettingStarted_HandlingData
+          # - examples_backup/GettingStarted_HandlingFailures
+          # - examples_backup/pingpair_ack
+          # - examples_backup/pingpair_dyn
+          # - examples_backup/pingpair_irq
+          # - examples_backup/pingpair_irq_simple
+          # - examples_backup/pingpair_multi_dyn
+          # - examples_backup/pingpair_sleepy
+          # - examples_backup/scanner
+          # - examples_backup/starping
+          # - examples_backup/Transfer
+          # - examples_backup/TransferTimeouts
+          # - examples_backup/Usage/led_remote
+          # - examples_backup/Usage/nordic_fob
           fqbn: ${{ matrix.fqbn }}
