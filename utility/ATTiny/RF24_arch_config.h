@@ -21,9 +21,9 @@
     #include <Arduino.h>
 #endif
 
-#include <stddef.h>  
+#include <stddef.h>
 
-#include <SPI.h>
+#include "SPI.h"
 
 #define _SPI SPI
 

@@ -74,9 +74,14 @@ jobs:
       - name: Compile examples
         uses: arduino/compile-sketches@main
         with:
-          # sketch-paths: |
-          #   - examples_backup/GettingStarted
-          #   - examples_backup/GettingStarted_CallResponse
+          sketch-paths: |
+            - examples/GettingStarted
+            - examples/GettingStarted_CallResponse
+            - examples/AcknowledgementPayloads
+            - examples/StreamingData
+            - examples/InterruptConfigure
+            - examples/MulticeiverDemo
+            - examples/FakeBLE
           #   - examples_backup/GettingStarted_HandlingData
           #   - examples_backup/GettingStarted_HandlingFailures
           #   - examples_backup/pingpair_ack
@@ -92,4 +97,23 @@ jobs:
           #   - examples_backup/TransferTimeouts
           #   - examples_backup/Usage/led_remote
           #   - examples_backup/Usage/nordic_fob
+          fqbn: ${{ matrix.fqbn }}
+  attiny:
+    stradegy:
+      fail-fast: false
+
+      fqbn:
+        - arduino:avr:ATtinyX5
+        - arduino:avr:ATtinyX4
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@main
+        with:
+          name: arduino:avr
+          source-url: https://github.com/damellis/attiny.git
+          sketch-paths: - examples/rf24_ATTiny
           fqbn: ${{ matrix.fqbn }}

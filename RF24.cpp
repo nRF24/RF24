@@ -1605,3 +1605,43 @@ void RF24::stopConstCarrier()
     write_register(RF_SETUP, (read_register(RF_SETUP)) & ~_BV(CONT_WAVE) & ~_BV(PLL_LOCK));
     ce(LOW);
 }
+
+//ATTiny support code pulled in from https://github.com/jscrane/RF24
+#if defined(RF24_TINY)
+
+void SPIClass::begin() {
+    // set USCK and DO for output
+    // set DI for input
+        #if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+    DDRB |= (1 << PB2) | (1 << PB1);
+    DDRB &= ~(1 << PB0);
+        #elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+    DDRA |= (1 << PA4) | (1 << PA5);
+    DDRA &= ~(1 << PA6);
+        #elif defined(__AVR_ATtiny2313__) || defined(__AVR_ATtiny4313__)
+    DDRB |= (1 << PB7) | (1 << PB6);
+    DDRB &= ~(1 << PB5);
+        #elif defined(__AVR_ATtiny861__)
+    DDRB |= (1 << PB2) | (1 << PB1);
+    DDRB &= ~(1 << PB0);
+        #endif // defined(__AVR_ATtiny861__)
+    USICR = _BV(USIWM0);
+}
+
+byte SPIClass::transfer(byte b)
+{
+    USIDR = b;
+    USISR = _BV(USIOIF);
+    do {
+        USICR = _BV(USIWM0) | _BV(USICS1) | _BV(USICLK) | _BV(USITC);
+    }
+    while ((USISR & _BV(USIOIF)) == 0);
+    return USIDR;
+}
+
+void SPIClass::end() {}
+void SPIClass::setDataMode(uint8_t mode){}
+void SPIClass::setBitOrder(uint8_t bitOrder){}
+void SPIClass::setClockDivider(uint8_t rate){}
+
+#endif
