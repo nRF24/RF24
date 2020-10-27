@@ -138,9 +138,10 @@ jobs:
         with:
           platforms: |
             - source-url: "https://github.com/SpenceKonde/ATTinyCore.git"
-            - name: "ATTinyCore:avr"
-            - version: "latest"
-            - source-path: "./avr/"
+              name: "ATTinyCore:avr"
+              version: "latest"
+              source-path: "./avr/"
+            - name: "arduino:avr"
           sketch-paths: |
             - examples/rf24_ATTiny
           # - examples/rf24_ATTiny/rf24ping85
