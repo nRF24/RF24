@@ -1074,19 +1074,16 @@ bool RF24::available(void)
 
 bool RF24::available(uint8_t* pipe_num)
 {
-    if (!(read_register(FIFO_STATUS) & _BV(RX_EMPTY))) {
+    // get implied RX FIFO empty flag from status byte
+    uint8_t pipe = (get_status() >> RX_P_NO) & 0x07;
+    if (pipe > 5)
+        return 0;
 
-        // If the caller wants the pipe number, include that
-        if (pipe_num) {
-            uint8_t status = get_status();
-            *pipe_num = (status >> RX_P_NO) & 0x07;
-        }
-        return 1;
-    }
+    // If the caller wants the pipe number, include that
+    if (pipe_num)
+        *pipe_num = pipe;
 
-    return 0;
-
-
+    return 1;
 }
 
 /****************************************************************************/
