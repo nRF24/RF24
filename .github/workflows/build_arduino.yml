@@ -102,9 +102,10 @@ jobs:
     stradegy:
       fail-fast: false
 
-      fqbn:
-        - arduino:avr:ATtinyX5
-        - arduino:avr:ATtinyX4
+      matrix:
+        fqbn:
+          - arduino:avr:ATtinyX5
+          - arduino:avr:ATtinyX4
 
     steps:
       - name: Checkout
@@ -115,5 +116,5 @@ jobs:
         with:
           name: arduino:avr
           source-url: https://github.com/damellis/attiny.git
-          sketch-paths: - examples/rf24_ATTiny
+          sketch-paths: - examples/rf24_ATTiny/rf24ping85
           fqbn: ${{ matrix.fqbn }}
