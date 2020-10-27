@@ -116,5 +116,6 @@ jobs:
         with:
           name: arduino:avr
           source-url: https://github.com/damellis/attiny.git
-          sketch-paths: - examples/rf24_ATTiny/rf24ping85
+          sketch-paths: |
+            - examples/rf24_ATTiny/rf24ping85
           fqbn: ${{ matrix.fqbn }}
