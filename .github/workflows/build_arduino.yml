@@ -106,8 +106,8 @@ jobs:
 
       matrix:
         fqbn:
-          - arduino:attiny:ATtinyX5
-          - arduino:attiny:ATtinyX4
+          - arduino:avr:ATtinyX5
+          - arduino:avr:ATtinyX4
 
     steps:
       - name: Checkout
@@ -117,7 +117,8 @@ jobs:
         uses: arduino/compile-sketches@main
         with:
           name: arduino:avr
-          source-url: https://github.com/damellis/attiny.git
+          source-url: https://github.com/SpenceKonde/ATTinyCore/archive/1.4.1.zip
           sketch-paths: |
-            - examples/rf24_ATTiny/rf24ping85
+            - examples/rf24_ATTiny
+          # - examples/rf24_ATTiny/rf24ping85
           fqbn: ${{ matrix.fqbn }}
