@@ -140,6 +140,6 @@ jobs:
               name: "ATTinyCore:avr"
             - name: "arduino:avr"
           sketch-paths: |
-            - examples/rf24_ATTiny
-          # - examples/rf24_ATTiny/rf24ping85
+            - examples/rf24_ATTiny/rf24ping85
+          #  - examples/rf24_ATTiny
           fqbn: ${{ matrix.fqbn }}
