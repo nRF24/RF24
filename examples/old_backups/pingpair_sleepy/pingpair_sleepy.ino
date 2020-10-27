@@ -94,6 +94,8 @@ void setup() {
 
   radio.begin();
 
+  radio.disableDynamicPayloads();  // new library default requires this
+
   // Open pipes to other nodes for communication
 
   // This simple sketch opens two pipes for these two nodes to communicate

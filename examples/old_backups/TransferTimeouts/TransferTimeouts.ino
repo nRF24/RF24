@@ -47,6 +47,7 @@ void setup(void) {
   printf_begin();
 
   radio.begin();                           // Setup and configure rf radio
+  radio.disableDynamicPayloads();          // new library default requires this
   radio.setChannel(1);                     // Set the channel
   radio.setPALevel(RF24_PA_LOW);           // Set PA LOW for this demonstration. We want the radio to be as lossy as possible for this example.
   radio.setDataRate(RF24_1MBPS);           // Raise the data rate to reduce transmission distance and increase lossiness

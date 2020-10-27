@@ -81,21 +81,18 @@ jobs:
             - examples/InterruptConfigure
             - examples/MulticeiverDemo
             - examples/FakeBLE
-          #   - examples_backup/GettingStarted_HandlingData
-          #   - examples_backup/GettingStarted_HandlingFailures
-          #   - examples_backup/pingpair_ack
-          #   - examples_backup/pingpair_dyn
-          #   - examples_backup/pingpair_irq
-          #   - examples_backup/pingpair_irq_simple
-          #   - examples_backup/pingpair_multi_dyn
-          #   - examples_backup/pingpair_sleepy
-          #   - examples_backup/rf24_ATTiny/rf24ping85
-          #   - examples_backup/scanner
-          #   - examples_backup/starping
-          #   - examples_backup/Transfer
-          #   - examples_backup/TransferTimeouts
-          #   - examples_backup/Usage/led_remote
-          #   - examples_backup/Usage/nordic_fob
+          #   - examples/old_backups/GettingStarted_HandlingData
+          #   - examples/old_backups/GettingStarted_HandlingFailures
+          #   - examples/old_backups/pingpair_dyn
+          #   - examples/old_backups/pingpair_irq
+          #   - examples/old_backups/pingpair_multi_dyn
+          #   - examples/old_backups/pingpair_sleepy
+          #   - examples/old_backups/rf24_ATTiny/rf24ping85
+          #   - examples/old_backups/scanner
+          #   - examples/old_backups/TransferTimeouts
+          #   - examples/old_backups/recipes/led_remote
+          #   - examples/old_backups/recipes/nordic_fob
+          #   - examples/old_backups/recipes/pingpair_maple
           fqbn: ${{ matrix.fqbn }}
   attiny:
     runs-on: ubuntu-latest
@@ -141,5 +138,5 @@ jobs:
             - name: "arduino:avr"
           sketch-paths: |
             - examples/rf24_ATTiny/rf24ping85
-          #  - examples/rf24_ATTiny
+          #  - examples/rf24_ATTiny  #timingSearch3pin example redefines SPI functions
           fqbn: ${{ matrix.fqbn }}

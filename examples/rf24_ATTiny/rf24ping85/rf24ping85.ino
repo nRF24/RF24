@@ -67,6 +67,7 @@ unsigned long payload = 0;
 void setup() {
   // Setup and configure rf radio
   radio.begin(); // Start up the radio
+  radio.disableDynamicPayloads();  // new library default requires this
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15, 15); // Max delay between retries & number of retries
   radio.openWritingPipe(addresses[1]); // Write to device address '2Node'
