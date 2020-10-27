@@ -106,28 +106,28 @@ jobs:
 
       matrix:
         fqbn:
-          - arduino:avr:attinyx4
-          - arduino:avr:attinyx4opti
-          - arduino:avr:attinyx4micr
-          - arduino:avr:attinyx5
-          - arduino:avr:attinyx5micr
-          - arduino:avr:attinyx8
-          - arduino:avr:attinyx8opti
-          - arduino:avr:attinyx8micr
-          - arduino:avr:attinyx7
-          - arduino:avr:attinyx7opti
-          - arduino:avr:attinyx7micr
-          - arduino:avr:attinyx61
-          - arduino:avr:attinyx61opti
-          - arduino:avr:attinyx41
-          - arduino:avr:attinyx41opti
-          - arduino:avr:attinyx41micr
-          - arduino:avr:attiny43
-          - arduino:avr:attiny828
-          - arduino:avr:attiny828opti
-          - arduino:avr:attiny1634
-          - arduino:avr:attiny1634opti
-          - arduino:avr:attinyx313
+          - ATTinyCore:avr:attinyx4
+          - ATTinyCore:avr:attinyx4opti
+          - ATTinyCore:avr:attinyx4micr
+          - ATTinyCore:avr:attinyx5
+          - ATTinyCore:avr:attinyx5micr
+          - ATTinyCore:avr:attinyx8
+          - ATTinyCore:avr:attinyx8opti
+          - ATTinyCore:avr:attinyx8micr
+          - ATTinyCore:avr:attinyx7
+          - ATTinyCore:avr:attinyx7opti
+          - ATTinyCore:avr:attinyx7micr
+          - ATTinyCore:avr:attinyx61
+          - ATTinyCore:avr:attinyx61opti
+          - ATTinyCore:avr:attinyx41
+          - ATTinyCore:avr:attinyx41opti
+          - ATTinyCore:avr:attinyx41micr
+          - ATTinyCore:avr:attiny43
+          - ATTinyCore:avr:attiny828
+          - ATTinyCore:avr:attiny828opti
+          - ATTinyCore:avr:attiny1634
+          - ATTinyCore:avr:attiny1634opti
+          - ATTinyCore:avr:attinyx313
 
     steps:
       - name: Checkout
@@ -136,7 +136,7 @@ jobs:
       - name: Compile examples
         uses: arduino/compile-sketches@main
         with:
-          name: arduino:avr
+          name: ATTinyCore:avr
           source-url: https://github.com/SpenceKonde/ATTinyCore/archive/1.4.1.zip
           sketch-paths: |
             - examples/rf24_ATTiny
