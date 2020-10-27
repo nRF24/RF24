@@ -106,8 +106,28 @@ jobs:
 
       matrix:
         fqbn:
-          - arduino:avr:ATtinyX5
-          - arduino:avr:ATtinyX4
+          - arduino:avr:attinyx4
+          - arduino:avr:attinyx4opti
+          - arduino:avr:attinyx4micr
+          - arduino:avr:attinyx5
+          - arduino:avr:attinyx5micr
+          - arduino:avr:attinyx8
+          - arduino:avr:attinyx8opti
+          - arduino:avr:attinyx8micr
+          - arduino:avr:attinyx7
+          - arduino:avr:attinyx7opti
+          - arduino:avr:attinyx7micr
+          - arduino:avr:attinyx61
+          - arduino:avr:attinyx61opti
+          - arduino:avr:attinyx41
+          - arduino:avr:attinyx41opti
+          - arduino:avr:attinyx41micr
+          - arduino:avr:attiny43
+          - arduino:avr:attiny828
+          - arduino:avr:attiny828opti
+          - arduino:avr:attiny1634
+          - arduino:avr:attiny1634opti
+          - arduino:avr:attinyx313
 
     steps:
       - name: Checkout
