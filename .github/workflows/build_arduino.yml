@@ -99,7 +99,7 @@ jobs:
           #   - examples_backup/Usage/nordic_fob
           fqbn: ${{ matrix.fqbn }}
   attiny:
-    stradegy:
+    strategy:
       fail-fast: false
 
       matrix:
