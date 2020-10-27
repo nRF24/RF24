@@ -106,28 +106,28 @@ jobs:
 
       matrix:
         fqbn:
-          - attinyCore:avr:attinyx4
-          - attinyCore:avr:attinyx4opti
-          - attinyCore:avr:attinyx4micr
-          - attinyCore:avr:attinyx5
-          - attinyCore:avr:attinyx5micr
-          - attinyCore:avr:attinyx8
-          - attinyCore:avr:attinyx8opti
-          - attinyCore:avr:attinyx8micr
-          - attinyCore:avr:attinyx7
-          - attinyCore:avr:attinyx7opti
-          - attinyCore:avr:attinyx7micr
-          - attinyCore:avr:attinyx61
-          - attinyCore:avr:attinyx61opti
-          - attinyCore:avr:attinyx41
-          - attinyCore:avr:attinyx41opti
-          - attinyCore:avr:attinyx41micr
-          - attinyCore:avr:attiny43
-          - attinyCore:avr:attiny828
-          - attinyCore:avr:attiny828opti
-          - attinyCore:avr:attiny1634
-          - attinyCore:avr:attiny1634opti
-          - attinyCore:avr:attinyx313
+          - attinycore:avr:attinyx4
+          - attinycore:avr:attinyx4opti
+          - attinycore:avr:attinyx4micr
+          - attinycore:avr:attinyx5
+          - attinycore:avr:attinyx5micr
+          - attinycore:avr:attinyx8
+          - attinycore:avr:attinyx8opti
+          - attinycore:avr:attinyx8micr
+          - attinycore:avr:attinyx7
+          - attinycore:avr:attinyx7opti
+          - attinycore:avr:attinyx7micr
+          - attinycore:avr:attinyx61
+          - attinycore:avr:attinyx61opti
+          - attinycore:avr:attinyx41
+          - attinycore:avr:attinyx41opti
+          - attinycore:avr:attinyx41micr
+          - attinycore:avr:attiny43
+          - attinycore:avr:attiny828
+          - attinycore:avr:attiny828opti
+          - attinycore:avr:attiny1634
+          - attinycore:avr:attiny1634opti
+          - attinycore:avr:attinyx313
 
     steps:
       - name: Checkout
@@ -136,7 +136,7 @@ jobs:
       - name: Compile examples
         uses: arduino/compile-sketches@main
         with:
-          name: ATTinyCore:avr
+          name: attinycore:avr
           source-url: https://github.com/SpenceKonde/ATTinyCore/archive/1.4.1.zip
           sketch-paths: |
             - examples/rf24_ATTiny
