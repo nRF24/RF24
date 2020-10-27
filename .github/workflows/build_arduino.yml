@@ -137,9 +137,9 @@ jobs:
         uses: arduino/compile-sketches@main
         platforms: |
           - source-url: "https://github.com/SpenceKonde/ATTinyCore.git"
-          name: "ATTinyCore:avr"
-          version: "latest"
-          source-path: "avr"
+          - name: "ATTinyCore:avr"
+          - version: "latest"
+          - source-path: "avr"
         with:
           sketch-paths: |
             - examples/rf24_ATTiny
