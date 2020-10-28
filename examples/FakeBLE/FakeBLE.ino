@@ -33,8 +33,7 @@ uint8_t currentChannel = 0;               // used for "channel hopping"
 // this technique has some limits. The members of the following struct that
 // are not declared as `const` can be adjusted (except checksum).
 struct PayloadStruct {
-  uint8_t pduType = 0x42;                                 // iPhone & Android compatible
-  const uint8_t size = 27;                                // actual size is 30 + size bytes
+  const uint8_t header[2] = {0x42, 27};                   // iPhone & Android compatible
   uint8_t mac[6];                                         // an arbitrary 6 byte MAC address
   const uint8_t flags[3] = {0x02, 0x01, 0x05};            // 0x05 = discoverable & non-connectable
   const uint8_t namePrefix[2] = {0x04, 0x08};             // appears as "short name"
@@ -42,7 +41,7 @@ struct PayloadStruct {
   const uint8_t prefixBatt[4] = {0x04, 0x16, 0x0F, 0x18}; // Battery service data header
   uint8_t batteryPercent;                                 // we can set this in loop()
   const uint8_t prefixTemp[4] = {0x07, 0x16, 0x09, 0x18}; // temperature service data header
-  int8_t temperatureInC[4];                               // we can set this with temperatureData()
+  int8_t temperatureInC[4];                               // we set this with temperatureData()
   uint8_t checksum[3] = {0x55, 0x55, 0x55};               // we set this with crc24()
 };
 PayloadStruct payload;                                    // instantiate the payload
@@ -87,7 +86,7 @@ void setup() {
   temperatureData(42.0);
 
   memcpy(packet, &payload, 32);
-  crc(packet, 29, packet + 29);
+  crc(packet, 28, packet + 29);
   for (uint8_t i = 0; i < 32; ++i) {
     Serial.print("packet[");
     Serial.print(i);
@@ -159,30 +158,20 @@ void temperatureData(float celcius) {
 void crc(uint8_t *data, uint8_t len, uint8_t* dst) {
   // calculate CRC24 with according to BT Core Spec 4.0, Section 6.B.3.1.1
 
-  uint8_t *buffer = (uint8_t*)&data;
-  // initialize 24-bit shift register in "wire bit order"
-  // dst[0] = bits 23-16, dst[1] = bits 15-8, dst[2] = bits 7-0
-  // dst[0] = 0xAA;
-  // dst[1] = 0xAA;
-  // dst[2] = 0xAA;
+  uint8_t v, t, d;
+  while(len--) {
+    d = *data++;
+    for(v = 0; v < 8; v++, d >>= 1) {
+      t = dst[0] >> 7;
+      dst[0] <<= 1;
+      if(dst[1] & 0x80) dst[0] |= 1;
+      dst[1] <<= 1;
+      if(dst[2] & 0x80) dst[1] |= 1;
+      dst[2] <<= 1;
 
-  while (len--) {
-
-    uint8_t d = *(buffer++);
-
-    for (uint8_t i = 1; i; i <<= 1, d >>= 1) {
-
-      // save bit 23 (highest-value), left-shift the entire register by one
-      uint8_t t = dst[0] & 0x01;         dst[0] >>= 1;
-      if (dst[1] & 0x01) dst[0] |= 0x80; dst[1] >>= 1;
-      if (dst[2] & 0x01) dst[1] |= 0x80; dst[2] >>= 1;
-
-      // if the bit just shifted out (former bit 23) and the incoming data
-      // bit are not equal (i.e. bit_out ^ bit_in == 1) => toggle tap bits
-      if (t != (d & 1)) {
-        // toggle register tap bits (=XOR with 1) according to CRC polynom
-        dst[2] ^= 0xDA; // 0b11011010 inv. = 0b01011011 ^= x^6+x^4+x^3+x+1
-        dst[1] ^= 0x60; // 0b01100000 inv. = 0b00000110 ^= x^10+x^9
+      if(t != (d & 1)) {
+        dst[2] ^= 0x5B;
+        dst[1] ^= 0x06;
       }
     }
   }
