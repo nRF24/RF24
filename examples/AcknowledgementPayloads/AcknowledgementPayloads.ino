@@ -1,21 +1,21 @@
 /*
-   See documentation at https://tmrh20.github.io/RF24
-   See License information at root directory of this library
-   Author: Brendan Doherty (2bndy5)
-*/
+ * See documentation at https://tmrh20.github.io/RF24
+ * See License information at root directory of this library
+ * Author: Brendan Doherty (2bndy5)
+ */
 
 /**
-   A simple example of sending data from 1 nRF24L01 transceiver to another
-   with Acknowledgement (ACK) payloads attached to ACK packets.
-
-   A challenge to learn new skills:
-   This example uses the nRF24L01's ACK payloads feature. Try adjusting this
-   example to use a different RX pipe that still responds with ACK
-   payloads.
-
-   This example was written to be used on 2 or more devices acting as "nodes".
-   Use the Serial Monitor to change each node's behavior.
-*/
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with Acknowledgement (ACK) payloads attached to ACK packets.
+ *
+ * A challenge to learn new skills:
+ * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
+ * example to use a different RX pipe that still responds with ACK
+ * payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
 #include <SPI.h>
 #include "RF24.h"
 

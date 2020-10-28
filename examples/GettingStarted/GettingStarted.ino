@@ -1,20 +1,20 @@
 /*
-   See documentation at https://tmrh20.github.io/RF24
-   See License information at root directory of this library
-   Author: Brendan Doherty (2bndy5)
-*/
+ * See documentation at https://tmrh20.github.io/RF24
+ * See License information at root directory of this library
+ * Author: Brendan Doherty (2bndy5)
+ */
 
 /**
-   A simple example of sending data from 1 nRF24L01 transceiver to another.
-
-   A challenge to learn new skills:
-   This example uses the RF24 library's default settings which includes having
-   dynamic payload length enabled. Try adjusting this example to use
-   statically sized payloads.
-
-   This example was written to be used on 2 or more devices acting as "nodes".
-   Use the Serial Monitor to change each node's behavior.
-*/
+ * A simple example of sending data from 1 nRF24L01 transceiver to another.
+ *
+ * A challenge to learn new skills:
+ * This example uses the RF24 library's default settings which includes having
+ * dynamic payload length enabled. Try adjusting this example to use
+ * statically sized payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
 #include <SPI.h>
 #include "RF24.h"
 

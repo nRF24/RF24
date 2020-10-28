@@ -1,23 +1,23 @@
 /*
-   See documentation at https://tmrh20.github.io/RF24
-   See License information at root directory of this library
-   Author: Brendan Doherty (2bndy5)
-*/
+ * See documentation at https://tmrh20.github.io/RF24
+ * See License information at root directory of this library
+ * Author: Brendan Doherty (2bndy5)
+ */
 
 /**
-   A simple example of using the nRF24L01 transceiver as a BLE advertising
-   beacon.
-
-   Original research was done by Dmitry Grinberg; his research can be found at
-   http://dmitry.gr/index.php?r=05.Projects&proj=11.%20Bluetooth%20LE%20fakery
-
-   Some of this example's code has been taken from Dmitry Grinberg's research,
-   while other bits of code has been derived from the
-   BTLE library by Florian Echtler. If this example seems to limited for your
-   projects needs, we highly recommend Florian Echtler's BTLE library, which
-   can be found in the Arduino IDE and directly on github at
-   https://github.com/floe/BTLE
-*/
+ * A simple example of using the nRF24L01 transceiver as a BLE advertising
+ * beacon.
+ *
+ * Original research was done by Dmitry Grinberg; his research can be found at
+ * http://dmitry.gr/index.php?r=05.Projects&proj=11.%20Bluetooth%20LE%20fakery
+ *
+ * Some of this example's code has been taken from Dmitry Grinberg's research,
+ * while other bits of code has been derived from the
+ * BTLE library by Florian Echtler. If this example seems to limited for your
+ * projects needs, we highly recommend Florian Echtler's BTLE library, which
+ * can be found in the Arduino IDE and directly on github at
+ * https://github.com/floe/BTLE
+ */
 #include <SPI.h>
 #include "RF24.h"
 
