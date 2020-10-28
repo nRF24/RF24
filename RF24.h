@@ -1499,6 +1499,26 @@ private:
  */
 
 /**
+ * @example{lineno} examples/ManualAcknowledgements/ManualAcknowledgements.ino
+ * <b>For Arduino</b><br>
+ * <b>Written by: 2bndy5 2020 </b><br>
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
+ * This example still uses ACK packets, but they have no payloads. Instead the
+ * acknowledging response is sent with `write()`. This tactic allows for more
+ * updated acknowledgement payload data, where actual ACK payloads' data are
+ * outdated by 1 transmission because they have to loaded before receiving a
+ * transmission.
+ *
+ * A challenge to learn new skills:
+ * This example uses 2 different addresses for the RX & TX nodes.
+ * Try adjusting this example to use the same address on different pipes.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
+
+/**
 * @example{lineno} examples_linux/gettingstarted.cpp
 * <b>For Linux</b><br>
 * <b>Updated: TMRh20 2014 </b><br>
