@@ -27,7 +27,7 @@ uint8_t address[6] = "1Node";
 // an identifying device destination
 
 // Used to control whether this node is sending or receiving
-bool role = false;  // true = TX node, flase = RX node
+bool role = false;  // true = TX node, false = RX node
 
 // For this example, we'll be using a payload containing
 // a single float number that will be incremented
