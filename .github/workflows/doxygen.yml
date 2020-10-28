@@ -1,6 +1,9 @@
 name: DoxyGen build
 
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+  release: [published, edited]
 
 jobs:
   build-doxygen:
@@ -26,8 +29,9 @@ jobs:
       with:
           working-directory: '.'
           doxyfile-path: './Doxyfile'
-    # - name: upload to github pages
-    #   uses: peaceiris/actions-gh-pages@v3
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: ./docs/doxygen/html
+    - name: upload to github pages
+      # if: ${{ github.event_name == 'release' && github.event.type == 'published' }}
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/html
