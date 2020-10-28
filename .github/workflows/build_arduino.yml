@@ -98,7 +98,6 @@ jobs:
             - examples/StreamingData
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
-            - examples/FakeBLE
           #   - examples/rf24_ATTiny/rf24ping85
           #   - examples/old_backups/GettingStarted_HandlingData
           #   - examples/old_backups/GettingStarted_HandlingFailures
