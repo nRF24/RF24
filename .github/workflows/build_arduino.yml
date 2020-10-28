@@ -26,10 +26,10 @@ jobs:
         with:
           options-file-path: ./examples/examples_formatter.conf
           name-patterns: |
-            - "*.ino"
-            - "*.cpp"
-            - "*.hpp"
-            - "*.h"
+            - '*.ino'
+            - '*.cpp'
+            - '*.hpp'
+            - '*.h'
           target-paths: |
             - examples
   build:
