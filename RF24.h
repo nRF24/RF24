@@ -261,7 +261,14 @@ public:
      * radio.stopListening();
      * radio.write(&data,sizeof(data));
      * @endcode
-     * @return True if the payload was delivered successfully and an ACK was received, or upon successfull transmission if auto-ack is disabled.
+     * @return
+     * - True if the payload was delivered successfully and an acknowledgement
+     *   (ACK packet) was received. If auto-ack is disabled, then any attempt
+     *   to transmit will also return true (even if the payload was not
+     *   received).
+     * - False if the payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
      */
     bool write(const void* buf, uint8_t len);
 
@@ -426,18 +433,26 @@ public:
     void powerUp(void);
 
     /**
-    * Write for single NOACK writes. Optionally disable
-    * acknowledgements/auto-retries for a single payload using the
-    * multicast parameter set to true.
-    *
-    * Can be used with enableAckPayload() to request a response
-    * @see setAutoAck()
-    * @see write()
-    *
-    * @param buf Pointer to the data to be sent
-    * @param len Number of bytes to be sent
-    * @param multicast Request ACK (0), NOACK (1)
-    */
+     * Write for single NOACK writes. Optionally disable
+     * acknowledgements/auto-retries for a single payload using the
+     * multicast parameter set to true.
+     *
+     * Can be used with enableAckPayload() to request a response
+     * @see setAutoAck()
+     * @see write()
+     *
+     * @param buf Pointer to the data to be sent
+     * @param len Number of bytes to be sent
+     * @param multicast Request ACK (0), NOACK (1)
+     * @return
+     * - True if the payload was delivered successfully and an acknowledgement
+     *   (ACK packet) was received. If auto-ack is disabled, then any attempt
+     *   to transmit will also return true (even if the payload was not
+     *   received).
+     * - False if the payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
+     */
     bool write(const void* buf, uint8_t len, const bool multicast);
 
     /**
@@ -466,21 +481,36 @@ public:
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
-     * @return True if the payload was delivered successfully false if not
+     * @return
+     * - True if the payload was delivered successfully and an acknowledgement
+     *   (ACK packet) was received. If auto-ack is disabled, then any attempt
+     *   to transmit will also return true (even if the payload was not
+     *   received).
+     * - False if the payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
      */
     bool writeFast(const void* buf, uint8_t len);
 
     /**
-    * WriteFast for single NOACK writes. Optionally disable
-    * acknowledgements/auto-retries for a single payload using the
-    * multicast parameter set to true.
-    *
-    * @see setAutoAck()
-    *
-    * @param buf Pointer to the data to be sent
-    * @param len Number of bytes to be sent
-    * @param multicast Request ACK (0) or NOACK (1)
-    */
+     * WriteFast for single NOACK writes. Optionally disable
+     * acknowledgements/auto-retries for a single payload using the
+     * multicast parameter set to true.
+     *
+     * @see setAutoAck()
+     *
+     * @param buf Pointer to the data to be sent
+     * @param len Number of bytes to be sent
+     * @param multicast Request ACK (0) or NOACK (1)
+     * @return
+     * - True if the payload was delivered successfully and an acknowledgement
+     *   (ACK packet) was received. If auto-ack is disabled, then any attempt
+     *   to transmit will also return true (even if the payload was not
+     *   received).
+     * - False if the payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
+     */
     bool writeFast(const void* buf, uint8_t len, const bool multicast);
 
     /**
@@ -492,12 +522,11 @@ public:
      * retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
-     * @code
      * Example (Full blocking):
-     *
-     *			radio.writeBlocking(&buf,32,1000); //Wait up to 1 second to write 1 payload to the buffers
-     *			txStandBy(1000);     			   //Wait up to 1 second for the payload to send. Return 1 if ok, 0 if failed.
-     *					  				   		   //Blocks only until user timeout or success. Data flushed on fail.
+     * @code
+     * radio.writeBlocking(&buf,32,1000); //Wait up to 1 second to write 1 payload to the buffers
+     * txStandBy(1000);     			  //Wait up to 1 second for the payload to send. Return 1 if ok, 0 if failed.
+     *					  				  //Blocks only until user timeout or success. Data flushed on fail.
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
      * @see txStandBy()
@@ -507,7 +536,15 @@ public:
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @param timeout User defined timeout in milliseconds.
-     * @return True if the payload was loaded into the buffer successfully false if not
+     * @return
+     * @return
+     * - True if all payloads in the TX FIFO were delivered successfully and
+     *   an acknowledgement (ACK packet) was received for each. If auto-ack is
+     *   disabled, then any attempt to transmit will also return true (even if
+     *   the payload was not received).
+     * - False if a payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
      */
     bool writeBlocking(const void* buf, uint8_t len, uint32_t timeout);
 
@@ -524,39 +561,50 @@ public:
      *
      * Relies on built-in auto retry functionality.
      *
-     * @code
      * Example (Partial blocking):
-     *
-     *			radio.writeFast(&buf,32);
-     *			radio.writeFast(&buf,32);
-     *			radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-     *			bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
-     *					  				   //Blocks only until MAX_RT timeout or success. Data flushed on fail.
+     * @code
+     * radio.writeFast(&buf,32);
+     * radio.writeFast(&buf,32);
+     * radio.writeFast(&buf,32);  //Fills the FIFO buffers up
+     * bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
+     * 		  				      //Blocks only until MAX_RT timeout or success. Data flushed on fail.
      * @endcode
      * @see txStandBy(unsigned long timeout)
-     * @return True if transmission is successful
-     *
+     * @return
+     * - True if all payloads in the TX FIFO were delivered successfully and
+     *   an acknowledgement (ACK packet) was received for each. If auto-ack is
+     *   disabled, then any attempt to transmit will also return true (even if
+     *   the payload was not received).
+     * - False if a payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
      */
     bool txStandBy();
 
     /**
      * This function allows extended blocking and auto-retries per a user defined timeout
-     * @code
-     *	Fully Blocking Example:
      *
-     *			radio.writeFast(&buf,32);
-     *			radio.writeFast(&buf,32);
-     *			radio.writeFast(&buf,32);   //Fills the FIFO buffers up
-     *			bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
-     *					  				    //Blocks only until user defined timeout or success. Data flushed on fail.
+     * Fully Blocking Example:
+     * @code
+     * radio.writeFast(&buf,32);
+     * radio.writeFast(&buf,32);
+     * radio.writeFast(&buf,32);   //Fills the FIFO buffers up
+     * bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
+     *					  		   //Blocks only until user defined timeout or success. Data flushed on fail.
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
      * @param timeout Number of milliseconds to retry failed payloads
      * @param startTx If this is set to `true`, then this function puts the nRF24L01
      * in TX Mode. `false` leaves the primary mode (TX or RX) as it is, which can
      * prevent the mandatory wait time to change modes.
-     * @return True if transmission is successful
-     *
+     * @return
+     * - True if all payloads in the TX FIFO were delivered successfully and
+     *   an acknowledgement (ACK packet) was received for each. If auto-ack is
+     *   disabled, then any attempt to transmit will also return true (even if
+     *   the payload was not received).
+     * - False if a payload was sent but was not acknowledged with an ACK
+     *   packet. This condition can only be reported if the auto-ack feature
+     *   is on.
      */
     bool txStandBy(uint32_t timeout, bool startTx = 0);
 
@@ -627,7 +675,6 @@ public:
      * @param startTx If this is set to `true`, then this function sets the
      * nRF24L01's CE pin to active (enabling TX transmissions). `false` has no
      * effect on the nRF24L01's CE pin.
-     * @return True if the payload was delivered successfully false if not
      */
     void startFastWrite(const void* buf, uint8_t len, const bool multicast, bool startTx = 1);
 
