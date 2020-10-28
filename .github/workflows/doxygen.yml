@@ -3,7 +3,8 @@ name: DoxyGen build
 on:
   pull_request:
   push:
-  release: [published, edited]
+  release:
+    types: [published, edited]
 
 jobs:
   build-doxygen:
