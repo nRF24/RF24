@@ -10,7 +10,7 @@
  *
  * A challenge to learn new skills:
  * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
- * example to use a different RX pipe for that still responds with ACK
+ * example to use a different RX pipe that still responds with ACK
  * payloads.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
@@ -22,8 +22,10 @@
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
-// Let these addresses be used for the pair
+// Let this addresses be used for the pair
 uint8_t address[6] = "1Node";
+// It is very helpful to think of an address as a one-way path instead of as
+// an identifying device destination
 
 // Used to control whether this node is sending or receiving
 bool role = false;  // true = TX node, flase = RX node

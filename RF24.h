@@ -156,13 +156,18 @@ public:
      * 2. Do not call write() while in this mode, without first calling stopListening().
      * 3. Call available() to check for incoming traffic, and read() to get it.
      *
+     * Open reading pipe 1 using address `0xCCCECCCECC`
      * @code
-     * Open reading pipe 1 using address CCCECCCECC
-     *
-     * byte address[] = { 0xCC,0xCE,0xCC,0xCE,0xCC };
+     * byte address[] = {0xCC, 0xCE, 0xCC, 0xCE, 0xCC};
      * radio.openReadingPipe(1,address);
      * radio.startListening();
      * @endcode
+     *
+     * @note If there was a call to openReadingPipe() about pipe 0 prior to
+     * calling this function, then this function will re-write the address
+     * that was last set to reading pipe 0. This is because openWritingPipe()
+     * will overwrite the address to reading pipe 0 for proper auto-ack
+     * functionality.
      */
     void startListening(void);
 
@@ -172,12 +177,12 @@ public:
      * Do this before calling write().
      * @code
      * radio.stopListening();
-     * radio.write(&data,sizeof(data));
+     * radio.write(&data, sizeof(data));
      * @endcode
      *
-     * @note The TX FIFO is flushed when calling this function. This is meant
-     * to discard any ACK payloads that were not appended to acknowledgment
-     * packets.
+     * @note When the ACK payloads feature is enabled, the TX FIFO buffers are
+     * flushed when calling this function. This is meant to discard any ACK
+     * payloads that were not appended to acknowledgment packets.
      */
     void stopListening(void);
 
@@ -264,8 +269,9 @@ public:
      * New: Open a pipe for writing via byte array. Old addressing format retained
      * for compatibility.
      *
-     * Only one writing pipe can be open at once, but you can change the address
-     * you'll write to. Call stopListening() first.
+     * Only one writing pipe can be opened at once, but this function changes
+     * the address that is used to transmit (ACK payloads/packets do not apply
+     * here). Be sure to call stopListening() prior to calling this function.
      *
      * Addresses are assigned via a byte array, default is 5 byte address length
      *
@@ -279,10 +285,25 @@ public:
      *  address[0] = 0x33;
      *  radio.openReadingPipe(1,address);
      * @endcode
-     * @see setAddressWidth
      *
-     * @param address The address of the pipe to open. Coordinate these pipe
-     * addresses amongst nodes on the network.
+     * @warning This function will overwrite the address set to reading pipe 0
+     * as stipulated by the datasheet for proper auto-ack functionality in TX
+     * mode. Use this function to ensure proper transmission acknowledgement
+     * when the address set to reading pipe 0 (via openReadingPipe()) does not
+     * match the address passed to this function. If the auto-ack feature is
+     * disabled, then this function will still overwrite the address for
+     * reading pipe 0 regardless.
+     *
+     * @see setAddressWidth()
+     * @see startListening()
+     *
+     * @param address The address to be used for outgoing transmissions (uses
+     * pipe 0). Coordinate this address amongst other receiving nodes (the
+     * pipe numbers don't need to match).
+     *
+     * @remark There is no address length parameter because this function will
+     * always write the number of bytes that the radio addresses are configured
+     * to use (set with setAddressWidth()).
      */
 
     void openWritingPipe(const uint8_t* address);
@@ -293,26 +314,38 @@ public:
      * Up to 6 pipes can be open for reading at once.  Open all the required
      * reading pipes, and then call startListening().
      *
-     * @see openWritingPipe
-     * @see setAddressWidth
+     * @see openWritingPipe()
+     * @see setAddressWidth()
      *
      * @note Pipes 0 and 1 will store a full 5-byte address. Pipes 2-5 will technically
-     * only store a single byte, borrowing up to 4 additional bytes from pipe #1 per the
-     * assigned address width.
-     * @warning Pipes 1-5 should share the same address, except the first byte.
+     * only store a single byte, borrowing up to 4 additional bytes from pipe 1 per the
+     * assigned address width.<br>
+     * Pipes 1-5 should share the same address, except the first byte.
      * Only the first byte in the array should be unique, e.g.
      * @code
-     *   uint8_t addresses[][6] = {"1Node","2Node"};
-     *   openReadingPipe(1,addresses[0]);
-     *   openReadingPipe(2,addresses[1]);
+     * uint8_t addresses[][6] = {"Prime", "2Node", "3xxxx", "4xxxx"};
+     * openReadingPipe(0, addresses[0]); // address used is "Prime"
+     * openReadingPipe(1, addresses[1]); // address used is "2Node"
+     * openReadingPipe(2, addresses[2]); // address used is "3Node"
+     * openReadingPipe(3, addresses[3]); // address used is "4Node"
      * @endcode
      *
-     * @warning Pipe 0 is also used by the writing pipe so should typically be avoided as a reading pipe.<br>
-     * If used, the reading pipe 0 address needs to be restored at avery call to startListening(), and the address<br>
-     * is ONLY restored if the LSB is a non-zero value.<br> See http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
+     * @warning If the reading pipe 0 is opened by this function, the address
+     * passed to this function (for pipe 0) will be restored at every call to
+     * startListening(), but the address for pipe 0 is ONLY restored if the LSB is a
+     * non-zero value.<br> Read
+     * http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
+     * to understand how to avoid using malformed addresses. This address
+     * restoration is implemented because of the underlying neccessary
+     * functionality of openWritingPipe().
      *
-     * @param number Which pipe# to open, 0-5.
+     * @param number Which pipe to open. Only pipe numbers 0-5 are available,
+     * an address assigned to any pipe number not in that range will be ignored.
      * @param address The 24, 32 or 40 bit address of the pipe to open.
+     *
+     * @remark There is no address length parameter because this function will
+     * always write the number of bytes (for pipes 0 and 1) that the radio
+     * addresses are configured to use (set with setAddressWidth()).
      */
 
     void openReadingPipe(uint8_t number, const uint8_t* address);
@@ -548,14 +581,25 @@ public:
     void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
     /**
-     * Call this when you get an interrupt to find out why
+     * Call this when you get an Interrupt Request (IRQ) to find out why
      *
-     * Tells you what caused the interrupt, and clears the state of
-     * interrupts.
+     * This function describes what event triggered the IRQ pin to go active
+     * LOW and clears the status of all events.
      *
-     * @param[out] tx_ok The send was successful (TX_DS)
-     * @param[out] tx_fail The send failed, too many retries (MAX_RT)
-     * @param[out] rx_ready There is a message waiting to be read (RX_DS)
+     * @see maskIRQ()
+     *
+     * @param[out] tx_ok The transmission attempt completed (TX_DS). This does
+     * not imply that the transmitted data was received by another radio, rather
+     * this only reports if the attempt to send was completed. This will
+     * always be `true` when the auto-ack feature is disabled.
+     * @param[out] tx_fail The transmission failed to be acknowledged, meaning
+     * too many retries (MAX_RT) were made while expecting an ACK packet. This
+     * event is only triggered when auto-ack feature is enabled.
+     * @param[out] rx_ready There is a newly received payload (RX_DR) saved to
+     * RX FIFO buffers. Remember that the RX FIFO can only hold up to 3
+     * payloads. Once the RX FIFO is full, all further received transmissions
+     * are rejected until there is space to save new data in the RX FIFO
+     * buffers.
      */
     void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
 
@@ -900,7 +944,7 @@ public:
      *
      * @see write()
      * @see writeFast()
-     * @see startWriteFast()
+     * @see startFastWrite()
      * @see startWrite()
      * @see writeAckPayload()
      *
@@ -935,7 +979,7 @@ public:
      *
      * @see write()
      * @see writeFast()
-     * @see startWriteFast()
+     * @see startFastWrite()
      * @see startWrite()
      * @see writeAckPayload()
      *
@@ -1021,20 +1065,34 @@ public:
     void disableCRC(void);
 
     /**
-    * The radio will generate interrupt signals when a transmission is complete,
-    * a transmission fails, or a payload is received. This allows users to mask
-    * those interrupts to prevent them from generating a signal on the interrupt
-    * pin. Interrupts are enabled on the radio chip by default.
+    * This function is used to configure what events will trigger the Interrupt
+    * Request (IRQ) pin active LOW.
+    * The following events can be configured:
+    * 1. "data sent": This does not mean that the data transmitted was
+    * recieved, only that the attempt to send it was complete.
+    * 2. "data failed": This means the data being sent was not recieved. This
+    * event is only triggered when the auto-ack feature is enabled.
+    * 3. "data received": This means that data from a receiving payload has
+    * been loaded into the RX FIFO buffers. Remember that there are only 3
+    * levels available in the RX FIFO buffers.
     *
+    * By default, all events are configured to trigger the IRQ pin active LOW.
+    * When the IRQ pin is active, use whatHappened() to determine what events
+    * triggered it. Remeber that calling whatHappened() also clears these
+    * events' status, and the IRQ pin will then be reset to inactive HIGH.
+    *
+    * The following code configures the IRQ pin to only reflect the "data received"
+    * event:
     * @code
-    * 	Mask all interrupts except the receive interrupt:
-    *
-    *		radio.maskIRQ(1,1,0);
+    * radio.maskIRQ(1, 1, 0);
     * @endcode
     *
-    * @param tx_ok  Mask transmission complete interrupts
-    * @param tx_fail  Mask transmit failure interrupts
-    * @param rx_ready Mask payload received interrupts
+    * @param tx_ok  `true` ignores the "data sent" event, `false` reflects the
+    * "data sent" event on the IRQ pin.
+    * @param tx_fail  `true` ignores the "data failed" event, `false` reflects the
+    * "data failed" event on the IRQ pin.
+    * @param rx_ready `true` ignores the "data received" event, `false` reflects the
+    * "data received" event on the IRQ pin.
     */
     void maskIRQ(bool tx_ok, bool tx_fail, bool rx_ready);
 
@@ -1337,20 +1395,111 @@ private:
 
 
 /**
- * @example GettingStarted.ino
+ * @example{lineno} examples/GettingStarted/GettingStarted.ino
  * <b>For Arduino</b><br>
- * <b>Updated: TMRh20 2014 </b><br>
+ * <b>Rewritten by: 2bndy5 2020 </b><br>
+ * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * This is an example of how to use the RF24 class to communicate on a basic level. Configure and write this sketch to two
- * different nodes. Put one of the nodes into 'transmit' mode by connecting with the serial monitor and <br>
- * sending a 'T'. The ping node sends the current time to the pong node, which responds by sending the value
- * back. The ping node can then see how long the whole cycle took. <br>
- * @note For a more efficient call-response scenario see the GettingStarted_CallResponse.ino example.
- * @note When switching between sketches, the radio may need to be powered down to clear settings that are not "un-set" otherwise
+ * A challenge to learn new skills:
+ * This example uses the RF24 library's default settings which includes having
+ * dynamic payload length enabled. Try adjusting this example to use
+ * statically sized payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
  */
 
 /**
-* @example gettingstarted.cpp
+ * @example{lineno} examples/AcknowledgementPayloads/AcknowledgementPayloads.ino
+ * <b>For Arduino</b><br>
+ * <b>Written by: 2bndy5 2020 </b><br>
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with Acknowledgement (ACK) payloads attached to ACK packets.
+ *
+ * A challenge to learn new skills:
+ * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
+ * example to use a different RX pipe that still responds with ACK
+ * payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
+
+/**
+ * @example{lineno} examples/ManualAcknowledgements/ManualAcknowledgements.ino
+ * <b>For Arduino</b><br>
+ * <b>Written by: 2bndy5 2020 </b><br>
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
+ * This example still uses ACK packets, but they have no payloads. Instead the
+ * acknowledging response is sent with `write()`. This tactic allows for more
+ * updated acknowledgement payload data, where actual ACK payloads' data are
+ * outdated by 1 transmission because they have to loaded before receiving a
+ * transmission.
+ *
+ * A challenge to learn new skills:
+ * This example uses 2 different addresses for the RX & TX nodes.
+ * Try adjusting this example to use the same address on different pipes.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
+
+/**
+ * @example{lineno} examples/StreamingData/StreamingData.ino
+ * <b>For Arduino</b><br>
+ * <b>Written by: 2bndy5 2020 </b><br>
+ * A simple example of streaming data from 1 nRF24L01 transceiver to another.
+ *
+ * A challenge to learn new skills:
+ * This example uses the startFastWrite() function to utilize all 3 levels of
+ * the TX FIFO. Try adjusting this example to use the write() function which
+ * only uses 1 level of the TX FIFO per call. Notice the difference in
+ * transmissions times.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
+
+/**
+ * @example{lineno} examples/MulticeiverDemo/MulticeiverDemo.ino
+ * <b>For Arduino</b><br>
+ * <b>Written by: 2bndy5 2020 </b><br>
+ * A simple example of sending data from as many as 6 nRF24L01 transceivers to
+ * 1 receiving transceiver. This technique is trademarked by
+ * Nordic Semiconductors as "MultiCeiver".
+ *
+ * A challenge to learn new skills:
+ * This example uses the Serial Monitor to change a node's role. Try adjusting
+ * this example so that the 1 recieving node sends a ping that tells
+ * all other transmitting nodes to start transmitting. HINT: use the
+ * "multicast" parameter to write().
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
+
+/**
+ * @example{lineno} examples/InterruptConfigure/InterruptConfigure.ino
+ * <b>For Arduino</b><br>
+ * <b>Written by: 2bndy5 2020 </b><br>
+ * This example uses Acknowledgement (ACK) payloads attached to ACK packets to
+ * demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
+ * configured to detect when data is received, or when data has transmitted
+ * successfully, or when data has failed to transmit.
+ *
+ * A challenge to learn new skills:
+ * This example does not use Arduino's attachInterrupt() function. Try
+ * adjusting this example so that attachInterrupt() calls this example's
+ * interruptHandler() function.
+ * HINT: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
+
+/**
+* @example{lineno} examples_linux/gettingstarted.cpp
 * <b>For Linux</b><br>
 * <b>Updated: TMRh20 2014 </b><br>
 *
@@ -1362,19 +1511,7 @@ private:
 */
 
 /**
- * @example GettingStarted_CallResponse.ino
- * <b>For Arduino</b><br>
- * <b>New: TMRh20 2014</b><br>
- *
- * This example continues to make use of all the normal functionality of the radios including
- * the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well. <br>
- * This allows very fast call-response communication, with the responding radio never having to
- * switch out of Primary Receiver mode to send back a payload, but having the option to switch to <br>
- * primary transmitter if wanting to initiate communication instead of respond to a commmunication.
- */
-
-/**
-* @example gettingstarted_call_response.cpp
+* @example{lineno} examples_linux/gettingstarted_call_response.cpp
 * <b>For Linux</b><br>
 * <b>New: TMRh20 2014</b><br>
 *
@@ -1386,7 +1523,7 @@ private:
 */
 
 /**
-* @example GettingStarted_HandlingData.ino
+* @example{lineno} examples/old_backups/GettingStarted_HandlingData/GettingStarted_HandlingData.ino
 * <b>Dec 2014 - TMRh20</b><br>
 *
 * This example demonstrates how to send multiple variables in a single payload and work with data. As usual, it is
@@ -1394,26 +1531,14 @@ private:
 */
 
 /**
-* @example GettingStarted_HandlingFailures.ino
+* @example{lineno} examples/old_backups/GettingStarted_HandlingFailures/GettingStarted_HandlingFailures.ino
 *
 * This example demonstrates the basic getting started functionality, but with failure handling for the radio chip.
 * Addresses random radio failures etc, potentially due to loose wiring on breadboards etc.
 */
 
-
 /**
- * @example Transfer.ino
- * <b>For Arduino</b><br>
- * This example demonstrates half-rate transfer using the FIFO buffers<br>
- *
- * It is an example of how to use the RF24 class.  Write this sketch to two
- * different nodes.  Put one of the nodes into 'transmit' mode by connecting <br>
- * with the serial monitor and sending a 'T'.  The data transfer will begin,
- * with the receiver displaying the payload count. (32Byte Payloads) <br>
- */
-
-/**
-* @example transfer.cpp
+* @example{lineno} examples_linux/transfer.cpp
 * <b>For Linux</b><br>
 * This example demonstrates half-rate transfer using the FIFO buffers<br>
 *
@@ -1424,7 +1549,7 @@ private:
 */
 
 /**
- * @example TransferTimeouts.ino
+ * @example{lineno} examples/old_backups/TransferTimeouts/TransferTimeouts.ino
  * <b>New: TMRh20 </b><br>
  * This example demonstrates the use of and extended timeout period and
  * auto-retries/auto-reUse to increase reliability in noisy or low signal scenarios. <br>
@@ -1436,32 +1561,7 @@ private:
  */
 
 /**
- * @example starping.pde
- *
- * This sketch is a more complex example of using the RF24 library for Arduino.
- * Deploy this on up to six nodes.  Set one as the 'pong receiver' by tying the
- * role_pin low, and the others will be 'ping transmit' units.  The ping units
- * unit will send out the value of millis() once a second.  The pong unit will
- * respond back with a copy of the value.  Each ping unit can get that response
- * back, and determine how long the whole cycle took.
- *
- * This example requires a bit more complexity to determine which unit is which.
- * The pong receiver is identified by having its role_pin tied to ground.
- * The ping senders are further differentiated by a byte in eeprom.
- */
-
-/**
- * @example pingpair_ack.ino
- * <b>Update: TMRh20</b><br>
- * This example continues to make use of all the normal functionality of the radios including
- * the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well.<br>
- * This allows very fast call-response communication, with the responding radio never having to
- * switch out of Primary Receiver mode to send back a payload, but having the option to if wanting<br>
- * to initiate communication instead of respond to a commmunication.
- */
-
-/**
- * @example pingpair_irq.ino
+ * @example{lineno} examples/old_backups/pingpair_irq/pingpair_irq.ino
  * <b>Update: TMRh20</b><br>
  * This is an example of how to user interrupts to interact with the radio, and a demonstration
  * of how to use them to sleep when receiving, and not miss any payloads.<br>
@@ -1469,14 +1569,9 @@ private:
  * Sleep functionality is built directly into my fork of the RF24Network library<br>
  */
 
-/**
-* @example pingpair_irq_simple.ino
-* <b>Dec 2014 - TMRh20</b><br>
-* This is an example of how to user interrupts to interact with the radio, with bidirectional communication.
-*/
 
 /**
- * @example pingpair_sleepy.ino
+ * @example{lineno} examples/old_backups/pingpair_sleepy/pingpair_sleepy.ino
  * <b>Update: TMRh20</b><br>
  * This is an example of how to use the RF24 class to create a battery-
  * efficient system.  It is just like the GettingStarted_CallResponse example, but the<br>
@@ -1485,37 +1580,37 @@ private:
  */
 
 /**
-* @example rf24ping85.ino
+* @example{lineno} examples/rf24_ATTiny/rf24ping85/rf24ping85.ino
 * <b>New: Contributed by https://github.com/tong67</b><br>
 * This is an example of how to use the RF24 class to communicate with ATtiny85 and other node. <br>
 */
 
 /**
-* @example timingSearch3pin.ino
+* @example{lineno} examples/rf24_ATTiny/timingSearch3pin/timingSearch3pin.ino
 * <b>New: Contributed by https://github.com/tong67</b><br>
 * This is an example of how to determine the correct timing for ATtiny when using only 3-pins
 */
 
 /**
- * @example pingpair_dyn.ino
+ * @example{lineno} examples/old_backups/pingpair_dyn/pingpair_dyn.ino
  *
  * This is an example of how to use payloads of a varying (dynamic) size on Arduino.
  */
 
 /**
-* @example pingpair_dyn.cpp
+* @example{lineno} examples_linux/pingpair_dyn.cpp
 *
 * This is an example of how to use payloads of a varying (dynamic) size on Linux.
 */
 
 /**
- * @example pingpair_dyn.py
+ * @example{lineno} examples_linux/pingpair_dyn.py
  *
  * This is a python example for RPi of how to use payloads of a varying (dynamic) size.
  */
 
 /**
- * @example scanner.ino
+ * @example{lineno} examples/old_backups/scanner/scanner.ino
  *
  * Example to detect interference on the various channels available.
  * This is a good diagnostic tool to check whether you're picking a
@@ -1700,7 +1795,8 @@ private:
  *
  * @page ATTiny ATTiny
  *
- * ATTiny support is built into the library, so users are not required to include SPI.h in their sketches<br>
+ * ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with the following guide:<br>
+ * http://highlowtech.org/?p=1695 <br>
  * See the included rf24ping85 example for pin info and usage
  *
  * Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny<br>

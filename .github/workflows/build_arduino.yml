@@ -75,19 +75,19 @@ jobs:
         with:
           sketch-paths: |
             - examples/GettingStarted
-            - examples/GettingStarted_CallResponse
             - examples/AcknowledgementPayloads
+            - examples/ManualAcknowledgements
             - examples/StreamingData
-            - examples/InterruptConfigure
             - examples/MulticeiverDemo
+            - examples/InterruptConfigure
             - examples/FakeBLE
+          #   - examples/rf24_ATTiny/rf24ping85
           #   - examples/old_backups/GettingStarted_HandlingData
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn
           #   - examples/old_backups/pingpair_irq
           #   - examples/old_backups/pingpair_multi_dyn
           #   - examples/old_backups/pingpair_sleepy
-          #   - examples/old_backups/rf24_ATTiny/rf24ping85
           #   - examples/old_backups/scanner
           #   - examples/old_backups/TransferTimeouts
           #   - examples/old_backups/recipes/led_remote

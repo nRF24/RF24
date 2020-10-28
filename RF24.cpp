@@ -711,11 +711,10 @@ void RF24::startListening(void)
     write_register(NRF_CONFIG, config_reg);
     write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT));
     ce(HIGH);
+
     // Restore the pipe0 adddress, if exists
     if (pipe0_reading_address[0] > 0) {
         write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);
-    } else {
-        closeReadingPipe(0);
     }
 }
 
