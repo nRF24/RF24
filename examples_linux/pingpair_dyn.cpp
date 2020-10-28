@@ -26,7 +26,7 @@ using namespace std;
 // ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
 
 // Generic:
-RF24 radio(22,0);
+RF24 radio(22, 0);
 
 /****************** Linux (BBB,x86,etc) ***********************/
 // See http://tmrh20.github.io/RF24/pages.html for more information on usage

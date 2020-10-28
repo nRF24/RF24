@@ -821,7 +821,7 @@ bool RF24::write(const void* buf, uint8_t len, const bool multicast)
 
     //Max retries exceeded
     if (status & _BV(MAX_RT)) {
-        flush_tx(); //Only going to be 1 packet int the FIFO at a time using this method, so just flush
+        flush_tx(); // Only going to be 1 packet in the FIFO at a time using this method, so just flush
         return 0;
     }
     //TX OK 1 or 0
@@ -842,16 +842,16 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
     //This way the FIFO will fill up and allow blocking until packets go through
     //The radio will auto-clear everything in the FIFO as long as CE remains high
 
-    uint32_t timer = millis();                              //Get the time that the payload transmission started
+    uint32_t timer = millis();                               // Get the time that the payload transmission started
 
     while ((get_status()
             & (_BV(TX_FULL)))) {          //Blocking only if FIFO is full. This will loop and block until TX is successful or timeout
 
-        if (get_status() & _BV(MAX_RT)) {                      //If MAX Retries have been reached
-            reUseTX();                                          //Set re-transmit and clear the MAX_RT interrupt flag
+        if (get_status() & _BV(MAX_RT)) {                    // If MAX Retries have been reached
+            reUseTX();                                       // Set re-transmit and clear the MAX_RT interrupt flag
             if (millis() - timer > timeout) {
-                return 0;
-            }          //If this payload has exceeded the user-defined timeout, exit and return 0
+                return 0;                                    // If this payload has exceeded the user-defined timeout, exit and return 0
+            }
         }
         #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > (timeout + 95)) {
@@ -865,18 +865,18 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
     }
 
     //Start Writing
-    startFastWrite(buf, len, 0);                                  //Write the payload if a buffer is clear
+    startFastWrite(buf, len, 0);                             // Write the payload if a buffer is clear
 
-    return 1;                                                  //Return 1 to indicate successful transmission
+    return 1;                                                // Return 1 to indicate successful transmission
 }
 
 /****************************************************************************/
 
 void RF24::reUseTX()
 {
-    write_register(NRF_STATUS, _BV(MAX_RT));              //Clear max retry flag
+    write_register(NRF_STATUS, _BV(MAX_RT));  //Clear max retry flag
     spiTrans(REUSE_TX_PL);
-    ce(LOW);                                          //Re-Transfer packet
+    ce(LOW);                                  //Re-Transfer packet
     ce(HIGH);
 }
 
@@ -896,7 +896,7 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
     //Blocking only if FIFO is full. This will loop and block until TX is successful or fail
     while ((get_status() & (_BV(TX_FULL)))) {
         if (get_status() & _BV(MAX_RT)) {
-            return 0;                                    //Return 0. The previous payload has been retransmitted
+            return 0;                                        //Return 0. The previous payload has not been retransmitted
             // From the user perspective, if you get a 0, just keep trying to send the same payload
         }
         #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
@@ -908,8 +908,7 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
         }
         #endif
     }
-    //Start Writing
-    startFastWrite(buf, len, multicast);
+    startFastWrite(buf, len, multicast);                     // Start Writing
 
     return 1;
 }
@@ -1098,8 +1097,8 @@ void RF24::read(void* buf, uint8_t len)
     // Fetch the payload
     read_payload(buf, len);
 
-    //Clear the two possible interrupt flags with one command
-    write_register(NRF_STATUS, _BV(RX_DR) | _BV(MAX_RT) | _BV(TX_DS));
+    //Clear the only applicable interrupt flags
+    write_register(NRF_STATUS, _BV(RX_DR));
 
 }
 
