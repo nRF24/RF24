@@ -1703,6 +1703,8 @@ private:
  * @section News News
  *
  * **Aug 2020** <br>
+ * v1.3.9
+ * - Fix broken compilation for some devices due to recent changes
  * v1.3.8
  * - Introduces change that mainly reduces the time required to call startListening(), powerUp(), and powerDown()
  * - Affects speed of switching from TX->RX. Users might consider starting updates of slower devices with this<br>
@@ -1730,11 +1732,11 @@ private:
  * @section Useful Useful References
  *
  *
- * @li <a href="http://tmrh20.github.io/RF24/classRF24.html"><b>RF24 Class Documentation</b></a>
- * @li <a href="http://tmrh20.github.io/RF24/pages.html"><b>Support & Configuration</b></a>
- * @li <a href="https://github.com/tmrh20/RF24/"><b>Source Code</b></a>
- * @li <a href="tmrh20/nRF24L01_datasheet_v2.pdf">nrf24L01 v2.0 Datasheet</a>
- * @li <a href="tmrh20/nRF24L01P_datasheet_v1.pdf">nrf24L01+ v1.0 Datasheet</a>
+ * @li <a href="http://nRF24.github.io/RF24/classRF24.html"><b>RF24 Class Documentation</b></a>
+ * @li <a href="http://nRF24.github.io/RF24/pages.html"><b>Support & Configuration</b></a>
+ * @li <a href="https://github.com/nRF24/RF24/"><b>Source Code</b></a>
+ * @li <a href="https://tmrh20.github.io/RF24/tmrh20/nRF24L01_datasheet_v2.pdf">nrf24L01 v2.0 Datasheet</a>
+ * @li <a href="https://tmrh20.github.io/RF24/tmrh20/nRF24L01P_datasheet_v1.pdf">nrf24L01+ v1.0 Datasheet</a>
  *
  * **Additional Information and Add-ons**
  *
