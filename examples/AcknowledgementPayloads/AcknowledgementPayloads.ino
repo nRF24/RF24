@@ -178,7 +178,4 @@ void loop() {
       radio.startListening();
     }
   }
-
-  // to make this example readable in the serial monitor
-  delay(1000); // slow it down by 1 second
 } // loop
