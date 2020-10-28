@@ -24,7 +24,7 @@ RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // Let these addresses be used for the pair
 uint8_t address[6] = "1Node";
-// It is very helpful to think of an address as a one-way path instead of as
+// It is very helpful to think of an address as a path instead of as
 // an identifying device destination
 
 // Used to control whether this node is sending or receiving
@@ -65,9 +65,8 @@ void setup() {
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
   // Fot this example, we use the same address to send data back and forth
-  // set the address of the RX node to the TX pipe
+  // set the addresses for both RX and TX nodes
   radio.openWritingPipe(address);    // always uses pipe 0
-  // set the address of the TX node to an RX pipe
   radio.openReadingPipe(0, address); // using pipe 0
 
   // additional setup specific to the node's role

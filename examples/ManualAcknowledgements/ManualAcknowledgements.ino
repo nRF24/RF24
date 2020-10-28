@@ -28,8 +28,8 @@ RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // Let these addresses be used for the pair of nodes used in this example
 uint8_t address[][6] = {"1Node", "2Node"};
-//             the TX address^ ,  ^the response node
-// It is very helpful to think of an address as a one-way path instead of as
+//             the TX address^ ,  ^the RX address
+// It is very helpful to think of an address as a path instead of as
 // an identifying device destination
 
 // Used to control whether this node is sending or receiving
@@ -66,19 +66,17 @@ void setup() {
   // Fot this example, we use the different addresses to send data back and forth
   // Notice that the addresses assigned to pipes are changed in loop() also
   if (role) {
-    // setup the TX payload
+    // setup the TX node
 
-    // set the address of the RX node to the TX pipe
-    radio.openWritingPipe(address[0]);    // set the TX pipe 0 to the RX node
     radio.stopListening();                // powerUp() into TX mode
+    radio.openWritingPipe(address[0]);    // set pipe 0 to the TX address
 
     // initialize the payload (used as a counter for successful transmission)
     payload = 0;
   } else {
-    // setup the ACK payload & load the first response into the FIFO
+    // setup the RX node
 
-    // set the address of the TX node to an RX pipe
-    radio.openReadingPipe(1, address[0]); // using pipe 1 for listening to TX node
+    radio.openReadingPipe(1, address[0]); // set pipe 1 to the TX address
     radio.startListening();               // powerUp() into RX mode
   }
 }
@@ -95,7 +93,7 @@ void loop() {
       // transmission successful; wait for response and print results
 
       bool timed_out = false;                                // a flag to track if response timed out
-      radio.openReadingPipe(1, address[1]);                  // open pipe 1 for listening to the RX node
+      radio.openReadingPipe(1, address[1]);                  // open pipe 1 to the RX address
       radio.startListening();                                // put in RX mode
       unsigned long start_timeout = millis();                // timer to detect no response
       while (!radio.available() && !timed_out) {             // wait for response or timeout
@@ -104,13 +102,13 @@ void loop() {
       }
       unsigned long end_timer = micros();                    // end the timer
       radio.stopListening();                                 // put back in TX mode
-      radio.openWritingPipe(address[0]);                     // set the TX pipe 0 to RX node
+      radio.openWritingPipe(address[0]);                     // set the pipe 0 to TX address
 
       // print summary of transactions
       Serial.print(F("Transmission successful!"));           // payload was delivered
       if (!timed_out && radio.available()) {                 // is there a payload received
         Serial.print(F(" Round trip delay = "));
-        Serial.print(end_timer - start_timer);             // print the timer result
+        Serial.print(end_timer - start_timer);               // print the timer result
         Serial.print(F(" us. Sent: "));
         Serial.print(payload);                               // print the payload sent
         radio.read(&payload, sizeof(unsigned int));          // get payload from FIFO
@@ -137,9 +135,9 @@ void loop() {
 
       // transmit response & save result to `report`
       radio.stopListening();                         // put in TX mode
-      radio.openWritingPipe(address[1]);             // set the TX pipe 0 to TX node
+      radio.openWritingPipe(address[1]);             // set the pipe 0 to RX address
       bool report = radio.write(&payload, sizeof(unsigned int));
-      radio.openReadingPipe(1, address[0]);          // open pipe 1 for listening to TX node
+      radio.openReadingPipe(1, address[0]);          // open pipe 1 to the TX address
       radio.startListening();                        // put back in RX mode
 
       // print summary of transactions
@@ -169,14 +167,14 @@ void loop() {
       role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
       radio.stopListening();                // put in TX mode
-      radio.openWritingPipe(address[0]);    // set the TX pipe 0 to the RX node
+      radio.openWritingPipe(address[0]);    // set pipe 0 to the TX address
 
     } else if (c == 'R' && role) {
       // Become the RX node
 
       role = false;
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
-      radio.openReadingPipe(1, address[0]); // open pipe 1 to the TX node
+      radio.openReadingPipe(1, address[0]); // open pipe 1 to the TX address
       radio.startListening();               // put in RX mode
     }
   }

@@ -25,7 +25,7 @@
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // For this example, we'll be using 6 addresses; 1 for each TX node
-// It is very helpful to think of an address as a one-way path instead of as
+// It is very helpful to think of an address as a path instead of as
 // an identifying device destination
 // Notice that the last byte is the only byte that changes in the last 5
 // addresses. This is a limitation of the nRF24L01 transceiver for pipes 2-5

@@ -24,7 +24,7 @@ RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // Let this addresses be used for the pair
 uint8_t address[6] = "1Node";
-// It is very helpful to think of an address as a one-way path instead of as
+// It is very helpful to think of an address as a path instead of as
 // an identifying device destination
 
 // Used to control whether this node is sending or receiving
