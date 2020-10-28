@@ -1,26 +1,26 @@
 /*
-  Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
-  Updated 2020 TMRh20
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  version 2 as published by the Free Software Foundation.
-*/
+ * Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+ * Updated 2020 TMRh20
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ */
 
 /**
-   Channel scanner and Continuous Carrier Wave Output
-
-   Example to detect interference on the various channels available.
-   This is a good diagnostic tool to check whether you're picking a
-   good channel for your application.
-
-   Run this sketch on two devices. On one device, start CCW output by sending a 'g'
-   character over Serial. The other device scanning should detect the output of the sending
-   device on the given channel. Adjust channel and output power of CCW below.
-
-   Inspired by cpixip.
-   See http://arduino.cc/forum/index.php/topic,54795.0.html
-*/
+ * Channel scanner and Continuous Carrier Wave Output
+ *
+ * Example to detect interference on the various channels available.
+ * This is a good diagnostic tool to check whether you're picking a
+ * good channel for your application.
+ *
+ * Run this sketch on two devices. On one device, start CCW output by sending a 'g'
+ * character over Serial. The other device scanning should detect the output of the sending
+ * device on the given channel. Adjust channel and output power of CCW below.
+ *
+ * Inspired by cpixip.
+ * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ */
 
 #include "RF24.h"
 #include "printf.h"
