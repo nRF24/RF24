@@ -1,24 +1,24 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
- * See License information at root directory of this library
- * Author: Brendan Doherty (2bndy5)
- */
+   See documentation at https://tmrh20.github.io/RF24
+   See License information at root directory of this library
+   Author: Brendan Doherty (2bndy5)
+*/
 
 /**
- * This example uses Acknowledgement (ACK) payloads attached to ACK packets to
- * demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
- * configured to detect when data is received, or when data has transmitted
- * successfully, or when data has failed to transmit.
- *
- * A challenge to learn new skills:
- * This example does not use Arduino's attachInterrupt() function. Try
- * adjusting this example so that attachInterrupt() calls this example's
- * interruptHandler() function.
- * HINT: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
- *
- * This example was written to be used on 2 or more devices acting as "nodes".
- * Use the Serial Monitor to change each node's behavior.
- */
+   This example uses Acknowledgement (ACK) payloads attached to ACK packets to
+   demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
+   configured to detect when data is received, or when data has transmitted
+   successfully, or when data has failed to transmit.
+
+   A challenge to learn new skills:
+   This example does not use Arduino's attachInterrupt() function. Try
+   adjusting this example so that attachInterrupt() calls this example's
+   interruptHandler() function.
+   HINT: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
+
+   This example was written to be used on 2 or more devices acting as "nodes".
+   Use the Serial Monitor to change each node's behavior.
+*/
 #include <SPI.h>
 #include "RF24.h"
 
@@ -61,7 +61,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("nRF24L01 is not responding!!"));
-    while(1) {} // hold in infinite loop
+    while (1) {} // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -158,14 +158,14 @@ void loop() {
 
       while (digitalRead(IRQ_PIN)) {
         /*
-         * IRQ pin is LOW when activated. Otherwise it is always HIGH
-         * Wait in this empty loop until IRQ pin is activated.
-         *
-         * In this example, the "data fail" event is always configured to
-         * trigger the IRQ pin active. Because the auto-ACK feature is on by
-         * default, we don't need to use a timeout check to prevent an
-         * infinite loop.
-         */
+           IRQ pin is LOW when activated. Otherwise it is always HIGH
+           Wait in this empty loop until IRQ pin is activated.
+
+           In this example, the "data fail" event is always configured to
+           trigger the IRQ pin active. Because the auto-ACK feature is on by
+           default, we don't need to use a timeout check to prevent an
+           infinite loop.
+        */
       }
       interruptHandler(); // print what happened
 

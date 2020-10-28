@@ -1,23 +1,23 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
- * See License information at root directory of this library
- * Author: Brendan Doherty (2bndy5)
- */
+   See documentation at https://tmrh20.github.io/RF24
+   See License information at root directory of this library
+   Author: Brendan Doherty (2bndy5)
+*/
 
 /**
- * A simple example of using the nRF24L01 transceiver as a BLE advertising
- * beacon.
- *
- * Original research was done by Dmitry Grinberg; his research can be found at
- * http://dmitry.gr/index.php?r=05.Projects&proj=11.%20Bluetooth%20LE%20fakery
- *
- * Some of this example's code has been taken from Dmitry Grinberg's research,
- * while other bits of code has been derived from the
- * BTLE library by Florian Echtler. If this example seems to limited for your
- * projects needs, we highly recommend Florian Echtler's BTLE library, which
- * can be found in the Arduino IDE and directly on github at
- * https://github.com/floe/BTLE
- */
+   A simple example of using the nRF24L01 transceiver as a BLE advertising
+   beacon.
+
+   Original research was done by Dmitry Grinberg; his research can be found at
+   http://dmitry.gr/index.php?r=05.Projects&proj=11.%20Bluetooth%20LE%20fakery
+
+   Some of this example's code has been taken from Dmitry Grinberg's research,
+   while other bits of code has been derived from the
+   BTLE library by Florian Echtler. If this example seems to limited for your
+   projects needs, we highly recommend Florian Echtler's BTLE library, which
+   can be found in the Arduino IDE and directly on github at
+   https://github.com/floe/BTLE
+*/
 #include <SPI.h>
 #include "RF24.h"
 
@@ -64,7 +64,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("nRF24L01 is not responding!!"));
-    while(1) {} // hold in infinite loop
+    while (1) {} // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -159,17 +159,17 @@ void crc(uint8_t *data, uint8_t len, uint8_t* dst) {
   // calculate CRC24 with according to BT Core Spec 4.0, Section 6.B.3.1.1
 
   uint8_t v, t, d;
-  while(len--) {
+  while (len--) {
     d = *data++;
-    for(v = 0; v < 8; v++, d >>= 1) {
+    for (v = 0; v < 8; v++, d >>= 1) {
       t = dst[0] >> 7;
       dst[0] <<= 1;
-      if(dst[1] & 0x80) dst[0] |= 1;
+      if (dst[1] & 0x80) dst[0] |= 1;
       dst[1] <<= 1;
-      if(dst[2] & 0x80) dst[1] |= 1;
+      if (dst[2] & 0x80) dst[1] |= 1;
       dst[2] <<= 1;
 
-      if(t != (d & 1)) {
+      if (t != (d & 1)) {
         dst[2] ^= 0x5B;
         dst[1] ^= 0x06;
       }

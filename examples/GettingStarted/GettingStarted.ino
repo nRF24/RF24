@@ -1,20 +1,20 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
- * See License information at root directory of this library
- * Author: Brendan Doherty (2bndy5)
- */
+   See documentation at https://tmrh20.github.io/RF24
+   See License information at root directory of this library
+   Author: Brendan Doherty (2bndy5)
+*/
 
 /**
- * A simple example of sending data from 1 nRF24L01 transceiver to another.
- *
- * A challenge to learn new skills:
- * This example uses the RF24 library's default settings which includes having
- * dynamic payload length enabled. Try adjusting this example to use
- * statically sized payloads.
- *
- * This example was written to be used on 2 or more devices acting as "nodes".
- * Use the Serial Monitor to change each node's behavior.
- */
+   A simple example of sending data from 1 nRF24L01 transceiver to another.
+
+   A challenge to learn new skills:
+   This example uses the RF24 library's default settings which includes having
+   dynamic payload length enabled. Try adjusting this example to use
+   statically sized payloads.
+
+   This example was written to be used on 2 or more devices acting as "nodes".
+   Use the Serial Monitor to change each node's behavior.
+*/
 #include <SPI.h>
 #include "RF24.h"
 
@@ -44,7 +44,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("nRF24L01 is not responding!!"));
-    while(1) {} // hold in infinite loop
+    while (1) {} // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -80,7 +80,7 @@ void loop() {
     bool report = radio.write(&payload, sizeof(float));      // transmit & save the report
     unsigned long end_timer = micros();                      // end the timer
 
-    if (report){
+    if (report) {
       Serial.print(F("Transmission successful! "));           // payload was delivered
       Serial.print(F("Time to transmit = "));
       Serial.println(end_timer - start_timer);               // print the timer result

@@ -1,21 +1,21 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
- * See License information at root directory of this library
- * Author: Brendan Doherty 2bndy5
- */
+   See documentation at https://tmrh20.github.io/RF24
+   See License information at root directory of this library
+   Author: Brendan Doherty 2bndy5
+*/
 
 /**
- * A simple example of streaming data from 1 nRF24L01 transceiver to another.
- *
- * A challenge to learn new skills:
- * This example uses the startFastWrite() function to utilize all 3 levels of
- * the TX FIFO. Try adjusting this example to use the write() function which
- * only uses 1 level of the TX FIFO per call. Notice the difference in
- * transmissions times.
- *
- * This example was written to be used on 2 or more devices acting as "nodes".
- * Use the Serial Monitor to change each node's behavior.
- */
+   A simple example of streaming data from 1 nRF24L01 transceiver to another.
+
+   A challenge to learn new skills:
+   This example uses the startFastWrite() function to utilize all 3 levels of
+   the TX FIFO. Try adjusting this example to use the write() function which
+   only uses 1 level of the TX FIFO per call. Notice the difference in
+   transmissions times.
+
+   This example was written to be used on 2 or more devices acting as "nodes".
+   Use the Serial Monitor to change each node's behavior.
+*/
 #include <SPI.h>
 #include "RF24.h"
 
@@ -52,7 +52,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("nRF24L01 is not responding!!"));
-    while(1) {} // hold in infinite loop
+    while (1) {} // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -86,7 +86,7 @@ void loop() {
     uint8_t i = 0;
     uint8_t failures = 0;
     unsigned long start_timer = millis();       // start the timer
-    while (i < SIZE){
+    while (i < SIZE) {
       makePayload(i);                           // make the payload
       if (!radio.writeFast(&buffer, SIZE)) {
         failures++;

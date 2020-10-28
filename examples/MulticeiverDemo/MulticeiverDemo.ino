@@ -1,23 +1,23 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
- * See License information at root directory of this library
- * Author: Brendan Doherty 2bndy5
- */
+   See documentation at https://tmrh20.github.io/RF24
+   See License information at root directory of this library
+   Author: Brendan Doherty 2bndy5
+*/
 
 /**
- * A simple example of sending data from as many as 6 nRF24L01 transceivers to
- * 1 receiving transceiver. This technique is trademarked by
- * Nordic Semiconductors as "MultiCeiver".
- *
- * A challenge to learn new skills:
- * This example uses the Serial Monitor to change a node's role. Try adjusting
- * this example so that the 1 recieving node sends a ping that tells
- * all other transmitting nodes to start transmitting. HINT: use the
- * "multicast" parameter to write().
- *
- * This example was written to be used on 2 or more devices acting as "nodes".
- * Use the Serial Monitor to change each node's behavior.
- */
+   A simple example of sending data from as many as 6 nRF24L01 transceivers to
+   1 receiving transceiver. This technique is trademarked by
+   Nordic Semiconductors as "MultiCeiver".
+
+   A challenge to learn new skills:
+   This example uses the Serial Monitor to change a node's role. Try adjusting
+   this example so that the 1 recieving node sends a ping that tells
+   all other transmitting nodes to start transmitting. HINT: use the
+   "multicast" parameter to write().
+
+   This example was written to be used on 2 or more devices acting as "nodes".
+   Use the Serial Monitor to change each node's behavior.
+*/
 #include <SPI.h>
 #include "RF24.h"
 
@@ -35,7 +35,8 @@ uint64_t address[6] = {0x7878787878LL,
                        0xB3B4B5B6CDLL,
                        0xB3B4B5B6A3LL,
                        0xB3B4B5B60FLL,
-                       0xB3B4B5B605LL};
+                       0xB3B4B5B605LL
+                      };
 
 // Because this example allow up to 6 nodes (specified by numbers 0-5) to
 // transmit and only 1 node to receive, we will use a negative value in our
@@ -67,7 +68,7 @@ void setup() {
   }
 
   // initialize the transceiver on the SPI bus
-  if (!radio.begin()){
+  if (!radio.begin()) {
     Serial.println(F("nRF24L01 is not responding!!"));
     while (1) {} // hold in infinite loop
   }

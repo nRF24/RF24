@@ -1,16 +1,16 @@
 /*
- Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+  Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- version 2 as published by the Free Software Foundation.
- */
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  version 2 as published by the Free Software Foundation.
+*/
 
 /**
- * Example using Dynamic Payloads
- *
- * This is an example of how to use payloads of a varying (dynamic) size.
- */
+   Example using Dynamic Payloads
+
+   This is an example of how to use payloads of a varying (dynamic) size.
+*/
 
 #include <SPI.h>
 #include "nRF24L01.h"
@@ -71,10 +71,10 @@ void setup(void)
   radio.setRetries(5, 15);        // delay between retries = 5 * 250 + 250 = 1500 microseconds, number of retries = 15
 
   // Open a writing and reading pipe on each radio, with opposite addresses
-  if (role == role_ping_out){
+  if (role == role_ping_out) {
     radio.openWritingPipe(addresses[0]);
     radio.openReadingPipe(1, addresses[1]);
-  }else{
+  } else {
     radio.openWritingPipe(addresses[1]);
     radio.openReadingPipe(1, addresses[0]);
   }
@@ -83,7 +83,7 @@ void setup(void)
   radio.printDetails();           // Dump the configuration of the rf unit for debugging
 }
 
-void loop(){
+void loop() {
 
 
   /****************** Ping Out Role ***************************/
@@ -110,9 +110,9 @@ void loop(){
     }
 
     // Describe the results
-    if (timeout){
+    if (timeout) {
       Serial.println(F("Failed, response timed out."));
-    }else{
+    } else {
       // Grab the response and print it
 
       uint8_t len = radio.getDynamicPayloadSize();  // get payload's length
@@ -144,7 +144,7 @@ void loop(){
   /****************** Pong Back Role ***************************/
   // Receive each packet, send it back, and dump it out
 
-  if (role == role_pong_back){
+  if (role == role_pong_back) {
     while (radio.available())                       // if there is data ready
     {
 

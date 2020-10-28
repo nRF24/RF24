@@ -1,25 +1,25 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
- * See License information at root directory of this library
- * Author: Brendan Doherty (2bndy5)
- */
+   See documentation at https://tmrh20.github.io/RF24
+   See License information at root directory of this library
+   Author: Brendan Doherty (2bndy5)
+*/
 
 /**
- * A simple example of sending data from 1 nRF24L01 transceiver to another
- * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
- * This example still uses ACK packets, but they have no payloads. Instead the
- * acknowledging response is sent with `write()`. This tactic allows for more
- * updated acknowledgement payload data, where actual ACK payloads' data are
- * outdated by 1 transmission because they have to loaded before receiving a
- * transmission.
- *
- * A challenge to learn new skills:
- * This example uses 2 different addresses for the RX & TX nodes.
- * Try adjusting this example to use the same address on different pipes.
- *
- * This example was written to be used on 2 or more devices acting as "nodes".
- * Use the Serial Monitor to change each node's behavior.
- */
+   A simple example of sending data from 1 nRF24L01 transceiver to another
+   with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
+   This example still uses ACK packets, but they have no payloads. Instead the
+   acknowledging response is sent with `write()`. This tactic allows for more
+   updated acknowledgement payload data, where actual ACK payloads' data are
+   outdated by 1 transmission because they have to loaded before receiving a
+   transmission.
+
+   A challenge to learn new skills:
+   This example uses 2 different addresses for the RX & TX nodes.
+   Try adjusting this example to use the same address on different pipes.
+
+   This example was written to be used on 2 or more devices acting as "nodes".
+   Use the Serial Monitor to change each node's behavior.
+*/
 #include <SPI.h>
 #include "RF24.h"
 
@@ -50,7 +50,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("nRF24L01 is not responding!!"));
-    while(1) {} // hold in infinite loop
+    while (1) {} // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -91,7 +91,7 @@ void loop() {
     unsigned long start_timer = micros();                      // start the timer
     bool report = radio.write(&payload, sizeof(unsigned int)); // transmit & save the report
 
-    if (report){
+    if (report) {
       // transmission successful; wait for response and print results
 
       bool timed_out = false;                                // a flag to track if response timed out

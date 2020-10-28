@@ -15,7 +15,25 @@ on:
       # - "!examples/rf24_ATTiny/timingSearch3pin/**"
 
 jobs:
+  check_formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check code formatting
+        uses: per1234/artistic-style-action@main
+        with:
+          options-file-path: ./examples/examples_formatter.conf
+          name-patterns: |
+            - "*.ino"
+            - "*.cpp"
+            - "*.hpp"
+            - "*.h"
+          target-paths: |
+            - examples
   build:
+    needs: check_formatting
     runs-on: ubuntu-latest
 
     strategy:
@@ -95,6 +113,7 @@ jobs:
           #   - examples/old_backups/recipes/pingpair_maple
           fqbn: ${{ matrix.fqbn }}
   attiny:
+    needs: check_formatting
     runs-on: ubuntu-latest
 
     strategy:
