@@ -382,7 +382,7 @@ public:
     void printDetails(void);
 
     /**
-     * Test whether there are bytes available to be read in the
+     * Test whether there are bytes available to be read from the
      * FIFO buffers.
      *
      * @param[out] pipe_num Which pipe has the payload available
@@ -390,18 +390,31 @@ public:
      * @code
      * uint8_t pipeNum;
      * if(radio.available(&pipeNum)){
-     *   radio.read(&data,sizeof(data));
-     *   Serial.print("Got data on pipe");
+     *   radio.read(&data, sizeof(data));
+     *   Serial.print("Got data on pipe ");
      *   Serial.println(pipeNum);
      * }
      * @endcode
-     * @return True if there is a payload available, false if none is
+     * @return
+     * - True if there is a payload available in the top (first out)
+     *   level RX FIFO.
+     * - False if there is nothing available in the RX FIFO because it is
+     *   empty.
      */
     bool available(uint8_t* pipe_num);
 
     /**
-     * Check if the radio needs to be read. Can be used to prevent data loss
-     * @return True if all three 32-byte radio buffers are full
+     * Use this function to check if the radio's RX FIFO levels are all
+     * occupied. This can be used to prevent data loss because any incoming
+     * transmissions are rejected if there is no unoccupied levels in the RX
+     * FIFO to store the incoming payload. Remember that each level can hold
+     * up to a maximum of 32 bytes.
+     * @return
+     * - True if all three 3 levels of the RX FIFO buffers are occupied.
+     * - False if there is one or more levels available in the RX FIFO
+     *   buffers. Remember that this does not always mean that the RX FIFO
+     *   buffers are empty; use available() to see if the RX FIFO buffers are
+     *   empty or not.
      */
     bool rxFifoFull();
 
@@ -1671,9 +1684,38 @@ private:
 */
 
 /**
- * @example{lineno} examples_linux/pingpair_dyn.py
+ * @example{lineno} examples_linux/getting_started.py
  *
- * This is a python example for RPi of how to use payloads of a varying (dynamic) size.
+ * This is a simple example of using the RF24 class on a Raspberry Pi.
+ */
+
+/**
+ * @example{lineno} examples_linux/acknowledgement_payloads.py
+ *
+ * This is a simple example of using the RF24 class on a Raspberry Pi to
+ * transmit and retrieve custom automatic acknowledgment payloads.
+ */
+
+/**
+ * @example{lineno} examples_linux/streaming_data.py
+ *
+ * This is a simple example of using the RF24 class on a Raspberry Pi for
+ * streaming multiple payloads.
+ */
+
+/**
+ * @example{lineno} examples_linux/interrupt_configure.py
+ *
+ * This is a simple example of using the RF24 class on a Raspberry Pi to
+ * detecting (and verifying) the IRQ (interrupt) pin on the nRF24L01.
+ */
+
+/**
+ * @example{lineno} examples_linux/multiceiver_demo.py
+ *
+ * This is a simple example of using the RF24 class on a Raspberry Pi for
+ * using 1 nRF24L01 to receive data from up to 6 other transceivers. This
+ * technique is called "multiceiver" in the datasheet.
  */
 
 /**
