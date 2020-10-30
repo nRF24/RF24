@@ -15,6 +15,7 @@
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` quit then restart the example to change each node's behavior.
  */
+#include <cstdio>
 #include <ctime>
 #include <iostream>
 #include <string>
