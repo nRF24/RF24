@@ -19,6 +19,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <string>
+#include <printf.h>
 #include <RF24/RF24.h>
 
 using namespace std;
@@ -54,7 +55,7 @@ void slave();   // prototype of the RX node's behavior; called by setRole()
 
 
 int main() {
-
+    printf_begin();
     // perform hardware check
     if (!radio.begin()) {
         cout << "nRF24L01 is not responding!!" << endl;
@@ -73,7 +74,7 @@ int main() {
     // set the addresses for both RX and TX nodes
     radio.openWritingPipe(address);    // always uses pipe 0
     radio.openReadingPipe(0, address); // using pipe 0
-
+    radio.printDetails();
     setRole(); // calls master() or slave() based on user input
     return 0;
 }
@@ -136,11 +137,13 @@ void master() {
 void slave() {
     radio.startListening(); // powerUp() into RX mode
     uint8_t pipe;
-    if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
-        uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
-        radio.read(&payload, bytes);                   // fetch payload from FIFO
-        cout << "Received " << bytes;                  // print the size of the payload
-        cout << " bytes on pipe " << pipe;             // print the pipe number
-        cout << ": " << payload << endl;               // print the payload's value
+    while (true) {
+        if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
+            uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
+            radio.read(&payload, bytes);                   // fetch payload from FIFO
+            cout << "Received " << bytes;                  // print the size of the payload
+            cout << " bytes on pipe " << pipe;             // print the pipe number
+            cout << ": " << payload << endl;               // print the payload's value
+        }
     }
 }
