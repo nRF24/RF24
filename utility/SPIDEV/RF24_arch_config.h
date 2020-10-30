@@ -63,6 +63,7 @@ typedef uint16_t prog_uint16_t;
 #define delay(milisec) __msleep(milisec)
 #define delayMicroseconds(usec) __usleep(usec)
 #define millis() __millis()
+#define micros() __micros()
 
 #endif // __ARCH_CONFIG_H__
 // vim:ai:cin:sts=2 sw=2 ft=cpp

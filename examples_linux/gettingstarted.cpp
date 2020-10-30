@@ -57,7 +57,7 @@ int main() {
 
     // perform hardware check
     if (!radio.begin()) {
-        Serial.println(F("nRF24L01 is not responding!!"));
+        cout << "nRF24L01 is not responding!!" << endl;
         return 0; // quit now
     }
 
