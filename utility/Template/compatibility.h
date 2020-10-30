@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   compatiblity.h
  * Author: purinda
  *
@@ -38,10 +38,12 @@ void __start_timer();
 
 long __millis();
 
+long __micros();
+
 #ifdef    __cplusplus
 }
 #endif
 
 #endif    /* COMPATIBLITY_H */
 
-/**@}*/	
+/**@}*/

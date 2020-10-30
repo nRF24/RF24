@@ -80,9 +80,11 @@ void loop() {
     unsigned long end_timer = micros();                      // end the timer
 
     if (report) {
-      Serial.print(F("Transmission successful! "));           // payload was delivered
+      Serial.print(F("Transmission successful! "));          // payload was delivered
       Serial.print(F("Time to transmit = "));
-      Serial.println(end_timer - start_timer);               // print the timer result
+      Serial.print(end_timer - start_timer);                 // print the timer result
+      Serial.print(F(" us. Sent: "));
+      Serial.println(payload);                               // print payload sent
       payload += 0.01;                                       // increment float payload
     } else {
       Serial.println(F("Transmission failed or timed out")); // payload was not delivered

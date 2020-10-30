@@ -160,4 +160,5 @@ void slave() {
             startTimer = time(nullptr);                      // reset timer
         }
     }
+    cout << "Timeout reached. Nothing received in 6 seconds" << endl;
 }
