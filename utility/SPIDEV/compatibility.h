@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   compatiblity.h
  * Author: purinda
  *
@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#include <stdint.h>  // for uintXX_t types	
+#include <stdint.h>  // for uintXX_t types
 #include <stddef.h>
 #include <time.h>
 #include <sys/time.h>
@@ -25,6 +25,8 @@ void __usleep(int milisec);
 void __start_timer();
 
 uint32_t __millis();
+
+uint32_t __micros();
 
 #ifdef __cplusplus
 }

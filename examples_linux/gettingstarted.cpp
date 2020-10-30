@@ -48,7 +48,7 @@ uint8_t address[6] = "1Node";
 // on every successful transmission
 float payload = 0.0;
 
-void SetRole(); // prototype to set the node's role
+void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
 void slave();   // prototype of the RX node's behavior; called by setRole()
 

@@ -48,3 +48,14 @@ uint32_t __millis()
     mtime = ((seconds) * 1000 + useconds / 1000.0) + 0.5;
     return mtime;
 }
+
+uint32_t __micros()
+{
+    //gettimeofday(&end, NULL);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    seconds = end.tv_sec - start.tv_sec;
+    useconds = (end.tv_nsec - start.tv_nsec) / 1000;
+
+    mtime = ((seconds) * 1000 + useconds) + 0.5;
+    return mtime;
+}

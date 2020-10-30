@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   compatiblity.h
  * Author: purinda
  *
@@ -23,6 +23,8 @@ void __usleep(int milisec);
 void __start_timer();
 
 long __millis();
+
+long __micros();
 
 #ifdef    __cplusplus
 }
