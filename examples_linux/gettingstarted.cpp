@@ -15,11 +15,11 @@
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` quit then restart the example to change each node's behavior.
  */
-#include <cstdio>
 #include <ctime>
 #include <iostream>
-#include <unistd.h>
 #include <string>
+#include <unistd.h>
+#include <time.h>      // for CLOCK_MONOTONIC_RAW, clock_gettime(), timespec
 #include <printf.h>
 #include <RF24/RF24.h>
 
@@ -54,6 +54,9 @@ void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
 void slave();   // prototype of the RX node's behavior; called by setRole()
 
+// custom defined timer for evaluating transmission time in microseconds
+struct timespec startTimer, endTimer;
+uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
 int main() {
     // perform hardware check
@@ -74,6 +77,7 @@ int main() {
     // set the addresses for both RX and TX nodes
     radio.openWritingPipe(address);    // always uses pipe 0
     radio.openReadingPipe(0, address); // using pipe 0
+
     // for debugging, uncomment the follow 2 lines
     // printf_begin();
     // radio.printDetails();
@@ -120,14 +124,14 @@ void master() {
     radio.stopListening();                                          // powerUp() into TX mode
     uint8_t failure = 0;                                            // keep track of failures
     while (failure < 3) {
-        unsigned long start_timer = rf24_micros();                       // start the timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);            // start the timer
         bool report = radio.write(&payload, sizeof(float));         // transmit & save the report
-        unsigned long end_timer = rf24_micros();                         // end the timer
+        uint32_t timerEllapsed = getMicros();                          // end the timer
 
         if (report) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
-            cout << end_timer - start_timer;                        // print the timer result
+            cout << timerEllapsed;                                  // print the timer result
             cout << " us. Sent: " << payload << endl;               // print payload sent
             payload += 0.01;                                        // increment float payload
 
@@ -161,4 +165,12 @@ void slave() {
         }
     }
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;
+}
+
+uint32_t getMicros() {
+    clock_gettime(CLOCK_MONOTONIC_RAW, &endTimer);
+    uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
+    uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
+
+    return ((seconds) * 1000 + useconds) + 0.5;
 }

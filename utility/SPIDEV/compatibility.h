@@ -26,8 +26,6 @@ void __start_timer();
 
 uint32_t __millis();
 
-uint32_t __micros();
-
 #ifdef __cplusplus
 }
 #endif
