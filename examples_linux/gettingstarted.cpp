@@ -120,9 +120,9 @@ void master() {
     radio.stopListening();                                          // powerUp() into TX mode
     uint8_t failure = 0;                                            // keep track of failures
     while (failure < 3) {
-        unsigned long start_timer = micros();                       // start the timer
+        unsigned long start_timer = rf24_micros();                       // start the timer
         bool report = radio.write(&payload, sizeof(float));         // transmit & save the report
-        unsigned long end_timer = micros();                         // end the timer
+        unsigned long end_timer = rf24_micros();                         // end the timer
 
         if (report) {
             // payload was delivered
