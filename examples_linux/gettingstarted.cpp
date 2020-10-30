@@ -136,13 +136,13 @@ void master() {
  */
 void slave() {
     radio.startListening(); // powerUp() into RX mode
-    uint8_t pipe;
     while (true) {
+        uint8_t pipe;
         if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
             uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
             radio.read(&payload, bytes);                   // fetch payload from FIFO
             cout << "Received " << bytes;                  // print the size of the payload
-            cout << " bytes on pipe " << pipe;             // print the pipe number
+            cout << " bytes on pipe " << pipe + 48;        // print the pipe number
             cout << ": " << payload << endl;               // print the payload's value
         }
     }
