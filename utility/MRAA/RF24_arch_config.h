@@ -51,7 +51,7 @@
     #define delay(milisec) __msleep(milisec)
     #define delayMicroseconds(usec) __usleep(usec)
     #define millis() __millis()
-    #define micros() __micros()
+    #define rf24_micros __micros()
 #endif
 
 #define INPUT mraa::DIR_IN
