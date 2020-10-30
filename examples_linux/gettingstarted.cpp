@@ -1,35 +1,27 @@
 /*
- Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
-
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- version 2 as published by the Free Software Foundation.
-
- 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
-              Modified to use with Arduipi board http://hallard.me/arduipi
-						  Changed to use modified bcm2835 and RF24 library
-TMRh20 2014 - Updated to work with optimized RF24 Arduino library
-
+ * See documentation at https://tmrh20.github.io/RF24
+ * See License information at root directory of this library
+ * Author: Brendan Doherty (2bndy5)
  */
 
 /**
- * Example RF Radio Ping Pair
+ * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * This is an example of how to use the RF24 class on RPi, communicating to an Arduino running
- * the GettingStarted sketch.
+ * A challenge to learn new skills:
+ * This example uses the RF24 library's default settings which includes having
+ * dynamic payload length enabled. Try adjusting this example to use
+ * statically sized payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` quit then restart the example to change each node's behavior.
  */
-
-#include <cstdlib>
+#include <cstdio>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <unistd.h>
+#include <string>
 #include <RF24/RF24.h>
 
 using namespace std;
-//
-// Hardware configuration
-// Configure the appropriate pins for your connections
 
 /****************** Linux ***********************/
 // Radio CE Pin, CSN Pin, SPI Speed
@@ -46,139 +38,109 @@ RF24 radio(22, 0);
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
 
-/********** User Config *********/
-// Assign a unique identifier for this node, 0 or 1
-bool radioNumber = 1;
+// Let these addresses be used for the pair
+uint8_t address[6] = "1Node";
+// It is very helpful to think of an address as a path instead of as
+// an identifying device destination
 
-/********************************/
+// For this example, we'll be using a payload containing
+// a single float number that will be incremented
+// on every successful transmission
+float payload = 0.0;
 
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint8_t pipes[][6] = {"1Node", "2Node"};
-
-int main(int argc, char** argv)
-{
-
-    bool role_ping_out = true, role_pong_back = false;
-    bool role = role_pong_back;
-
-    cout << "RF24/examples/GettingStarted/\n";
-
-    // Setup and configure rf radio
-    radio.begin();
-
-    // optionally, increase the delay between retries & # of retries
-    radio.setRetries(15, 15);
-    // Dump the configuration of the rf unit for debugging
-    radio.printDetails();
+void SetRole(); // prototype to set the node's role
+void master();  // prototype of the TX node's behavior; called by setRole()
+void slave();   // prototype of the RX node's behavior; called by setRole()
 
 
-    /********* Role chooser ***********/
+int main() {
 
-    printf("\n ************ Role Setup ***********\n");
-    string input = "";
-    char myChar = {0};
-    cout << "Choose a role: Enter 0 for pong_back, 1 for ping_out (CTRL+C to exit) \n>";
-    getline(cin, input);
-
-    if (input.length() == 1) {
-        myChar = input[0];
-        if (myChar == '0') {
-            cout << "Role: Pong Back, awaiting transmission " << endl << endl;
-        } else {
-            cout << "Role: Ping Out, starting transmission " << endl << endl;
-            role = role_ping_out;
-        }
-    }
-    /***********************************/
-    // This simple sketch opens two pipes for these two nodes to communicate
-    // back and forth.
-
-    if (!radioNumber) {
-        radio.openWritingPipe(pipes[0]);
-        radio.openReadingPipe(1, pipes[1]);
-    } else {
-        radio.openWritingPipe(pipes[1]);
-        radio.openReadingPipe(1, pipes[0]);
+    // perform hardware check
+    if (!radio.begin()) {
+        Serial.println(F("nRF24L01 is not responding!!"));
+        return 0; // quit now
     }
 
-    radio.startListening();
+    // print example's introductory prompt
+    cout << "RF24/examples_linux/GettingStarted\n";
 
-    // forever loop
-    while (1) {
-        if (role == role_ping_out) {
-            // First, stop listening so we can talk.
-            radio.stopListening();
+    // Set the PA Level low to try preventing power supply related problems
+    // because these examples are likely run with nodes in close proximity to
+    // each other.
+    radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
-            // Take the time, and send it.  This will block until complete
+    // Fot this example, we use the same address to send data back and forth
+    // set the addresses for both RX and TX nodes
+    radio.openWritingPipe(address);    // always uses pipe 0
+    radio.openReadingPipe(0, address); // using pipe 0
 
-            printf("Now sending...\n");
-            unsigned long time = millis();
-
-            bool ok = radio.write(&time, sizeof(unsigned long));
-
-            if (!ok) {
-                printf("failed.\n");
-            }
-            // Now, continue listening
-            radio.startListening();
-
-            // Wait here until we get a response, or timeout (250ms)
-            unsigned long started_waiting_at = millis();
-            bool timeout = false;
-            while (!radio.available() && !timeout) {
-                if (millis() - started_waiting_at > 200) {
-                    timeout = true;
-                }
-            }
-
-
-            // Describe the results
-            if (timeout) {
-                printf("Failed, response timed out.\n");
-            } else {
-                // Grab the response, compare, and send to debugging spew
-                unsigned long got_time;
-                radio.read(&got_time, sizeof(unsigned long));
-
-                // Spew it
-                printf("Got response %lu, round-trip delay: %lu\n", got_time, millis() - got_time);
-            }
-            sleep(1);
-        }
-
-        //
-        // Pong back role.  Receive each packet, dump it out, and send it back
-        //
-
-        if (role == role_pong_back) {
-
-            // if there is data ready
-            if (radio.available()) {
-                // Dump the payloads until we've gotten everything
-                unsigned long got_time;
-
-                // Fetch the payload, and see if this was the last one.
-                while (radio.available()) {
-                    radio.read(&got_time, sizeof(unsigned long));
-                }
-                radio.stopListening();
-
-                radio.write(&got_time, sizeof(unsigned long));
-
-                // Now, resume listening so we catch the next packets.
-                radio.startListening();
-
-                // Spew it
-                printf("Got payload(%d) %lu...\n", sizeof(unsigned long), got_time);
-
-                delay(925); //Delay after payload responded to, minimize RPi CPU time
-
-            }
-
-        }
-
-    } // forever loop
-
+    setRole(); // calls master() or slave() based on user input
     return 0;
 }
 
+/**
+ * set this node's role from stdin stream.
+ * this only considers the first char as input.
+ */
+void setRole() {
+    string input = "";
+    while (!input.length()) {
+        cout << "*** PRESS 'T' to begin transmitting to the other node\n";
+        cout << "*** PRESS 'R' to begin receiving from the other node\n";
+        getline(cin, input);
+        if (input.length() >= 1) {
+            if (input[0] == 'T' || input[0] == 't') {
+                master();
+            }
+            else if (input[0] == 'R' || input[0] == 'r') {
+                slave();
+            }
+            else {
+                cout << input[0] << " is an invalid input. Please try again." << endl;
+                input = ""; // stay in the while loop
+            }
+        }
+    } // while
+} // setRole()
+
+
+/**
+ * make this node act as the transmitter
+ */
+void master() {
+    radio.stopListening();                                          // powerUp() into TX mode
+    while (true) {
+        unsigned long start_timer = micros();                       // start the timer
+        bool report = radio.write(&payload, sizeof(float));         // transmit & save the report
+        unsigned long end_timer = micros();                         // end the timer
+
+        if (report) {
+            // payload was delivered
+            cout << "Transmission successful! Time to transmit = ";
+            cout << end_timer - start_timer << endl;                // print the timer result
+            payload += 0.01;                                        // increment float payload
+
+        } else {
+            // payload was not delivered
+            cout << "Transmission failed or timed out" << endl;
+        }
+
+        // to make this example readable in the terminal
+        sleep(1);  // slow transmissions down by 1 second
+    }
+}
+
+/**
+ * make this node act as the receiver
+ */
+void slave() {
+    radio.startListening(); // powerUp() into RX mode
+    uint8_t pipe;
+    if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
+        uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
+        radio.read(&payload, bytes);                   // fetch payload from FIFO
+        cout << "Received " << bytes;                  // print the size of the payload
+        cout << " bytes on pipe " << pipe;             // print the pipe number
+        cout << ": " << payload << endl;               // print the payload's value
+    }
+}

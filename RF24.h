@@ -198,45 +198,45 @@ public:
     bool available(void);
 
     /**
-     * Read from the available payload
+     * Read payload data from the RX FIFO buffer(s).
      *
-     * The length of data read should the next available payload's length
-     * @sa getPayloadSize(), getDynamicPayloadSize()
+     * The length of data read is usually the next available payload's length
+     * @see getPayloadSize()
+     * @see getDynamicPayloadSize()
      *
-     * @note I specifically chose 'void*' as a data type to make it easier
+     * @note I specifically chose `void*` as a data type to make it easier
      * for beginners to use.  No casting needed.
-     *
-     * @note No longer boolean. Use available to determine if packets are
-     * available. Interrupt flags are now cleared during reads instead of
-     * when calling available().
      *
      * @param buf Pointer to a buffer where the data should be written
      * @param len Maximum number of bytes to read into the buffer. This
      * value should match the length of the object referenced using the
      * `buf` parameter. There is no bounds checking implemented here.
-     *
-     * @code
-     * if(radio.available()){
-     *   radio.read(&data,sizeof(data));
-     * }
-     * @endcode
-     * @return No return value. Use available().
      * @remark Remember that each call to read() fetches data from the
      * RX FIFO beginning with the first byte from the first available
      * payload. A payload is not removed from the RX FIFO until it's
      * entire length (or more) is fetched using read().
      * @remarks
-     * - If `len` parameter's value is less than the available payload's
+     * - If @a len parameter's value is less than the available payload's
      *   length, then the payload remains in the RX FIFO.
-     * - If `len` parameter's value is greater than the first of multiple
-     *   available payloads, then the data returned to the `buf`
+     * - If @a len parameter's value is greater than the first of multiple
+     *   available payloads, then the data saved to the @a buf
      *   parameter's object will be supplemented with data from the next
      *   available payload.
-     * - If `len` parameter's value is greater than the last available
+     * - If @a len parameter's value is greater than the last available
      *   payload's length, then the last byte in the payload is used as
-     *   padding for the data returned to the `buf` parameter's object.
-     *   The nRF24L01 will continue returning the last byte from the last
+     *   padding for the data saved to the @a buf parameter's object.
+     *   The nRF24L01 will repeatedly use the last byte from the last
      *   payload even when read() is called with an empty RX FIFO.
+     *
+     * @return No return value. Use available().
+     * @note This function no longer returns a boolean. Use available to
+     * determine if packets are available. The `RX_DR` Interrupt flag is now
+     * cleared with this function instead of when calling available().
+     * @code
+     * if(radio.available()) {
+     *   radio.read(&data, sizeof(data));
+     * }
+     * @endcode
      */
     void read(void* buf, uint8_t len);
 
@@ -745,15 +745,16 @@ public:
     void reUseTX();
 
     /**
-     * Empty the transmit buffer. This is generally not required in standard operation.
-     * May be required in specific cases after stopListening() , if operating at 250KBPS data rate.
+     * Empty all 3 of the TX (transmit) FIFO buffers. This is automatically
+     * called by stopListening() if ACK payloads are enabled. However,
+     * startListening() does not call this function.
      *
      * @return Current value of status register
      */
     uint8_t flush_tx(void);
 
     /**
-     * Empty the receive buffer
+     * Empty all 3 of the RX (receive) FIFO buffers.
      *
      * @return Current value of status register
      */
@@ -784,7 +785,8 @@ public:
      *    radio.read(0,0);
      * }
      * @endcode
-     * @return true if signal => -64dBm, false if not
+     * @return true if a signal less than or equal to -64dBm was detected,
+     * false if not.
      */
     bool testRPD(void);
 
@@ -801,41 +803,42 @@ public:
     }
 
     /**
-    * Close a pipe after it has been previously opened.
-    * Can be safely called without having previously opened a pipe.
-    * @param pipe Which pipe # to close, 0-5.
-    */
+     * Close a pipe after it has been previously opened.
+     * Can be safely called without having previously opened a pipe.
+     * @param pipe Which pipe number to close, any integer not in range [0, 5]
+     * is ignored.
+     */
     void closeReadingPipe(uint8_t pipe);
 
     /**
-    *
-    * If a failure has been detected, it usually indicates a hardware issue. By default the library
-    * will cease operation when a failure is detected.
-    * This should allow advanced users to detect and resolve intermittent hardware issues.
-    *
-    * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
-    * applied after a failure occurs, if wanting to re-enable the device immediately.
-    *
-    * The three main failure modes of the radio include:
-    *
-    * Writing to radio: Radio unresponsive - Fixed internally by adding a timeout to the internal write functions in RF24 (failure handling)
-    *
-    * Reading from radio: Available returns true always - Fixed by adding a timeout to available functions by the user. This is implemented internally in  RF24Network.
-    *
-    * Radio configuration settings are lost - Fixed by monitoring a value that is different from the default, and re-configuring the radio if this setting reverts to the default.
-    *
-    * See the included example, GettingStarted_HandlingFailures
-    *
-    *  @code
-    *  if(radio.failureDetected){
-    *    radio.begin();                       // Attempt to re-configure the radio with defaults
-    *    radio.failureDetected = 0;           // Reset the detection value
-    *	 radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
-    *    radio.openReadingPipe(1,addresses[0]);
-    *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
-    *  }
-    * @endcode
-    */
+     *
+     * If a failure has been detected, it usually indicates a hardware issue. By default the library
+     * will cease operation when a failure is detected.
+     * This should allow advanced users to detect and resolve intermittent hardware issues.
+     *
+     * In most cases, the radio must be re-enabled via radio.begin(); and the appropriate settings
+     * applied after a failure occurs, if wanting to re-enable the device immediately.
+     *
+     * The three main failure modes of the radio include:
+     *
+     * Writing to radio: Radio unresponsive - Fixed internally by adding a timeout to the internal write functions in RF24 (failure handling)
+     *
+     * Reading from radio: Available returns true always - Fixed by adding a timeout to available functions by the user. This is implemented internally in  RF24Network.
+     *
+     * Radio configuration settings are lost - Fixed by monitoring a value that is different from the default, and re-configuring the radio if this setting reverts to the default.
+     *
+     * See the included example, GettingStarted_HandlingFailures
+     *
+     *  @code
+     *  if(radio.failureDetected){
+     *    radio.begin();                       // Attempt to re-configure the radio with defaults
+     *    radio.failureDetected = 0;           // Reset the detection value
+     *	 radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
+     *    radio.openReadingPipe(1,addresses[0]);
+     *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
+     *  }
+     * @endcode
+     */
     //#if defined (FAILURE_HANDLING)
     bool failureDetected;
     //#endif
@@ -851,34 +854,46 @@ public:
     /**@{*/
 
     /**
-    * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
-    *
-    * @param a_width The address width to use: 3,4 or 5
-    */
-
+     * Set the address width from 3 to 5 bytes (24, 32 or 40 bit)
+     *
+     * @param a_width The address width (in bytes) to use; this can be 3, 4 or
+     * 5.
+     */
     void setAddressWidth(uint8_t a_width);
 
     /**
-     * Set the number and delay of retries upon failed submit
+     * Set the number of retry attempts and delay between retry attempts when
+     * transmitting a payload. The radio is waiting for an acknowledgement
+     * (ACK) packet during the delay between retry attempts.
      *
-     * @param delay How long to wait between each retry, in multiples of 250us,
-     * max is 15.  0 means 250us, 15 means 4000us.
-     * @param count How many retries before giving up, max 15
+     * @param delay How long to wait between each retry, in multiples of
+     * 250 us. The minumum of 0 means 250 us, and the maximum of 15 means
+     * 4000 us. The default value of 5 means 1500us (5 * 250 + 250).
+     * @param count How many retries before giving up. The default/maximum is 15. Use
+     * 0 to disable the auto-retry feature all together.
+     *
+     * @note Disable the auto-retry feature on a transmitter still uses the
+     * auto-ack feature (if enabled), except it will not retry to transmit if
+     * the payload was not acknowledged on the first attempt.
      */
     void setRetries(uint8_t delay, uint8_t count);
 
     /**
-     * Set RF communication channel
+     * Set RF communication channel. The frequency used by a channel is
+     * calculated as:
+     * @verbatim 2400 MHz + <channel number> @endverbatim
+     * Meaning the default channel of 76 uses the approximate frequency of
+     * 2476 MHz.
      *
      * @param channel Which RF channel to communicate on, 0-125
      */
     void setChannel(uint8_t channel);
 
     /**
-   * Get RF communication channel
-   *
-   * @return The currently configured RF Channel
-   */
+     * Get RF communication channel
+     *
+     * @return The currently configured RF Channel
+     */
     uint8_t getChannel(void);
 
     /**
@@ -1085,13 +1100,13 @@ public:
     uint8_t getARC(void);
 
     /**
-    * Set the transmission data rate
-    *
-    * @warning setting RF24_250KBPS will fail for non-plus units
-    *
-    * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
-    * @return true if the change was successful
-    */
+     * Set the transmission data rate
+     *
+     * @warning setting RF24_250KBPS will fail for non-plus units
+     *
+     * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+     * @return true if the change was successful
+     */
     bool setDataRate(rf24_datarate_e speed);
 
     /**
@@ -1125,60 +1140,58 @@ public:
     void disableCRC(void);
 
     /**
-    * This function is used to configure what events will trigger the Interrupt
-    * Request (IRQ) pin active LOW.
-    * The following events can be configured:
-    * 1. "data sent": This does not mean that the data transmitted was
-    * recieved, only that the attempt to send it was complete.
-    * 2. "data failed": This means the data being sent was not recieved. This
-    * event is only triggered when the auto-ack feature is enabled.
-    * 3. "data received": This means that data from a receiving payload has
-    * been loaded into the RX FIFO buffers. Remember that there are only 3
-    * levels available in the RX FIFO buffers.
-    *
-    * By default, all events are configured to trigger the IRQ pin active LOW.
-    * When the IRQ pin is active, use whatHappened() to determine what events
-    * triggered it. Remeber that calling whatHappened() also clears these
-    * events' status, and the IRQ pin will then be reset to inactive HIGH.
-    *
-    * The following code configures the IRQ pin to only reflect the "data received"
-    * event:
-    * @code
-    * radio.maskIRQ(1, 1, 0);
-    * @endcode
-    *
-    * @param tx_ok  `true` ignores the "data sent" event, `false` reflects the
-    * "data sent" event on the IRQ pin.
-    * @param tx_fail  `true` ignores the "data failed" event, `false` reflects the
-    * "data failed" event on the IRQ pin.
-    * @param rx_ready `true` ignores the "data received" event, `false` reflects the
-    * "data received" event on the IRQ pin.
-    */
+     * This function is used to configure what events will trigger the Interrupt
+     * Request (IRQ) pin active LOW.
+     * The following events can be configured:
+     * 1. "data sent": This does not mean that the data transmitted was
+     * recieved, only that the attempt to send it was complete.
+     * 2. "data failed": This means the data being sent was not recieved. This
+     * event is only triggered when the auto-ack feature is enabled.
+     * 3. "data received": This means that data from a receiving payload has
+     * been loaded into the RX FIFO buffers. Remember that there are only 3
+     * levels available in the RX FIFO buffers.
+     *
+     * By default, all events are configured to trigger the IRQ pin active LOW.
+     * When the IRQ pin is active, use whatHappened() to determine what events
+     * triggered it. Remeber that calling whatHappened() also clears these
+     * events' status, and the IRQ pin will then be reset to inactive HIGH.
+     *
+     * The following code configures the IRQ pin to only reflect the "data received"
+     * event:
+     * @code
+     * radio.maskIRQ(1, 1, 0);
+     * @endcode
+     *
+     * @param tx_ok  `true` ignores the "data sent" event, `false` reflects the
+     * "data sent" event on the IRQ pin.
+     * @param tx_fail  `true` ignores the "data failed" event, `false` reflects the
+     * "data failed" event on the IRQ pin.
+     * @param rx_ready `true` ignores the "data received" event, `false` reflects the
+     * "data received" event on the IRQ pin.
+     */
     void maskIRQ(bool tx_ok, bool tx_fail, bool rx_ready);
 
     /**
-    *
-    * The driver will delay for this duration when stopListening() is called
-    *
-    * When responding to payloads, faster devices like ARM(RPi) are much faster than Arduino:
-    * 1. Arduino sends data to RPi, switches to RX mode
-    * 2. The RPi receives the data, switches to TX mode and sends before the Arduino radio is in RX mode
-    * 3. If AutoACK is disabled, this can be set as low as 0. If AA/ESB enabled, set to 100uS minimum on RPi
-    *
-    * @warning If set to 0, ensure 130uS delay after stopListening() and before any sends
-    */
-
+     *
+     * The driver will delay for this duration when stopListening() is called
+     *
+     * When responding to payloads, faster devices like ARM(RPi) are much faster than Arduino:
+     * 1. Arduino sends data to RPi, switches to RX mode
+     * 2. The RPi receives the data, switches to TX mode and sends before the Arduino radio is in RX mode
+     * 3. If AutoACK is disabled, this can be set as low as 0. If AA/ESB enabled, set to 100uS minimum on RPi
+     *
+     * @warning If set to 0, ensure 130uS delay after stopListening() and before any sends
+     */
     uint32_t txDelay;
 
     /**
-    *
-    * On all devices but Linux and ATTiny, a small delay is added to the CSN toggling function
-    *
-    * This is intended to minimise the speed of SPI polling due to radio commands
-    *
-    * If using interrupts or timed requests, this can be set to 0 Default:5
-    */
-
+     *
+     * On all devices but Linux and ATTiny, a small delay is added to the CSN toggling function
+     *
+     * This is intended to minimise the speed of SPI polling due to radio commands
+     *
+     * If using interrupts or timed requests, this can be set to 0 Default:5
+     */
     uint32_t csDelay;
 
     /**
@@ -1225,7 +1238,7 @@ public:
 
     /**
      * Open a pipe for reading
-     * @note For compatibility with old code only, see new function
+     * @deprecated For compatibility with old code only, see new function
      *
      * @warning Pipes 1-5 should share the first 32 bits.
      * Only the least significant byte should be unique, e.g.
@@ -1245,7 +1258,7 @@ public:
 
     /**
      * Open a pipe for writing
-     * @note For compatibility with old code only, see new function
+     * @deprecated For compatibility with old code only, see new function
      *
      * Addresses are 40-bit hex values, e.g.:
      *
@@ -1261,7 +1274,7 @@ public:
      * Enable dynamic ACKs (single write multicast or unicast) for chosen
      * messages.
      *
-     * @note This function is performed in begin(), so there's no need to
+     * @deprecated This function is performed in begin(), so there's no need to
      * manually call it anymore.
      *
      * @note To enable full multicast or per-pipe multicast, use setAutoAck()
@@ -1277,7 +1290,7 @@ public:
      * Determine if an ack payload was received in the most recent call to
      * write(). The regular available() can also be used.
      *
-     * Call read() to retrieve the ack payload.
+     * @deprecated Call read() to retrieve the ack payload.
      *
      * @return True if an ack payload is available.
      */
@@ -1440,7 +1453,6 @@ private:
     /**
      * Built in spi transfer function to simplify repeating code repeating code
      */
-
     uint8_t spiTrans(uint8_t cmd);
 
     #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
@@ -1660,16 +1672,18 @@ private:
  */
 
 /**
-* @example{lineno} examples/rf24_ATTiny/rf24ping85/rf24ping85.ino
-* <b>New: Contributed by https://github.com/tong67</b><br>
-* This is an example of how to use the RF24 class to communicate with ATtiny85 and other node. <br>
-*/
+ * @example{lineno} examples/rf24_ATTiny/rf24ping85/rf24ping85.ino
+ * <b>New: Contributed by https://github.com/tong67</b><br>
+ * This is an example of how to use the RF24 class to communicate with
+ * ATtiny85 and other node.
+ */
 
 /**
-* @example{lineno} examples/rf24_ATTiny/timingSearch3pin/timingSearch3pin.ino
-* <b>New: Contributed by https://github.com/tong67</b><br>
-* This is an example of how to determine the correct timing for ATtiny when using only 3-pins
-*/
+ * @example{lineno} examples/rf24_ATTiny/timingSearch3pin/timingSearch3pin.ino
+ * <b>New: Contributed by https://github.com/tong67</b><br>
+ * This is an example of how to determine the correct timing for ATtiny when
+ * using only 3-pins
+ */
 
 /**
  * @example{lineno} examples/old_backups/pingpair_dyn/pingpair_dyn.ino
@@ -1678,10 +1692,10 @@ private:
  */
 
 /**
-* @example{lineno} examples_linux/pingpair_dyn.cpp
-*
-* This is an example of how to use payloads of a varying (dynamic) size on Linux.
-*/
+ * @example{lineno} examples_linux/pingpair_dyn.cpp
+ *
+ * This is an example of how to use payloads of a varying (dynamic) size on Linux.
+ */
 
 /**
  * @example{lineno} examples_linux/getting_started.py
