@@ -16,6 +16,7 @@
  * Use `ctrl+c` quit then restart the example to change each node's behavior.
  */
 #include <cstdio>
+#include <ctime>
 #include <iostream>
 #include <unistd.h>
 #include <string>
@@ -55,7 +56,6 @@ void slave();   // prototype of the RX node's behavior; called by setRole()
 
 
 int main() {
-    printf_begin();
     // perform hardware check
     if (!radio.begin()) {
         cout << "nRF24L01 is not responding!!" << endl;
@@ -74,7 +74,11 @@ int main() {
     // set the addresses for both RX and TX nodes
     radio.openWritingPipe(address);    // always uses pipe 0
     radio.openReadingPipe(0, address); // using pipe 0
-    radio.printDetails();
+    // for debugging, uncomment the follow 2 lines
+    // printf_begin();
+    // radio.printDetails();
+
+    // ready to execute program now
     setRole(); // calls master() or slave() based on user input
     return 0;
 }
@@ -88,6 +92,7 @@ void setRole() {
     while (!input.length()) {
         cout << "*** PRESS 'T' to begin transmitting to the other node\n";
         cout << "*** PRESS 'R' to begin receiving from the other node\n";
+        cout << "*** PRESS 'Q' to exit\n";
         getline(cin, input);
         if (input.length() >= 1) {
             if (input[0] == 'T' || input[0] == 't') {
@@ -96,11 +101,14 @@ void setRole() {
             else if (input[0] == 'R' || input[0] == 'r') {
                 slave();
             }
+            else if (input[0] == 'Q' || input[0] == 'q') {
+                break;
+            }
             else {
                 cout << input[0] << " is an invalid input. Please try again." << endl;
-                input = ""; // stay in the while loop
             }
         }
+        input = ""; // stay in the while loop
     } // while
 } // setRole()
 
@@ -110,7 +118,8 @@ void setRole() {
  */
 void master() {
     radio.stopListening();                                          // powerUp() into TX mode
-    while (true) {
+    uint8_t failure = 0;                                            // keep track of failures
+    while (failure < 3) {
         unsigned long start_timer = micros();                       // start the timer
         bool report = radio.write(&payload, sizeof(float));         // transmit & save the report
         unsigned long end_timer = micros();                         // end the timer
@@ -118,17 +127,20 @@ void master() {
         if (report) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
-            cout << end_timer - start_timer << endl;                // print the timer result
+            cout << end_timer - start_timer;                        // print the timer result
+            cout << " us. Sent: " << payload << endl;               // print payload sent
             payload += 0.01;                                        // increment float payload
 
         } else {
             // payload was not delivered
             cout << "Transmission failed or timed out" << endl;
+            failure++;
         }
 
         // to make this example readable in the terminal
         sleep(1);  // slow transmissions down by 1 second
     }
+    cout << "3 failures detected, going back to setRole()" << endl;
 }
 
 /**
@@ -136,7 +148,8 @@ void master() {
  */
 void slave() {
     radio.startListening(); // powerUp() into RX mode
-    while (true) {
+    time_t startTimer = time(nullptr);                       // start a timer
+    while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
         uint8_t pipe;
         if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
             uint8_t bytes = radio.getDynamicPayloadSize();   // get the size of the payload
@@ -144,6 +157,7 @@ void slave() {
             cout << "Received " << (unsigned int)bytes;      // print the size of the payload
             cout << " bytes on pipe " << (unsigned int)pipe; // print the pipe number
             cout << ": " << payload << endl;                 // print the payload's value
+            startTimer = time(nullptr);                      // reset timer
         }
     }
 }
