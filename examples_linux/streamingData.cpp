@@ -128,7 +128,7 @@ void master() {
     unsigned int failures = 0;               // keep track of failures
     uint8_t i = 0;
     unsigned long startTimer = millis();     // start the timer
-    while (failures < 100 || i < SIZE) {
+    while (failures < 100 && i < SIZE) {
         makePayload(i);
         if (!radio.writeFast(&buffer, SIZE)) {
             failures++;
