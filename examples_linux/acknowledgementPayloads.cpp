@@ -150,7 +150,7 @@ void master() {
                 radio.read(&ack, sizeof(PayloadStruct));            // fetch ACK payload
                 cout << " Received: ";
                 cout << ack.message << ack.counter << endl;         // print ACK payload
-                payload += 0.01;                                    // increment payload counter
+                payload.counter++;                                    // increment payload counter
             }
             else {
                 cout << " Received an empty ACK packet." << endl;   // ACK had no payload
