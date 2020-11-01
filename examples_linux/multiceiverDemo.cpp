@@ -112,7 +112,7 @@ void setRole() {
         cout << "*** PRESS 'Q' to exit" << endl;
         getline(cin, input);
         if (input.length() >= 1) {
-            uint8_t toNumber = stoi(input[0]);
+            uint8_t toNumber = (uint8_t)(input[0]) - 48;
             if (toNumber < 6 && toNumber >= 0)
                 master(toNumber);
             else if (input[0] == 'R' || input[0] == 'r')
