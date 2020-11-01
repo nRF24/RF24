@@ -65,7 +65,7 @@ def master(count=1, size=32):
             if radio.writeFast(buf[buf_iter], size):
                 # reception failed; we need to reset the irq_rf flag
                 failures += 1  # increment manual retries
-                radio.reUseTx()
+                radio.reUseTX()
                 if failures > 99 and buf_iter < 7 and c < 2:
                     # we need to prevent an infinite loop
                     print(

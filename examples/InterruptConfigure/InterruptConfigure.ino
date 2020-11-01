@@ -265,12 +265,12 @@ void interruptHandler() {
   // pl_iterator has already been incremented by now
   if (pl_iterator == 1) {
     Serial.print(F("   'Data Ready' event test "));
-    Serial.println(F(rx_dr ? "passed" : "failed"));
+    Serial.println(rx_dr ? F("passed") : F("failed"));
   } else if (pl_iterator == 2) {
     Serial.print(F("   'Data Sent' event test "));
-    Serial.println(F(tx_ds ? "passed" : "failed"));
+    Serial.println(tx_ds ? F("passed") : F("failed"));
   } else if (pl_iterator == 4) {
     Serial.print(F("   'Data Fail' event test "));
-    Serial.println(F(tx_df ? "passed" : "failed"));
+    Serial.println(tx_df ? F("passed") : F("failed"));
   }
 } // interruptHandler
