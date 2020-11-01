@@ -75,7 +75,6 @@ def master(count=1, size=32):
                     buf_iter = size + 1  # be sure to exit the while loop
                     radio.flush_tx()  # discard all payloads in TX FIFO
                     break
-                radio.clear_status_flags()  # clear the irq_df flag
         end_timer = time.monotonic() * 1000  # end timer
         print(
             "Transmission took {} ms with {} failures detected.".format(
