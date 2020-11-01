@@ -99,9 +99,9 @@ void loop() {
     unsigned long end_timer = micros();                         // end the timer
 
     if (report) {
-      Serial.print(F("Transmission successful!"));              // payload was delivered
+      Serial.print(F("Transmission successful! "));             // payload was delivered
       Serial.print(F("Time to transmit = "));
-      Serial.println(end_timer - start_timer);                  // print the timer result
+      Serial.print(end_timer - start_timer);                    // print the timer result
       Serial.print(F("us. Sent: "));
       Serial.print(payload.message);                            // print the payload message
       Serial.print(payload.counter);                            // print the payload counter
@@ -112,7 +112,7 @@ void loop() {
         Serial.print(ack.message);                              // print ACK message
         Serial.println(ack.counter);                              // print ACK counter
       } else {
-        Serial.println(F(" Recieved: a blank ACK packet"));       // empty ACK packet received
+        Serial.println(F(" Recieved: an empty ACK packet"));    // empty ACK packet received
       }
       payload.counter++;                                        // increment payload counter
 

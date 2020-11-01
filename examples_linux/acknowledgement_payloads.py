@@ -51,21 +51,36 @@ def master(count=5):  # count = 5 will only transmit 5 packets
 
     while count:
         # construct a payload to send
-        buffer = b"Hello \x00" + struct.pack("<I", counter[0])
+        buffer = b"Hello \x00" + struct.pack("<b", counter[0])
 
         # send the payload and prompt
-        start_timer = time.monotonic() * 1000  # start timer
+        start_timer = time.monotonic_ns()  # start timer
         result = radio.write(buffer)  # save the report
-        end_timer = time.monotonic() * 1000  # stop timer
+        end_timer = time.monotonic_ns()  # stop timer
         print("Sent:", buffer, end=" ")
         if result:
             # print timer results upon transmission success
-            print("Transmission took", end_timer - start_timer, end=" ")
+            print(
+                "Transmission successful! Time to transmit: "
+                "{} us. Sent: {}{}".format(
+                    int((end_timer - start_timer) / 1000),
+                    buffer[:6].decode("utf-8"),
+                    counter[0]
+                ),
+                end=" "
+            )
             if radio.available():
                 # print the received ACK that was automatically sent
                 result = radio.read(radio.getDynamicPayloadSize())
-                print("ms Received:", result)
+                print(
+                    " Received: {}{}".format(
+                        result[:6].decode("utf-8"),
+                        struct.unpack("<b", result[7:])[0]
+                    )
+                )
                 counter[0] += 1  # increment payload counter
+            else:
+                print(" Received an empty ACK packet")
         else:
             print("Transmission failed or timed out")
         time.sleep(1)  # let the RX node prepare a new ACK payload
@@ -87,17 +102,27 @@ def slave(count=5):
 
     start = time.monotonic()  # start timer
     while count and (time.monotonic() - start) < 6:  # use 6 second timeout
-        if radio.available():
+        has_payload, pipe_number = radio.available_pipe()
+        if has_payload:
             count -= 1
-            # fetch the received packet's payload
-            rx = radio.radio(radio.getDynamicPayloadSize())
+            length = radio.getDynamicPayloadSize()  # grab the payload length
+            received = radio.read(length)  # fetch 1 payload from RX FIFO
             # increment counter from received payload
-            counter[0] = struct.unpack("<i", rx[7:])[0] + 1
-            print("Received: {} Sent: {}".format(rx, buffer))
+            counter[0] = struct.unpack("<b", received[7:])[0] + 1
+            print(
+                "Received {} bytes on pipe {}: {}{} Sent: {}{}".format(
+                    length,
+                    pipe_number,
+                    received[:6].decode("utf-8"),
+                    struct.unpack("<b", received[7:])[0],
+                    buffer[:6].decode("utf-8"),
+                    counter[0]
+                )
+            )
             start = time.monotonic()  # reset timer
             if count:  # Going again?
-                # build a new ACK
-                buffer = b"World \x00" + struct.pack("<i", counter[0])
+                # build a new ACK payload
+                buffer = b"World \x00" + struct.pack("<b", counter[0])
                 radio.writeAckPayload(0, buffer)  # load ACK for next response
 
     # recommended behavior is to keep in TX mode while idle

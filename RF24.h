@@ -389,14 +389,20 @@ public:
      * FIFO buffers.
      *
      * @note This function is named `available_pipe()` in the python wrapper.
-     * Instead of returning a boolean, the `available_pipe()` function (which
-     * takes no arguments) returns the pipe number that received the next
-     * available payload in the RX FIFO buffers.<br>To use this function in
-     * python:
+     * Additionally, the `available_pipe()` function (which
+     * takes no arguments) returns a 2 item tuple containing (ordered by
+     * tuple's indices):
+     * - A boolean describing if there is a payload available to read from
+     *   the RX FIFO buffers.
+     * - The pipe number that received the next available payload in the RX
+     *   FIFO buffers. If the item at the tuple's index 0 is `False`, then
+     *   this pipe number is invalid.
+     * @note To use this function in python:
      * @code{.py}
      * # let `radio` be the instatiated RF24 object
-     * if radio.available():  # is there a payload?
-     *     pipe = radio.available_pipe()  # get the pipe number that received it
+     * has_payload, pipe_number = radio.available_pipe()  # expand the tuple to 2 variables
+     * if has_payload:
+     *     print("Received a payload with pipe", pipe_number)
      * @endcode
      *
      * @param[out] pipe_num Which pipe has the payload available

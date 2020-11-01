@@ -48,13 +48,19 @@ def base(timeout=10):
     radio.startListening()  # put base station into RX mode
     start_timer = time.monotonic()  # start timer
     while time.monotonic() - start_timer < timeout:
-        while radio.available():  # keep RX FIFO empty for reception
-            # show the pipe number that received the payload
-            print("pipe", radio.available_pipe(), end=" ")
+        has_payload, pipe_number = radio.available_pipe()
+        if has_payload:
+            length = radio.getDynamicPayloadSize()  # grab the payload length
+            # unpack payload
             nodeID, payloadID = struct.unpack("<ii", radio.read(8))
+            # show the pipe number that received the payload
             print(
-                "received from node {}. PayloadID: {}".format(
-                    nodeID, payloadID
+                "Received {} bytes on pipe {} from node {}. PayloadID: "
+                "{}".format(
+                    length,
+                    pipe_number,
+                    nodeID,
+                    payloadID
                 )
             )
             start_timer = time.monotonic()  # reset timer with every payload

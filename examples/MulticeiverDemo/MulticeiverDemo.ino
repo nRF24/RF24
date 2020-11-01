@@ -140,7 +140,7 @@ void loop() {
       Serial.println(F("--- a unique node number that transmits to the RX node."));
       setRole(); // change address on all pipes to TX nodes
 
-    } else if (c >= 0 || c <= 5) {
+    } else if (c >= 0 && c <= 5 && c != role) {
       // Become a TX node with identifier 'c'
 
       role = c;

@@ -46,17 +46,20 @@ def master(count=5):  # count = 5 will only transmit 5 packets
         buffer = struct.pack("<f", payload[0])
         # 'i' means a single 4 byte int value.
         # '<' means little endian byte order. this may be optional
-        print("Sending: {} as struct: {}".format(payload[0], buffer))
-        start_timer = time.monotonic() * 1000  # start timer
+        start_timer = time.monotonic_ns()  # start timer
         result = radio.write(buffer)
-        end_timer = time.monotonic() * 1000  # end timer
+        end_timer = time.monotonic_ns()  # end timer
         if not result:
-            print("send() failed or timed out")
+            print("Transmission failed or timed out")
         else:
-            print("send() successful")
+            print(
+                "Transmission successful! Time to Transmit: "
+                "{} us. Sent: {}".format(
+                    (end_timer - start_timer) / 1000,
+                    payload[0]
+                )
+            )
             payload[0] += 0.01
-        # print timer results despite transmission success
-        print("Transmission took", end_timer - start_timer, "ms")
         time.sleep(1)
         count -= 1
 
@@ -73,19 +76,23 @@ def slave(count=5):
 
     start = time.monotonic()
     while count and (time.monotonic() - start) < 6:
-        if radio.available():
+        has_payload, pipe_number = radio.available_pipe()
+        if has_payload:
             count -= 1
             length = radio.getDynamicPayloadSize()  # grab the payload length
-            # print details about the received packet
-            print("{} bytes received on pipe {}".format(length, radio.available_pipe()))
             # fetch 1 payload from RX FIFO
             rx = radio.read(length)  # also clears radio.irq_dr status flag
-
             # expecting a float, thus the format string "<f"
             # rx[:4] truncates padded 0s in case dynamic payloads are disabled
             payload[0] = struct.unpack("<f", rx[:4])[0]
-            # print the payload received
-            print("Received: {}, Raw: {}".format(payload[0], rx))
+            # print details about the received packet
+            print(
+                "{} bytes received on pipe {}: {}".format(
+                    length,
+                    pipe_number,
+                    payload[0]
+                )
+            )
             start = time.monotonic()  # reset the timeout timer
 
     # recommended behavior is to keep in TX mode while idle

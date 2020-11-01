@@ -38,7 +38,7 @@ address = [b"1Node", b"2Node"]
 
 # using the python keyword global is bad practice. Instead we'll use a 1 item
 # list to store our float number for the payloads sent
-payload = [0.0]
+payload = [0]
 
 def master(count=10):
     """Transmits a message and an incrementing integer every second"""
@@ -101,12 +101,12 @@ def slave(count=10):
     radio.startListening()  # put radio into RX mode and power up
 
     start_timer = time.monotonic()  # start a timer to detect timeout
-    while count or (time.monotonic() - start_timer) < 6:
+    while count and (time.monotonic() - start_timer) < 6:
         # receive `count` payloads or wait 6 seconds till timing out
-        if radio.available():
+        has_payload, pipe_number = radio.available_pipe()
+        if has_payload:
             count -= 1
             length = radio.getDynamicPayloadSize()  # grab the payload length
-            pipe = radio.available_pipe()  # grab the pipe number
             received = radio.read(length)  # fetch 1 payload from RX FIFO
             # use struct.unpack() to get the payload's appended int
             # NOTE received[7:] discards NULL terminating 0, and
@@ -121,7 +121,7 @@ def slave(count=10):
             print(
                 "Received {} bytes on pipe {}: {}{}.".format(
                     length,
-                    pipe,
+                    pipe_number,
                     received[:6].decode("utf-8"),
                     payload[0] - 1
                 ),
@@ -129,7 +129,7 @@ def slave(count=10):
             )
             if response:
                 print(
-                    "Sent:, {}{}".format(
+                    "Sent: {}{}".format(
                         buffer[:6].decode("utf-8"),
                         payload[0]
                     )
