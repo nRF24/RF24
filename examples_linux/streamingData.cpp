@@ -126,6 +126,7 @@ void master() {
     // radio.openWritingPipe(0, address);
 
     unsigned int failures = 0;               // keep track of failures
+    uint8_t i = 0;
     unsigned long startTimer = millis();     // start the timer
     while (failures < 100 || i < SIZE) {
         makePayload(i);
