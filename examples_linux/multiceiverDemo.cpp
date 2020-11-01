@@ -85,7 +85,7 @@ int main() {
     }
 
     // print example's introductory prompt
-    Serial.println(F("RF24/examples/MulticeiverDemo"));
+    cout <<"RF24/examples_linux/multiceiverDemo" << endl;
 
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
