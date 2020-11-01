@@ -26,10 +26,6 @@
 #include <printf.h>
 #include <RF24/RF24.h> // delay(), pinMode(), digitalRead(), OUTPUT
 
-#ifdef RF24_WIRINGPI
-#include "wiringPi.h"
-#endif
-
 using namespace std;
 
 // We will be using the nRF24L01's IRQ pin for this example
@@ -263,9 +259,9 @@ void interruptHandler() {
 
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     if (pl_iterator == 0)
-        cout << "   'Data Ready' event test " << rx_dr ? "passed" : "failed." << endl;
+        cout << "   'Data Ready' event test " << (rx_dr ? "passed" : "failed") << endl;
     else if (pl_iterator == 1)
-        cout << "   'Data Sent' event test " << tx_ds ? "passed" : "failed." << endl;
+        cout << "   'Data Sent' event test " << (tx_ds ? "passed" : "failed") << endl;
     else if (pl_iterator == 3)
-        cout << "   'Data Fail' event test " << tx_df ? "passed" : "failed." << endl;
+        cout << "   'Data Fail' event test " << (tx_df ? "passed" : "failed") << endl;
 } // interruptHandler

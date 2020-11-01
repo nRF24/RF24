@@ -22,10 +22,6 @@
 #include <printf.h>
 #include <RF24/RF24.h> // delay()
 
-#ifdef RF24_WIRINGPI
-#include "wiringPi.h"
-#endif
-
 using namespace std;
 
 /****************** Linux ***********************/
