@@ -134,30 +134,30 @@ void master() {
         if (report) {
             // transmission successful; wait for response and print results
 
-            bool timed_out = false;                       // variable for response timeout
-            radio.openReadingPipe(1, address[1]);         // open pipe 1 to the RX address
-            radio.startListening();                       // put in RX mode
-            unsigned long start_timeout = millis();       // timer to detect no response
-            while (!radio.available() && !timed_out) {    // wait for response or timeout
-                if (millis() - start_timeout > 200)       // only wait 200 ms
+            bool timed_out = false;                        // variable for response timeout
+            radio.openReadingPipe(1, address[1]);          // open pipe 1 to the RX address
+            radio.startListening();                        // put in RX mode
+            unsigned long start_timeout = millis();        // timer to detect no response
+            while (!radio.available() && !timed_out) {     // wait for response or timeout
+                if (millis() - start_timeout > 200)        // only wait 200 ms
                     timed_out = true;
             }
-            unsigned long end_timer = millis();           // end the timer
-            radio.stopListening();                        // put back in TX mode
-            radio.openWritingPipe(address[0]);            // set the pipe 0 to TX address
+            unsigned long end_timer = millis();            // end the timer
+            radio.stopListening();                         // put back in TX mode
+            radio.openWritingPipe(address[0]);             // set the pipe 0 to TX address
 
             // print summary of transactions
-            cout << "Transmission successful!";           // payload was delivered
-            if (!timed_out && radio.available()) {        // is there a payload received
+            cout << "Transmission successful!";            // payload was delivered
+            if (radio.available()) {         // is there a payload received
                 cout << " Round trip delay = ";
-                cout << end_timer - start_timer;          // print the timer result
-                cout << " ms. Sent: " << payload.message; // print the outgoing message
-                cout << payload.counter;                  // print outgoing counter
+                cout << end_timer - start_timer;           // print the timer result
+                cout << " ms. Sent: " << payload.message;  // print the outgoing message
+                cout << (unsigned int)payload.counter;     // print outgoing counter
                 PayloadStruct ack;
-                radio.read(&ack, sizeof(PayloadStruct));  // get payload from RX FIFO
-                cout << " Recieved: " << ack.message;     // print the incoming message
-                cout << ack.counter << endl;              // print the incoming counter
-                payload.counter = ack.counter;            // save updated counter
+                radio.read(&ack, sizeof(PayloadStruct));   // get payload from RX FIFO
+                cout << " Recieved: " << ack.message;      // print the incoming message
+                cout << (unsigned int)ack.counter << endl; // print the incoming counter
+                payload.counter = ack.counter;             // save updated counter
             }
             else {
                 cout << " Recieved no response." << endl; // no response received
@@ -202,11 +202,12 @@ void slave() {
             cout << "Received " << bytes;                   // print the size of the payload
             cout << " bytes on pipe " << pipe;              // print the pipe number
             cout << ": " << received.message;               // print incoming message
-            cout << received.counter;                       // print received counter
+            cout << (unsigned int)received.counter;         // print received counter
 
             if (report) {
                 cout << " Sent: " << payload.message;       // print response message
-                cout << payload.counter << endl;            // print response counter
+                cout << (unsigned int)payload.counter;      // print response counter
+                cout << endl;
             }
             else {
                 cout << " Response failed to send." << endl; // failed to send response

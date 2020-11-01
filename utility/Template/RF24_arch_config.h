@@ -72,6 +72,7 @@ typedef uint16_t prog_uint16_t;
 #define INPUT GPIO::DIRECTION_IN
 #define OUTPUT GPIO::DIRECTION_OUT
 #define digitalWrite(pin, value) GPIO::write(pin, value)
+#define digitalRead(pin) GPIO::read(pin)
 #define pinMode(pin, direction) GPIO::open(pin, direction)
 #define delay(milisec) __msleep(milisec)
 #define delayMicroseconds(usec) __usleep(usec)

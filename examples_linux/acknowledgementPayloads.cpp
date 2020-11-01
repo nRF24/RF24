@@ -141,19 +141,20 @@ void master() {
         if (report) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
-            cout << timerEllapsed;                                  // print the timer result
+            cout << timerEllapsed;                                    // print the timer result
             cout << " us. Sent: ";
-            cout << payload.message << payload.counter;             // print payload sent
+            cout << payload.message << (unsigned int)payload.counter; // print payload sent
 
             if (radio.available()) {
                 PayloadStruct ack;
-                radio.read(&ack, sizeof(PayloadStruct));            // fetch ACK payload
+                radio.read(&ack, sizeof(PayloadStruct));              // fetch ACK payload
                 cout << " Received: ";
-                cout << ack.message << ack.counter << endl;         // print ACK payload
+                cout << ack.message << (unsigned int)ack.counter;     // print ACK payload
+                cout << endl;
                 payload.counter++;                                    // increment payload counter
             }
             else {
-                cout << " Received an empty ACK packet." << endl;   // ACK had no payload
+                cout << " Received an empty ACK packet." << endl;     // ACK had no payload
             }
         }
         else {
@@ -190,9 +191,11 @@ void slave() {
             radio.read(&rx, bytes);                           // fetch payload from FIFO
             cout << "Received " << (unsigned int)bytes;       // print the size of the payload
             cout << " bytes on pipe " << (unsigned int)pipe;  // print the pipe number
-            cout << ": " << rx.message << rx.counter;         // print received payload
+            cout << ": " << rx.message;
+            cout << (unsigned int)rx.counter;                 // print received payload
             cout << " Sent: ";
-            cout << payload.message << payload.counter;       // print ACK payload sent
+            cout << payload.message;
+            cout << (unsigned int)payload.counter << endl;    // print ACK payload sent
             startTimer = time(nullptr);                       // reset timer
 
             // increment payload counter

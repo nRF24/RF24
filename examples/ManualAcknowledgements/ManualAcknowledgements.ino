@@ -114,7 +114,7 @@ void loop() {
 
       // print summary of transactions
       Serial.print(F("Transmission successful!"));           // payload was delivered
-      if (!timed_out && radio.available()) {                 // is there a payload received
+      if (radio.available()) {                 // is there a payload received
         Serial.print(F(" Round trip delay = "));
         Serial.print(end_timer - start_timer);               // print the timer result
         Serial.print(F(" ms. Sent: "));

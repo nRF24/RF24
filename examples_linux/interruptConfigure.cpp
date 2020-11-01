@@ -210,6 +210,9 @@ void slave() {
         rx_fifo[tx_pl_size * 3] = 0;                   // append a NULL terminating 0 for use as a c-string
         cout <<"Complete RX FIFO: " << rx_fifo << endl; // print the entire RX FIFO with 1 buffer
     }
+    else {
+        cout << "Timeout was reached. Going back to setRole()" << endl;
+    }
 }
 
 

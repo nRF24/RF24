@@ -49,7 +49,7 @@ uint8_t address[6] = "1Node";
 // monitor. The TX node and RX node needs only a single 32 byte buffer.
 #define SIZE 32
 char buffer[SIZE + 1];     // for the RX node
-uint8_t counter = 0;       // for counting the number of received payloads
+unsigned int counter = 0;  // for counting the number of received payloads
 void makePayload(uint8_t); // prototype to construct payload dynamically
 
 void setRole(); // prototype to set the node's role
