@@ -1,4 +1,4 @@
-"""!
+"""
 Simple example of using the RF24 class.
 """
 import time
@@ -28,15 +28,17 @@ radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
 # addresses needs to be in a buffer protocol object (bytearray)
 address = b"1Node"
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
 
 # using the python keyword global is bad practice. Instead we'll use a 1 item
 # list to store our float number for the payloads sent
 payload = [0.0]
 
 def master(count=5):  # count = 5 will only transmit 5 packets
-    """Transmits an incrementing integer every second"""
-    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
+    """Transmits an incrementing float every second"""
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
+    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
 
     while count:
         # use struct.pack to packetize your data
@@ -71,12 +73,11 @@ def slave(count=5):
 
     start = time.monotonic()
     while count and (time.monotonic() - start) < 6:
-        pipe = 7
-        if radio.available(pipe):
+        if radio.available():
             count -= 1
             length = radio.getDynamicPayloadSize()  # grab the payload length
             # print details about the received packet
-            print("{} bytes received on pipe {}".format(length, pipe))
+            print("{} bytes received on pipe {}".format(length, radio.available_pipe()))
             # fetch 1 payload from RX FIFO
             rx = radio.read(length)  # also clears radio.irq_dr status flag
 

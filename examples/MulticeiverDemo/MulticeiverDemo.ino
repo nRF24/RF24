@@ -137,7 +137,7 @@ void loop() {
       role = c;
       Serial.println(F("*** CHANGING ROLE TO RECEIVER ***"));
       Serial.println(F("--- Enter a number between 0 and 5 (inclusive) to act as"));
-      Serial.println(F("--- a unique node number that transmits  to the RX node."));
+      Serial.println(F("--- a unique node number that transmits to the RX node."));
       setRole(); // change address on all pipes to TX nodes
 
     } else if (c >= 0 || c <= 5) {

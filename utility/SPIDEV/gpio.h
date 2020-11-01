@@ -27,7 +27,7 @@ public:
 
 /**
  * @file gpio.h
- * \cond HIDDEN_SYMBOLS
+ * @cond HIDDEN_SYMBOLS
  * Class declaration for GPIO helper files
  */
 
@@ -71,7 +71,6 @@ public:
     /**
      * Similar to Arduino digitalRead(pin);
      * @param port
-     * @param value
      */
     static int read(int port);
 
@@ -89,7 +88,7 @@ private:
     static std::map<int, GPIOfdCache_t> cache;
 };
 /**
- * \endcond
+ * @endcond
  */
-/*@}*/
+/**@}*/
 #endif    /* H */

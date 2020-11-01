@@ -193,6 +193,9 @@ public:
      *   radio.read(&data,sizeof(data));
      * }
      * @endcode
+     *
+     * @see available(uint8_t*)
+     *
      * @return True if there is a payload available, false if none is
      */
     bool available(void);
@@ -384,6 +387,17 @@ public:
     /**
      * Test whether there are bytes available to be read from the
      * FIFO buffers.
+     *
+     * @note This function is named `available_pipe()` in the python wrapper.
+     * Instead of returning a boolean, the `available_pipe()` function (which
+     * takes no arguments) returns the pipe number that received the next
+     * available payload in the RX FIFO buffers.<br>To use this function in
+     * python:
+     * @code{.py}
+     * # let `radio` be the instatiated RF24 object
+     * if radio.available():  # is there a payload?
+     *     pipe = radio.available_pipe()  # get the pipe number that received it
+     * @endcode
      *
      * @param[out] pipe_num Which pipe has the payload available
      *
@@ -885,12 +899,26 @@ public:
      * Meaning the default channel of 76 uses the approximate frequency of
      * 2476 MHz.
      *
+     * @note In the python wrapper, this function is the setter of the
+     * `channel` attribute.<br>To use this function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * radio.channel = 2  # set the channel to 2 (2402 MHz)
+     * @endcode
+     *
      * @param channel Which RF channel to communicate on, 0-125
      */
     void setChannel(uint8_t channel);
 
     /**
      * Get RF communication channel
+     *
+     * @note In the python wrapper, this function is the getter of the
+     * `channel` attribute.<br>To use this function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * chn = radio.channel  # get the channel
+     * @endcode
      *
      * @return The currently configured RF Channel
      */
@@ -904,7 +932,12 @@ public:
      * transmit the maximum payload size (32 bytes), no matter how much
      * was sent to write().
      *
-     * @todo Implement variable-sized payloads feature
+     * @note In the python wrapper, this function is the setter of the
+     * `payloadSize` attribute.<br>To use this function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * radio.payloadSize = 16  # set the static payload size to 16 bytes
+     * @endcode
      *
      * @param size The number of bytes in the payload
      */
@@ -912,6 +945,13 @@ public:
 
     /**
      * Get Static Payload Size
+     *
+     * @note In the python wrapper, this function is the getter of the
+     * `payloadSize` attribute.<br>To use this function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * pl_size = radio.payloadSize  # get the static payload size
+     * @endcode
      *
      * @see setPayloadSize()
      *
@@ -1469,10 +1509,10 @@ private:
 /**
  * @example{lineno} examples/GettingStarted/GettingStarted.ino
  * <b>For Arduino</b><br>
- * <b>Rewritten by: 2bndy5 2020 </b><br>
+ * <b>Re-written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example uses the RF24 library's default settings which includes having
  * dynamic payload length enabled. Try adjusting this example to use
  * statically sized payloads.
@@ -1484,11 +1524,11 @@ private:
 /**
  * @example{lineno} examples/AcknowledgementPayloads/AcknowledgementPayloads.ino
  * <b>For Arduino</b><br>
- * <b>Written by: 2bndy5 2020 </b><br>
+ * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
  * example to use a different RX pipe that still responds with ACK
  * payloads.
@@ -1500,7 +1540,7 @@ private:
 /**
  * @example{lineno} examples/ManualAcknowledgements/ManualAcknowledgements.ino
  * <b>For Arduino</b><br>
- * <b>Written by: 2bndy5 2020 </b><br>
+ * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
  * This example still uses ACK packets, but they have no payloads. Instead the
@@ -1509,7 +1549,7 @@ private:
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example uses 2 different addresses for the RX & TX nodes.
  * Try adjusting this example to use the same address on different pipes.
  *
@@ -1520,10 +1560,10 @@ private:
 /**
  * @example{lineno} examples/StreamingData/StreamingData.ino
  * <b>For Arduino</b><br>
- * <b>Written by: 2bndy5 2020 </b><br>
+ * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of streaming data from 1 nRF24L01 transceiver to another.
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example uses the startFastWrite() function to utilize all 3 levels of
  * the TX FIFO. Try adjusting this example to use the write() function which
  * only uses 1 level of the TX FIFO per call. Notice the difference in
@@ -1536,12 +1576,12 @@ private:
 /**
  * @example{lineno} examples/MulticeiverDemo/MulticeiverDemo.ino
  * <b>For Arduino</b><br>
- * <b>Written by: 2bndy5 2020 </b><br>
+ * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of sending data from as many as 6 nRF24L01 transceivers to
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example uses the Serial Monitor to change a node's role. Try adjusting
  * this example so that the 1 recieving node sends a ping that tells
  * all other transmitting nodes to start transmitting. HINT: use the
@@ -1554,13 +1594,13 @@ private:
 /**
  * @example{lineno} examples/InterruptConfigure/InterruptConfigure.ino
  * <b>For Arduino</b><br>
- * <b>Written by: 2bndy5 2020 </b><br>
+ * <b>Written by 2bndy5 2020 </b><br>
  * This example uses Acknowledgement (ACK) payloads attached to ACK packets to
  * demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
  * configured to detect when data is received, or when data has transmitted
  * successfully, or when data has failed to transmit.
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example does not use Arduino's attachInterrupt() function. Try
  * adjusting this example so that attachInterrupt() calls this example's
  * interruptHandler() function.
@@ -1573,7 +1613,7 @@ private:
 /**
  * @example{lineno} examples/ManualAcknowledgements/ManualAcknowledgements.ino
  * <b>For Arduino</b><br>
- * <b>Written by: 2bndy5 2020 </b><br>
+ * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
  * This example still uses ACK packets, but they have no payloads. Instead the
@@ -1582,37 +1622,13 @@ private:
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * A challenge to learn new skills:
+ * A challenge to learn new skills:<br>
  * This example uses 2 different addresses for the RX & TX nodes.
  * Try adjusting this example to use the same address on different pipes.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
-
-/**
-* @example{lineno} examples_linux/gettingstarted.cpp
-* <b>For Linux</b><br>
-* <b>Updated: TMRh20 2014 </b><br>
-*
-* This is an example of how to use the RF24 class to communicate on a basic level. Configure and write this sketch to two
-* different nodes. Put one of the nodes into 'transmit' mode by connecting with the serial monitor and <br>
-* sending a 'T'. The ping node sends the current time to the pong node, which responds by sending the value
-* back. The ping node can then see how long the whole cycle took. <br>
-* @note For a more efficient call-response scenario see the GettingStarted_CallResponse.ino example.
-*/
-
-/**
-* @example{lineno} examples_linux/gettingstarted_call_response.cpp
-* <b>For Linux</b><br>
-* <b>New: TMRh20 2014</b><br>
-*
-* This example continues to make use of all the normal functionality of the radios including
-* the auto-ack and auto-retry features, but allows ack-payloads to be written optionlly as well. <br>
-* This allows very fast call-response communication, with the responding radio never having to
-* switch out of Primary Receiver mode to send back a payload, but having the option to switch to <br>
-* primary transmitter if wanting to initiate communication instead of respond to a commmunication.
-*/
 
 /**
 * @example{lineno} examples/old_backups/GettingStarted_HandlingData/GettingStarted_HandlingData.ino
@@ -1627,17 +1643,6 @@ private:
 *
 * This example demonstrates the basic getting started functionality, but with failure handling for the radio chip.
 * Addresses random radio failures etc, potentially due to loose wiring on breadboards etc.
-*/
-
-/**
-* @example{lineno} examples_linux/transfer.cpp
-* <b>For Linux</b><br>
-* This example demonstrates half-rate transfer using the FIFO buffers<br>
-*
-* It is an example of how to use the RF24 class.  Write this sketch to two
-* different nodes.  Put one of the nodes into 'transmit' mode by connecting <br>
-* with the serial monitor and sending a 'T'.  The data transfer will begin,
-* with the receiver displaying the payload count. (32Byte Payloads) <br>
 */
 
 /**
@@ -1660,7 +1665,6 @@ private:
  * The pingpair_sleepy example expands on sleep functionality with a timed sleep option for the transmitter.
  * Sleep functionality is built directly into my fork of the RF24Network library<br>
  */
-
 
 /**
  * @example{lineno} examples/old_backups/pingpair_sleepy/pingpair_sleepy.ino
@@ -1692,12 +1696,6 @@ private:
  */
 
 /**
- * @example{lineno} examples_linux/pingpair_dyn.cpp
- *
- * This is an example of how to use payloads of a varying (dynamic) size on Linux.
- */
-
-/**
  * @example{lineno} examples_linux/getting_started.py
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi.
@@ -1708,6 +1706,16 @@ private:
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * transmit and retrieve custom automatic acknowledgment payloads.
+ */
+
+/**
+ * @example{lineno} examples_linux/manual_acknowledgements.py
+ *
+ * This is a simple example of using the RF24 class on a Raspberry Pi to
+ * transmit and respond with acknowledgment (ACK) transmissions. Notice that
+ * the auto-ack feature is enabled, but this example doesn't use automatic ACK
+ * payloads because automatic ACK payloads' data will always be outdated by 1
+ * transmission. Instead, this example uses a call and response paradigm.
  */
 
 /**
@@ -1741,6 +1749,94 @@ private:
  *
  * Inspired by cpixip.
  * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ */
+
+/**
+ * @example{lineno} examples_linux/gettingstarted.cpp
+ * <b>For Linux</b><br>
+ * <b>Re-written by 2bndy5 2020</b><br>
+ *
+ * A simple example of sending data from 1 nRF24L01 transceiver to another.
+ *
+ * A challenge to learn new skills:<br>
+ * This example uses the RF24 library's default settings which includes having
+ * dynamic payload length enabled. Try adjusting this example to use
+ * statically sized payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` to quit at any time.
+ */
+
+/**
+ * @example{lineno} examples_linux/acknowledgementPayloads.cpp
+ * <b>For Linux</b><br>
+ * <b>Written by 2bndy5 2020</b>
+ *
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with Acknowledgement (ACK) payloads attached to ACK packets.
+ *
+ * A challenge to learn new skills:<br>
+ * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
+ * example to use a different RX pipe that still responds with ACK
+ * payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` to quit at any time.
+ */
+
+/**
+ * @example{lineno} examples_linux/manualAcknowledgements.cpp
+ * <b>For Linux</b><br>
+ * <b>Written by 2bndy5 2020</b>
+ *
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
+ * This example still uses ACK packets, but they have no payloads. Instead the
+ * acknowledging response is sent with `write()`. This tactic allows for more
+ * updated acknowledgement payload data, where actual ACK payloads' data are
+ * outdated by 1 transmission because they have to loaded before receiving a
+ * transmission.
+ *
+ * A challenge to learn new skills:<br>
+ * This example uses 2 different addresses for the RX & TX nodes.
+ * Try adjusting this example to use the same address on different pipes.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` to quit at any time.
+ */
+
+/**
+ * @example{lineno} examples_linux/streamingData.cpp
+ * <b>For Linux</b><br>
+ * <b>Written by 2bndy5 2020</b><br>
+ *
+ * A simple example of sending data from 1 nRF24L01 transceiver to another.
+ *
+ * A challenge to learn new skills:<br>
+ * This example uses the RF24 library's default settings which includes having
+ * dynamic payload length enabled. Try adjusting this example to use
+ * statically sized payloads.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` to quit at any time.
+ */
+
+/**
+ * @example{lineno} examples_linux/multiceiverDemo.cpp
+ * <b>For Linux</b><br>
+ * <b>Written by 2bndy5 2020</b><br>
+ * A simple example of sending data from as many as 6 nRF24L01 transceivers to
+ * 1 receiving transceiver. This technique is trademarked by
+ * Nordic Semiconductors as "MultiCeiver".
+ *
+ * A challenge to learn new skills:<br>
+ * This example uses the Serial Monitor to change a node's role. Try adjusting
+ * this example so that the 1 recieving node sends a ping that tells
+ * all other transmitting nodes to start transmitting. HINT: use the
+ * "multicast" parameter to write().
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` to quit at any time.
  */
 
 /**

@@ -129,15 +129,15 @@ void loop() {
     uint8_t pipe;
     if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
-      PayloadStruct tx;
-      radio.read(&tx, bytes);                        // fetch payload from FIFO
+      PayloadStruct rx;
+      radio.read(&rx, bytes);                        // fetch payload from FIFO
       Serial.print(F("Received "));
       Serial.print(bytes);                           // print the size of the payload
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                            // print the pipe number
       Serial.print(F(": "));
-      Serial.print(tx.message);                      // print payload message
-      Serial.print(tx.counter);                      // print payload counter
+      Serial.print(rx.message);                      // print payload message
+      Serial.print(rx.counter);                      // print payload counter
       Serial.print(F(" Sent: "));
       Serial.print(payload.message);                 // print ACK message
       Serial.println(payload.counter);               // print ACK counter

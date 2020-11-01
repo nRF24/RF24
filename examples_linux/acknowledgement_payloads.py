@@ -1,4 +1,4 @@
-"""!
+"""
 Simple example of using the library to transmit
 and retrieve custom automatic acknowledgment payloads.
 """
@@ -36,6 +36,8 @@ radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
 # addresses needs to be in a buffer protocol object (bytearray)
 address = b"1Node"
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
 
 # using the python keyword global is bad practice. Instead we'll use a 1 item
 # list to store our integer number for the payloads' counter

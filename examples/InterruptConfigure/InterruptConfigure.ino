@@ -130,12 +130,11 @@ void loop() {
       radio.maskIRQ(1, 1, 1); // disable IRQ masking for this step
 
       Serial.println(F("\nSending 1 payload to fill RX node's FIFO. IRQ pin is neglected."));
-      if (radio.write(&tx_payloads[pl_iterator], tx_pl_size)) {
+      // write() will call flush_tx() on 'data fail' events
+      if (radio.write(&tx_payloads[pl_iterator], tx_pl_size))
         Serial.println(F("RX node's FIFO is full; it is not listening any more"));
-      } else {
-        radio.flush_tx(); // clear the failed payload for continued operation
+      else
         Serial.println(F("Transmission failed or timed out. Continuing anyway."));
-      }
 
     } else if (pl_iterator == 3) {
       // test the "data fail" event with the IRQ pin
@@ -148,12 +147,7 @@ void loop() {
     if (pl_iterator < 4 && pl_iterator != 2) {
       // use the non-blocking call to write a payload and begin transmission
       // the "false" argument means we are expecting an ACK packet response
-      radio.startFastWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
-
-      // To only send 1 payload at a time, there needs to be a 10 us pulse on
-      // the CE_PIN. Every call to startWrite() initiates that pulse.
-      delayMicroseconds(10); // ensure pulse is at least 10 us
-      digitalWrite(CE_PIN, LOW); // end the 10 us mandatory pulse
+      radio.startWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
 
       while (digitalRead(IRQ_PIN)) {
         /*
@@ -162,8 +156,7 @@ void loop() {
          *
          * In this example, the "data fail" event is always configured to
          * trigger the IRQ pin active. Because the auto-ACK feature is on by
-         * default, we don't need to use a timeout check to prevent an
-         * infinite loop.
+         * default, we don't need a timeout check to prevent an infinite loop.
          */
       }
       interruptHandler(); // print what happened
@@ -256,6 +249,7 @@ void interruptHandler() {
   radio.whatHappened(tx_ds, tx_df, rx_dr);      // get values for IRQ masks
   // whatHappened() clears the IRQ masks also. This is required for
   // continued TX operations when a transmission fails.
+  // clearing the IRQ masks resets the IRQ pin to its inactive state (HIGH)
 
   Serial.print(F("\tdata_sent: "));
   Serial.print(tx_ds);                          // print "data sent" mask state
@@ -270,22 +264,13 @@ void interruptHandler() {
   // print if test passed or failed. Unintentional fails mean the RX node was not listening.
   // pl_iterator has already been incremented by now
   if (pl_iterator == 1) {
-    if (rx_dr) {
-      Serial.println(F("   'Data Ready' event test passed."));
-    } else {
-      Serial.println(F("   'Data Ready' event test failed."));
-    }
+    Serial.print(F("   'Data Ready' event test "));
+    Serial.println(F(rx_dr ? "passed" : "failed"));
   } else if (pl_iterator == 2) {
-    if (tx_ds) {
-      Serial.println(F("   'Data Sent' event test passed."));
-    } else {
-      Serial.println(F("   'Data Sent' event test failed."));
-    }
+    Serial.print(F("   'Data Sent' event test "));
+    Serial.println(F(tx_ds ? "passed" : "failed"));
   } else if (pl_iterator == 4) {
-    if (tx_df) {
-      Serial.println(F("   'Data Fail' event test passed."));
-    } else {
-      Serial.println(F("   'Data Fail' event test failed."));
-    }
+    Serial.print(F("   'Data Fail' event test "));
+    Serial.println(F(tx_df ? "passed" : "failed"));
   }
 } // interruptHandler

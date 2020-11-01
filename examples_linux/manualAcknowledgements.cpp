@@ -1,0 +1,218 @@
+/*
+ * See documentation at https://tmrh20.github.io/RF24
+ * See License information at root directory of this library
+ * Author: Brendan Doherty (2bndy5)
+ */
+
+/**
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
+ * This example still uses ACK packets, but they have no payloads. Instead the
+ * acknowledging response is sent with `write()`. This tactic allows for more
+ * updated acknowledgement payload data, where actual ACK payloads' data are
+ * outdated by 1 transmission because they have to loaded before receiving a
+ * transmission.
+ *
+ * A challenge to learn new skills:
+ * This example uses 2 different addresses for the RX & TX nodes.
+ * Try adjusting this example to use the same address on different pipes.
+ *
+ * This example was written to be used on 2 or more devices acting as "nodes".
+ * Use `ctrl+c` to quit at any time.
+ */
+#include <ctime>       // time()
+#include <iostream>
+#include <string>
+#include <printf.h>
+#include <RF24/RF24.h> // millis(), delay()
+
+using namespace std;
+
+/****************** Linux ***********************/
+// Radio CE Pin, CSN Pin, SPI Speed
+// CE Pin uses GPIO number with BCM and SPIDEV drivers, other platforms use their own pin numbering
+// CS Pin addresses the SPI bus number at /dev/spidev<a>.<b>
+// ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
+
+// Generic:
+RF24 radio(22, 0);
+
+/****************** Linux (BBB,x86,etc) ***********************/
+// See http://tmrh20.github.io/RF24/pages.html for more information on usage
+// See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
+// See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
+
+
+// Let these addresses be used for the pair of nodes used in this example
+uint8_t address[][6] = {"1Node", "2Node"};
+//             the TX address^ ,  ^the RX address
+// It is very helpful to think of an address as a path instead of as
+// an identifying device destination
+
+// For this example, we'll be using a payload containing
+// a string & an integer number that will be incremented
+// on every successful transmission.
+// Make a data structure to store the entire payload of different datatypes
+struct PayloadStruct {
+  char message[7];          // only using 6 characters for TX & RX payloads
+  uint8_t counter;
+};
+PayloadStruct payload;
+
+void setRole(); // prototype to set the node's role
+void master();  // prototype of the TX node's behavior; called by setRole()
+void slave();   // prototype of the RX node's behavior; called by setRole()
+
+
+int main() {
+    // append a NULL terminating 0 for printing as a c-string
+    payload.message[6] = 0;
+
+    // perform hardware check
+    if (!radio.begin()) {
+        cout << "nRF24L01 is not responding!!" << endl;
+        return 0; // quit now
+    }
+
+    // print example's introductory prompt
+    cout << "RF24/examples_linux/ManualAcknowledgements\n";
+
+    // Set the PA Level low to try preventing power supply related problems
+    // because these examples are likely run with nodes in close proximity to
+    // each other.
+    radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+
+    // for debugging, uncomment the follow 2 lines
+    // printf_begin();
+    // radio.printDetails();
+
+    // ready to execute program now
+    setRole(); // calls master() or slave() based on user input
+    return 0;
+}
+
+/**
+ * set this node's role from stdin stream.
+ * this only considers the first char as input.
+ */
+void setRole() {
+    string input = "";
+    while (!input.length()) {
+        cout << "*** PRESS 'T' to begin transmitting to the other node\n";
+        cout << "*** PRESS 'R' to begin receiving from the other node\n";
+        cout << "*** PRESS 'Q' to exit" << endl;
+        getline(cin, input);
+        if (input.length() >= 1) {
+            if (input[0] == 'T' || input[0] == 't')
+                master();
+            else if (input[0] == 'R' || input[0] == 'r')
+                slave();
+            else if (input[0] == 'Q' || input[0] == 'q')
+                break;
+            else
+                cout << input[0] << " is an invalid input. Please try again." << endl;
+        }
+        input = ""; // stay in the while loop
+    } // while
+} // setRole()
+
+
+/**
+ * make this node act as the transmitter
+ */
+void master() {
+
+    memcpy(payload.message, "Hello ", 6); // set the outgoing message
+    radio.stopListening();                // put in TX mode
+    radio.openWritingPipe(address[0]);    // set pipe 0 to the TX address
+
+    unsigned int failures = 0;                                      // keep track of failures
+    while (failures < 6) {
+        unsigned long start_timer = millis();                       // start the timer
+        bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
+
+        if (report) {
+            // transmission successful; wait for response and print results
+
+            bool timed_out = false;                       // variable for response timeout
+            radio.openReadingPipe(1, address[1]);         // open pipe 1 to the RX address
+            radio.startListening();                       // put in RX mode
+            unsigned long start_timeout = millis();       // timer to detect no response
+            while (!radio.available() && !timed_out) {    // wait for response or timeout
+                if (millis() - start_timeout > 200)       // only wait 200 ms
+                    timed_out = true;
+            }
+            unsigned long end_timer = millis();           // end the timer
+            radio.stopListening();                        // put back in TX mode
+            radio.openWritingPipe(address[0]);            // set the pipe 0 to TX address
+
+            // print summary of transactions
+            cout << "Transmission successful!";           // payload was delivered
+            if (!timed_out && radio.available()) {        // is there a payload received
+                cout << " Round trip delay = ";
+                cout << end_timer - start_timer;          // print the timer result
+                cout << " ms. Sent: " << payload.message; // print the outgoing message
+                cout << payload.counter;                  // print outgoing counter
+                PayloadStruct ack;
+                radio.read(&ack, sizeof(PayloadStruct));  // get payload from RX FIFO
+                cout << " Recieved: " << ack.message;     // print the incoming message
+                cout << ack.counter << endl;              // print the incoming counter
+                payload.counter = ack.counter;            // save updated counter
+            }
+            else {
+                cout << " Recieved no response." << endl; // no response received
+            }
+        }
+        else {
+            failures++;                                         // increment failure counter
+            cout << "Transmission failed or timed out" << endl; // payload was not delivered
+        } // report
+
+        // to make this example readable in the terminal
+        delay(1000);  // slow transmissions down by 1 second
+    }
+    cout << failures << " failures detected, going back to setRole()" << endl;
+} // master
+
+/**
+ * make this node act as the receiver
+ */
+void slave() {
+    memcpy(payload.message, "World ", 6);               // set the response message
+    radio.openReadingPipe(1, address[0]);               // open pipe 1 to the TX address
+    radio.startListening();                             // put in RX mode
+
+    time_t startTimer = time(nullptr);                  // start a timer
+    while (time(nullptr) - startTimer < 6) {            // use 6 second timeout
+        uint8_t pipe;
+        if (radio.available(&pipe)) {                       // is there a payload? get the pipe number that recieved it
+            uint8_t bytes = radio.getDynamicPayloadSize();  // get the size of the payload
+            PayloadStruct received;
+            radio.read(&received, bytes);                   // fetch payload from FIFO
+            payload.counter = received.counter + 1;         // increment payload for response
+
+            // transmit response & save result to `report`
+            radio.stopListening();                          // put in TX mode
+            radio.openWritingPipe(address[1]);              // set the pipe 0 to RX address
+            bool report = radio.write(&payload, sizeof(PayloadStruct));
+            radio.openReadingPipe(1, address[0]);           // open pipe 1 to the TX address
+            radio.startListening();                         // put back in RX mode
+
+            // print summary of transactions
+            cout << "Received " << bytes;                   // print the size of the payload
+            cout << " bytes on pipe " << pipe;              // print the pipe number
+            cout << ": " << received.message;               // print incoming message
+            cout << received.counter;                       // print received counter
+
+            if (report) {
+                cout << " Sent: " << payload.message;       // print response message
+                cout << payload.counter << endl;            // print response counter
+            }
+            else {
+                cout << " Response failed to send." << endl; // failed to send response
+            }
+        }
+    } // while
+    cout << "Timeout reached. Nothing received in 6 seconds" << endl;
+    radio.stopListening();
+} // slave

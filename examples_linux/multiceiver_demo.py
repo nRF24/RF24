@@ -1,4 +1,4 @@
-"""!
+"""
 Simple example of using 1 nRF24L01 to receive data from up to 6 other
 transceivers. This technique is called "multiceiver" in the datasheet.
 """
@@ -36,6 +36,8 @@ addresses = [
     b"\x0F\xB6\xB5\xB4\xB3",
     b"\x05\xB6\xB5\xB4\xB3"
 ]
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
 
 
 def base(timeout=10):
@@ -46,10 +48,9 @@ def base(timeout=10):
     radio.startListening()  # put base station into RX mode
     start_timer = time.monotonic()  # start timer
     while time.monotonic() - start_timer < timeout:
-        pipe = 7
-        while radio.available(pipe):  # keep RX FIFO empty for reception
+        while radio.available():  # keep RX FIFO empty for reception
             # show the pipe number that received the payload
-            print("pipe", pipe, end=" ")
+            print("pipe", radio.available_pipe(), end=" ")
             nodeID, payloadID = struct.unpack("<ii", radio.read(8))
             print(
                 "received from node {}. PayloadID: {}".format(

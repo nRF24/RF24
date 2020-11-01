@@ -16,11 +16,11 @@
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()
+#include <cmath>       // abs()
 #include <iostream>
 #include <string>
-#include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
 #include <printf.h>
-#include <RF24/RF24.h> // delay()
+#include <RF24/RF24.h> // millis()
 
 using namespace std;
 
@@ -44,20 +44,24 @@ uint8_t address[6] = "1Node";
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
 
-// For this example, we'll be using a payload containing
-// a single float number that will be incremented
-// on every successful transmission
-float payload = 0.0;
+// For this example, we'll be sending 32 payloads each containing
+// 32 bytes of data that looks like ASCII art when printed to the serial
+// monitor. The TX node and RX node needs only a single 32 byte buffer.
+#define SIZE 32
+char buffer[SIZE + 1];     // for the RX node
+uint8_t counter = 0;       // for counting the number of received payloads
+void makePayload(uint8_t); // prototype to construct payload dynamically
 
 void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
 void slave();   // prototype of the RX node's behavior; called by setRole()
 
-// custom defined timer for evaluating transmission time in microseconds
-struct timespec startTimer, endTimer;
-uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
 int main() {
+
+    // add a NULL terminating 0 for printing as a c-string
+    buffer[SIZE] = 0;
+
     // perform hardware check
     if (!radio.begin()) {
         cout << "nRF24L01 is not responding!!" << endl;
@@ -65,7 +69,7 @@ int main() {
     }
 
     // print example's introductory prompt
-    cout << "RF24/examples_linux/GettingStarted\n";
+    cout << "RF24/examples_linux/streamingData\n";
 
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
@@ -116,34 +120,36 @@ void setRole() {
  * make this node act as the transmitter
  */
 void master() {
-    radio.stopListening();                                          // powerUp() into TX mode
+    radio.stopListening();                           // powerUp() into TX mode
 
     // address for this example doesn't change
     // radio.openWritingPipe(0, address);
 
-    unsigned int failure = 0;                                            // keep track of failures
-    while (failure < 6) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);            // start the timer
-        bool report = radio.write(&payload, sizeof(float));         // transmit & save the report
-        uint32_t timerEllapsed = getMicros();                          // end the timer
-
-        if (report) {
-            // payload was delivered
-            cout << "Transmission successful! Time to transmit = ";
-            cout << timerEllapsed;                                  // print the timer result
-            cout << " us. Sent: " << payload << endl;               // print payload sent
-            payload += 0.01;                                        // increment float payload
-
-        } else {
-            // payload was not delivered
-            cout << "Transmission failed or timed out" << endl;
-            failure++;
+    unsigned int failures = 0;               // keep track of failures
+    unsigned long startTimer = millis();     // start the timer
+    while (failures < 100 || i < SIZE) {
+        makePayload(i);
+        if (!radio.writeFast(&buffer, SIZE)) {
+            failures++;
+            radio.reUseTX();
         }
-
-        // to make this example readable in the terminal
-        delay(1000);  // slow transmissions down by 1 second
+        else {
+            i++;
+        }
     }
-    cout << failure << " failures detected, going back to setRole()" << endl;
+    uint32_t endTimer = millis();            // end the timer
+    if (failures < 100) {
+        cout << "Time to transmit data = ";
+        cout << endTimer - startTimer;       // print the timer result
+        cout << " ms. Detected: ";
+        cout << failures;                    // print number of retries
+        cout << " failures." << endl;
+    }
+    else {
+        // else There was (most likely) no device listening for the data stream
+        cout << "Too many failures detected (" << failures;
+        cout << "); going back to setRole()" << endl;
+    }
 }
 
 /**
@@ -158,13 +164,11 @@ void slave() {
 
     time_t startTimer = time(nullptr);                       // start a timer
     while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
-        uint8_t pipe;
-        if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
-            uint8_t bytes = radio.getDynamicPayloadSize();   // get the size of the payload
-            radio.read(&payload, bytes);                     // fetch payload from FIFO
-            cout << "Received " << (unsigned int)bytes;      // print the size of the payload
-            cout << " bytes on pipe " << (unsigned int)pipe; // print the pipe number
-            cout << ": " << payload << endl;                 // print the payload's value
+        if (radio.available()) {                             // is there a payload
+            radio.read(&buffer, SIZE);                       // fetch payload from FIFO
+            cout << "Received: " << buffer;                  // print the payload's value
+            cout << " - " << counter << endl;                // print the counter
+            counter++;                                       // increment counter
             startTimer = time(nullptr);                      // reset timer
         }
     }
@@ -173,15 +177,17 @@ void slave() {
 }
 
 /**
- * Calculate the ellapsed time in microseconds
+ * Make a single payload based on position in stream.
+ * This example employs function to save on memory allocated.
  */
-uint32_t getMicros() {
-    // this function assumes that the timer was started using
-    // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
+void makePayload(uint8_t i) {
 
-    clock_gettime(CLOCK_MONOTONIC_RAW, &endTimer);
-    uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
-    uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
-
-    return ((seconds) * 1000 + useconds) + 0.5;
+  // let the first character be an identifying alphanumeric prefix
+  // this lets us see which payload didn't get received
+  buffer[0] = i + (i < 26 ? 65 : 71);
+  for (uint8_t j = 0; j < SIZE - 1; ++j) {
+    char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
+    chr |= j <= (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
+    buffer[j + 1] = chr + 48;
+  }
 }

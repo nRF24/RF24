@@ -1,4 +1,4 @@
-"""!
+"""
 Example of library usage for streaming multiple payloads.
 """
 import time
@@ -53,8 +53,8 @@ def master(count=1, size=32):
         print("setting size to 6;", size, "is not allowed for this test.")
         size = 6
     buf = make_buffers(size)  # make a list of payloads
-    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
+    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
     for c in range(count):  # transmit the same payloads this many times
         radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
         # NOTE the write_only parameter does not initiate sending
