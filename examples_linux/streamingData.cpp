@@ -22,6 +22,10 @@
 #include <printf.h>
 #include <RF24/RF24.h> // millis()
 
+#ifdef RF24_WIRINGPI
+#include "wiringPi.h"
+#endif
+
 using namespace std;
 
 /****************** Linux ***********************/

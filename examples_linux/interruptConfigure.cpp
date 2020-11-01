@@ -23,9 +23,12 @@
 #include <ctime>       // time()
 #include <iostream>
 #include <string>
-#include <unistd.h>
 #include <printf.h>
-#include <RF24/RF24.h> // delay(), pinMode(), read(), OUTPUT
+#include <RF24/RF24.h> // delay(), pinMode(), digitalRead(), OUTPUT
+
+#ifdef RF24_WIRINGPI
+#include "wiringPi.h"
+#endif
 
 using namespace std;
 
@@ -66,7 +69,7 @@ void interruptHandler(); // prototype to handle the interrupt request (IRQ) pin
 void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
 void slave();   // prototype of the RX node's behavior; called by setRole()
-void pig_n_wait(); // prototype that sends a payload and waits for the IRQ pin to get triggered
+void ping_n_wait(); // prototype that sends a payload and waits for the IRQ pin to get triggered
 
 
 int main() {
@@ -183,7 +186,7 @@ void master() {
         // print the entire RX FIFO with 1 buffer
         cout << "\nComplete RX FIFO: " << rx_fifo << endl;
     }
-    usleep(500000);                                // wait for RX node to startListening() again
+    delay(500);                                // wait for RX node to startListening() again
 
 } // master
 
@@ -208,8 +211,7 @@ void slave() {
     if (radio.rxFifoFull()) {
         char rx_fifo[tx_pl_size * 3 + 1];               // RX FIFO is full & we know TX payloads' size
         radio.read(&rx_fifo, tx_pl_size * 3);           // this clears the RX FIFO for this example
-        rx_fifo[tx_payloads * 3] = 0;                   // append a NULL terminating 0 for use as a c-string
-        rx_fifo[tx_pl_size * 3] = 0;                    // add NULL termintating 0 (for easy printing)
+        rx_fifo[tx_pl_size * 3] = 0;                   // append a NULL terminating 0 for use as a c-string
         cout <<"Complete RX FIFO: " << rx_fifo << endl; // print the entire RX FIFO with 1 buffer
     }
 }
@@ -224,7 +226,7 @@ void ping_n_wait() {
     // the "false" argument means we are expecting an ACK packet response
     radio.startWrite(tx_payloads[pl_iterator], tx_pl_size, false);
 
-    while (read(IRQ_PIN)) {
+    while (digitalRead(IRQ_PIN)) {
         /*
          * IRQ pin is LOW when activated. Otherwise it is always HIGH
          * Wait in this empty loop until IRQ pin is activated.
