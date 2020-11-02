@@ -61,7 +61,6 @@ def master(count=5):  # count = 5 will only transmit 5 packets
         start_timer = time.monotonic_ns()  # start timer
         result = radio.write(buffer)  # save the report
         end_timer = time.monotonic_ns()  # stop timer
-        print("Sent:", buffer, end=" ")
         if result:
             # print timer results upon transmission success
             print(
