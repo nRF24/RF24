@@ -29,6 +29,9 @@ if not radio.begin():
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# for debugging
+radio.printDetails()
+
 # setup the addresses for all transmitting nRF24L01 nodes
 addresses = [
     b"\x78" * 5,

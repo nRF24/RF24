@@ -28,6 +28,9 @@ if not radio.begin():
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# for debugging
+radio.printDetails()
+
 # addresses needs to be in a buffer protocol object (bytearray)
 address = b"1Node"
 # It is very helpful to think of an address as a path instead of as

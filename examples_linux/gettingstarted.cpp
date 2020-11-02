@@ -172,6 +172,7 @@ void slave() {
     radio.stopListening();
 }
 
+
 /**
  * Calculate the ellapsed time in microseconds
  */

@@ -92,6 +92,10 @@ int main() {
     // each other.
     radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
+    // for debugging
+    printf_begin();
+    radio.printDetails();
+
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input
     return 0;

@@ -100,7 +100,7 @@ void loop() {
 
     if (report) {
       Serial.print(F("Transmission successful! "));             // payload was delivered
-      Serial.print(F(" Time to transmit = "));
+      Serial.print(F("Time to transmit = "));
       Serial.print(end_timer - start_timer);                    // print the timer result
       Serial.print(F(" us. Sent: "));
       Serial.print(payload.message);                            // print the outgoing message
@@ -119,7 +119,7 @@ void loop() {
 
 
     } else {
-      Serial.println(F(" Transmission failed or timed out"));   // payload was not delivered
+      Serial.println(F("Transmission failed or timed out"));   // payload was not delivered
     }
 
     // to make this example readable in the serial monitor

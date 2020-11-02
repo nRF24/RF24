@@ -23,6 +23,7 @@
 #include <ctime>       // time()
 #include <iostream>
 #include <string>
+#include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
 #include <printf.h>
 #include <RF24/RF24.h> // millis(), delay()
 
@@ -82,9 +83,9 @@ int main() {
     // each other.
     radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
-    // for debugging, uncomment the follow 2 lines
-    // printf_begin();
-    // radio.printDetails();
+    // for debugging
+    printf_begin();
+    radio.printDetails();
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input
@@ -128,7 +129,7 @@ void master() {
 
     unsigned int failures = 0;                                // keep track of failures
     while (failures < 6) {
-        unsigned long start_timer = millis();                 // start the timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);      // start the timer
         bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
 
         if (report) {
@@ -142,7 +143,7 @@ void master() {
                 if (millis() - start_timeout > 200)        // only wait 200 ms
                     timed_out = true;
             }
-            unsigned long end_timer = millis();            // end the timer
+            unsigned long ellapsedTime = getmicros();      // end the timer
             radio.stopListening();                         // put back in TX mode
             radio.openWritingPipe(address[0]);             // set the pipe 0 to TX address
 
@@ -150,7 +151,7 @@ void master() {
             cout << "Transmission successful! ";           // payload was delivered
             if (radio.available()) {                       // is there a payload received
                 cout << "Round trip delay = ";
-                cout << end_timer - start_timer;           // print the timer result
+                cout << ellapsedTime;                      // print the timer result
                 cout << " ms. Sent: " << payload.message;  // print outgoing message
                 cout << (unsigned int)payload.counter;     // print outgoing counter
                 PayloadStruct received;
@@ -213,8 +214,24 @@ void slave() {
             else {
                 cout << " Response failed to send." << endl; // failed to send response
             }
-        }
+            startTimer = time(nullptr);                     // reset timer
+        } // available
     } // while
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;
     radio.stopListening(); // recommended idle mode is TX mode
 } // slave
+
+
+/**
+ * Calculate the ellapsed time in microseconds
+ */
+uint32_t getMicros() {
+    // this function assumes that the timer was started using
+    // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &endTimer);
+    uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
+    uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
+
+    return ((seconds) * 1000 + useconds) + 0.5;
+}

@@ -27,26 +27,26 @@ if not radio.begin():
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# for debugging
+radio.printDetails()
+
 # addresses needs to be in a buffer protocol object (bytearray)
 address = b"1Node"
 
 
-def make_buffers(size=32):
+def make_buffers(iter, size=32):
     """return a list of payloads"""
     buffers = []
     # we'll use `size` for the number of payloads in the list and the
     # payloads' length
-    for i in range(size):
-        # prefix payload with a sequential letter to indicate which
-        # payloads were lost (if any)
-        buff = bytes([i + (65 if 0 <= i < 26 else 71)])
-        for j in range(size - 1):
-            char = bool(j >= (size - 1) / 2 + abs((size - 1) / 2 - i))
-            char |= bool(j < (size - 1) / 2 - abs((size - 1) / 2 - i))
-            buff += bytes([char + 48])
-        buffers.append(buff)
-        del buff
-    return buffers
+    # prefix payload with a sequential letter to indicate which
+    # payloads were lost (if any)
+    buff = bytes([iter + (65 if 0 <= iter < 26 else 71)])
+    for j in range(size - 1):
+        char = bool(j >= (size - 1) / 2 + abs((size - 1) / 2 - iter))
+        char |= bool(j < (size - 1) / 2 - abs((size - 1) / 2 - iter))
+        buff += bytes([char + 48])
+    return buff
 
 
 def master(count=1, size=32):
@@ -54,7 +54,6 @@ def master(count=1, size=32):
     if size < 6:
         print("setting size to 6;", size, "is not allowed for this test.")
         size = 6
-    buf = make_buffers(size)  # make a list of payloads
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
     radio.openWritingPipe(address)  # set address of RX node into a TX pipe
     for c in range(count):  # transmit the same payloads this many times
@@ -64,7 +63,8 @@ def master(count=1, size=32):
         failures = 0  # keep track of manual retries
         start_timer = time.monotonic() * 1000  # start timer
         while buf_iter < size:  # cycle through all the payloads
-            if radio.writeFast(buf[buf_iter], size):
+            buf = make_buffers(buf_iter, size)  # make a payload
+            if radio.writeFast(buf, size):
                 # reception failed; we need to reset the irq_rf flag
                 failures += 1  # increment manual retries
                 radio.reUseTX()

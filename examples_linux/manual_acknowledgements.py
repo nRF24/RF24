@@ -32,6 +32,9 @@ if not radio.begin():
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# for debugging
+radio.printDetails()
+
 # addresses needs to be in a buffer protocol object (bytearray)
 address = [b"1Node", b"2Node"]
 # our TX address^  ,    ^our responding address
@@ -52,7 +55,7 @@ def master(count=10):
         # "<b" means a single little endian unsigned byte.
         # NOTE we added a b"\x00" byte as a c-string's NULL terminating 0
         buffer = b"Hello \x00" + struct.pack("<b", payload[0])
-        start_timer = time.monotonic() * 1000  # start timer
+        start_timer = time.monotonic_ns()  # start timer
         result = radio.write(buffer, len(buffer))
         if not result:
             print("Transmission failed or timed out")
@@ -67,7 +70,7 @@ def master(count=10):
                     radio.read(ack, radio.getDynamicPayloadSize())
                     radio.stopListening()
                     radio.openWritingPipe(address[0])
-            end_timer = time.monotonic() * 1000  # end timer
+            end_timer = time.monotonic_ns()  # end timer
             print(
                 "Transmission successful. Sent: {}{}.".format(
                     buffer[:6].decode("utf-8"),
@@ -89,7 +92,7 @@ def master(count=10):
                     "Received: {}{}. Roundtrip delay: {} ms.".format(
                          response,
                          payload[0],
-                         end_timer - start_timer
+                         (end_timer - start_timer) / 1000
                     )
                 )
         time.sleep(1)  # make example readable by slowing down transmissions

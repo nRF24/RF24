@@ -94,7 +94,7 @@ void loop() {
   if (role) {
     // This device is a TX node
 
-    unsigned long start_timer = millis();                      // start the timer
+    unsigned long start_timer = micros();                      // start the timer
     bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
 
     if (report) {
@@ -108,7 +108,7 @@ void loop() {
         if (millis() - start_timeout > 200)                  // only wait 200 ms
           timed_out = true;
       }
-      unsigned long end_timer = millis();                    // end the timer
+      unsigned long end_timer = micros();                    // end the timer
       radio.stopListening();                                 // put back in TX mode
       radio.openWritingPipe(address[0]);                     // set the pipe 0 to TX address
 
