@@ -275,6 +275,16 @@ public:
      * radio.stopListening();
      * radio.write(&data,sizeof(data));
      * @endcode
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.write(buffer)
+     * @endcode
+     *
      * @return
      * - True if the payload was delivered successfully and an acknowledgement
      *   (ACK packet) was received. If auto-ack is disabled, then any attempt
@@ -496,6 +506,15 @@ public:
      * - False if the payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.write(buffer, False)  # False = the multicast parameter
+     * @endcode
      */
     bool write(const void* buf, uint8_t len, const bool multicast);
 
@@ -533,6 +552,15 @@ public:
      * - False if the payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.writeFast(buffer)
+     * @endcode
      */
     bool writeFast(const void* buf, uint8_t len);
 
@@ -554,6 +582,15 @@ public:
      * - False if the payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.writeFast(buffer, False)  # False = the multicast parameter
+     * @endcode
      */
     bool writeFast(const void* buf, uint8_t len, const bool multicast);
 
@@ -580,7 +617,16 @@ public:
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @param timeout User defined timeout in milliseconds.
-     * @return
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.writeBlocking(buffer, 1000)  # 1000 means wait at most 1 second
+     * @endcode
+     *
      * @return
      * - True if all payloads in the TX FIFO were delivered successfully and
      *   an acknowledgement (ACK packet) was received for each. If auto-ack is
@@ -669,6 +715,15 @@ public:
      * @param buf Pointer to data that is sent
      * @param len Length of the data to send, up to 32 bytes max.  Not affected
      * by the static payload set by setPayloadSize().
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.writeAckPayload(1, buffer)  # load an ACK payload for response on pipe 1
+     * @endcode
      */
     void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
@@ -692,6 +747,15 @@ public:
      * payloads. Once the RX FIFO is full, all further received transmissions
      * are rejected until there is space to save new data in the RX FIFO
      * buffers.
+     *
+     * @note This function expects no parameters in the python wrapper.
+     * Instead, this function returns a 3 item tuple describing the IRQ
+     * events' status.<br> To use this function in the python wrapper:
+     * @code{.py}
+     * # let`radio` be the instantiated RF24 object
+     * tx_ds, tx_df, rx_dr = radio.whatHappened()  # get IRQ status flags
+     * print("tx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
+     * @endcode
      */
     void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
 
@@ -718,7 +782,19 @@ public:
      * @param multicast Request ACK (0) or NOACK (1)
      * @param startTx If this is set to `true`, then this function sets the
      * nRF24L01's CE pin to active (enabling TX transmissions). `false` has no
-     * effect on the nRF24L01's CE pin.
+     * effect on the nRF24L01's CE pin and simply loads the payload into the
+     * TX FIFO.
+     *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.startFastWrite(buffer, False, True)  # 3rd parameter is optional
+     * #     False means expecting ACK response (multicast parameter)
+     * #     True means initiate transmission (startTx parameter)
+     * @endcode
      */
     void startFastWrite(const void* buf, uint8_t len, const bool multicast, bool startTx = 1);
 
@@ -740,6 +816,14 @@ public:
      * @param len Number of bytes to be sent
      * @param multicast Request ACK (0) or NOACK (1)
      *
+     * @note The @a len parameter must be omitted when using the python
+     * wrapper because the length of the payload is determined automatically.
+     * <br>To use this function function in the python wrapper:
+     * @code{.py}
+     * # let `radio` be the instantiated RF24 object
+     * buffer = b"Hello World"  # a `bytes` object
+     * radio.staratWrite(buffer, False)  # False = the multicast parameter
+     * @endcode
      */
     void startWrite(const void* buf, uint8_t len, const bool multicast);
 

@@ -56,7 +56,7 @@ def master(count=10):
         # NOTE we added a b"\x00" byte as a c-string's NULL terminating 0
         buffer = b"Hello \x00" + struct.pack("<b", payload[0])
         start_timer = time.monotonic_ns()  # start timer
-        result = radio.write(buffer, len(buffer))
+        result = radio.write(buffer)
         if not result:
             print("Transmission failed or timed out")
         else:
@@ -121,7 +121,7 @@ def slave(count=10):
             # NOTE b"\x00" byte is a c-string's NULL terminating 0
             buffer = b"World \x00" + bytes([payload[0]])
             # save response's result
-            response = radio.write(buffer, len(buffer))
+            response = radio.write(buffer)
             # print the payload received and the response's payload
             print(
                 "Received {} bytes on pipe {}: {}{}.".format(

@@ -64,7 +64,7 @@ def master(count=1, size=32):
         start_timer = time.monotonic() * 1000  # start timer
         while buf_iter < size:  # cycle through all the payloads
             buf = make_buffers(buf_iter, size)  # make a payload
-            if radio.writeFast(buf, size):
+            if radio.writeFast(buf):
                 # reception failed; we need to reset the irq_rf flag
                 failures += 1  # increment manual retries
                 radio.reUseTX()
