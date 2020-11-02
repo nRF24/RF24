@@ -29,7 +29,7 @@
 using namespace std;
 
 // We will be using the nRF24L01's IRQ pin for this example
-#define IRQ_PIN 6 // this needs to be a digital input capable pin
+#define IRQ_PIN 12 // this needs to be a digital input capable pin
 
 /****************** Linux ***********************/
 // Radio CE Pin, CSN Pin, SPI Speed
@@ -80,7 +80,7 @@ int main() {
     }
 
     // print example's introductory prompt
-    cout << "RF24/examples_linux/AcknowledgementPayloads\n";
+    cout << "RF24/examples_linux/interruptConfigure\n";
 
     // Acknowledgement packets have no payloads by default. We need to enable
     // this feature for all nodes (TX & RX) to use ACK payloads.
@@ -202,7 +202,7 @@ void slave() {
     while (time(nullptr) - startTimer < 6 && !radio.rxFifoFull()) {
         // use 6 second timeout & wait till RX FIFO is full
     }
-    delay(200);                                 // let last ACK finish transmitting
+    delay(500);                                 // let last ACK finish transmitting
     radio.stopListening();                      // also discards unused ACK payloads
 
     if (radio.rxFifoFull()) {
