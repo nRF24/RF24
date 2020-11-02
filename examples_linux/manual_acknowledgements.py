@@ -83,7 +83,7 @@ def master(count=10):
             else:
                 # decode response's text as an string
                 # NOTE ack[:6] ignores the NULL terminating 0
-                response = ack[:6].encode("utf-8")
+                response = ack[:6].decode("utf-8")
                 # use struct.unpack() to get the repsonse's appended int
                 # NOTE ack[7:] discards NULL terminating 0, and
                 # "<b" means its a single little endian unsigned byte
