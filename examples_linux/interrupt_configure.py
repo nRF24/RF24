@@ -36,6 +36,9 @@ radio.enableAckPayloads()  # enable ACK payloads
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# for debugging
+radio.printDetails()
+
 # address needs to be in a buffer protocol object (bytearray is preferred)
 address = b"1Node"
 # It is very helpful to think of an address as a path instead of as
@@ -152,6 +155,7 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
     while not radio.rxFifoFull() and time.monotonic() - start_timer < timeout:
         # if RX FIFO is not full and timeout is not reached, then keep waiting
         pass
+    time.sleep(0.5)  # wait for last ACK payload to transmit
     radio.stopListening()  # put radio in TX mode & discard any ACK payloads
     if radio.available():  # if RX FIFO is not empty (timeout did not occur)
         # all 3 payloads received were 5 bytes each, and RX FIFO is full
@@ -162,7 +166,7 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
 print(
     """\
     nRF24L01 Interrupt pin test.\n\
-    Make sure the IRQ pin is connected to the MCU\n\
+    Make sure the IRQ pin is connected to the RPi GPIO12\n\
     Run slave() on receiver\n\
     Run master() on transmitter"""
 )
