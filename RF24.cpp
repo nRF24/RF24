@@ -283,9 +283,6 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
     uint8_t status;
     uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
-    if (data_len > payload_size) {
-        data_len = payload_size;
-    }
     uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
 
     //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
