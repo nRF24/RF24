@@ -67,7 +67,7 @@ def master(count=10):
             while ack[0] == 0 or time.monotonic() * 1000 < timout:
                 if radio.available():
                     # get the response & save it to ack variable
-                    radio.read(ack, radio.getDynamicPayloadSize())
+                    ack = radio.read(radio.getDynamicPayloadSize())
                     radio.stopListening()
                     radio.openWritingPipe(address[0])
             end_timer = time.monotonic_ns()  # end timer
@@ -90,9 +90,9 @@ def master(count=10):
                 payload[0] = struct.unpack("<b", ack[7:])[0]
                 print(
                     "Received: {}{}. Roundtrip delay: {} ms.".format(
-                         response,
-                         payload[0],
-                         (end_timer - start_timer) / 1000
+                        response,
+                        payload[0],
+                        (end_timer - start_timer) / 1000
                     )
                 )
         time.sleep(1)  # make example readable by slowing down transmissions

@@ -156,7 +156,7 @@ void master() {
             if (radio.available()) {                       // is there a payload received
                 cout << "Round trip delay = ";
                 cout << ellapsedTime;                      // print the timer result
-                cout << " ms. Sent: " << payload.message;  // print outgoing message
+                cout << " us. Sent: " << payload.message;  // print outgoing message
                 cout << (unsigned int)payload.counter;     // print outgoing counter
                 PayloadStruct received;
                 radio.read(&received, sizeof(received));   // get incoming payload
@@ -205,8 +205,9 @@ void slave() {
             radio.startListening();                         // put back in RX mode
 
             // print summary of transactions
-            cout << "Received " << bytes;                   // print the size of the payload
-            cout << " bytes on pipe " << pipe;              // print the pipe number
+            cout << "Received " << (unsigned int)bytes;     // print the size of the payload
+            cout << " bytes on pipe ";
+            cout << (unsigned int)pipe;                     // print the pipe number
             cout << ": " << received.message;               // print incoming message
             cout << (unsigned int)received.counter;         // print incoming counter
 
