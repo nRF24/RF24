@@ -64,6 +64,10 @@ void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
 void slave();   // prototype of the RX node's behavior; called by setRole()
 
+// custom defined timer for evaluating transmission time in microseconds
+struct timespec startTimer, endTimer;
+uint32_t getMicros(); // prototype to get ellapsed time in microseconds
+
 
 int main() {
     // append a NULL terminating 0 for printing as a c-string
