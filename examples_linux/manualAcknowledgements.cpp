@@ -147,7 +147,7 @@ void master() {
                 if (millis() - start_timeout > 200)        // only wait 200 ms
                     timed_out = true;
             }
-            unsigned long ellapsedTime = getmicros();      // end the timer
+            unsigned long ellapsedTime = getMicros();      // end the timer
             radio.stopListening();                         // put back in TX mode
             radio.openWritingPipe(address[0]);             // set the pipe 0 to TX address
 
