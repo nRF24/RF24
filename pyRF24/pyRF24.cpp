@@ -46,7 +46,7 @@ bp::object read_wrap(RF24& ref, int maxlen)
     char* buf = new char[maxlen + 1];
     ref.read(buf, maxlen);
     bp::object
-    py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
+    py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen)));
     delete[] buf;
     return py_ba;
 }
