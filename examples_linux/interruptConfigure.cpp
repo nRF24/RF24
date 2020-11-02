@@ -196,19 +196,21 @@ void slave() {
     radio.writeAckPayload(0, &ack_payloads[0], ack_pl_size);
     radio.writeAckPayload(0, &ack_payloads[1], ack_pl_size);
     radio.writeAckPayload(0, &ack_payloads[2], ack_pl_size);
-    radio.startListening();                // We're ready to start over. Begin listening.
+    radio.startListening();                     // We're ready to start. Begin listening.
 
-    time_t startTimer = time(nullptr);                       // start a timer
+    time_t startTimer = time(nullptr);          // start a timer
     while (time(nullptr) - startTimer < 6 && !radio.rxFifoFull()) {
         // use 6 second timeout & wait till RX FIFO is full
     }
-    radio.stopListening();                          // also discards unused ACK payloads
+    delay(200);                                 // let last ACK finish transmitting
+    radio.stopListening();                      // also discards unused ACK payloads
 
     if (radio.rxFifoFull()) {
-        char rx_fifo[tx_pl_size * 3 + 1];               // RX FIFO is full & we know TX payloads' size
-        radio.read(&rx_fifo, tx_pl_size * 3);           // this clears the RX FIFO for this example
-        rx_fifo[tx_pl_size * 3] = 0;                   // append a NULL terminating 0 for use as a c-string
-        cout <<"Complete RX FIFO: " << rx_fifo << endl; // print the entire RX FIFO with 1 buffer
+        char rx_fifo[tx_pl_size * 3 + 1];       // RX FIFO is full & we know TX payloads' size
+        radio.read(&rx_fifo, tx_pl_size * 3);   // this clears the RX FIFO for this example
+        rx_fifo[tx_pl_size * 3] = 0;            // append a NULL terminating 0 for use as a c-string
+        cout <<"Complete RX FIFO: " << rx_fifo; // print the entire RX FIFO with 1 buffer
+        cout << endl;
     }
     else {
         cout << "Timeout was reached. Going back to setRole()" << endl;

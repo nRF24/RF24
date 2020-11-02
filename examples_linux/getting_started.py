@@ -20,7 +20,9 @@ radio = RF24(22, 0)
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
 # initialize the nRF24L01 on the spi bus
-radio.begin()
+if not radio.begin():
+    print("nRF24L01 hardware isn't responding")
+    exit()  # quit now
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
@@ -87,7 +89,7 @@ def slave(count=5):
             payload[0] = struct.unpack("<f", rx[:4])[0]
             # print details about the received packet
             print(
-                "{} bytes received on pipe {}: {}".format(
+                "Received {} bytes on pipe {}: {}".format(
                     length,
                     pipe_number,
                     payload[0]

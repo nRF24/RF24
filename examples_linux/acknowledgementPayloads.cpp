@@ -134,33 +134,33 @@ void master() {
 
     unsigned int failures = 0;                                            // keep track of failures
     while (failures <  6) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);            // start the timer
-        bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
-        uint32_t timerEllapsed = getMicros();                       // end the timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);      // start the timer
+        bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
+        uint32_t timerEllapsed = getMicros();                 // end the timer
 
         if (report) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
-            cout << timerEllapsed;                                    // print the timer result
+            cout << timerEllapsed;                                // print the timer result
             cout << " us. Sent: ";
-            cout << payload.message << (unsigned int)payload.counter; // print payload sent
+            cout << payload.message;                              // print outgoing message
+            cout << (unsigned int)payload.counter;                // print outgoing counter counter
 
             if (radio.available()) {
-                PayloadStruct ack;
-                radio.read(&ack, sizeof(PayloadStruct));              // fetch ACK payload
+                PayloadStruct received;
+                radio.read(&received, sizeof(received));          // get incoming ACK payload
                 cout << " Received: ";
-                cout << ack.message << (unsigned int)ack.counter;     // print ACK payload
-                cout << endl;
-                payload.counter++;                                    // increment payload counter
+                cout << received.message;                         // print incoming message
+                cout << (unsigned int)received.counter << endl;   // print incoming counter
+                payload.counter++;                                // increment outgoing counter
             }
             else {
-                cout << " Received an empty ACK packet." << endl;     // ACK had no payload
+                cout << " Received an empty ACK packet." << endl; // ACK had no payload
             }
         }
         else {
-            // payload was not delivered
-            cout << "Transmission failed or timed out" << endl;
-            failures++;
+            cout << "Transmission failed or timed out" << endl;   // payload was not delivered
+            failures++;                                           // increment failures
         }
 
         // to make this example readable in the terminal
@@ -176,7 +176,7 @@ void slave() {
     memcpy(payload.message, "World ", 6);                    // set the payload message
 
     // load the payload for the first received transmission on pipe 0
-    radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
+    radio.writeAckPayload(0, &payload, sizeof(payload));
 
     // address for this example doesn't change
     // radio.openReadingPipe(0, address);
@@ -187,21 +187,20 @@ void slave() {
         uint8_t pipe;
         if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
             uint8_t bytes = radio.getDynamicPayloadSize();   // get the size of the payload
-            PayloadStruct rx;
-            radio.read(&rx, bytes);                           // fetch payload from FIFO
-            cout << "Received " << (unsigned int)bytes;       // print the size of the payload
-            cout << " bytes on pipe " << (unsigned int)pipe;  // print the pipe number
-            cout << ": " << rx.message;
-            cout << (unsigned int)rx.counter;                 // print received payload
+            PayloadStruct received;
+            radio.read(&received, sizeof(received));         // fetch payload from RX FIFO
+            cout << "Received " << (unsigned int)bytes;      // print the size of the payload
+            cout << " bytes on pipe " << (unsigned int)pipe; // print the pipe number
+            cout << ": " << received.message;
+            cout << (unsigned int)received.counter;          // print received payload
             cout << " Sent: ";
             cout << payload.message;
-            cout << (unsigned int)payload.counter << endl;    // print ACK payload sent
-            startTimer = time(nullptr);                       // reset timer
+            cout << (unsigned int)payload.counter << endl;   // print ACK payload sent
+            startTimer = time(nullptr);                      // reset timer
+            payload.counter += 1;                            // increment payload counter
 
-            // increment payload counter
-            payload.counter++;
             // load the payload for the first received transmission on pipe 0
-            radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
+            radio.writeAckPayload(0, &payload, sizeof(payload));
         }
     }
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;

@@ -9,9 +9,13 @@ version = ""
 
 
 def process_configparams():
-    version = ""
-    # can't access "../Makefile.inc" from working dir because it's relative.
-    # brute force absolute path dynamically.
+    version = ""  # using python keyword `global` is bad practice
+    # NOTE current repo directory structure requires the use of
+    # `python3 setup.py build` and `python3 setup.py install`
+    # where `pip3 install ./pyRF24` copies pyRF24 directory to
+    # `tmp` folder that doesn't have the needed `../Makefile.inc`
+    # NOTE can't access "../Makefile.inc" from working dir because
+    # it's relative. Brute force absolute path dynamically.
     script_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
     abs_file_path = os.path.join(script_dir, "Makefile.inc")
     with open(abs_file_path) as f:

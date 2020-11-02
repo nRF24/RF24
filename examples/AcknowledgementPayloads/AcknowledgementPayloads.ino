@@ -100,24 +100,26 @@ void loop() {
 
     if (report) {
       Serial.print(F("Transmission successful! "));             // payload was delivered
-      Serial.print(F("Time to transmit = "));
+      Serial.print(F(" Time to transmit = "));
       Serial.print(end_timer - start_timer);                    // print the timer result
-      Serial.print(F("us. Sent: "));
-      Serial.print(payload.message);                            // print the payload message
-      Serial.print(payload.counter);                            // print the payload counter
+      Serial.print(F(" us. Sent: "));
+      Serial.print(payload.message);                            // print the outgoing message
+      Serial.print(outgoing.counter);                           // print the outgoing counter
       if (radio.available()) {                                  // is there an ACK payload?
-        PayloadStruct ack;
-        radio.read(&ack, sizeof(PayloadStruct));                // get ACK payload from FIFO
+        PayloadStruct received;
+        radio.read(&received, sizeof(received));                // get incoming ACK payload
         Serial.print(F(" Recieved: "));
-        Serial.print(ack.message);                              // print ACK message
-        Serial.println(ack.counter);                              // print ACK counter
+        Serial.print(received.message);                         // print incoming message
+        Serial.println(received.counter);                       // print incoming counter
+        payload.counter++;                                      // increment outgoing counter
+
       } else {
         Serial.println(F(" Recieved: an empty ACK packet"));    // empty ACK packet received
       }
-      payload.counter++;                                        // increment payload counter
+
 
     } else {
-      Serial.println(F("Transmission failed or timed out"));    // payload was not delivered
+      Serial.println(F(" Transmission failed or timed out"));   // payload was not delivered
     }
 
     // to make this example readable in the serial monitor
@@ -129,23 +131,23 @@ void loop() {
     uint8_t pipe;
     if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
-      PayloadStruct rx;
-      radio.read(&rx, bytes);                        // fetch payload from FIFO
+      PayloadStruct received;
+      radio.read(&received, sizeof(received));       // get incoming payload
       Serial.print(F("Received "));
       Serial.print(bytes);                           // print the size of the payload
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                            // print the pipe number
       Serial.print(F(": "));
-      Serial.print(rx.message);                      // print payload message
-      Serial.print(rx.counter);                      // print payload counter
+      Serial.print(received.message);                // print incoming message
+      Serial.print(received.counter);                // print incoming counter
       Serial.print(F(" Sent: "));
-      Serial.print(payload.message);                 // print ACK message
-      Serial.println(payload.counter);               // print ACK counter
+      Serial.print(payload.message);                 // print outgoing message
+      Serial.println(payload.counter);               // print outgoing counter
 
       // increment payload counter
       payload.counter++;
       // load the payload for the first received transmission on pipe 0
-      radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
+      radio.writeAckPayload(0, &payload, sizeof(payload));
     }
   } // role
 

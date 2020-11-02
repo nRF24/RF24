@@ -3,7 +3,6 @@ Simple example of using the library to transmit
 and retrieve custom automatic acknowledgment payloads.
 """
 import time
-import struct
 import RPi.GPIO as GPIO
 from RF24 import RF24, RF24_PA_LOW
 
@@ -21,7 +20,9 @@ radio = RF24(22, 0)
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
 # initialize the nRF24L01 on the spi bus
-radio.begin()
+if not radio.begin():
+    print("nRF24L01 hardware isn't responding")
+    exit()  # quit now
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
@@ -51,7 +52,7 @@ def master(count=5):  # count = 5 will only transmit 5 packets
 
     while count:
         # construct a payload to send
-        buffer = b"Hello \x00" + struct.pack("<b", counter[0])
+        buffer = b"Hello \x00" + bytes([counter[0]])
 
         # send the payload and prompt
         start_timer = time.monotonic_ns()  # start timer
@@ -75,7 +76,7 @@ def master(count=5):  # count = 5 will only transmit 5 packets
                 print(
                     " Received: {}{}".format(
                         result[:6].decode("utf-8"),
-                        struct.unpack("<b", result[7:])[0]
+                        result[7:8][0]
                     )
                 )
                 counter[0] += 1  # increment payload counter
@@ -95,7 +96,7 @@ def slave(count=5):
     radio.startListening()  # put radio into RX mode, power it up
 
     # setup the first transmission's ACK payload
-    buffer = b"World \x00" + struct.pack("<i", counter[0])
+    buffer = b"World \x00" + bytes([counter[0]])
     # we must set the ACK payload data and corresponding
     # pipe number [0,5]
     radio.writeAckPayload(0, buffer)  # load ACK for first response
@@ -108,13 +109,13 @@ def slave(count=5):
             length = radio.getDynamicPayloadSize()  # grab the payload length
             received = radio.read(length)  # fetch 1 payload from RX FIFO
             # increment counter from received payload
-            counter[0] = struct.unpack("<b", received[7:])[0] + 1
+            counter[0] = received[7:8][0] + 1
             print(
                 "Received {} bytes on pipe {}: {}{} Sent: {}{}".format(
                     length,
                     pipe_number,
                     received[:6].decode("utf-8"),
-                    struct.unpack("<b", received[7:])[0],
+                    received[7:8][0],
                     buffer[:6].decode("utf-8"),
                     counter[0]
                 )
@@ -122,7 +123,7 @@ def slave(count=5):
             start = time.monotonic()  # reset timer
             if count:  # Going again?
                 # build a new ACK payload
-                buffer = b"World \x00" + struct.pack("<b", counter[0])
+                buffer = b"World \x00" + bytes([counter[0]])
                 radio.writeAckPayload(0, buffer)  # load ACK for next response
 
     # recommended behavior is to keep in TX mode while idle

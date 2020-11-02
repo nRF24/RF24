@@ -114,18 +114,18 @@ void loop() {
 
       // print summary of transactions
       Serial.print(F("Transmission successful!"));           // payload was delivered
-      if (radio.available()) {                 // is there a payload received
+      if (radio.available()) {                               // is there a payload received
         Serial.print(F(" Round trip delay = "));
         Serial.print(end_timer - start_timer);               // print the timer result
         Serial.print(F(" ms. Sent: "));
         Serial.print(payload.message);                       // print the outgoing payload's message
         Serial.print(payload.counter);                       // print outgoing payload's counter
-        PayloadStruct ack;
-        radio.read(&ack, sizeof(PayloadStruct));             // get payload from RX FIFO
+        PayloadStruct received;
+        radio.read(&received, sizeof(received));             // get payload from RX FIFO
         Serial.print(F(" Recieved: "));
-        Serial.print(ack.message);                           // print the incoming payload's message
-        Serial.println(ack.counter);                         // print the incoming payload's counter
-        payload.counter = ack.counter;                       // save updated counter
+        Serial.print(received.message);                      // print the incoming payload's message
+        Serial.println(received.counter);                    // print the incoming payload's counter
+        payload.counter = received.counter;                  // save incoming counter for next outgoing counter
       } else {
         Serial.println(F(" Recieved no response."));         // no response received
       }
@@ -141,15 +141,15 @@ void loop() {
 
     uint8_t pipe;
     if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
-      uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
+      uint8_t bytes = radio.getDynamicPayloadSize(); // get size of incoming payload
       PayloadStruct received;
-      radio.read(&received, bytes);                  // fetch payload from FIFO
-      payload.counter = received.counter + 1;        // increment payload for response
+      radio.read(&received, sizeof(received));       // get incoming payload
+      payload.counter = received.counter + 1;        // increment incoming counter for next outgoing response
 
       // transmit response & save result to `report`
       radio.stopListening();                         // put in TX mode
       radio.openWritingPipe(address[1]);             // set the pipe 0 to RX address
-      bool report = radio.write(&payload, sizeof(PayloadStruct));
+      bool report = radio.write(&payload, sizeof(payload));
       radio.openReadingPipe(1, address[0]);          // open pipe 1 to the TX address
       radio.startListening();                        // put back in RX mode
 
@@ -159,13 +159,13 @@ void loop() {
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                            // print the pipe number
       Serial.print(F(": "));
-      Serial.print(received.message);                // print incoming payload's message
-      Serial.print(received.counter);                // print received payload's counter
+      Serial.print(received.message);                // print incoming message
+      Serial.print(received.counter);                // print incoming counter
 
       if (report) {
         Serial.print(F(" Sent: "));
-        Serial.print(payload.message);               // print response payload's message
-        Serial.println(payload.counter);             // print response payload's counter
+        Serial.print(payload.message);               // print outgoing message
+        Serial.println(payload.counter);             // print outgoing counter
       } else {
         Serial.println(" Response failed.");         // failed to send response
       }

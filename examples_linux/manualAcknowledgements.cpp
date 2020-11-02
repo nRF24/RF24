@@ -126,10 +126,10 @@ void master() {
     radio.stopListening();                // put in TX mode
     radio.openWritingPipe(address[0]);    // set pipe 0 to the TX address
 
-    unsigned int failures = 0;                                      // keep track of failures
+    unsigned int failures = 0;                                // keep track of failures
     while (failures < 6) {
-        unsigned long start_timer = millis();                       // start the timer
-        bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
+        unsigned long start_timer = millis();                 // start the timer
+        bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
 
         if (report) {
             // transmission successful; wait for response and print results
@@ -147,25 +147,26 @@ void master() {
             radio.openWritingPipe(address[0]);             // set the pipe 0 to TX address
 
             // print summary of transactions
-            cout << "Transmission successful!";            // payload was delivered
-            if (radio.available()) {         // is there a payload received
-                cout << " Round trip delay = ";
+            cout << "Transmission successful! ";           // payload was delivered
+            if (radio.available()) {                       // is there a payload received
+                cout << "Round trip delay = ";
                 cout << end_timer - start_timer;           // print the timer result
-                cout << " ms. Sent: " << payload.message;  // print the outgoing message
+                cout << " ms. Sent: " << payload.message;  // print outgoing message
                 cout << (unsigned int)payload.counter;     // print outgoing counter
-                PayloadStruct ack;
-                radio.read(&ack, sizeof(PayloadStruct));   // get payload from RX FIFO
-                cout << " Recieved: " << ack.message;      // print the incoming message
-                cout << (unsigned int)ack.counter << endl; // print the incoming counter
-                payload.counter = ack.counter;             // save updated counter
+                PayloadStruct received;
+                radio.read(&received, sizeof(received));   // get incoming payload
+                cout << " Recieved: " << received.message; // print the incoming message
+                cout << (unsigned int)received.counter;    // print the incoming counter
+                cout << endl;
+                payload.counter = received.counter;        // save incoming counter for next outgoing counter
             }
             else {
-                cout << " Recieved no response." << endl; // no response received
+                cout << "Recieved no response." << endl;   // no response received
             }
         }
         else {
-            failures++;                                         // increment failure counter
             cout << "Transmission failed or timed out" << endl; // payload was not delivered
+            failures++;                                         // increment failure counter
         } // report
 
         // to make this example readable in the terminal
@@ -186,15 +187,15 @@ void slave() {
     while (time(nullptr) - startTimer < 6) {            // use 6 second timeout
         uint8_t pipe;
         if (radio.available(&pipe)) {                       // is there a payload? get the pipe number that recieved it
-            uint8_t bytes = radio.getDynamicPayloadSize();  // get the size of the payload
+            uint8_t bytes = radio.getDynamicPayloadSize();  // get size of incoming payload
             PayloadStruct received;
-            radio.read(&received, bytes);                   // fetch payload from FIFO
+            radio.read(&received, sizeof(received));        // get incoming payload
             payload.counter = received.counter + 1;         // increment payload for response
 
             // transmit response & save result to `report`
             radio.stopListening();                          // put in TX mode
             radio.openWritingPipe(address[1]);              // set the pipe 0 to RX address
-            bool report = radio.write(&payload, sizeof(PayloadStruct));
+            bool report = radio.write(&payload, sizeof(payload));
             radio.openReadingPipe(1, address[0]);           // open pipe 1 to the TX address
             radio.startListening();                         // put back in RX mode
 
@@ -202,11 +203,11 @@ void slave() {
             cout << "Received " << bytes;                   // print the size of the payload
             cout << " bytes on pipe " << pipe;              // print the pipe number
             cout << ": " << received.message;               // print incoming message
-            cout << (unsigned int)received.counter;         // print received counter
+            cout << (unsigned int)received.counter;         // print incoming counter
 
             if (report) {
-                cout << " Sent: " << payload.message;       // print response message
-                cout << (unsigned int)payload.counter;      // print response counter
+                cout << " Sent: " << payload.message;       // print outgoing message
+                cout << (unsigned int)payload.counter;      // print outgoing counter
                 cout << endl;
             }
             else {
@@ -215,5 +216,5 @@ void slave() {
         }
     } // while
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;
-    radio.stopListening();
+    radio.stopListening(); // recommended idle mode is TX mode
 } // slave

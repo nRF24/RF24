@@ -182,6 +182,7 @@ void loop() {
     if (radio.rxFifoFull()) {
       // wait until RX FIFO is full then stop listening
 
+      delay(200);                            // let last ACK finish transmitting
       radio.stopListening();                 // also discards unused ACK payloads
       char rx_fifo[tx_pl_size * 3 + 1];      // RX FIFO is full & we know TX payloads' size
       radio.read(&rx_fifo, tx_pl_size * 3);  // this clears the RX FIFO for this example
