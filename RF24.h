@@ -231,14 +231,15 @@ public:
      *   The nRF24L01 will repeatedly use the last byte from the last
      *   payload even when read() is called with an empty RX FIFO.
      *
-     * @note To use this function in the python wrapper, remember that the
+     * @note To use this function in the python wrapper, remember that
      * only the @a len parameter is required because this function (in the
      * python wrapper) returns the payload data as a buffer protocol object
      * (bytearray object).
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
-     * length = radio.getDynamicPayloadSize()  # or radio.getPayloadSize() for static payload sizes
-     * received_payload = radio.read(length)
+     * if radio.available():
+     *     length = radio.getDynamicPayloadSize()  # or radio.getPayloadSize() for static payload sizes
+     *     received_payload = radio.read(length)
      * @endcode
      *
      * @return No return value. Use available().

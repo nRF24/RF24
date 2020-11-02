@@ -30,7 +30,7 @@ if not radio.begin():
 
 # this example uses the ACK payload to trigger the IRQ pin active for
 # the "on data received" event
-radio.enableAckPayloads()  # enable ACK payloads
+radio.enableAckPayload()  # enable ACK payloads
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other

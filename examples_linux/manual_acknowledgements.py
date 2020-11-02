@@ -89,7 +89,7 @@ def master(count=10):
                 # "<b" means its a single little endian unsigned byte
                 payload[0] = struct.unpack("<b", ack[7:])[0]
                 print(
-                    "Received: {}{}. Roundtrip delay: {} ms.".format(
+                    "Received: {}{}. Roundtrip delay: {} us.".format(
                         response,
                         payload[0],
                         (end_timer - start_timer) / 1000
