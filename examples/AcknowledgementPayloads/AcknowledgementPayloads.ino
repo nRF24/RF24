@@ -104,7 +104,7 @@ void loop() {
       Serial.print(end_timer - start_timer);                    // print the timer result
       Serial.print(F(" us. Sent: "));
       Serial.print(payload.message);                            // print the outgoing message
-      Serial.print(outgoing.counter);                           // print the outgoing counter
+      Serial.print(payload.counter);                           // print the outgoing counter
       if (radio.available()) {                                  // is there an ACK payload?
         PayloadStruct received;
         radio.read(&received, sizeof(received));                // get incoming ACK payload
