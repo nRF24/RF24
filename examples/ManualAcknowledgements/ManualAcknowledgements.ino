@@ -117,7 +117,7 @@ void loop() {
       if (radio.available()) {                               // is there a payload received
         Serial.print(F(" Round trip delay = "));
         Serial.print(end_timer - start_timer);               // print the timer result
-        Serial.print(F(" ms. Sent: "));
+        Serial.print(F(" us. Sent: "));
         Serial.print(payload.message);                       // print the outgoing payload's message
         Serial.print(payload.counter);                       // print outgoing payload's counter
         PayloadStruct received;

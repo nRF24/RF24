@@ -50,7 +50,7 @@ int8_t role = -1; // 0-5 = TX node; any negative number = RX node
 // Make a data structure to use as a payload.
 struct PayloadStruct
 {
-  byte nodeID;
+  uint8_t nodeID;
   unsigned int payloadID = 0;
 };
 PayloadStruct payload;
@@ -97,11 +97,17 @@ void loop() {
     unsigned long end_timer = micros();                         // end the timer
 
     if (report) {
-      Serial.print(F("Transmission successful!")); // payload was delivered
-      Serial.print(F(" Time to transmit = "));
-      Serial.print(end_timer - start_timer);   // print the timer result
+      // payload was delivered
+
+      Serial.print(F("Transmission of payloadID "));
+      Serial.print(payload.payloadID);                       // print payloadID
+      Serial.print(F(" as node "));
+      Serial.print(payload.nodeID);                          // print nodeID
+      Serial.print(F(" successful!"));
+      Serial.print(F(" Time to transmit: "));
+      Serial.print(end_timer - start_timer);                 // print the timer result
       Serial.println(F(" us"));
-      payload.payloadID++;                     // increment payload number
+      payload.payloadID++;                                   // increment payload number
     } else {
       Serial.println(F("Transmission failed or timed out")); // payload was not delivered
     }

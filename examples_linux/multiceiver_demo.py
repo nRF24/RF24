@@ -57,7 +57,7 @@ def base(timeout=10):
         if has_payload:
             length = radio.getDynamicPayloadSize()  # grab the payload length
             # unpack payload
-            nodeID, payloadID = struct.unpack("<ii", radio.read(8))
+            nodeID, payloadID = struct.unpack("<bi", radio.read(8))
             # show the pipe number that received the payload
             print(
                 "Received {} bytes on pipe {} from node {}. PayloadID: "
@@ -72,7 +72,7 @@ def base(timeout=10):
     radio.stopListening()
 
 
-def node(node_number, count=6):
+def node(node_number, count=10):
     """start transmitting to the base station.
 
         :param int node_number: the node's identifying index (from the
@@ -88,11 +88,22 @@ def node(node_number, count=6):
     while counter < count:
         counter += 1
         # payloads will include the node_number and a payload ID character
-        payload = struct.pack("<ii", node_number, counter)
+        payload = struct.pack("<bi", node_number, counter)
+        start_timer = time.monotonic_ns()
+        report = radio.write(payload)
+        end_timer = time.monotonic_ns()
         # show something to see it isn't frozen
-        print(
-            "attempt {} returned {}".format(counter, radio.write(payload))
-        )
+        if report:
+            print(
+                "Transmission of payloadID {} as node {} successfull! "
+                "Transmission time: {} us".format(
+                    counter,
+                    node_number,
+                    (end_timer - start_timer) / 1000
+                )
+            )
+        else:
+            print("Transmission failed or timed out")
         time.sleep(0.5)  # slow down the test for readability
 
 
