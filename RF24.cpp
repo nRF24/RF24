@@ -728,7 +728,7 @@ void RF24::stopListening(void)
     }
     //flush_rx();
     config_reg &= ~_BV(PRIM_RX);
-    write_register(NRF_CONFIG, (read_register(NRF_CONFIG)) & ~_BV(PRIM_RX));
+    write_register(NRF_CONFIG,config_reg);
 
     #if defined(RF24_TINY) || defined(LITTLEWIRE)
     // for 3 pins solution TX mode is only left with additonal powerDown/powerUp cycle
@@ -1440,7 +1440,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
     setup &= ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH));
 
     #if !defined(F_CPU) || F_CPU > 20000000
-    txDelay = 250;
+    txDelay = 280;
     #else //16Mhz Arduino
     txDelay=85;
     #endif
@@ -1449,7 +1449,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
         // Making it '10'.
         setup |= _BV(RF_DR_LOW);
         #if !defined(F_CPU) || F_CPU > 20000000
-        txDelay = 450;
+        txDelay = 505;
         #else //16Mhz Arduino
         txDelay = 155;
         #endif
@@ -1459,7 +1459,7 @@ bool RF24::setDataRate(rf24_datarate_e speed)
         if (speed == RF24_2MBPS) {
             setup |= _BV(RF_DR_HIGH);
             #if !defined(F_CPU) || F_CPU > 20000000
-            txDelay = 190;
+            txDelay = 240;
             #else // 16Mhz Arduino
             txDelay = 65;
             #endif
