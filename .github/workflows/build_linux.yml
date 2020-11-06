@@ -37,21 +37,20 @@ jobs:
         run: make
       - name: library make install
         run: sudo make install
-      - name: Setup Python 3
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-          architecture: 'x86'
-      - name: Install boost.python, RPi.GPIO, pylint
-        run: |
-          sudo apt-get install python3-dev libboost-python-dev python3-setuptools
-          pip3 install RPi.GPIO pylint
-      - name: build Python wrapper
-        run: |
-          sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python3-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so
-          cd pyRF24
-          python3 setup.py build
-          python3 setup.py install
+      # - name: Setup Python 3
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.x'
+      # - name: Install boost.python, RPi.GPIO, pylint
+      #   run: |
+      #     sudo apt-get install python3-dev libboost-python-dev python3-setuptools
+      #     pip3 install RPi.GPIO pylint
+      # - name: build Python wrapper
+      #   run: |
+      #     sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python3-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so
+      #     cd pyRF24
+      #     python3 setup.py build
+      #     python3 setup.py install
       - name: make linux examples
         # compiling examples for wiringPi is broken see nRF24#669 issue
         if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
