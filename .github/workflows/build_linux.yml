@@ -24,6 +24,7 @@ jobs:
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
           arm-linux-gnueabihf-gcc -v
           arm-linux-gnueabihf-g++ -v
+          python3 --version
       - name: provide WiringPi
         if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
         run: |

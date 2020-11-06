@@ -5,9 +5,6 @@ and retrieve custom automatic acknowledgment payloads.
 import time
 from RF24 import RF24, RF24_PA_LOW
 
-# RPi.GPIO will show a warning if any pin is setup() that is already been
-# setup() for use without calling cleanup() first
-GPIO.cleanup()  # call this now in case it wasn't called on last program exit
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
