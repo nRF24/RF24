@@ -43,8 +43,8 @@ jobs:
           python-version: '3.x'
       - name: Install boost.python, RPi.GPIO, pylint
         run: |
-          sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-rpi.gpio
-          pip3 install pylint
+          sudo apt-get install python3-dev libboost-python-dev python3-setuptools
+          pip3 install RPi.GPIO pylint
       - name: build Python wrapper
         run: |
           sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python3-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so
