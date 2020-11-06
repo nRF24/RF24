@@ -156,13 +156,13 @@ void master(uint8_t role) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
             cout << timerEllapsed << " us" << endl;                 // print the timer result
-            payload.payloadID++;                                    // increment payload number
         }
         else {
             // payload was not delivered
             failures++;
             cout << "Transmission failed or timed out" << endl;
         }
+        payload.payloadID++;                                        // increment payload number
 
         // to make this example readable in the terminal
         delay(1000); // slow transmissions down by 1 second

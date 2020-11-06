@@ -105,10 +105,10 @@ void loop() {
       Serial.print(F(" Time to transmit: "));
       Serial.print(end_timer - start_timer);                 // print the timer result
       Serial.println(F(" us"));
-      payload.payloadID++;                                   // increment payload number
     } else {
       Serial.println(F("Transmission failed or timed out")); // payload was not delivered
     }
+    payload.payloadID++;                                     // increment payload number
 
     // to make this example readable in the serial monitor
     delay(500); // slow transmissions down by 1 second

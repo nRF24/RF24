@@ -75,7 +75,7 @@ void setup() {
   radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
   // save on transmission time by setting the radio to only transmit the
-  // number of bytes we need to transmit a float
+  // number of bytes we need to transmit
   radio.setPayloadSize(SIZE);     // default value is the maximum 32 bytes
 
   // For this example, we use the different addresses to send data
@@ -160,9 +160,9 @@ void makePayload(uint8_t i) {
   // let the first character be an identifying alphanumeric prefix
   // this lets us see which payload didn't get received
   buffer[0] = i + (i < 26 ? 65 : 71);
-  for (uint8_t j = 0; j < SIZE - 1; ++j) {
+  for (uint8_t j = 0; j < SIZE; ++j) {
     char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
-    chr |= j <= (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
+    chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
     buffer[j + 1] = chr + 48;
   }
 }
