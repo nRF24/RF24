@@ -278,7 +278,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -307,14 +307,14 @@ public:
      * Addresses are assigned via a byte array, default is 5 byte address length
      *
      * @code
-     *   uint8_t addresses[][6] = {"1Node","2Node"};
+     *   uint8_t addresses[][6] = {"1Node", "2Node"};
      *   radio.openWritingPipe(addresses[0]);
      * @endcode
      * @code
-     *  uint8_t address[] = { 0xCC,0xCE,0xCC,0xCE,0xCC };
+     *  uint8_t address[] = { 0xCC, 0xCE, 0xCC, 0xCE, 0xCC };
      *  radio.openWritingPipe(address);
      *  address[0] = 0x33;
-     *  radio.openReadingPipe(1,address);
+     *  radio.openReadingPipe(1, address);
      * @endcode
      *
      * @warning This function will overwrite the address set to reading pipe 0
@@ -497,7 +497,9 @@ public:
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
-     * @param multicast Request ACK (0), NOACK (1)
+     * @param multicast Request ACK response (false), or no ACK response
+     * (true). Be sure to have called enableDynamicAck() at least once before
+     * setting this parameter.
      * @return
      * - True if the payload was delivered successfully and an acknowledgement
      *   (ACK packet) was received. If auto-ack is disabled, then any attempt
@@ -509,7 +511,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -555,7 +557,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -573,7 +575,9 @@ public:
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
-     * @param multicast Request ACK (0) or NOACK (1)
+     * @param multicast Request ACK response (false), or no ACK response
+     * (true). Be sure to have called enableDynamicAck() at least once before
+     * setting this parameter.
      * @return
      * - True if the payload was delivered successfully and an acknowledgement
      *   (ACK packet) was received. If auto-ack is disabled, then any attempt
@@ -585,7 +589,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -620,7 +624,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -718,7 +722,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -779,7 +783,9 @@ public:
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
-     * @param multicast Request ACK (0) or NOACK (1)
+     * @param multicast Request ACK response (false), or no ACK response
+     * (true). Be sure to have called enableDynamicAck() at least once before
+     * setting this parameter.
      * @param startTx If this is set to `true`, then this function sets the
      * nRF24L01's CE pin to active (enabling TX transmissions). `false` has no
      * effect on the nRF24L01's CE pin and simply loads the payload into the
@@ -787,7 +793,7 @@ public:
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
@@ -814,15 +820,17 @@ public:
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
-     * @param multicast Request ACK (0) or NOACK (1)
+     * @param multicast Request ACK response (false), or no ACK response
+     * (true). Be sure to have called enableDynamicAck() at least once before
+     * setting this parameter.
      *
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
-     * <br>To use this function function in the python wrapper:
+     * <br>To use this function in the python wrapper:
      * @code{.py}
      * # let `radio` be the instantiated RF24 object
      * buffer = b"Hello World"  # a `bytes` object
-     * radio.staratWrite(buffer, False)  # False = the multicast parameter
+     * radio.startWrite(buffer, False)  # False = the multicast parameter
      * @endcode
      */
     void startWrite(const void* buf, uint8_t len, const bool multicast);
@@ -1131,6 +1139,25 @@ public:
     void disableDynamicPayloads(void);
 
     /**
+     * Enable dynamic ACKs (single write multicast or unicast) for chosen
+     * messages.
+     *
+     * @note This function must be called once before using the multicast
+     * parameter for any functions that offer it. To use multicast behavior
+     * about all outgoing payloads (using pipe 0) or incoming payloads
+     * (concerning all RX pipes), use setAutoAck()
+     *
+     * @see setAutoAck() for all pipes
+     * @see setAutoAck(uint8_t, bool) for individual pipes
+     *
+     * @code
+     * radio.write(&data, 32, 1); // Sends a payload with no acknowledgement requested
+     * radio.write(&data, 32, 0); // Sends a payload using auto-retry/autoACK
+     * @endcode
+     */
+    void enableDynamicAck();
+
+    /**
      * Determine whether the hardware is an nRF24L01+ or not.
      *
      * @return true if the hardware is nRF24L01+ (or compatible) and false
@@ -1412,22 +1439,6 @@ public:
     void openWritingPipe(uint64_t address);
 
     /**
-     * Enable dynamic ACKs (single write multicast or unicast) for chosen
-     * messages.
-     *
-     * @deprecated This function is performed in begin(), so there's no need to
-     * manually call it anymore.
-     *
-     * @note To enable full multicast or per-pipe multicast, use setAutoAck()
-     *
-     * @code
-     * radio.write(&data,32,1);  // Sends a payload with no acknowledgement requested
-     * radio.write(&data,32,0);  // Sends a payload using auto-retry/autoACK
-     * @endcode
-     */
-    void enableDynamicAck();
-
-    /**
      * Determine if an ack payload was received in the most recent call to
      * write(). The regular available() can also be used.
      *
@@ -1613,11 +1624,6 @@ private:
  * <b>Re-written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * A challenge to learn new skills:<br>
- * This example uses the RF24 library's default settings which includes having
- * dynamic payload length enabled. Try adjusting this example to use
- * statically sized payloads.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -1628,11 +1634,6 @@ private:
  * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
- *
- * A challenge to learn new skills:<br>
- * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
- * example to use a different RX pipe that still responds with ACK
- * payloads.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
@@ -1650,10 +1651,6 @@ private:
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * A challenge to learn new skills:<br>
- * This example uses 2 different addresses for the RX & TX nodes.
- * Try adjusting this example to use the same address on different pipes.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -1663,12 +1660,6 @@ private:
  * <b>For Arduino</b><br>
  * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of streaming data from 1 nRF24L01 transceiver to another.
- *
- * A challenge to learn new skills:<br>
- * This example uses the startFastWrite() function to utilize all 3 levels of
- * the TX FIFO. Try adjusting this example to use the write() function which
- * only uses 1 level of the TX FIFO per call. Notice the difference in
- * transmissions times.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
@@ -1681,12 +1672,6 @@ private:
  * A simple example of sending data from as many as 6 nRF24L01 transceivers to
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
- *
- * A challenge to learn new skills:<br>
- * This example uses the Serial Monitor to change a node's role. Try adjusting
- * this example so that the 1 recieving node sends a ping that tells
- * all other transmitting nodes to start transmitting. HINT: use the
- * "multicast" parameter to write().
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
@@ -1701,12 +1686,6 @@ private:
  * configured to detect when data is received, or when data has transmitted
  * successfully, or when data has failed to transmit.
  *
- * A challenge to learn new skills:<br>
- * This example does not use Arduino's attachInterrupt() function. Try
- * adjusting this example so that attachInterrupt() calls this example's
- * interruptHandler() function.
- * HINT: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -1722,10 +1701,6 @@ private:
  * updated acknowledgement payload data, where actual ACK payloads' data are
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
- *
- * A challenge to learn new skills:<br>
- * This example uses 2 different addresses for the RX & TX nodes.
- * Try adjusting this example to use the same address on different pipes.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
@@ -1800,6 +1775,11 @@ private:
  * @example{lineno} examples_linux/getting_started.py
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi.
+ *
+ * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * <br>To run this example, enter
+ * @code{.py}from getting_started import *@endcode and follow the prompts.
  */
 
 /**
@@ -1807,6 +1787,11 @@ private:
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * transmit and retrieve custom automatic acknowledgment payloads.
+ *
+ * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * <br>To run this example, enter
+ * @code{.py}from acknowledgement_payloads import *@endcode and follow the prompts.
  */
 
 /**
@@ -1817,6 +1802,11 @@ private:
  * the auto-ack feature is enabled, but this example doesn't use automatic ACK
  * payloads because automatic ACK payloads' data will always be outdated by 1
  * transmission. Instead, this example uses a call and response paradigm.
+ *
+ * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * <br>To run this example, enter
+ * @code{.py}from manual_acknowledgements import *@endcode and follow the prompts.
  */
 
 /**
@@ -1824,6 +1814,11 @@ private:
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi for
  * streaming multiple payloads.
+ *
+ * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * <br>To run this example, enter
+ * @code{.py}from streaming_data import *@endcode and follow the prompts.
  */
 
 /**
@@ -1831,6 +1826,11 @@ private:
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * detecting (and verifying) the IRQ (interrupt) pin on the nRF24L01.
+ *
+ * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * <br>To run this example, enter
+ * @code{.py}from interrupt_configure import *@endcode and follow the prompts.
  */
 
 /**
@@ -1839,6 +1839,11 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi for
  * using 1 nRF24L01 to receive data from up to 6 other transceivers. This
  * technique is called "multiceiver" in the datasheet.
+ *
+ * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * <br>To run this example, enter
+ * @code{.py}from multiceiver_demo import *@endcode and follow the prompts.
  */
 
 /**
@@ -1859,11 +1864,6 @@ private:
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * A challenge to learn new skills:<br>
- * This example uses the RF24 library's default settings which includes having
- * dynamic payload length enabled. Try adjusting this example to use
- * statically sized payloads.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
@@ -1875,11 +1875,6 @@ private:
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
- *
- * A challenge to learn new skills:<br>
- * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
- * example to use a different RX pipe that still responds with ACK
- * payloads.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
@@ -1898,10 +1893,6 @@ private:
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * A challenge to learn new skills:<br>
- * This example uses 2 different addresses for the RX & TX nodes.
- * Try adjusting this example to use the same address on different pipes.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
@@ -1912,11 +1903,6 @@ private:
  * <b>Written by 2bndy5 2020</b><br>
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
- *
- * A challenge to learn new skills:<br>
- * This example uses the RF24 library's default settings which includes having
- * dynamic payload length enabled. Try adjusting this example to use
- * statically sized payloads.
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
@@ -1929,12 +1915,6 @@ private:
  * A simple example of sending data from as many as 6 nRF24L01 transceivers to
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
- *
- * A challenge to learn new skills:<br>
- * This example uses the Serial Monitor to change a node's role. Try adjusting
- * this example so that the 1 recieving node sends a ping that tells
- * all other transmitting nodes to start transmitting. HINT: use the
- * "multicast" parameter to write().
  *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
@@ -1988,8 +1968,8 @@ private:
  * @li <a href="http://nRF24.github.io/RF24/classRF24.html"><b>RF24 Class Documentation</b></a>
  * @li <a href="http://nRF24.github.io/RF24/pages.html"><b>Support & Configuration</b></a>
  * @li <a href="https://github.com/nRF24/RF24/"><b>Source Code</b></a>
- * @li <a href="https://tmrh20.github.io/RF24/tmrh20/nRF24L01_datasheet_v2.pdf">nrf24L01 v2.0 Datasheet</a>
- * @li <a href="https://tmrh20.github.io/RF24/tmrh20/nRF24L01P_datasheet_v1.pdf">nrf24L01+ v1.0 Datasheet</a>
+ * @li <a href="http://tmrh20.github.io/RF24/tmrh20/nRF24L01_datasheet_v2.pdf">nrf24L01 v2.0 Datasheet</a>
+ * @li <a href="http://tmrh20.github.io/RF24/tmrh20/nRF24L01P_datasheet_v1.pdf">nrf24L01+ v1.0 Datasheet</a>
  *
  * **Additional Information and Add-ons**
  *

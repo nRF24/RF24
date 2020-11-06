@@ -10,12 +10,6 @@
  * configured to detect when data is received, or when data has transmitted
  * successfully, or when data has failed to transmit.
  *
- * A challenge to learn new skills:
- * This example does not use Arduino's attachInterrupt() function. Try
- * adjusting this example so that attachInterrupt() calls this example's
- * interruptHandler() function.
- * HINT: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -23,17 +17,20 @@
 #include "RF24.h"
 
 // We will be using the nRF24L01's IRQ pin for this example
-#define IRQ_PIN 6 // this needs to be a digital input capable pin
+#define IRQ_PIN 2 // this needs to be a digital input capable pin
+volatile bool wait_for_event = false; // used to wait for an IRQ event to trigger
 
-// We will be using the nRF24L01's CE pin to control transmissions
-#define CE_PIN 7
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(CE_PIN, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // Let these addresses be used for the pair
-uint8_t address[6] = "1Node";
+uint8_t address[][6] = {"1Node", "2Node"};
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
+
+// to use different addresses on a pair of radios, we need a variable to
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // Used to control whether this node is sending or receiving
 bool role = false;  // true = TX node, false = RX node
@@ -66,27 +63,42 @@ void setup() {
 
   // print example's introductory prompt
   Serial.println(F("RF24/examples/InterruptConfigure"));
+
+  // To set the radioNumber via the Serial monitor on startup
+  Serial.println(F("Which radio is this? Enter '0' or '1'. Defaults to '0'"));
+  while (!Serial.available()) {
+    // wait for user input
+  }
+  char input = Serial.parseInt();
+  radioNumber = input == 1;
+  Serial.print(F("radioNumber = "));
+  Serial.println((int)radioNumber);
+
+  // role variable is hardcoded to RX behavior, inform the user of this
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // setup the IRQ_PIN
-  pinMode(IRQ_PIN, INPUT);
-  // pinMode(CE_PIN, OUTPUT); // performed by radio.begin()
+  pinMode(IRQ_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(IRQ_PIN), interruptHandler, FALLING);
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity to
   // each other.
-  radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
+  radio.setPALevel(RF24_PA_LOW);    // RF24_PA_MAX is default.
 
-  // For this example we use acknowledgment payloads to trigger the
+  // For this example we use acknowledgment (ACK) payloads to trigger the
   // IRQ pin when data is received on the TX node.
+  // to use ACK payloads, we need to enable dynamic payload lengths
+  radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
+
   // Acknowledgement packets have no payloads by default. We need to enable
   // this feature for all nodes (TX & RX) to use ACK payloads.
   radio.enableAckPayload();
-
   // Fot this example, we use the same address to send data back and forth
-  // set the addresses for both RX and TX nodes
-  radio.openWritingPipe(address);    // always uses pipe 0
-  radio.openReadingPipe(0, address); // using pipe 0
+
+  // For this example, we use the different addresses to send data
+  radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+  radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
   // additional setup specific to the node's role
   if (role) {
@@ -95,19 +107,24 @@ void setup() {
 
   } else {
     // setup for RX mode
+
+    // don't use the interruptHandler() on the RX node in this example
+    radio.maskIRQ(1, 1, 1); // prevent IRQ pin from triggering
+
     // Fill the TX FIFO with 3 ACK payloads for the first 3 received
     // transmissions on pipe 0.
-    radio.writeAckPayload(0, &ack_payloads[0], ack_pl_size);
-    radio.writeAckPayload(0, &ack_payloads[1], ack_pl_size);
-    radio.writeAckPayload(0, &ack_payloads[2], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
     radio.startListening();                                 // powerUp() into RX mode
   }
 }
 
 void loop() {
 
-  if (role) {
-    // This device is a TX node
+  if (role && !wait_for_event) {
+    // This device is a TX node. This if block is only triggered when
+    // NOT waiting for an IRQ event to happen
 
     if (pl_iterator == 0) {
       // Test the "data ready" event with the IRQ pin
@@ -149,17 +166,12 @@ void loop() {
       // the "false" argument means we are expecting an ACK packet response
       radio.startWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
 
-      while (digitalRead(IRQ_PIN)) {
-        /*
-         * IRQ pin is LOW when activated. Otherwise it is always HIGH
-         * Wait in this empty loop until IRQ pin is activated.
-         *
-         * In this example, the "data fail" event is always configured to
-         * trigger the IRQ pin active. Because the auto-ACK feature is on by
-         * default, we don't need a timeout check to prevent an infinite loop.
-         */
-      }
-      interruptHandler(); // print what happened
+      // IRQ pin is LOW when activated. Otherwise it is always HIGH
+      // Wait until IRQ pin is activated.
+      wait_for_event = true;
+      // In this example, the "data fail" event is always configured to
+      // trigger the IRQ pin active. Because the auto-ACK feature is on by
+      // default, we don't need a timeout check to prevent an infinite loop.
 
     } else if (pl_iterator == 4) {
       // all IRQ tests are done; flush_tx() and print the ACK payloads for fun
@@ -174,7 +186,6 @@ void loop() {
     } else if (pl_iterator == 2) {
       pl_iterator++; // proceed from step 3 to last step (stop at step 4 for readability)
     }
-
 
   } else {
     // This device is a RX node
@@ -193,9 +204,9 @@ void loop() {
 
       // Fill the TX FIFO with 3 ACK payloads for the first 3 received
       // transmissions on pipe 0.
-      radio.writeAckPayload(0, &ack_payloads[0], ack_pl_size);
-      radio.writeAckPayload(0, &ack_payloads[1], ack_pl_size);
-      radio.writeAckPayload(0, &ack_payloads[2], ack_pl_size);
+      radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+      radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+      radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
       radio.startListening();                // We're ready to start over. Begin listening.
     }
 
@@ -218,8 +229,6 @@ void loop() {
       // startListening() clears the IRQ masks also. This is required for
       // continued TX operations when a transmission fails.
       radio.stopListening(); // this also discards any unused ACK payloads
-      // address for this example doesn't change
-      // radio.openWritingPipe(address);
 
     } else if (c == 'R' && role) {
       // Become the RX node
@@ -227,17 +236,17 @@ void loop() {
 
       role = false;
 
+      // don't use the interruptHandler() on the RX node in this example
+      radio.maskIRQ(1, 1, 1); // prevent IRQ pin from triggering
+
       // Fill the TX FIFO with 3 ACK payloads for the first 3 received
       // transmissions on pipe 0
       radio.flush_tx(); // make sure there is room for 3 new ACK payloads
-      radio.writeAckPayload(0, &ack_payloads[0], ack_pl_size);
-      radio.writeAckPayload(0, &ack_payloads[1], ack_pl_size);
-      radio.writeAckPayload(0, &ack_payloads[2], ack_pl_size);
-
-      // address for this example doesn't change
-      // radio.openReadingPipe(0, address);
+      radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+      radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+      radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
       radio.startListening();
-    } // change role
+    }
   } // Serial.available()
 } // loop
 
@@ -274,4 +283,5 @@ void interruptHandler() {
     Serial.print(F("   'Data Fail' event test "));
     Serial.println(tx_df ? F("passed") : F("failed"));
   }
+  wait_for_event = false; // ready to continue with loop() operations
 } // interruptHandler

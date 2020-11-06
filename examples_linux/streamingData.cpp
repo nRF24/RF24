@@ -7,11 +7,6 @@
 /**
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * A challenge to learn new skills:
- * This example uses the RF24 library's default settings which includes having
- * dynamic payload length enabled. Try adjusting this example to use
- * statically sized payloads.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
@@ -38,11 +33,14 @@ RF24 radio(22, 0);
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
-
 // Let these addresses be used for the pair
-uint8_t address[6] = "1Node";
+uint8_t address[2][6] = {"1Node", "2Node"};
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
+
+// to use different addresses on a pair of radios, we need a variable to
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // For this example, we'll be sending 32 payloads each containing
 // 32 bytes of data that looks like ASCII art when printed to the serial
@@ -71,10 +69,20 @@ int main() {
     // print example's introductory prompt
     cout << "RF24/examples_linux/streamingData\n";
 
+    // To set the radioNumber via the terminal on startup
+    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+    string input;
+    getline(cin, input);
+    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
+
+    // save on transmission time by setting the radio to only transmit the
+    // number of bytes we need to transmit a float
+    radio.setPayloadSize(SIZE);        // default value is the maximum 32 bytes
+
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+    radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
 
     // Fot this example, we use the same address to send data back and forth
     // set the addresses for both RX and TX nodes
@@ -122,9 +130,6 @@ void setRole() {
 void master() {
     radio.stopListening();                           // powerUp() into TX mode
 
-    // address for this example doesn't change
-    // radio.openWritingPipe(0, address);
-
     unsigned int failures = 0;               // keep track of failures
     uint8_t i = 0;
     unsigned long startTimer = millis();     // start the timer
@@ -157,9 +162,6 @@ void master() {
  * make this node act as the receiver
  */
 void slave() {
-
-    // address for this example doesn't change
-    // radio.openReadingPipe(0, address);
 
     radio.startListening();                                  // powerUp() into RX mode
 

@@ -10,13 +10,6 @@
  * configured to detect when data is received, or when data has transmitted
  * successfully, or when data has failed to transmit.
  *
- * A challenge to learn new skills:
- * This example does not use Arduino's attachInterrupt() function, but this
- * library has ported Arduino's attachInterrupt() function for ease of
- * portability in Linux. Try adjusting this example so that attachInterrupt()
- * calls this example's interruptHandler() function.
- * HINT: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
@@ -30,6 +23,7 @@ using namespace std;
 
 // We will be using the nRF24L01's IRQ pin for this example
 #define IRQ_PIN 12 // this needs to be a digital input capable pin
+bool wait_for_event = false; // used to signify that the event is handled
 
 /****************** Linux ***********************/
 // Radio CE Pin, CSN Pin, SPI Speed
@@ -45,11 +39,14 @@ RF24 radio(22, 0);
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
-
 // Let these addresses be used for the pair
-uint8_t address[6] = "1Node";
+uint8_t address[2][6] = {"1Node", "2Node"};
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
+
+// to use different addresses on a pair of radios, we need a variable to
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // For this example, we'll be using a payload containing
 // a string that changes on every transmission. (successful or not)
@@ -71,7 +68,8 @@ void ping_n_wait(); // prototype that sends a payload and waits for the IRQ pin 
 int main() {
 
     // setup the digital input pin connected to the nRF24L01's IRQ pin
-    pinMode(IRQ_PIN, OUTPUT);
+    pinMode(IRQ_PIN, INPUT);
+    attachInterrupt(IRQ_PIN, INT_EDGE_FALLING, interruptHandler); //Attach interrupt to bcm pin 23
 
     // perform hardware check
     if (!radio.begin()) {
@@ -81,6 +79,9 @@ int main() {
 
     // print example's introductory prompt
     cout << "RF24/examples_linux/interruptConfigure\n";
+
+    // to use ACK payloads, we need to enable dynamic payload lengths
+    radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
 
     // Acknowledgement packets have no payloads by default. We need to enable
     // this feature for all nodes (TX & RX) to use ACK payloads.
@@ -191,6 +192,10 @@ void master() {
  * act as the receiver
  */
 void slave() {
+
+    // don't use the interruptHandler() on the RX node in this example
+    radio.maskIRQ(1, 1, 1); // prevent IRQ pin from triggering
+
     // Fill the TX FIFO with 3 ACK payloads for the first 3 received
     // transmissions on pipe 0.
     radio.writeAckPayload(0, &ack_payloads[0], ack_pl_size);
@@ -227,7 +232,8 @@ void ping_n_wait() {
     // the "false" argument means we are expecting an ACK packet response
     radio.startWrite(tx_payloads[pl_iterator], tx_pl_size, false);
 
-    while (digitalRead(IRQ_PIN)) {
+    wait_for_event = true;
+    while (wait_for_event) {
         /*
          * IRQ pin is LOW when activated. Otherwise it is always HIGH
          * Wait in this empty loop until IRQ pin is activated.
@@ -237,7 +243,6 @@ void ping_n_wait() {
          * default, we don't need a timeout check to prevent an infinite loop.
          */
     }
-    interruptHandler(); // print what happened
 }
 
 
@@ -269,4 +274,6 @@ void interruptHandler() {
         cout << "   'Data Sent' event test " << (tx_ds ? "passed" : "failed") << endl;
     else if (pl_iterator == 3)
         cout << "   'Data Fail' event test " << (tx_df ? "passed" : "failed") << endl;
+
+    wait_for_event = false; // ready to continue
 } // interruptHandler

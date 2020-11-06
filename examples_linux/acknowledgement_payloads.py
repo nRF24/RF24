@@ -3,8 +3,11 @@ Simple example of using the library to transmit
 and retrieve custom automatic acknowledgment payloads.
 """
 import time
-import RPi.GPIO as GPIO
 from RF24 import RF24, RF24_PA_LOW
+
+# RPi.GPIO will show a warning if any pin is setup() that is already been
+# setup() for use without calling cleanup() first
+GPIO.cleanup()  # call this now in case it wasn't called on last program exit
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -19,14 +22,37 @@ radio = RF24(22, 0)
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
+# using the python keyword global is bad practice. Instead we'll use a 1 item
+# list to store our integer number for the payloads' counter
+counter = [0]
+
+# For this example, we will use different addresses
+# An address need to be a buffer protocol object (bytearray)
+address = [b"1Node", b"2Node"]
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
+
+# to use different addresses on a pair of radios, we need a variable to
+# uniquely identify which address this radio will use to transmit
+# 0 uses address[0] to transmit, 1 uses address[1] to transmit
+radio_number = bool(
+    int(
+        input(
+            "Which radio is this? Enter '0' or '1'. Defaults to '0' "
+        ) or 0
+    )
+)
+
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    print("nRF24L01 hardware isn't responding")
-    exit()  # quit now
+    raise OSError("nRF24L01 hardware isn't responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+# ACK payloads are dynamically sized, so we need to enable that feature also
+radio.enableDynamicPayloads()
 
 # to enable the custom ACK payload feature
 radio.enableAckPayload()
@@ -35,23 +61,19 @@ radio.enableAckPayload()
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# set TX address of RX node into the TX pipe
+radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+# set RX address of TX node into an RX pipe
+radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
 # for debugging
 radio.printDetails()
-
-# addresses needs to be in a buffer protocol object (bytearray)
-address = b"1Node"
-# It is very helpful to think of an address as a path instead of as
-# an identifying device destination
-
-# using the python keyword global is bad practice. Instead we'll use a 1 item
-# list to store our integer number for the payloads' counter
-counter = [0]
 
 
 def master(count=5):  # count = 5 will only transmit 5 packets
     """Transmits a payload every second and prints the ACK payload"""
     radio.stopListening()  # put radio in TX mode
-    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
 
     while count:
         # construct a payload to send
@@ -92,16 +114,13 @@ def master(count=5):  # count = 5 will only transmit 5 packets
 
 def slave(count=5):
     """Prints the received value and sends an ACK payload"""
-    # set address of TX node into an RX pipe. NOTE you MUST specify
-    # which pipe number to use for RX; we'll be using pipe 0
-    radio.openReadingPipe(0, address)
     radio.startListening()  # put radio into RX mode, power it up
 
     # setup the first transmission's ACK payload
     buffer = b"World \x00" + bytes([counter[0]])
     # we must set the ACK payload data and corresponding
     # pipe number [0,5]
-    radio.writeAckPayload(0, buffer)  # load ACK for first response
+    radio.writeAckPayload(1, buffer)  # load ACK for first response
 
     start = time.monotonic()  # start timer
     while count and (time.monotonic() - start) < 6:  # use 6 second timeout
@@ -126,7 +145,7 @@ def slave(count=5):
             if count:  # Going again?
                 # build a new ACK payload
                 buffer = b"World \x00" + bytes([counter[0]])
-                radio.writeAckPayload(0, buffer)  # load ACK for next response
+                radio.writeAckPayload(1, buffer)  # load ACK for next response
 
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put radio in TX mode & flush unused ACK payloads

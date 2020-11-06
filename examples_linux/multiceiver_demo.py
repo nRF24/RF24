@@ -4,8 +4,11 @@ transceivers. This technique is called "multiceiver" in the datasheet.
 """
 import time
 import struct
-import RPi.GPIO as GPIO
 from RF24 import RF24, RF24_PA_LOW
+
+# RPi.GPIO will show a warning if any pin is setup() that is already been
+# setup() for use without calling cleanup() first
+GPIO.cleanup()  # call this now in case it wasn't called on last program exit
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -20,18 +23,6 @@ radio = RF24(22, 0)
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
-# initialize the nRF24L01 on the spi bus
-if not radio.begin():
-    print("nRF24L01 hardware isn't responding")
-    exit()  # quit now
-
-# set the Power Amplifier level to -12 dBm since this test example is
-# usually run with nRF24L01 transceivers in close proximity of each other
-radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
-# for debugging
-radio.printDetails()
-
 # setup the addresses for all transmitting nRF24L01 nodes
 addresses = [
     b"\x78" * 5,
@@ -44,6 +35,23 @@ addresses = [
 # It is very helpful to think of an address as a path instead of as
 # an identifying device destination
 
+# initialize the nRF24L01 on the spi bus
+if not radio.begin():
+    raise OSError("nRF24L01 hardware isn't responding")
+
+# set the Power Amplifier level to -12 dBm since this test example is
+# usually run with nRF24L01 transceivers in close proximity of each other
+radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+# To save time during transmission, we'll set the payload size to be only what
+# we need.
+# A byte and an int occupy 5 bytes in memory using len(struct.pack())
+# "<bi" means a little endian unsigned byte and int
+radio.setPayloadSize(len(struct.unpack("<bi", 0, 0)))
+
+# for debugging
+radio.printDetails()
+
 
 def base(timeout=10):
     """Use the nRF24L01 as a base station for lisening to all nodes"""
@@ -55,7 +63,7 @@ def base(timeout=10):
     while time.monotonic() - start_timer < timeout:
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
-            length = radio.getDynamicPayloadSize()  # grab the payload length
+            length = radio.getPayloadSize()  # grab the payload length
             # unpack payload
             nodeID, payloadID = struct.unpack("<bi", radio.read(8))
             # show the pipe number that received the payload

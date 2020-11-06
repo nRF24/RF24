@@ -2,8 +2,11 @@
 Example of library usage for streaming multiple payloads.
 """
 import time
-import RPi.GPIO as GPIO
 from RF24 import RF24, RF24_PA_LOW
+
+# RPi.GPIO will show a warning if any pin is setup() that is already been
+# setup() for use without calling cleanup() first
+GPIO.cleanup()  # call this now in case it wasn't called on last program exit
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -18,33 +21,45 @@ radio = RF24(22, 0)
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
+# For this example, we will use different addresses
+# An address need to be a buffer protocol object (bytearray)
+address = [b"1Node", b"2Node"]
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
+
+# to use different addresses on a pair of radios, we need a variable to
+# uniquely identify which address this radio will use to transmit
+# 0 uses address[0] to transmit, 1 uses address[1] to transmit
+radio_number = bool(int(input("Which radio is this ('0' or '1')? ")))
+
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    print("nRF24L01 hardware isn't responding")
-    exit()  # quit now
+    raise OSError("nRF24L01 hardware isn't responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# set TX address of RX node into the TX pipe
+radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+# set RX address of TX node into an RX pipe
+radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
 # for debugging
 radio.printDetails()
 
-# addresses needs to be in a buffer protocol object (bytearray)
-address = b"1Node"
 
-
-def make_buffers(iter, size=32):
+def make_buffer(buf_iter, size=32):
     """return a list of payloads"""
-    buffers = []
     # we'll use `size` for the number of payloads in the list and the
     # payloads' length
     # prefix payload with a sequential letter to indicate which
     # payloads were lost (if any)
-    buff = bytes([iter + (65 if 0 <= iter < 26 else 71)])
+    buff = bytes([buf_iter + (65 if 0 <= buf_iter < 26 else 71)])
     for j in range(size - 1):
-        char = bool(j >= (size - 1) / 2 + abs((size - 1) / 2 - iter))
-        char |= bool(j < (size - 1) / 2 - abs((size - 1) / 2 - iter))
+        char = bool(j >= (size - 1) / 2 + abs((size - 1) / 2 - buf_iter))
+        char |= bool(j < (size - 1) / 2 - abs((size - 1) / 2 - buf_iter))
         buff += bytes([char + 48])
     return buff
 
@@ -54,8 +69,12 @@ def master(count=1, size=32):
     if size < 6:
         print("setting size to 6;", size, "is not allowed for this test.")
         size = 6
+
+    # save on transmission time by setting the radio to only transmit the
+    #  number of bytes we need to transmit
+    radio.setPayloadSize(size)  # the default is the maximum 32 bytes
+
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
-    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
     for c in range(count):  # transmit the same payloads this many times
         radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
         # NOTE the write_only parameter does not initiate sending
@@ -63,7 +82,7 @@ def master(count=1, size=32):
         failures = 0  # keep track of manual retries
         start_timer = time.monotonic() * 1000  # start timer
         while buf_iter < size:  # cycle through all the payloads
-            buf = make_buffers(buf_iter, size)  # make a payload
+            buf = make_buffer(buf_iter, size)  # make a payload
             if not radio.writeFast(buf):
                 # reception failed; we need to reset the irq_rf flag
                 failures += 1  # increment manual retries
@@ -87,11 +106,14 @@ def master(count=1, size=32):
         )
 
 
-def slave(timeout=5):
+def slave(timeout=5, size=32):
     """Stops listening after a `timeout` with no response"""
     # set address of TX node into an RX pipe. NOTE you MUST specify
-    # which pipe number to use for RX, we'll be using pipe 0
-    radio.openReadingPipe(0, address)  # pipe number options range [0,5]
+
+    # save on transmission time by setting the radio to only transmit the
+    #  number of bytes we need to transmit
+    radio.setPayloadSize(size)  # the default is the maximum 32 bytes
+
     radio.startListening()  # put radio into RX mode and power up
     count = 0  # keep track of the number of received payloads
     start_timer = time.monotonic()  # start timer

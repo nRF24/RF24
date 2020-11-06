@@ -19,9 +19,8 @@ Session.vim
 .DS_Store
 Makefile.inc
 utility/includes.h
-examples_linux/*
-!examples_linux/**/
-!examples_linux/*.*
+examples_linux/__pycache__
 .directory
 .idea
 doxygenAction
+.vscode/

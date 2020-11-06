@@ -455,7 +455,12 @@ uint8_t RF24::getChannel()
 
 void RF24::setPayloadSize(uint8_t size)
 {
-    payload_size = rf24_min(size, 32);
+    // payload size must be in range [1, 32]
+    payload_size = rf24_max(1, rf24_min(32, size));
+
+    // write static payload size setting for all pipes
+    for (uint8_t i = 0; i < 6; ++i)
+        write_register(RX_PW_P0 + i, payload_size);
 }
 
 /****************************************************************************/
@@ -629,7 +634,7 @@ bool RF24::begin(void)
 
     // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
     // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
-    // sizes must never be used. See documentation for a more complete explanation.
+    // sizes must never be used. See datasheet for a more complete explanation.
     setRetries(5, 15);
 
     // Then set the data rate to the slowest (and most reliable) speed supported by all
@@ -641,34 +646,41 @@ bool RF24::begin(void)
     toggle_features();
     uint8_t after_toggle = read_register(FEATURE);
     _is_p_variant = false ? before_toggle != after_toggle : true;
-    if (after_toggle != 5){
+    if (!after_toggle){
         if (_is_p_variant){
             // module did not experience power-on-reset (#401)
             toggle_features();
         }
         // allow use of multicast parameter and dynamic payloads by default
-        write_register(FEATURE, _BV(EN_DYN_ACK) | _BV(EN_DPL));
+        write_register(FEATURE, 0);
     }
-    // enable dynamic payloads by default (for all pipes)
-    write_register(DYNPD, 0x3F);
-    dynamic_payloads_enabled = true;
-
-    ack_payloads_enabled = false;
-
-    // Reset current status
-    // Notice reset and flush is the last thing we do
-    write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT));
+    ack_payloads_enabled = false;     // ack payloads disabled by default
+    write_register(DYNPD, 0);         // disable dynamic payloads by default (for all pipes)
+    dynamic_payloads_enabled = false;
+    write_register(EN_AA, 0x3F);      // enable auto-ack on all pipes
+    write_register(EN_RXADDR, 0);     // close all RX pipes
+    setPayloadSize(32);               // set static payload size to 32 (max) bytes by default
+    setAddressWidth(5);               // set default address length to (max) 5 bytes
 
     // Set up default configuration.  Callers can always change it later.
     // This channel should be universally safe and not bleed over into adjacent
     // spectrum.
     setChannel(76);
 
+    // Reset current status
+    // Notice reset and flush is the last thing we do
+    write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT));
+
+
     // Flush buffers
     flush_rx();
     flush_tx();
 
-    // Clear CONFIG register, Enable PTX, Power Up & 16-bit CRC
+    // Clear CONFIG register:
+    //      Reflect all IRQ events on IRQ pin
+    //      Enable PTX
+    //      Power Up
+    //      16-bit CRC (CRC required by auto-ack)
     // Do not write CE high so radio will remain in standby I mode
     // PTX should use only 22uA of power
     write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO)) );
@@ -1122,11 +1134,6 @@ void RF24::openWritingPipe(uint64_t value)
 
     write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), addr_width);
     write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), addr_width);
-
-
-    //const uint8_t max_payload_size = 32;
-    //write_register(RX_PW_P0,rf24_min(payload_size,max_payload_size));
-    write_register(RX_PW_P0, payload_size);
 }
 
 /****************************************************************************/
@@ -1136,17 +1143,11 @@ void RF24::openWritingPipe(const uint8_t* address)
     // expects it LSB first too, so we're good.
     write_register(RX_ADDR_P0, address, addr_width);
     write_register(TX_ADDR, address, addr_width);
-
-    //const uint8_t max_payload_size = 32;
-    //write_register(RX_PW_P0,rf24_min(payload_size,max_payload_size));
-    write_register(RX_PW_P0, payload_size);
 }
 
 /****************************************************************************/
 static const PROGMEM uint8_t child_pipe[] = {RX_ADDR_P0, RX_ADDR_P1, RX_ADDR_P2,
                                              RX_ADDR_P3, RX_ADDR_P4, RX_ADDR_P5};
-static const PROGMEM uint8_t child_payload_size[] = {RX_PW_P0, RX_PW_P1, RX_PW_P2,
-                                                     RX_PW_P3, RX_PW_P4, RX_PW_P5};
 
 void RF24::openReadingPipe(uint8_t child, uint64_t address)
 {
@@ -1164,8 +1165,6 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
         } else {
             write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
         }
-
-        write_register(pgm_read_byte(&child_payload_size[child]), payload_size);
 
         // Note it would be more efficient to set all of the bits for all open
         // pipes at once.  However, I thought it would make the calling code
@@ -1205,7 +1204,6 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t* address)
         } else {
             write_register(pgm_read_byte(&child_pipe[child]), address, 1);
         }
-        write_register(pgm_read_byte(&child_payload_size[child]), payload_size);
 
         // Note it would be more efficient to set all of the bits for all open
         // pipes at once.  However, I thought it would make the calling code
@@ -1571,9 +1569,16 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel )
         uint8_t dummy_buf[32];
         for (uint8_t i = 0; i < 32; ++i)
             dummy_buf[i] = 0xFF;
+
+        // use write_register() instead of openWritingPipe() to bypass
+        // truncation of the address with the current RF24::addr_width value
         write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&dummy_buf), 5);
         flush_tx();  // so we can write to top level
-        write_payload(reinterpret_cast<const uint8_t*>(&dummy_buf), 32, W_TX_PAYLOAD);
+
+        // use write_register() instead of write_payload() to bypass
+        // truncation of the payload with the current RF24::payload_size value
+        write_register(W_TX_PAYLOAD, reinterpret_cast<const uint8_t*>(&dummy_buf), 32);
+
         disableCRC();
     }
     setPALevel(level);
@@ -1581,7 +1586,7 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel )
     IF_SERIAL_DEBUG( printf_P(PSTR("RF_SETUP=%02x\r\n"), read_register(RF_SETUP)  ) );
     ce(HIGH);
     if (isPVariant()){
-        delay(1);
+        delay(1); // datasheet says 1 ms is ok in this instance
         ce(LOW);
         reUseTX();
     }

@@ -13,10 +13,6 @@
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * A challenge to learn new skills:
- * This example uses 2 different addresses for the RX & TX nodes.
- * Try adjusting this example to use the same address on different pipes.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
@@ -45,10 +41,14 @@ RF24 radio(22, 0);
 
 
 // Let these addresses be used for the pair of nodes used in this example
-uint8_t address[][6] = {"1Node", "2Node"};
+uint8_t address[2][6] = {"1Node", "2Node"};
 //             the TX address^ ,  ^the RX address
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
+
+// to use different addresses on a pair of radios, we need a variable to
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // For this example, we'll be using a payload containing
 // a string & an integer number that will be incremented
@@ -70,6 +70,7 @@ uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
 
 int main() {
+
     // append a NULL terminating 0 for printing as a c-string
     payload.message[6] = 0;
 
@@ -82,10 +83,28 @@ int main() {
     // print example's introductory prompt
     cout << "RF24/examples_linux/ManualAcknowledgements\n";
 
+    // To set the radioNumber via the terminal on startup
+    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+    string input;
+    getline(cin, input);
+    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
+
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
     radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+
+    // save on transmission time by setting the radio to only transmit the
+    // number of bytes we need to transmit a float
+    radio.setPayloadSize(sizeof(payload)); // char[7] & uint8_t datatypes occupy 8 bytes
+
+    // For this example, we use the different addresses to send data
+    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
+    // Notice that the addresses assigned to pipes are not changed in
+    // loop() because we are using pipe 1 to receive and pipe 0 to transmit
+    // However, if we used pipe 0 to receive we would need to constantly
+    // re-write the TX address on pipe 0
 
     // for debugging
     printf_begin();
@@ -129,7 +148,6 @@ void master() {
 
     memcpy(payload.message, "Hello ", 6); // set the outgoing message
     radio.stopListening();                // put in TX mode
-    radio.openWritingPipe(address[0]);    // set pipe 0 to the TX address
 
     unsigned int failures = 0;                                // keep track of failures
     while (failures < 6) {
@@ -139,17 +157,14 @@ void master() {
         if (report) {
             // transmission successful; wait for response and print results
 
-            bool timed_out = false;                        // variable for response timeout
-            radio.openReadingPipe(1, address[1]);          // open pipe 1 to the RX address
             radio.startListening();                        // put in RX mode
             unsigned long start_timeout = millis();        // timer to detect no response
-            while (!radio.available() && !timed_out) {     // wait for response or timeout
+            while (!radio.available()) {                   // wait for response
                 if (millis() - start_timeout > 200)        // only wait 200 ms
-                    timed_out = true;
+                    break;
             }
             unsigned long ellapsedTime = getMicros();      // end the timer
             radio.stopListening();                         // put back in TX mode
-            radio.openWritingPipe(address[0]);             // set the pipe 0 to TX address
 
             // print summary of transactions
             cout << "Transmission successful! ";           // payload was delivered
@@ -185,7 +200,6 @@ void master() {
  */
 void slave() {
     memcpy(payload.message, "World ", 6);               // set the response message
-    radio.openReadingPipe(1, address[0]);               // open pipe 1 to the TX address
     radio.startListening();                             // put in RX mode
 
     time_t startTimer = time(nullptr);                  // start a timer
@@ -199,9 +213,7 @@ void slave() {
 
             // transmit response & save result to `report`
             radio.stopListening();                          // put in TX mode
-            radio.openWritingPipe(address[1]);              // set the pipe 0 to RX address
             bool report = radio.write(&payload, sizeof(payload));
-            radio.openReadingPipe(1, address[0]);           // open pipe 1 to the TX address
             radio.startListening();                         // put back in RX mode
 
             // print summary of transactions

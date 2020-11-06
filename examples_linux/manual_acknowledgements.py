@@ -7,8 +7,11 @@ example uses a call and response paradigm.
 """
 import time
 import struct
-import RPi.GPIO as GPIO
 from RF24 import RF24, RF24_PA_LOW
+
+# RPi.GPIO will show a warning if any pin is setup() that is already been
+# setup() for use without calling cleanup() first
+GPIO.cleanup()  # call this now in case it wasn't called on last program exit
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -23,23 +26,39 @@ radio = RF24(22, 0)
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
+# For this example, we will use different addresses
+# An address need to be a buffer protocol object (bytearray)
+address = [b"1Node", b"2Node"]
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
+
+# to use different addresses on a pair of radios, we need a variable to
+# uniquely identify which address this radio will use to transmit
+# 0 uses address[0] to transmit, 1 uses address[1] to transmit
+radio_number = bool(
+    int(
+        input(
+            "Which radio is this? Enter '0' or '1'. Defaults to '0' "
+        ) or 0
+    )
+)
+
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    print("nRF24L01 hardware isn't responding")
-    exit()  # quit now
+    raise OSError("nRF24L01 hardware isn't responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# To save time during transmission, we'll set the payload size to be only what
+# we need. A float value occupies 4 bytes in memory using len(struct.pack())
+# "<b" means a little endian unsigned byte
+# we also need an addition 7 bytes for the payload message
+radio.setPayloadSize(len(struct.pack("<b", 0)) + 7)
+
 # for debugging
 radio.printDetails()
-
-# addresses needs to be in a buffer protocol object (bytearray)
-address = [b"1Node", b"2Node"]
-# our TX address^  ,    ^our responding address
-# It is very helpful to think of an address as a path instead of as
-# an identifying device destination
 
 # using the python keyword global is bad practice. Instead we'll use a 1 item
 # list to store our float number for the payloads sent
@@ -67,7 +86,7 @@ def master(count=10):
             while ack[0] == 0 or time.monotonic() * 1000 < timout:
                 if radio.available():
                     # get the response & save it to ack variable
-                    ack = radio.read(radio.getDynamicPayloadSize())
+                    ack = radio.read(radio.getPayloadSize())
                     radio.stopListening()
                     radio.openWritingPipe(address[0])
             end_timer = time.monotonic_ns()  # end timer
@@ -111,7 +130,7 @@ def slave(count=10):
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
             count -= 1
-            length = radio.getDynamicPayloadSize()  # grab the payload length
+            length = radio.getPayloadSize()  # grab the payload length
             received = radio.read(length)  # fetch 1 payload from RX FIFO
             # use struct.unpack() to get the payload's appended int
             # NOTE received[7:] discards NULL terminating 0, and

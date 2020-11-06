@@ -9,12 +9,6 @@
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * A challenge to learn new skills:
- * This example uses the Serial Monitor to change a node's role. Try adjusting
- * this example so that the 1 recieving node sends a ping that tells
- * all other transmitting nodes to start transmitting. HINT: use the
- * "multicast" parameter to write().
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -82,6 +76,10 @@ void setup() {
   // each other.
   radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
+  // save on transmission time by setting the radio to only transmit the
+  // number of bytes we need to transmit a float
+  radio.setPayloadSize(sizeof(payload)); // uint8_t & int datatypes occupy 5 bytes
+
   // Set the pipe addresses accordingly. This function additionally also
   // calls startListening() or stopListening() and sets the payload's nodeID
   setRole();
@@ -93,7 +91,7 @@ void loop() {
     // This device is a TX node
 
     unsigned long start_timer = micros();                       // start the timer
-    bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
+    bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
     unsigned long end_timer = micros();                         // end the timer
 
     if (report) {
@@ -120,7 +118,7 @@ void loop() {
 
     uint8_t pipe;
     if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
-      uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
+      uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
       radio.read(&payload, bytes);                   // fetch payload from FIFO
       Serial.print(F("Received "));
       Serial.print(bytes); // print the size of the payload

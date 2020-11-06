@@ -39,7 +39,6 @@
 #endif
 
 #define digitalWrite(pin, value) bcm2835_gpio_write(pin, value)
-#define digitalRead(pin) bcm2835_gpio_lev(pin)
 #define pinMode(pin, value) bcm2835_gpio_fsel(pin,value)
 #define OUTPUT BCM2835_GPIO_FSEL_OUTP
 

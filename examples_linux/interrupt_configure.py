@@ -23,10 +23,23 @@ radio = RF24(22, 0)
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
+# select your digital input pin that's connected to the IRQ pin on the nRF24L01
+irq_pin = 12
+
+# For this example, we will use different addresses
+# An address need to be a buffer protocol object (bytearray)
+address = [b"1Node", b"2Node"]
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
+
+# to use different addresses on a pair of radios, we need a variable to
+# uniquely identify which address this radio will use to transmit
+# 0 uses address[0] to transmit, 1 uses address[1] to transmit
+radio_number = bool(int(input("Which radio is this ('0' or '1')? ")))
+
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    print("nRF24L01 hardware isn't responding")
-    exit()  # quit now
+    raise OSError("nRF24L01 hardware isn't responding")
 
 # this example uses the ACK payload to trigger the IRQ pin active for
 # the "on data received" event
@@ -36,20 +49,14 @@ radio.enableAckPayload()  # enable ACK payloads
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# set TX address of RX node into the TX pipe
+radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+# set RX address of TX node into an RX pipe
+radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
 # for debugging
 radio.printDetails()
-
-# address needs to be in a buffer protocol object (bytearray is preferred)
-address = b"1Node"
-# It is very helpful to think of an address as a path instead of as
-# an identifying device destination
-
-# select your digital input pin that's connected to the IRQ pin on the nRF24L01
-irq_pin = 12
-
-# setup GPIO pins
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(irq_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # For this example, we'll be using a payload containing
 # a string that changes on every transmission. (successful or not)
@@ -84,25 +91,34 @@ def interrupt_handler():
         )
 
 
+# setup IRQ GPIO pin
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(irq_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.add_event_detect(irq_pin, GPIO.FALLING, callback=interrupt_handler)
+
+
 def _wait_for_irq():
-    """wait till irq_pin goes active, print IRQ status
-    flags."""
-    while GPIO.input(irq_pin) == GPIO.HIGH:
-        # IRQ pin is LOW when activated. Otherwise it is always HIGH
-        # Wait in this empty loop until IRQ pin is activated.
-        #
-        # In this example, the "data fail" event is always configured to
-        # trigger the IRQ pin active. Because the auto-ACK feature is on by
-        # default, we don't need a timeout check to prevent an infinite loop.
-        pass
-    interrupt_handler()
+    """Wait till irq_pin goes active then inactive.
+    IRQ pin is LOW when activated. Otherwise it is always HIGH
+
+    In this example, the "data fail" event is always configured to
+    trigger the IRQ pin active. Because the auto-ACK feature is on by
+    default, the timeout in GPIO.wait_for_edge() is inconsequential.
+    """
+    # wait up to 1 second for event to be cleared.
+    # GPIO.RISING means whatHappened() was called.
+    channel = GPIO.wait_for_edge(irq_pin, GPIO.RISING, timeout=1000)
+    if channel is None:  # channel should be equal to GPIO.HIGH
+        raise RuntimeError("Interrupt event not detected. Check your wiring.")
+    else:
+        # wait for half a second for interrupt_handler() to complete
+        time.sleep(0.5)
 
 
 def master():
     """Transmits 3 times: successfully receive ACK payload first, successfully
     transmit on second, and intentionally fail transmit on the third"""
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
-    radio.openWritingPipe(address)  # set address of RX node into a TX pipe
 
     # on data ready test
     print("\nConfiguring IRQ pin to only ignore 'on data sent' event")
@@ -145,10 +161,9 @@ def master():
 def slave(timeout=6):  # will listen for 6 seconds before timing out
     """Only listen for 3 payload from the master node"""
     # setup radio to recieve pings, fill TX FIFO with ACK payloads
-    radio.openReadingPipe(0, address)
-    radio.writeAckPayload(0, ack_payloads[0])
-    radio.writeAckPayload(0, ack_payloads[1])
-    radio.writeAckPayload(0, ack_payloads[2])
+    radio.writeAckPayload(1, ack_payloads[0])
+    radio.writeAckPayload(1, ack_payloads[1])
+    radio.writeAckPayload(1, ack_payloads[2])
     radio.startListening()  # start listening & clear irq_dr flag
     start_timer = time.monotonic()  # start timer now
     while not radio.rxFifoFull() and time.monotonic() - start_timer < timeout:

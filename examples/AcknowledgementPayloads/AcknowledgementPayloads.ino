@@ -8,11 +8,6 @@
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
  *
- * A challenge to learn new skills:
- * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
- * example to use a different RX pipe that still responds with ACK
- * payloads.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -22,13 +17,18 @@
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
-// Let this addresses be used for the pair
-uint8_t address[6] = "1Node";
+// an identifying device destination
+// Let these addresses be used for the pair
+uint8_t address[][6] = {"1Node", "2Node"};
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
+// to use different addresses on a pair of radios, we need a variable to
+
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // Used to control whether this node is sending or receiving
-bool role = false;  // true = TX node, false = RX node
+bool role = false;  // true = TX role, false = RX role
 
 // For this example, we'll be using a payload containing
 // a string & an integer number that will be incremented
@@ -55,6 +55,18 @@ void setup() {
 
   // print example's introductory prompt
   Serial.println(F("RF24/examples/AcknowledgementPayloads"));
+
+  // To set the radioNumber via the Serial monitor on startup
+  Serial.println(F("Which radio is this? Enter '0' or '1'. Defaults to '0'"));
+  while (!Serial.available()) {
+    // wait for user input
+  }
+  char input = Serial.parseInt();
+  radioNumber = input == 1;
+  Serial.print(F("radioNumber = "));
+  Serial.println((int)radioNumber);
+
+  // role variable is hardcoded to RX behavior, inform the user of this
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // Set the PA Level low to try preventing power supply related problems
@@ -62,15 +74,16 @@ void setup() {
   // each other.
   radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
 
+  // to use ACK payloads, we need to enable dynamic payload lengths (for all nodes)
+  radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
+
   // Acknowledgement packets have no payloads by default. We need to enable
   // this feature for all nodes (TX & RX) to use ACK payloads.
   radio.enableAckPayload();
 
-  // Fot this example, we use the same address to send data back and forth
-  // set the address of the RX node to the TX pipe
-  radio.openWritingPipe(address);     // always uses pipe 0
-  // set the address of the TX node to an RX pipe
-  radio.openReadingPipe(0, address);  // using pipe 0
+  // For this example, we use the different addresses to send data
+  radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+  radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
   // additional setup specific to the node's role
   if (role) {
@@ -83,7 +96,7 @@ void setup() {
 
     memcpy(payload.message, "World ", 6);                       // set the payload message
     // load the payload for the first received transmission on pipe 0
-    radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
+    radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
 
     radio.startListening();                                     // powerUp() into RX mode
   }
@@ -147,7 +160,7 @@ void loop() {
       // increment payload counter
       payload.counter++;
       // load the payload for the first received transmission on pipe 0
-      radio.writeAckPayload(0, &payload, sizeof(payload));
+      radio.writeAckPayload(1, &payload, sizeof(payload));
     }
   } // role
 
@@ -162,8 +175,6 @@ void loop() {
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
       memcpy(payload.message, "Hello ", 6); // change payload message
       radio.stopListening();                // this also discards any unused ACK payloads
-      // address for this example doesn't change
-      // radio.openWritingPipe(address);
 
     } else if (c == 'R' && role) {
       // Become the RX node
@@ -174,11 +185,9 @@ void loop() {
 
       memcpy(payload.message, "World ", 6);                      // change payload message
       // load the payload for the first received transmission on pipe 0
-      radio.writeAckPayload(0, &payload, sizeof(PayloadStruct));
+      radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
       payload.counter++;                                         // increment payload counter
 
-      // address for this example doesn't change
-      // radio.openReadingPipe(0, address);
       radio.startListening();
     }
   }

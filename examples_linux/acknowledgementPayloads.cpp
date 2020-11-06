@@ -8,11 +8,6 @@
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
  *
- * A challenge to learn new skills:
- * This example uses the nRF24L01's ACK payloads feature. Try adjusting this
- * example to use a different RX pipe that still responds with ACK
- * payloads.
- *
  * This example was written to be used on 2 or more devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
@@ -39,11 +34,14 @@ RF24 radio(22, 0);
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
-
 // Let these addresses be used for the pair
-uint8_t address[6] = "1Node";
+uint8_t address[2][6] = {"1Node", "2Node"};
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
+
+// to use different addresses on a pair of radios, we need a variable to
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // For this example, we'll be using a payload containing
 // a string & an integer number that will be incremented
@@ -73,6 +71,15 @@ int main() {
     // print example's introductory prompt
     cout << "RF24/examples_linux/AcknowledgementPayloads\n";
 
+    // To set the radioNumber via the terminal on startup
+    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+    string input;
+    getline(cin, input);
+    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
+
+    // to use ACK payloads, we need to enable dynamic payload lengths
+    radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
+
     // Acknowledgement packets have no payloads by default. We need to enable
     // this feature for all nodes (TX & RX) to use ACK payloads.
     radio.enableAckPayload();
@@ -85,7 +92,7 @@ int main() {
     // Fot this example, we use the same address to send data back and forth
     // set the addresses for both RX and TX nodes
     radio.openWritingPipe(address);    // always uses pipe 0
-    radio.openReadingPipe(0, address); // using pipe 0
+    radio.openReadingPipe(1, address); // using pipe 0
 
     // for debugging
     printf_begin();
@@ -128,9 +135,6 @@ void setRole() {
 void master() {
     memcpy(payload.message, "Hello ", 6);                           // set the payload message
     radio.stopListening();                                          // powerUp() into TX mode
-
-    // address for this example doesn't change
-    // radio.openWritingPipe(0, address);
 
     unsigned int failures = 0;                                            // keep track of failures
     while (failures <  6) {
@@ -176,10 +180,7 @@ void slave() {
     memcpy(payload.message, "World ", 6);                    // set the payload message
 
     // load the payload for the first received transmission on pipe 0
-    radio.writeAckPayload(0, &payload, sizeof(payload));
-
-    // address for this example doesn't change
-    // radio.openReadingPipe(0, address);
+    radio.writeAckPayload(1, &payload, sizeof(payload));
 
     radio.startListening();                                  // powerUp() into RX mode
     time_t startTimer = time(nullptr);                       // start a timer
@@ -200,7 +201,7 @@ void slave() {
             payload.counter += 1;                            // increment payload counter
 
             // load the payload for the first received transmission on pipe 0
-            radio.writeAckPayload(0, &payload, sizeof(payload));
+            radio.writeAckPayload(1, &payload, sizeof(payload));
         }
     }
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;
