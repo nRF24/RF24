@@ -69,7 +69,7 @@ def master(count=1, size=32):
 
     # save on transmission time by setting the radio to only transmit the
     #  number of bytes we need to transmit
-    radio.setPayloadSize(size)  # the default is the maximum 32 bytes
+    radio.payloadSize = size  # the default is the maximum 32 bytes
 
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
     for c in range(count):  # transmit the same payloads this many times

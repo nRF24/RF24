@@ -52,7 +52,7 @@ radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 # we need. A float value occupies 4 bytes in memory using len(struct.pack())
 # "<b" means a little endian unsigned byte
 # we also need an addition 7 bytes for the payload message
-radio.setPayloadSize(len(struct.pack("<b", 0)) + 7)
+radio.payloadSize = len(struct.pack("<b", 0)) + 7
 
 # for debugging
 radio.printDetails()

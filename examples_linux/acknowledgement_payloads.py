@@ -48,8 +48,8 @@ if not radio.begin():
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
-# ACK payloads are dynamically sized, so we need to enable that feature also
-radio.enableDynamicPayloads()
+# ACK payloads are dynamically sized.
+radio.enableDynamicPayloads()  # to use ACK payloads
 
 # to enable the custom ACK payload feature
 radio.enableAckPayload()

@@ -57,7 +57,7 @@ radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
 # To save time during transmission, we'll set the payload size to be only what
 # we need. A float value occupies 4 bytes in memory using len(struct.pack())
 # "<f" means a little endian unsigned float
-radio.setPayloadSize(len(struct.pack("<f", payload[0])))
+radio.payloadSize = len(struct.pack("<f", payload[0]))
 
 # for debugging
 radio.printDetails()

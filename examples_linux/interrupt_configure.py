@@ -38,6 +38,9 @@ radio_number = bool(int(input("Which radio is this ('0' or '1')? ")))
 if not radio.begin():
     raise OSError("nRF24L01 hardware isn't responding")
 
+# ACK payloads are dynamically sized.
+radio.enableDynamicPayloads()  # to use ACK payloads
+
 # this example uses the ACK payload to trigger the IRQ pin active for
 # the "on data received" event
 radio.enableAckPayload()  # enable ACK payloads
