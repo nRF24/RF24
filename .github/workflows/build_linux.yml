@@ -58,9 +58,9 @@ jobs:
           cd examples_linux
           make
           file ./gettingstarted
-      - name: check python examples
-        run: |
-          cd examples_linux
-          pylint *.py --disable=invalid-name,no-name-in-module,no-member,duplicate-code
+      # - name: check python examples
+      #   run: |
+      #     cd examples_linux
+      #     pylint *.py --disable=invalid-name,no-name-in-module,no-member,duplicate-code
         # invalid-name,no-name-in-module,no-member are errors related to C++ wrapped into a python package; Applies to RF24 & RPi.GPIO packages
         # duplicate-code error gets flagged because some examples use similar code snippets
