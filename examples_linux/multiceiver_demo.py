@@ -60,14 +60,16 @@ def base(timeout=10):
     while time.monotonic() - start_timer < timeout:
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
-            length = radio.getPayloadSize()  # grab the payload length
             # unpack payload
-            nodeID, payloadID = struct.unpack("<bi", radio.read(8))
+            nodeID, payloadID = struct.unpack(
+                "<bi",
+                radio.read(radio.payloadSize)
+            )
             # show the pipe number that received the payload
             print(
                 "Received {} bytes on pipe {} from node {}. PayloadID: "
                 "{}".format(
-                    length,
+                    radio.payloadSize,
                     pipe_number,
                     nodeID,
                     payloadID

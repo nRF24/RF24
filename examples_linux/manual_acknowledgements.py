@@ -83,7 +83,7 @@ def master(count=10):
             while ack[0] == 0 or time.monotonic() * 1000 < timout:
                 if radio.available():
                     # get the response & save it to ack variable
-                    ack = radio.read(radio.getPayloadSize())
+                    ack = radio.read(radio.payloadSize)
                     radio.stopListening()
                     radio.openWritingPipe(address[0])
             end_timer = time.monotonic_ns()  # end timer
@@ -127,8 +127,7 @@ def slave(count=10):
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
             count -= 1
-            length = radio.getPayloadSize()  # grab the payload length
-            received = radio.read(length)  # fetch 1 payload from RX FIFO
+            received = radio.read(radio.payloadSize)  # fetch the payload
             # use struct.unpack() to get the payload's appended int
             # NOTE received[7:] discards NULL terminating 0, and
             # "<b" means its a single little endian unsigned byte
@@ -141,7 +140,7 @@ def slave(count=10):
             # print the payload received and the response's payload
             print(
                 "Received {} bytes on pipe {}: {}{}.".format(
-                    length,
+                    radio.payloadSize,
                     pipe_number,
                     received[:6].decode("utf-8"),
                     payload[0] - 1

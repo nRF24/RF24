@@ -109,7 +109,7 @@ def slave(timeout=5, size=32):
 
     # save on transmission time by setting the radio to only transmit the
     #  number of bytes we need to transmit
-    radio.setPayloadSize(size)  # the default is the maximum 32 bytes
+    radio.payloadSize = size  # the default is the maximum 32 bytes
 
     radio.startListening()  # put radio into RX mode and power up
     count = 0  # keep track of the number of received payloads
@@ -118,8 +118,7 @@ def slave(timeout=5, size=32):
         if radio.available():
             count += 1
             # retreive the received packet's payload
-            length = radio.getDynamicPayloadSize()
-            receive_payload = radio.read(length)
+            receive_payload = radio.read(radio.payloadSize)
             print("Received: {} - {}".format(receive_payload, count))
             start_timer = time.monotonic()  # reset timer on every RX payload
 

@@ -100,16 +100,15 @@ def slave(count=5):
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
             count -= 1
-            length = radio.getPayloadSize()  # grab the payload length
             # fetch 1 payload from RX FIFO
-            rx = radio.read(length)  # also clears radio.irq_dr status flag
+            rx = radio.read(radio.payloadSize)
             # expecting a little endian float, thus the format string "<f"
             # rx[:4] truncates padded 0s in case dynamic payloads are disabled
             payload[0] = struct.unpack("<f", rx[:4])[0]
             # print details about the received packet
             print(
                 "Received {} bytes on pipe {}: {}".format(
-                    length,
+                    radio.payloadSize,
                     pipe_number,
                     payload[0]
                 )
