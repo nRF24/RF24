@@ -31,7 +31,7 @@ radio_number = bool(int(input("Which radio is this ('0' or '1')? ")))
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise OSError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("nRF24L01 hardware isn't responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other

@@ -36,7 +36,7 @@ radio_number = bool(int(input("Which radio is this ('0' or '1')? ")))
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise OSError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("nRF24L01 hardware isn't responding")
 
 # ACK payloads are dynamically sized.
 radio.enableDynamicPayloads()  # to use ACK payloads
