@@ -84,10 +84,9 @@ int main() {
     // each other.
     radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
 
-    // Fot this example, we use the same address to send data back and forth
-    // set the addresses for both RX and TX nodes
-    radio.openWritingPipe(address);    // always uses pipe 0
-    radio.openReadingPipe(0, address); // using pipe 0
+    // For this example, we use the different addresses to send data
+    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
     // for debugging
     printf_begin();

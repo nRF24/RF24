@@ -77,6 +77,12 @@ int main() {
         return 0; // quit now
     }
 
+    // To set the radioNumber via the terminal on startup
+    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+    string input;
+    getline(cin, input);
+    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
+
     // print example's introductory prompt
     cout << "RF24/examples_linux/interruptConfigure\n";
 
@@ -92,10 +98,9 @@ int main() {
     // each other.
     radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
-    // Fot this example, we use the same address to send data back and forth
-    // set the addresses for both RX and TX nodes
-    radio.openWritingPipe(address);    // always uses pipe 0
-    radio.openReadingPipe(0, address); // using pipe 0
+    // For this example, we use the different addresses to send data
+    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
     // for debugging
     printf_begin();

@@ -85,9 +85,9 @@ int main() {
     radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
-    // for debugging, uncomment the follow 2 lines
-    // printf_begin();
-    // radio.printDetails();
+    // for debugging
+    printf_begin();
+    radio.printDetails();
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input
