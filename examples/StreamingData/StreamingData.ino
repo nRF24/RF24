@@ -39,7 +39,6 @@ void makePayload(uint8_t); // prototype to construct payload dynamically
 
 void setup() {
 
-
   buffer[SIZE] = 0;        // add a NULL terminating charcter (for easy printing)
 
   Serial.begin(115200);
@@ -90,6 +89,7 @@ void setup() {
   }
 } // setup
 
+
 void loop() {
 
   if (role) {
@@ -97,21 +97,19 @@ void loop() {
 
     uint8_t i = 0;
     uint8_t failures = 0;
-    unsigned long start_timer = millis();       // start the timer
+    unsigned long start_timer = micros();       // start the timer
     while (i < SIZE) {
       makePayload(i);                           // make the payload
-      if (!radio.writeFast(&buffer, SIZE)) {
+      if (!radio.write(&buffer, SIZE))
         failures++;
-        radio.reUseTX();
-      } else {
+      else
         i++;
-      }
     }
-    unsigned long end_timer = millis();         // end the timer
+    unsigned long end_timer = micros();         // end the timer
 
     Serial.print(F("Time to transmit = "));
     Serial.print(end_timer - start_timer);      // print the timer result
-    Serial.print(F(" ms with "));
+    Serial.print(F(" us with "));
     Serial.print(failures);                     // print failures detected
     Serial.println(F(" failures detected"));
 
@@ -152,6 +150,7 @@ void loop() {
   }
 
 } // loop
+
 
 void makePayload(uint8_t i) {
   // Make a single payload based on position in stream.

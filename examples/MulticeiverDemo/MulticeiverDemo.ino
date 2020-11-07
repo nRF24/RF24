@@ -90,9 +90,9 @@ void loop() {
   if (role >= 0) {
     // This device is a TX node
 
-    unsigned long start_timer = micros();                       // start the timer
-    bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
-    unsigned long end_timer = micros();                         // end the timer
+    unsigned long start_timer = micros();                    // start the timer
+    bool report = radio.write(&payload, sizeof(payload));    // transmit & save the report
+    unsigned long end_timer = micros();                      // end the timer
 
     if (report) {
       // payload was delivered
@@ -117,17 +117,17 @@ void loop() {
     // This device is the RX node
 
     uint8_t pipe;
-    if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
+    if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
-      radio.read(&payload, bytes);                   // fetch payload from FIFO
+      radio.read(&payload, bytes);            // fetch payload from FIFO
       Serial.print(F("Received "));
-      Serial.print(bytes); // print the size of the payload
+      Serial.print(bytes);                    // print the size of the payload
       Serial.print(F(" bytes on pipe "));
-      Serial.print(pipe); // print the pipe number
+      Serial.print(pipe);                     // print the pipe number
       Serial.print(F(" from node "));
-      Serial.print(payload.nodeID); // print the payload's origin
+      Serial.print(payload.nodeID);           // print the payload's origin
       Serial.print(F(". PayloadID: "));
-      Serial.println(payload.payloadID); // print the payload's number
+      Serial.println(payload.payloadID);      // print the payload's number
     }
   } // role
 

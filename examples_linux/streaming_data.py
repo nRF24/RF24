@@ -77,13 +77,12 @@ def master(count=1, size=32):
         # NOTE the write_only parameter does not initiate sending
         buf_iter = 0  # iterator of payloads for the while loop
         failures = 0  # keep track of manual retries
-        start_timer = time.monotonic() * 1000  # start timer
+        start_timer = time.monotonic_ns()  # start timer
         while buf_iter < size:  # cycle through all the payloads
             buf = make_buffer(buf_iter, size)  # make a payload
-            if not radio.writeFast(buf):
+            if not radio.write(buf):
                 # reception failed; we need to reset the irq_rf flag
                 failures += 1  # increment manual retries
-                radio.reUseTX()
                 if failures > 99 and buf_iter < 7 and c < 2:
                     # we need to prevent an infinite loop
                     print(
@@ -94,10 +93,10 @@ def master(count=1, size=32):
                     radio.flush_tx()  # discard all payloads in TX FIFO
                     break
             buf_iter += 1
-        end_timer = time.monotonic() * 1000  # end timer
+        end_timer = time.monotonic_ns()  # end timer
         print(
-            "Transmission took {} ms with {} failures detected.".format(
-                end_timer - start_timer,
+            "Transmission took {} us with {} failures detected.".format(
+                (end_timer - start_timer) / 1000,
                 failures
             )
         )

@@ -61,6 +61,7 @@ void slave();   // prototype of the RX node's behavior; called by setRole()
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
+
 int main() {
     // perform hardware check
     if (!radio.begin()) {
@@ -206,6 +207,7 @@ void slave() {
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;
     radio.stopListening(); // recommended idle behavior is TX mode
 }
+
 
 /**
  * Calculate the ellapsed time in microseconds

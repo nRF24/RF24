@@ -14,8 +14,9 @@
 #include <cmath>       // abs()
 #include <iostream>
 #include <string>
+#include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
 #include <printf.h>
-#include <RF24/RF24.h> // millis()
+#include <RF24/RF24.h>
 
 using namespace std;
 
@@ -53,6 +54,10 @@ void makePayload(uint8_t); // prototype to construct payload dynamically
 void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
 void slave();   // prototype of the RX node's behavior; called by setRole()
+
+// custom defined timer for evaluating transmission time in microseconds
+struct timespec startTimer, endTimer;
+uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
 
 int main() {
@@ -97,6 +102,7 @@ int main() {
     return 0;
 }
 
+
 /**
  * set this node's role from stdin stream.
  * this only considers the first char as input.
@@ -129,20 +135,17 @@ void setRole() {
 void master() {
     radio.stopListening();                           // powerUp() into TX mode
 
-    unsigned int failures = 0;               // keep track of failures
+    unsigned int failures = 0;                       // keep track of failures
     uint8_t i = 0;
-    unsigned long startTimer = millis();     // start the timer
+    clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer); // start the timer
     while (failures < 100 && i < SIZE) {
         makePayload(i);
-        if (!radio.writeFast(&buffer, SIZE)) {
+        if (!radio.write(&buffer, SIZE))
             failures++;
-            radio.reUseTX();
-        }
-        else {
+        else
             i++;
-        }
     }
-    uint32_t endTimer = millis();            // end the timer
+    uint32_t endTimer = getMicros();            // end the timer
     if (failures < 100) {
         cout << "Time to transmit data = ";
         cout << endTimer - startTimer;       // print the timer result
@@ -178,6 +181,7 @@ void slave() {
     radio.stopListening();
 }
 
+
 /**
  * Make a single payload based on position in stream.
  * This example employs function to save on memory allocated.
@@ -189,7 +193,22 @@ void makePayload(uint8_t i) {
   buffer[0] = i + (i < 26 ? 65 : 71);
   for (uint8_t j = 0; j < SIZE - 1; ++j) {
     char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
-    chr |= j <= (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
+    chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
     buffer[j + 1] = chr + 48;
   }
+}
+
+
+/**
+ * Calculate the ellapsed time in microseconds
+ */
+uint32_t getMicros() {
+    // this function assumes that the timer was started using
+    // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &endTimer);
+    uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
+    uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
+
+    return ((seconds) * 1000 + useconds) + 0.5;
 }

@@ -1780,6 +1780,9 @@ private:
  * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
  * <br>To run this example, enter
  * @code{.py}from getting_started import *@endcode and follow the prompts.
+ *
+ * @note this example requires python v3.7 or newer because it measures
+ * transmission time with `time.monotonic_ns()`.
  */
 
 /**
@@ -1792,6 +1795,9 @@ private:
  * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
  * <br>To run this example, enter
  * @code{.py}from acknowledgement_payloads import *@endcode and follow the prompts.
+ *
+ * @note this example requires python v3.7 or newer because it measures
+ * transmission time with `time.monotonic_ns()`.
  */
 
 /**
@@ -1807,6 +1813,9 @@ private:
  * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
  * <br>To run this example, enter
  * @code{.py}from manual_acknowledgements import *@endcode and follow the prompts.
+ *
+ * @note this example requires python v3.7 or newer because it measures
+ * transmission time with `time.monotonic_ns()`.
  */
 
 /**
@@ -1819,6 +1828,9 @@ private:
  * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
  * <br>To run this example, enter
  * @code{.py}from streaming_data import *@endcode and follow the prompts.
+ *
+ * @note this example requires python v3.7 or newer because it measures
+ * transmission time with `time.monotonic_ns()`.
  */
 
 /**
@@ -1831,6 +1843,9 @@ private:
  * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
  * <br>To run this example, enter
  * @code{.py}from interrupt_configure import *@endcode and follow the prompts.
+ *
+ * @note this example requires python v3.7 or newer because it measures
+ * transmission time with `time.monotonic_ns()`.
  */
 
 /**
@@ -1844,6 +1859,9 @@ private:
  * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
  * <br>To run this example, enter
  * @code{.py}from multiceiver_demo import *@endcode and follow the prompts.
+ *
+ * @note this example requires python v3.7 or newer because it measures
+ * transmission time with `time.monotonic_ns()`.
  */
 
 /**
