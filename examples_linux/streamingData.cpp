@@ -145,12 +145,12 @@ void master() {
         else
             i++;
     }
-    uint32_t endTimer = getMicros();            // end the timer
+    uint32_t ellapsedTime = getMicros();             // end the timer
     if (failures < 100) {
         cout << "Time to transmit data = ";
-        cout << endTimer - startTimer;       // print the timer result
+        cout << ellapsedTime;                        // print the timer result
         cout << " ms. Detected: ";
-        cout << failures;                    // print number of retries
+        cout << failures;                            // print number of retries
         cout << " failures." << endl;
     }
     else {
