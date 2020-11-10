@@ -628,7 +628,7 @@ bool RF24::begin(void)
     uint8_t before_toggle = read_register(FEATURE);
     toggle_features();
     uint8_t after_toggle = read_register(FEATURE);
-    _is_p_variant = false ? before_toggle != after_toggle : true;
+    _is_p_variant = before_toggle == after_toggle;
     if (!after_toggle){
         if (_is_p_variant){
             // module did not experience power-on-reset (#401)
