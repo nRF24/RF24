@@ -84,6 +84,7 @@ private:
     uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
     #endif
+    uint8_t status; /** The status byte returned from every SPI transaction */
     uint8_t payload_size; /**< Fixed size of payloads */
     bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
     bool ack_payloads_enabled; /**< Whether ack payloads are enabled. */
@@ -213,7 +214,9 @@ public:
      * @param buf Pointer to a buffer where the data should be written
      * @param len Maximum number of bytes to read into the buffer. This
      * value should match the length of the object referenced using the
-     * `buf` parameter. There is no bounds checking implemented here.
+     * `buf` parameter. The absolute maximum number of bytes that can be read
+     * in one call is 32 or whatever number was previously passed to
+     * setPayloadSize().
      * @remark Remember that each call to read() fetches data from the
      * RX FIFO beginning with the first byte from the first available
      * payload. A payload is not removed from the RX FIFO until it's
@@ -824,6 +827,11 @@ public:
      * (true). Be sure to have called enableDynamicAck() at least once before
      * setting this parameter.
      *
+     * @return
+     * - true if payload was written to the TX FIFO buffers and the
+     *   transmission was started.
+     * - false if the TX FIFO is full and the payload could not be written. In
+     *   this condition, the transmission process is restarted.
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
@@ -833,7 +841,7 @@ public:
      * radio.startWrite(buffer, False)  # False = the multicast parameter
      * @endcode
      */
-    void startWrite(const void* buf, uint8_t len, const bool multicast);
+    bool startWrite(const void* buf, uint8_t len, const bool multicast);
 
     /**
      * The function will instruct the radio to re-use the payload in the
@@ -1486,9 +1494,10 @@ private:
      * @param reg Which register. Use constants from nRF24L01.h
      * @param buf Where to put the data
      * @param len How many bytes of data to transfer
-     * @return Current value of status register
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
      */
-    uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
+    void read_register(uint8_t reg, uint8_t* buf, uint8_t len);
 
     /**
      * Read single byte from a register
@@ -1504,18 +1513,20 @@ private:
      * @param reg Which register. Use constants from nRF24L01.h
      * @param buf Where to get the data
      * @param len How many bytes of data to transfer
-     * @return Current value of status register
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
      */
-    uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
+    void write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
 
     /**
      * Write a single byte to a register
      *
      * @param reg Which register. Use constants from nRF24L01.h
      * @param value The new value to write
-     * @return Current value of status register
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
      */
-    uint8_t write_register(uint8_t reg, uint8_t value);
+    void write_register(uint8_t reg, uint8_t value);
 
     /**
      * Write the transmit payload
@@ -1524,9 +1535,10 @@ private:
      *
      * @param buf Where to get the data
      * @param len Number of bytes to be sent
-     * @return Current value of status register
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
      */
-    uint8_t write_payload(const void* buf, uint8_t len, const uint8_t writeType);
+    void write_payload(const void* buf, uint8_t len, const uint8_t writeType);
 
     /**
      * Read the receive payload
@@ -1535,9 +1547,10 @@ private:
      *
      * @param buf Where to put the data
      * @param len Maximum number of bytes to read
-     * @return Current value of status register
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
      */
-    uint8_t read_payload(void* buf, uint8_t len);
+    void read_payload(void* buf, uint8_t len);
 
     /**
      * Retrieve the current status of the chip

@@ -156,7 +156,8 @@ void master() {
     else {
         // else There was (most likely) no device listening for the data stream
         cout << "Too many failures detected (" << failures;
-        cout << "); going back to setRole()" << endl;
+        cout << "); Aborting at payload " << i;
+        cout << " going back to setRole()" << endl;
     }
 }
 

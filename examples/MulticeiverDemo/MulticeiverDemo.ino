@@ -44,8 +44,8 @@ int8_t role = -1; // 0-5 = TX node; any negative number = RX node
 // Make a data structure to use as a payload.
 struct PayloadStruct
 {
-  uint8_t nodeID;
-  unsigned int payloadID = 0;
+  unsigned int nodeID;
+  unsigned int payloadID;
 };
 PayloadStruct payload;
 
@@ -78,7 +78,7 @@ void setup() {
 
   // save on transmission time by setting the radio to only transmit the
   // number of bytes we need to transmit a float
-  radio.setPayloadSize(sizeof(payload)); // uint8_t & int datatypes occupy 5 bytes
+  radio.setPayloadSize(sizeof(payload)); // 2x int datatype occupy 8 bytes
 
   // Set the pipe addresses accordingly. This function additionally also
   // calls startListening() or stopListening() and sets the payload's nodeID

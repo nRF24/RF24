@@ -56,8 +56,8 @@ uint64_t address[6] = {0x7878787878LL,
 // Make a data structure to use as a payload.
 struct PayloadStruct
 {
-  uint8_t nodeID;
-  unsigned int payloadID = 0;
+  unsigned int nodeID;
+  unsigned int payloadID;
 };
 PayloadStruct payload;
 
@@ -88,7 +88,7 @@ int main() {
 
     // save on transmission time by setting the radio to only transmit the
     // number of bytes we need to transmit a float
-    radio.setPayloadSize(sizeof(payload)); // uint8_t & int datatypes occupy 5 bytes
+    radio.setPayloadSize(sizeof(payload)); // 2x int datatype occupy 8 bytes
 
     // for debugging
     printf_begin();

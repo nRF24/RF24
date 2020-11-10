@@ -104,6 +104,12 @@ void loop() {
         failures++;
       else
         i++;
+
+      if (failures >= 100) {
+        Serial.print(F("Too many failures detected. Aborting at payload "));
+        Serial.println(i);
+        break;
+      }
     }
     unsigned long end_timer = micros();         // end the timer
 

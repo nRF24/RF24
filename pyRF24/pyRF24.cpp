@@ -46,7 +46,7 @@ bp::object read_wrap(RF24& ref, int maxlen)
     char* buf = new char[maxlen + 1];
     ref.read(buf, maxlen);
     bp::object
-    py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen)));
+    py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
     delete[] buf;
     return py_ba;
 }
@@ -124,6 +124,10 @@ bp::tuple available_wrap(RF24& ref)
 
     result = ref.available(&pipe);
     return bp::make_tuple(result, pipe);
+}
+
+void setPALevel_wrap(RF24& ref, rf24_pa_dbm_e level) {
+    ref.setPALevel(level, 1);
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy,
@@ -239,13 +243,13 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
                 "RF24_CRC_16", RF24_CRC_16).export_values()
         ;
 
-        bp::enum_< rf24_datarate_e>("rf24_datarate_e")
+        bp::enum_<rf24_datarate_e>("rf24_datarate_e")
         .value("RF24_1MBPS", RF24_1MBPS)
         .value("RF24_2MBPS", RF24_2MBPS)
         .value("RF24_250KBPS", RF24_250KBPS)
         .export_values();
 
-        bp::enum_< rf24_pa_dbm_e>("rf24_pa_dbm_e")
+        bp::enum_<rf24_pa_dbm_e>("rf24_pa_dbm_e")
         .value("RF24_PA_MIN", RF24_PA_MIN)
         .value("RF24_PA_LOW", RF24_PA_LOW)
         .value("RF24_PA_HIGH", RF24_PA_HIGH)
@@ -294,6 +298,7 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         .def("setCRCLength", &RF24::setCRCLength, (bp::arg("length")))
         .def("setDataRate", &RF24::setDataRate, (bp::arg("speed")))
         .def("setPALevel", &RF24::setPALevel, (bp::arg("level"), bp::arg("lnaEnable")=1))
+        .def("setPALevel", &setPALevel_wrap, (bp::arg("level")))
         .def("setRetries", &RF24::setRetries, (bp::arg("delay"), bp::arg("count")))
         .def("startFastWrite", &startFastWrite_wrap1, (bp::arg("buf"), bp::arg("len"), bp::arg("multicast")))
         .def("startFastWrite", &startFastWrite_wrap2, (bp::arg("buf"), bp::arg("len"), bp::arg("multicast"), bp::arg("startTx")))
