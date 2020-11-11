@@ -35,6 +35,9 @@ byte address[][5] = {0xCC, 0xCE, 0xCC, 0xCE, 0xCC, 0xCE, 0xCC, 0xCE, 0xCC, 0xCE}
 // Set up role.  This sketch uses the same software for all the nodes in this
 // system.  Doing so greatly simplifies testing.
 
+// declare the Digital input pin number used to connect to the nRF24L01 IRQ pin
+const short irq_pin = 0;
+
 // The role_pin is a digital input pin used to set the role of this radio.
 // Connect the role_pin to GND to be the 'pong' receiver
 // Leave the role_pin open to be the 'ping' transmitter
@@ -47,6 +50,7 @@ role_e role;                                                           // The ro
 void setup() {
 
   pinMode(role_pin, INPUT);      // set up the role pin
+  pinmode(irq_pin, INPUT);
   digitalWrite(role_pin, HIGH);  // Change this to LOW/HIGH instead of using an external pin
   delay(20);                     // Just to get a solid reading on the role pin
 
@@ -90,7 +94,7 @@ void setup() {
   delay(50);
 
   // Attach interrupt handler to interrupt #0 (using pin 2) on BOTH the sender and receiver
-  attachInterrupt(0, check_radio, LOW);
+  attachInterrupt(digitalPinToInterrupt(irq_pin), check_radio, LOW);
 } // setup
 
 

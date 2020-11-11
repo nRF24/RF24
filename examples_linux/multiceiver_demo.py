@@ -44,7 +44,7 @@ radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 # we need.
 # A byte and an int occupy 5 bytes in memory using len(struct.pack())
 # "<bi" means a little endian unsigned byte and int
-radio.payloadSize = len(struct.pack("<bi", 0, 0))
+radio.payloadSize = len(struct.pack("<ii", 0, 0))
 
 # for debugging
 radio.printDetails()
@@ -62,7 +62,7 @@ def base(timeout=10):
         if has_payload:
             # unpack payload
             nodeID, payloadID = struct.unpack(
-                "<bi",
+                "<ii",
                 radio.read(radio.payloadSize)
             )
             # show the pipe number that received the payload
@@ -95,7 +95,7 @@ def node(node_number, count=10):
     while counter < count:
         counter += 1
         # payloads will include the node_number and a payload ID character
-        payload = struct.pack("<bi", node_number, counter)
+        payload = struct.pack("<ii", node_number, counter)
         start_timer = time.monotonic_ns()
         report = radio.write(payload)
         end_timer = time.monotonic_ns()

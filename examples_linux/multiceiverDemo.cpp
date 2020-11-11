@@ -154,7 +154,10 @@ void master(uint8_t role) {
 
         if (report) {
             // payload was delivered
-            cout << "Transmission successful! Time to transmit = ";
+            cout << "Transmission of PayloadID ";
+            cout << payload.payloadID;                              // print payload number
+            cout << " as node " << payload.nodeID;                  // print node number
+            cout << " successful! Time to transmit = ";
             cout << timerEllapsed << " us" << endl;                 // print the timer result
         }
         else {
@@ -167,7 +170,7 @@ void master(uint8_t role) {
         // to make this example readable in the terminal
         delay(1000); // slow transmissions down by 1 second
     } // while
-    cout << failures << " detected. Going back to setRole()." << endl;
+    cout << failures << " failures detected. Going back to setRole()." << endl;
 } // master
 
 
@@ -190,7 +193,7 @@ void slave() {
             radio.read(&payload, bytes);                           // fetch payload from FIFO
             cout << "Received " << (unsigned int)bytes;            // print the size of the payload
             cout << " bytes on pipe " << (unsigned int)pipe;       // print the pipe number
-            cout << " from node " << (unsigned int)payload.nodeID; // print the payload's origin
+            cout << " from node " << payload.nodeID;               // print the payload's origin
             cout << ". PayloadID: " << payload.payloadID << endl;  // print the payload's number
             startTimer = time(nullptr);                            // reset timer
         }

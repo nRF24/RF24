@@ -121,7 +121,7 @@ void loop() {
       radio.startListening();                                // put in RX mode
       unsigned long start_timeout = millis();                // timer to detect no response
       while (!radio.available() && !timed_out) {             // wait for response or timeout
-        if (millis() - start_timeout > 200)                  // only wait 200 ms
+        if (millis() - start_timeout > 250)                  // only wait 250 ms
           timed_out = true;
       }
       unsigned long end_timer = micros();                    // end the timer

@@ -48,6 +48,12 @@ if not radio.begin():
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
+# set TX address of RX node into the TX pipe
+radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+# set RX address of TX node into an RX pipe
+radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
 # To save time during transmission, we'll set the payload size to be only what
 # we need. A float value occupies 4 bytes in memory using len(struct.pack())
 # "<b" means a little endian unsigned byte
@@ -64,7 +70,6 @@ payload = [0]
 def master(count=10):
     """Transmits a message and an incrementing integer every second"""
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
-    radio.openWritingPipe(address[0])  # set address of RX node into a TX pipe
 
     while count:  # only transmit `count` packets
         # use struct.pack to packetize your data into a usable payload
@@ -76,9 +81,8 @@ def master(count=10):
         if not result:
             print("Transmission failed or timed out")
         else:
-            radio.openReadingPipe(1, address[1])
             radio.startListening()
-            timout = time.monotonic() * 1000 + 200  # use 200 ms timeout
+            timout = time.monotonic() * 1000 + 250  # use 250 ms timeout
             ack = b"\x00" * len(buffer)  # variable used for the response
             while ack[0] == 0 or time.monotonic() * 1000 < timout:
                 if radio.available():
@@ -118,7 +122,6 @@ def master(count=10):
 def slave(count=10):
     """Polls the radio and prints the received value. This method expires
     after 6 seconds of no received transmission"""
-    radio.openReadingPipe(1, address[0])  # set TX address to an RX pipe
     radio.startListening()  # put radio into RX mode and power up
 
     start_timer = time.monotonic()  # start a timer to detect timeout

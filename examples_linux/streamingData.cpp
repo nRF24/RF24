@@ -149,7 +149,7 @@ void master() {
     if (failures < 100) {
         cout << "Time to transmit data = ";
         cout << ellapsedTime;                        // print the timer result
-        cout << " ms. Detected: ";
+        cout << " us. Detected: ";
         cout << failures;                            // print number of retries
         cout << " failures." << endl;
     }
@@ -192,10 +192,10 @@ void makePayload(uint8_t i) {
   // let the first character be an identifying alphanumeric prefix
   // this lets us see which payload didn't get received
   buffer[0] = i + (i < 26 ? 65 : 71);
-  for (uint8_t j = 0; j < SIZE - 1; ++j) {
+  for (uint8_t j =1; j < SIZE; ++j) {
     char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
     chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
-    buffer[j + 1] = chr + 48;
+    buffer[j] = chr + 48;
   }
 }
 
