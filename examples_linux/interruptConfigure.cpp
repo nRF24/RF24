@@ -60,12 +60,12 @@ uint8_t pl_iterator = 0;
 char tx_payloads[][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
 char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
-void interruptHandler();   // prototype to handle the interrupt request (IRQ) pin
-void setRole();            // prototype to set the node's role
-void master();             // prototype of the TX node's behavior; called by setRole()
-void slave();              // prototype of the RX node's behavior; called by setRole()
-void ping_n_wait();        // prototype that sends a payload and waits for the IRQ pin to get triggered
-void printRxFifo(uint8_t); // prototype to print entire contents of RX FIFO with 1 buffer
+void interruptHandler();         // prototype to handle the interrupt request (IRQ) pin
+void setRole();                  // prototype to set the node's role
+void master();                   // prototype of the TX node's behavior; called by setRole()
+void slave();                    // prototype of the RX node's behavior; called by setRole()
+void ping_n_wait();              // prototype that sends a payload and waits for the IRQ pin to get triggered
+void printRxFifo(const uint8_t); // prototype to print entire contents of RX FIFO with 1 buffer
 
 
 int main() {
@@ -288,7 +288,7 @@ void interruptHandler() {
  * @param pl_size used to determine received payload size. Remember that the
  * payload sizes are declared as tx_pl_size and ack_pl_size.
  */
-void printRxFifo(bool pl_size) {
+void printRxFifo(const uint8_t pl_size) {
     char rx_fifo[pl_size * 3 + 1];         // assuming RX FIFO is full; declare a buffer to hold it all
     if (radio.rxFifoFull()) {
         rx_fifo[pl_size * 3] = 0;          // add a NULL terminating char to use as a c-string
