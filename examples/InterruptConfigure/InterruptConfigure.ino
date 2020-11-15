@@ -21,7 +21,7 @@
 volatile bool wait_for_event = false; // used to wait for an IRQ event to trigger
 
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
+volatile RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // Let these addresses be used for the pair
 uint8_t address[][6] = {"1Node", "2Node"};
@@ -45,8 +45,10 @@ uint8_t pl_iterator = 0;
 char tx_payloads[][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
 char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
-// Declare prototype for interruptHandler()
-void interruptHandler(); // see definition below loop()
+// Declare function prototypes
+void interruptHandler(); // prototype to handle IRQ events
+void printRxFifo();     // prototype to print RX FIFO with 1 buffer
+
 
 void setup() {
 
@@ -78,8 +80,12 @@ void setup() {
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
   // setup the IRQ_PIN
-  pinMode(IRQ_PIN, INPUT_PULLUP);
+  pinMode(IRQ_PIN, INPUT);
   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), interruptHandler, FALLING);
+  // IMPORTANT: do not call radio.available(&pipe_number) before calling
+  // radio.whatHappened() when the interruptHandler() is triggered by the
+  // IRQ pin FALLING event. According to the datasheet, the pipe information
+  // is unreliable during the IRQ pin FALLING transition.
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity to
@@ -108,22 +114,22 @@ void setup() {
   } else {
     // setup for RX mode
 
-    // don't use the interruptHandler() on the RX node in this example
-    radio.maskIRQ(1, 1, 1); // prevent IRQ pin from triggering
+    // let IRQ pin only trigger on "data ready" event in RX mode
+    radio.maskIRQ(1, 1, 0); // args = "data_sent", "data_fail", "data_ready"
 
     // Fill the TX FIFO with 3 ACK payloads for the first 3 received
-    // transmissions on pipe 0.
+    // transmissions on pipe 1.
     radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
     radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
     radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
-    radio.startListening();                                 // powerUp() into RX mode
+
+    radio.startListening(); // powerUp() into RX mode
   }
 }
 
 void loop() {
-
   if (role && !wait_for_event) {
-    // This device is a TX node. This if block is only triggered when
+    // This device is a TX node. This `if` block is only triggered when
     // NOT waiting for an IRQ event to happen
 
     if (pl_iterator == 0) {
@@ -147,11 +153,16 @@ void loop() {
       radio.maskIRQ(1, 1, 1); // disable IRQ masking for this step
 
       Serial.println(F("\nSending 1 payload to fill RX node's FIFO. IRQ pin is neglected."));
-      // write() will call flush_tx() on 'data fail' events
-      if (radio.write(&tx_payloads[pl_iterator], tx_pl_size))
-        Serial.println(F("RX node's FIFO is full; it is not listening any more"));
-      else
+      if (radio.write(&tx_payloads[pl_iterator], tx_pl_size)) {
+        if (radio.rxFifoFull()) {
+          Serial.println(F("RX node's FIFO is full; it is not listening any more"));
+        } else {
+          Serial.println("Transmission successful, but the RX node might still be listening.");
+        }
+      } else {
         Serial.println(F("Transmission failed or timed out. Continuing anyway."));
+        radio.flush_tx(); // discard payload(s) that failed to transmit
+      }
 
     } else if (pl_iterator == 3) {
       // test the "data fail" event with the IRQ pin
@@ -162,52 +173,48 @@ void loop() {
     }
 
     if (pl_iterator < 4 && pl_iterator != 2) {
-      // use the non-blocking call to write a payload and begin transmission
-      // the "false" argument means we are expecting an ACK packet response
-      radio.startWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
 
       // IRQ pin is LOW when activated. Otherwise it is always HIGH
       // Wait until IRQ pin is activated.
       wait_for_event = true;
+
+      // use the non-blocking call to write a payload and begin transmission
+      // the "false" argument means we are expecting an ACK packet response
+      radio.startFastWrite(tx_payloads[pl_iterator++], tx_pl_size, false);
+
       // In this example, the "data fail" event is always configured to
       // trigger the IRQ pin active. Because the auto-ACK feature is on by
       // default, we don't need a timeout check to prevent an infinite loop.
 
     } else if (pl_iterator == 4) {
       // all IRQ tests are done; flush_tx() and print the ACK payloads for fun
-      char rx_fifo[ack_pl_size * 3];             // RX FIFO is full & we know ACK payloads' size
-      if (radio.available()) {                   // if there is data in the RX FIFO
-        radio.read(&rx_fifo, ack_pl_size * 3);   // this clears the RX FIFO (for this example)
-        Serial.print(F("\nComplete RX FIFO: "));
-        Serial.println(rx_fifo);                 // print the entire RX FIFO with 1 buffer
-      }
-      delay(500);                                // wait for RX node to startListening() again
+
+      radio.flush_tx();                          // flush the TX FIFO of artifact payloads
+      printRxFifo();
+      pl_iterator++;
 
     } else if (pl_iterator == 2) {
       pl_iterator++; // proceed from step 3 to last step (stop at step 4 for readability)
     }
 
-  } else {
+  } else if (!role) {
     // This device is a RX node
 
     if (radio.rxFifoFull()) {
       // wait until RX FIFO is full then stop listening
 
-      delay(500);                            // let last ACK finish transmitting
-      radio.stopListening();                 // also discards unused ACK payloads
-      char rx_fifo[tx_pl_size * 3 + 1];      // RX FIFO is full & we know TX payloads' size
-      radio.read(&rx_fifo, tx_pl_size * 3);  // this clears the RX FIFO for this example
-      rx_fifo[tx_pl_size * 3] = 0;           // add NULL termintating 0 (for easy printing)
-      Serial.print(F("Complete RX FIFO: "));
-      Serial.println(rx_fifo);               // print the entire RX FIFO with 1 buffer
-      delay(100);                            // wait 100 ms for TX node to complete it's role
+      delay(100);             // let ACK payload finish transmitting
+      radio.stopListening();  // also discards unused ACK payloads
+      printRxFifo();          // flush the RX FIFO
 
       // Fill the TX FIFO with 3 ACK payloads for the first 3 received
-      // transmissions on pipe 0.
+      // transmissions on pipe 1.
       radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
       radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
       radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
-      radio.startListening();                // We're ready to start over. Begin listening.
+
+      delay(100);             // let TX node finish its role
+      radio.startListening(); // We're ready to start over. Begin listening.
     }
 
   } // role
@@ -224,7 +231,9 @@ void loop() {
         Serial.println(F("*** RESTARTING IRQ PIN TEST ***"));
 
       role = true;
-      pl_iterator = 0;  // reset the iterator
+      wait_for_event = false;
+      pl_iterator = 0;   // reset the iterator
+      radio.flush_tx();  // discard any payloads in the TX FIFO
 
       // startListening() clears the IRQ masks also. This is required for
       // continued TX operations when a transmission fails.
@@ -236,8 +245,7 @@ void loop() {
 
       role = false;
 
-      // don't use the interruptHandler() on the RX node in this example
-      radio.maskIRQ(1, 1, 1); // prevent IRQ pin from triggering
+      radio.maskIRQ(0, 0, 0); // the IRQ pin should only trigger on "data ready" event
 
       // Fill the TX FIFO with 3 ACK payloads for the first 3 received
       // transmissions on pipe 0
@@ -254,26 +262,26 @@ void interruptHandler() {
   // print IRQ status and all masking flags' states
 
   Serial.println(F("\tIRQ pin is actively LOW")); // show that this function was called
-
-  bool tx_ds, tx_df, rx_dr;                     // declare variables for IRQ masks
-  radio.whatHappened(tx_ds, tx_df, rx_dr);      // get values for IRQ masks
+  delayMicroseconds(250);
+  bool tx_ds, tx_df, rx_dr;                       // declare variables for IRQ masks
+  radio.whatHappened(tx_ds, tx_df, rx_dr);        // get values for IRQ masks
   // whatHappened() clears the IRQ masks also. This is required for
   // continued TX operations when a transmission fails.
   // clearing the IRQ masks resets the IRQ pin to its inactive state (HIGH)
 
   Serial.print(F("\tdata_sent: "));
-  Serial.print(tx_ds);                          // print "data sent" mask state
+  Serial.print(tx_ds);                            // print "data sent" mask state
   Serial.print(F(", data_fail: "));
-  Serial.print(tx_df);                          // print "data fail" mask state
+  Serial.print(tx_df);                            // print "data fail" mask state
   Serial.print(F(", data_ready: "));
-  Serial.println(rx_dr);                        // print "data ready" mask state
+  Serial.println(rx_dr);                          // print "data ready" mask state
 
-  if (tx_df)                                    // if TX payload failed
-    radio.flush_tx();                           // clear all payloads from the TX FIFO
+  if (tx_df)                                      // if TX payload failed
+    radio.flush_tx();                             // clear all payloads from the TX FIFO
 
   // print if test passed or failed. Unintentional fails mean the RX node was not listening.
   // pl_iterator has already been incremented by now
-  if (pl_iterator == 1) {
+  if (pl_iterator <= 1) {
     Serial.print(F("   'Data Ready' event test "));
     Serial.println(rx_dr ? F("passed") : F("failed"));
   } else if (pl_iterator == 2) {
@@ -285,3 +293,25 @@ void interruptHandler() {
   }
   wait_for_event = false; // ready to continue with loop() operations
 } // interruptHandler
+
+void printRxFifo() {
+  if (radio.available()) {                   // if there is data in the RX FIFO
+    // to flush the data from the RX FIFO, we'll fetch it all using 1 buffer
+
+    uint8_t pl_size = !role ? tx_pl_size : ack_pl_size;
+    char rx_fifo[pl_size * 3 + 1];       // RX FIFO is full & we know ACK payloads' size
+    if (radio.rxFifoFull()) {
+      rx_fifo[pl_size * 3] = 0;          // add a NULL terminating char to use as a c-string
+      radio.read(&rx_fifo, pl_size * 3); // this clears the RX FIFO (for this example)
+    } else {
+      uint8_t i = 0;
+      while (radio.available()) {
+        radio.read(&rx_fifo + (i * pl_size), pl_size);
+        i++;
+      }
+      rx_fifo[i * pl_size] = 0;          // add a NULL terminating char to use as a c-string
+    }
+    Serial.print(F("Complete RX FIFO: "));
+    Serial.println(rx_fifo);                 // print the entire RX FIFO with 1 buffer
+  }
+}

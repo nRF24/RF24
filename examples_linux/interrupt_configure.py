@@ -21,7 +21,7 @@ radio = RF24(22, 0)
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
 # select your digital input pin that's connected to the IRQ pin on the nRF24L01
-irq_pin = 12
+IRQ_PIN = 12
 
 # For this example, we will use different addresses
 # An address need to be a buffer protocol object (bytearray)
@@ -32,7 +32,13 @@ address = [b"1Node", b"2Node"]
 # to use different addresses on a pair of radios, we need a variable to
 # uniquely identify which address this radio will use to transmit
 # 0 uses address[0] to transmit, 1 uses address[1] to transmit
-radio_number = bool(int(input("Which radio is this ('0' or '1')? ")))
+radio_number = bool(
+    int(
+        input(
+            "Which radio is this? Enter '0' or '1'. Defaults to '0' "
+        ) or 0
+    )
+)
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
@@ -66,9 +72,9 @@ tx_payloads = (b"Ping ", b"Pong ", b"Radio", b"1FAIL")
 ack_payloads = (b"Yak ", b"Back", b" ACK")
 
 
-def interrupt_handler():
+def interrupt_handler(channel):
     """This function is called when IRQ pin is detected active LOW"""
-    print("IRQ pin went active LOW.")
+    print("IRQ pin", channel, "went active LOW.")
     tx_ds, tx_df, rx_dr = radio.whatHappened()   # update IRQ status flags
     print("\ttx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
     if pl_iterator[0] == 0 and rx_dr:
@@ -93,26 +99,28 @@ def interrupt_handler():
 
 # setup IRQ GPIO pin
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(irq_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.add_event_detect(irq_pin, GPIO.FALLING, callback=interrupt_handler)
+GPIO.setup(IRQ_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.add_event_detect(IRQ_PIN, GPIO.FALLING, callback=interrupt_handler)
 
 
-def _wait_for_irq():
-    """Wait till irq_pin goes active then inactive.
-    IRQ pin is LOW when activated. Otherwise it is always HIGH
+def print_rx_fifo(pl_size):
+    """fush RX FIFO by printing all available payloads with 1 buffer
 
-    In this example, the "data fail" event is always configured to
-    trigger the IRQ pin active. Because the auto-ACK feature is on by
-    default, the timeout in GPIO.wait_for_edge() is inconsequential.
+    :param int pl_size: the expected size of each payload
     """
-    # wait up to 1 second for event to be cleared.
-    # GPIO.RISING means whatHappened() was called.
-    channel = GPIO.wait_for_edge(irq_pin, GPIO.RISING, timeout=1000)
-    if channel is None:  # channel should be equal to GPIO.HIGH
-        raise RuntimeError("Interrupt event not detected. Check your wiring.")
+    if radio.rxFifoFull():
+            # all 3 payloads received were 5 bytes each, and RX FIFO is full
+            # so, fetching 15 bytes from the RX FIFO also flushes RX FIFO
+            print(
+                "Complete RX FIFO:",
+                radio.read(pl_size * 3).decode("utf-8")
+            )
     else:
-        # wait for half a second for interrupt_handler() to complete
-        time.sleep(0.5)
+        buffer = bytearray()
+        while radio.available():
+            buffer += radio.read(pl_size)
+        if buffer:  # if any payloads were read from the RX FIFO
+            print("Complete RX FIFO:", buffer.decode("utf-8"))
 
 
 def master():
@@ -124,20 +132,26 @@ def master():
     print("\nConfiguring IRQ pin to only ignore 'on data sent' event")
     radio.maskIRQ(True, False, False)  # args = tx_ds, tx_df, rx_dr
     print("    Pinging slave node for an ACK payload...", end=" ")
+    # set pl_iterator[0] so interrupt_handler() can determine if test was
+    # successful or not
     pl_iterator[0] = 0
-    radio.startWrite(tx_payloads[0], False)  # False means expecting an ACK
-    _wait_for_irq()
+    radio.startFastWrite(tx_payloads[0], False)  # False means expecting an ACK
+    time.sleep(1) # wait a second for interrupt_handler() to complete
 
     # on "data sent" test
     print("\nConfiguring IRQ pin to only ignore 'on data ready' event")
     radio.maskIRQ(False, False, True)  # args = tx_ds, tx_df, rx_dr
     print("    Pinging slave node again...             ", end=" ")
+    # set pl_iterator[0] so interrupt_handler() can determine if test was
+    # successful or not
     pl_iterator[0] = 1
-    radio.startWrite(tx_payloads[1], False)  # False means expecting an ACK
-    _wait_for_irq()
+    radio.flush_tx()  # just in case any previous tests failed
+    radio.startFastWrite(tx_payloads[1], False)  # False means expecting an ACK
+    time.sleep(1) # wait a second for interrupt_handler() to complete
 
     # trigger slave node to exit by filling the slave node's RX FIFO
     print("\nSending one extra payload to fill RX FIFO on slave node.")
+    radio.maskIRQ(1, 1, 1)  # disable IRQ pin for this step
     if radio.write(tx_payloads[2]):
         # when send_only parameter is True, send() ignores RX FIFO usage
         print("Slave node should not be listening anymore.")
@@ -149,13 +163,13 @@ def master():
     radio.maskIRQ(False, False, False)  # args = tx_ds, tx_df, rx_dr
     print("    Sending a ping to inactive slave node...", end=" ")
     radio.flush_tx()  # just in case any previous tests failed
+    # set pl_iterator[0] so interrupt_handler() can determine if test was
+    # successful or not
     pl_iterator[0] = 2
-    radio.startWrite(tx_payloads[3], False)  # False means expecting an ACK
-    _wait_for_irq()
+    radio.startFastWrite(tx_payloads[3], False)  # False means expecting ACK
+    time.sleep(1) # wait a second for interrupt_handler() to complete
     radio.flush_tx()  # flush artifact payload in TX FIFO from last test
-    # all 3 ACK payloads received were 4 bytes each, and RX FIFO is full
-    # so, fetching 12 bytes from the RX FIFO also flushes RX FIFO
-    print("\nComplete RX FIFO:", radio.read(12))
+    print_rx_fifo(len(ack_payloads[0]))
 
 
 def slave(timeout=6):  # will listen for 6 seconds before timing out
@@ -169,13 +183,9 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
     while not radio.rxFifoFull() and time.monotonic() - start_timer < timeout:
         # if RX FIFO is not full and timeout is not reached, then keep waiting
         pass
-    time.sleep(0.5)  # wait for last ACK payload to transmit
+    time.sleep(0.1)  # wait for last ACK payload to transmit
     radio.stopListening()  # put radio in TX mode & discard any ACK payloads
-    if radio.available():  # if RX FIFO is not empty (timeout did not occur)
-        # all 3 payloads received were 5 bytes each, and RX FIFO is full
-        # so, fetching 15 bytes from the RX FIFO also flushes RX FIFO
-        print("Complete RX FIFO:", radio.read(15))
-
+    print_rx_fifo(len(tx_payloads[0]))
 
 print(
     """\

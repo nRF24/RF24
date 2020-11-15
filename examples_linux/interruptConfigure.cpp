@@ -17,13 +17,15 @@
 #include <iostream>
 #include <string>
 #include <printf.h>
-#include <RF24/RF24.h> // delay(), pinMode(), digitalRead(), OUTPUT
+#include <RF24/RF24.h> // delay(), pinMode(), INPUT
 
 using namespace std;
 
 // We will be using the nRF24L01's IRQ pin for this example
 #define IRQ_PIN 12 // this needs to be a digital input capable pin
-bool wait_for_event = false; // used to signify that the event is handled
+
+// this example is a sequential program. so we need to wait for the event to be handled
+volatile bool wait_for_event = false; // used to signify that the event is handled
 
 /****************** Linux ***********************/
 // Radio CE Pin, CSN Pin, SPI Speed
@@ -59,17 +61,20 @@ char tx_payloads[][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
 char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
 void interruptHandler(); // prototype to handle the interrupt request (IRQ) pin
-void setRole(); // prototype to set the node's role
-void master();  // prototype of the TX node's behavior; called by setRole()
-void slave();   // prototype of the RX node's behavior; called by setRole()
-void ping_n_wait(); // prototype that sends a payload and waits for the IRQ pin to get triggered
+void setRole();          // prototype to set the node's role
+void master();           // prototype of the TX node's behavior; called by setRole()
+void slave();            // prototype of the RX node's behavior; called by setRole()
+void ping_n_wait();      // prototype that sends a payload and waits for the IRQ pin to get triggered
 
 
 int main() {
 
     // setup the digital input pin connected to the nRF24L01's IRQ pin
     pinMode(IRQ_PIN, INPUT);
-    attachInterrupt(IRQ_PIN, INT_EDGE_FALLING, interruptHandler); //Attach interrupt to bcm pin 23
+
+    // register the interrupt request (IRQ) to call our
+    // Interrupt Service Routine (ISR) callback function interruptHandler()
+    attachInterrupt(IRQ_PIN, INT_EDGE_FALLING, &interruptHandler);
 
     // perform hardware check
     if (!radio.begin()) {
@@ -157,6 +162,7 @@ void master() {
     cout << "\nConfiguring IRQ pin to ignore the 'data ready' event\n";
     radio.maskIRQ(false, false, true); // args = "data_sent", "data_fail", "data_ready"
     cout << "   Pinging RX node for 'data sent' event...";
+    radio.flush_tx();                  // flush payloads from any failed prior test
     ping_n_wait();                     // transmit a payload and detect the IRQ pin
     pl_iterator++;                     // increment iterator for next test
 
@@ -169,8 +175,10 @@ void master() {
     // write() will call flush_tx() on 'data fail' events
     if (radio.write(&tx_payloads[pl_iterator], tx_pl_size))
         cout << "RX node's FIFO is full; it is not listening any more" << endl;
-    else
+    else {
         cout << "Transmission failed or timed out. Continuing anyway." << endl;
+        radio.flush_tx();
+    }
     pl_iterator++;                     // increment iterator for next test
 
 
@@ -178,18 +186,12 @@ void master() {
     cout << "\nConfiguring IRQ pin to reflect all events\n";
     radio.maskIRQ(0, 0, 0); // args = "data_sent", "data_fail", "data_ready"
     cout << "   Pinging inactive RX node for 'data fail' event...";
+    ping_n_wait();                     // transmit a payload and detect the IRQ pin
+    radio.flush_tx();                  // flush payloads
 
-
-    // all IRQ tests are done; flush_tx() and print the ACK payloads for fun
-    char rx_fifo[ack_pl_size * 3];             // RX FIFO is full & we know ACK payloads' size
-    if (radio.available()) {                   // if there is data in the RX FIFO
-        radio.read(&rx_fifo, ack_pl_size * 3); // this clears the RX FIFO (for this example)
-
-        // print the entire RX FIFO with 1 buffer
-        cout << "\nComplete RX FIFO: " << rx_fifo << endl;
+    if (radio.available()) {
+        printRxFifo(ack_pl_size);
     }
-    delay(500);                                // wait for RX node to startListening() again
-
 } // master
 
 
@@ -198,29 +200,25 @@ void master() {
  */
 void slave() {
 
-    // don't use the interruptHandler() on the RX node in this example
-    radio.maskIRQ(1, 1, 1); // prevent IRQ pin from triggering
+    // let IRQ pin only trigger on "data_ready" event in RX mode
+    radio.maskIRQ(1, 1, 0); // args = "data_sent", "data_fail", "data_ready"
 
     // Fill the TX FIFO with 3 ACK payloads for the first 3 received
     // transmissions on pipe 0.
-    radio.writeAckPayload(0, &ack_payloads[0], ack_pl_size);
-    radio.writeAckPayload(0, &ack_payloads[1], ack_pl_size);
-    radio.writeAckPayload(0, &ack_payloads[2], ack_pl_size);
-    radio.startListening();                     // We're ready to start. Begin listening.
+    radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
 
-    time_t startTimer = time(nullptr);          // start a timer
+    radio.startListening();            // powerUp() into RX mode
+    time_t startTimer = time(nullptr); // start a timer
     while (time(nullptr) - startTimer < 6 && !radio.rxFifoFull()) {
         // use 6 second timeout & wait till RX FIFO is full
     }
-    delay(500);                                 // let last ACK finish transmitting
-    radio.stopListening();                      // also discards unused ACK payloads
+    delay(100);                        // wait for ACK payload to finish transmitting
+    radio.stopListening();             // also discards unused ACK payloads
 
-    if (radio.rxFifoFull()) {
-        char rx_fifo[tx_pl_size * 3 + 1];       // RX FIFO is full & we know TX payloads' size
-        radio.read(&rx_fifo, tx_pl_size * 3);   // this clears the RX FIFO for this example
-        rx_fifo[tx_pl_size * 3] = 0;            // append a NULL terminating 0 for use as a c-string
-        cout <<"Complete RX FIFO: " << rx_fifo; // print the entire RX FIFO with 1 buffer
-        cout << endl;
+    if (radio.available()) {
+        printRxFifo(tx_pl_size);
     }
     else {
         cout << "Timeout was reached. Going back to setRole()" << endl;
@@ -235,7 +233,7 @@ void slave() {
 void ping_n_wait() {
     // use the non-blocking call to write a payload and begin transmission
     // the "false" argument means we are expecting an ACK packet response
-    radio.startWrite(tx_payloads[pl_iterator], tx_pl_size, false);
+    radio.startFastWrite(tx_payloads[pl_iterator], tx_pl_size, false);
 
     wait_for_event = true;
     while (wait_for_event) {
@@ -282,3 +280,28 @@ void interruptHandler() {
 
     wait_for_event = false; // ready to continue
 } // interruptHandler
+
+
+/**
+ * Print the entire RX FIFO with one buffer. This also flushes the RX FIFO.
+ * @param pl_size used to determine received payload size. Remember that the
+ * payload sizes are declared as tx_pl_size and ack_pl_size.
+ */
+void printRxFifo(bool pl_size) {
+    char rx_fifo[pl_size * 3 + 1];         // assuming RX FIFO is full; declare a buffer to hold it all
+    if (radio.rxFifoFull()) {
+        rx_fifo[pl_size * 3] = 0;          // add a NULL terminating char to use as a c-string
+        radio.read(&rx_fifo, pl_size * 3); // this clears the RX FIFO (for this example)
+    }
+    else {
+        uint8_t i = 0;
+        while (radio.available()) {
+            radio.read(&rx_fifo + (i * pl_size), pl_size);
+            i++;
+        }
+        rx_fifo[i * pl_size] = 0;          // add a NULL terminating char to use as a c-string
+    }
+
+    // print the entire RX FIFO with 1 buffer
+    cout << "Complete RX FIFO: " << rx_fifo << endl;
+}
