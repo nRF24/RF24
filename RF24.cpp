@@ -202,10 +202,10 @@ void RF24::write_register(uint8_t reg, uint8_t value)
     beginTransaction();
     uint8_t * prx = spi_rxbuff;
     uint8_t * ptx = spi_txbuff;
-    *ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
-    *ptx = value ;
+    *ptx++ = (W_REGISTER | (REGISTER_MASK & reg));
+    *ptx = value;
 
-    _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
+    _SPI.transfernb((char *)spi_txbuff, (char *)spi_rxbuff, 2);
     status = *prx++; // status is 1st byte of receive buffer
     endTransaction();
     #else // !defined(RF24_LINUX)
@@ -694,17 +694,12 @@ void RF24::startListening(void)
     #if !defined(RF24_TINY) && !defined(LITTLEWIRE)
     powerUp();
     #endif
-    /* Notes Once ready for next release
-     * 1. Can update stopListening() to use config_reg var and ack_payloads_enabled var instead of SPI rx/tx
-     * 2. Update txDelay defaults: 240 for 2MBPS, 280 for 1MBPS, 505 for 250KBPS per initial testing
-     * 3. Allows time for slower devices to update with the faster startListening() function prior to updating stopListening() & adjusting txDelay
-     */
     config_reg |= _BV(PRIM_RX);
     write_register(NRF_CONFIG, config_reg);
     write_register(NRF_STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT));
     ce(HIGH);
 
-    // Restore the pipe0 adddress, if exists
+    // Restore the pipe0 address, if exists
     if (pipe0_reading_address[0] > 0) {
         write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);
     }
@@ -1297,7 +1292,7 @@ void RF24::enableDynamicAck(void)
 
 /****************************************************************************/
 
-void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
+bool RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
     if (ack_payloads_enabled){
         const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
@@ -1306,25 +1301,29 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
         #if defined(RF24_LINUX)
         beginTransaction();
+        uint8_t * prx = spi_rxbuff;
         uint8_t * ptx = spi_txbuff;
         uint8_t size = data_len + 1 ; // Add register value to transmit buffer
-        *ptx++ =  W_ACK_PAYLOAD | ( pipe & 0x07 );
+        *ptx++ =  W_ACK_PAYLOAD | (pipe & 0x07);
         while ( data_len-- ){
-        *ptx++ =  *current++;
+            *ptx++ =  *current++;
         }
 
-        _SPI.transfern( (char *) spi_txbuff, size);
+        _SPI.transfernb((char *)spi_txbuff, (char *)spi_rxbuff, size);
         endTransaction();
+        status = *prx++;
         #else
         beginTransaction();
-        _SPI.transfer(W_ACK_PAYLOAD | (pipe & 0x07));
+        status = _SPI.transfer(W_ACK_PAYLOAD | (pipe & 0x07));
 
         while (data_len--)
             _SPI.transfer(*current++);
 
         endTransaction();
         #endif
+        return !(status & _BV(TX_FULL));
     }
+    return 0;
 }
 
 /****************************************************************************/

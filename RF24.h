@@ -198,6 +198,25 @@ public:
      * @see available(uint8_t*)
      *
      * @return True if there is a payload available, false if none is
+     *
+     * @warning This function relies on the information about the pipe number
+     * that received the next available payload. According to the datasheet,
+     * the data about the pipe number that received the next available payload
+     * is "unreliable" during a FALLING transition on the IRQ pin. This means
+     * you should wait at least 5 microseconds before calling this function
+     * during an ISR (Interrupt Service Routine).<br>For example:
+     * @code
+     * void isrCallbackFunction() {
+     *   // do other stuff like radio.whatHappened()
+     *   delayMicroseconds(5); // wait for IRQ pin to settle LOW
+     *   radio.available();    // returned data should now be reliable
+     * }
+     *
+     * void setup() {
+     *   pinmode(IRQ_PIN, INPUT);
+     *   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), isrCallbackFunction, FALLING);
+     * }
+     * @endcode
      */
     bool available(void);
 
@@ -435,10 +454,29 @@ public:
      * uint8_t pipeNum;
      * if(radio.available(&pipeNum)){
      *   radio.read(&data, sizeof(data));
-     *   Serial.print("Got data on pipe ");
+     *   Serial.print("Received data on pipe ");
      *   Serial.println(pipeNum);
      * }
      * @endcode
+     *
+     * @warning According to the datasheet, the data saved to @a pipe_num is
+     * "unreliable" during a FALLING transition on the IRQ pin. This means you
+     * should wait at least 5 microseconds before calling this function during
+     * an ISR (Interrupt Service Routine).<br>For example:
+     * @code
+     * void isrCallbackFunction() {
+     *   delayMicroseconds(5); // wait for IRQ pin to settle LOW
+     *   uint8_t pipe = 7;
+     *   radio.available(&pipe); // pipe info should now be reliable
+     *   // do other stuff like radio.whatHappened()
+     * }
+     *
+     * void setup() {
+     *   pinmode(IRQ_PIN, INPUT);
+     *   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), isrCallbackFunction, FALLING);
+     * }
+     * @endcode
+     *
      * @return
      * - True if there is a payload available in the top (first out)
      *   level RX FIFO.
@@ -706,17 +744,27 @@ public:
     bool txStandBy(uint32_t timeout, bool startTx = 0);
 
     /**
-     * Write an ack payload for the specified pipe
+     * Write an acknowledgement (ACK) payload for the specified pipe
      *
-     * The next time a message is received on @p pipe, the data in @p buf will
-     * be sent back in the acknowledgement.
+     * The next time a message is received on a specified @a pipe, the data in
+     * @a buf will be sent back in the ACK payload.
+     *
      * @see enableAckPayload()
      * @see enableDynamicPayloads()
-     * @warning Only three of these can be pending at any time as there are only 3 FIFO buffers.<br> Dynamic payloads must be enabled.
-     * @note Ack payloads are handled automatically by the radio chip when a payload is received. Users should generally
-     * write an ack payload as soon as startListening() is called, so one is available when a regular payload is received.
-     * @note Ack payloads are dynamic payloads. This only works on pipes 0&1 by default. Call
-     * enableDynamicPayloads() to enable on all pipes.
+     *
+     * @note ACK payloads are handled automatically by the radio chip when a
+     * regular payload is received. It is important to discard regular payloads
+     * in the TX FIFO (using flush_tx()) before loading the first ACK payload
+     * into the TX FIFO. This function can be called before and after calling
+     * startListening().
+     *
+     * @warning Only three of these can be pending at any time as there are
+     * only 3 FIFO buffers.<br> Dynamic payloads must be enabled.
+     *
+     * @note ACK payloads are dynamic payloads. Calling enableAckPayload()
+     * will automatically enable dynamic payloads on pipe 0 (required for TX
+     * mode when expecting ACK payloads). To use ACK payloads on any other
+     * pipe in RX mode, call enableDynamicPayloads().
      *
      * @param pipe Which pipe# (typically 1-5) will get this response.
      * @param buf Pointer to data that is sent
@@ -731,8 +779,14 @@ public:
      * buffer = b"Hello World"  # a `bytes` object
      * radio.writeAckPayload(1, buffer)  # load an ACK payload for response on pipe 1
      * @endcode
+     *
+     * @return
+     * - true if the payload was loaded into the TX FIFO.
+     * - false if the payload wasn't loaded into the TX FIFO because it is
+     *   already full or the ACK payload feature is not enabled using
+     *   enableAckPayload().
      */
-    void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
+    bool writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
     /**
      * Call this when you get an Interrupt Request (IRQ) to find out why
