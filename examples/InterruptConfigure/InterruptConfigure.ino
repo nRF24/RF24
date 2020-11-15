@@ -21,7 +21,7 @@
 volatile bool wait_for_event = false; // used to wait for an IRQ event to trigger
 
 // instantiate an object for the nRF24L01 transceiver
-volatile RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // Let these addresses be used for the pair
 uint8_t address[][6] = {"1Node", "2Node"};

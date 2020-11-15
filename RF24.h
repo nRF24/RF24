@@ -1637,7 +1637,7 @@ private:
  * <b>Re-written by 2bndy5 2020 </b><br>
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 
@@ -1648,7 +1648,7 @@ private:
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 
@@ -1664,7 +1664,7 @@ private:
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 
@@ -1674,7 +1674,7 @@ private:
  * <b>Written by 2bndy5 2020 </b><br>
  * A simple example of streaming data from 1 nRF24L01 transceiver to another.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 
@@ -1686,7 +1686,7 @@ private:
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 
@@ -1699,23 +1699,7 @@ private:
  * configured to detect when data is received, or when data has transmitted
  * successfully, or when data has failed to transmit.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
- * Use the Serial Monitor to change each node's behavior.
- */
-
-/**
- * @example{lineno} examples/ManualAcknowledgements/ManualAcknowledgements.ino
- * <b>For Arduino</b><br>
- * <b>Written by 2bndy5 2020 </b><br>
- * A simple example of sending data from 1 nRF24L01 transceiver to another
- * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
- * This example still uses ACK packets, but they have no payloads. Instead the
- * acknowledging response is sent with `write()`. This tactic allows for more
- * updated acknowledgement payload data, where actual ACK payloads' data are
- * outdated by 1 transmission because they have to loaded before receiving a
- * transmission.
- *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 
