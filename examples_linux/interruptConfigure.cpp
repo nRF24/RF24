@@ -70,13 +70,6 @@ void printRxFifo(const uint8_t); // prototype to print entire contents of RX FIF
 
 int main() {
 
-    // setup the digital input pin connected to the nRF24L01's IRQ pin
-    pinMode(IRQ_PIN, INPUT);
-
-    // register the interrupt request (IRQ) to call our
-    // Interrupt Service Routine (ISR) callback function interruptHandler()
-    attachInterrupt(IRQ_PIN, INT_EDGE_FALLING, &interruptHandler);
-
     // perform hardware check
     if (!radio.begin()) {
         cout << "nRF24L01 is not responding!!" << endl;
@@ -111,6 +104,17 @@ int main() {
     // for debugging
     printf_begin();
     radio.printDetails();
+
+    // setup the digital input pin connected to the nRF24L01's IRQ pin
+    pinMode(IRQ_PIN, INPUT);
+
+    // register the interrupt request (IRQ) to call our
+    // Interrupt Service Routine (ISR) callback function interruptHandler()
+    attachInterrupt(IRQ_PIN, INT_EDGE_FALLING, &interruptHandler);
+    // IMPORTANT: do not call radio.available(&pipe_number) before calling
+    // radio.whatHappened() when the interruptHandler() is triggered by the
+    // IRQ pin FALLING event. According to the datasheet, the pipe information
+    // is unreliable during the IRQ pin FALLING transition.
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input

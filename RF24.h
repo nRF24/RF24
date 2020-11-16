@@ -203,17 +203,17 @@ public:
      * that received the next available payload. According to the datasheet,
      * the data about the pipe number that received the next available payload
      * is "unreliable" during a FALLING transition on the IRQ pin. This means
-     * you should wait at least 5 microseconds before calling this function
+     * you should call whatHappened() before calling this function
      * during an ISR (Interrupt Service Routine).<br>For example:
      * @code
      * void isrCallbackFunction() {
-     *   // do other stuff like radio.whatHappened()
-     *   delayMicroseconds(5); // wait for IRQ pin to settle LOW
-     *   radio.available();    // returned data should now be reliable
+     *   bool tx_ds, tx_df, rx_dr;
+     *   radio.whatHappened(tx_ds, tx_df, rx_dr); // resets the IRQ pin to HIGH
+     *   radio.available();                       // returned data should now be reliable
      * }
      *
      * void setup() {
-     *   pinmode(IRQ_PIN, INPUT);
+     *   pinMode(IRQ_PIN, INPUT);
      *   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), isrCallbackFunction, FALLING);
      * }
      * @endcode
@@ -449,7 +449,6 @@ public:
      * @endcode
      *
      * @param[out] pipe_num Which pipe has the payload available
-     *
      * @code
      * uint8_t pipeNum;
      * if(radio.available(&pipeNum)){
@@ -461,18 +460,18 @@ public:
      *
      * @warning According to the datasheet, the data saved to @a pipe_num is
      * "unreliable" during a FALLING transition on the IRQ pin. This means you
-     * should wait at least 5 microseconds before calling this function during
+     * should call whatHappened() before calling this function during
      * an ISR (Interrupt Service Routine).<br>For example:
      * @code
      * void isrCallbackFunction() {
-     *   delayMicroseconds(5); // wait for IRQ pin to settle LOW
-     *   uint8_t pipe = 7;
-     *   radio.available(&pipe); // pipe info should now be reliable
-     *   // do other stuff like radio.whatHappened()
+     *   bool tx_ds, tx_df, rx_dr;
+     *   radio.whatHappened(tx_ds, tx_df, rx_dr); // resets the IRQ pin to HIGH
+     *   uint8_t pipe;                            // initialize pipe data
+     *   radio.available(&pipe);                  // pipe data should now be reliable
      * }
      *
      * void setup() {
-     *   pinmode(IRQ_PIN, INPUT);
+     *   pinMode(IRQ_PIN, INPUT);
      *   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), isrCallbackFunction, FALLING);
      * }
      * @endcode
@@ -650,9 +649,9 @@ public:
      *
      * Example (Full blocking):
      * @code
-     * radio.writeBlocking(&buf,32,1000); //Wait up to 1 second to write 1 payload to the buffers
-     * txStandBy(1000);     			  //Wait up to 1 second for the payload to send. Return 1 if ok, 0 if failed.
-     *					  				  //Blocks only until user timeout or success. Data flushed on fail.
+     * radio.writeBlocking(&buf, sizeof(buf), 1000); // Wait up to 1 second to write 1 payload to the buffers
+     * radio.txStandBy(1000);                        // Wait up to 1 second for the payload to send. Return 1 if ok, 0 if failed.
+     *                                               // Blocks only until user timeout or success. Data flushed on fail.
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
      * @see txStandBy()

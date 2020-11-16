@@ -81,19 +81,19 @@ def interrupt_handler(channel):
     print("\ttx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
     if pl_iterator[0] == 0:
         print(
-            "'data ready' event test {}".format(
+            "    'data ready' event test {}".format(
                 "passed" if rx_dr else "failed"
             )
         )
     elif pl_iterator[0] == 1:
         print(
-            "'data sent' event test {}".format(
+            "    'data sent' event test {}".format(
                 "passed" if tx_ds else "failed"
             )
         )
     elif pl_iterator[0] == 3:
         print(
-            "'data fail' event test {}".format(
+            "    'data fail' event test {}".format(
                 "passed" if tx_df else "failed"
             )
         )
@@ -103,6 +103,11 @@ def interrupt_handler(channel):
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(IRQ_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(IRQ_PIN, GPIO.FALLING, callback=interrupt_handler)
+# IMPORTANT: do not call radio.available(&pipe_number) before calling
+# radio.whatHappened() when the interruptHandler() is triggered by the
+# IRQ pin FALLING event. According to the datasheet, the pipe information
+# is unreliable during the IRQ pin FALLING transition.
+
 
 def _ping_n_wait(pl_iter):
     """private function to ping RX node and wait for IRQ pin to be handled

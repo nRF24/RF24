@@ -79,8 +79,10 @@ void setup() {
   // role variable is hardcoded to RX behavior, inform the user of this
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
-  // setup the IRQ_PIN
+  // setup the digital input pin connected to the nRF24L01's IRQ pin
   pinMode(IRQ_PIN, INPUT);
+  // register the interrupt request (IRQ) to call our
+  // Interrupt Service Routine (ISR) callback function interruptHandler()
   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), interruptHandler, FALLING);
   // IMPORTANT: do not call radio.available(&pipe_number) before calling
   // radio.whatHappened() when the interruptHandler() is triggered by the
@@ -258,8 +260,14 @@ void loop() {
   } // Serial.available()
 } // loop
 
+
+/**
+ * This function is can be used to handle the Interrupt Request (IRQ) signal from the radio.
+ * In this example, this function is used as an Interrupt Service Routine (ISR) callback.
+ * This function is registered as a callback using attachInterupt().
+ */
 void interruptHandler() {
-  // print IRQ status and all masking flags' states
+  // print IRQ pin status and all masking flags' states
 
   Serial.println(F("\tIRQ pin is actively LOW")); // show that this function was called
   delayMicroseconds(250);
@@ -295,23 +303,23 @@ void interruptHandler() {
 } // interruptHandler
 
 void printRxFifo() {
-  if (radio.available()) {                   // if there is data in the RX FIFO
+  if (radio.available()) {                              // if there is data in the RX FIFO
     // to flush the data from the RX FIFO, we'll fetch it all using 1 buffer
 
-    uint8_t pl_size = !role ? tx_pl_size : ack_pl_size;
-    char rx_fifo[pl_size * 3 + 1];       // RX FIFO is full & we know ACK payloads' size
+    uint8_t pl_size = !role ? tx_pl_size : ack_pl_size; // use the correct payload size based on the current role
+    char rx_fifo[pl_size * 3 + 1];                      // RX FIFO is full & we know ACK payloads' size
     if (radio.rxFifoFull()) {
-      rx_fifo[pl_size * 3] = 0;          // add a NULL terminating char to use as a c-string
-      radio.read(&rx_fifo, pl_size * 3); // this clears the RX FIFO (for this example)
+      rx_fifo[pl_size * 3] = 0;                         // add a NULL terminating char to use as a c-string
+      radio.read(&rx_fifo, pl_size * 3);                // this clears the RX FIFO (for this example)
     } else {
       uint8_t i = 0;
       while (radio.available()) {
         radio.read(&rx_fifo + (i * pl_size), pl_size);
         i++;
       }
-      rx_fifo[i * pl_size] = 0;          // add a NULL terminating char to use as a c-string
+      rx_fifo[i * pl_size] = 0;                         // add a NULL terminating char to use as a c-string
     }
     Serial.print(F("Complete RX FIFO: "));
-    Serial.println(rx_fifo);                 // print the entire RX FIFO with 1 buffer
+    Serial.println(rx_fifo);                            // print the entire RX FIFO with 1 buffer
   }
 }
