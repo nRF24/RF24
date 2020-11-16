@@ -702,6 +702,8 @@ void RF24::startListening(void)
     // Restore the pipe0 address, if exists
     if (pipe0_reading_address[0] > 0) {
         write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);
+    } else {
+        closeReadingPipe(0);
     }
 }
 
