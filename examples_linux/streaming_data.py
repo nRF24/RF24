@@ -37,24 +37,29 @@ radio_number = bool(
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise RuntimeError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("radio is not responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
-# set TX address of RX node into the TX pipe
+# set the TX address of the RX node into the TX pipe
 radio.openWritingPipe(address[radio_number])  # always uses pipe 0
 
-# set RX address of TX node into an RX pipe
+# set the RX address of the TX node into a RX pipe
 radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
 
-# for debugging
-radio.printDetails()
+# for debugging, we have 2 options that print a large block of details
+# radio.printDetails();  # (smaller) function that prints raw register values
+# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
 
 def make_buffer(buf_iter, size=32):
-    """return a list of payloads"""
+    """Returns a dynamically created payloads
+
+    :param int buf_iter: The position of the payload in the data stream
+    :param int size:  The max number of bytes in the payload
+    """
     # we'll use `size` for the number of payloads in the list and the
     # payloads' length
     # prefix payload with a sequential letter to indicate which
@@ -68,50 +73,65 @@ def make_buffer(buf_iter, size=32):
 
 
 def master(count=1, size=32):
-    """Uses all 3 levels of the TX FIFO `RF24.writeFast()`"""
-    if size < 6:
-        print("setting size to 6;", size, "is not allowed for this test.")
-        size = 6
+    """Uses all 3 levels of the TX FIFO to send a stream of data
 
+    :param int count: how many time to transmit the stream of data.
+    :param int size: The number of bytes in the payload. This is also used to
+        specify the number of payloads in the stream of data
+    """
+    if size < 6:
+        print("setting size to 6;", size, "is not allowed for this example.")
+        size = 6
+    elif size > 32:
+        print("size cannot be greater than 32 for this example")
+        size = 32
     # save on transmission time by setting the radio to only transmit the
-    #  number of bytes we need to transmit
+    # number of bytes we need to transmit
     radio.payloadSize = size  # the default is the maximum 32 bytes
 
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
-    for c in range(count):  # transmit the same payloads this many times
-        radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
-        # NOTE the write_only parameter does not initiate sending
+    radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
+    failures = 0  # keep track of manual retries
+    start_timer = time.monotonic_ns()  # start timer
+    for multiplier in range(count):  # repeat transmit the same data stream
         buf_iter = 0  # iterator of payloads for the while loop
-        failures = 0  # keep track of manual retries
-        start_timer = time.monotonic_ns()  # start timer
         while buf_iter < size:  # cycle through all the payloads
-            buf = make_buffer(buf_iter, size)  # make a payload
-            if not radio.write(buf):
-                # reception failed; we need to reset the irq_rf flag
-                failures += 1  # increment manual retries
-                if failures > 99 and buf_iter < 7 and c < 2:
+            buffer = make_buffer(buf_iter, size)  # make a payload
+
+            if not radio.writeFast(buffer):  # transmission failed
+                failures += 1  # increment manual retry count
+                if failures > 99 and buf_iter < 7 and multiplier < 2:
                     # we need to prevent an infinite loop
                     print(
-                        "Make sure slave() node is listening."
-                        " Quiting master_fifo()"
+                        "Too many failures detected. Aborting at payload ",
+                        buffer[0]
                     )
-                    buf_iter = size + 1  # be sure to exit the while loop
-                    radio.flush_tx()  # discard all payloads in TX FIFO
-                    break
-            buf_iter += 1
-        end_timer = time.monotonic_ns()  # end timer
-        print(
-            "Transmission took {} us with {} failures detected.".format(
-                (end_timer - start_timer) / 1000,
-                failures
-            )
+                    multiplier = count  # be sure to exit the for loop
+                    break  # exit the while loop
+                radio.reUseTX()  # resend payload in top level of TX FIFO
+            else:  # transmission succeeded
+                buf_iter += 1
+    end_timer = time.monotonic_ns()  # end timer
+    print(
+        "Time to transmit data = {} us. Detected {} failures.".format(
+            (end_timer - start_timer) / 1000,
+            failures
         )
+    )
 
 
-def slave(timeout=5, size=32):
-    """Stops listening after a `timeout` with no response"""
-    # set address of TX node into an RX pipe. NOTE you MUST specify
+def slave(timeout=6, size=32):
+    """Listen for any payloads and print them out (suffixed with received
+    counter)
 
+    :param int timeout: The number of seconds to wait (with no transmission)
+        until exiting function.
+    :param int size: The number of bytes in the payload. This is also used to
+        specify the number of payloads in the stream of data
+    """
+    if size > 32:
+        print("size cannot be greater than 32 for this example")
+        size = 32
     # save on transmission time by setting the radio to only transmit the
     #  number of bytes we need to transmit
     radio.payloadSize = size  # the default is the maximum 32 bytes
@@ -119,7 +139,7 @@ def slave(timeout=5, size=32):
     radio.startListening()  # put radio into RX mode and power up
     count = 0  # keep track of the number of received payloads
     start_timer = time.monotonic()  # start timer
-    while time.monotonic() < start_timer + timeout:
+    while (time.monotonic() - start_timer) < timeout:
         if radio.available():
             count += 1
             # retreive the received packet's payload

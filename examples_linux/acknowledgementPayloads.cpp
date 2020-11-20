@@ -65,7 +65,7 @@ uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 int main() {
     // perform hardware check
     if (!radio.begin()) {
-        cout << "nRF24L01 is not responding!!" << endl;
+        cout << "radio is not responding!!" << endl;
         return 0; // quit now
     }
 
@@ -90,13 +90,16 @@ int main() {
     // each other.
     radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
-    // For this example, we use the different addresses to send data
+    // set the TX address of the RX node into the TX pipe
     radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+
+    // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
-    // for debugging
-    printf_begin();
-    radio.printDetails();
+    // For debugging info
+    // printf_begin();             // needed only once for printing details
+    // radio.printDetails();       // (smaller) function that prints raw register values
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input

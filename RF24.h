@@ -234,8 +234,8 @@ public:
      * @param len Maximum number of bytes to read into the buffer. This
      * value should match the length of the object referenced using the
      * `buf` parameter. The absolute maximum number of bytes that can be read
-     * in one call is 32 or whatever number was previously passed to
-     * setPayloadSize().
+     * in one call is 32 (for dynamic payload lengths) or whatever number was
+     * previously passed to setPayloadSize() (for static payload lengths).
      * @remark Remember that each call to read() fetches data from the
      * RX FIFO beginning with the first byte from the first available
      * payload. A payload is not removed from the RX FIFO until it's
@@ -426,6 +426,26 @@ public:
      * @endcode
      */
     void printDetails(void);
+
+    /**
+     * Print a giant block of debugging information to stdout. This function
+     * differs from printDetails() because it makes the information more
+     * understandable without having to look up the datasheet or convert
+     * hexadecimal to binary. Only use this function if your application can
+     * spare a few extra bytes of memory.
+     *
+     * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+     * The printf.h file is included with the library for Arduino.
+     * @code
+     * #include <printf.h>
+     * setup(){
+     *  Serial.begin(115200);
+     *  printf_begin();
+     *  ...
+     * }
+     * @endcode
+     */
+    void printPrettyDetails(void);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1579,7 +1599,7 @@ private:
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
-    void write_register(uint8_t reg, uint8_t value);
+    void write_register(uint8_t reg, uint8_t value, bool is_cmd_only = false);
 
     /**
      * Write the transmit payload
@@ -1667,11 +1687,6 @@ private:
      * are enabled.  See the datasheet for details.
      */
     void toggle_features(void);
-
-    /**
-     * Built in spi transfer function to simplify repeating code repeating code
-     */
-    uint8_t spiTrans(uint8_t cmd);
 
     #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 

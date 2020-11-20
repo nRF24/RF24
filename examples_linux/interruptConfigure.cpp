@@ -57,8 +57,8 @@ const uint8_t tx_pl_size = 5;
 const uint8_t ack_pl_size = 4;
 uint8_t pl_iterator = 0;
 // The " + 1" compensates for the c-string's NULL terminating 0
-char tx_payloads[][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
-char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
+char tx_payloads[4][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
+char ack_payloads[3][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
 void interruptHandler();         // prototype to handle the interrupt request (IRQ) pin
 void setRole();                  // prototype to set the node's role
@@ -72,7 +72,7 @@ int main() {
 
     // perform hardware check
     if (!radio.begin()) {
-        cout << "nRF24L01 is not responding!!" << endl;
+        cout << "radio is not responding!!" << endl;
         return 0; // quit now
     }
 
@@ -97,13 +97,16 @@ int main() {
     // each other.
     radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
-    // For this example, we use the different addresses to send data
+    // set the TX address of the RX node into the TX pipe
     radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+
+    // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
-    // for debugging
-    printf_begin();
-    radio.printDetails();
+    // For debugging info
+    // printf_begin();             // needed only once for printing details
+    // radio.printDetails();       // (smaller) function that prints raw register values
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // setup the digital input pin connected to the nRF24L01's IRQ pin
     pinMode(IRQ_PIN, INPUT);
@@ -149,11 +152,14 @@ void setRole() {
 
 
 /**
- * act as the transmitter
+ * act as the transmitter to show 3 different IRQ events by sending 4 payloads:
+ * 1. Successfully receive ACK payload first
+ * 2. Successfully transmit on second
+ * 3. Send a third payload to fill RX node's RX FIFO (supposedly making RX node unresponsive)
+ * 4. intentionally fail transmit on the fourth
  */
 void master() {
     pl_iterator = 0; // reset the iterator for the following tests done in master()
-
 
     // Test the "data ready" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to ignore the 'data sent' event\n";
@@ -192,10 +198,13 @@ void master() {
     radio.maskIRQ(0, 0, 0); // args = "data_sent", "data_fail", "data_ready"
     cout << "   Pinging inactive RX node for 'data fail' event...";
     ping_n_wait();                     // transmit a payload and detect the IRQ pin
-    radio.flush_tx();                  // flush payloads
+
+    // CE pin is still HIGH which consumes more power. Example is now idling so...
+    radio.stopListening(); // ensure CE pin is LOW
+    // stopListening() also calls flush_tx() when ACK payloads are enabled
 
     if (radio.available()) {
-        printRxFifo(ack_pl_size);
+        printRxFifo(ack_pl_size); // doing this will flush the RX FIFO
     }
 } // master
 
@@ -288,7 +297,7 @@ void interruptHandler() {
 
 
 /**
- * Print the entire RX FIFO with one buffer. This also flushes the RX FIFO.
+ * Print the entire RX FIFO with one buffer. This will also flush the RX FIFO.
  * @param pl_size used to determine received payload size. Remember that the
  * payload sizes are declared as tx_pl_size and ack_pl_size.
  */

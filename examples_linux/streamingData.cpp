@@ -46,10 +46,10 @@ bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to tra
 // For this example, we'll be sending 32 payloads each containing
 // 32 bytes of data that looks like ASCII art when printed to the serial
 // monitor. The TX node and RX node needs only a single 32 byte buffer.
-#define SIZE 32
+#define SIZE 32            // this is the maximum for this example. (minimum is 1)
 char buffer[SIZE + 1];     // for the RX node
 unsigned int counter = 0;  // for counting the number of received payloads
-void makePayload(uint8_t); // prototype to construct payload dynamically
+void makePayload(uint8_t); // prototype to construct a payload dynamically
 
 void setRole(); // prototype to set the node's role
 void master();  // prototype of the TX node's behavior; called by setRole()
@@ -67,7 +67,7 @@ int main() {
 
     // perform hardware check
     if (!radio.begin()) {
-        cout << "nRF24L01 is not responding!!" << endl;
+        cout << "radio is not responding!!" << endl;
         return 0; // quit now
     }
 
@@ -82,20 +82,23 @@ int main() {
 
     // save on transmission time by setting the radio to only transmit the
     // number of bytes we need to transmit a float
-    radio.setPayloadSize(SIZE);        // default value is the maximum 32 bytes
+    radio.setPayloadSize(SIZE);    // default value is the maximum 32 bytes
 
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
+    radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
-    // For this example, we use the different addresses to send data
+    // set the TX address of the RX node into the TX pipe
     radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+
+    // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
-    // for debugging
-    printf_begin();
-    radio.printDetails();
+    // For debugging info
+    // printf_begin();             // needed only once for printing details
+    // radio.printDetails();       // (smaller) function that prints raw register values
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input
@@ -138,65 +141,70 @@ void master() {
     unsigned int failures = 0;                       // keep track of failures
     uint8_t i = 0;
     clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer); // start the timer
-    while (failures < 100 && i < SIZE) {
+    while (i < SIZE) {
         makePayload(i);
-        if (!radio.write(&buffer, SIZE))
+        if (!radio.writeFast(&buffer, SIZE)) {
             failures++;
-        else
+            radio.reUseTX();
+        } else {
             i++;
-    }
+        }
+
+        if (failures >= 100) {
+            // most likely no device is listening for the data stream
+            cout << "Too many failures detected. ";
+            cout << "Aborting at payload " << buffer[0];
+            break;
+        }
+    } // while
     uint32_t ellapsedTime = getMicros();             // end the timer
-    if (failures < 100) {
-        cout << "Time to transmit data = ";
-        cout << ellapsedTime;                        // print the timer result
-        cout << " us. Detected: ";
-        cout << failures;                            // print number of retries
-        cout << " failures." << endl;
-    }
-    else {
-        // else There was (most likely) no device listening for the data stream
-        cout << "Too many failures detected (" << failures;
-        cout << "); Aborting at payload " << i;
-        cout << " going back to setRole()" << endl;
-    }
+    cout << "Time to transmit data = ";
+    cout << ellapsedTime;                            // print the timer result
+    cout << " us. Detected: ";
+    cout << failures;                                // print number of retries
+    cout << " failures." << endl;
+    cout << " going back to setRole()" << endl;
 }
+
 
 /**
  * make this node act as the receiver
  */
 void slave() {
 
-    radio.startListening();                                  // powerUp() into RX mode
-
-    time_t startTimer = time(nullptr);                       // start a timer
-    while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
-        if (radio.available()) {                             // is there a payload
-            radio.read(&buffer, SIZE);                       // fetch payload from FIFO
-            cout << "Received: " << buffer;                  // print the payload's value
-            cout << " - " << counter << endl;                // print the counter
-            counter++;                                       // increment counter
-            startTimer = time(nullptr);                      // reset timer
+    counter = 0;
+    radio.startListening();                   // powerUp() into RX mode
+    time_t startTimer = time(nullptr);        // start a timer
+    while (time(nullptr) - startTimer < 6) {  // use 6 second timeout
+        if (radio.available()) {              // is there a payload
+            radio.read(&buffer, SIZE);        // fetch payload from FIFO
+            cout << "Received: " << buffer;   // print the payload's value
+            cout << " - " << counter << endl; // print the counter
+            counter++;                        // increment counter
+            startTimer = time(nullptr);       // reset timer
         }
     }
-    cout << "Timeout reached. Nothing received in 6 seconds" << endl;
-    radio.stopListening();
+    radio.stopListening();                    // use TX mode for idle behavior
+
+    cout << "Timeout reached. Nothing received in 6 seconds.";
+    cout << " Going back to setRole()" << endl;
 }
 
 
 /**
  * Make a single payload based on position in stream.
- * This example employs function to save on memory allocated.
+ * This example employs this function to save on memory allocated.
  */
 void makePayload(uint8_t i) {
 
-  // let the first character be an identifying alphanumeric prefix
-  // this lets us see which payload didn't get received
-  buffer[0] = i + (i < 26 ? 65 : 71);
-  for (uint8_t j =1; j < SIZE; ++j) {
-    char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
-    chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
-    buffer[j] = chr + 48;
-  }
+    // let the first character be an identifying alphanumeric prefix
+    // this lets us see which payload didn't get received
+    buffer[0] = i + (i < 26 ? 65 : 71);
+    for (uint8_t j = 0; j < SIZE - 1; ++j) {
+        char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
+        chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
+        buffer[j + 1] = chr + 48;
+    }
 }
 
 

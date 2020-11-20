@@ -42,7 +42,7 @@ radio_number = bool(
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise RuntimeError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("radio is not responding")
 
 # ACK payloads are dynamically sized.
 radio.enableDynamicPayloads()  # to use ACK payloads
@@ -55,14 +55,15 @@ radio.enableAckPayload()  # enable ACK payloads
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
-# set TX address of RX node into the TX pipe
+# set the TX address of the RX node into the TX pipe
 radio.openWritingPipe(address[radio_number])  # always uses pipe 0
 
-# set RX address of TX node into an RX pipe
+# set the RX address of the TX node into a RX pipe
 radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
 
-# for debugging
-radio.printDetails()
+# for debugging, we have 2 options that print a large block of details
+# radio.printDetails();  # (smaller) function that prints raw register values
+# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
 # For this example, we'll be using a payload containing
 # a string that changes on every transmission. (successful or not)
@@ -145,8 +146,14 @@ def print_rx_fifo(pl_size):
 
 
 def master():
-    """Transmits 3 times: successfully receive ACK payload first, successfully
-    transmit on second, and intentionally fail transmit on the third"""
+    """Transmits 4 times and reports results
+
+        1. successfully receive ACK payload first
+        2. successfully transmit on second
+        3. send a third payload to fill RX node's RX FIFO
+           (supposedly making RX node unresponsive)
+        4. intentionally fail transmit on the fourth
+    """
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
 
     # on data ready test
@@ -183,11 +190,19 @@ def master():
     print("    Sending a ping to inactive slave node...", end=" ")
     _ping_n_wait(3)
 
+    # CE pin is still HIGH which consumes more power. Example is now idling so...
+    radio.stopListening()  # ensure CE pin is LOW
+    # stopListening() also calls flush_tx() when ACK payloads are enabled
+
     print_rx_fifo(len(ack_payloads[0]))  # empty RX FIFO
 
 
 def slave(timeout=6):  # will listen for 6 seconds before timing out
-    """Only listen for 3 payload from the master node"""
+    """Only listen for 3 payload from the master node
+
+    :param int timeout: The number of seconds to wait (with no transmission)
+        until exiting function.
+    """
     pl_iterator[0] = 0  # reset this to indicate event is a 'data_ready' event
     # setup radio to recieve pings, fill TX FIFO with ACK payloads
     radio.writeAckPayload(1, ack_payloads[0])
@@ -201,6 +216,7 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
     time.sleep(0.1)  # wait for last ACK payload to transmit
     radio.stopListening()  # put radio in TX mode & discard any ACK payloads
     print_rx_fifo(len(tx_payloads[0]))
+
 
 print(
     """\

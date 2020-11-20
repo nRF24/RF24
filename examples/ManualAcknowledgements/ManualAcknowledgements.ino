@@ -17,6 +17,7 @@
  * Use the Serial Monitor to change each node's behavior.
  */
 #include <SPI.h>
+#include "printf.h"
 #include "RF24.h"
 
 // instantiate an object for the nRF24L01 transceiver
@@ -56,7 +57,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("nRF24L01 is not responding!!"));
+    Serial.println(F("radio is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
@@ -85,13 +86,11 @@ void setup() {
   // number of bytes we need to transmit a float
   radio.setPayloadSize(sizeof(payload)); // char[7] & uint8_t datatypes occupy 8 bytes
 
-  // For this example, we use the different addresses to send data
+  // set the TX address of the RX node into the TX pipe
   radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+
+  // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
-  // Notice that the addresses assigned to pipes are not changed in
-  // loop() because we are using pipe 1 to receive and pipe 0 to transmit
-  // However, if we used pipe 0 to receive we would need to constantly
-  // re-write the TX address on pipe 0
 
   if (role) {
     // setup the TX node
@@ -104,7 +103,13 @@ void setup() {
     memcpy(payload.message, "World ", 6); // set the outgoing message
     radio.startListening();               // powerUp() into RX mode
   }
-}
+
+  // For debugging info
+  // printf_begin();             // needed only once for printing details
+  // radio.printDetails();       // (smaller) function that prints raw register values
+  // radio.printPrettyDetails(); // (larger) function that prints human readable data
+
+} // setup()
 
 void loop() {
 
@@ -121,23 +126,29 @@ void loop() {
       radio.startListening();                                // put in RX mode
       unsigned long start_timeout = millis();                // timer to detect no response
       while (!radio.available() && !timed_out) {             // wait for response or timeout
-        if (millis() - start_timeout > 250)                  // only wait 250 ms
+        if (millis() - start_timeout > 200)                  // only wait 200 ms
           timed_out = true;
       }
       unsigned long end_timer = micros();                    // end the timer
+      delayMicroseconds(130);
       radio.stopListening();                                 // put back in TX mode
 
       // print summary of transactions
       Serial.print(F("Transmission successful!"));           // payload was delivered
-      if (radio.available()) {                               // is there a payload received
-        Serial.print(F(" Round trip delay = "));
+      uint8_t pipe;
+      if (radio.available(&pipe)) {                               // is there a payload received
+        Serial.print(F(" Round-trip delay: "));
         Serial.print(end_timer - start_timer);               // print the timer result
         Serial.print(F(" us. Sent: "));
         Serial.print(payload.message);                       // print the outgoing payload's message
         Serial.print(payload.counter);                       // print outgoing payload's counter
         PayloadStruct received;
         radio.read(&received, sizeof(received));             // get payload from RX FIFO
-        Serial.print(F(" Recieved: "));
+        Serial.print(F(" Received "));
+        Serial.print(radio.getPayloadSize());                // print the size of the payload
+        Serial.print(F(" bytes on pipe "));
+        Serial.print(pipe);                                  // print the pipe number
+        Serial.print(F(": "));
         Serial.print(received.message);                      // print the incoming payload's message
         Serial.println(received.counter);                    // print the incoming payload's counter
         payload.counter = received.counter;                  // save incoming counter for next outgoing counter
@@ -156,19 +167,21 @@ void loop() {
 
     uint8_t pipe;
     if (radio.available(&pipe)) {              // is there a payload? get the pipe number that recieved it
-      uint8_t bytes = radio.getPayloadSize();  // get size of incoming payload
       PayloadStruct received;
       radio.read(&received, sizeof(received)); // get incoming payload
       payload.counter = received.counter + 1;  // increment incoming counter for next outgoing response
 
       // transmit response & save result to `report`
       radio.stopListening();                   // put in TX mode
-      bool report = radio.write(&payload, sizeof(payload));
+
+      radio.writeFast(&payload, sizeof(payload));  // write response to TX FIFO
+      bool report = radio.txStandBy(150, false);   // keep retrying for 150 ms
+
       radio.startListening();                  // put back in RX mode
 
       // print summary of transactions
       Serial.print(F("Received "));
-      Serial.print(bytes);                     // print the size of the payload
+      Serial.print(radio.getPayloadSize());    // print the size of the payload
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                      // print the pipe number
       Serial.print(F(": "));

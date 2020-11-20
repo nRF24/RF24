@@ -64,7 +64,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("nRF24L01 is not responding!!"));
+    Serial.println(F("radio is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
@@ -85,9 +85,13 @@ void setup() {
   // Set the pipe addresses accordingly. This function additionally also
   // calls startListening() or stopListening() and sets the payload's nodeID
   setRole();
-  printf_begin();
-  radio.printDetails();
-}
+
+  // For debugging info
+  // printf_begin();             // needed only once for printing details
+  // radio.printDetails();       // (smaller) function that prints raw register values
+  // radio.printPrettyDetails(); // (larger) function that prints human readable data
+
+} // setup()
 
 void loop() {
 
@@ -115,7 +119,7 @@ void loop() {
     payload.payloadID++;                                     // increment payload number
 
     // to make this example readable in the serial monitor
-    delay(1000); // slow transmissions down by 1 second
+    delay(500); // slow transmissions down by 1 second
 
   } else if (role == 'R') {
     // This device is the RX node

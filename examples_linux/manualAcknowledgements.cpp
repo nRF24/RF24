@@ -76,7 +76,7 @@ int main() {
 
     // perform hardware check
     if (!radio.begin()) {
-        cout << "nRF24L01 is not responding!!" << endl;
+        cout << "radio is not responding!!" << endl;
         return 0; // quit now
     }
 
@@ -98,17 +98,16 @@ int main() {
     // number of bytes we need to transmit a float
     radio.setPayloadSize(sizeof(payload)); // char[7] & uint8_t datatypes occupy 8 bytes
 
-    // For this example, we use the different addresses to send data
+    // set the TX address of the RX node into the TX pipe
     radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
-    radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
-    // Notice that the addresses assigned to pipes are not changed in
-    // loop() because we are using pipe 1 to receive and pipe 0 to transmit
-    // However, if we used pipe 0 to receive we would need to constantly
-    // re-write the TX address on pipe 0
 
-    // for debugging
-    printf_begin();
-    radio.printDetails();
+    // set the RX address of the TX node into a RX pipe
+    radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
+
+    // For debugging info
+    // printf_begin();             // needed only once for printing details
+    // radio.printDetails();       // (smaller) function that prints raw register values
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input
@@ -157,83 +156,91 @@ void master() {
         if (report) {
             // transmission successful; wait for response and print results
 
-            radio.startListening();                        // put in RX mode
-            unsigned long start_timeout = millis();        // timer to detect no response
-            while (!radio.available()) {                   // wait for response
-                if (millis() - start_timeout > 250)        // only wait 250 ms
+            radio.startListening();                          // put in RX mode
+            unsigned long start_timeout = millis();          // timer to detect no response
+            while (!radio.available()) {                     // wait for response
+                if (millis() - start_timeout > 200)          // only wait 200 ms
                     break;
             }
-            unsigned long ellapsedTime = getMicros();      // end the timer
-            radio.stopListening();                         // put back in TX mode
+            unsigned long ellapsedTime = getMicros();        // end the timer
+            radio.stopListening();                           // put back in TX mode
 
             // print summary of transactions
-            cout << "Transmission successful! ";           // payload was delivered
-            if (radio.available()) {                       // is there a payload received
+            uint8_t pipe;
+            cout << "Transmission successful! ";
+            if (radio.available(&pipe)) {                    // is there a payload received? grab the pipe number that received it
+                uint8_t bytes = radio.getPayloadSize();      // grab the incoming payload size
                 cout << "Round trip delay = ";
-                cout << ellapsedTime;                      // print the timer result
-                cout << " us. Sent: " << payload.message;  // print outgoing message
-                cout << (unsigned int)payload.counter;     // print outgoing counter
+                cout << ellapsedTime;                        // print the timer result
+                cout << " us. Sent: " << payload.message;    // print outgoing message
+                cout << (unsigned int)payload.counter;       // print outgoing counter
                 PayloadStruct received;
-                radio.read(&received, sizeof(received));   // get incoming payload
-                cout << " Recieved: " << received.message; // print the incoming message
-                cout << (unsigned int)received.counter;    // print the incoming counter
+                radio.read(&received, sizeof(received));     // get incoming payload
+                cout << " Recieved " << (unsigned int)bytes; // print incoming payload size
+                cout << " on pipe " << (unsigned int)pipe;   // print RX pipe number
+                cout << ": " << received.message;            // print the incoming message
+                cout << (unsigned int)received.counter;      // print the incoming counter
                 cout << endl;
-                payload.counter = received.counter;        // save incoming counter for next outgoing counter
+                payload.counter = received.counter;          // save incoming counter for next outgoing counter
             }
             else {
-                cout << "Recieved no response." << endl;   // no response received
+                cout << "Recieved no response." << endl;     // no response received
             }
         }
         else {
-            cout << "Transmission failed or timed out" << endl; // payload was not delivered
-            failures++;                                         // increment failure counter
+            cout << "Transmission failed or timed out";      // payload was not delivered
+            cout << endl;
+            failures++;                                      // increment failure counter
         } // report
 
         // to make this example readable in the terminal
         delay(1000);  // slow transmissions down by 1 second
-    }
-    cout << failures << " failures detected, going back to setRole()" << endl;
+    } // while
+
+    cout << failures << " failures detected. Going back to setRole()" << endl;
 } // master
 
 /**
  * make this node act as the receiver
  */
 void slave() {
-    memcpy(payload.message, "World ", 6);               // set the response message
-    radio.startListening();                             // put in RX mode
+    memcpy(payload.message, "World ", 6);                    // set the response message
+    radio.startListening();                                  // put in RX mode
 
-    time_t startTimer = time(nullptr);                  // start a timer
-    while (time(nullptr) - startTimer < 6) {            // use 6 second timeout
+    time_t startTimer = time(nullptr);                       // start a timer
+    while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
         uint8_t pipe;
-        if (radio.available(&pipe)) {                       // is there a payload? get the pipe number that recieved it
-            uint8_t bytes = radio.getDynamicPayloadSize();  // get size of incoming payload
+        if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
+            uint8_t bytes = radio.getPayloadSize();          // get size of incoming payload
             PayloadStruct received;
-            radio.read(&received, sizeof(received));        // get incoming payload
-            payload.counter = received.counter + 1;         // increment payload for response
+            radio.read(&received, sizeof(received));         // get incoming payload
+            payload.counter = received.counter + 1;          // increment payload for response
 
             // transmit response & save result to `report`
-            radio.stopListening();                          // put in TX mode
-            bool report = radio.write(&payload, sizeof(payload));
-            radio.startListening();                         // put back in RX mode
+            radio.stopListening();                           // put in TX mode
+            radio.writeFast(&payload, sizeof(payload));      // write response to TX FIFO
+            bool report = radio.txStandBy(150, false);       // keep retrying for 150 ms
+            radio.startListening();                          // put back in RX mode
 
             // print summary of transactions
-            cout << "Received " << (unsigned int)bytes;     // print the size of the payload
+            cout << "Received " << (unsigned int)bytes;      // print the size of the payload
             cout << " bytes on pipe ";
-            cout << (unsigned int)pipe;                     // print the pipe number
-            cout << ": " << received.message;               // print incoming message
-            cout << (unsigned int)received.counter;         // print incoming counter
+            cout << (unsigned int)pipe;                      // print the pipe number
+            cout << ": " << received.message;                // print incoming message
+            cout << (unsigned int)received.counter;          // print incoming counter
 
             if (report) {
-                cout << " Sent: " << payload.message;       // print outgoing message
-                cout << (unsigned int)payload.counter;      // print outgoing counter
+                cout << " Sent: " << payload.message;        // print outgoing message
+                cout << (unsigned int)payload.counter;       // print outgoing counter
                 cout << endl;
             }
             else {
                 cout << " Response failed to send." << endl; // failed to send response
             }
-            startTimer = time(nullptr);                     // reset timer
+            startTimer = time(nullptr);                      // reset timer
         } // available
     } // while
+
     cout << "Timeout reached. Nothing received in 6 seconds" << endl;
     radio.stopListening(); // recommended idle mode is TX mode
 } // slave

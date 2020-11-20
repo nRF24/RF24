@@ -34,7 +34,7 @@ addresses = [
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise RuntimeError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("radio is not responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
@@ -46,12 +46,17 @@ radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 # "<bi" means a little endian unsigned byte and int
 radio.payloadSize = len(struct.pack("<ii", 0, 0))
 
-# for debugging
-radio.printDetails()
+# for debugging, we have 2 options that print a large block of details
+# radio.printDetails();  # (smaller) function that prints raw register values
+# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
 
 def base(timeout=10):
-    """Use the nRF24L01 as a base station for lisening to all nodes"""
+    """Use the nRF24L01 as a base station for lisening to all nodes
+
+    :param int timeout: The number of seconds to wait (with no transmission)
+        until exiting function.
+    """
     # write the addresses to all pipes.
     for pipe_n, addr in enumerate(addresses):
         radio.openReadingPipe(pipe_n, addr)
@@ -82,10 +87,10 @@ def base(timeout=10):
 def node(node_number, count=10):
     """start transmitting to the base station.
 
-        :param int node_number: the node's identifying index (from the
-            the `addresses` list). This is a required parameter
-        :param int count: the number of times that the node will transmit
-            to the base station.
+    :param int node_number: the node's identifying index (from the
+        the `addresses` list). This is a required parameter
+    :param int count: the number of times that the node will transmit
+        to the base station.
     """
     radio.stopListening()
     # set the TX address to the address of the base station.
@@ -100,17 +105,21 @@ def node(node_number, count=10):
         report = radio.write(payload)
         end_timer = time.monotonic_ns()
         # show something to see it isn't frozen
+        print(
+            "Transmission of payloadID {} as node {}".format(
+                counter,
+                node_number
+            ),
+            end=" "
+        )
         if report:
             print(
-                "Transmission of payloadID {} as node {} successfull! "
-                "Transmission time: {} us".format(
-                    counter,
-                    node_number,
+                "successfull! Time to transmit = {} us".format(
                     (end_timer - start_timer) / 1000
                 )
             )
         else:
-            print("Transmission failed or timed out")
+            print("failed or timed out")
         time.sleep(0.5)  # slow down the test for readability
 
 

@@ -23,6 +23,10 @@ radio = RF24(22, 0)
 # RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
 # set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
 
+# using the python keyword global is bad practice. Instead we'll use a 1 item
+# list to store our integer number for the payloads' counter
+counter = [0]
+
 # For this example, we will use different addresses
 # An address need to be a buffer protocol object (bytearray)
 address = [b"1Node", b"2Node"]
@@ -42,119 +46,119 @@ radio_number = bool(
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise RuntimeError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("radio is not responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
-# set TX address of RX node into the TX pipe
+# set the TX address of the RX node into the TX pipe
 radio.openWritingPipe(address[radio_number])  # always uses pipe 0
 
-# set RX address of TX node into an RX pipe
+# set the RX address of the TX node into a RX pipe
 radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
 
 # To save time during transmission, we'll set the payload size to be only what
-# we need. A float value occupies 4 bytes in memory using len(struct.pack())
-# "<b" means a little endian unsigned byte
-# we also need an addition 7 bytes for the payload message
-radio.payloadSize = len(struct.pack("<b", 0)) + 7
+# we need. For this example, we'll be using a byte for the payload counter and
+# 7 bytes for the payload message
+radio.payloadSize = 8
 
-# for debugging
-radio.printDetails()
+# for debugging, we have 2 options that print a large block of details
+# radio.printDetails();  # (smaller) function that prints raw register values
+# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
-# using the python keyword global is bad practice. Instead we'll use a 1 item
-# list to store our float number for the payloads sent
-payload = [0]
 
-def master(count=10):
-    """Transmits a message and an incrementing integer every second"""
+def master(count=5):
+    """Transmits a message and an incrementing integer every second, then
+    wait for a response for up to 200 ms.
+
+    :param int count: The number of payloads to transmit (failed or
+        successful).
+    """
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
 
     while count:  # only transmit `count` packets
-        # use struct.pack to packetize your data into a usable payload
-        # "<b" means a single little endian unsigned byte.
-        # NOTE we added a b"\x00" byte as a c-string's NULL terminating 0
-        buffer = b"Hello \x00" + struct.pack("<b", payload[0])
+        # use bytes() to pack our counter data into the payload
+        # NOTE b"\x00" byte is a c-string's NULL terminating 0
+        buffer = b"Hello \x00" + bytes(counter)
         start_timer = time.monotonic_ns()  # start timer
         result = radio.write(buffer)
         if not result:
             print("Transmission failed or timed out")
         else:
             radio.startListening()
-            timout = time.monotonic() * 1000 + 250  # use 250 ms timeout
-            ack = b"\x00" * len(buffer)  # variable used for the response
-            while ack[0] == 0 or time.monotonic() * 1000 < timout:
-                if radio.available():
-                    # get the response & save it to ack variable
-                    ack = radio.read(radio.payloadSize)
-                    radio.stopListening()
-                    radio.openWritingPipe(address[0])
+            timout = time.monotonic() * 1000 + 200  # use 200 ms timeout
+            # declare a variable to save the incoming response
+            while not radio.available() and time.monotonic() * 1000 < timout:
+                pass  # wait for incoming payload or timeout
+            radio.stopListening()
             end_timer = time.monotonic_ns()  # end timer
             print(
                 "Transmission successful. Sent: {}{}.".format(
                     buffer[:6].decode("utf-8"),
-                    payload[0]
+                    counter[0]
                 ),
                 end=" "
             )
-            if ack[0] == 0:
-                print("No response received.")
-            else:
-                # decode response's text as an string
-                # NOTE ack[:6] ignores the NULL terminating 0
-                response = ack[:6].decode("utf-8")
-                # use struct.unpack() to get the repsonse's appended int
-                # NOTE ack[7:] discards NULL terminating 0, and
-                # "<b" means its a single little endian unsigned byte
-                payload[0] = struct.unpack("<b", ack[7:])[0]
+            has_payload, pipe_number = radio.available_pipe()
+            if has_payload:
+                # grab the incoming payload
+                received = radio.read(radio.payloadSize)
+                # NOTE received[7:8] discards NULL terminating 0
+                counter[0] = received[7:8][0]  # save the counter
                 print(
-                    "Received: {}{}. Roundtrip delay: {} us.".format(
-                        response,
-                        payload[0],
+                    "Received {} bytes on pipe {}: {}{}. "
+                    "Round-trip delay: {} us.".format(
+                        radio.payloadSize,
+                        pipe_number,
+                        bytes(received[:6]).decode("utf-8"),
+                        counter[0],
                         (end_timer - start_timer) / 1000
                     )
                 )
+            else:
+                print("No response received.")
         time.sleep(1)  # make example readable by slowing down transmissions
         count -= 1
 
 
-def slave(count=10):
-    """Polls the radio and prints the received value. This method expires
-    after 6 seconds of no received transmission"""
+def slave(timeout=6):
+    """Listen for any payloads and print the transaction
+
+    :param int timeout: The number of seconds to wait (with no transmission)
+        until exiting function.
+    """
     radio.startListening()  # put radio into RX mode and power up
 
     start_timer = time.monotonic()  # start a timer to detect timeout
-    while count and (time.monotonic() - start_timer) < 6:
+    while (time.monotonic() - start_timer) < timeout:
         # receive `count` payloads or wait 6 seconds till timing out
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
-            count -= 1
             received = radio.read(radio.payloadSize)  # fetch the payload
-            # use struct.unpack() to get the payload's appended int
-            # NOTE received[7:] discards NULL terminating 0, and
-            # "<b" means its a single little endian unsigned byte
-            payload[0] = struct.unpack("<b", received[7:])[0] + 1
-            # use bytes() to packetize our data into a usable payload
+            # NOTE received[7:8] discards NULL terminating 0
+            counter[0] = received[7:8][0] + 1  # increment the counter
+            # use bytes() to pack our counter data into the payload
             # NOTE b"\x00" byte is a c-string's NULL terminating 0
-            buffer = b"World \x00" + bytes([payload[0]])
+            buffer = b"World \x00" + bytes(counter)
             # save response's result
-            response = radio.write(buffer)
-            # print the payload received and the response's payload
+            result = radio.write(buffer)
+            # print the payload received payload
             print(
                 "Received {} bytes on pipe {}: {}{}.".format(
                     radio.payloadSize,
                     pipe_number,
-                    received[:6].decode("utf-8"),
-                    payload[0] - 1
+                    bytes(received[:6]).decode("utf-8"),
+                    received[7:8][0]
                 ),
                 end=" "
             )
-            if response:
+            if result:  # did response succeed?
+                # print response's payload
                 print(
                     "Sent: {}{}".format(
                         buffer[:6].decode("utf-8"),
-                        payload[0]
+                        counter[0]
                     )
                 )
             else:

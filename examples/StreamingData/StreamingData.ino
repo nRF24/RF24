@@ -11,6 +11,7 @@
  * Use the Serial Monitor to change each node's behavior.
  */
 #include <SPI.h>
+#include "printf.h"
 #include "RF24.h"
 
 // instantiate an object for the nRF24L01 transceiver
@@ -23,23 +24,23 @@ uint8_t address[][6] = {"1Node", "2Node"};
 
 // to use different addresses on a pair of radios, we need a variable to
 // uniquely identify which address this radio will use to transmit
-bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
+bool radioNumber; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // Used to control whether this node is sending or receiving
-bool role = false;  // true = TX node, false = RX node
+bool role = false; // true = TX node, false = RX node
 
 // For this example, we'll be sending 32 payloads each containing
 // 32 bytes of data that looks like ASCII art when printed to the serial
 // monitor. The TX node and RX node needs only a single 32 byte buffer.
-#define SIZE 32
+#define SIZE 32            // this is the maximum for this example. (minimum is 1)
 char buffer[SIZE + 1];     // for the RX node
 uint8_t counter = 0;       // for counting the number of received payloads
-void makePayload(uint8_t); // prototype to construct payload dynamically
+void makePayload(uint8_t); // prototype to construct a payload dynamically
 
 
 void setup() {
 
-  buffer[SIZE] = 0;        // add a NULL terminating charcter (for easy printing)
+  buffer[SIZE] = 0;        // add a NULL terminating character (for easy printing)
 
   Serial.begin(115200);
   while (!Serial) {
@@ -48,7 +49,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("nRF24L01 is not responding!!"));
+    Serial.println(F("radio is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
@@ -77,8 +78,10 @@ void setup() {
   // number of bytes we need to transmit
   radio.setPayloadSize(SIZE);     // default value is the maximum 32 bytes
 
-  // For this example, we use the different addresses to send data
+  // set the TX address of the RX node into the TX pipe
   radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+
+  // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
   // additional setup specific to the node's role
@@ -87,7 +90,13 @@ void setup() {
   } else {
     radio.startListening(); // powerUp() into RX mode
   }
-} // setup
+
+  // For debugging info
+  // printf_begin();             // needed only once for printing details
+  // radio.printDetails();       // (smaller) function that prints raw register values
+  // radio.printPrettyDetails(); // (larger) function that prints human readable data
+
+} // setup()
 
 
 void loop() {
@@ -95,19 +104,22 @@ void loop() {
   if (role) {
     // This device is a TX node
 
+    radio.flush_tx();
     uint8_t i = 0;
     uint8_t failures = 0;
     unsigned long start_timer = micros();       // start the timer
     while (i < SIZE) {
       makePayload(i);                           // make the payload
-      if (!radio.write(&buffer, SIZE))
+      if (!radio.writeFast(&buffer, SIZE)) {
         failures++;
-      else
+        radio.reUseTX();
+      } else {
         i++;
+      }
 
       if (failures >= 100) {
         Serial.print(F("Too many failures detected. Aborting at payload "));
-        Serial.println(i);
+        Serial.println(buffer[0]);
         break;
       }
     }
@@ -165,7 +177,7 @@ void makePayload(uint8_t i) {
   // let the first character be an identifying alphanumeric prefix
   // this lets us see which payload didn't get received
   buffer[0] = i + (i < 26 ? 65 : 71);
-  for (uint8_t j = 0; j < SIZE; ++j) {
+  for (uint8_t j = 0; j < SIZE - 1; ++j) {
     char chr = j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);
     chr |= j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);
     buffer[j + 1] = chr + 48;

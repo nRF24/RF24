@@ -61,9 +61,9 @@ struct PayloadStruct
 };
 PayloadStruct payload;
 
-void setRole();       // prototype to set the node's role
-void master(uint8_t); // prototype of a TX node's behavior; called by setRole()
-void slave();         // prototype of the RX node's behavior; called by setRole()
+void setRole();            // prototype to set the node's role
+void master(unsigned int); // prototype of a TX node's behavior; called by setRole()
+void slave();              // prototype of the RX node's behavior; called by setRole()
 
 // custom defined timer for evaluating transmission time in microseconds
 struct timespec startTimer, endTimer;
@@ -74,7 +74,7 @@ int main() {
 
     // perform hardware check
     if (!radio.begin()) {
-        cout << "nRF24L01 is not responding!!" << endl;
+        cout << "radio is not responding!!" << endl;
         return 0; // quit now
     }
 
@@ -90,9 +90,10 @@ int main() {
     // number of bytes we need to transmit a float
     radio.setPayloadSize(sizeof(payload)); // 2x int datatype occupy 8 bytes
 
-    // for debugging
-    printf_begin();
-    radio.printDetails();
+    // For debugging info
+    // printf_begin();             // needed only once for printing details
+    // radio.printDetails();       // (smaller) function that prints raw register values
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // ready to execute program now
     setRole(); // calls master() or slave() based on user input
@@ -114,7 +115,7 @@ void setRole() {
         cout << "*** PRESS 'Q' to exit" << endl;
         getline(cin, input);
         if (input.length() >= 1) {
-            uint8_t toNumber = (uint8_t)(input[0]) - 48;
+            unsigned int toNumber = (unsigned int)(input[0]) - 48;
             if (toNumber < 6 && toNumber >= 0)
                 master(toNumber);
             else if (input[0] == 'R' || input[0] == 'r')
@@ -126,13 +127,13 @@ void setRole() {
         }
         input = ""; // stay in the while loop
     } // while
-} // setRole()
+} // setRole
 
 
 /**
  * act as unique TX node identified by the `role` number
  */
-void master(uint8_t role) {
+void master(unsigned int role) {
     // set the payload's nodeID & reset the payload's identifying number
     payload.nodeID = role;
     payload.payloadID = 0;
@@ -148,27 +149,27 @@ void master(uint8_t role) {
 
     unsigned int failures = 0;
     while (failures < 6) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);            // start the timer
-        bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
-        uint32_t timerEllapsed = getMicros();                       // end the timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);       // start the timer
+        bool report = radio.write(&payload, sizeof(payload));  // transmit & save the report
+        uint32_t timerEllapsed = getMicros();                  // end the timer
 
         if (report) {
             // payload was delivered
             cout << "Transmission of PayloadID ";
-            cout << payload.payloadID;                              // print payload number
-            cout << " as node " << payload.nodeID;                  // print node number
+            cout << payload.payloadID;                         // print payload number
+            cout << " as node " << payload.nodeID;             // print node number
             cout << " successful! Time to transmit = ";
-            cout << timerEllapsed << " us" << endl;                 // print the timer result
+            cout << timerEllapsed << " us" << endl;            // print the timer result
         }
         else {
             // payload was not delivered
             failures++;
             cout << "Transmission failed or timed out" << endl;
         }
-        payload.payloadID++;                                        // increment payload number
+        payload.payloadID++;                                   // increment payload number
 
         // to make this example readable in the terminal
-        delay(1000); // slow transmissions down by 1 second
+        delay(500); // slow transmissions down by 0.5 second
     } // while
     cout << failures << " failures detected. Going back to setRole()." << endl;
 } // master

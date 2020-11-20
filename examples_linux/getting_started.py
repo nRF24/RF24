@@ -42,36 +42,40 @@ radio_number = bool(
 
 # initialize the nRF24L01 on the spi bus
 if not radio.begin():
-    raise RuntimeError("nRF24L01 hardware isn't responding")
+    raise RuntimeError("radio is not responding")
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
-# set TX address of RX node into the TX pipe
+# set the TX address of the RX node into the TX pipe
 radio.openWritingPipe(address[radio_number])  # always uses pipe 0
 
-# set RX address of TX node into an RX pipe
+# set the RX address of the TX node into a RX pipe
 radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
 
 # To save time during transmission, we'll set the payload size to be only what
-# we need. A float value occupies 4 bytes in memory using len(struct.pack())
+# we need. A float value occupies 4 bytes in memory using struct.pack()
 # "<f" means a little endian unsigned float
 radio.payloadSize = len(struct.pack("<f", payload[0]))
 
-# for debugging
-radio.printDetails()
+# for debugging, we have 2 options that print a large block of details
+# radio.printDetails();  # (smaller) function that prints raw register values
+# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
 
-def master(count=5):  # count = 5 will only transmit 5 packets
-    """Transmits an incrementing float every second"""
+def master(count=5):
+    """Transmits an incrementing float every second
+
+    :param int count: The number of payloads to transmmit (failed or
+        successful)
+    """
     radio.stopListening()  # ensures the nRF24L01 is in TX mode
 
     while count:
-        # use struct.pack to packetize your data
-        # into a usable payload
-        buffer = struct.pack("<f", payload[0])
+        # use struct.pack() to packet your data into the payload
         # "<f" means a single little endian (4 byte) float value.
+        buffer = struct.pack("<f", payload[0])
         start_timer = time.monotonic_ns()  # start timer
         result = radio.write(buffer)
         end_timer = time.monotonic_ns()  # end timer
@@ -90,21 +94,24 @@ def master(count=5):  # count = 5 will only transmit 5 packets
         count -= 1
 
 
-def slave(count=5):
-    """Polls the radio and prints the received value. This method expires
-    after 6 seconds of no received transmission"""
+def slave(timeout=6):
+    """Listen for any payloads and print the transaction
+
+    :param int timeout: The number of seconds to wait (with no transmission)
+        until exiting function.
+    """
     radio.startListening()  # put radio into RX mode and power up
 
-    start = time.monotonic()
-    while count and (time.monotonic() - start) < 6:
+    start_timer = time.monotonic()
+    while (time.monotonic() - start_timer) < timeout:
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
-            count -= 1
             # fetch 1 payload from RX FIFO
-            rx = radio.read(radio.payloadSize)
+            buffer = radio.read(radio.payloadSize)
+            # use struct.unpack() to convert the buffer into usable data
             # expecting a little endian float, thus the format string "<f"
-            # rx[:4] truncates padded 0s in case dynamic payloads are disabled
-            payload[0] = struct.unpack("<f", rx[:4])[0]
+            # buffer[:4] truncates padded 0s in case payloadSize was not set
+            payload[0] = struct.unpack("<f", buffer[:4])[0]
             # print details about the received packet
             print(
                 "Received {} bytes on pipe {}: {}".format(
@@ -113,7 +120,7 @@ def slave(count=5):
                     payload[0]
                 )
             )
-            start = time.monotonic()  # reset the timeout timer
+            start_timer = time.monotonic()  # reset the timeout timer
 
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put the nRF24L01 is in TX mode
