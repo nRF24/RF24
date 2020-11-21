@@ -1456,13 +1456,13 @@ void RF24::setPALevel(uint8_t level, bool lnaEnable)
 
     uint8_t setup = read_register(RF_SETUP) & 0xF8;
 
-    if (level > 3) {                        // If invalid level, go to max PA
-        level = (RF24_PA_MAX << 1) + lnaEnable;        // +1 to support the SI24R1 chip extra bit
+    if (level > 3) {                            // If invalid level, go to max PA
+        level = (RF24_PA_MAX << 1) + lnaEnable; // +1 to support the SI24R1 chip extra bit
     } else {
-        level = (level << 1) + lnaEnable;            // Else set level as requested
+        level = (level << 1) + lnaEnable;       // Else set level as requested
     }
 
-    write_register(RF_SETUP, setup |= level);    // Write it to the chip
+    write_register(RF_SETUP, setup |= level);   // Write it to the chip
 }
 
 /****************************************************************************/

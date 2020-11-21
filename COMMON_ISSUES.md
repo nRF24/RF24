@@ -4,15 +4,15 @@
 Before you report undesirable behavior, please make sure that the
 following RF24 configurations match on both receiving and transmitting
 nRF24L01 transceivers:
-1. `setAddressWidth()`
-2. `setChannel()`
-3. `setDataRate()`
-4. `setAutoAck()`
-5. `enableDymanicPayloads()` or `disableDynamicPayloads()`
-6. `enableAckPayload()` or `disableAckPayload()` (requires auto-ack and
+1. `RF24::setAddressWidth()`
+2. `RF24::setChannel()`
+3. `RF24::setDataRate()`
+4. `RF24::setAutoAck()`
+5. `RF24::enableDynamicPayloads()` or `RF24::disableDynamicPayloads()`
+6. `RF24::enableAckPayload()` or `RF24::disableAckPayload()` (requires auto-ack and
    dynamic payloads features)
-7. `setPayloadSize()` (only if `disableDynamicPayloads()` was called)
-8. `setCRClength()` or `disableCRCLength()` (the auto-ack feature
+7. `RF24::setPayloadSize()` (only if the dynamic payloads feature is disabled -- it is disabled by default)
+8. `RF24::setCRCLength()` or `RF24::disableCRC()` (the auto-ack feature
    automatically enables CRC because it is required)
 
 Also, it helps to think of an address as a path (a commonly shared route)
@@ -27,9 +27,9 @@ TX FIFO buffers and the RX FIFO buffers both have a maximum occupancy of
 ## Here are the most common issues and their solutions.
 
 ### write() always returns true after setAutoAck(false)
-Don't disabled the auto-ack feature. write() has no reason to doubt
+Don't disabled the auto-ack feature. RF24::write() has no reason to doubt
 that the payload was delivered if the auto-ack feature is disabled. We
-recommend you read the docs about setAutoAck() before disabling the
+recommend you read the docs about RF24::setAutoAck() before disabling the
 auto-ack feature.
 
 ### write() returns false when the payload was received

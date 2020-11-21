@@ -23,42 +23,92 @@
     #include <DigitalIO.h>
 #endif
 
+
 /**
- * Power Amplifier level.
- *
- * For use with setPALevel()
+ * @defgroup PALevel Power Amplifier level
+ * Power Amplifier level. The units dBm (decibel-milliwatts or dB<sub>mW</sub>)
+ * represents a logarithmic signal loss.
+ * @see RF24::setPALevel()
+ * @see RF24::getPALevel()
+ * @{
  */
 typedef enum {
+    /**
+     * (0) represents:
+     * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
+     * :-------:|:-----------------------------:|:----------------------------:
+     *  -18 dBm | -6 dBm | -12 dBm
+     */
     RF24_PA_MIN = 0,
+
+    /**
+     * (1) represents:
+     * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
+     * :-------:|:-----------------------------:|:----------------------------:
+     *  -12 dBm | 0 dBm | -4 dBm
+     */
     RF24_PA_LOW,
+
+    /**
+     * (2) represents:
+     * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
+     * :-------:|:-----------------------------:|:----------------------------:
+     *  -6 dBm | 3 dBm | 1 dBm
+     */
     RF24_PA_HIGH,
+
+    /**
+     * (3) represents:
+     * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
+     * :-------:|:-----------------------------:|:----------------------------:
+     *  0 dBm | 7 dBm | 4 dBm
+     */
     RF24_PA_MAX,
+
+    /**
+     * (4) This should not be used and remains for backward compatibility.
+     */
     RF24_PA_ERROR
 } rf24_pa_dbm_e;
 
 /**
- * Data rate.  How fast data moves through the air.
- *
- * For use with setDataRate()
+ * @}
+ * @defgroup Datarate datarate
+ * How fast data moves through the air. Units are in bits per second (bps).
+ * @see RF24::setDataRate()
+ * @see RF24::getDataRate()
+ * @{
  */
 typedef enum {
+    /** (0) represents 1 Mbps */
     RF24_1MBPS = 0,
+    /** (1) represents 2 Mbps */
     RF24_2MBPS,
+    /** (2) represents 250 kbps */
     RF24_250KBPS
 } rf24_datarate_e;
 
 /**
- * CRC Length.  How big (if any) of a CRC is included.
- *
- * For use with setCRCLength()
+ * @}
+ * @defgroup CRCLength CRC length
+ * The length of a CRC checksum that is used (if any).<br>Cyclical Redundancy
+ * Checking (CRC) is commonly used to ensure data integrity.
+ * @see RF24::setCRCLength()
+ * @see RF24::getCRCLength()
+ * @see RF24::disableCRC()
+ * @{
  */
 typedef enum {
+    /** (0) represents no CRC checksum is used */
     RF24_CRC_DISABLED = 0,
+    /** (1) represents CRC 8 bit checksum is used */
     RF24_CRC_8,
+    /** (2) represents CRC 16 bit checksum is used */
     RF24_CRC_16
 } rf24_crclength_e;
 
 /**
+ * @}
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
@@ -308,11 +358,11 @@ public:
      * @endcode
      *
      * @return
-     * - True if the payload was delivered successfully and an acknowledgement
+     * - `true` if the payload was delivered successfully and an acknowledgement
      *   (ACK packet) was received. If auto-ack is disabled, then any attempt
      *   to transmit will also return true (even if the payload was not
      *   received).
-     * - False if the payload was sent but was not acknowledged with an ACK
+     * - `false` if the payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      */
@@ -497,9 +547,9 @@ public:
      * @endcode
      *
      * @return
-     * - True if there is a payload available in the top (first out)
+     * - `true` if there is a payload available in the top (first out)
      *   level RX FIFO.
-     * - False if there is nothing available in the RX FIFO because it is
+     * - `false` if there is nothing available in the RX FIFO because it is
      *   empty.
      */
     bool available(uint8_t* pipe_num);
@@ -511,8 +561,8 @@ public:
      * FIFO to store the incoming payload. Remember that each level can hold
      * up to a maximum of 32 bytes.
      * @return
-     * - True if all three 3 levels of the RX FIFO buffers are occupied.
-     * - False if there is one or more levels available in the RX FIFO
+     * - `true` if all three 3 levels of the RX FIFO buffers are occupied.
+     * - `false` if there is one or more levels available in the RX FIFO
      *   buffers. Remember that this does not always mean that the RX FIFO
      *   buffers are empty; use available() to see if the RX FIFO buffers are
      *   empty or not.
@@ -561,11 +611,11 @@ public:
      * (true). Be sure to have called enableDynamicAck() at least once before
      * setting this parameter.
      * @return
-     * - True if the payload was delivered successfully and an acknowledgement
+     * - `true` if the payload was delivered successfully and an acknowledgement
      *   (ACK packet) was received. If auto-ack is disabled, then any attempt
      *   to transmit will also return true (even if the payload was not
      *   received).
-     * - False if the payload was sent but was not acknowledged with an ACK
+     * - `false` if the payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      *
@@ -607,11 +657,11 @@ public:
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @return
-     * - True if the payload was delivered successfully and an acknowledgement
+     * - `true` if the payload was delivered successfully and an acknowledgement
      *   (ACK packet) was received. If auto-ack is disabled, then any attempt
      *   to transmit will also return true (even if the payload was not
      *   received).
-     * - False if the payload was sent but was not acknowledged with an ACK
+     * - `false` if the payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      *
@@ -639,12 +689,10 @@ public:
      * (true). Be sure to have called enableDynamicAck() at least once before
      * setting this parameter.
      * @return
-     * - True if the payload was delivered successfully and an acknowledgement
-     *   (ACK packet) was received. If auto-ack is disabled, then any attempt
-     *   to transmit will also return true (even if the payload was not
-     *   received).
-     * - False if the payload was sent but was not acknowledged with an ACK
-     *   packet. This condition can only be reported if the auto-ack feature
+     * - `true` if the payload passed to @a buf was loaded in the TX FIFO.
+     * - `false` if the payload passed to @a buf was not loaded in the TX FIFO
+     *   because a previous payload already in the TX FIFO failed to
+     *   transmit. This condition can only be reported if the auto-ack feature
      *   is on.
      *
      * @note The @a len parameter must be omitted when using the python
@@ -692,12 +740,10 @@ public:
      * @endcode
      *
      * @return
-     * - True if all payloads in the TX FIFO were delivered successfully and
-     *   an acknowledgement (ACK packet) was received for each. If auto-ack is
-     *   disabled, then any attempt to transmit will also return true (even if
-     *   the payload was not received).
-     * - False if a payload was sent but was not acknowledged with an ACK
-     *   packet. This condition can only be reported if the auto-ack feature
+     * - `true` if the payload passed to @a buf was loaded in the TX FIFO.
+     * - `false` if the payload passed to @a buf was not loaded in the TX FIFO
+     *   because a previous payload already in the TX FIFO failed to
+     *   transmit. This condition can only be reported if the auto-ack feature
      *   is on.
      */
     bool writeBlocking(const void* buf, uint8_t len, uint32_t timeout);
@@ -725,11 +771,11 @@ public:
      * @endcode
      * @see txStandBy(unsigned long timeout)
      * @return
-     * - True if all payloads in the TX FIFO were delivered successfully and
+     * - `true` if all payloads in the TX FIFO were delivered successfully and
      *   an acknowledgement (ACK packet) was received for each. If auto-ack is
      *   disabled, then any attempt to transmit will also return true (even if
      *   the payload was not received).
-     * - False if a payload was sent but was not acknowledged with an ACK
+     * - `false` if a payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      */
@@ -752,11 +798,11 @@ public:
      * in TX Mode. `false` leaves the primary mode (TX or RX) as it is, which can
      * prevent the mandatory wait time to change modes.
      * @return
-     * - True if all payloads in the TX FIFO were delivered successfully and
+     * - `true` if all payloads in the TX FIFO were delivered successfully and
      *   an acknowledgement (ACK packet) was received for each. If auto-ack is
      *   disabled, then any attempt to transmit will also return true (even if
      *   the payload was not received).
-     * - False if a payload was sent but was not acknowledged with an ACK
+     * - `false` if a payload was sent but was not acknowledged with an ACK
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      */
@@ -800,8 +846,8 @@ public:
      * @endcode
      *
      * @return
-     * - true if the payload was loaded into the TX FIFO.
-     * - false if the payload wasn't loaded into the TX FIFO because it is
+     * - `true` if the payload was loaded into the TX FIFO.
+     * - `false` if the payload wasn't loaded into the TX FIFO because it is
      *   already full or the ACK payload feature is not enabled using
      *   enableAckPayload().
      */
@@ -901,9 +947,9 @@ public:
      * setting this parameter.
      *
      * @return
-     * - true if payload was written to the TX FIFO buffers and the
+     * - `true` if payload was written to the TX FIFO buffers and the
      *   transmission was started.
-     * - false if the TX FIFO is full and the payload could not be written. In
+     * - `false` if the TX FIFO is full and the payload could not be written. In
      *   this condition, the transmission process is restarted.
      * @note The @a len parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
@@ -1306,6 +1352,8 @@ public:
      * @see startFastWrite()
      * @see startWrite()
      * @see writeAckPayload()
+     * @see enableAckPayloads()
+     * @see disableAckPayloads()
      *
      * @param pipe Which pipe to configure. This number should be in range
      * [0, 5].
@@ -1315,27 +1363,29 @@ public:
     void setAutoAck(uint8_t pipe, bool enable);
 
     /**
-     * Set Power Amplifier (PA) level to one of four levels:
-     * RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH and RF24_PA_MAX
+     * Set Power Amplifier (PA) level and Low Noise Amplifier (LNA) state
      *
-     * The power levels correspond to the following output levels respectively:
-     * NRF24L01: -18dBm, -12dBm,-6dBM, and 0dBm, lnaEnable affects modules with LNA
+     * @param level The desired @ref PALevel as defined by @ref rf24_pa_dbm_e.
+     * @param lnaEnable Enable or Disable the LNA (Low Noise Amplifier) Gain.
+     * See table for Si24R1 modules below.<br> @p lnaEnable only affects
+     * nRF24L01 modules with an LNA chip.
      *
-     * SI24R1: -6dBm, 0dBm, 3dBm and 7dBm with lnaEnable = 1
-     *        -12dBm,-4dBm, 1dBm and 4dBm with lnaEnable = 0
+     * | @p level (enum value) | nRF24L01<br>description | Si24R1<br>description when<br> @p lnaEnable = 1 | Si24R1<br>description when<br> @p lnaEnable = 0 |
+     * |:---------------------:|:-------:|:--------:|:-------:|
+     * | @ref RF24_PA_MIN (0)  | -18 dBm |  -6 dBm  | -12 dBm |
+     * | @ref RF24_PA_LOW (1)  | -12 dBm |  -0 dBm  | -4 dBm  |
+     * | @ref RF24_PA_HIGH (2) | -6 dBm  |  3 dBm   | 1 dBm   |
+     * | @ref RF24_PA_MAX (3)  |  0 dBm  |  7 dBm   | 4 dBm   |
      *
-     * @param level Desired PA level.
-     * @param lnaEnable En/Disable LNA Gain
+     * @note The getPALevel() function does not care what was passed @p lnaEnable parameter.
      */
     void setPALevel(uint8_t level, bool lnaEnable = 1);
 
     /**
-     * Fetches the current PA level.
+     * Fetches the current @ref PALevel.
      *
-     * NRF24L01: -18dBm, -12dBm, -6dBm and 0dBm
-     * SI24R1:   -6dBm, 0dBm, 3dBm, 7dBm
-     *
-     * @return Returns values 0 to 3 representing the PA Level.
+     * @return One of the values defined by @ref rf24_pa_dbm_e.<br>
+     * See tables in @ref rf24_pa_dbm_e or setPALevel()
      */
     uint8_t getPALevel(void);
 
@@ -1349,35 +1399,48 @@ public:
     uint8_t getARC(void);
 
     /**
-     * Set the transmission data rate
+     * Set the transmission @ref Datarate
      *
-     * @warning setting RF24_250KBPS will fail for non-plus units
+     * @warning setting @ref RF24_250KBPS will fail for non-plus modules (when
+     * isPVariant() returns false).
      *
-     * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+     * @param speed Specify one of the following values (as defined by
+     * @ref rf24_datarate_e):
+     * | @p speed (enum value) | description |
+     * |:---------------------:|:-----------:|
+     * | @ref RF24_1MBPS (0)   | for 1 Mbps  |
+     * | @ref RF24_2MBPS (1)   | for 2 Mbps  |
+     * | @ref RF24_250KBPS (2) | for 250 kbs |
+     *
      * @return true if the change was successful
      */
     bool setDataRate(rf24_datarate_e speed);
 
     /**
-     * Fetches the transmission data rate
+     * Fetches the currently configured transmission @ref Datarate
      *
-     * @return Returns the hardware's currently configured datarate. The value
-     * is one of 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS, as defined in the
-     * rf24_datarate_e enum.
+     * @return One of the values defined by @ref rf24_datarate_e.<br>
+     * See table in @ref rf24_datarate_e or setDataRate()
      */
     rf24_datarate_e getDataRate(void);
 
     /**
-     * Set the CRC length
-     * <br>CRC checking cannot be disabled if auto-ack is enabled
-     * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
+     * Set the @ref CRCLength (in bits)
+     * <br>CRC cannot be disabled if auto-ack is enabled
+     * @param length Specify one of the values (as defined by @ref rf24_crclength_e)
+     * | @p length (enum value)     | description                    |
+     * |:--------------------------:|:------------------------------:|
+     * | @ref RF24_CRC_DISABLED (0) | to disable using CRC checksums |
+     * | @ref RF24_CRC_8 (1)        | to use 8-bit checksums         |
+     * | @ref RF24_CRC_16 (2)       | to use 16-bit checksums        |
      */
     void setCRCLength(rf24_crclength_e length);
 
     /**
-     * Get the CRC length
+     * Get the @ref CRCLength (in bits)
      * <br>CRC checking cannot be disabled if auto-ack is enabled
-     * @return RF24_CRC_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
+     * @return One of the values defined by @ref rf24_crclength_e.<br>
+     * See table in @ref rf24_crclength_e or setCRCLength()
      */
     rf24_crclength_e getCRCLength(void);
 
@@ -2022,19 +2085,19 @@ private:
  * v1.3.9
  * - Fix broken compilation for some devices due to recent changes
  * v1.3.8
- * - Introduces change that mainly reduces the time required to call startListening(), powerUp(), and powerDown()
+ * - Introduces change that mainly reduces the time required to call RF24::startListening(), RF24::powerUp(), and RF24::powerDown()
  * - Affects speed of switching from TX->RX. Users might consider starting updates of slower devices with this<br>
  *   release to prevent missed packets when similar changes are introduced, affecting switching from RX->TX
- * - Clean up begin() function (reduce program size)
+ * - Clean up RF24::begin() function (reduce program size)
  *
  * v1.3.7
- * - Bug fix for writeFast() function affecting RF24 stack (all RF24 libraries)
+ * - Bug fix for RF24::writeFast() function affecting RF24 stack (all RF24 libraries)
  * - Unify Arduino & Linux constructor. Accept SPI speed in Hz as optional parameter
  * - Removal of BCM2835 SPI speed constants due to removal from BCM library
  * - Update to latest BCM2835 driver
  * - Bug fix for RPi millis() code
  * - Added Constant Carrier Wave functionality & added to scanner example
- * - Modify setPALevel() to allow setting LNA gain via optional parameter
+ * - Modify RF24::setPALevel() to allow setting LNA gain via optional parameter
  * - Cleanup of warnings, errors and old files
  *
  * **March-July 2020**
@@ -2048,11 +2111,11 @@ private:
  * @section Useful Useful References
  *
  *
- * @li <a href="http://nRF24.github.io/RF24/classRF24.html"><b>RF24 Class Documentation</b></a>
- * @li <a href="http://nRF24.github.io/RF24/pages.html"><b>Support & Configuration</b></a>
+ * @li <a href="classRF24.html"><b>RF24 Class Documentation</b></a>
+ * @li <a href="pages.html"><b>Support & Configuration</b></a>
  * @li <a href="https://github.com/nRF24/RF24/"><b>Source Code</b></a>
- * @li <a href="http://tmrh20.github.io/RF24/tmrh20/nRF24L01_datasheet_v2.pdf">nrf24L01 v2.0 Datasheet</a>
- * @li <a href="http://tmrh20.github.io/RF24/tmrh20/nRF24L01P_datasheet_v1.pdf">nrf24L01+ v1.0 Datasheet</a>
+ * @li <a href="http://github.com/nRF24/RF24/datasheets/nRF24L01_datasheet_v2.pdf">nRF24L01 v2.0 Datasheet</a>
+ * @li <a href="http://github.com/nRF24/RF24/datasheets/nRF24L01P_datasheet_v1.pdf">nRF24L01+ v1.0 Datasheet</a>
  *
  * **Additional Information and Add-ons**
  *

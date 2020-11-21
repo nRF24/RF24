@@ -801,4 +801,15 @@ dl.bug {
 .caption {
     font-weight: bold;
 }
+td.fielddoc
+th.markdownTableHeadLeft,
+th.markdownTableHeadRight,
+th.markdownTableHeadCenter,
+th.markdownTableHeadNone {
+    background-image: none;
+    border-radius: unset;
+}
 
+td.fielddoc tr:last-child {
+    border-bottom: 1px solid #2D4068;
+}

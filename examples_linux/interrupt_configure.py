@@ -17,8 +17,11 @@ from RF24 import RF24, RF24_PA_LOW
 
 # Generic:
 radio = RF24(22, 0)
-# RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
-# set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
+################## Linux (BBB,x86,etc) #########################
+# See http://tmrh20.github.io/RF24/pages.html for more information on usage
+# See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
+# See https://www.kernel.org/doc/Documentation/spi/spidev for more
+# information on SPIDEV
 
 # select your digital input pin that's connected to the IRQ pin on the nRF24L01
 IRQ_PIN = 12

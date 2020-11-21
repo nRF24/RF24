@@ -20,8 +20,11 @@ from RF24 import RF24, RF24_PA_LOW
 
 # Generic:
 radio = RF24(22, 0)
-# RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and
-# set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
+################## Linux (BBB,x86,etc) #########################
+# See http://tmrh20.github.io/RF24/pages.html for more information on usage
+# See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
+# See https://www.kernel.org/doc/Documentation/spi/spidev for more
+# information on SPIDEV
 
 # using the python keyword global is bad practice. Instead we'll use a 1 item
 # list to store our integer number for the payloads' counter
@@ -141,8 +144,12 @@ def slave(timeout=6):
             # use bytes() to pack our counter data into the payload
             # NOTE b"\x00" byte is a c-string's NULL terminating 0
             buffer = b"World \x00" + bytes(counter)
-            # save response's result
-            result = radio.write(buffer)
+            radio.stopListening()  # put radio in TX mode
+            radio.writeFast(buffer)  # load response into TX FIFO
+            # keep retrying to send response for 150 milliseconds
+            result = radio.txStandBy(150)  # save response's result
+            # NOTE txStandBy() flushes TX FIFO on transmission failure
+            radio.startListening()  # put radio back in RX mode
             # print the payload received payload
             print(
                 "Received {} bytes on pipe {}: {}{}.".format(
