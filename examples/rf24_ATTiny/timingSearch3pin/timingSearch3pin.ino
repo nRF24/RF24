@@ -94,7 +94,7 @@ void write_register(uint8_t reg, uint8_t value)
 /****************************************************************************/
 void setup(void) {
 
-  #ifndef __AVR_ATtinyX313__
+#ifndef __AVR_ATtinyX313__
   // not enough memory on ATTiny4313 or ATTint2313(a) to use Serial I/O for this sketch
 
   // start serial port and SPI
@@ -200,7 +200,7 @@ void setup(void) {
   Serial.print(" csnLow=");
   Serial.println(advice[1], DEC);
 
-  #endif // not defined __AVR_ATtinyX313__
+#endif // not defined __AVR_ATtinyX313__
 }
 
 
