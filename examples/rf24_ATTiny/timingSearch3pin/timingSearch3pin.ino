@@ -200,7 +200,7 @@ void setup(void) {
   Serial.print(" csnLow=");
   Serial.println(advice[1], DEC);
 
-#endif // not defined __AVR_ATtinyX313__
+  #endif // not defined __AVR_ATtinyX313__
 }
 
 
