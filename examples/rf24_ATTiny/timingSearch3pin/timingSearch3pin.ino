@@ -94,6 +94,9 @@ void write_register(uint8_t reg, uint8_t value)
 /****************************************************************************/
 void setup(void) {
 
+  #ifndef __AVR_ATtinyX313__
+  // not enough memory on ATTiny4313 or ATTint2313(a) to use Serial I/O for this sketch
+
   // start serial port and SPI
   Serial.begin(115200);
   SPI.begin();
@@ -145,7 +148,7 @@ void setup(void) {
       csnLowSettle = limit[1];
       // check current values
       uint8_t i = 0;
-      while (i < 255 & success) {
+      while (i < 255 && success) {
         for (uint8_t j = 0; j < 2; j++) {
           write_register(EN_AA, value[j]);
           result = read_register(EN_AA);
@@ -196,6 +199,8 @@ void setup(void) {
   Serial.print(advice[0], DEC);
   Serial.print(" csnLow=");
   Serial.println(advice[1], DEC);
+
+#endif // not defined __AVR_ATtinyX313__
 }
 
 
