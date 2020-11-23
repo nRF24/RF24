@@ -1,135 +1,72 @@
+/**
+ * See documentation at https://tmrh20.github.io/RF24
+ * See License information at root directory of this library
+ * written by tong67 (https://github.com/tong67)
+ * edited by 2bndy5 (http://github.com/2bndy5) for compatibility with SpenceKonde's ATTinyCore
+ */
+
 /*
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  version 2 as published by the Free Software Foundation.
-
-    timingSearch3pin.ino by tong67 ( https://github.com/tong67 )
-    This sketch can be used to determine the best settleTime values to use in RF24::csn().
-	The used settleTimeValues are 100/20. Depend on used RC combiniation and voltage drop by LED.
-    It is setup to be completely selfcontained, copied defines and code from RF24 library.
-    The ATtiny85 uses the tiny-core by CodingBadly (https://code.google.com/p/arduino-tiny/)
-	(Intermediate) results are written to TX (PB3, pin 2). For schematic see rf24ping85.ino
-*/
-
-#include <nRF24L01.h>
-/****************************************************************************/
-
-//ATTiny support code pulled in from https://github.com/jscrane/RF24
-#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-// see http://gammon.com.au/spi
-#	define DI   0  // D0, pin 5  Data In
-#	define DO   1  // D1, pin 6  Data Out (this is *not* MOSI)
-#	define USCK 2  // D2, pin 7  Universal Serial Interface clock
-#	define SS   3  // D3, pin 2  Slave Select
-#elif defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-// these depend on the core used (check pins_arduino.h)
-// this is for jeelabs' one (based on google-code core)
-#	define DI   4   // PA6
-#	define DO   5   // PA5
-#	define USCK 6   // PA4
-#	define SS   3   // PA7
-#endif
-
-#if defined (ARDUINO) && !defined (__arm__)
-#if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-#define RF24_TINY
-#else
-//		#include <SPI.h>
-#endif
-#endif
+ * This sketch can be used to determine the best settle time values to use for
+ * RF24::csDelay in RF24::csn().
+ * The settle time values used here are 100/20. However, these values depend
+ * on the actual used RC combiniation and voltage drop by LED. The
+ * intermediate results are written to TX (PB3, pin 2 -- using Serial).
+ *
+ * For schematic details, see introductory comment block in the
+ * examples/rf24_ATTiny/rf24ping85/rf24ping85.ino sketch.
+ */
 
 #include <stdio.h>
-#if defined(RF24_TINY)
+#include <SPI.h>
 #include <Arduino.h>
-#include <avr/pgmspace.h>
+#include <nRF24L01.h>
 
-#define SPI_CLOCK_DIV4 0x00
-#define SPI_CLOCK_DIV16 0x01
-#define SPI_CLOCK_DIV64 0x02
-#define SPI_CLOCK_DIV128 0x03
-#define SPI_CLOCK_DIV2 0x04
-#define SPI_CLOCK_DIV8 0x05
-#define SPI_CLOCK_DIV32 0x06
-//#define SPI_CLOCK_DIV64 0x07
 
-#define SPI_MODE0 0x00
-#define SPI_MODE1 0x04
-#define SPI_MODE2 0x08
-#define SPI_MODE3 0x0C
-
-#define SPI_MODE_MASK 0x0C  // CPOL = bit 3, CPHA = bit 2 on SPCR
-#define SPI_CLOCK_MASK 0x03  // SPR1 = bit 1, SPR0 = bit 0 on SPCR
-#define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
-
-class SPIClass {
-  public:
-    static byte transfer(byte _data);
-
-    // SPI Configuration methods
-
-    inline static void attachInterrupt();
-    inline static void detachInterrupt(); // Default
-
-    static void begin(); // Default
-    static void end();
-
-    //  static void setBitOrder(uint8_t);
-    //  static void setDataMode(uint8_t);
-    //  static void setClockDivider(uint8_t);
-};
-extern SPIClass SPI;
-
-void SPIClass::begin() {
-  digitalWrite(SS, HIGH);
-  pinMode(USCK, OUTPUT);
-  pinMode(DO, OUTPUT);
-  pinMode(SS, OUTPUT);
-  pinMode(DI, INPUT);
-  USICR = _BV(USIWM0);
-}
-
-byte SPIClass::transfer(byte b) {
-  USIDR = b;
-  USISR = _BV(USIOIF);
-  do
-    USICR = _BV(USIWM0) | _BV(USICS1) | _BV(USICLK) | _BV(USITC);
-  while ((USISR & _BV(USIOIF)) == 0);
-  return USIDR;
-}
-
-void SPIClass::end() {}
-
-#endif /* RF24_TINY */
+#if defined (ARDUINO) && !defined (__arm__)
+#if defined(__AVR_ATtinyX5__) || defined(__AVR_ATtinyX4__)
+#define RF24_TINY
+#endif
+#endif
 
 /****************************************************************************/
-uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-uint8_t csn_pin; /**< SPI Chip select */
-uint8_t csnHighSettle = 255;
-uint8_t csnLowSettle = 255;
+
+#if defined(RF24_TINY)
+
+// when Attiny84 or Attiny85 is detected
+#define CE_PIN   3 /** "Chip Enable" pin, activates the RX or TX role */
+#define CSN_PIN  3 /** SPI Chip Select Not */
+
+#else
+// when not running on an ATTiny84 or ATTiny85
+#define CE_PIN   7 /** "Chip Enable" pin, activates the RX or TX role */
+#define CSN_PIN  8 /** SPI Chip Select Not */
+
+#endif
+
+#define MAX_HIGH	100
+#define MAX_LOW		100
+#define MINIMAL		8
+
+uint8_t csnHighSettle = MAX_HIGH;
+uint8_t csnLowSettle = MAX_LOW;
+uint8_t status; // for storing the status byte captured over MISO
+
 /****************************************************************************/
 void ce(bool level) {
-  if (ce_pin != csn_pin) digitalWrite(ce_pin, level);
+  if (CE_PIN != CSN_PIN) digitalWrite(CE_PIN, level);
 }
 
-/****************************************************************************/
-void setCsnHighSettle(uint8_t level) {
-  csnHighSettle = level;
-}
-
-/****************************************************************************/
-void setCsnLowSettle(uint8_t level) {
-  csnLowSettle = level;
-}
 /****************************************************************************/
 void csn(bool mode) {
-  if (ce_pin != csn_pin) {
-    digitalWrite(csn_pin, mode);
+  if (CE_PIN != CSN_PIN) {
+    digitalWrite(CSN_PIN, mode);
   } else {
+    digitalWrite(SCK, mode);
     if (mode == HIGH) {
-      PORTB |= (1 << PINB2);  	// SCK->CSN HIGH
-      delayMicroseconds(csnHighSettle);  // allow csn to settle
+      // SCK->CSN HIGH
+      delayMicroseconds(csnHighSettle); // allow csn to settle
     } else {
-      PORTB &= ~(1 << PINB2);	// SCK->CSN LOW
+      // SCK->CSN LOW
       delayMicroseconds(csnLowSettle);  // allow csn to settle
     }
   }
@@ -139,78 +76,57 @@ void csn(bool mode) {
 uint8_t read_register(uint8_t reg)
 {
   csn(LOW);
-  SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
+  status = SPI.transfer(R_REGISTER | reg);
   uint8_t result = SPI.transfer(0xff);
   csn(HIGH);
   return result;
 }
 
 /****************************************************************************/
-uint8_t write_register2(uint8_t reg, uint8_t value)
+void write_register(uint8_t reg, uint8_t value)
 {
-  uint8_t status;
-
   csn(LOW);
-  status = SPI.transfer( W_REGISTER | ( REGISTER_MASK & reg ) );
+  status = SPI.transfer(W_REGISTER | reg);
   SPI.transfer(value);
   csn(HIGH);
-  return status;
 }
 
 /****************************************************************************/
-#if defined(RF24_TINY)
-#define CE_PIN   3
-#define CSN_PIN  3
-#else
-#define CE_PIN   7
-#define CSN_PIN  8
-#endif
-
-#define MAX_HIGH	100
-#define MAX_LOW		100
-#define MINIMAL		8
-
 void setup(void) {
-  uint8_t status;
 
   // start serial port and SPI
-  Serial.begin(9600);
+  Serial.begin(115200);
   SPI.begin();
+  // configure CE and CSN as output when used
+  pinMode(CE_PIN, OUTPUT);
+  if (CSN_PIN != CE_PIN)
+    pinMode(CSN_PIN, OUTPUT);
 
-  // configure ce and scn as output when used
-  ce_pin = CE_PIN;
-  csn_pin = CSN_PIN;
-
-  setCsnHighSettle(MAX_HIGH);
-  setCsnLowSettle(MAX_LOW);
   // csn is used in SPI transfers. Set to LOW at start and HIGH after transfer. Set to HIGH to reflect no transfer active
   // SPI command are accepted in Power Down state.
-  // ce represent PRX (LOW) or PTX (HIGH) mode apart from register settings. Start in PRX mode.
+  // CE pin represent PRX (LOW) or PTX (HIGH) mode apart from register settings. Start in PRX mode.
   ce(LOW);
   csn(HIGH);
 
   // nRF24L01 goes from to Power Down state 100ms after Power on Reset ( Vdd > 1.9V) or when PWR_UP is 0 in config register
   // Goto Power Down state (Powerup or force) and set in transmit mode
-  write_register2(NRF_CONFIG, read_register(NRF_CONFIG) & ~_BV(PWR_UP) & ~_BV(PRIM_RX));
+  write_register(NRF_CONFIG, read_register(NRF_CONFIG) & ~_BV(PWR_UP) & ~_BV(PRIM_RX));
   delay(100);
 
   // Goto Standby-I
   // Technically we require 4.5ms Tpd2stby+ 14us as a worst case. We'll just call it 5ms for good measure.
   // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
-  write_register2(NRF_CONFIG, read_register(NRF_CONFIG) | _BV(PWR_UP));
+  write_register(NRF_CONFIG, read_register(NRF_CONFIG) | _BV(PWR_UP));
   delay(5) ;
 
   // Goto Standby-II
   ce(HIGH);
-  Serial.print("Scanning for optimal setting time for scn");
-}
+  Serial.print("Scanning for optimal setting time for csn");
 
 
-void loop(void) {
-  uint8_t status;
-  uint8_t i;
-  uint8_t j;
-  uint8_t k;
+  /************************** Main program *********************************/
+
+  uint8_t result; // used to compare read/write results with read/write cmds
   bool success = true;
   uint8_t csnHigh = MAX_HIGH;
   uint8_t csnLow = MAX_LOW;
@@ -221,19 +137,19 @@ void loop(void) {
   uint8_t advice[] = {MAX_HIGH, MAX_LOW};
 
   // check max values give correct behavior
-  for (k = 0; k < 2; k++) {
+  for (uint8_t k = 0; k < 2; k++) {
     bottom_found = false;
     bottom_success = 0;
     while (bottom_success < 255) {
-      setCsnHighSettle(limit[0]);
-      setCsnLowSettle(limit[1]);
+      csnHighSettle = limit[0];
+      csnLowSettle = limit[1];
       // check current values
-      i = 0;
+      uint8_t i = 0;
       while (i < 255 & success) {
-        for (j = 0; j < 2; j++) {
-          write_register2(EN_AA, value[j]);
-          status = read_register(EN_AA);
-          if (value[j] != status) {
+        for (uint8_t j = 0; j < 2; j++) {
+          write_register(EN_AA, value[j]);
+          result = read_register(EN_AA);
+          if (value[j] != result) {
             success = false;
           }
         }
@@ -241,7 +157,7 @@ void loop(void) {
       }
       // process result of current values
       if (!success) {
-        Serial.print("Settle NOK. csnHigh=");
+        Serial.print("Settle Not OK. csnHigh=");
         Serial.print(limit[0], DEC);
         Serial.print(" csnLow=");
         Serial.println(limit[1], DEC);
@@ -276,12 +192,11 @@ void loop(void) {
     advice[k] = limit[k] + (limit[k] / 10);
     limit[k] = 100;
   }
-  Serial.print("Adviced Settle times are: csnHigh=");
+  Serial.print("Advised Settle times are: csnHigh=");
   Serial.print(advice[0], DEC);
   Serial.print(" csnLow=");
   Serial.println(advice[1], DEC);
-  while (true)
-  {
-    ;
-  }
 }
+
+
+void loop(void) {} // this program runs only once, thus it resides in setup()

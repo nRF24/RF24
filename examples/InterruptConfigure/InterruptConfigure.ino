@@ -10,7 +10,7 @@
  * configured to detect when data is received, or when data has transmitted
  * successfully, or when data has failed to transmit.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 #include <SPI.h>

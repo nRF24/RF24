@@ -9,7 +9,8 @@
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used up to 6 devices acting as TX nodes &
+ * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()

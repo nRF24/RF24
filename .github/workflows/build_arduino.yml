@@ -5,14 +5,13 @@ on:
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
-      - "!examples/Usage/pingpair_maple/**"
+      - "!examples/old_backups/recipes/pingpair_maple/**"
 
   push:
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
-      - "!examples/Usage/pingpair_maple/**"
-      # - "!examples/rf24_ATTiny/timingSearch3pin/**"
+      - "!examples/old_backups/recipes/pingpair_maple/**"
 
 jobs:
   check_formatting:
@@ -98,8 +97,6 @@ jobs:
             - examples/StreamingData
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
-          #   - examples/rf24_ATTiny/rf24ping85
-          #   - examples/old_backups/GettingStarted_HandlingData
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn
           #   - examples/old_backups/pingpair_irq
@@ -156,5 +153,5 @@ jobs:
             - name: "arduino:avr"
           sketch-paths: |
             - examples/rf24_ATTiny/rf24ping85
-          #  - examples/rf24_ATTiny  #timingSearch3pin example redefines SPI functions
+            - examples/rf24_ATTiny/timingSearch3pin
           fqbn: ${{ matrix.fqbn }}

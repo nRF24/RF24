@@ -1764,8 +1764,8 @@ private:
 
 /**
  * @example{lineno} examples/GettingStarted/GettingStarted.ino
- * <b>For Arduino</b><br>
- * <b>Re-written by 2bndy5 2020 </b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
  * This example was written to be used on 2 devices acting as "nodes".
@@ -1774,8 +1774,8 @@ private:
 
 /**
  * @example{lineno} examples/AcknowledgementPayloads/AcknowledgementPayloads.ino
- * <b>For Arduino</b><br>
- * <b>Written by 2bndy5 2020 </b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
  *
@@ -1785,8 +1785,8 @@ private:
 
 /**
  * @example{lineno} examples/ManualAcknowledgements/ManualAcknowledgements.ino
- * <b>For Arduino</b><br>
- * <b>Written by 2bndy5 2020 </b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
  * This example still uses ACK packets, but they have no payloads. Instead the
@@ -1801,8 +1801,8 @@ private:
 
 /**
  * @example{lineno} examples/StreamingData/StreamingData.ino
- * <b>For Arduino</b><br>
- * <b>Written by 2bndy5 2020 </b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * A simple example of streaming data from 1 nRF24L01 transceiver to another.
  *
  * This example was written to be used on 2 devices acting as "nodes".
@@ -1811,20 +1811,21 @@ private:
 
 /**
  * @example{lineno} examples/MulticeiverDemo/MulticeiverDemo.ino
- * <b>For Arduino</b><br>
- * <b>Written by 2bndy5 2020 </b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * A simple example of sending data from as many as 6 nRF24L01 transceivers to
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used on 2 devices acting as "nodes".
+ * This example was written to be used up to 6 devices acting as TX nodes &
+ * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use the Serial Monitor to change each node's behavior.
  */
 
 /**
  * @example{lineno} examples/InterruptConfigure/InterruptConfigure.ino
- * <b>For Arduino</b><br>
- * <b>Written by 2bndy5 2020 </b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * This example uses Acknowledgement (ACK) payloads attached to ACK packets to
  * demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
  * configured to detect when data is received, or when data has transmitted
@@ -1835,25 +1836,20 @@ private:
  */
 
 /**
-* @example{lineno} examples/old_backups/GettingStarted_HandlingData/GettingStarted_HandlingData.ino
-* <b>Dec 2014 - TMRh20</b><br>
-*
-* This example demonstrates how to send multiple variables in a single payload and work with data. As usual, it is
-* generally important to include an incrementing value like millis() in the payloads to prevent errors.
-*/
-
-/**
-* @example{lineno} examples/old_backups/GettingStarted_HandlingFailures/GettingStarted_HandlingFailures.ino
-*
-* This example demonstrates the basic getting started functionality, but with failure handling for the radio chip.
-* Addresses random radio failures etc, potentially due to loose wiring on breadboards etc.
-*/
+ * @example{lineno} examples/old_backups/GettingStarted_HandlingFailures/GettingStarted_HandlingFailures.ino
+ * Written by [TMRh20](http://github.com/TMRh20) in 2019
+ *
+ * This example demonstrates the basic getting started functionality, but with
+ * failure handling for the radio chip. Addresses random radio failures etc,
+ * potentially due to loose wiring on breadboards etc.
+ */
 
 /**
  * @example{lineno} examples/old_backups/TransferTimeouts/TransferTimeouts.ino
- * <b>New: TMRh20 </b><br>
+ * Written by [TMRh20](https://github.com/TMRh20)
+ *
  * This example demonstrates the use of and extended timeout period and
- * auto-retries/auto-reUse to increase reliability in noisy or low signal scenarios. <br>
+ * auto-retries/auto-reUse to increase reliability in noisy or low signal scenarios.
  *
  * Write this sketch to two different nodes.  Put one of the nodes into 'transmit'
  * mode by connecting with the serial monitor and sending a 'T'.  The data <br>
@@ -1863,7 +1859,8 @@ private:
 
 /**
  * @example{lineno} examples/old_backups/pingpair_irq/pingpair_irq.ino
- * <b>Update: TMRh20</b><br>
+ * Updated by [TMRh20](https://github.com/TMRh20)
+ *
  * This is an example of how to user interrupts to interact with the radio, and a demonstration
  * of how to use them to sleep when receiving, and not miss any payloads.<br>
  * The pingpair_sleepy example expands on sleep functionality with a timed sleep option for the transmitter.
@@ -1872,7 +1869,8 @@ private:
 
 /**
  * @example{lineno} examples/old_backups/pingpair_sleepy/pingpair_sleepy.ino
- * <b>Update: TMRh20</b><br>
+ * Updated by [TMRh20](https://github.com/TMRh20)
+ *
  * This is an example of how to use the RF24 class to create a battery-
  * efficient system.  It is just like the GettingStarted_CallResponse example, but the<br>
  * ping node powers down the radio and sleeps the MCU after every
@@ -1881,16 +1879,45 @@ private:
 
 /**
  * @example{lineno} examples/rf24_ATTiny/rf24ping85/rf24ping85.ino
- * <b>New: Contributed by https://github.com/tong67</b><br>
- * This is an example of how to use the RF24 class to communicate with
- * ATtiny85 and other node.
+ * <b>2014 Contribution by [tong67](https://github.com/tong67)</b><br>
+ * Updated 2020 by [2bndy5](http://github.com/2bndy5) for the
+ * [SpenceKonde ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)<br>
+ * The RF24 library uses the [ATTinyCore by
+ * SpenceKonde](https://github.com/SpenceKonde/ATTinyCore)
+ *
+ * This sketch is a duplicate of the ManualAcknowledgements.ino example
+ * (without all the Serial input/output code), and it demonstrates
+ * a ATTiny25/45/85 or ATTiny24/44/84 driving the nRF24L01 transceiver using
+ * the RF24 class to communicate with another node.
+ *
+ * A simple example of sending data from 1 nRF24L01 transceiver to another
+ * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
+ * This example still uses ACK packets, but they have no payloads. Instead the
+ * acknowledging response is sent with `write()`. This tactic allows for more
+ * updated acknowledgement payload data, where actual ACK payloads' data are
+ * outdated by 1 transmission because they have to loaded before receiving a
+ * transmission.
+ *
+ * This example was written to be used on 2 devices acting as "nodes".
  */
 
 /**
  * @example{lineno} examples/rf24_ATTiny/timingSearch3pin/timingSearch3pin.ino
- * <b>New: Contributed by https://github.com/tong67</b><br>
- * This is an example of how to determine the correct timing for ATtiny when
- * using only 3-pins
+ * <b>2014 Contribution by [tong67](https://github.com/tong67)</b><br>
+ * Updated 2020 by [2bndy5](http://github.com/2bndy5) for the
+ * [SpenceKonde ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)<br>
+ * The RF24 library uses the [ATTinyCore by
+ * SpenceKonde](https://github.com/SpenceKonde/ATTinyCore)
+ *
+ * This sketch can be used to determine the best settle time values to use for
+ * RF24::csDelay in RF24::csn() (private function).
+ * @see RF24::csDelay
+ *
+ * The settle time values used here are 100/20. However, these values depend
+ * on the actual used RC combiniation and voltage drop by LED. The
+ * intermediate results are written to TX (PB3, pin 2 -- using Serial).
+ *
+ * For schematic details, see introductory comment block in the rf24ping85.ino sketch.
  */
 
 /**
@@ -1901,6 +1928,7 @@ private:
 
 /**
  * @example{lineno} examples_linux/getting_started.py
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi.
  *
@@ -1915,6 +1943,7 @@ private:
 
 /**
  * @example{lineno} examples_linux/acknowledgement_payloads.py
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * transmit and retrieve custom automatic acknowledgment payloads.
@@ -1930,6 +1959,7 @@ private:
 
 /**
  * @example{lineno} examples_linux/manual_acknowledgements.py
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * transmit and respond with acknowledgment (ACK) transmissions. Notice that
@@ -1948,6 +1978,7 @@ private:
 
 /**
  * @example{lineno} examples_linux/streaming_data.py
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi for
  * streaming multiple payloads.
@@ -1963,6 +1994,7 @@ private:
 
 /**
  * @example{lineno} examples_linux/interrupt_configure.py
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * detecting (and verifying) the IRQ (interrupt) pin on the nRF24L01.
@@ -1978,6 +2010,7 @@ private:
 
 /**
  * @example{lineno} examples_linux/multiceiver_demo.py
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi for
  * using 1 nRF24L01 to receive data from up to 6 other transceivers. This
@@ -2005,31 +2038,30 @@ private:
 
 /**
  * @example{lineno} examples_linux/gettingstarted.cpp
- * <b>For Linux</b><br>
- * <b>Re-written by 2bndy5 2020</b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written  * This example was written to be used up to 6 devices acting as TX nodes &
+ * only 1 device acting as the RX node (that's a maximum of 7 devices).
+ acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
 
 /**
  * @example{lineno} examples_linux/acknowledgementPayloads.cpp
- * <b>For Linux</b><br>
- * <b>Written by 2bndy5 2020</b>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with Acknowledgement (ACK) payloads attached to ACK packets.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
 
 /**
  * @example{lineno} examples_linux/manualAcknowledgements.cpp
- * <b>For Linux</b><br>
- * <b>Written by 2bndy5 2020</b>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another
  * with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.
@@ -2039,30 +2071,30 @@ private:
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
 
 /**
  * @example{lineno} examples_linux/streamingData.cpp
- * <b>For Linux</b><br>
- * <b>Written by 2bndy5 2020</b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use `ctrl+c` to quit at any time.
  */
 
 /**
  * @example{lineno} examples_linux/multiceiverDemo.cpp
- * <b>For Linux</b><br>
- * <b>Written by 2bndy5 2020</b><br>
+ * Written by [2bndy5](http://github.com/2bndy5) in 2020
+ *
  * A simple example of sending data from as many as 6 nRF24L01 transceivers to
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used up to 6 devices acting as TX nodes &
+ * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use `ctrl+c` to quit at any time.
  */
 

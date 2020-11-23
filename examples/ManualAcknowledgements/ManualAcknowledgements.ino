@@ -13,7 +13,7 @@
  * outdated by 1 transmission because they have to loaded before receiving a
  * transmission.
  *
- * This example was written to be used on 2 or more devices acting as "nodes".
+ * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
 #include <SPI.h>
