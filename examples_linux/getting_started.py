@@ -71,7 +71,7 @@ def master():
             )
             payload[0] += 0.01
         time.sleep(1)
-    print(failures, "failures detected. Going back to set_role()")
+    print(failures, "failures detected. Leaving TX role.")
 
 
 def slave(timeout=6):
@@ -102,7 +102,7 @@ def slave(timeout=6):
             )
             start_timer = time.monotonic()  # reset the timeout timer
 
-    print("Nothing received in 6 seconds. Going back to set_role()")
+    print("Nothing received in 6 seconds. Leaving RX role")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put the radio in TX mode
 

@@ -227,10 +227,8 @@ void master() {
     uint32_t ellapsedTime = getMicros();             // end the timer
     cout << "Time to transmit data = ";
     cout << ellapsedTime;                            // print the timer result
-    cout << " us. Detected: ";
-    cout << failures;                                // print number of retries
-    cout << " failures." << endl;
-    cout << " going back to setRole()" << endl;
+    cout << " us. " << failures;                     // print number of retries
+    cout << " failures detected. Leaving TX role." << endl;
 } // master
 
 
@@ -253,8 +251,7 @@ void slave() {
     }
     radio.stopListening();                    // use TX mode for idle behavior
 
-    cout << "Timeout reached. Nothing received in 6 seconds.";
-    cout << " Going back to setRole()" << endl;
+    cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
 }
 
 

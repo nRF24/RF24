@@ -116,27 +116,34 @@ void loop() {
   if (role) {
     // This device is a TX node
 
-    unsigned long start_timer = micros();                       // start the timer
-    bool report = radio.write(&payload, sizeof(PayloadStruct)); // transmit & save the report
-    unsigned long end_timer = micros();                         // end the timer
+    unsigned long start_timer = micros();                    // start the timer
+    bool report = radio.write(&payload, sizeof(payload));    // transmit & save the report
+    unsigned long end_timer = micros();                      // end the timer
 
     if (report) {
-      Serial.print(F("Transmission successful! "));             // payload was delivered
+      Serial.print(F("Transmission successful! "));          // payload was delivered
       Serial.print(F("Time to transmit = "));
-      Serial.print(end_timer - start_timer);                    // print the timer result
+      Serial.print(end_timer - start_timer);                 // print the timer result
       Serial.print(F(" us. Sent: "));
-      Serial.print(payload.message);                            // print the outgoing message
-      Serial.print(payload.counter);                            // print the outgoing counter
-      if (radio.available()) {                                  // is there an ACK payload?
+      Serial.print(payload.message);                         // print the outgoing message
+      Serial.print(payload.counter);                         // print the outgoing counter
+      uint8_t pipe;
+      if (radio.available(&pipe)) {                          // is there an ACK payload? grab the pipe number that received it
         PayloadStruct received;
-        radio.read(&received, sizeof(received));                // get incoming ACK payload
-        Serial.print(F(" Recieved: "));
-        Serial.print(received.message);                         // print incoming message
-        Serial.println(received.counter);                       // print incoming counter
-        payload.counter = received.counter + 1;                 // save incoming counter & increment for next outgoing
+        radio.read(&received, sizeof(received));             // get incoming ACK payload
+        Serial.print(F(" Recieved "));
+        Serial.print(radio.getDynamicPayloadSize());         // print incoming payload size
+        Serial.print(F(" bytes on pipe "));
+        Serial.print(pipe);                                  // print pipe number that received the ACK
+        Serial.print(F(": "));
+        Serial.print(received.message);                      // print incoming message
+        Serial.println(received.counter);                    // print incoming counter
+
+        // save incoming counter & increment for next outgoing
+        payload.counter = received.counter + 1;
 
       } else {
-        Serial.println(F(" Recieved: an empty ACK packet"));    // empty ACK packet received
+        Serial.println(F(" Recieved: an empty ACK packet")); // empty ACK packet received
       }
 
 
@@ -166,8 +173,8 @@ void loop() {
       Serial.print(payload.message);                 // print outgoing message
       Serial.println(payload.counter);               // print outgoing counter
 
-      // increment payload counter
-      payload.counter++;
+      // save incoming counter & increment for next outgoing
+      payload.counter = received.counter + 1;
       // load the payload for the first received transmission on pipe 0
       radio.writeAckPayload(1, &payload, sizeof(payload));
     }
@@ -182,6 +189,7 @@ void loop() {
 
       role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
+
       memcpy(payload.message, "Hello ", 6); // change payload message
       radio.stopListening();                // this also discards any unused ACK payloads
 
@@ -190,13 +198,10 @@ void loop() {
 
       role = false;
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
+      memcpy(payload.message, "World ", 6); // change payload message
 
-
-      memcpy(payload.message, "World ", 6);                      // change payload message
       // load the payload for the first received transmission on pipe 0
       radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
-      payload.counter++;                                         // increment payload counter
-
       radio.startListening();
     }
   }

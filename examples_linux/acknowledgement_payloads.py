@@ -82,14 +82,18 @@ def master():
                         response[7:8][0]
                     )
                 )
-                counter[0] += 1  # increment payload counter
+                # increment counter from received payload
+                if response[7:8][0] < 255:
+                    counter[0] = response[7:8][0] + 1
+                else:
+                    counter[0] = 0
             else:
                 print("Received an empty ACK packet")
         else:
             failures += 1
             print("Transmission failed or timed out")
         time.sleep(1)  # let the RX node prepare a new ACK payload
-    print(failures, "failures detected. Going back to set_role()")
+    print(failures, "failures detected. Leaving TX role.")
 
 
 def slave(timeout=6):
@@ -113,7 +117,7 @@ def slave(timeout=6):
             length = radio.getDynamicPayloadSize()  # grab the payload length
             received = radio.read(length)  # fetch 1 payload from RX FIFO
             # increment counter from received payload
-            counter[0] = received[7:8][0] + 1
+            counter[0] = received[7:8][0] + 1 if received[7:8][0] < 255 else 0
             print(
                 "Received {} bytes on pipe {}: {}{} Sent: {}{}".format(
                     length,
@@ -128,7 +132,7 @@ def slave(timeout=6):
             radio.writeAckPayload(1, buffer)  # load ACK for next response
             start_timer = time.monotonic()  # reset timer
 
-    print("Nothing received in 6 seconds. Going back to set_role()")
+    print("Nothing received in 6 seconds. Leaving RX role")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put radio in TX mode & flush unused ACK payloads
 

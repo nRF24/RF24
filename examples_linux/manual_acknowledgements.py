@@ -102,7 +102,7 @@ def master():
             else:
                 print("No response received.")
         time.sleep(1)  # make example readable by slowing down transmissions
-    print(failures, "failures detected. Going back to set_role()")
+    print(failures, "failures detected. Leaving TX role.")
 
 
 def slave(timeout=6):
@@ -120,7 +120,8 @@ def slave(timeout=6):
         if has_payload:
             received = radio.read(radio.payloadSize)  # fetch the payload
             # NOTE received[7:8] discards NULL terminating 0
-            counter[0] = received[7:8][0] + 1  # increment the counter
+            # increment the counter from received payload
+            counter[0] = received[7:8][0] + 1 if received[7:8][0] < 255 else 0
             # use bytes() to pack our counter data into the payload
             # NOTE b"\x00" byte is a c-string's NULL terminating 0
             buffer = b"World \x00" + bytes(counter)
@@ -152,7 +153,7 @@ def slave(timeout=6):
                 print("Response failed or timed out")
             start_timer = time.monotonic()  # reset the timeout timer
 
-    print("Nothing received in 6 seconds. Going back to set_role()")
+    print("Nothing received in 6 seconds. Leaving RX role")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put the radio in TX mode
 

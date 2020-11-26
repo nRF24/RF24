@@ -207,7 +207,7 @@ void master() {
     radio.stopListening();                                    // put radio in TX mode
 
     unsigned int failures = 0;                                // keep track of failures
-    while (failures <  6) {
+    while (failures < 6) {
         clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);      // start the timer
         bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
         uint32_t timerEllapsed = getMicros();                 // end the timer
@@ -220,18 +220,21 @@ void master() {
             cout << payload.message;                                // print outgoing message
             cout << (unsigned int)payload.counter;                  // print outgoing counter counter
 
-            if (radio.available()) {
+            uint8_t pipe;
+            if (radio.available(&pipe)) {
                 PayloadStruct received;
                 radio.read(&received, sizeof(received));          // get incoming ACK payload
-                cout << " Received: ";
-                cout << received.message;                         // print incoming message
+                cout << " Received ";
+                cout << radio.getDynamicPayloadSize();            // print incoming payload size
+                cout << " bytes on pipe " << (unsigned int)pipe;  // print pipe that received it
+                cout << ": " << received.message;                 // print incoming message
                 cout << (unsigned int)received.counter << endl;   // print incoming counter
                 payload.counter = received.counter + 1;           // save incoming counter & increment for next outgoing
-            }
+            } // if got an ACK payload
             else {
                 cout << " Received an empty ACK packet." << endl; // ACK had no payload
             }
-        }
+        } // if delivered
         else {
             cout << "Transmission failed or timed out" << endl;   // payload was not delivered
             failures++;                                           // increment failures
@@ -239,8 +242,8 @@ void master() {
 
         // to make this example readable in the terminal
         delay(1000);  // slow transmissions down by 1 second
-    }
-    cout << failures << " failures detected, going back to setRole()" << endl;
+    } // while
+    cout << failures << " failures detected. Leaving TX role." << endl;
 } // master
 
 
@@ -269,13 +272,14 @@ void slave() {
             cout << payload.message;
             cout << (unsigned int)payload.counter << endl;   // print ACK payload sent
             startTimer = time(nullptr);                      // reset timer
-            payload.counter += 1;                            // increment payload counter
 
+            // save incoming counter & increment for next outgoing
+            payload.counter = received.counter + 1;
             // load the payload for the first received transmission on pipe 0
             radio.writeAckPayload(1, &payload, sizeof(payload));
-        }
-    }
-    cout << "Timeout reached. Nothing received in 6 seconds" << endl;
+        } // if received something
+    } // while
+    cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
     radio.stopListening(); // recommended idle behavior is TX mode
 } // slave
 

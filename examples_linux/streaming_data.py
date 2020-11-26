@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     # To save time during transmission, we'll set the payload size to be only
     # what we need. For this example, we'll be using the default maximum 32
-    radio.setPayloadSize(SIZE)
+    radio.payloadSize = SIZE
 
     # for debugging, we have 2 options that print a large block of details
     # (smaller) function that prints raw register values

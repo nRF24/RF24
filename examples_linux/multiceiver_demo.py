@@ -87,7 +87,7 @@ def master(node_number):
             failures += 1
             print("failed or timed out")
         time.sleep(0.5)  # slow down the test for readability
-    print(failures, "failures detected. Going back to set_role()")
+    print(failures, "failures detected. Leaving TX role.")
 
 
 def slave(timeout=10):
@@ -121,7 +121,7 @@ def slave(timeout=10):
             )
             start_timer = time.monotonic()  # reset timer with every payload
 
-    print("Nothing received in 6 seconds. Going back to set_role()")
+    print("Nothing received in 6 seconds. Leaving RX role")
     radio.stopListening()
 
 

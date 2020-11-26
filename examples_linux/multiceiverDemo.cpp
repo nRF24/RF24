@@ -218,7 +218,7 @@ void master(unsigned int role) {
         // to make this example readable in the terminal
         delay(500); // slow transmissions down by 0.5 second
     } // while
-    cout << failures << " failures detected. Going back to setRole()." << endl;
+    cout << failures << " failures detected. Leaving TX role." << endl;
 } // master
 
 
@@ -246,7 +246,7 @@ void slave() {
             startTimer = time(nullptr);                            // reset timer
         }
     }
-    cout << "Nothing received in 6 seconds. Going back to setRole()" << endl;
+    cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
 } // slave
 
 

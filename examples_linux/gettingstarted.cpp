@@ -218,7 +218,7 @@ void master() {
         // to make this example readable in the terminal
         delay(1000);  // slow transmissions down by 1 second
     }
-    cout << failure << " failures detected, going back to setRole()" << endl;
+    cout << failure << " failures detected. Leaving TX role." << endl;
 }
 
 /**
@@ -240,7 +240,7 @@ void slave() {
             startTimer = time(nullptr);                      // reset timer
         }
     }
-    cout << "Timeout reached. Nothing received in 6 seconds" << endl;
+    cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
     radio.stopListening();
 }
 

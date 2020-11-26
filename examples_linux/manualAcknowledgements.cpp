@@ -263,7 +263,7 @@ void master() {
         delay(1000);  // slow transmissions down by 1 second
     } // while
 
-    cout << failures << " failures detected. Going back to setRole()" << endl;
+    cout << failures << " failures detected. Leaving TX role." << endl;
 } // master
 
 
@@ -286,7 +286,7 @@ void slave() {
             // transmit response & save result to `report`
             radio.stopListening();                           // put in TX mode
             radio.writeFast(&payload, sizeof(payload));      // load response into TX FIFO
-            bool report = radio.txStandBy(150);       // keep retrying for 150 ms
+            bool report = radio.txStandBy(150);              // keep retrying for 150 ms
             radio.startListening();                          // put back in RX mode
 
             // print summary of transactions
@@ -308,7 +308,7 @@ void slave() {
         } // available
     } // while
 
-    cout << "Timeout reached. Nothing received in 6 seconds" << endl;
+    cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
     radio.stopListening(); // recommended idle mode is TX mode
 } // slave
 
