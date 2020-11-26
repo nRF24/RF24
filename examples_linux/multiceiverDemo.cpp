@@ -284,8 +284,9 @@ void printHelp(string progName) {
          << "A simple example of sending data from as many as 6 nRF24L01 transceivers to\n"
          << "1 receiving transceiver. This technique is trademarked by\n"
          << "Nordic Semiconductors as 'MultiCeiver'.\n"
-         << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
-         << "optional arguments:\n  -h, --help\t\tshow this help message and exit\n"
+         << "\nThis example was written to be used on up to 6 devices acting as TX nodes with\n"
+         << "another device acting as a RX node (that's a total of 7 devices).\n"
+         << "\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n"
          << "  -n {0,1,2,3,4,5,r,R}, --node {0,1,2,3,4,5,r,R}"
          << "\n\t\t\t0-5 specifies the identifying node ID number for the TX role."
          << "\n\t\t\t'r' or 'R' specifies the RX role." << endl;

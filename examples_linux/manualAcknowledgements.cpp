@@ -352,7 +352,7 @@ void printHelp(string progName) {
          << "outdated by 1 transmission because they have to loaded before receiving a\n"
          << "transmission.\n"
          << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
-         << "optional arguments:\n  -h, --help\t\tshow this help message and exit\n"
+         << "\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n"
          << "  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n"
          << "  -r {0,1}, --role {0,1}\n\t\t\t'1' specifies the TX role."
          << " '0' specifies the RX role." << endl;

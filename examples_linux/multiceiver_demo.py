@@ -13,7 +13,10 @@ import struct
 from RF24 import RF24, RF24_PA_LOW
 
 
-parser = argparse.ArgumentParser(description=__doc__)
+parser = argparse.ArgumentParser(
+    description=__doc__,
+    formatter_class=argparse.RawDescriptionHelpFormatter
+)
 parser.add_argument(
     "-n",
     "--node",
