@@ -333,7 +333,7 @@ uint32_t getMicros() {
  * This is meant to handle keyboard interrupts properly
  */
 void programInterruptHandler(int s) {
-    cout << "interrupt signal " << s << " detected. Exiting..." << endl;
+    cout << " Interrupt signal " << s << " detected. Exiting..." << endl;
     radio.powerDown();
     exit(0);
 }

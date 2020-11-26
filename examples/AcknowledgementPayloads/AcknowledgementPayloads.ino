@@ -126,14 +126,14 @@ void loop() {
       Serial.print(end_timer - start_timer);                    // print the timer result
       Serial.print(F(" us. Sent: "));
       Serial.print(payload.message);                            // print the outgoing message
-      Serial.print(payload.counter);                           // print the outgoing counter
+      Serial.print(payload.counter);                            // print the outgoing counter
       if (radio.available()) {                                  // is there an ACK payload?
         PayloadStruct received;
         radio.read(&received, sizeof(received));                // get incoming ACK payload
         Serial.print(F(" Recieved: "));
         Serial.print(received.message);                         // print incoming message
         Serial.println(received.counter);                       // print incoming counter
-        payload.counter++;                                      // increment outgoing counter
+        payload.counter = received.counter + 1;                 // save incoming counter & increment for next outgoing
 
       } else {
         Serial.println(F(" Recieved: an empty ACK packet"));    // empty ACK packet received
@@ -141,7 +141,7 @@ void loop() {
 
 
     } else {
-      Serial.println(F("Transmission failed or timed out"));   // payload was not delivered
+      Serial.println(F("Transmission failed or timed out"));    // payload was not delivered
     }
 
     // to make this example readable in the serial monitor

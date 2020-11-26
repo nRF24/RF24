@@ -50,7 +50,47 @@ addresses = [
 # It is very helpful to think of an address as a path instead of as
 # an identifying device destination
 
-def base(timeout=10):
+
+def master(node_number):
+    """start transmitting to the base station.
+
+    :param int node_number: the node's identifying index (from the
+        the `addresses` list). This is a required parameter
+    """
+    radio.stopListening()  # put radio in TX mode
+    # set the TX address to the address of the base station.
+    radio.openWritingPipe(addresses[node_number])
+    counter = 0
+    failures = 0
+    while failures < 6:
+        counter += 1
+        # payloads will include the node_number and a payload ID character
+        payload = struct.pack("<ii", node_number, counter)
+        start_timer = time.monotonic_ns()
+        report = radio.write(payload)
+        end_timer = time.monotonic_ns()
+        # show something to see it isn't frozen
+        print(
+            "Transmission of payloadID {} as node {}".format(
+                counter,
+                node_number
+            ),
+            end=" "
+        )
+        if report:
+            print(
+                "successfull! Time to transmit = {} us".format(
+                    (end_timer - start_timer) / 1000
+                )
+            )
+        else:
+            failures += 1
+            print("failed or timed out")
+        time.sleep(0.5)  # slow down the test for readability
+    print(failures, "failures detected. Going back to set_role()")
+
+
+def slave(timeout=10):
     """Use the radio as a base station for lisening to all nodes
 
     :param int timeout: The number of seconds to wait (with no transmission)
@@ -80,74 +120,34 @@ def base(timeout=10):
                 )
             )
             start_timer = time.monotonic()  # reset timer with every payload
+
+    print("Nothing received in 6 seconds. Going back to set_role()")
     radio.stopListening()
 
 
-def node(node_number, count=10):
-    """start transmitting to the base station.
-
-    :param int node_number: the node's identifying index (from the
-        the `addresses` list). This is a required parameter
-    :param int count: the number of times that the node will transmit
-        to the base station.
-    """
-    radio.stopListening()  # put radio in TX mode
-    # set the TX address to the address of the base station.
-    radio.openWritingPipe(addresses[node_number])
-    counter = 0
-    # use the node_number to identify where the payload came from
-    while counter < count:
-        counter += 1
-        # payloads will include the node_number and a payload ID character
-        payload = struct.pack("<ii", node_number, counter)
-        start_timer = time.monotonic_ns()
-        report = radio.write(payload)
-        end_timer = time.monotonic_ns()
-        # show something to see it isn't frozen
-        print(
-            "Transmission of payloadID {} as node {}".format(
-                counter,
-                node_number
-            ),
-            end=" "
-        )
-        if report:
-            print(
-                "successfull! Time to transmit = {} us".format(
-                    (end_timer - start_timer) / 1000
-                )
-            )
-        else:
-            print("failed or timed out")
-        time.sleep(0.5)  # slow down the test for readability
-
-
 def set_role():
-    """Set the role using stdin stream.
-    Role args can be specified using spaces (e.g. 'R 10' calls `base(10)`)
+    """Set the role using stdin stream. Timeout arg for slave() can be
+    specified using a space delimiter (e.g. 'R 10' calls `slave(10)`)
 
     :return:
         - True when role is complete & app should continue running.
         - False when app should exit
     """
     user_input = input(
-        "Enter 'R' for receiver role.\n"
-        "Enter a number in range [0, 5] to use a specific node ID for "
+        "*** Enter 'R' for receiver role.\n"
+        "*** Enter a number in range [0, 5] to use a specific node ID for "
         "transmitter role.\n"
-        "Enter 'Q' to quit example.\n"
+        "*** Enter 'Q' to quit example.\n"
     ) or "?"
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
         if len(user_input) > 1:
-            base(int(user_input[1]))
+            slave(int(user_input[1]))
         else:
-            base()
+            slave()
         return True
     elif user_input[0].isdigit() and 0 <= int(user_input[0]) <= 5:
-        if len(user_input) > 1:
-            node(int(user_input[0]), int(user_input[1]))
-        else:
-            node(int(user_input[0]))
+        master(int(user_input[0]))
         return True
     elif user_input[0].upper().startswith("Q"):
         radio.powerDown()
@@ -160,11 +160,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()  # parse any CLI args
 
-    print(sys.argv[0])  # print example name
-
     # initialize the nRF24L01 on the spi bus
     if not radio.begin():
         raise RuntimeError("radio hardware is not responding")
+
+    print(sys.argv[0])  # print example name
 
     # set the Power Amplifier level to -12 dBm since this test example is
     # usually run with nRF24L01 transceivers in close proximity of each other
@@ -187,9 +187,10 @@ if __name__ == "__main__":
         else:  # if role was set using CLI args
             # run role once and exit
             if args.node.isdigit():
-                node(int(args.node))
+                master(int(args.node))
             else:
-                base()
+                slave()
     except KeyboardInterrupt:
+        print(" Keyboard Interrupt detected. Exiting...")
         radio.powerDown()
         sys.exit()

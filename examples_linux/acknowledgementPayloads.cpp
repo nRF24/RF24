@@ -226,7 +226,7 @@ void master() {
                 cout << " Received: ";
                 cout << received.message;                         // print incoming message
                 cout << (unsigned int)received.counter << endl;   // print incoming counter
-                payload.counter++;                                // increment outgoing counter
+                payload.counter = received.counter + 1;           // save incoming counter & increment for next outgoing
             }
             else {
                 cout << " Received an empty ACK packet." << endl; // ACK had no payload
@@ -300,7 +300,7 @@ uint32_t getMicros() {
  * This is meant to handle keyboard interrupts properly
  */
 void programInterruptHandler(int s) {
-    cout << "interrupt signal " << s << " detected. Exiting..." << endl;
+    cout << " Interrupt signal " << s << " detected. Exiting..." << endl;
     radio.powerDown();
     exit(0);
 }

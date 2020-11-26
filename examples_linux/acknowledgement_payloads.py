@@ -16,7 +16,6 @@ parser.add_argument(
     "--node",
     type=int,
     choices=range(2),
-    default=0,
     help="the identifying radio number (or node ID number)"
 )
 parser.add_argument(
@@ -47,15 +46,11 @@ radio = RF24(22, 0)
 # 1 item list to store our integer number for the payloads' counter
 counter = [0]
 
-def master(count=5):  # count = 5 will only transmit 5 packets
-    """Transmits a message and an incrementing integer every second.
-
-    :param int count: The number of payloads to transmit (failed or
-        successful).
-    """
+def master():
+    """Transmits a message and an incrementing integer every second."""
     radio.stopListening()  # put radio in TX mode
-
-    while count:
+    failures = 0
+    while failures < 6:
         # construct a payload to send
         buffer = b"Hello \x00" + bytes(counter)
 
@@ -91,9 +86,10 @@ def master(count=5):  # count = 5 will only transmit 5 packets
             else:
                 print("Received an empty ACK packet")
         else:
+            failures += 1
             print("Transmission failed or timed out")
         time.sleep(1)  # let the RX node prepare a new ACK payload
-        count -= 1
+    print(failures, "failures detected. Going back to set_role()")
 
 
 def slave(timeout=6):
@@ -132,22 +128,23 @@ def slave(timeout=6):
             radio.writeAckPayload(1, buffer)  # load ACK for next response
             start_timer = time.monotonic()  # reset timer
 
+    print("Nothing received in 6 seconds. Going back to set_role()")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put radio in TX mode & flush unused ACK payloads
 
 
 def set_role():
-    """Set the role using stdin stream.
-    Role args can be specified using spaces (e.g. 'R 10' calls `slave(10)`)
+    """Set the role using stdin stream. Timeout arg for slave() can be
+    specified using a space delimiter (e.g. 'R 10' calls `slave(10)`)
 
     :return:
         - True when role is complete & app should continue running.
         - False when app should exit
     """
     user_input = input(
-        "Enter 'R' for receiver role.\n"
-        "Enter 'T' for transmitter role.\n"
-        "Enter 'Q' to quit example.\n"
+        "*** Enter 'R' for receiver role.\n"
+        "*** Enter 'T' for transmitter role.\n"
+        "*** Enter 'Q' to quit example.\n"
     ) or "?"
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
@@ -157,10 +154,7 @@ def set_role():
             slave()
         return True
     elif user_input[0].upper().startswith("T"):
-        if len(user_input) > 1:
-            master(int(user_input[1]))
-        else:
-            master()
+        master()
         return True
     elif user_input[0].upper().startswith("Q"):
         radio.powerDown()
@@ -173,7 +167,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()  # parse any CLI args
 
-    print(sys.argv[0])  # print example name
+    # initialize the nRF24L01 on the spi bus
+    if not radio.begin():
+        raise RuntimeError("radio hardware is not responding")
 
     # For this example, we will use different addresses
     # An address need to be a buffer protocol object (bytearray)
@@ -181,11 +177,13 @@ if __name__ == "__main__":
     # It is very helpful to think of an address as a path instead of as
     # an identifying device destination
 
+    print(sys.argv[0])  # print example name
+
     # to use different addresses on a pair of radios, we need a variable to
     # uniquely identify which address this radio will use to transmit
     # 0 uses address[0] to transmit, 1 uses address[1] to transmit
     radio_number = args.node  # uses default value from `parser`
-    if len(sys.argv) == 1:  # if no args were passed
+    if args.node is None:  # if '--node' arg wasn't specified
         radio_number = bool(
             int(
                 input(
@@ -193,10 +191,6 @@ if __name__ == "__main__":
                 ) or 0
             )
         )
-
-    # initialize the nRF24L01 on the spi bus
-    if not radio.begin():
-        raise RuntimeError("radio hardware is not responding")
 
     # set the Power Amplifier level to -12 dBm since this test example is
     # usually run with nRF24L01 transceivers in close proximity of each other
@@ -232,5 +226,6 @@ if __name__ == "__main__":
             # run role once and exit
             master() if args.role else slave()
     except KeyboardInterrupt:
+        print(" Keyboard Interrupt detected. Exiting...")
         radio.powerDown()
         sys.exit()
