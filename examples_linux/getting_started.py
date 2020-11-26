@@ -139,9 +139,8 @@ def set_role():
     elif user_input[0].upper().startswith("Q"):
         radio.powerDown()
         return False
-    else:
-        print(user_input[0], "is an unrecognized input. Please try again.")
-        return set_role()
+    print(user_input[0], "is an unrecognized input. Please try again.")
+    return set_role()
 
 
 if __name__ == "__main__":
@@ -158,7 +157,7 @@ if __name__ == "__main__":
     # to use different addresses on a pair of radios, we need a variable to
     # uniquely identify which address this radio will use to transmit
     # 0 uses address[0] to transmit, 1 uses address[1] to transmit
-    radio_number = args.radio_number  # uses default value from `parser`
+    radio_number = args.node  # uses default value from `parser`
     if len(sys.argv) == 1:  # if no args were passed
         radio_number = bool(
             int(

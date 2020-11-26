@@ -152,9 +152,8 @@ def set_role():
     elif user_input[0].upper().startswith("Q"):
         radio.powerDown()
         return False
-    else:
-        print(user_input[0], "is an unrecognized input. Please try again.")
-        return set_role()
+    print(user_input[0], "is an unrecognized input. Please try again.")
+    return set_role()
 
 
 if __name__ == "__main__":
@@ -182,7 +181,7 @@ if __name__ == "__main__":
     # radio.printPrettyDetails();  # (larger) function that prints human readable data
 
     try:
-        if args.node is None:  # if not specified with CLI arg '-r'
+        if args.node is None:  # if not specified with CLI arg '-n'
             while set_role():
                 pass  # continue example until 'Q' is entered
         else:  # if role was set using CLI args
