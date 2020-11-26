@@ -1,11 +1,34 @@
 """
-Simple example of detecting (and verifying) the IRQ (interrupt) pin on the
-nRF24L01
+This example uses Acknowledgement (ACK) payloads attached to ACK packets to
+demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
+configured to detect when data is received, or when data has transmitted
+successfully, or when data has failed to transmit.
+
+This example was written to be used on 2 devices acting as "nodes".
 """
+import sys
+import argparse
 import time
 import RPi.GPIO as GPIO
 from RF24 import RF24, RF24_PA_LOW
 
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "-n",
+    "--node",
+    type=int,
+    choices=range(2),
+    default=0,
+    help="the identifying radio number (or node ID number)"
+)
+parser.add_argument(
+    "-r",
+    "--role",
+    type=bool,
+    choices=range(2),
+    help="'1' specifies the TX role. '0' specifies the RX role."
+)
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -25,48 +48,6 @@ radio = RF24(22, 0)
 
 # select your digital input pin that's connected to the IRQ pin on the nRF24L01
 IRQ_PIN = 12
-
-# For this example, we will use different addresses
-# An address need to be a buffer protocol object (bytearray)
-address = [b"1Node", b"2Node"]
-# It is very helpful to think of an address as a path instead of as
-# an identifying device destination
-
-# to use different addresses on a pair of radios, we need a variable to
-# uniquely identify which address this radio will use to transmit
-# 0 uses address[0] to transmit, 1 uses address[1] to transmit
-radio_number = bool(
-    int(
-        input(
-            "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-        ) or 0
-    )
-)
-
-# initialize the nRF24L01 on the spi bus
-if not radio.begin():
-    raise RuntimeError("radio is not responding")
-
-# ACK payloads are dynamically sized.
-radio.enableDynamicPayloads()  # to use ACK payloads
-
-# this example uses the ACK payload to trigger the IRQ pin active for
-# the "on data received" event
-radio.enableAckPayload()  # enable ACK payloads
-
-# set the Power Amplifier level to -12 dBm since this test example is
-# usually run with nRF24L01 transceivers in close proximity of each other
-radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
-# set the TX address of the RX node into the TX pipe
-radio.openWritingPipe(address[radio_number])  # always uses pipe 0
-
-# set the RX address of the TX node into a RX pipe
-radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
-
-# for debugging, we have 2 options that print a large block of details
-# radio.printDetails();  # (smaller) function that prints raw register values
-# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
 # For this example, we'll be using a payload containing
 # a string that changes on every transmission. (successful or not)
@@ -107,7 +88,7 @@ def interrupt_handler(channel):
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(IRQ_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(IRQ_PIN, GPIO.FALLING, callback=interrupt_handler)
-# IMPORTANT: do not call radio.available(&pipe_number) before calling
+# IMPORTANT: do not call radio.available() before calling
 # radio.whatHappened() when the interruptHandler() is triggered by the
 # IRQ pin FALLING event. According to the datasheet, the pipe information
 # is unreliable during the IRQ pin FALLING transition.
@@ -157,7 +138,7 @@ def master():
            (supposedly making RX node unresponsive)
         4. intentionally fail transmit on the fourth
     """
-    radio.stopListening()  # ensures the nRF24L01 is in TX mode
+    radio.stopListening()  # put radio in TX mode
 
     # on data ready test
     print("\nConfiguring IRQ pin to only ignore 'on data sent' event")
@@ -221,10 +202,96 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
     print_rx_fifo(len(tx_payloads[0]))
 
 
-print(
-    """\
-    nRF24L01 Interrupt pin test.\n\
-    Make sure the IRQ pin is connected to the RPi GPIO12\n\
-    Run slave() on receiver\n\
-    Run master() on transmitter"""
-)
+def set_role():
+    """Set the role using stdin stream.
+    Role args can be specified using spaces (e.g. 'R 10' calls `slave(10)`)
+
+    :return:
+        - True when role is complete & app should continue running.
+        - False when app should exit
+    """
+    user_input = input(
+        "Enter 'R' for receiver role.\n"
+        "Enter 'T' for transmitter role.\n"
+        "Enter 'Q' to quit example.\n"
+    ) or "?"
+    user_input = user_input.split()
+    if user_input[0].upper().startswith("R"):
+        if len(user_input) > 1:
+            slave(int(user_input[1]))
+        else:
+            slave()
+        return True
+    elif user_input[0].upper().startswith("T"):
+        master()
+        return True
+    elif user_input[0].upper().startswith("Q"):
+        radio.powerDown()
+        return False
+    else:
+        print(user_input[0], "is an unrecognized input. Please try again.")
+        return set_role()
+
+
+if __name__ == "__main__":
+
+    args = parser.parse_args()  # parse any CLI args
+
+    print(sys.argv[0])  # print example name
+
+    # For this example, we will use different addresses
+    # An address need to be a buffer protocol object (bytearray)
+    address = [b"1Node", b"2Node"]
+    # It is very helpful to think of an address as a path instead of as
+    # an identifying device destination
+
+    # to use different addresses on a pair of radios, we need a variable to
+    # uniquely identify which address this radio will use to transmit
+    # 0 uses address[0] to transmit, 1 uses address[1] to transmit
+    radio_number = args.radio_number  # uses default value from `parser`
+    if len(sys.argv) == 1:  # if no args were passed
+        radio_number = bool(
+            int(
+                input(
+                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
+                ) or 0
+            )
+        )
+
+    # initialize the nRF24L01 on the spi bus
+    if not radio.begin():
+        raise RuntimeError("radio hardware is not responding")
+
+    # set the Power Amplifier level to -12 dBm since this test example is
+    # usually run with nRF24L01 transceivers in close proximity of each other
+    radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+    # ACK payloads are dynamically sized.
+    radio.enableDynamicPayloads()  # to use ACK payloads
+
+    # this example uses the ACK payload to trigger the IRQ pin active for
+    # the "on data received" event
+    radio.enableAckPayload()  # enable ACK payloads
+
+    # set the TX address of the RX node into the TX pipe
+    radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+    # set the RX address of the TX node into a RX pipe
+    radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
+    # for debugging, we have 2 options that print a large block of details
+    # (smaller) function that prints raw register values
+    # radio.printDetails()
+    # (larger) function that prints human readable data
+    # radio.printPrettyDetails()
+
+    try:
+        if args.role is None:  # if not specified with CLI arg '-r'
+            while set_role():
+                pass  # continue example until 'Q' is entered
+        else:  # if role was set using CLI args
+            # run role once and exit
+            master() if args.role else slave()
+    except KeyboardInterrupt:
+        radio.powerDown()
+        sys.exit()

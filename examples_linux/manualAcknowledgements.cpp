@@ -17,11 +17,12 @@
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()
-#include <iostream>
-#include <string>
+#include <cstring>     // strcmp()
+#include <iostream>    // cin, cout, endl
+#include <csignal>     // sigaction, sigemptyset(),  SIGINT
+#include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
-#include <printf.h>
-#include <RF24/RF24.h> // millis(), delay()
+#include <RF24/RF24.h> // RF24, RF24_PA_LOW, delay()
 
 using namespace std;
 
@@ -33,22 +34,10 @@ using namespace std;
 
 // Generic:
 RF24 radio(22, 0);
-
 /****************** Linux (BBB,x86,etc) ***********************/
 // See http://tmrh20.github.io/RF24/pages.html for more information on usage
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
-
-
-// Let these addresses be used for the pair of nodes used in this example
-uint8_t address[2][6] = {"1Node", "2Node"};
-//             the TX address^ ,  ^the RX address
-// It is very helpful to think of an address as a path instead of as
-// an identifying device destination
-
-// to use different addresses on a pair of radios, we need a variable to
-// uniquely identify which address this radio will use to transmit
-bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // For this example, we'll be using a payload containing
 // a string & an integer number that will be incremented
@@ -60,34 +49,94 @@ struct PayloadStruct {
 };
 PayloadStruct payload;
 
-void setRole(); // prototype to set the node's role
-void master();  // prototype of the TX node's behavior; called by setRole()
-void slave();   // prototype of the RX node's behavior; called by setRole()
+void setRole();                    // prototype to set the node's role
+void master();                     // prototype of the TX node's behavior
+void slave();                      // prototype of the RX node's behavior
+void printHelp(string);            // prototype to function that explain CLI arg usage
+void programInterruptHandler(int); // for handling keyboard interrupts
 
 // custom defined timer for evaluating transmission time in microseconds
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
 
-int main() {
+int main(int argc, char** argv) {
+
+    // perform hardware check
+    if (!radio.begin()) {
+        cout << "radio hardware is not responding!!" << endl;
+        return 0; // quit now
+    }
 
     // append a NULL terminating 0 for printing as a c-string
     payload.message[6] = 0;
 
-    // perform hardware check
-    if (!radio.begin()) {
-        cout << "radio is not responding!!" << endl;
-        return 0; // quit now
+    // Let these addresses be used for the pair of nodes used in this example
+    uint8_t address[2][6] = {"1Node", "2Node"};
+    //             the TX address^ ,  ^the RX address
+    // It is very helpful to think of an address as a path instead of as
+    // an identifying device destination
+
+    // to use different addresses on a pair of radios, we need a variable to
+    // uniquely identify which address this radio will use to transmit
+    bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
+
+    bool foundArgNode = false;
+    bool foundArgRole = false;
+    bool role = false;
+    if (argc > 1) {
+        // CLI args are specified
+        if ((argc - 1) % 2 != 0) {
+            // some CLI arg doesn't have an option specified for it
+            printHelp(string(argv[0])); // all args need an option in this example
+            return 0;
+        }
+        else {
+            // iterate through args starting after program name
+            int a = 1;
+            while (a < argc) {
+                bool invalidOption = false;
+                if (strcmp(argv[a], "-n") == 0 || strcmp(argv[a], "--node") == 0) {
+                    // "-n" or "--node" has been specified
+                    foundArgNode = true;
+                    if (argv[a + 1][0] - 48 <= 1) {
+                        radioNumber = (argv[a + 1][0] - 48) == 1;
+                    }
+                    else {
+                        // option is invalid
+                        invalidOption = true;
+                    }
+                }
+                else if (strcmp(argv[a], "-r") == 0 || strcmp(argv[a], "--role") == 0) {
+                    // "-r" or "--role" has been specified
+                    foundArgRole = true;
+                    if (argv[a + 1][0] - 48 <= 1) {
+                        role = (argv[a + 1][0] - 48) == 1;
+                    }
+                    else {
+                        // option is invalid
+                        invalidOption = true;
+                    }
+                }
+                if (invalidOption) {
+                    printHelp(string(argv[0]));
+                    return 0;
+                }
+                a += 2;
+            } // while
+        } // else
+    } // if
+
+    // print example's name
+    cout << argv[0] << endl;
+
+    if (!foundArgNode) {
+        // Set the radioNumber via the terminal on startup
+        cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+        string input;
+        getline(cin, input);
+        radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
     }
-
-    // print example's introductory prompt
-    cout << "RF24/examples_linux/ManualAcknowledgements\n";
-
-    // To set the radioNumber via the terminal on startup
-    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
-    string input;
-    getline(cin, input);
-    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
 
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
@@ -105,14 +154,26 @@ int main() {
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
     // For debugging info
-    // printf_begin();             // needed only once for printing details
     // radio.printDetails();       // (smaller) function that prints raw register values
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
+    // setup interrupt handler for keyboard interrupts
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = programInterruptHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
     // ready to execute program now
-    setRole(); // calls master() or slave() based on user input
+    if (!foundArgRole) {           // if CLI arg "-r"/"--role" was not specified
+        setRole();                 // calls master() or slave() based on user input
+    }
+    else {                         // if CLI arg "-r"/"--role" was specified
+        role ? master() : slave(); // based on CLI arg option
+    }
     return 0;
-}
+} // main
+
 
 /**
  * set this node's role from stdin stream.
@@ -200,6 +261,7 @@ void master() {
     cout << failures << " failures detected. Going back to setRole()" << endl;
 } // master
 
+
 /**
  * make this node act as the receiver
  */
@@ -258,4 +320,35 @@ uint32_t getMicros() {
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
     return ((seconds) * 1000 + useconds) + 0.5;
+}
+
+
+/**
+ * function to handle system interrupt request signals.
+ * This is meant to handle keyboard interrupts properly
+ */
+void programInterruptHandler(int s) {
+    cout << "interrupt signal " << s << " detected. Exiting..." << endl;
+    radio.powerDown();
+    exit(0);
+}
+
+
+/**
+ * print a manual page of instructions on how to use this example's CLI args
+ */
+void printHelp(string progName) {
+    cout << "usage: " << progName << " [-h] [-n {0,1}] [-r {0,1}]\n\n"
+         << "A simple example of sending data from 1 nRF24L01 transceiver to another\n"
+         << "with manually transmitted (non-automatic) Acknowledgement (ACK) payloads.\n"
+         << "This example still uses ACK packets, but they have no payloads. Instead the\n"
+         << "acknowledging response is sent with `write()`. This tactic allows for more\n"
+         << "updated acknowledgement payload data, where actual ACK payloads' data are\n"
+         << "outdated by 1 transmission because they have to loaded before receiving a\n"
+         << "transmission.\n"
+         << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
+         << "optional arguments:\n  -h, --help\t\tshow this help message and exit\n"
+         << "  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n"
+         << "  -r {0,1}, --role {0,1}\n\t\t\t'1' specifies the TX role."
+         << " '0' specifies the RX role." << endl;
 }

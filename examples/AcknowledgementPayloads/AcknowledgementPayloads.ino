@@ -50,7 +50,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("radio is not responding!!"));
+    Serial.println(F("radio hardware is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
@@ -93,7 +93,7 @@ void setup() {
     // setup the TX payload
 
     memcpy(payload.message, "Hello ", 6);                       // set the payload message
-    radio.stopListening();                                      // powerUp() into TX mode
+    radio.stopListening();                                      // put radio in TX mode
   } else {
     // setup the ACK payload & load the first response into the FIFO
 
@@ -101,7 +101,7 @@ void setup() {
     // load the payload for the first received transmission on pipe 0
     radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
 
-    radio.startListening();                                     // powerUp() into RX mode
+    radio.startListening();                                     // put radio in RX mode
   }
 
   // For debugging info

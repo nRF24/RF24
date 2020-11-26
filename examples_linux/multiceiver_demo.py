@@ -1,11 +1,26 @@
 """
-Simple example of using 1 nRF24L01 to receive data from up to 6 other
-transceivers. This technique is called "multiceiver" in the datasheet.
+A simple example of sending data from as many as 6 nRF24L01 transceivers to
+1 receiving transceiver. This technique is trademarked by
+Nordic Semiconductors as "MultiCeiver".
+
+This example was written to be used on up to 6 devices acting as TX nodes &
+only 1 device acting as the RX node (that's a maximum of 7 devices).
 """
+import sys
+import argparse
 import time
 import struct
 from RF24 import RF24, RF24_PA_LOW
 
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "-n",
+    "--node",
+    choices=("0", "1", "2", "3", "4", "5", "R", "r"),
+    help="the identifying node ID number for the TX role. "
+         "Use 'R' or 'r' to specify the RX role"
+)
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -23,7 +38,7 @@ radio = RF24(22, 0)
 # See https://www.kernel.org/doc/Documentation/spi/spidev for more
 # information on SPIDEV
 
-# setup the addresses for all transmitting nRF24L01 nodes
+# setup the addresses for all transmitting radio nodes
 addresses = [
     b"\x78" * 5,
     b"\xF1\xB6\xB5\xB4\xB3",
@@ -35,27 +50,8 @@ addresses = [
 # It is very helpful to think of an address as a path instead of as
 # an identifying device destination
 
-# initialize the nRF24L01 on the spi bus
-if not radio.begin():
-    raise RuntimeError("radio is not responding")
-
-# set the Power Amplifier level to -12 dBm since this test example is
-# usually run with nRF24L01 transceivers in close proximity of each other
-radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
-# To save time during transmission, we'll set the payload size to be only what
-# we need.
-# A byte and an int occupy 5 bytes in memory using len(struct.pack())
-# "<bi" means a little endian unsigned byte and int
-radio.payloadSize = len(struct.pack("<ii", 0, 0))
-
-# for debugging, we have 2 options that print a large block of details
-# radio.printDetails();  # (smaller) function that prints raw register values
-# radio.printPrettyDetails();  # (larger) function that prints human readable data
-
-
 def base(timeout=10):
-    """Use the nRF24L01 as a base station for lisening to all nodes
+    """Use the radio as a base station for lisening to all nodes
 
     :param int timeout: The number of seconds to wait (with no transmission)
         until exiting function.
@@ -63,7 +59,7 @@ def base(timeout=10):
     # write the addresses to all pipes.
     for pipe_n, addr in enumerate(addresses):
         radio.openReadingPipe(pipe_n, addr)
-    radio.startListening()  # put base station into RX mode
+    radio.startListening()  # put radio in RX mode
     start_timer = time.monotonic()  # start timer
     while time.monotonic() - start_timer < timeout:
         has_payload, pipe_number = radio.available_pipe()
@@ -95,7 +91,7 @@ def node(node_number, count=10):
     :param int count: the number of times that the node will transmit
         to the base station.
     """
-    radio.stopListening()
+    radio.stopListening()  # put radio in TX mode
     # set the TX address to the address of the base station.
     radio.openWritingPipe(addresses[node_number])
     counter = 0
@@ -126,11 +122,75 @@ def node(node_number, count=10):
         time.sleep(0.5)  # slow down the test for readability
 
 
-print(
-    """\
-    RF24/examples_linux/multiceiver_demo\n\
-    Run base() on the receiver\n\
-        base() sends ACK payloads to node 1\n\
-    Run node(node_number) on a transmitter\n\
-        node()'s parameter, `node_number`, must be in range [0, 5]"""
-)
+def set_role():
+    """Set the role using stdin stream.
+    Role args can be specified using spaces (e.g. 'R 10' calls `base(10)`)
+
+    :return:
+        - True when role is complete & app should continue running.
+        - False when app should exit
+    """
+    user_input = input(
+        "Enter 'R' for receiver role.\n"
+        "Enter a number in range [0, 5] to use a specific node ID for "
+        "transmitter role.\n"
+        "Enter 'Q' to quit example.\n"
+    ) or "?"
+    user_input = user_input.split()
+    if user_input[0].upper().startswith("R"):
+        if len(user_input) > 1:
+            base(int(user_input[1]))
+        else:
+            base()
+        return True
+    elif user_input[0].isdigit() and 0 <= int(user_input[0]) <= 5:
+        if len(user_input) > 1:
+            node(int(user_input[0]), int(user_input[1]))
+        else:
+            node(int(user_input[0]))
+        return True
+    elif user_input[0].upper().startswith("Q"):
+        radio.powerDown()
+        return False
+    else:
+        print(user_input[0], "is an unrecognized input. Please try again.")
+        return set_role()
+
+
+if __name__ == "__main__":
+
+    args = parser.parse_args()  # parse any CLI args
+
+    print(sys.argv[0])  # print example name
+
+    # initialize the nRF24L01 on the spi bus
+    if not radio.begin():
+        raise RuntimeError("radio hardware is not responding")
+
+    # set the Power Amplifier level to -12 dBm since this test example is
+    # usually run with nRF24L01 transceivers in close proximity of each other
+    radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+    # To save time during transmission, we'll set the payload size to be only what
+    # we need.
+    # 2 int occupy 8 bytes in memory using len(struct.pack())
+    # "<ii" means 2x little endian unsigned int
+    radio.payloadSize = len(struct.pack("<ii", 0, 0))
+
+    # for debugging, we have 2 options that print a large block of details
+    # radio.printDetails();  # (smaller) function that prints raw register values
+    # radio.printPrettyDetails();  # (larger) function that prints human readable data
+
+    try:
+        if args.node is None:  # if not specified with CLI arg '-r'
+            while set_role():
+                pass  # continue example until 'Q' is entered
+        else:  # if role was set using CLI args
+            # run role once and exit
+            if args.node.isdigit():
+                node(int(args.node))
+            else:
+                base()
+    except KeyboardInterrupt:
+        radio.powerDown()
+        sys.exit()

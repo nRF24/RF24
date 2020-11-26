@@ -9,16 +9,17 @@
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used up to 6 devices acting as TX nodes &
+ * This example was written to be used on up to 6 devices acting as TX nodes &
  * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()
-#include <iostream>
-#include <string>
+#include <cstring>     // strcmp()
+#include <iostream>    // cin, cout, endl
+#include <csignal>     // sigaction, sigemptyset(),  SIGINT
+#include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
-#include <printf.h>
-#include <RF24/RF24.h> // delay()
+#include <RF24/RF24.h> // RF24, RF24_PA_LOW, delay()
 
 using namespace std;
 
@@ -30,7 +31,6 @@ using namespace std;
 
 // Generic:
 RF24 radio(22, 0);
-
 /****************** Linux (BBB,x86,etc) ***********************/
 // See http://tmrh20.github.io/RF24/pages.html for more information on usage
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
@@ -62,25 +62,54 @@ struct PayloadStruct
 };
 PayloadStruct payload;
 
-void setRole();            // prototype to set the node's role
-void master(unsigned int); // prototype of a TX node's behavior; called by setRole()
-void slave();              // prototype of the RX node's behavior; called by setRole()
+void setRole();                    // prototype to set the node's role
+void master(unsigned int);         // prototype of a TX node's behavior
+void slave();                      // prototype of the RX node's behavior
+void printHelp(string);            // prototype to function that explain CLI arg usage
+void programInterruptHandler(int); // for handling keyboard interrupts
 
 // custom defined timer for evaluating transmission time in microseconds
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
 
-int main() {
+int main(int argc, char** argv) {
 
     // perform hardware check
     if (!radio.begin()) {
-        cout << "radio is not responding!!" << endl;
+        cout << "radio hardware is not responding!!" << endl;
         return 0; // quit now
     }
 
-    // print example's introductory prompt
-    cout <<"RF24/examples_linux/multiceiverDemo" << endl;
+    // to use different addresses on a pair of radios, we need a variable to
+    // uniquely identify which address this radio will use to transmit
+    unsigned int nodeNumber = 'R'; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
+
+    bool foundArgNode = false;
+    if (argc > 1) {
+        if ((argc - 1) != 2) {
+            // CLI arg "-n"/"--node" needs an option specified for it
+            printHelp(string(argv[0]));
+            return 0;
+        }
+        else if (strcmp(argv[1], "-n") == 0 || strcmp(argv[1], "--node") == 0) {
+            // "-n" or "--node" has been specified
+            foundArgNode = true;
+            if ((argv[2][0] - 48) < 6) {
+                nodeNumber = argv[2][0] - 48;
+            }
+            else if (argv[2][0] == 'R' || argv[2][0] == 'r') {
+                nodeNumber = 'R';
+            }
+            else {
+                printHelp(string(argv[0]));
+                return 0;
+            }
+        }
+    }
+
+    // print example's name
+    cout << argv[0] << endl;
 
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
@@ -92,12 +121,23 @@ int main() {
     radio.setPayloadSize(sizeof(payload)); // 2x int datatype occupy 8 bytes
 
     // For debugging info
-    // printf_begin();             // needed only once for printing details
     // radio.printDetails();       // (smaller) function that prints raw register values
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
+    // setup interrupt handler for keyboard interrupts
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = programInterruptHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
     // ready to execute program now
-    setRole(); // calls master() or slave() based on user input
+    if (!foundArgNode) {
+        setRole(); // calls master() or slave() based on user input
+    }
+    else {
+        nodeNumber < 6 ? master(nodeNumber) : slave();
+    }
     return 0;
 }
 
@@ -216,4 +256,31 @@ uint32_t getMicros() {
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
     return ((seconds) * 1000 + useconds) + 0.5;
+}
+
+
+/**
+ * function to handle system interrupt request signals.
+ * This is meant to handle keyboard interrupts properly
+ */
+void programInterruptHandler(int s) {
+    cout << "interrupt signal " << s << " detected. Exiting..." << endl;
+    radio.powerDown();
+    exit(0);
+}
+
+
+/**
+ * print a manual page of instructions on how to use this example's CLI args
+ */
+void printHelp(string progName) {
+    cout << "usage: " << progName << " [-h] [-n {0,1,2,3,4,5,r,R}]\n\n"
+         << "A simple example of sending data from as many as 6 nRF24L01 transceivers to\n"
+         << "1 receiving transceiver. This technique is trademarked by\n"
+         << "Nordic Semiconductors as 'MultiCeiver'.\n"
+         << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
+         << "optional arguments:\n  -h, --help\t\tshow this help message and exit\n"
+         << "  -n {0,1,2,3,4,5,r,R}, --node {0,1,2,3,4,5,r,R}"
+         << "\n\t\t\t0-5 specifies the identifying node ID number for the TX role."
+         << "\n\t\t\t'r' or 'R' specifies the RX role." << endl;
 }

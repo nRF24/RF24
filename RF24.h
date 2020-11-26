@@ -1817,7 +1817,7 @@ private:
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used up to 6 devices acting as TX nodes &
+ * This example was written to be used on up to 6 devices acting as TX nodes &
  * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -1933,9 +1933,9 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi.
  *
  * Remember to install the <a href="Python.html">Python wrapper</a>, then
- * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
- * @code{.py}from getting_started import *@endcode and follow the prompts.
+ * @code{.sh}python3 getting_started.py @endcode and follow the prompts.
  *
  * @note this example requires python v3.7 or newer because it measures
  * transmission time with `time.monotonic_ns()`.
@@ -1949,9 +1949,9 @@ private:
  * transmit and retrieve custom automatic acknowledgment payloads.
  *
  * Remember to install the <a href="Python.html">Python wrapper</a>, then
- * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
- * @code{.py}from acknowledgement_payloads import *@endcode and follow the prompts.
+ * @code{.sh}python3 acknowledgement_payloads.py @endcode and follow the prompts.
  *
  * @note this example requires python v3.7 or newer because it measures
  * transmission time with `time.monotonic_ns()`.
@@ -1968,9 +1968,9 @@ private:
  * transmission. Instead, this example uses a call and response paradigm.
  *
  * Remember to install the <a href="Python.html">Python wrapper</a>, then
- * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
- * @code{.py}from manual_acknowledgements import *@endcode and follow the prompts.
+ * @code{.sh}python3 manual_acknowledgements.py @endcode and follow the prompts.
  *
  * @note this example requires python v3.7 or newer because it measures
  * transmission time with `time.monotonic_ns()`.
@@ -1984,9 +1984,9 @@ private:
  * streaming multiple payloads.
  *
  * Remember to install the <a href="Python.html">Python wrapper</a>, then
- * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
- * @code{.py}from streaming_data import *@endcode and follow the prompts.
+ * @code{.sh}python3 streaming_data.py @endcode and follow the prompts.
  *
  * @note this example requires python v3.7 or newer because it measures
  * transmission time with `time.monotonic_ns()`.
@@ -2000,9 +2000,9 @@ private:
  * detecting (and verifying) the IRQ (interrupt) pin on the nRF24L01.
  *
  * Remember to install the <a href="Python.html">Python wrapper</a>, then
- * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
- * @code{.py}from interrupt_configure import *@endcode and follow the prompts.
+ * @code{.sh}python3 interrupt_configure.py @endcode and follow the prompts.
  *
  * @note this example requires python v3.7 or newer because it measures
  * transmission time with `time.monotonic_ns()`.
@@ -2017,9 +2017,9 @@ private:
  * technique is called "multiceiver" in the datasheet.
  *
  * Remember to install the <a href="Python.html">Python wrapper</a>, then
- * navigate to the "RF24/examples_linux" folder and open a `python3` REPL.
+ * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
- * @code{.py}from multiceiver_demo import *@endcode and follow the prompts.
+ * @code{.sh}python3 multiceiver_demo.py @endcode and follow the prompts.
  *
  * @note this example requires python v3.7 or newer because it measures
  * transmission time with `time.monotonic_ns()`.
@@ -2042,7 +2042,7 @@ private:
  *
  * A simple example of sending data from 1 nRF24L01 transceiver to another.
  *
- * This example was written  * This example was written to be used up to 6 devices acting as TX nodes &
+ * This example was written  * This example was written to be used on up to 6 devices acting as TX nodes &
  * only 1 device acting as the RX node (that's a maximum of 7 devices).
  acting as "nodes".
  * Use `ctrl+c` to quit at any time.
@@ -2093,7 +2093,7 @@ private:
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used up to 6 devices acting as TX nodes &
+ * This example was written to be used on up to 6 devices acting as TX nodes &
  * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use `ctrl+c` to quit at any time.
  */

@@ -144,12 +144,12 @@ void setup() {
     // setup the TX node
 
     memcpy(payload.message, "Hello ", 6); // set the outgoing message
-    radio.stopListening();                // powerUp() into TX mode
+    radio.stopListening();                // put radio in TX mode
   } else {
     // setup the RX node
 
     memcpy(payload.message, "World ", 6); // set the outgoing message
-    radio.startListening();               // powerUp() into RX mode
+    radio.startListening();               // put radio in RX mode
   }
 } // setup()
 

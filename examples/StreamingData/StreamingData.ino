@@ -49,7 +49,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("radio is not responding!!"));
+    Serial.println(F("radio hardware is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
@@ -86,9 +86,9 @@ void setup() {
 
   // additional setup specific to the node's role
   if (role) {
-    radio.stopListening();  // powerUp() into TX mode
+    radio.stopListening();  // put radio in TX mode
   } else {
-    radio.startListening(); // powerUp() into RX mode
+    radio.startListening(); // put radio in RX mode
   }
 
   // For debugging info

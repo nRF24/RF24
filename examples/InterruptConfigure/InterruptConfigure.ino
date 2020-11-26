@@ -58,7 +58,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("radio is not responding!!"));
+    Serial.println(F("radio hardware is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
@@ -81,7 +81,7 @@ void setup() {
   // setup the IRQ_PIN
   pinMode(IRQ_PIN, INPUT);
   attachInterrupt(digitalPinToInterrupt(IRQ_PIN), interruptHandler, FALLING);
-  // IMPORTANT: do not call radio.available(&pipe_number) before calling
+  // IMPORTANT: do not call radio.available() before calling
   // radio.whatHappened() when the interruptHandler() is triggered by the
   // IRQ pin FALLING event. According to the datasheet, the pipe information
   // is unreliable during the IRQ pin FALLING transition.
@@ -110,7 +110,7 @@ void setup() {
   // additional setup specific to the node's role
   if (role) {
     // setup for TX mode
-    radio.stopListening();                                  // powerUp() into TX mode
+    radio.stopListening();                                  // put radio in TX mode
 
   } else {
     // setup for RX mode
@@ -124,7 +124,7 @@ void setup() {
     radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
     radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
 
-    radio.startListening(); // powerUp() into RX mode
+    radio.startListening(); // put radio in RX mode
   }
 
   // For debugging info

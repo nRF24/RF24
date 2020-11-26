@@ -1,9 +1,30 @@
 """
-Example of library usage for streaming multiple payloads.
+A simple example of streaming data from 1 nRF24L01 transceiver to another.
+
+This example was written to be used on 2 devices acting as 'nodes'.
 """
+import sys
+import argparse
 import time
 from RF24 import RF24, RF24_PA_LOW
 
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "-n",
+    "--node",
+    type=int,
+    choices=range(2),
+    default=0,
+    help="the identifying radio number (or node ID number)"
+)
+parser.add_argument(
+    "-r",
+    "--role",
+    type=bool,
+    choices=range(2),
+    help="'1' specifies the TX role. '0' specifies the RX role."
+)
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -21,85 +42,42 @@ radio = RF24(22, 0)
 # See https://www.kernel.org/doc/Documentation/spi/spidev for more
 # information on SPIDEV
 
-# For this example, we will use different addresses
-# An address need to be a buffer protocol object (bytearray)
-address = [b"1Node", b"2Node"]
-# It is very helpful to think of an address as a path instead of as
-# an identifying device destination
-
-# to use different addresses on a pair of radios, we need a variable to
-# uniquely identify which address this radio will use to transmit
-# 0 uses address[0] to transmit, 1 uses address[1] to transmit
-radio_number = bool(
-    int(
-        input(
-            "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-        ) or 0
-    )
-)
-
-# initialize the nRF24L01 on the spi bus
-if not radio.begin():
-    raise RuntimeError("radio is not responding")
-
-# set the Power Amplifier level to -12 dBm since this test example is
-# usually run with nRF24L01 transceivers in close proximity of each other
-radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
-# set the TX address of the RX node into the TX pipe
-radio.openWritingPipe(address[radio_number])  # always uses pipe 0
-
-# set the RX address of the TX node into a RX pipe
-radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
-
-# for debugging, we have 2 options that print a large block of details
-# radio.printDetails();  # (smaller) function that prints raw register values
-# radio.printPrettyDetails();  # (larger) function that prints human readable data
+# Specify the number of bytes in the payload. This is also used to
+# specify the number of payloads in 1 stream of data
+SIZE = 32  # this is the default maximum payload size
 
 
-def make_buffer(buf_iter, size=32):
+def make_buffer(buf_iter):
     """Returns a dynamically created payloads
 
     :param int buf_iter: The position of the payload in the data stream
-    :param int size:  The max number of bytes in the payload
     """
-    # we'll use `size` for the number of payloads in the list and the
+    # we'll use `SIZE` for the number of payloads in the list and the
     # payloads' length
     # prefix payload with a sequential letter to indicate which
     # payloads were lost (if any)
     buff = bytes([buf_iter + (65 if 0 <= buf_iter < 26 else 71)])
-    for j in range(size - 1):
-        char = bool(j >= (size - 1) / 2 + abs((size - 1) / 2 - buf_iter))
-        char |= bool(j < (size - 1) / 2 - abs((size - 1) / 2 - buf_iter))
+    for j in range(SIZE - 1):
+        char = bool(j >= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - buf_iter))
+        char |= bool(j < (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - buf_iter))
         buff += bytes([char + 48])
     return buff
 
 
-def master(count=1, size=32):
+def master(count=1):
     """Uses all 3 levels of the TX FIFO to send a stream of data
 
-    :param int count: how many time to transmit the stream of data.
-    :param int size: The number of bytes in the payload. This is also used to
-        specify the number of payloads in the stream of data
+    :param int count: how many times to transmit the stream of data.
     """
-    if size < 6:
-        print("setting size to 6;", size, "is not allowed for this example.")
-        size = 6
-    elif size > 32:
-        print("size cannot be greater than 32 for this example")
-        size = 32
-    # save on transmission time by setting the radio to only transmit the
-    # number of bytes we need to transmit
-    radio.payloadSize = size  # the default is the maximum 32 bytes
 
-    radio.stopListening()  # ensures the nRF24L01 is in TX mode
+    radio.stopListening()  # put radio in TX mode
     radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
     failures = 0  # keep track of manual retries
     start_timer = time.monotonic_ns()  # start timer
     for multiplier in range(count):  # repeat transmit the same data stream
         buf_iter = 0  # iterator of payloads for the while loop
-        while buf_iter < size:  # cycle through all the payloads
-            buffer = make_buffer(buf_iter, size)  # make a payload
+        while buf_iter < SIZE:  # cycle through all the payloads
+            buffer = make_buffer(buf_iter)  # make a payload
 
             if not radio.writeFast(buffer):  # transmission failed
                 failures += 1  # increment manual retry count
@@ -123,23 +101,14 @@ def master(count=1, size=32):
     )
 
 
-def slave(timeout=6, size=32):
+def slave(timeout=6):
     """Listen for any payloads and print them out (suffixed with received
     counter)
 
     :param int timeout: The number of seconds to wait (with no transmission)
         until exiting function.
-    :param int size: The number of bytes in the payload. This is also used to
-        specify the number of payloads in the stream of data
     """
-    if size > 32:
-        print("size cannot be greater than 32 for this example")
-        size = 32
-    # save on transmission time by setting the radio to only transmit the
-    #  number of bytes we need to transmit
-    radio.payloadSize = size  # the default is the maximum 32 bytes
-
-    radio.startListening()  # put radio into RX mode and power up
+    radio.startListening()  # put radio in RX mode
     count = 0  # keep track of the number of received payloads
     start_timer = time.monotonic()  # start timer
     while (time.monotonic() - start_timer) < timeout:
@@ -154,9 +123,96 @@ def slave(timeout=6, size=32):
     radio.stopListening()  # put the nRF24L01 is in TX mode
 
 
-print(
-    """\
-    RF24/examples_linux/streaming_data.py\n\
-    Run slave() on receiver\n\
-    Run master() on transmitter"""
-)
+def set_role():
+    """Set the role using stdin stream.
+    Role args can be specified using spaces (e.g. 'R 10' calls `slave(10)`)
+
+    :return:
+        - True when role is complete & app should continue running.
+        - False when app should exit
+    """
+    user_input = input(
+        "Enter 'R' for receiver role.\n"
+        "Enter 'T' for transmitter role.\n"
+        "Enter 'Q' to quit example.\n"
+    ) or "?"
+    user_input = user_input.split()
+    if user_input[0].upper().startswith("R"):
+        if len(user_input) > 1:
+            slave(int(user_input[1]))
+        else:
+            slave()
+        return True
+    elif user_input[0].upper().startswith("T"):
+        if len(user_input) > 1:
+            master(int(user_input[1]))
+        else:
+            master()
+        return True
+    elif user_input[0].upper().startswith("Q"):
+        radio.powerDown()
+        return False
+    else:
+        print(user_input[0], "is an unrecognized input. Please try again.")
+        return set_role()
+
+
+if __name__ == "__main__":
+
+    args = parser.parse_args()  # parse any CLI args
+
+    print(sys.argv[0])  # print example name
+
+    # For this example, we will use different addresses
+    # An address need to be a buffer protocol object (bytearray)
+    address = [b"1Node", b"2Node"]
+    # It is very helpful to think of an address as a path instead of as
+    # an identifying device destination
+
+    # to use different addresses on a pair of radios, we need a variable to
+    # uniquely identify which address this radio will use to transmit
+    # 0 uses address[0] to transmit, 1 uses address[1] to transmit
+    radio_number = args.radio_number  # uses default value from `parser`
+    if len(sys.argv) == 1:  # if no args were passed
+        radio_number = bool(
+            int(
+                input(
+                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
+                ) or 0
+            )
+        )
+
+    # initialize the nRF24L01 on the spi bus
+    if not radio.begin():
+        raise RuntimeError("radio hardware is not responding")
+
+    # set the Power Amplifier level to -12 dBm since this test example is
+    # usually run with nRF24L01 transceivers in close proximity of each other
+    radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+    # set the TX address of the RX node into the TX pipe
+    radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+    # set the RX address of the TX node into a RX pipe
+    radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
+    # To save time during transmission, we'll set the payload size to be only
+    # what we need. For this example, we'll be using the default maximum 32
+    radio.setPayloadSize(SIZE)
+
+    # for debugging, we have 2 options that print a large block of details
+    # (smaller) function that prints raw register values
+    # radio.printDetails()
+    # (larger) function that prints human readable data
+    # radio.printPrettyDetails()
+
+    try:
+        if args.role is None:  # if not specified with CLI arg '-r'
+            while set_role():
+                pass  # continue example until 'Q' is entered
+        else:  # if role was set using CLI args
+            # run role once and exit
+            master() if args.role else slave()
+    except KeyboardInterrupt:
+        radio.powerDown()
+        sys.exit()

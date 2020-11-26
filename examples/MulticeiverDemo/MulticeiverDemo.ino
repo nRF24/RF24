@@ -9,7 +9,7 @@
  * 1 receiving transceiver. This technique is trademarked by
  * Nordic Semiconductors as "MultiCeiver".
  *
- * This example was written to be used up to 6 devices acting as TX nodes &
+ * This example was written to be used on up to 6 devices acting as TX nodes &
  * only 1 device acting as the RX node (that's a maximum of 7 devices).
  * Use the Serial Monitor to change each node's behavior.
  */
@@ -65,7 +65,7 @@ void setup() {
 
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
-    Serial.println(F("radio is not responding!!"));
+    Serial.println(F("radio hardware is not responding!!"));
     while (1) {} // hold in infinite loop
   }
 
