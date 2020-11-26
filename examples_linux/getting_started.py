@@ -20,7 +20,7 @@ parser.add_argument(
 parser.add_argument(
     "-r",
     "--role",
-    type=bool,
+    type=int,
     choices=range(2),
     help="'1' specifies the TX role. '0' specifies the RX role."
 )
@@ -193,7 +193,7 @@ if __name__ == "__main__":
                 pass  # continue example until 'Q' is entered
         else:  # if role was set using CLI args
             # run role once and exit
-            master() if args.role else slave()
+            master() if bool(args.role) else slave()
     except KeyboardInterrupt:
         print(" Keyboard Interrupt detected. Exiting...")
         radio.powerDown()
