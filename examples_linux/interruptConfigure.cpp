@@ -122,6 +122,11 @@ int main(int argc, char** argv) {
                 }
                 a += 2;
             } // while
+            if (!foundArgNode && !foundArgRole) {
+                // no valid args were specified
+                printHelp(string(argv[0]));
+                return 0;
+            }
         } // else
     } // if
 

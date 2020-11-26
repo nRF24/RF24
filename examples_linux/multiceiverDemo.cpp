@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
     if (argc > 1) {
         if ((argc - 1) != 2) {
             // CLI arg "-n"/"--node" needs an option specified for it
+            // only 1 arg is expected, so only traverse the first "--arg option" pair
             printHelp(string(argv[0]));
             return 0;
         }
@@ -105,6 +106,11 @@ int main(int argc, char** argv) {
                 printHelp(string(argv[0]));
                 return 0;
             }
+        }
+        else {
+            // "-n"/"--node" arg was not specified
+            printHelp(string(argv[0]));
+            return 0;
         }
     }
 
