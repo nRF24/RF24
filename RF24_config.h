@@ -18,15 +18,16 @@
 #ifndef __RF24_CONFIG_H__
 #define __RF24_CONFIG_H__
 
-/*** USER DEFINES:    ***/    
+/*** USER DEFINES:    ***/
 #define FAILURE_HANDLING
 //#define SERIAL_DEBUG
 //#define MINIMAL
 //#define SPI_UART    // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
 //#define SOFTSPI     // Requires library from https://github.com/greiman/DigitalIO
-    
-#if !defined(RF24_POWERUP_DELAY_MS)
-#define RF24_POWERUP_DELAY_MS	5
+ 
+/** User access to internally used delay time (in microseconds) during RF24::powerUp() */
+#if !defined(RF24_POWERUP_DELAY)
+#define RF24_POWERUP_DELAY	5000
 #endif
 
 /**********************/
