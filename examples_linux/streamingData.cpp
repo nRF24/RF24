@@ -14,7 +14,6 @@
 #include <ctime>       // time()
 #include <cstring>     // strcmp()
 #include <iostream>    // cin, cout, endl
-#include <csignal>     // sigaction, sigemptyset(),  SIGINT
 #include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
 #include <RF24/RF24.h> // RF24, RF24_PA_LOW, delay()
@@ -41,12 +40,10 @@ RF24 radio(22, 0);
 char buffer[SIZE + 1];     // for the RX node
 unsigned int counter = 0;  // for counting the number of received payloads
 void makePayload(uint8_t); // prototype to construct a payload dynamically
-
-void setRole();                    // prototype to set the node's role
-void master();                     // prototype of the TX node's behavior
-void slave();                      // prototype of the RX node's behavior
-void printHelp(string);            // prototype to function that explain CLI arg usage
-void programInterruptHandler(int); // for handling keyboard interrupts
+void setRole();            // prototype to set the node's role
+void master();             // prototype of the TX node's behavior
+void slave();              // prototype of the RX node's behavior
+void printHelp(string);    // prototype to function that explain CLI arg usage
 
 // custom defined timer for evaluating transmission time in microseconds
 struct timespec startTimer, endTimer;
@@ -154,13 +151,6 @@ int main(int argc, char** argv) {
     // For debugging info
     // radio.printDetails();       // (smaller) function that prints raw register values
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
-
-    // setup interrupt handler for keyboard interrupts
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = programInterruptHandler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-    sigaction(SIGINT, &sigIntHandler, NULL);
 
     // ready to execute program now
     if (!foundArgRole) {           // if CLI arg "-r"/"--role" was not specified
@@ -284,17 +274,6 @@ uint32_t getMicros() {
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
     return ((seconds) * 1000 + useconds) + 0.5;
-}
-
-
-/**
- * function to handle system interrupt request signals.
- * This is meant to handle keyboard interrupts properly
- */
-void programInterruptHandler(int s) {
-    cout << " Interrupt signal " << s << " detected. Exiting..." << endl;
-    radio.powerDown();
-    exit(0);
 }
 
 

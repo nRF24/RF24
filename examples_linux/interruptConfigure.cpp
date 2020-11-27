@@ -16,7 +16,6 @@
 #include <ctime>       // time()
 #include <cstring>     // strcmp()
 #include <iostream>    // cin, cout, endl
-#include <csignal>     // sigaction, sigemptyset(),  SIGINT
 #include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
 #include <RF24/RF24.h> // RF24, RF24_PA_LOW, delay(), pinMode(), INPUT, attachInterrupt(), INT_EDGE_FALLING
@@ -52,14 +51,13 @@ uint8_t pl_iterator = 0;
 char tx_payloads[4][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
 char ack_payloads[3][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
-void interruptHandler();           // prototype to handle the interrupt request (IRQ) pin
-void setRole();                    // prototype to set the node's role
-void master();                     // prototype of the TX node's behavior
-void slave();                      // prototype of the RX node's behavior
-void ping_n_wait();                // prototype that sends a payload and waits for the IRQ pin to get triggered
-void printRxFifo(const uint8_t);   // prototype to print entire contents of RX FIFO with 1 buffer
-void printHelp(string);            // prototype to function that explain CLI arg usage
-void programInterruptHandler(int); // for handling keyboard interrupts
+void interruptHandler();         // prototype to handle the interrupt request (IRQ) pin
+void setRole();                  // prototype to set the node's role
+void master();                   // prototype of the TX node's behavior
+void slave();                    // prototype of the RX node's behavior
+void ping_n_wait();              // prototype that sends a payload and waits for the IRQ pin to get triggered
+void printRxFifo(const uint8_t); // prototype to print entire contents of RX FIFO with 1 buffer
+void printHelp(string);          // prototype to function that explain CLI arg usage
 
 
 int main(int argc, char** argv) {
@@ -162,13 +160,6 @@ int main(int argc, char** argv) {
     // For debugging info
     // radio.printDetails();       // (smaller) function that prints raw register values
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
-
-    // setup interrupt handler for keyboard interrupts
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = programInterruptHandler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-    sigaction(SIGINT, &sigIntHandler, NULL);
 
     // setup the digital input pin connected to the nRF24L01's IRQ pin
     pinMode(IRQ_PIN, INPUT);
@@ -387,16 +378,6 @@ void printRxFifo(const uint8_t pl_size) {
     cout << "Complete RX FIFO: " << rx_fifo << endl;
 }
 
-
-/**
- * function to handle system interrupt request signals.
- * This is meant to handle keyboard interrupts properly
- */
-void programInterruptHandler(int s) {
-    cout << " Interrupt signal " << s << " detected. Exiting..." << endl;
-    radio.powerDown();
-    exit(0);
-}
 
 
 /**
