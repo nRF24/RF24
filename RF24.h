@@ -385,7 +385,7 @@ public:
      * To return to low power mode, call powerDown().
      * @note This will take up to 5ms for maximum compatibility
      */
-    void powerUp(bool wait = true);
+    void powerUp(void);
 
     /**
     * Write for single NOACK writes. Optionally disables acknowledgements/autoretries for a single write.
