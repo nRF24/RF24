@@ -2,9 +2,17 @@ name: DoxyGen build
 
 on:
   pull_request:
+    branches:
+      - master
   push:
+    branches:
+      - master
   release:
-    types: [published, edited]
+    branches:
+      - master
+    types:
+      - published
+      - edited
 
 jobs:
   build-doxygen:
