@@ -43,10 +43,9 @@ struct PayloadStruct {
 };
 PayloadStruct payload;
 
-void setRole();         // prototype to set the node's role
-void master();          // prototype of the TX node's behavior
-void slave();           // prototype of the RX node's behavior
-void printHelp(string); // prototype to function that explain CLI arg usage
+void setRole(); // prototype to set the node's role
+void master();  // prototype of the TX node's behavior
+void slave();   // prototype of the RX node's behavior
 
 // custom defined timer for evaluating transmission time in microseconds
 struct timespec startTimer, endTimer;
@@ -69,67 +68,14 @@ int main(int argc, char** argv) {
     // uniquely identify which address this radio will use to transmit
     bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
-    bool foundArgNode = false;
-    bool foundArgRole = false;
-    bool role = false;
-    if (argc > 1) {
-        // CLI args are specified
-        if ((argc - 1) % 2 != 0) {
-            // some CLI arg doesn't have an option specified for it
-            printHelp(string(argv[0])); // all args need an option in this example
-            return 0;
-        }
-        else {
-            // iterate through args starting after program name
-            int a = 1;
-            while (a < argc) {
-                bool invalidOption = false;
-                if (strcmp(argv[a], "-n") == 0 || strcmp(argv[a], "--node") == 0) {
-                    // "-n" or "--node" has been specified
-                    foundArgNode = true;
-                    if (argv[a + 1][0] - 48 <= 1) {
-                        radioNumber = (argv[a + 1][0] - 48) == 1;
-                    }
-                    else {
-                        // option is invalid
-                        invalidOption = true;
-                    }
-                }
-                else if (strcmp(argv[a], "-r") == 0 || strcmp(argv[a], "--role") == 0) {
-                    // "-r" or "--role" has been specified
-                    foundArgRole = true;
-                    if (argv[a + 1][0] - 48 <= 1) {
-                        role = (argv[a + 1][0] - 48) == 1;
-                    }
-                    else {
-                        // option is invalid
-                        invalidOption = true;
-                    }
-                }
-                if (invalidOption) {
-                    printHelp(string(argv[0]));
-                    return 0;
-                }
-                a += 2;
-            } // while
-            if (!foundArgNode && !foundArgRole) {
-                // no valid args were specified
-                printHelp(string(argv[0]));
-                return 0;
-            }
-        } // else
-    } // if
-
     // print example's name
     cout << argv[0] << endl;
 
-    if (!foundArgNode) {
-        // Set the radioNumber via the terminal on startup
-        cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
-        string input;
-        getline(cin, input);
-        radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
-    }
+    // Set the radioNumber via the terminal on startup
+    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+    string input;
+    getline(cin, input);
+    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
 
     // to use ACK payloads, we need to enable dynamic payload lengths
     radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
@@ -154,12 +100,7 @@ int main(int argc, char** argv) {
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // ready to execute program now
-    if (!foundArgRole) {           // if CLI arg "-r"/"--role" was not specified
-        setRole();                 // calls master() or slave() based on user input
-    }
-    else {                         // if CLI arg "-r"/"--role" was specified
-        role ? master() : slave(); // based on CLI arg option
-    }
+    setRole(); // calls master() or slave() based on user input
     return 0;
 }
 
@@ -287,19 +228,4 @@ uint32_t getMicros() {
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
     return ((seconds) * 1000 + useconds) + 0.5;
-}
-
-
-/**
- * print a manual page of instructions on how to use this example's CLI args
- */
-void printHelp(string progName) {
-    cout << "usage: " << progName << " [-h] [-n {0,1}] [-r {0,1}]\n\n"
-         << "A simple example of sending data from 1 nRF24L01 transceiver to another\n"
-         << "with Acknowledgement (ACK) payloads attached to ACK packets.\n"
-         << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
-         << "\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n"
-         << "  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n"
-         << "  -r {0,1}, --role {0,1}\n\t\t\t'1' specifies the TX role."
-         << " '0' specifies the RX role." << endl;
 }

@@ -57,7 +57,6 @@ void master();                   // prototype of the TX node's behavior
 void slave();                    // prototype of the RX node's behavior
 void ping_n_wait();              // prototype that sends a payload and waits for the IRQ pin to get triggered
 void printRxFifo(const uint8_t); // prototype to print entire contents of RX FIFO with 1 buffer
-void printHelp(string);          // prototype to function that explain CLI arg usage
 
 
 int main(int argc, char** argv) {
@@ -77,67 +76,14 @@ int main(int argc, char** argv) {
     // uniquely identify which address this radio will use to transmit
     bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
-    bool foundArgNode = false;
-    bool foundArgRole = false;
-    bool role = false;
-    if (argc > 1) {
-        // CLI args are specified
-        if ((argc - 1) % 2 != 0) {
-            // some CLI arg doesn't have an option specified for it
-            printHelp(string(argv[0])); // all args need an option in this example
-            return 0;
-        }
-        else {
-            // iterate through args starting after program name
-            int a = 1;
-            while (a < argc) {
-                bool invalidOption = false;
-                if (strcmp(argv[a], "-n") == 0 || strcmp(argv[a], "--node") == 0) {
-                    // "-n" or "--node" has been specified
-                    foundArgNode = true;
-                    if (argv[a + 1][0] - 48 <= 1) {
-                        radioNumber = (argv[a + 1][0] - 48) == 1;
-                    }
-                    else {
-                        // option is invalid
-                        invalidOption = true;
-                    }
-                }
-                else if (strcmp(argv[a], "-r") == 0 || strcmp(argv[a], "--role") == 0) {
-                    // "-r" or "--role" has been specified
-                    foundArgRole = true;
-                    if (argv[a + 1][0] - 48 <= 1) {
-                        role = (argv[a + 1][0] - 48) == 1;
-                    }
-                    else {
-                        // option is invalid
-                        invalidOption = true;
-                    }
-                }
-                if (invalidOption) {
-                    printHelp(string(argv[0]));
-                    return 0;
-                }
-                a += 2;
-            } // while
-            if (!foundArgNode && !foundArgRole) {
-                // no valid args were specified
-                printHelp(string(argv[0]));
-                return 0;
-            }
-        } // else
-    } // if
-
     // print example's name
     cout << argv[0] << endl;
 
-    if (!foundArgNode) {
-        // Set the radioNumber via the terminal on startup
-        cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
-        string input;
-        getline(cin, input);
-        radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
-    }
+    // Set the radioNumber via the terminal on startup
+    cout << "Which radio is this? Enter '0' or '1'. Defaults to '0' ";
+    string input;
+    getline(cin, input);
+    radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
 
     // to use ACK payloads, we need to enable dynamic payload lengths
     radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
@@ -173,12 +119,7 @@ int main(int argc, char** argv) {
     // is unreliable during the IRQ pin FALLING transition.
 
     // ready to execute program now
-    if (!foundArgRole) {           // if CLI arg "-r"/"--role" was not specified
-        setRole();                 // calls master() or slave() based on user input
-    }
-    else {                         // if CLI arg "-r"/"--role" was specified
-        role ? master() : slave(); // based on CLI arg option
-    }
+    setRole(); // calls master() or slave() based on user input
     return 0;
 } // main
 
