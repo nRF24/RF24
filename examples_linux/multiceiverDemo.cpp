@@ -1,5 +1,5 @@
 /*
- * See documentation at https://tmrh20.github.io/RF24
+ * See documentation at https://nRF24.github.io/RF24
  * See License information at root directory of this library
  * Author: Brendan Doherty (2bndy5)
  */
@@ -31,7 +31,7 @@ using namespace std;
 // Generic:
 RF24 radio(22, 0);
 /****************** Linux (BBB,x86,etc) ***********************/
-// See http://tmrh20.github.io/RF24/pages.html for more information on usage
+// See http://nRF24.github.io/RF24/pages.html for more information on usage
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 

@@ -1,5 +1,5 @@
 /**
- * See documentation at https://tmrh20.github.io/RF24
+ * See documentation at https://nRF24.github.io/RF24
  * See License information at root directory of this library
  * written in 2014 by tong67 (https://github.com/tong67)
  * Updated 2020 by 2bndy5 (http://github.com/2bndy5) for the

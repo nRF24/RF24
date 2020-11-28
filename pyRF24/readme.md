@@ -1,2 +1,2 @@
 Python Wrapper for RF24
-See http://tmrh20.github.io/RF24 for more information
+See http://nRF24.github.io/RF24 for more information

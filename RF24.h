@@ -2151,10 +2151,10 @@ private:
  *
  * **Additional Information and Add-ons**
  *
- * @li <a href="http://tmrh20.github.io/RF24Network"> <b>RF24Network:</b> OSI Network Layer for multi-device communication. Create a home sensor network.</a>
- * @li <a href="http://tmrh20.github.io/RF24Mesh"> <b>RF24Mesh:</b> Dynamic Mesh Layer for RF24Network</a>
- * @li <a href="http://tmrh20.github.io/RF24Ethernet"> <b>RF24Ethernet:</b> TCP/IP Radio Mesh Networking (shares Arduino Ethernet API)</a>
- * @li <a href="http://tmrh20.github.io/RF24Audio"> <b>RF24Audio:</b> Realtime Wireless Audio streaming</a>
+ * @li <a href="http://nRF24.github.io/RF24Network"> <b>RF24Network:</b> OSI Network Layer for multi-device communication. Create a home sensor network.</a>
+ * @li <a href="http://nRF24.github.io/RF24Mesh"> <b>RF24Mesh:</b> Dynamic Mesh Layer for RF24Network</a>
+ * @li <a href="http://nRF24.github.io/RF24Ethernet"> <b>RF24Ethernet:</b> TCP/IP Radio Mesh Networking (shares Arduino Ethernet API)</a>
+ * @li <a href="http://nRF24.github.io/RF24Audio"> <b>RF24Audio:</b> Realtime Wireless Audio streaming</a>
  * @li <a href="http://tmrh20.blogspot.com/2014/03/high-speed-data-transfers-and-wireless.html"><b>My Blog:</b> RF24 Optimization Overview</a>
  * @li <a href="http://tmrh20.blogspot.com/2016/08/raspberry-pilinux-with-nrf24l01.html"><b>My Blog:</b> RPi/Linux w/RF24Gateway</a>
  * @li <a href="http://tmrh20.github.io/">All TMRh20 Documentation Main Page</a>
@@ -2448,7 +2448,7 @@ private:
  * Run @code sudo ldconfig @endcode
  *
  * 3. Install RF24, using MRAA
- * See http://tmrh20.github.io/RF24/Linux.html
+ * See http://nRF24.github.io/RF24/Linux.html
  *
  *
  * <br><br><br>
