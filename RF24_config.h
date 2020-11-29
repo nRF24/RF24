@@ -24,6 +24,15 @@
 //#define MINIMAL
 //#define SPI_UART    // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
 //#define SOFTSPI     // Requires library from https://github.com/greiman/DigitalIO
+ 
+/**
+ * User access to internally used delay time (in microseconds) during RF24::powerUp()
+ * @warning This default value compensates for all supported hardware. Only adjust this if you
+ * know your radio's hardware is, in fact, genuine and reliable.
+ */
+#if !defined(RF24_POWERUP_DELAY)
+#define RF24_POWERUP_DELAY	5000
+#endif
 
 /**********************/
 #define rf24_max(a, b) (a>b?a:b)
