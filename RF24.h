@@ -170,7 +170,7 @@ public:
      * Creates a new instance of this driver.  Before using, you create an instance
      * and send in the unique pins that this chip is connected to.
      *
-     * See http://tmrh20.github.io/RF24/pages.html for device specific information <br>
+     * See http://nRF24.github.io/RF24/pages.html for device specific information <br>
      *
      * @note Users can specify default SPI speed by modifying `#define RF24_SPI_SPEED` in RF24_config.h <br>
      * For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
