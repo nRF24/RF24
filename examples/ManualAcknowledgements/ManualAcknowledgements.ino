@@ -122,21 +122,19 @@ void loop() {
     if (report) {
       // transmission successful; wait for response and print results
 
-      bool timed_out = false;                                // a flag to track if response timed out
       radio.startListening();                                // put in RX mode
-      unsigned long start_timeout = millis();                // timer to detect no response
-      while (!radio.available() && !timed_out) {             // wait for response or timeout
+      unsigned long start_timeout = millis();                // timer to detect timeout
+      while (!radio.available()) {                           // wait for response
         if (millis() - start_timeout > 200)                  // only wait 200 ms
-          timed_out = true;
+          break;
       }
       unsigned long end_timer = micros();                    // end the timer
-      delayMicroseconds(130);
       radio.stopListening();                                 // put back in TX mode
 
       // print summary of transactions
       Serial.print(F("Transmission successful!"));           // payload was delivered
       uint8_t pipe;
-      if (radio.available(&pipe)) {                               // is there a payload received
+      if (radio.available(&pipe)) {                          // is there a payload received
         Serial.print(F(" Round-trip delay: "));
         Serial.print(end_timer - start_timer);               // print the timer result
         Serial.print(F(" us. Sent: "));
