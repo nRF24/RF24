@@ -10,8 +10,6 @@ extern "C" {
 #endif
 extern uint32_t millis(void);
 
-extern uint32_t mircos(void);
-
 #ifdef __cplusplus
 }
 #endif

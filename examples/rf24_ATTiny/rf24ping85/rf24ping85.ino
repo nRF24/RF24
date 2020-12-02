@@ -163,14 +163,12 @@ void loop() {
     if (report) {
       // transmission successful; wait for response and print results
 
-      bool timed_out = false;                    // a flag to track if response timed out
       radio.startListening();                    // put in RX mode
       unsigned long start_timeout = millis();    // timer to detect no response
-      while (!radio.available() && !timed_out) { // wait for response or timeout
+      while (!radio.available()) { // wait for response or timeout
         if (millis() - start_timeout > 200)      // only wait 200 ms
-          timed_out = true;
+          break;
       }
-      delayMicroseconds(130);
       radio.stopListening();                     // put back in TX mode
 
       // print summary of transactions

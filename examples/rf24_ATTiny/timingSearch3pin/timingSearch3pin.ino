@@ -61,12 +61,12 @@ void csn(bool mode) {
   if (CE_PIN != CSN_PIN) {
     digitalWrite(CSN_PIN, mode);
   } else {
-    digitalWrite(SCK, mode);
+    // digitalWrite(SCK, mode);
     if (mode == HIGH) {
-      // SCK->CSN HIGH
+      PORTB |= (1 << PINB2); // SCK->CSN HIGH
       delayMicroseconds(csnHighSettle); // allow csn to settle
     } else {
-      // SCK->CSN LOW
+      PORTB &= ~(1 << PINB2); // SCK->CSN LOW
       delayMicroseconds(csnLowSettle);  // allow csn to settle
     }
   }
