@@ -27,6 +27,15 @@
 
 #define _SPI SPI
 
+#if !defined(RF24_CSN_SETTLE_LOW_DELAY)
+#define RF24_CSN_SETTLE_LOW_DELAY 11
+#endif
+
+#if !defined(RF24_CSN_SETTLE_HIGH_DELAY)
+#define RF24_CSN_SETTLE_HIGH_DELAY 100
+#endif
+
+
 #ifdef SERIAL_DEBUG
     #define IF_SERIAL_DEBUG(x) ({x;})
 #else

@@ -24,7 +24,7 @@
 //#define MINIMAL
 //#define SPI_UART    // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
 //#define SOFTSPI     // Requires library from https://github.com/greiman/DigitalIO
- 
+
 /**
  * User access to internally used delay time (in microseconds) during RF24::powerUp()
  * @warning This default value compensates for all supported hardware. Only adjust this if you
@@ -53,7 +53,7 @@
     #include "utility/includes.h"
 
 //ATTiny
-#elif defined (__AVR_ATtiny25__) || defined (__AVR_ATtiny45__) || defined (__AVR_ATtiny85__) || defined (__AVR_ATtiny24__) || defined (__AVR_ATtiny44__) || defined (__AVR_ATtiny84__) || defined (__AVR_ATtiny2313__) || defined (__AVR_ATtiny4313__) || defined (__AVR_ATtiny861__)
+#elif defined (__AVR_ATtiny25__) || defined (__AVR_ATtiny45__) || defined (__AVR_ATtiny85__) || defined (__AVR_ATtiny24__) || defined (__AVR_ATtiny44__) || defined (__AVR_ATtiny84__) || defined (__AVR_ATtiny2313__) || defined (__AVR_ATtiny4313__) || defined (__AVR_ATtiny861__) || defined (__AVR_ATtinyX5__) || defined (__AVR_ATtinyX4__) || defined (__AVR_ATtinyX313__) || defined (__AVR_ATtinyX61__)
     #define RF24_TINY
     #include "utility/ATTiny/RF24_arch_config.h"
 

@@ -6,8 +6,9 @@
  */
 
 /*
- * This sketch can be used to determine the best settle time values to use for
- * RF24::csDelay in RF24::csn().
+ * This sketch can determine the best settle time values to use for
+ * macros, defined as RF24_CSN_SETTLE_HIGH_DELAY and RF24_CSN_SETTLE_LOW_DELAY,
+ * in RF24::csn().
  * The settle time values used here are 100/20. However, these values depend
  * on the actual used RC combiniation and voltage drop by LED. The
  * intermediate results are written to TX (PB3, pin 2 -- using Serial).
@@ -47,9 +48,12 @@
 #define MAX_LOW		100
 #define MINIMAL		8
 
-uint8_t csnHighSettle = MAX_HIGH;
-uint8_t csnLowSettle = MAX_LOW;
-uint8_t status; // for storing the status byte captured over MISO
+// Use these adjustable variables to test for best configuration to be used on
+// the ATTiny chips. These variables are defined as macros in the library's
+// RF24/utility/ATTiny/RF24_arch_config.h file. To change them, simply define
+// the corresponding macro(s) before #include <RF24> in your sketch.
+uint8_t csnHighSettle = MAX_HIGH; // defined as RF24_CSN_SETTLE_HIGH_DELAY
+uint8_t csnLowSettle = MAX_LOW;   // defined as RF24_CSN_SETTLE_LOW_DELAY
 
 /****************************************************************************/
 void ce(bool level) {
@@ -76,7 +80,7 @@ void csn(bool mode) {
 uint8_t read_register(uint8_t reg)
 {
   csn(LOW);
-  status = SPI.transfer(R_REGISTER | reg);
+  SPI.transfer(R_REGISTER | reg);
   uint8_t result = SPI.transfer(0xff);
   csn(HIGH);
   return result;
@@ -86,7 +90,7 @@ uint8_t read_register(uint8_t reg)
 void write_register(uint8_t reg, uint8_t value)
 {
   csn(LOW);
-  status = SPI.transfer(W_REGISTER | reg);
+  SPI.transfer(W_REGISTER | reg);
   SPI.transfer(value);
   csn(HIGH);
 }
@@ -131,8 +135,6 @@ void setup(void) {
 
   uint8_t result; // used to compare read/write results with read/write cmds
   bool success = true;
-  uint8_t csnHigh = MAX_HIGH;
-  uint8_t csnLow = MAX_LOW;
   uint8_t bottom_success;
   bool bottom_found;
   uint8_t value[] = {5, 10};
@@ -184,7 +186,7 @@ void setup(void) {
           bottom_success++;
         }
       }
-    }
+    } // while (bottom_success < 255)
     Serial.print("Settle value found for ");
     if (k == 0) {
       Serial.print("csnHigh: ");
@@ -194,7 +196,7 @@ void setup(void) {
     Serial.println(limit[k], DEC);
     advice[k] = limit[k] + (limit[k] / 10);
     limit[k] = 100;
-  }
+  } // for (uint8_t k = 0; k < 2; k++)
   Serial.print("Advised Settle times are: csnHigh=");
   Serial.print(advice[0], DEC);
   Serial.print(" csnLow=");

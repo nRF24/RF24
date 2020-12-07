@@ -21,12 +21,12 @@ void RF24::csn(bool mode)
     }
     else {
         if (mode == HIGH) {
-            PORTB |= (1<<PINB2);  	// SCK->CSN HIGH
-            delayMicroseconds(100); // allow csn to settle.
+            PORTB |= (1<<PINB2);  	                       // SCK->CSN HIGH
+            delayMicroseconds(RF24_CSN_SETTLE_HIGH_DELAY); // allow csn to settle.
         }
         else {
-            PORTB &= ~(1<<PINB2);	// SCK->CSN LOW
-            delayMicroseconds(11);  // allow csn to settle
+            PORTB &= ~(1<<PINB2);	                      // SCK->CSN LOW
+            delayMicroseconds(RF24_CSN_SETTLE_LOW_DELAY); // allow csn to settle
         }
     }
     // Return, CSN toggle complete
