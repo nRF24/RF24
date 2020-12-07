@@ -6,18 +6,17 @@
  */
 
 /**
-* @file compatibility.h
-* Class declaration for SPI helper files
-*/
+ * @file compatibility.h
+ * Class declaration for SPI helper files
+ */
 
 /**
-* Example of compatibility.h class declaration for timing functions portability
-*
-* @defgroup Porting_Timing Porting: Timing
-*
-*
-* @{
-*/
+ * Example of compatibility.h class declaration for timing functions portability
+ *
+ * @defgroup Porting_Timing Porting: Timing
+ *
+ * @{
+ */
 
 #ifndef COMPATIBLITY_H
 #define COMPATIBLITY_H

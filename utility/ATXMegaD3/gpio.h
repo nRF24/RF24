@@ -14,7 +14,7 @@
 * @{
 */
 #ifndef GPIO_H
-#define    GPIO_H
+#define GPIO_H
 
 #include <avr/io.h>
 #include "gpio_helper.h"
@@ -46,7 +46,6 @@ public:
     /**
      * Similar to Arduino digitalRead(pin);
      * @param port
-     * @param value
      */
     static int read(int port);
 
@@ -62,4 +61,4 @@ public:
 };
 
 #endif    /* GPIO_H */
-/*@}*/	
+/*@}*/

@@ -40,7 +40,6 @@ typedef enum {
      *  -18 dBm | -6 dBm | -12 dBm
      */
     RF24_PA_MIN = 0,
-
     /**
      * (1) represents:
      * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
@@ -48,7 +47,6 @@ typedef enum {
      *  -12 dBm | 0 dBm | -4 dBm
      */
     RF24_PA_LOW,
-
     /**
      * (2) represents:
      * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
@@ -56,7 +54,6 @@ typedef enum {
      *  -6 dBm | 3 dBm | 1 dBm
      */
     RF24_PA_HIGH,
-
     /**
      * (3) represents:
      * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
@@ -64,7 +61,6 @@ typedef enum {
      *  0 dBm | 7 dBm | 4 dBm
      */
     RF24_PA_MAX,
-
     /**
      * (4) This should not be used and remains for backward compatibility.
      */
@@ -109,7 +105,7 @@ typedef enum {
 
 /**
  * @}
- * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
+ * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
 class RF24 {
@@ -170,7 +166,7 @@ public:
      * Creates a new instance of this driver.  Before using, you create an instance
      * and send in the unique pins that this chip is connected to.
      *
-     * See http://nRF24.github.io/RF24/pages.html for device specific information <br>
+     * See [Related Pages](pages.html) for device specific information <br>
      *
      * @note Users can specify default SPI speed by modifying `#define RF24_SPI_SPEED` in RF24_config.h <br>
      * For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
@@ -1550,13 +1546,14 @@ public:
 
     /**
      * Open a pipe for reading
-     * @deprecated For compatibility with old code only, see new function
+     * @deprecated For compatibility with old code only, see newer function
+     * openReadingPipe()
      *
      * @warning Pipes 1-5 should share the first 32 bits.
      * Only the least significant byte should be unique, e.g.
      * @code
-     *   openReadingPipe(1,0xF0F0F0F0AA);
-     *   openReadingPipe(2,0xF0F0F0F066);
+     *   openReadingPipe(1, 0xF0F0F0F0AA);
+     *   openReadingPipe(2, 0xF0F0F0F066);
      * @endcode
      *
      * @warning Pipe 0 is also used by the writing pipe so should typically be avoided as a reading pipe.<br>
@@ -1570,7 +1567,8 @@ public:
 
     /**
      * Open a pipe for writing
-     * @deprecated For compatibility with old code only, see new function
+     * @deprecated For compatibility with old code only, see newer function
+     * openWritingPipe()
      *
      * Addresses are 40-bit hex values, e.g.:
      *

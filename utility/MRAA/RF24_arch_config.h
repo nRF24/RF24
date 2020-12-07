@@ -19,8 +19,8 @@
 //#include <UtilTime.h> // Precompiled arduino x86 based utiltime for timing functions
 
 // GCC a Arduino Missing
-#define HIGH    1
-#define LOW    0
+#define HIGH 1
+#define LOW 0
 #define _BV(x) (1<<(x))
 #define pgm_read_word(p) (*(p))
 #define pgm_read_byte(p) (*(p))
@@ -43,6 +43,7 @@
 #endif
 
 #define digitalWrite(pin, value) gpio.write(pin, value)
+#define digitalRead(pin) GPIO::read(pin)
 #define pinMode(pin, direction) gpio.open(pin, direction)
 
 #ifndef __TIME_H__
