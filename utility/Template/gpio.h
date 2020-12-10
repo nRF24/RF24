@@ -14,10 +14,8 @@
  */
 
 #include <cstdio>
-/**
- * @brief generic class for guidance about porting to an unsupported platform
- */
-class GPIO {
+
+// class GPIO {
 public:
     /* Constants */
     static const int DIRECTION_OUT = 1;

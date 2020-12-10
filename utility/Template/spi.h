@@ -23,10 +23,8 @@
 #include <linux/spi/spidev.h>
 
 using namespace std;
-/**
- * @brief generic class for guidance about porting to an unsupported platform
- */
-class SPI {
+
+// class SPI {
 public:
 
 	/**
