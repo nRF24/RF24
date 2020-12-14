@@ -25,7 +25,7 @@ void GPIO::close(int port)
     // Nothing to do with close;
 }
 
-int read(int port)
+int GPIO::read(int port)
 {
     uint8_t pin;
     PORT_t* p = GPIO_getPort(port, &pin);

@@ -113,7 +113,7 @@ void one_failed(void)
 }
 
 //
-// Setup 
+// Setup
 //
 
 void setup(void)
@@ -173,13 +173,14 @@ void setup(void)
 
     // We will be using the Ack Payload feature, so please enable it
     radio.enableAckPayload();
+    radio.enableDynamicPayloads();  // needed for using ACK payloads
 
     // Config 2 is special radio config
-    if (configuration == '2') {
+    if (configuration == '2'){
         radio.setCRCLength(RF24_CRC_8);
         radio.setDataRate(RF24_250KBPS);
         radio.setChannel(10);
-    } else {
+    }else{
         //Otherwise, default radio config
 
         // Optional: Increase CRC length for improved reliability
@@ -193,23 +194,23 @@ void setup(void)
     }
 
     // Config 3 is static payloads only
-    if (configuration == '3') {
+    if (configuration == '3'){
         next_payload_size = 16;
         payload_size_increments_by = 0;
         radio.setPayloadSize(next_payload_size);
-    } else {
+    }else{
         // enable dynamic payloads
         radio.enableDynamicPayloads();
     }
 
     // Config 4 tests out a higher pipe ##
-    if (configuration == '4' && role == role_sender) {
+    if (configuration == '4' && role == role_sender){
         // Set top 4 bytes of the address in pipe 1
         radio.openReadingPipe(1, pipe & 0xFFFFFFFF00ULL);
 
         // indicate the pipe to use
         pipe_number = 5;
-    } else if (role == role_sender) {
+    }else if (role == role_sender){
         radio.openReadingPipe(5, 0);
     }
 
@@ -220,9 +221,9 @@ void setup(void)
     // This simple sketch opens a single pipe for these two nodes to communicate
     // back and forth.  One listens on it, the other talks to it.
 
-    if (role == role_sender) {
+    if (role == role_sender){
         radio.openWritingPipe(pipe);
-    } else {
+    }else{
         radio.openReadingPipe(pipe_number, pipe);
     }
 
@@ -230,7 +231,7 @@ void setup(void)
     // Start listening
     //
 
-    if (role == role_receiver) {
+    if (role == role_receiver){
         radio.startListening();
     }
 
@@ -247,7 +248,7 @@ void setup(void)
 
     attachInterrupt(0, check_radio, FALLING);
     delay(50);
-    if (role == role_receiver) {
+    if (role == role_receiver){
         printf("\n\r+OK ");
     }
 }
@@ -265,19 +266,18 @@ char* prbuf_in = prbuf;
 char* prbuf_out = prbuf;
 
 //
-// Loop 
+// Loop
 //
 
 static uint32_t message_count = 0;
 static uint32_t last_message_count = 0;
 
-void loop(void)
-{
+void loop(void){
     //
     // Sender role.  Repeatedly send the current time
     //
 
-    if (role == role_sender && !done) {
+    if (role == role_sender && !done){
         // The payload will always be the same, what will change is how much of it we send.
         static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
 
@@ -290,7 +290,7 @@ void loop(void)
 
         // Update size for next time.
         next_payload_size += payload_size_increments_by;
-        if (next_payload_size > max_payload_size) {
+        if (next_payload_size > max_payload_size){
             next_payload_size = min_payload_size;
         }
 
@@ -298,7 +298,7 @@ void loop(void)
         delay(interval);
 
         // Timeout if we have not received anything back ever
-        if (!last_message_count && millis() > interval * 100) {
+        if (!last_message_count && millis() > interval * 100){
             printf("No responses received.  Are interrupts connected??\n\r");
             done = true;
         }
@@ -313,7 +313,7 @@ void loop(void)
     //
 
     size_t write_length = prbuf_in - prbuf_out;
-    if (write_length) {
+    if (write_length){
         Serial.write(reinterpret_cast<uint8_t*>(prbuf_out), write_length);
         prbuf_out += write_length;
     }
@@ -321,17 +321,16 @@ void loop(void)
     //
     // Stop the test if we're done and report results
     //
-    if (done && !notified) {
+    if (done && !notified){
         notified = true;
 
         printf("\n\r+OK ");
-        if (passed) {
+        if (passed){
             printf("PASS\n\r\n\r");
-        } else {
+        }else{
             printf("FAIL\n\r\n\r");
         }
     }
-
 }
 
 void check_radio(void)
@@ -341,48 +340,47 @@ void check_radio(void)
     radio.whatHappened(tx, fail, rx);
 
     // Have we successfully transmitted?
-    if (tx) {
-        if (role == role_sender) {
+    if (tx){
+        if (role == role_sender){
             prbuf_in += sprintf(prbuf_in, "Send:OK ");
         }
 
-        if (role == role_receiver) {
+        if (role == role_receiver){
             prbuf_in += sprintf(prbuf_in, "Ack Payload:Sent\n\r");
         }
     }
 
     // Have we failed to transmit?
-    if (fail) {
-        if (role == role_sender) {
+    if (fail){
+        if (role == role_sender){
             prbuf_in += sprintf(prbuf_in, "Send:Failed ");
 
             // log status of this line
             one_failed();
         }
 
-        if (role == role_receiver) {
+        if (role == role_receiver){
             prbuf_in += sprintf(prbuf_in, "Ack Payload:Failed\n\r");
         }
     }
 
     // Not powering down since radio is in standby mode
-    //if ( ( tx || fail ) && ( role == role_sender ) )
-    //radio.powerDown();
+    //if (( tx || fail ) && ( role == role_sender )){ radio.powerDown(); }
 
     // Did we receive a message?
-    if (rx) {
+    if (rx){
         // If we're the sender, we've received an ack payload
-        if (role == role_sender) {
+        if (role == role_sender){
             radio.read(&message_count, sizeof(message_count));
             prbuf_in += sprintf(prbuf_in, "Ack:%lu ", message_count);
 
             // is this ack what we were expecting?  to account
             // for failures, we simply want to make sure we get a
             // DIFFERENT ack every time.
-            if ((message_count != last_message_count) || (configuration == '3' && message_count == 16)) {
+            if ((message_count != last_message_count) || (configuration == '3' && message_count == 16)){
                 prbuf_in += sprintf(prbuf_in, "OK ");
                 one_ok();
-            } else {
+            }else{
                 prbuf_in += sprintf(prbuf_in, "FAILED ");
                 one_failed();
             }
@@ -390,14 +388,14 @@ void check_radio(void)
         }
 
         // If we're the receiver, we've received a time message
-        if (role == role_receiver) {
+        if (role == role_receiver){
             // Get this payload and dump it
             size_t len = max_payload_size;
             memset(receive_payload, 0, max_payload_size);
 
-            if (configuration == '3') {
+            if (configuration == '3'){
                 len = next_payload_size;
-            } else {
+            }else{
                 len = radio.getDynamicPayloadSize();
             }
 
@@ -415,6 +413,5 @@ void check_radio(void)
 
             ++message_count;
         }
-
     }
 }

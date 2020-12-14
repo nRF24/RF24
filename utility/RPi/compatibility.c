@@ -9,5 +9,5 @@ uint32_t millis(void)
 
     ms = ((now.tv_sec * 1000000) + now.tv_usec) / 1000;
     return (ms);
-    
+
 }

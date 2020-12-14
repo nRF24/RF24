@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   compatiblity.h
  * Author: purinda
  *
@@ -46,4 +46,4 @@ void update_milisec();
 
 #endif    /* COMPATIBLITY_H */
 
-/*@}*/	
+/*@}*/

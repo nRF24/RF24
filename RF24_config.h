@@ -1,6 +1,6 @@
 
 /*
- Copyright (C) 
+ Copyright (C)
     2011            J. Coliz <maniacbug@ymail.com>
     2015-2019 TMRh20
     2015            spaniakos <spaniakos@gmail.com>
@@ -9,7 +9,7 @@
     2016            akatran
     2017-2019 Avamander <avamander@gmail.com>
     2019            IkpeohaGodson
-                 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -24,7 +24,7 @@
 //#define MINIMAL
 //#define SPI_UART    // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
 //#define SOFTSPI     // Requires library from https://github.com/greiman/DigitalIO
- 
+
 /**
  * User access to internally used delay time (in microseconds) during RF24::powerUp()
  * @warning This default value compensates for all supported hardware. Only adjust this if you
@@ -35,11 +35,11 @@
 #endif
 
 /**********************/
-#define rf24_max(a,b) (a>b?a:b)
-#define rf24_min(a,b) (a<b?a:b)
+#define rf24_max(a, b) (a>b?a:b)
+#define rf24_min(a, b) (a<b?a:b)
 
 #define RF24_SPI_SPEED 10000000
-    
+
 //ATXMega
 #if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__) // In order to be available both in Windows and Linux this should take presence here.
     #define XMEGA
@@ -52,8 +52,8 @@
     // The includes.h file defines either RF24_RPi, MRAA, LITTLEWIRE or RF24_SPIDEV and includes the correct RF24_arch_config.h file
     #include "utility/includes.h"
 
-//ATTiny    
-#elif defined (__AVR_ATtiny25__) || defined (__AVR_ATtiny45__) || defined (__AVR_ATtiny85__) || defined (__AVR_ATtiny24__) || defined (__AVR_ATtiny44__) || defined (__AVR_ATtiny84__) || defined (__AVR_ATtiny2313__) || defined (__AVR_ATtiny4313__) || defined (__AVR_ATtiny861__)    
+//ATTiny
+#elif defined (__AVR_ATtiny25__) || defined (__AVR_ATtiny45__) || defined (__AVR_ATtiny85__) || defined (__AVR_ATtiny24__) || defined (__AVR_ATtiny44__) || defined (__AVR_ATtiny84__) || defined (__AVR_ATtiny2313__) || defined (__AVR_ATtiny4313__) || defined (__AVR_ATtiny861__) || defined (__AVR_ATtinyX5__) || defined (__AVR_ATtinyX4__) || defined (__AVR_ATtinyX313__) || defined (__AVR_ATtinyX61__)
     #define RF24_TINY
     #include "utility/ATTiny/RF24_arch_config.h"
 
@@ -61,11 +61,11 @@
     #include "utility/LittleWire/RF24_arch_config.h"
 
 #elif defined (TEENSYDUINO) //Teensy
-    #include "utility/Teensy/RF24_arch_config.h"    
+    #include "utility/Teensy/RF24_arch_config.h"
 
 #else //Everything else
     #include <Arduino.h>
-    
+
 
     #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
         #if defined SPI_UART
@@ -88,7 +88,7 @@
 
             const uint8_t SPI_MODE = 0;
             #define _SPI spi
-    
+
         #else // !defined (SPI_UART) && !defined (SOFTSPI)
             #include <SPI.h>
             #define _SPI SPI
@@ -114,7 +114,7 @@
             extern HardwareSPI SPI;
 
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
-        
+
         #ifndef _BV
           #define _BV(x) (1<<(x))
         #endif
@@ -129,13 +129,13 @@
 
         #endif // defined(RF24_TINY)
     #endif // SERIAL_DEBUG
-    
+
     #if defined (__ARDUINO_X86__)
         #define printf_P printf
         #define _BV(bit) (1<<(bit))
 
     #endif // defined (__ARDUINO_X86__)
-    
+
     // Progmem is Arduino-specific
     // Arduino DUE is arm and does not include avr/pgmspace
     #if defined (ARDUINO_ARCH_ESP8266) || defined (ESP32)
@@ -158,7 +158,7 @@
           #endif
           #ifndef pgm_read_byte
             #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-          #endif  
+          #endif
         #endif // !defined (ARDUINO)
 
         #ifndef prog_uint16_t
@@ -188,7 +188,7 @@
 
     #endif // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)
 #endif //Everything else
-    
+
 #if defined (SPI_HAS_TRANSACTION) && !defined (SPI_UART) && !defined (SOFTSPI)
     #define RF24_SPI_TRANSACTIONS
 #endif // defined (SPI_HAS_TRANSACTION) && !defined (SPI_UART) && !defined (SOFTSPI)

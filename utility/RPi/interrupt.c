@@ -59,7 +59,7 @@ int waitForInterrupt(int pin, int mS)
     //      A one character read appars to be enough.
     //      Followed by a seek to reset it.
 
-    (void) read(fd, &c, 1);
+    (void) (read(fd, &c, 1) + 1);
     lseek(fd, 0, SEEK_SET);
 
     return x;
@@ -153,7 +153,7 @@ int attachInterrupt(int pin, int mode, void (* function)(void))
 
     ioctl(sysFds[bcmGpioPin], FIONREAD, &count);
     for (i = 0; i < count; ++i) {
-        read(sysFds[bcmGpioPin], &c, 1);
+        (void) (read(sysFds[bcmGpioPin], &c, 1) + 1);
     }
 
     isrFunctions[pin] = function;

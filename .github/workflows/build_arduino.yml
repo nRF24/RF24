@@ -1,0 +1,157 @@
+name: Arduino CLI build
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/build_arduino.yml"
+      - "examples/**"
+      - "!examples/old_backups/recipes/pingpair_maple/**"
+
+  push:
+    paths:
+      - ".github/workflows/build_arduino.yml"
+      - "examples/**"
+      - "!examples/old_backups/recipes/pingpair_maple/**"
+
+jobs:
+  check_formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check code formatting
+        uses: per1234/artistic-style-action@main
+        with:
+          options-file-path: ./examples/examples_formatter.conf
+          name-patterns: |
+            - '*.ino'
+            - '*.cpp'
+            - '*.hpp'
+            - '*.h'
+          target-paths: |
+            - examples
+  build:
+    needs: check_formatting
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        fqbn:
+          - "arduino:avr:yun"
+          - "arduino:avr:uno"
+          - "arduino:avr:diecimila"
+          - "arduino:avr:nano"
+          - "arduino:avr:mega"
+          - "arduino:avr:megaADK"
+          - "arduino:avr:leonardo"
+          - "arduino:avr:micro"
+          - "arduino:avr:esplora"
+          - "arduino:avr:mini"
+          - "arduino:avr:ethernet"
+          - "arduino:avr:fio"
+          - "arduino:avr:bt"
+          # - "arduino:avr:LilyPad"  # board not found
+          - "arduino:avr:LilyPadUSB"
+          - "arduino:avr:pro"
+          - "arduino:avr:atmegang"
+          - "arduino:avr:robotControl"
+          - "arduino:avr:robotMotor"
+          # - "arduino:avr:gemma"  # does not support SPI
+          - "arduino:avr:circuitplay32u4cat"
+          - "arduino:avr:yunmini"
+          - "arduino:avr:chiwawa"
+          - "arduino:avr:one"
+          - "arduino:avr:unowifi"
+          - "arduino:mbed:nano33ble"
+          # - "arduino:samd:mkr1000"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrzero"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrwifi1010"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:nano_33_iot"
+          # - "arduino:samd:mkrfox1200"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrwan1300"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrwan1310"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrgsm1400"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrnb1500"  # InterruptConfigure.ino uses pin 2
+          # - "arduino:samd:mkrvidor4000"  # InterruptConfigure.ino uses pin 2
+          - "arduino:samd:adafruit_circuitplayground_m0"
+          - "arduino:samd:mzero_pro_bl"
+          - "arduino:samd:mzero_bl"
+          - "arduino:samd:tian"
+          - "arduino:megaavr:uno2018"
+          # - "arduino:megaavr:nano4809"  # board not found
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@main
+        with:
+          sketch-paths: |
+            - examples/GettingStarted
+            - examples/AcknowledgementPayloads
+            - examples/ManualAcknowledgements
+            - examples/StreamingData
+            - examples/MulticeiverDemo
+            - examples/InterruptConfigure
+          #   - examples/old_backups/GettingStarted_HandlingFailures
+          #   - examples/old_backups/pingpair_dyn
+          #   - examples/old_backups/pingpair_irq
+          #   - examples/old_backups/pingpair_multi_dyn
+          #   - examples/old_backups/pingpair_sleepy
+          #   - examples/old_backups/scanner
+          #   - examples/old_backups/TransferTimeouts
+          #   - examples/old_backups/recipes/led_remote
+          #   - examples/old_backups/recipes/nordic_fob
+          #   - examples/old_backups/recipes/pingpair_maple
+          fqbn: ${{ matrix.fqbn }}
+  attiny:
+    needs: check_formatting
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        fqbn:
+          - ATTinyCore:avr:attinyx4
+          - ATTinyCore:avr:attinyx4opti
+          - ATTinyCore:avr:attinyx4micr
+          - ATTinyCore:avr:attinyx5
+          - ATTinyCore:avr:attinyx5micr
+          - ATTinyCore:avr:attinyx8
+          - ATTinyCore:avr:attinyx8opti
+          - ATTinyCore:avr:attinyx8micr
+          - ATTinyCore:avr:attinyx7
+          - ATTinyCore:avr:attinyx7opti
+          - ATTinyCore:avr:attinyx7micr
+          - ATTinyCore:avr:attinyx61
+          - ATTinyCore:avr:attinyx61opti
+          - ATTinyCore:avr:attinyx41
+          - ATTinyCore:avr:attinyx41opti
+          - ATTinyCore:avr:attinyx41micr
+          # - ATTinyCore:avr:attiny43  # doesn't seem to support USI implementation of SPI
+          - ATTinyCore:avr:attiny828
+          - ATTinyCore:avr:attiny828opti
+          - ATTinyCore:avr:attiny1634
+          - ATTinyCore:avr:attiny1634opti
+          - ATTinyCore:avr:attinyx313
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@main
+        with:
+          platforms: |
+            - source-url: "http://drazzy.com/package_drazzy.com_index.json"
+              name: "ATTinyCore:avr"
+            - name: "arduino:avr"
+          sketch-paths: |
+            - examples/rf24_ATTiny/rf24ping85
+            - examples/rf24_ATTiny/timingSearch3pin
+          fqbn: ${{ matrix.fqbn }}

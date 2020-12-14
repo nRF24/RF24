@@ -1,142 +1,154 @@
-
 /*
-* Getting Started example sketch for nRF24L01+ radios
-* This is a very basic example of how to send data from one node to another
-* Updated: Dec 2014 by TMRh20
-*/
+ * See documentation at https://nRF24.github.io/RF24
+ * See License information at root directory of this library
+ * Author: Brendan Doherty (2bndy5)
+ */
 
+/**
+ * A simple example of sending data from 1 nRF24L01 transceiver to another.
+ *
+ * This example was written to be used on 2 devices acting as "nodes".
+ * Use the Serial Monitor to change each node's behavior.
+ */
 #include <SPI.h>
+#include "printf.h"
 #include "RF24.h"
 
-/****************** User Config ***************************/
-/***      Set this radio as radio number 0 or 1         ***/
-bool radioNumber = 0;
+// instantiate an object for the nRF24L01 transceiver
+RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
-/* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
-RF24 radio(7,8);
-/**********************************************************/
+// Let these addresses be used for the pair
+uint8_t address[][6] = {"1Node", "2Node"};
+// It is very helpful to think of an address as a path instead of as
+// an identifying device destination
 
-byte addresses[][6] = {"1Node","2Node"};
+// to use different addresses on a pair of radios, we need a variable to
+// uniquely identify which address this radio will use to transmit
+bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // Used to control whether this node is sending or receiving
-bool role = 0;
+bool role = false;  // true = TX role, false = RX role
+
+// For this example, we'll be using a payload containing
+// a single float number that will be incremented
+// on every successful transmission
+float payload = 0.0;
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println(F("RF24/examples/GettingStarted"));
-  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
-  
-  radio.begin();
 
-  // Set the PA Level low to prevent power supply related issues since this is a
- // getting_started sketch, and the likelihood of close proximity of the devices. RF24_PA_MAX is default.
-  radio.setPALevel(RF24_PA_LOW);
-  
-  // Open a writing and reading pipe on each radio, with opposite addresses
-  if(radioNumber){
-    radio.openWritingPipe(addresses[1]);
-    radio.openReadingPipe(1,addresses[0]);
-  }else{
-    radio.openWritingPipe(addresses[0]);
-    radio.openReadingPipe(1,addresses[1]);
+  Serial.begin(115200);
+  while (!Serial) {
+    // some boards need to wait to ensure access to serial over USB
   }
-  
-  // Start the radio listening for data
-  radio.startListening();
-}
+
+  // initialize the transceiver on the SPI bus
+  if (!radio.begin()) {
+    Serial.println(F("radio hardware is not responding!!"));
+    while (1) {} // hold in infinite loop
+  }
+
+  // print example's introductory prompt
+  Serial.println(F("RF24/examples/GettingStarted"));
+
+  // To set the radioNumber via the Serial monitor on startup
+  Serial.println(F("Which radio is this? Enter '0' or '1'. Defaults to '0'"));
+  while (!Serial.available()) {
+    // wait for user input
+  }
+  char input = Serial.parseInt();
+  radioNumber = input == 1;
+  Serial.print(F("radioNumber = "));
+  Serial.println((int)radioNumber);
+
+  // role variable is hardcoded to RX behavior, inform the user of this
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
+
+  // Set the PA Level low to try preventing power supply related problems
+  // because these examples are likely run with nodes in close proximity to
+  // each other.
+  radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+
+  // save on transmission time by setting the radio to only transmit the
+  // number of bytes we need to transmit a float
+  radio.setPayloadSize(sizeof(payload)); // float datatype occupies 4 bytes
+
+  // set the TX address of the RX node into the TX pipe
+  radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+
+  // set the RX address of the TX node into a RX pipe
+  radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
+
+  // additional setup specific to the node's role
+  if (role) {
+    radio.stopListening();  // put radio in TX mode
+  } else {
+    radio.startListening(); // put radio in RX mode
+  }
+
+  // For debugging info
+  // printf_begin();             // needed only once for printing details
+  // radio.printDetails();       // (smaller) function that prints raw register values
+  // radio.printPrettyDetails(); // (larger) function that prints human readable data
+
+} // setup
 
 void loop() {
-  
-  
-/****************** Ping Out Role ***************************/  
-if (role == 1)  {
-    
-    radio.stopListening();                                    // First, stop listening so we can talk.
-    
-    
-    Serial.println(F("Now sending"));
 
-    unsigned long start_time = micros();                             // Take the time, and send it.  This will block until complete
-     if (!radio.write( &start_time, sizeof(unsigned long) )){
-       Serial.println(F("failed"));
-     }
-        
-    radio.startListening();                                    // Now, continue listening
-    
-    unsigned long started_waiting_at = micros();               // Set up a timeout period, get the current microseconds
-    boolean timeout = false;                                   // Set up a variable to indicate if a response was received or not
-    
-    while ( ! radio.available() ){                             // While nothing is received
-      if (micros() - started_waiting_at > 200000 ){            // If waited longer than 200ms, indicate timeout and exit while loop
-          timeout = true;
-          break;
-      }      
-    }
-        
-    if ( timeout ){                                             // Describe the results
-        Serial.println(F("Failed, response timed out."));
-    }else{
-        unsigned long got_time;                                 // Grab the response, compare, and send to debugging spew
-        radio.read( &got_time, sizeof(unsigned long) );
-        unsigned long end_time = micros();
-        
-        // Spew it
-        Serial.print(F("Sent "));
-        Serial.print(start_time);
-        Serial.print(F(", Got response "));
-        Serial.print(got_time);
-        Serial.print(F(", Round-trip delay "));
-        Serial.print(end_time-start_time);
-        Serial.println(F(" microseconds"));
+  if (role) {
+    // This device is a TX node
+
+    unsigned long start_timer = micros();                    // start the timer
+    bool report = radio.write(&payload, sizeof(float));      // transmit & save the report
+    unsigned long end_timer = micros();                      // end the timer
+
+    if (report) {
+      Serial.print(F("Transmission successful! "));          // payload was delivered
+      Serial.print(F("Time to transmit = "));
+      Serial.print(end_timer - start_timer);                 // print the timer result
+      Serial.print(F(" us. Sent: "));
+      Serial.println(payload);                               // print payload sent
+      payload += 0.01;                                       // increment float payload
+    } else {
+      Serial.println(F("Transmission failed or timed out")); // payload was not delivered
     }
 
-    // Try again 1s later
-    delay(1000);
-  }
+    // to make this example readable in the serial monitor
+    delay(1000);  // slow transmissions down by 1 second
 
+  } else {
+    // This device is a RX node
 
+    uint8_t pipe;
+    if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
+      uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
+      radio.read(&payload, bytes);                   // fetch payload from FIFO
+      Serial.print(F("Received "));
+      Serial.print(bytes);                           // print the size of the payload
+      Serial.print(F(" bytes on pipe "));
+      Serial.print(pipe);                            // print the pipe number
+      Serial.print(F(": "));
+      Serial.println(payload);                       // print the payload's value
+    }
+  } // role
 
-/****************** Pong Back Role ***************************/
+  if (Serial.available()) {
+    // change the role via the serial monitor
 
-  if ( role == 0 )
-  {
-    unsigned long got_time;
-    
-    if( radio.available()){
-                                                                    // Variable for the received timestamp
-      while (radio.available()) {                                   // While there is data ready
-        radio.read( &got_time, sizeof(unsigned long) );             // Get the payload
-      }
-     
-      radio.stopListening();                                        // First, stop listening so we can talk   
-      radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
-      radio.startListening();                                       // Now, resume listening so we catch the next packets.     
-      Serial.print(F("Sent response "));
-      Serial.println(got_time);  
-   }
- }
-
-
-
-
-/****************** Change Roles via Serial Commands ***************************/
-
-  if ( Serial.available() )
-  {
     char c = toupper(Serial.read());
-    if ( c == 'T' && role == 0 ){      
+    if (c == 'T' && !role) {
+      // Become the TX node
+
+      role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
-      role = 1;                  // Become the primary transmitter (ping out)
-    
-   }else
-    if ( c == 'R' && role == 1 ){
-      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));      
-       role = 0;                // Become the primary receiver (pong back)
-       radio.startListening();
-       
+      radio.stopListening();
+
+    } else if (c == 'R' && role) {
+      // Become the RX node
+
+      role = false;
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
+      radio.startListening();
     }
   }
 
-
-} // Loop
-
+} // loop

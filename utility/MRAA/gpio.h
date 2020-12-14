@@ -1,13 +1,13 @@
-/* 
+/*
  * TMRh20 2015
- * 
+ *
  */
 
 #ifndef RF24_ARCH_GPIO_H
-#define    RF24_ARCH_GPIO_H
+#define RF24_ARCH_GPIO_H
 /**
 * @file spi.h
-* \cond HIDDEN_SYMBOLS
+* @cond HIDDEN_SYMBOLS
 * Class declaration for GPIO helper files
 */
 #include <cstdio>
@@ -46,7 +46,6 @@ public:
     /**
      *
      * @param port
-     * @param value
      */
     int read(int port);
 
@@ -64,7 +63,7 @@ private:
     //mraa::Gpio* gpio_1; /** gpio object for cs_pin **/
 };
 /**
- * \endcond
+ * @endcond
  */
-#endif    /* RF24_ARCH_GPIO_H */
+#endif /* RF24_ARCH_GPIO_H */
 

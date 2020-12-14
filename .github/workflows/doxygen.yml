@@ -1,0 +1,46 @@
+name: DoxyGen build
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  release:
+    branches:
+      - master
+    types:
+      - published
+      - edited
+
+jobs:
+  build-doxygen:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: get latest release version number
+      id: latest_ver
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: nRF24/RF24
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: overwrite doxygen tags
+      run: |
+        mkdir docs
+        touch doxygenAction
+        echo "PROJECT_NUMBER = ${{ steps.latest_ver.outputs.release }}" >> doxygenAction
+        echo "OUTPUT_DIRECTORY = ./docs" >> doxygenAction
+        echo "@INCLUDE = doxygenAction" >> Doxyfile
+    - name: build doxygen
+      uses: mattnotmitt/doxygen-action@v1
+      with:
+          working-directory: '.'
+          doxyfile-path: './Doxyfile'
+    - name: upload to github pages
+      if: ${{ github.event_name == 'release'}}
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/html

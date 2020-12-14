@@ -48,7 +48,7 @@ const uint64_t pipe = 0xE8E8F0F0E1LL;
 //
 
 // The various roles supported by this sketch
-typedef enum {
+typedef enum{
     role_sender = 1,
     role_receiver
 } role_e;
@@ -62,8 +62,7 @@ role_e role;
 // Interrupt handler, check the radio because we got an IRQ
 void check_radio(void);
 
-void setup(void)
-{
+void setup(void){
     //
     // Role
     //
@@ -74,7 +73,7 @@ void setup(void)
     delay(20); // Just to get a solid reading on the role pin
 
     // read the address pin, establish our role
-    if (digitalRead(role_pin)) {
+    if (digitalRead(role_pin)){
         role = role_sender;
     } else {
         role = role_receiver;
@@ -97,6 +96,7 @@ void setup(void)
 
     // We will be using the Ack Payload feature, so please enable it
     radio.enableAckPayload();
+    radio.enableDynamicPayloads();  // needed for using ACK payloads
 
     //
     // Open pipes to other nodes for communication
@@ -115,9 +115,8 @@ void setup(void)
     // Start listening
     //
 
-    if (role == role_receiver) {
+    if (role == role_receiver)
         radio.startListening();
-    }
 
     //
     // Dump the configuration of the rf unit for debugging
@@ -148,7 +147,7 @@ void loop(void)
     // Sender role.  Repeatedly send the current time
     //
 
-    if (role == role_sender) {
+    if (role == role_sender){
         // Take the time, and send it.
         unsigned long time = millis();
         printf("Now sending %lu\n\r", time);
@@ -171,43 +170,43 @@ void check_radio(void)
     radio.whatHappened(tx, fail, rx);
 
     // Have we successfully transmitted?
-    if (tx) {
-        if (role == role_sender) {
+    if (tx){
+        if (role == role_sender){
             printf("Send:OK\n\r");
         }
 
-        if (role == role_receiver) {
+        if (role == role_receiver){
             printf("Ack Payload:Sent\n\r");
         }
     }
 
     // Have we failed to transmit?
-    if (fail) {
-        if (role == role_sender) {
+    if (fail){
+        if (role == role_sender){
             printf("Send:Failed\n\r");
         }
 
-        if (role == role_receiver) {
+        if (role == role_receiver){
             printf("Ack Payload:Failed\n\r");
         }
     }
 
     // Transmitter can power down for now, because
     // the transmission is done.
-    if ((tx || fail) && (role == role_sender)) {
+    if ((tx || fail) && (role == role_sender)){
         radio.powerDown();
     }
 
     // Did we receive a message?
-    if (rx) {
+    if (rx){
         // If we're the sender, we've received an ack payload
-        if (role == role_sender) {
+        if (role == role_sender){
             radio.read(&message_count, sizeof(message_count));
             printf("Ack:%lu\n\r", (unsigned long) message_count);
         }
 
         // If we're the receiver, we've received a time message
-        if (role == role_receiver) {
+        if (role == role_receiver){
             // Get this payload and dump it
             static unsigned long got_time;
             radio.read(&got_time, sizeof(got_time));
