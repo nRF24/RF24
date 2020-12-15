@@ -11,7 +11,6 @@
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()
-#include <cstring>     // strcmp()
 #include <iostream>    // cin, cout, endl
 #include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
@@ -189,18 +188,4 @@ uint32_t getMicros() {
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
     return ((seconds) * 1000 + useconds) + 0.5;
-}
-
-
-/**
- * print a manual page of instructions on how to use this example's CLI args
- */
-void printHelp(string progName) {
-    cout << "usage: " << progName << " [-h] [-n {0,1}] [-r {0,1}]\n\n"
-         << "A simple example of sending data from 1 nRF24L01 transceiver to another.\n"
-         << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
-         << "\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n"
-         << "  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n"
-         << "  -r {0,1}, --role {0,1}\n\t\t\t'1' specifies the TX role."
-         << " '0' specifies the RX role." << endl;
 }
