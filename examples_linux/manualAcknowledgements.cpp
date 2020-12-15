@@ -17,7 +17,6 @@
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()
-#include <cstring>     // strcmp()
 #include <iostream>    // cin, cout, endl
 #include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
