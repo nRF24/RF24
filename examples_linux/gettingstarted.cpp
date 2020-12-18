@@ -11,7 +11,6 @@
  * Use `ctrl+c` to quit at any time.
  */
 #include <ctime>       // time()
-#include <cstring>     // strcmp()
 #include <iostream>    // cin, cout, endl
 #include <string>      // string, getline()
 #include <time.h>      // CLOCK_MONOTONIC_RAW, timespec, clock_gettime()
@@ -164,7 +163,7 @@ void slave() {
     while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
         uint8_t pipe;
         if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
-            uint8_t bytes = radio.getDynamicPayloadSize();   // get the size of the payload
+            uint8_t bytes = radio.getPayloadSize();          // get the size of the payload
             radio.read(&payload, bytes);                     // fetch payload from FIFO
             cout << "Received " << (unsigned int)bytes;      // print the size of the payload
             cout << " bytes on pipe " << (unsigned int)pipe; // print the pipe number
@@ -189,18 +188,4 @@ uint32_t getMicros() {
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
     return ((seconds) * 1000 + useconds) + 0.5;
-}
-
-
-/**
- * print a manual page of instructions on how to use this example's CLI args
- */
-void printHelp(string progName) {
-    cout << "usage: " << progName << " [-h] [-n {0,1}] [-r {0,1}]\n\n"
-         << "A simple example of sending data from 1 nRF24L01 transceiver to another.\n"
-         << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"
-         << "\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n"
-         << "  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n"
-         << "  -r {0,1}, --role {0,1}\n\t\t\t'1' specifies the TX role."
-         << " '0' specifies the RX role." << endl;
 }
