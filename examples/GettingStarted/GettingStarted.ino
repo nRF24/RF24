@@ -119,15 +119,15 @@ void loop() {
     // This device is a RX node
 
     uint8_t pipe;
-    if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
-      uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
-      radio.read(&payload, bytes);                   // fetch payload from FIFO
+    if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
+      uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
+      radio.read(&payload, bytes);            // fetch payload from FIFO
       Serial.print(F("Received "));
-      Serial.print(bytes);                           // print the size of the payload
+      Serial.print(bytes);                    // print the size of the payload
       Serial.print(F(" bytes on pipe "));
-      Serial.print(pipe);                            // print the pipe number
+      Serial.print(pipe);                     // print the pipe number
       Serial.print(F(": "));
-      Serial.println(payload);                       // print the payload's value
+      Serial.println(payload);                // print the payload's value
     }
   } // role
 
