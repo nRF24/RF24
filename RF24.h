@@ -2144,8 +2144,8 @@ private:
  * @li <a href="classRF24.html"><b>RF24 Class Documentation</b></a>
  * @li <a href="pages.html"><b>Support & Configuration</b></a>
  * @li <a href="https://github.com/nRF24/RF24/"><b>Source Code</b></a>
- * @li <a href="http://github.com/nRF24/RF24/datasheets/nRF24L01_datasheet_v2.pdf">nRF24L01 v2.0 Datasheet</a>
- * @li <a href="http://github.com/nRF24/RF24/datasheets/nRF24L01P_datasheet_v1.pdf">nRF24L01+ v1.0 Datasheet</a>
+ * @li <a href="http://github.com/nRF24/RF24/raw/master/datasheets/nRF24L01_datasheet_v2.pdf">nRF24L01 v2.0 Datasheet</a>
+ * @li <a href="http://github.com/nRF24/RF24/raw/master/datasheets/nRF24L01P_datasheet_v1.pdf">nRF24L01+ v1.0 Datasheet</a>
  *
  * **Additional Information and Add-ons**
  *
