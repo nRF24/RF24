@@ -631,7 +631,7 @@ void RF24::printPrettyDetails(void) {
         "\r\n"), (char*)pgm_read_ptr(&rf24_feature_e_str_P[(bool)(autoAck) * 1]));
     } else {
         // representation per pipe
-        printf_P(PSTR("Auto Acknowledgment\t0b%c%c%c%c%c%c\r\n"),
+        printf_P(PSTR("Auto Acknowledgment\t= 0b%c%c%c%c%c%c\r\n"),
                  (char)((bool)(autoAck & _BV(ENAA_P5)) + 48),
                  (char)((bool)(autoAck & _BV(ENAA_P4)) + 48),
                  (char)((bool)(autoAck & _BV(ENAA_P3)) + 48),
