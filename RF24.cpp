@@ -628,7 +628,7 @@ void RF24::printPrettyDetails(void) {
     "\r\n"), (char*)pgm_read_ptr(&rf24_feature_e_str_P[(bool)(autoAck & 1) * 1]));
 
     config_reg = read_register(NRF_CONFIG);
-    printf_P(PSTR("Primary Mode\t\t= %cX\r\n"), config_reg & _BV(PWR_UP) ? 'T' : 'R');
+    printf_P(PSTR("Primary Mode\t\t= %cX\r\n"), config_reg & _BV(PRIM_RX) ? 'T' : 'R');
     print_address_register(PSTR("TX address\t"), TX_ADDR);
 
     uint8_t openPipes = read_register(EN_RXADDR);
