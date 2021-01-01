@@ -2194,7 +2194,7 @@ private:
  *
  * @li [0] https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
  * @li [1] http://highlowtech.org/?p=1695
- * @li [2] http://littlewire.cc/
+ * @li [2] http://littlewire.github.io/
  * <br><br><br>
  *
  *
