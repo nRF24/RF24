@@ -2171,7 +2171,7 @@ private:
  *
  * @li <a href="Arduino.html"><b>Arduino</b></a> (Uno, Nano, Mega, Due, Galileo, etc)
  * @li <a href="ATTiny.html"><b>ATTiny</b></a>
- * @li <a href="Linux.html"><b>Linux Installation</b></a>( <a href="RPi.html"><b>Linux/RPi General</b></a> , <a href="MRAA.html"><b>MRAA</b></a> supported boards ( Galileo, Edison, etc), <a href="LittleWire.html"><b>LittleWire</b></a>)
+ * @li <a href="Linux.html"><b>Linux Installation</b></a>( <a href="RPi.html"><b>Linux/RPi General</b></a> , <a href="MRAA.html"><b>MRAA</b></a> supported boards (Galileo, Edison, etc), LittleWire)
  * @li <a href="CrossCompile.html"><b>Cross-compilation</b></a> for linux devices
  * @li <a href="Python.html"><b>Python</b></a> wrapper available for Linux devices
  *
