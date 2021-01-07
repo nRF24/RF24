@@ -1,6 +1,6 @@
 #include "compatibility.h"
-
-static struct timeval start, end;
+#include <chrono>
+//static struct timeval start, end;
 //static long mtime, seconds, useconds;
 
 /**********************************************************************/
@@ -26,22 +26,19 @@ void __usleep(int milisec)
     //usleep(milisec);
 }
 
+auto start = std::chrono::steady_clock::now();
+
 /**
  * This function is added in order to simulate arduino millis() function
  */
 void __start_timer()
 {
-    gettimeofday(&start, NULL);
+    //gettimeofday(&start, NULL);
 }
 
 long __millis()
 {
-    static long mtime, seconds, useconds;
-
-    gettimeofday(&end, NULL);
-    seconds = end.tv_sec - start.tv_sec;
-    useconds = end.tv_usec - start.tv_usec;
-
-    mtime = ((seconds) * 1000 + useconds / 1000.0) + 0.5;
-    return mtime;
+    auto end = std::chrono::steady_clock::now();
+	
+	return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }

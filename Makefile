@@ -47,8 +47,8 @@ bcm2835.o: $(DRIVER_DIR)/bcm2835.c
 spi.o: $(DRIVER_DIR)/spi.cpp
 	$(CXX) -fPIC $(CFLAGS) -c $^
 
-compatibility.o: $(DRIVER_DIR)/compatibility.c
-	$(CC) -fPIC  $(CFLAGS) -c $(DRIVER_DIR)/compatibility.c
+compatibility.o: $(DRIVER_DIR)/compatibility.cpp
+	$(CC) -fPIC  $(CFLAGS) -c $(DRIVER_DIR)/compatibility.cpp
 
 gpio.o: $(DRIVER_DIR)/gpio.cpp
 	$(CXX) -fPIC $(CFLAGS) -c $(DRIVER_DIR)/gpio.cpp

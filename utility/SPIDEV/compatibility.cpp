@@ -1,9 +1,10 @@
 #include "compatibility.h"
 
-static uint32_t mtime, seconds, useconds;
+long long mtime, seconds, useconds;
 //static struct timeval start, end;
-struct timespec start, end;
-
+//struct timespec start, end;
+#include <time.h>
+#include <chrono>
 /**********************************************************************/
 /**
  * This function is added in order to simulate arduino delay() function
@@ -31,21 +32,20 @@ void __usleep(int microsec)
  * This function is added in order to simulate arduino millis() function
  */
 
+bool timerStarted = false; 
 
 void __start_timer()
 {
-    //gettimeofday(&start, NULL);
-    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
 }
+
+auto start = std::chrono::steady_clock::now();
 
 uint32_t __millis()
 {
-    //gettimeofday(&end, NULL);
-    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-    seconds = end.tv_sec - start.tv_sec;
-    useconds = (end.tv_nsec - start.tv_nsec) / 1000;
-
-    mtime = ((seconds) * 1000 + useconds / 1000.0) + 0.5;
-    return mtime;
+	
+	auto end = std::chrono::steady_clock::now();
+	
+	return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }
 
