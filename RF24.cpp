@@ -1609,7 +1609,7 @@ void RF24::disableCRC(void)
 /****************************************************************************/
 void RF24::setRetries(uint8_t delay, uint8_t count)
 {
-    write_register(SETUP_RETR, (delay & 0xf) << ARD | (count & 0xf) << ARC);
+    write_register(SETUP_RETR, rf24_min(15, delay) << ARD | rf24_min(15, count));
 }
 
 /****************************************************************************/
