@@ -478,7 +478,7 @@ public:
      * differs from printDetails() because it makes the information more
      * understandable without having to look up the datasheet or convert
      * hexadecimal to binary. Only use this function if your application can
-     * spare a few extra bytes of memory.
+     * spare extra bytes of memory.
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      * The printf.h file is included with the library for Arduino.
@@ -490,6 +490,11 @@ public:
      *  ...
      * }
      * @endcode
+     *
+     * @note If the automatic acknowledgements feature is configured differently
+     * for each pipe, then a binary representation is used in which bits 0-5
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled and
+     * a `1` means the feature is enabled.
      */
     void printPrettyDetails(void);
 

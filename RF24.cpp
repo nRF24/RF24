@@ -619,16 +619,29 @@ void RF24::printPrettyDetails(void) {
     "\r\n"), (char*)pgm_read_ptr(&rf24_feature_e_str_P[(bool)(features & _BV(EN_ACK_PAY)) * 1]));
 
     uint8_t dynPl = read_register(DYNPD);
-    uint8_t autoAck = read_register(EN_AA);
     printf_P(PSTR("Dynamic Payloads\t"
     PRIPSTR
     "\r\n"), (char*)pgm_read_ptr(&rf24_feature_e_str_P[(dynPl && (features &_BV(EN_DPL))) * 1]));
-    printf_P(PSTR("Auto Acknowledgment\t"
-    PRIPSTR
-    "\r\n"), (char*)pgm_read_ptr(&rf24_feature_e_str_P[(bool)(autoAck & 1) * 1]));
+
+    uint8_t autoAck = read_register(EN_AA);
+    if (autoAck == 0x3F || autoAck == 0) {
+        // all pipes have the same configuration about auto-ack feature
+        printf_P(PSTR("Auto Acknowledgment\t"
+        PRIPSTR
+        "\r\n"), (char*)pgm_read_ptr(&rf24_feature_e_str_P[(bool)(autoAck) * 1]));
+    } else {
+        // representation per pipe
+        printf_P(PSTR("Auto Acknowledgment\t= 0b%c%c%c%c%c%c\r\n"),
+                 (char)((bool)(autoAck & _BV(ENAA_P5)) + 48),
+                 (char)((bool)(autoAck & _BV(ENAA_P4)) + 48),
+                 (char)((bool)(autoAck & _BV(ENAA_P3)) + 48),
+                 (char)((bool)(autoAck & _BV(ENAA_P2)) + 48),
+                 (char)((bool)(autoAck & _BV(ENAA_P1)) + 48),
+                 (char)((bool)(autoAck & _BV(ENAA_P0)) + 48));
+    }
 
     config_reg = read_register(NRF_CONFIG);
-    printf_P(PSTR("Primary Mode\t\t= %cX\r\n"), config_reg & _BV(PWR_UP) ? 'T' : 'R');
+    printf_P(PSTR("Primary Mode\t\t= %cX\r\n"), config_reg & _BV(PRIM_RX) ? 'R' : 'T');
     print_address_register(PSTR("TX address\t"), TX_ADDR);
 
     uint8_t openPipes = read_register(EN_RXADDR);
