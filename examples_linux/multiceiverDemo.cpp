@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
     // to use different addresses on a pair of radios, we need a variable to
     // uniquely identify which address this radio will use to transmit
-    unsigned int nodeNumber = 'R'; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
+    unsigned int nodeNumber = 'R'; // integers 0-5 = TX node; character 'R' or integer 82 = RX node
 
     bool foundArgNode = false;
     if (argc > 1) {
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
         else if (strcmp(argv[1], "-n") == 0 || strcmp(argv[1], "--node") == 0) {
             // "-n" or "--node" has been specified
             foundArgNode = true;
-            if ((argv[2][0] - 48) < 6) {
+            if ((argv[2][0] - 48) < 6 && (argv[2][0] - 48) >= 0) {
                 nodeNumber = argv[2][0] - 48;
             }
             else if (argv[2][0] == 'R' || argv[2][0] == 'r') {
