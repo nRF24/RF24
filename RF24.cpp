@@ -754,7 +754,7 @@ bool RF24::begin(void)
     write_register(DYNPD, 0);         // disable dynamic payloads by default (for all pipes)
     dynamic_payloads_enabled = false;
     write_register(EN_AA, 0x3F);      // enable auto-ack on all pipes
-    write_register(EN_RXADDR, 0);     // close all RX pipes
+    write_register(EN_RXADDR, 3);     // close all RX pipes
     setPayloadSize(32);               // set static payload size to 32 (max) bytes by default
     setAddressWidth(5);               // set default address length to (max) 5 bytes
 
@@ -1355,7 +1355,7 @@ void RF24::enableAckPayload(void)
         IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
         // Enable dynamic payload on pipes 0
-        write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P0));
+        write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
         dynamic_payloads_enabled = true;
         ack_payloads_enabled = true;
     }
