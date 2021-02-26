@@ -16,5 +16,6 @@
     "espressif32",
     "espressif8266",
     "linux_arm"
+    "ststm32"
   ]
 }

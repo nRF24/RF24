@@ -38,7 +38,7 @@ uint64_t address[6] = {0x7878787878LL,
 // transmit and only 1 node to receive, we will use a negative value in our
 // role variable to signify this node is a receiver.
 // role variable is used to control whether this node is sending or receiving
-char role = 'R'; // 0-5 = TX node; any negative number = RX node
+char role = 'R'; // integers 0-5 = TX node; character 'R' or integer 82 = RX node
 
 // For this example, we'll be using a payload containing
 // a node ID number and a single integer number that will be incremented
