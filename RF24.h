@@ -2174,7 +2174,7 @@ private:
  * |  8  |   IRQ    |      -      |        -           |         -       | -                       |    -       |       -           |
  *
  * @li [0] https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints
- * @li [1] http://highlowtech.org/?p=1695
+ * @li [1] http://highlowtech.org/?p=1695 The ATTiny2313 is unsupported due to lack of sufficient memory resources.
  * @li [2] http://littlewire.github.io/
  * <br><br><br>
  *
@@ -2257,6 +2257,8 @@ private:
  * ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with the following guide:<br>
  * http://highlowtech.org/?p=1695 <br>
  * See the included rf24ping85 example for pin info and usage
+ *
+ * @warning The ATTiny2313 is unsupported due to lack of sufficient memory resources
  *
  * Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny<br>
  * See https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC for ATTiny patch

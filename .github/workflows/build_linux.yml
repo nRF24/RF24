@@ -13,7 +13,7 @@ jobs:
         config-options:
           - "--soc=BCM2835 --driver=RPi"
           - "--soc=BCM2836 --driver=RPi"
-          - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
+          # - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
           - "--driver=SPIDEV"
 
     steps:
@@ -28,7 +28,7 @@ jobs:
       - name: provide WiringPi
         if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
         run: |
-          git clone https://github.com/CoRfr/WiringPi
+          git clone https://github.com/WiringPi/WiringPi
           cd WiringPi/wiringPi
           CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
           sudo make install
