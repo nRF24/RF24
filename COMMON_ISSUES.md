@@ -51,11 +51,11 @@ capacitors may not be good enough (depending on the manufacturing source).
 You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ seperate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:
 
 1. Stronger power source. Below is a chart of advertised current requirements that many MCU boards’ 3V regulators may not be able to provide (after supplying power to internal components).
-| Specification | Value |
-|:-------------:|:-----:|
-| Emission mode current(peak) | 115 mA |
-| Receive Mode current(peak)  | 45 mA  |
-| Power-down mode current     | 4.2 µA |
+   | Specification | Value |
+   |:-------------:|:-----:|
+   | Emission mode current(peak) | 115 mA |
+   | Receive Mode current(peak)  | 45 mA  |
+   | Power-down mode current     | 4.2 µA |
 
 2. Needs shielding from electromagnetic interference. Shielding usually works best when it has a path to ground (GND pin), but this connection to the GND pin is not required. It is important that the sheilding does not touch any current carrying parts.
    - Professionals tend to use a faraday cage/mesh to implement electromagnetic shielding, but it can be pricey for this scenario.
