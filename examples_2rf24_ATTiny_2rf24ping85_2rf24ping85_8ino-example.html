@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.11</span>
+   &#160;<span id="projectnumber">v1.3.12</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -266,7 +266,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      radio.stopListening();                      <span class="comment">// put in TX mode</span></div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      radio.writeFast(&amp;payload, <span class="keyword">sizeof</span>(payload)); <span class="comment">// load response to TX FIFO</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      <span class="keywordtype">bool</span> report = radio.txStandBy(150);         <span class="comment">// keep retrying for 150 ms</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      radio.txStandBy(150);                       <span class="comment">// keep retrying for 150 ms</span></div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      radio.startListening();                     <span class="comment">// put back in RX mode</span></div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    }</div>
@@ -280,7 +280,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 26 2021 07:59:59 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Feb 27 2021 23:43:34 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

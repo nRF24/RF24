@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.11</span>
+   &#160;<span id="projectnumber">v1.3.12</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -100,29 +100,8 @@ Design Goals</h1>
 </ul>
 <h1><a class="anchor" id="News"></a>
 News</h1>
-<p><b>Aug 2020</b> <br  />
- v1.3.9</p><ul>
-<li>Fix broken compilation for some devices due to recent changes v1.3.8</li>
-<li>Introduces change that mainly reduces the time required to call <a class="el" href="classRF24.html#a30a2733a3889bdc331fe2d2f4f0f7b39">RF24::startListening()</a>, <a class="el" href="classRF24.html#a5cdaf47aa0edd6dca1b9a8bb7972a1a3">RF24::powerUp()</a>, and <a class="el" href="classRF24.html#aa0a51923a09ba4f3478aba9be0f8a6a1">RF24::powerDown()</a></li>
-<li>Affects speed of switching from TX-&gt;RX. Users might consider starting updates of slower devices with this<br  />
- release to prevent missed packets when similar changes are introduced, affecting switching from RX-&gt;TX</li>
-<li>Clean up <a class="el" href="classRF24.html#a048a20c73c7d9b2e02dcbae6fb9c4ba8">RF24::begin()</a> function (reduce program size)</li>
-</ul>
-<p>v1.3.7</p><ul>
-<li>Bug fix for <a class="el" href="classRF24.html#a47b2516993481b58e724d1274a7fd9cb">RF24::writeFast()</a> function affecting <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> stack (all <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> libraries)</li>
-<li>Unify Arduino &amp; Linux constructor. Accept SPI speed in Hz as optional parameter</li>
-<li>Removal of BCM2835 SPI speed constants due to removal from BCM library</li>
-<li>Update to latest BCM2835 driver</li>
-<li>Bug fix for RPi <a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a> code</li>
-<li>Added Constant Carrier Wave functionality &amp; added to scanner example</li>
-<li>Modify <a class="el" href="classRF24.html#ab6a711a9cc14fb459a4a1698b8665d82">RF24::setPALevel()</a> to allow setting LNA gain via optional parameter</li>
-<li>Cleanup of warnings, errors and old files</li>
-</ul>
-<p><b>March-July 2020</b></p><ul>
-<li>Fixes for SPI_HAS_TRANSACTION detection (Affecting many devices)</li>
-<li>Add ability to configure SPI speed properly in Linux constructor</li>
-<li>Support multiple instances of SPIDEV on Linux</li>
-<li>Minor fixes &amp; changes</li>
+<ul>
+<li>See the releases' descriptions on <a href="http://github.com/nRF24/RF24/releases">the library's release page</a> for a list of changes.</li>
 </ul>
 <h1><a class="anchor" id="Useful"></a>
 Useful References</h1>
@@ -130,8 +109,8 @@ Useful References</h1>
 <li><a href="classRF24.html"><b>RF24 Class Documentation</b></a> </li>
 <li><a href="pages.html"><b>Support &amp; Configuration</b></a> </li>
 <li><a href="https://github.com/nRF24/RF24/"><b>Source Code</b></a> </li>
-<li><a href="http://github.com/nRF24/RF24/datasheets/nRF24L01_datasheet_v2.pdf">nRF24L01 v2.0 Datasheet</a> </li>
-<li><a href="http://github.com/nRF24/RF24/datasheets/nRF24L01P_datasheet_v1.pdf">nRF24L01+ v1.0 Datasheet</a></li>
+<li><a href="http://github.com/nRF24/RF24/raw/master/datasheets/nRF24L01_datasheet_v2.pdf">nRF24L01 v2.0 Datasheet</a> </li>
+<li><a href="http://github.com/nRF24/RF24/raw/master/datasheets/nRF24L01P_datasheet_v1.pdf">nRF24L01+ v1.0 Datasheet</a></li>
 </ul>
 <p><b>Additional Information and Add-ons</b></p>
 <ul>
@@ -158,7 +137,7 @@ Platform Support Pages</h1>
 <ul>
 <li><a href="Arduino.html"><b>Arduino</b></a> (Uno, Nano, Mega, Due, Galileo, etc) </li>
 <li><a href="ATTiny.html"><b>ATTiny</b></a> </li>
-<li><a href="Linux.html"><b>Linux Installation</b></a>( <a href="RPi.html"><b>Linux/RPi General</b></a> , <a href="MRAA.html"><b>MRAA</b></a> supported boards ( Galileo, Edison, etc), <a href="LittleWire.html"><b>LittleWire</b></a>) </li>
+<li><a href="Linux.html"><b>Linux Installation</b></a>( <a href="RPi.html"><b>Linux/RPi General</b></a> , <a href="MRAA.html"><b>MRAA</b></a> supported boards (Galileo, Edison, etc), LittleWire) </li>
 <li><a href="CrossCompile.html"><b>Cross-compilation</b></a> for linux devices </li>
 <li><a href="Python.html"><b>Python</b></a> wrapper available for Linux devices</li>
 </ul>
@@ -187,8 +166,8 @@ Platform Support Pages</h1>
 </table>
 <ul>
 <li>[0] <a href="https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints">https://learn.sparkfun.com/tutorials/tiny-avr-programmer-hookup-guide/attiny85-use-hints</a> </li>
-<li>[1] <a href="http://highlowtech.org/?p=1695">http://highlowtech.org/?p=1695</a> </li>
-<li>[2] <a href="http://littlewire.cc/">http://littlewire.cc/</a> <br  />
+<li>[1] <a href="http://highlowtech.org/?p=1695">http://highlowtech.org/?p=1695</a> The ATTiny2313 is unsupported due to lack of sufficient memory resources. </li>
+<li>[2] <a href="http://littlewire.github.io/">http://littlewire.github.io/</a> <br  />
 <br  />
 <br  />
  </li>
@@ -197,7 +176,7 @@ Platform Support Pages</h1>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 26 2021 08:00:00 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Feb 27 2021 23:43:34 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

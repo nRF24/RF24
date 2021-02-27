@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.11</span>
+   &#160;<span id="projectnumber">v1.3.12</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -111,12 +111,34 @@ write() always returns true after setAutoAck(false)</h2>
 write() returns false when the payload was received</h2>
 <p>If the settings match on both endpoint transceivers, then this can only mean that the receiving nRF24L01 failed to send an acknowledgement (ACK) packet back to the transmitting nRF24L01. Usually this is due to instability (electric noise) in the power lines (VCC and GND) going to the receiving nRF24L01.</p>
 <p>If you're not receiving ACK packets correctly/reliably on data rates lower than 2MBPS, try adding a big capacitor close to the module/chip. Example issues: <a href="https://github.com/nRF24/RF24/issues/264">#264</a> <a href="https://github.com/nRF24/RF24/issues/211">#211</a>.</p>
-<p>For reliability, please use Electrolytic or Tantalum capacitors. Ceramic capacitors may not be good enough (depending on the manufacturing source). </p>
+<p>For reliability, please use Electrolytic or Tantalum capacitors. Ceramic capacitors may not be good enough (depending on the manufacturing source).</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
+my PA/LNA module fails to transmit</h2>
+<p>You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ seperate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:</p>
+<ol type="1">
+<li>Stronger power source. Below is a chart of advertised current requirements that many MCU boards’ 3V regulators may not be able to provide (after supplying power to internal components). <table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter">Specification   </th><th class="markdownTableHeadCenter">Value    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">Emission mode current(peak)   </td><td class="markdownTableBodyCenter">115 mA    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">Receive Mode current(peak)   </td><td class="markdownTableBodyCenter">45 mA    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">Power-down mode current   </td><td class="markdownTableBodyCenter">4.2 µA   </td></tr>
+</table>
+</li>
+<li>Needs shielding from electromagnetic interference. Shielding usually works best when it has a path to ground (GND pin), but this connection to the GND pin is not required. It is important that the sheilding does not touch any current carrying parts.<ul>
+<li>Professionals tend to use a faraday cage/mesh to implement electromagnetic shielding, but it can be pricey for this scenario.</li>
+<li>A quick do-it-yourself solution (as proof-of-concept) would be to wrap the PA/LNA module with electrical tape and then wrap foil around the electrical tape (for shielding) while being very careful to not let the foil touch any current carrying parts (like the GPIO pins, the antenna mount, and the soldier joints for the antenna mount). <br  />
+ See <a href="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png"><img src="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png" alt="ghetto_shielding_1.png" class="inline"/></a> and <a href="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png"><img src="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png" alt="ghetto_shielding_2.png" class="inline"/></a> </li>
+</ul>
+</li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 26 2021 08:00:00 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Feb 27 2021 23:43:34 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

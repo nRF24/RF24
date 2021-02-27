@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.11</span>
+   &#160;<span id="projectnumber">v1.3.12</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -166,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">// to use different addresses on a pair of radios, we need a variable to</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">// uniquely identify which address this radio will use to transmit</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nodeNumber = <span class="charliteral">&#39;R&#39;</span>; <span class="comment">// 0 uses address[0] to transmit, 1 uses address[1] to transmit</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nodeNumber = <span class="charliteral">&#39;R&#39;</span>; <span class="comment">// integers 0-5 = TX node; character &#39;R&#39; or integer 82 = RX node</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">bool</span> foundArgNode = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">if</span> (argc &gt; 1) {</div>
@@ -179,7 +179,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(argv[1], <span class="stringliteral">&quot;-n&quot;</span>) == 0 || strcmp(argv[1], <span class="stringliteral">&quot;--node&quot;</span>) == 0) {</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            <span class="comment">// &quot;-n&quot; or &quot;--node&quot; has been specified</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            foundArgNode = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            <span class="keywordflow">if</span> ((argv[2][0] - 48) &lt; 6) {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            <span class="keywordflow">if</span> ((argv[2][0] - 48) &lt; 6 &amp;&amp; (argv[2][0] - 48) &gt;= 0) {</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                nodeNumber = argv[2][0] - 48;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            }</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argv[2][0] == <span class="charliteral">&#39;R&#39;</span> || argv[2][0] == <span class="charliteral">&#39;r&#39;</span>) {</div>
@@ -346,7 +346,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 26 2021 08:00:00 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Feb 27 2021 23:43:34 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
