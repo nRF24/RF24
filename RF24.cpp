@@ -416,7 +416,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
     printf_P(PSTR("\r\n"));
 }
 
-#endif
+#endif // !defined(MINIMAL)
 
 /****************************************************************************/
 
