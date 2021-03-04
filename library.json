@@ -15,7 +15,7 @@
     "atmelmegaavr",
     "espressif32",
     "espressif8266",
-    "linux_arm"
+    "linux_arm",
     "ststm32"
   ]
 }
