@@ -118,6 +118,8 @@ private:
 
     #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
+    #else // everything else (Arduino)
+    _SPI* _spi;
     #endif
     #if defined (MRAA)
     GPIO gpio;
@@ -1935,7 +1937,7 @@ private:
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi.
  *
- * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 getting_started.py @endcode and follow the prompts.
@@ -1951,7 +1953,7 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * transmit and retrieve custom automatic acknowledgment payloads.
  *
- * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 acknowledgement_payloads.py @endcode and follow the prompts.
@@ -1970,7 +1972,7 @@ private:
  * payloads because automatic ACK payloads' data will always be outdated by 1
  * transmission. Instead, this example uses a call and response paradigm.
  *
- * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 manual_acknowledgements.py @endcode and follow the prompts.
@@ -1986,7 +1988,7 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi for
  * streaming multiple payloads.
  *
- * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 streaming_data.py @endcode and follow the prompts.
@@ -2002,7 +2004,7 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * detecting (and verifying) the IRQ (interrupt) pin on the nRF24L01.
  *
- * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 interrupt_configure.py @endcode and follow the prompts.
@@ -2019,7 +2021,7 @@ private:
  * using 1 nRF24L01 to receive data from up to 6 other transceivers. This
  * technique is called "multiceiver" in the datasheet.
  *
- * Remember to install the <a href="Python.html">Python wrapper</a>, then
+ * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 multiceiver_demo.py @endcode and follow the prompts.
