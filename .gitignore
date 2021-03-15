@@ -3,7 +3,8 @@
 .*.swp
 *.orig
 .swp
-docs/
+docs/html/
+docs/xml/
 output/
 ojam/
 out/
