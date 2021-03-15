@@ -104,7 +104,7 @@ inline void RF24::endTransaction()
     csn(HIGH);
     #if defined(RF24_SPI_TRANSACTIONS)
         #if defined(RF24_RPi)
-    _SPI.endTransacrtion();
+    _SPI.endTransaction();
         #else // !defined(RF24_RPi)
     _spi->endTransaction();
         #endif // !defined(RF24_RPi)
