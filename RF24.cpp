@@ -707,6 +707,17 @@ void RF24::printPrettyDetails(void) {
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
+#if !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+
+bool RF24::begin(_SPI* spiBus)
+{
+    _spi = spiBus;
+    return begin();
+}
+
+#endif // !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+
+/****************************************************************************/
 
 bool RF24::begin(void)
 {

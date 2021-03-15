@@ -189,9 +189,27 @@ public:
      * Begin operation of the chip
      *
      * Call this in setup(), before calling any other methods.
-     * @code radio.begin() @endcode
+     * @code
+     * if (!radio.begin()) {
+     *   Serial.println(F("radio hardware not responding!"));
+     *   while (1) {} // hold program in infinite loop to prevent subsequent errors
+     * }
+     * @endcode
+     * @return
+     * - `true` if the radio was successfully initialized
+     * - `false` if the MCU failed to communicate with the radio hardware
      */
     bool begin(void);
+
+    #if !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+    /**
+     * Same as begin(), but allows specifying a non-primary SPI bus to use
+     * @warning This function is for the Arduino platform only
+     * @param spiBus A pointer or reference to an instantiated SPI bus object.
+     * @return same result as begin()
+     */
+    bool begin(_SPI* spiBus);
+    #endif // !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
 
     /**
      * Checks if the chip is connected to the SPI bus
