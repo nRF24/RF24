@@ -201,7 +201,7 @@ public:
      */
     bool begin(void);
 
-    #if !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+    #if !defined (RF24_LINUX) && !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
     /**
      * Same as begin(), but allows specifying a non-primary SPI bus to use
      * @warning This function is for the Arduino platform only
