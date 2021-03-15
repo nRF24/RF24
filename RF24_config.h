@@ -70,7 +70,7 @@
     #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
         #if defined SPI_UART
             #include <SPI_UART.h>
-            #define _SPI uspi
+            #define _SPI SPIUARTClass
         #elif defined (SOFTSPI)
             // change these pins to your liking
             //
@@ -87,31 +87,31 @@
             #endif // SOFT_SPI_SCK_PIN
 
             const uint8_t SPI_MODE = 0;
-            #define _SPI spi
+            #define _SPI SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE>
 
         #else // !defined (SPI_UART) && !defined (SOFTSPI)
             #include <SPI.h>
-            #define _SPI SPI
+            #define _SPI SPIClass
         #endif // !defined (SPI_UART) && !defined (SOFTSPI)
 
-    #else // defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
+    #else // !defined(ARDUINO) || defined (__arm__) || defined (__ARDUINO_X86__)
         // Define _BV for non-Arduino platforms and for Arduino DUE
         #include <stdint.h>
         #include <stdio.h>
         #include <string.h>
 
-        #if defined(__arm__) || defined (__ARDUINO_X86__)
+        #if defined (__arm__) || defined (__ARDUINO_X86__)
             #if defined (__arm__) && defined (SPI_UART)
                 #include <SPI_UART.h>
-                #define _SPI uspi
+                #define _SPI SPIUARTClass
 
             #else // !defined (__arm__) || !defined (SPI_UART)
                 #include <SPI.h>
-                #define _SPI SPI
+                #define _SPI SPIClass
 
             #endif // !defined (__arm__) || !defined (SPI_UART)
         #elif !defined(__arm__) && !defined (__ARDUINO_X86__)
-            extern HardwareSPI SPI;
+            extern HardwareSPI SPI;  // what platform is this for? (ESP?)
 
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
 
