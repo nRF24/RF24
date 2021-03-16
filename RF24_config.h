@@ -41,12 +41,13 @@
 #define RF24_SPI_SPEED 10000000
 
 //ATXMega
-#if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__) // In order to be available both in Windows and Linux this should take presence here.
+#if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__)
+// In order to be available both in Windows and Linux this should take presence here.
     #define XMEGA
     #define XMEGA_D3
     #include "utility/ATXMegaD3/RF24_arch_config.h"
 
-#elif ( !defined (ARDUINO) ) // Any non-arduino device is handled via configure/Makefile
+#elif (!defined (ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
     // This behavior can be overridden by calling configure with respective parameters
     // The includes.h file defines either RF24_RPi, MRAA, LITTLEWIRE or RF24_SPIDEV and includes the correct RF24_arch_config.h file
@@ -111,7 +112,9 @@
 
             #endif // !defined (__arm__) || !defined (SPI_UART)
         #elif !defined(__arm__) && !defined (__ARDUINO_X86__)
-            extern HardwareSPI SPI;  // what platform is this for? (ESP?)
+            // fallback to unofficially supported Hardware (courtesy of ManiacBug)
+            extern HardwareSPI SPI;
+            #define _SPI HardwareSPI
 
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
 
