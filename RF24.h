@@ -118,9 +118,10 @@ private:
 
     #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
-    #else // everything else (Arduino)
+    #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
+    #if !defined (RF24_LINUX) || defined (XMEGA_D3)
     _SPI* _spi;
-    #endif
+    #endif // !defined (RF24_LINUX) || defined (XMEGA_D3)
     #if defined (MRAA)
     GPIO gpio;
     #endif
@@ -206,6 +207,10 @@ public:
      * Same as begin(), but allows specifying a non-primary SPI bus to use
      * @warning This function is for the Arduino platform only
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
+     * @note The _SPI datatype is "wrapped" definition that will represent
+     * various SPI implementations based on specified platform (or SoftSPI or
+     * SPI_UART).
+     * @see Review the [Arduino support page](md_docs_arduino.html).
      * @return same result as begin()
      */
     bool begin(_SPI* spiBus);
