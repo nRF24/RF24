@@ -719,7 +719,7 @@ bool RF24::begin(void)
       if (ce_pin != csn_pin) {
         pinMode(ce_pin,OUTPUT);
       };
-      _SPI.begin(csn_pin);
+      _spi->begin(csn_pin);
       ce(LOW);
       csn(HIGH);
       delay(200);
@@ -737,7 +737,14 @@ bool RF24::begin(void)
       #endif
     #endif //Linux
 
-    // Must allow the radio time to settle else configuration bits will not necessarily stick.
+    return _init_radio();
+}
+
+/****************************************************************************/
+
+bool RF24::_init_radio()
+{
+        // Must allow the radio time to settle else configuration bits will not necessarily stick.
     // This is actually only required following power up but some settling time also appears to
     // be required after resets too. For full coverage, we'll always assume the worst.
     // Enabling 16b CRC is by far the most obvious case if the wrong timing is used - or skipped.
