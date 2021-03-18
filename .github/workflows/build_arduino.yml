@@ -97,6 +97,8 @@ jobs:
             - examples/StreamingData
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
+
+          # The following examples still exist for posterity
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn
           #   - examples/old_backups/pingpair_irq
