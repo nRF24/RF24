@@ -16,7 +16,7 @@
 
 #include <SPI.h>
 
-#define _SPI SPI
+#define _SPI SPIClass
 
 #define printf Serial.printf
 
@@ -27,7 +27,3 @@
 #endif
 
 #define PRIPSTR "%s"
-
-
-
-

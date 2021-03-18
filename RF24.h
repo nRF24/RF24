@@ -119,9 +119,9 @@ private:
     #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
     #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
-    #if !defined (RF24_LINUX) || defined (XMEGA_D3)
+    #if !defined (RF24_LINUX)
     _SPI* _spi;
-    #endif // !defined (RF24_LINUX) || defined (XMEGA_D3)
+    #endif // !defined (RF24_LINUX)
     #if defined (MRAA)
     GPIO gpio;
     #endif
@@ -1631,6 +1631,13 @@ private:
      *  may want to extend this class.
      */
     /**@{*/
+
+    /**
+     * initialize radio by performing a soft reset.
+     * @warning This function assumes the SPI bus object's begin() method has been
+     * previously called.
+     */
+    bool _init_radio();
 
     /**
      * Set chip select pin

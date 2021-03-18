@@ -12,7 +12,8 @@
 #include <LittleWireSPI/littlewirespi.h>
 #include <LittleWireSPI/avr_fixes.h>
 
-extern LittleWireSPI _SPI;
+extern LittleWireSPI SPI;
+#define _SPI LittleWireSPI
 
 // GCC a Arduino Missing
 #define _BV(x) (1<<(x))

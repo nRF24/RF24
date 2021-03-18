@@ -1,7 +1,7 @@
 /*
  TMRh20 2015
  RF24 Configuration file for Arduino Due
- 
+
 */
 
 #ifndef __RF24_ARCH_CONFIG_H__
@@ -19,7 +19,7 @@
 #include <SPI.h>
 
 #define _BV(x) (1<<(x))
-#define _SPI SPI
+#define _SPI SPIClass
 
 #ifdef SERIAL_DEBUG
     #define IF_SERIAL_DEBUG(x) ({x;})
@@ -32,4 +32,3 @@
 #define PRIPSTR "%s"
 
 #endif // __RF24_CONFIG_H__
-
