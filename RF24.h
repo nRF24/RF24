@@ -204,7 +204,10 @@ public:
 
     #if defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
     /**
-     * Same as begin(), but allows specifying a non-primary SPI bus to use
+     * Same as begin(), but allows specifying a non-default SPI bus to use.
+     * @note This function assumes the `SPI::begin()` method was called before to
+     * calling this function.
+     *
      * @warning This function is for the Arduino platform only
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      * @note The _SPI datatype is "wrapped" definition that will represent
@@ -1637,6 +1640,11 @@ private:
      * previously called.
      */
     bool _init_radio();
+
+    /**
+     * initialize the GPIO pins
+     */
+    void _init_pins();
 
     /**
      * Set chip select pin

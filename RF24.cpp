@@ -718,7 +718,8 @@ void RF24::printPrettyDetails(void) {
 bool RF24::begin(_SPI* spiBus)
 {
     _spi = spiBus;
-    return begin();
+    _init_pins();
+    return _init_radio();
 }
 
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
@@ -728,6 +729,31 @@ bool RF24::begin(_SPI* spiBus)
 bool RF24::begin(void)
 {
 
+    #if defined (RF24_LINUX)
+
+    _SPI.begin(csn_pin, spi_speed);
+
+    #elif defined (XMEGA_D3)
+    _spi->begin(csn_pin);
+
+    #else // using an Arduino platform || defined (LITTLEWIRE)
+
+        #if defined (RF24_SPI_PTR)
+    _spi->begin();
+        #else  // !defined(RF24_SPI_PTR)
+    _SPI.begin();
+        #endif // !defined(RF24_SPI_PTR)
+
+    #endif // !defined(XMEGA_D3) && !defined(RF24_LINUX)
+
+    _init_pins();
+    return _init_radio();
+}
+
+/****************************************************************************/
+
+void RF24::_init_pins()
+{
     #if defined (RF24_LINUX)
 
         #if defined (MRAA)
@@ -749,21 +775,18 @@ bool RF24::begin(void)
     }
         #endif // RF24_RPi
 
-    _SPI.begin(csn_pin,spi_speed);
     pinMode(ce_pin,OUTPUT);
     ce(LOW);
     delay(100);
 
     #elif defined (LITTLEWIRE)
     pinMode(csn_pin,OUTPUT);
-    _SPI.begin();
     csn(HIGH);
 
     #elif defined (XMEGA_D3)
     if (ce_pin != csn_pin) {
         pinMode(ce_pin,OUTPUT);
     };
-    _spi->begin(csn_pin);
     ce(LOW);
     csn(HIGH);
     delay(200);
@@ -775,11 +798,6 @@ bool RF24::begin(void)
         pinMode(ce_pin, OUTPUT);
         pinMode(csn_pin, OUTPUT);
     }
-        #if defined (RF24_SPI_PTR)
-    _spi->begin();
-        #else  // !defined(RF24_SPI_PTR)
-    _SPI.begin();
-        #endif // !defined(RF24_SPI_PTR)
 
     ce(LOW);
     csn(HIGH);
@@ -788,15 +806,13 @@ bool RF24::begin(void)
     delay(100);
         #endif
     #endif // !defined(XMEGA_D3) && !defined(LITTLEWIRE) && !defined(RF24_LINUX)
-
-    return _init_radio();
 }
 
 /****************************************************************************/
 
 bool RF24::_init_radio()
 {
-        // Must allow the radio time to settle else configuration bits will not necessarily stick.
+    // Must allow the radio time to settle else configuration bits will not necessarily stick.
     // This is actually only required following power up but some settling time also appears to
     // be required after resets too. For full coverage, we'll always assume the worst.
     // Enabling 16b CRC is by far the most obvious case if the wrong timing is used - or skipped.
