@@ -119,9 +119,9 @@ private:
     #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
     #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
-    #if !defined (RF24_LINUX)
+    #if defined (RF24_SPI_PTR)
     _SPI* _spi;
-    #endif // !defined (RF24_LINUX)
+    #endif // defined (RF24_SPI_PTR)
     #if defined (MRAA)
     GPIO gpio;
     #endif
@@ -202,7 +202,7 @@ public:
      */
     bool begin(void);
 
-    #if !defined (RF24_LINUX) && !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+    #if defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
     /**
      * Same as begin(), but allows specifying a non-primary SPI bus to use
      * @warning This function is for the Arduino platform only
@@ -214,7 +214,7 @@ public:
      * @return same result as begin()
      */
     bool begin(_SPI* spiBus);
-    #endif // !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+    #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
 
     /**
      * Checks if the chip is connected to the SPI bus

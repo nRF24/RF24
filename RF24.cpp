@@ -88,11 +88,11 @@ void RF24::ce(bool level)
 inline void RF24::beginTransaction()
 {
     #if defined (RF24_SPI_TRANSACTIONS)
-        #if defined (RF24_RPi)
-    _SPI.beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE0));
-        #else // !defined(RF24_RPi)
+        #if defined (RF24_SPI_PTR)
     _spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE0));
-        #endif // !defined(RF24_RPi)
+        #else // !defined(RF24_SPI_PTR)
+    _SPI.beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE0));
+        #endif // !defined(RF24_SPI_PTR)
     #endif // defined (RF24_SPI_TRANSACTIONS)
     csn(LOW);
 }
@@ -103,11 +103,11 @@ inline void RF24::endTransaction()
 {
     csn(HIGH);
     #if defined (RF24_SPI_TRANSACTIONS)
-        #if defined (RF24_RPi)
-    _SPI.endTransaction();
-        #else // !defined(RF24_RPi)
+        #if defined (RF24_SPI_PTR)
     _spi->endTransaction();
-        #endif // !defined(RF24_RPi)
+        #else // !defined(RF24_SPI_PTR)
+    _SPI.endTransaction();
+        #endif // !defined(RF24_SPI_PTR)
     #endif // defined (RF24_SPI_TRANSACTIONS)
 }
 
@@ -135,8 +135,15 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
     #else // !defined(RF24_LINUX)
 
     beginTransaction();
+        #if defined (RF24_SPI_PTR)
     status = _spi->transfer(R_REGISTER | reg);
     while (len--) { *buf++ = _spi->transfer(0xFF); }
+
+        #else // !defined(RF24_SPI_PTR)
+    status = _SPI.transfer(R_REGISTER | reg);
+    while (len--) { *buf++ = _SPI.transfer(0xFF); }
+
+        #endif // !defined(RF24_SPI_PTR)
     endTransaction();
     #endif // !defined(RF24_LINUX)
 }
@@ -163,8 +170,15 @@ uint8_t RF24::read_register(uint8_t reg)
     #else // !defined(RF24_LINUX)
 
     beginTransaction();
+        #if defined (RF24_SPI_PTR)
     status = _spi->transfer(R_REGISTER | reg);
     result = _spi->transfer(0xff);
+
+        #else // !defined(RF24_SPI_PTR)
+    status = _SPI.transfer(R_REGISTER | reg);
+    result = _SPI.transfer(0xff);
+
+        #endif // !defined(RF24_SPI_PTR)
     endTransaction();
     #endif // !defined(RF24_LINUX)
 
@@ -191,8 +205,15 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
     #else // !defined(RF24_LINUX)
 
     beginTransaction();
+        #if defined (RF24_SPI_PTR)
     status = _spi->transfer(W_REGISTER | reg);
     while (len--) { _spi->transfer(*buf++); }
+
+        #else // !defined(RF24_SPI_PTR)
+    status = _SPI.transfer(W_REGISTER | reg);
+    while (len--) { _SPI.transfer(*buf++); }
+
+        #endif // !defined(RF24_SPI_PTR)
     endTransaction();
     #endif // !defined(RF24_LINUX)
 }
@@ -209,7 +230,11 @@ void RF24::write_register(uint8_t reg, uint8_t value, bool is_cmd_only)
         #if defined (RF24_LINUX)
         status = _SPI.transfer(W_REGISTER | reg);
         #else
+            #if defined (RF24_SPI_PTR)
         status = _spi->transfer(W_REGISTER | reg);
+            #else // !defined (RF24_SPI_PTR)
+        status = _SPI.transfer(W_REGISTER | reg);
+            #endif // !defined (RF24_SPI_PTR)
         #endif // !defined(RF24_LINUX)
         endTransaction();
     }
@@ -228,8 +253,13 @@ void RF24::write_register(uint8_t reg, uint8_t value, bool is_cmd_only)
         #else // !defined(RF24_LINUX)
 
         beginTransaction();
+            #if defined (RF24_SPI_PTR)
         status = _spi->transfer(W_REGISTER | reg);
         _spi->transfer(value);
+            #else // !defined(RF24_SPI_PTR)
+        status = _SPI.transfer(W_REGISTER | reg);
+        _SPI.transfer(value);
+            #endif // !defined(RF24_SPI_PTR)
         endTransaction();
         #endif // !defined(RF24_LINUX)
     }
@@ -271,9 +301,17 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     #else // !defined(RF24_LINUX)
 
     beginTransaction();
+        #if defined (RF24_SPI_PTR)
     status = _spi->transfer(writeType);
     while (data_len--) { _spi->transfer(*current++); }
     while (blank_len--) { _spi->transfer(0); }
+
+        #else // !defined(RF24_SPI_PTR)
+    status = _SPI.transfer(writeType);
+    while (data_len--) { _SPI.transfer(*current++); }
+    while (blank_len--) { _SPI.transfer(0); }
+
+        #endif // !defined(RF24_SPI_PTR)
     endTransaction();
     #endif // !defined(RF24_LINUX)
 }
@@ -323,9 +361,17 @@ void RF24::read_payload(void* buf, uint8_t data_len)
     #else // !defined(RF24_LINUX)
 
     beginTransaction();
+        #if defined (RF24_SPI_PTR)
     status = _spi->transfer(R_RX_PAYLOAD);
     while (data_len--) { *current++ = _spi->transfer(0xFF); }
     while (blank_len--) { _spi->transfer(0xff); }
+
+        #else // !defined(RF24_SPI_PTR)
+    status = _SPI.transfer(R_RX_PAYLOAD);
+    while (data_len--) { *current++ = _SPI.transfer(0xFF); }
+    while (blank_len--) { _SPI.transfer(0xff); }
+
+        #endif // !defined(RF24_SPI_PTR)
     endTransaction();
 
     #endif // !defined(RF24_LINUX)
@@ -667,7 +713,7 @@ void RF24::printPrettyDetails(void) {
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
-#if !defined (RF24_LINUX) && !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+#if defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
 
 bool RF24::begin(_SPI* spiBus)
 {
@@ -675,7 +721,7 @@ bool RF24::begin(_SPI* spiBus)
     return begin();
 }
 
-#endif // !defined (RF24_LINUX) || !defined (XMEGA_D3) || defined (DOXYGEN_FORCED)
+#endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
 
 /****************************************************************************/
 
@@ -723,7 +769,7 @@ bool RF24::begin(void)
       ce(LOW);
       csn(HIGH);
       delay(200);
-    #else
+    #else // using an Arduino platform
       // Initialize pins
       if (ce_pin != csn_pin) {
         pinMode(ce_pin, OUTPUT);
@@ -1322,12 +1368,12 @@ void RF24::closeReadingPipe(uint8_t pipe)
 void RF24::toggle_features(void)
 {
     beginTransaction();
-    #if defined (RF24_LINUX) || defined (XMEGA_D3)
-    status = _SPI.transfer(ACTIVATE);
-    _SPI.transfer(0x73);
-    #else
+    #if defined (RF24_SPI_PTR)
     status = _spi->transfer(ACTIVATE);
     _spi->transfer(0x73);
+    #else
+    status = _SPI.transfer(ACTIVATE);
+    _SPI.transfer(0x73);
     #endif
     endTransaction();
 }

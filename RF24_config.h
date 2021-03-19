@@ -71,7 +71,7 @@
     #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
         #if defined SPI_UART
             #include <SPI_UART.h>
-            #define _SPI SPIUARTClass
+            #define _SPI uspi
         #elif defined (SOFTSPI)
             // change these pins to your liking
             //
@@ -89,10 +89,12 @@
 
             const uint8_t SPI_MODE = 0;
             #define _SPI SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE>
+            #define RF24_SPI_PTR
 
         #else // !defined (SPI_UART) && !defined (SOFTSPI)
             #include <SPI.h>
             #define _SPI SPIClass
+            #define RF24_SPI_PTR
         #endif // !defined (SPI_UART) && !defined (SOFTSPI)
 
     #else // !defined(ARDUINO) || defined (__arm__) || defined (__ARDUINO_X86__)
@@ -104,17 +106,19 @@
         #if defined (__arm__) || defined (__ARDUINO_X86__)
             #if defined (__arm__) && defined (SPI_UART)
                 #include <SPI_UART.h>
-                #define _SPI SPIUARTClass
+                #define _SPI uspi
 
             #else // !defined (__arm__) || !defined (SPI_UART)
                 #include <SPI.h>
                 #define _SPI SPIClass
+                #define RF24_SPI_PTR
 
             #endif // !defined (__arm__) || !defined (SPI_UART)
         #elif !defined(__arm__) && !defined (__ARDUINO_X86__)
             // fallback to unofficially supported Hardware (courtesy of ManiacBug)
             extern HardwareSPI SPI;
             #define _SPI HardwareSPI
+            #define RF24_SPI_PTR
 
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
 
