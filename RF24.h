@@ -208,8 +208,7 @@ public:
      * @warning This function is for the Arduino platform only
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      * @note The _SPI datatype is "wrapped" definition that will represent
-     * various SPI implementations based on specified platform (or SoftSPI or
-     * SPI_UART).
+     * various SPI implementations based on specified platform (or SoftSPI).
      * @see Review the [Arduino support page](md_docs_arduino.html).
      * @return same result as begin()
      */

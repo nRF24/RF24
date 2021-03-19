@@ -468,13 +468,13 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
          csDelay(5)
 {
     // Use a pointer on the Arduino platform
-    #if defined (SOFTSPI) || defined (XMEGA_D3)
+    #if defined (RF24_SPI_PTR)
+        #if defined (SOFTSPI)
     _spi = &spi;
-    #elif defined (SPI_UART)
-    _spi = &uspi;
-    #elif !defined(RF24_LINUX)
+        #else  // !defined(SOFTSPI)
     _spi = &SPI;
-    #endif
+        #endif // !defined(SOFTSPI)
+    #endif // defined (RF24_SPI_PTR)
 
     pipe0_reading_address[0] = 0;
     if(spi_speed <= 35000){ //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
@@ -728,60 +728,66 @@ bool RF24::begin(_SPI* spiBus)
 bool RF24::begin(void)
 {
 
-    #if defined(RF24_LINUX)
+    #if defined (RF24_LINUX)
 
-      #if defined(MRAA)
-        GPIO();
-        gpio.begin(ce_pin, csn_pin);
-      #endif
+        #if defined (MRAA)
+    GPIO();
+    gpio.begin(ce_pin, csn_pin);
+        #endif
 
-      #if defined(RF24_RPi)
-        switch(csn_pin){     //Ensure valid hardware CS pin
-          case 0: break;
-          case 1: break;
-          // Allow BCM2835 enums for RPi
-          case 8: csn_pin = 0; break;
-          case 7: csn_pin = 1; break;
-          case 18: csn_pin = 10; break;	//to make it work on SPI1
-          case 17: csn_pin = 11; break;
-          case 16: csn_pin = 12; break;
-          default: csn_pin = 0; break;
-        }
-      #endif // RF24_RPi
+        #if defined (RF24_RPi)
+    switch(csn_pin) {                 // Ensure valid hardware CS pin
+        case 0: break;
+        case 1: break;
+        // Allow BCM2835 enums for RPi
+        case 8: csn_pin = 0; break;
+        case 7: csn_pin = 1; break;
+        case 18: csn_pin = 10; break; // to make it work on SPI1
+        case 17: csn_pin = 11; break;
+        case 16: csn_pin = 12; break;
+        default: csn_pin = 0; break;
+    }
+        #endif // RF24_RPi
 
-      _SPI.begin(csn_pin,spi_speed);
+    _SPI.begin(csn_pin,spi_speed);
+    pinMode(ce_pin,OUTPUT);
+    ce(LOW);
+    delay(100);
 
-      pinMode(ce_pin,OUTPUT);
-      ce(LOW);
-      delay(100);
+    #elif defined (LITTLEWIRE)
+    pinMode(csn_pin,OUTPUT);
+    _SPI.begin();
+    csn(HIGH);
 
-    #elif defined(LITTLEWIRE)
-
-      pinMode(csn_pin,OUTPUT);
-      _SPI.begin();
-      csn(HIGH);
-
-    #elif defined(XMEGA_D3)
-      if (ce_pin != csn_pin) {
+    #elif defined (XMEGA_D3)
+    if (ce_pin != csn_pin) {
         pinMode(ce_pin,OUTPUT);
-      };
-      _spi->begin(csn_pin);
-      ce(LOW);
-      csn(HIGH);
-      delay(200);
+    };
+    _spi->begin(csn_pin);
+    ce(LOW);
+    csn(HIGH);
+    delay(200);
+
     #else // using an Arduino platform
-      // Initialize pins
-      if (ce_pin != csn_pin) {
+
+    // Initialize pins
+    if (ce_pin != csn_pin) {
         pinMode(ce_pin, OUTPUT);
         pinMode(csn_pin, OUTPUT);
-      }
-      _spi->begin();
-      ce(LOW);
-      csn(HIGH);
-      #if defined(__ARDUINO_X86__)
-        delay(100);
-      #endif
-    #endif //Linux
+    }
+        #if defined (RF24_SPI_PTR)
+    _spi->begin();
+        #else  // !defined(RF24_SPI_PTR)
+    _SPI.begin();
+        #endif // !defined(RF24_SPI_PTR)
+
+    ce(LOW);
+    csn(HIGH);
+
+        #if defined (__ARDUINO_X86__)
+    delay(100);
+        #endif
+    #endif // !defined(XMEGA_D3) && !defined(LITTLEWIRE) && !defined(RF24_LINUX)
 
     return _init_radio();
 }
