@@ -730,6 +730,19 @@ bool RF24::begin(void)
 {
 
     #if defined (RF24_LINUX)
+        #if defined (RF24_RPi)
+    switch(csn_pin) {                 // Ensure valid hardware CS pin
+        case 0: break;
+        case 1: break;
+        // Allow BCM2835 enums for RPi
+        case 8: csn_pin = 0; break;
+        case 7: csn_pin = 1; break;
+        case 18: csn_pin = 10; break; // to make it work on SPI1
+        case 17: csn_pin = 11; break;
+        case 16: csn_pin = 12; break;
+        default: csn_pin = 0; break;
+    }
+        #endif // RF24_RPi
 
     _SPI.begin(csn_pin, spi_speed);
 
@@ -761,31 +774,17 @@ void RF24::_init_pins()
     gpio.begin(ce_pin, csn_pin);
         #endif
 
-        #if defined (RF24_RPi)
-    switch(csn_pin) {                 // Ensure valid hardware CS pin
-        case 0: break;
-        case 1: break;
-        // Allow BCM2835 enums for RPi
-        case 8: csn_pin = 0; break;
-        case 7: csn_pin = 1; break;
-        case 18: csn_pin = 10; break; // to make it work on SPI1
-        case 17: csn_pin = 11; break;
-        case 16: csn_pin = 12; break;
-        default: csn_pin = 0; break;
-    }
-        #endif // RF24_RPi
-
     pinMode(ce_pin,OUTPUT);
     ce(LOW);
     delay(100);
 
     #elif defined (LITTLEWIRE)
-    pinMode(csn_pin,OUTPUT);
+    pinMode(csn_pin, OUTPUT);
     csn(HIGH);
 
     #elif defined (XMEGA_D3)
     if (ce_pin != csn_pin) {
-        pinMode(ce_pin,OUTPUT);
+        pinMode(ce_pin, OUTPUT);
     };
     ce(LOW);
     csn(HIGH);
