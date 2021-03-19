@@ -30,7 +30,6 @@ jobs:
       run: |
         touch doxygenAction
         echo "PROJECT_NUMBER = ${{ steps.latest_ver.outputs.release }}" >> doxygenAction
-        echo "OUTPUT_DIRECTORY = ./docs" >> doxygenAction
         echo "@INCLUDE = doxygenAction" >> Doxyfile
     - name: build doxygen
       uses: mattnotmitt/doxygen-action@v1
