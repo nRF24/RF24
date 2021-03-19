@@ -1,7 +1,7 @@
 # ATXMEGA
 The RF24 driver can be build as a static library with Atmel Studio 7 in order to be included as any other library in another program for the XMEGA family.
 
-Currently only the <b>ATXMEGA D3</b> family is implemented.
+Currently only the [<b>ATXMEGA D3</b>](https://www.microchip.com/wwwproducts/en/ATxmega64d3) family is implemented.
 
 ## Preparation
 Create an empty GCC Static Library project in Atmel Studio 7.
