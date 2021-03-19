@@ -20,6 +20,7 @@
 
 #define _BV(x) (1<<(x))
 #define _SPI SPIClass
+#define RF24_SPI_PTR
 
 #ifdef SERIAL_DEBUG
     #define IF_SERIAL_DEBUG(x) ({x;})
