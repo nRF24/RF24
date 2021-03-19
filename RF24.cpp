@@ -774,7 +774,7 @@ void RF24::_init_pins()
     gpio.begin(ce_pin, csn_pin);
         #endif
 
-    pinMode(ce_pin,OUTPUT);
+    pinMode(ce_pin, OUTPUT);
     ce(LOW);
     delay(100);
 
