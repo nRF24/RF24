@@ -82,6 +82,7 @@ jobs:
           - "arduino:samd:tian"
           - "arduino:megaavr:uno2018"
           # - "arduino:megaavr:nano4809"  # board not found
+          - "arduino:sam:arduino_due_x_dbg"
 
     steps:
       - name: Checkout
