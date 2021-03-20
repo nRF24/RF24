@@ -41,19 +41,20 @@ jobs:
 
       matrix:
         example: |
-          - "examples/GettingStarted/GettingStarted.ino"
-          - "examples/AcknowledgementPayloads/AcknowledgementPayloads.ino"
-          - "examples/ManualAcknowledgements/ManualAcknowledgements.ino"
-          - "examples/StreamingData/StreamingData.ino"
-          - "examples/MulticeiverDemo/MulticeiverDemo.ino"
-          - "examples/InterruptConfigure/InterruptConfigure.ino"
+          - 'examples/GettingStarted/GettingStarted.ino'
+          - 'examples/AcknowledgementPayloads/AcknowledgementPayloads.ino'
+          - 'examples/ManualAcknowledgements/ManualAcknowledgements.ino'
+          - 'examples/StreamingData/StreamingData.ino'
+          - 'examples/MulticeiverDemo/MulticeiverDemo.ino'
+          - 'examples/InterruptConfigure/InterruptConfigure.ino'
+
         board: |
-          - "teensy31"
-          - "teensy35"
-          - "teensy36"
-          - "teensy40"
-          - "teensy41"
-          - "teensylc"
+          - 'teensy31'
+          - 'teensy35'
+          - 'teensy36'
+          - 'teensy40'
+          - 'teensy41'
+          - 'teensylc'
 
     steps:
     - uses: actions/checkout@v2
