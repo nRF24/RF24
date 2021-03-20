@@ -78,8 +78,8 @@ https://github.com/TMRh20/RF24/issues/24 for more information on SPI_UART.
 
 ### Using a specific SPI Bus
 An alternate SPI bus can be specified using the overloaded `RF24::begin(_SPI*)` method.
-This useful for some boards that offer more than 1 hardware-driven SPI bus or cetain Arduino
-cores that implement a software-driven (AKA bitbanged) SPI bus that does not use the DigitalIO
+This is useful for some boards that offer more than 1 hardware-driven SPI bus or cetain Arduino
+cores that implement a software-driven (AKA bit-banged) SPI bus that does not use the DigitalIO
 library.
 
 @warning The SPI bus object's <b>`SPIClass::begin()`</b> method <b>must</b> be called before
