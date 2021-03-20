@@ -34,7 +34,7 @@ jobs:
           CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
           sudo make install
       - name: provide MRAA
-        if: ${{ matrix.config-options == '-driver=MRAA' }}
+        if: ${{ matrix.config-options == '--driver=MRAA' }}
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
