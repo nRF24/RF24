@@ -17,7 +17,7 @@ available pins.
 RF24 supports alternate SPI methods, in case the standard hardware SPI pins are otherwise unavailable.
 
 ### Software Driven SPI
-Software driven SPI is provided by the [DigitalIO library](https://github.com/greiman/DigitalIO>).
+Software driven SPI is provided by the [DigitalIO library](https://github.com/greiman/DigitalIO).
 
 Setup:
 1. Install the digitalIO library
@@ -75,3 +75,176 @@ SPI_UART SPI Pin Connections:
 
 @note SPI_UART on Mega boards requires soldering to an unused pin on the chip. <br>See
 https://github.com/TMRh20/RF24/issues/24 for more information on SPI_UART.
+
+### Using a specific SPI Bus
+An alternate SPI bus can be specified using the overloaded `RF24::begin(_SPI*)` method.
+This useful for some boards that offer more than 1 hardware-driven SPI bus or cetain Arduino
+cores that implement a software-driven (AKA bitbanged) SPI bus that does not use the DigitalIO
+library.
+
+@warning The SPI bus object's <b>`SPIClass::begin()`</b> method <b>must</b> be called before
+calling the overloaded `RF24::begin(_SPI*)` method.
+
+Below are some example snippets that demonstrate how this can be done.
+
+
+#### ESP8266 example
+@see The following example code is meant for the popular NodeMCU board. Please refer to the
+[ESP8266 ArduinoCore's SPI documentation](https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#spi)
+for [other ESP8266-based boards](https://arduino-esp8266.readthedocs.io/en/latest/boards.html#).
+
+```cpp
+#include <SPI.h>
+#include <RF24.h>
+
+// notice these pin numbers are not the same used in the library examples
+RF24 radio(D4, D3); // the (ce_pin, csn_pin) connected to the radio
+
+// by default (with no arguments passed) SPI uses D5 (HSCLK), D6 (HMISO), D7 (HMOSI)
+SPI.pins(6, 7, 8, 0);
+// this means the following pins are used for the SPI bus:
+// MOSI = SD1
+// MISO = SD0
+// SCLK = CLK
+// CSN = GPIO0 (labeled D3 on the board)
+// **notice we also passed `D3` to the RF24 contructor's csn_pin parameter**
+
+void setup() {
+   Serial.begin(115200);
+   while (!Serial) {} //some boards need this
+
+   SPI.begin();
+   if (!radio.begin(&SPI)) {
+      Serial.println(F("radio hardware not responding!!"));
+      while (1) {} // hold program in infinite loop to prevent subsequent errors
+   }
+
+   // ... continue with program as normal (see library examples/ folder)
+}
+```
+
+#### ESP32 example
+@see Please review the Espressif's
+[SPI_Multiple_Buses.ino example for the ESP32](https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino)
+located in their ArduinoCore repository (along with the SPI library for the ESP32).
+
+```cpp
+#include <SPI.h>
+#include <RF24.h>
+
+// to use custom-defined pins, uncomment the following
+// #define MY_MISO 26
+// #define MY_MOSI 27
+// #define MY_SCLK 25
+// #define MY_SS   32  // pass MY_SS as the csn_pin parameter to the RF24 constructor
+
+// notice these pin numbers are not the same used in the library examples
+RF24 radio(2, 0); // the (ce_pin, csn_pin) connected to the radio
+
+SPIClass* hspi = nullptr; // we'll instantiate this in the `setup()` function
+// by default the HSPI bus predefines the following pins
+// HSPI_MISO = 12
+// HSPI_MOSI = 13
+// HSPI_SCLK = 14
+// HSPI_SS   = 15
+
+void setup() {
+   Serial.begin(115200);
+   while (!Serial) {} //some boards need this
+
+   hspi = new SPIClass(HSPI); // by default VSPI is used
+   hspi->begin();
+   // to use the custom defined pins, uncomment the following
+   // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
+
+   if (!radio.begin(hspi)) {
+      Serial.println(F("radio hardware not responding!!"));
+      while (1) {} // hold program in infinite loop to prevent subsequent errors
+   }
+
+   // ... continue with program as normal (see library examples/ folder)
+}
+```
+
+#### Teensy example
+@see The overloaded RF24::begin(_SPI*) may not be needed according to the
+[Teensyduino SPI documentation](https://www.pjrc.com/teensy/td_libs_SPI.html).
+Please review the table provided in the
+[Teensyduino documentation](https://www.pjrc.com/teensy/td_libs_SPI.html) for what pins are used by
+default for certain Teensy boards.
+
+```cpp
+#include <SPI.h>
+#include <RF24.h>
+
+// these pins are the alternate SPI pins available for Teensy LC/3.0/3.1/3.2/3.5/3.6
+#define MY_MISO 8
+#define MY_MOSI 7
+#define MY_SCLK 14
+
+// notice these pin numbers are not the same used in the library examples
+RF24 radio(2, 0); // the (ce_pin, csn_pin) connected to the radio
+
+void setup() {
+   Serial.begin(115200);
+   while (!Serial) {} //some boards need this
+
+   SPI.setMOSI(MY_MOSI);
+   SPI.setMISO(MY_MISO);
+   SPI.setSCK(MY_SCLK);
+   SPI.begin();
+   // to use the custom defined pins, uncomment the following
+   // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
+
+   if (!radio.begin(&SPI)) {
+      Serial.println(F("radio hardware not responding!!"));
+      while (1) {} // hold program in infinite loop to prevent subsequent errors
+   }
+
+   // ... continue with program as normal (see library examples/ folder)
+}
+```
+
+#### ATSAMD21 example
+@see The Suport for secondary SPI bus on ATSAMD21 chips is sparcely documented. However,
+[Sparkfun has a tutorial about using a second SPI bus](https://learn.sparkfun.com/tutorials/adding-more-sercom-ports-for-samd-boards/adding-an-spi)
+that often refers to the
+[ArduinoCore-samd SPI library source code](https://github.com/arduino/ArduinoCore-samd/blob/master/libraries/SPI/SPI.h). This example applies Sparkfun's tutorial toward the RF24 library.
+Special thanks to [ex-caliper](https://github.com/ex-caliper) for the lead!
+
+```cpp
+#include <SPI.h>
+#include <RF24.h>
+#include "wiring_private.h" // pinPeripheral()
+
+// Define the pins are the alternate SPI pins we will use. These pin numbers ARE NOT chosen at random.
+// The Sparkfun tutorial explains these choices in more detail (link is in "See Also" comment above).
+#define MY_MISO 3
+#define MY_MOSI 4
+#define MY_SCLK 5
+
+// instantiate the secondary SPI bus
+SPIClass MY_SPI(&sercom2, MY_MISO, MY_SCLK, MY_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_1);
+
+// notice these pin numbers are not the same used in the library examples
+RF24 radio(7, 6); // the (ce_pin, csn_pin) connected to the radio
+
+void setup() {
+   Serial.begin(115200);
+   while (!Serial) {} //some boards need this
+
+   // enable the alternate functionality for our secondary SPI bus' pins
+   pinPeripheral(MY_MISO, PIO_SERCOM_ALT);
+   pinPeripheral(MY_MOSI, PIO_SERCOM_ALT);
+   pinPeripheral(MY_SCLK, PIO_SERCOM);
+
+   MY_SPI.begin(); // initialize the secondary SPI bus
+
+   if (!radio.begin(&MY_SPI)) {
+      Serial.println(F("radio hardware not responding!!"));
+      while (1) {} // hold program in infinite loop to prevent subsequent errors
+   }
+
+   // ... continue with program as normal (see library examples/ folder)
+}
+```
