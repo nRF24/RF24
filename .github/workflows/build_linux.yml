@@ -15,7 +15,7 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           # - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
           - "--driver=SPIDEV"
-          - "--driver=MRAA"
+          # - "--driver=MRAA"
 
     steps:
       - uses: actions/checkout@v1
