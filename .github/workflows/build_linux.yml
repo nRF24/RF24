@@ -15,7 +15,7 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           # - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
           - "--driver=SPIDEV"
-          # - "--driver=MRAA"
+          - "--driver=MRAA"
 
     steps:
       - uses: actions/checkout@v1
@@ -42,7 +42,7 @@ jobs:
           cd build
           cmake .. -DBUILDSWIGNODE=OFF
           sudo make install
-          echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf
+          sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
       - name: library configure
         run: ./configure ${{ matrix.config-options }}
