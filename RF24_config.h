@@ -158,14 +158,18 @@
     #else // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)
         #if !defined (ARDUINO) // This doesn't work on Arduino DUE
             typedef char const char;
-
-        #elif defined (ARDUINO_ARCH_SAMD)
-            #define printf Serial.printf
-
         #else // Fill in pgm_read_byte that is used, but missing from DUE
             #if defined (ARDUINO_ARCH_AVR) || defined (ARDUINO_ARCH_SAMD)
                 #include <avr/pgmspace.h>
             #endif
+
+            // Due the Official Arduino/ArduinoCore-samd repo switching to a unified API in 2016,
+            // Serial.printf() is not longer defined in the unifying Arduino/ArduinoCore_API repo
+            #if defined (ARDUINO_ARCH_SAMD) && !defined (ARDUINO_API_VERSION)
+                // likely using the Adafruit/ArduinoCore-samd repo
+                #define printf_P Serial.printf
+            #endif // defined (ARDUINO_ARCH_SAMD)
+
             #ifndef pgm_read_byte
                 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
             #endif
