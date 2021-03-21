@@ -4,4 +4,8 @@
 
 # See http://nRF24.github.io/RF24 for all documentation
 
-### Check our [contributing guidelines](CONTRIBUTING.md) before opening a pull request
+## Having problems?
+Please read our **[solutions to common problems](COMMON_ISSUES.md)**. If that doesn't help, then open an issue describing your problem with as much detail as possible.
+
+### Want to contribute?
+Awesome! However, please check our [contributing guidelines](CONTRIBUTING.md) before opening a pull request.
