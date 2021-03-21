@@ -248,3 +248,6 @@ void setup() {
    // ... continue with program as normal (see library examples/ folder)
 }
 ```
+
+#### Other platforms that support multiple SPI bus objects
+- need example for [ArduinoCore-mbed SPI library](https://github.com/arduino/ArduinoCore-mbed/tree/master/libraries/SPI) (applies to Arduino Nano 33 BLE boards)

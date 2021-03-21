@@ -123,7 +123,7 @@
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
 
         #ifndef _BV
-          #define _BV(x) (1<<(x))
+            #define _BV(x) (1<<(x))
         #endif
     #endif // defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
 
@@ -159,38 +159,41 @@
         #if !defined (ARDUINO) // This doesn't work on Arduino DUE
             typedef char const char;
 
+        #elif defined (ARDUINO_ARCH_SAMD)
+            #define printf Serial.printf
+
         #else // Fill in pgm_read_byte that is used, but missing from DUE
-          #ifdef ARDUINO_ARCH_AVR
-            #include <avr/pgmspace.h>
-          #endif
-          #ifndef pgm_read_byte
-            #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-          #endif
+            #if defined (ARDUINO_ARCH_AVR) || defined (ARDUINO_ARCH_SAMD)
+                #include <avr/pgmspace.h>
+            #endif
+            #ifndef pgm_read_byte
+                #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+            #endif
         #endif // !defined (ARDUINO)
 
         #ifndef prog_uint16_t
-          typedef uint16_t prog_uint16_t;
+            typedef uint16_t prog_uint16_t;
         #endif
         #ifndef PSTR
-          #define PSTR(x) (x)
+            #define PSTR(x) (x)
         #endif
         #ifndef printf_P
-          #define printf_P printf
+            #define printf_P printf
         #endif
         #ifndef strlen_P
-          #define strlen_P strlen
+            #define strlen_P strlen
         #endif
         #ifndef PROGMEM
-          #define PROGMEM
+            #define PROGMEM
         #endif
         #ifndef pgm_read_word
-          #define pgm_read_word(p) (*(p))
+            #define pgm_read_word(p) (*(p))
         #endif
         #if !defined pgm_read_ptr || defined ARDUINO_ARCH_MBED
-          #define pgm_read_ptr(p) (*(p))
+            #define pgm_read_ptr(p) (*(p))
         #endif
         #ifndef PRIPSTR
-          #define PRIPSTR "%s"
+            #define PRIPSTR "%s"
         #endif
 
     #endif // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)
