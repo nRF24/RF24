@@ -21,8 +21,8 @@
 
 int serial_putc(char c, FILE *)
 {
-  Serial.write(c);
-  return c;
+    Serial.write(c);
+    return c;
 }
 
 #elif defined (ARDUINO_ARCH_MBED)
