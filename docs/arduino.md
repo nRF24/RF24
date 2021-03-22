@@ -249,5 +249,28 @@ void setup() {
 }
 ```
 
-#### Other platforms that support multiple SPI bus objects
-- need example for [ArduinoCore-mbed SPI library](https://github.com/arduino/ArduinoCore-mbed/tree/master/libraries/SPI) (applies to Arduino Nano 33 BLE boards)
+#### MBED example
+@see The [ArduinoCore-mbed SPI library](https://github.com/arduino/ArduinoCore-mbed/tree/master/libraries/SPI)
+has predefined the possible hardware-driven SPI buses. This applies to Arduino Nano 33 BLE and
+Arduino Portenta boards.
+
+```cpp
+#include <SPI.h>
+#include <RF24.h>
+
+RF24 radio(7, 8); // the (ce_pin, csn_pin) connected to the radio
+
+void setup() {
+   Serial.begin(115200);
+   while (!Serial) {} //some boards need this
+
+   SPI1.begin();
+
+   if (!radio.begin(&SPI1)) {
+      Serial.println(F("radio hardware not responding!!"));
+      while (1) {} // hold program in infinite loop to prevent subsequent errors
+   }
+
+   // ... continue with program as normal (see library examples/ folder)
+}
+```
