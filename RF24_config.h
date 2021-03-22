@@ -20,7 +20,7 @@
 
 /*** USER DEFINES:    ***/
 #define FAILURE_HANDLING
-//#define SERIAL_DEBUG
+#define SERIAL_DEBUG
 //#define MINIMAL
 //#define SPI_UART    // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
 //#define SOFTSPI     // Requires library from https://github.com/greiman/DigitalIO
@@ -144,29 +144,28 @@
     #endif // defined (__ARDUINO_X86__)
 
     // Progmem is Arduino-specific
-    // Arduino DUE is arm and does not include avr/pgmspace
     #if defined (ARDUINO_ARCH_ESP8266) || defined (ESP32)
         #include <pgmspace.h>
         #define PRIPSTR "%s"
         #ifndef pgm_read_ptr
           #define pgm_read_ptr(p) (*(p))
         #endif
-    #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && ! defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
+    #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && !defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
         #include <avr/pgmspace.h>
         #define PRIPSTR "%S"
 
     #else // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)
         #if !defined (ARDUINO) // This doesn't work on Arduino DUE
             typedef char const char;
-        #else // Fill in pgm_read_byte that is used, but missing from DUE
-            #if defined (ARDUINO_ARCH_AVR) || defined (ARDUINO_ARCH_SAMD)
-                #include <avr/pgmspace.h>
+        #else // Fill in pgm_read_byte that is used
+            #if defined (ARDUINO_ARCH_AVR) || defined (ARDUINO_ARCH_SAMD) || defined (ARDUINO_SAM_DUE)
+                #include <avr/pgmspace.h> // added to ArduinoCore-sam (Due core) in 2013
             #endif
 
-            // Due the Official Arduino/ArduinoCore-samd repo switching to a unified API in 2016,
-            // Serial.printf() is not longer defined in the unifying Arduino/ArduinoCore_API repo
+            // Since the official arduino/ArduinoCore-samd repo switched to a unified API in 2016,
+            // Serial.printf() is no longer defined in the unifying Arduino/ArduinoCore-API repo
             #if defined (ARDUINO_ARCH_SAMD) && !defined (ARDUINO_API_VERSION)
-                // likely using the Adafruit/ArduinoCore-samd repo
+                // likely using the adafruit/ArduinoCore-samd repo
                 #define printf_P Serial.printf
             #endif // defined (ARDUINO_ARCH_SAMD)
 
