@@ -171,14 +171,15 @@ public:
      *
      * See [Related Pages](pages.html) for device specific information <br>
      *
-     * @note Users can specify default SPI speed by modifying `#define RF24_SPI_SPEED` in RF24_config.h <br>
-     * For Arduino, SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS <br>
-     * Older/Unsupported Arduino devices will use a default clock divider & settings configuration <br>
-     * Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed <br>
-     *
      * @param _cepin The pin attached to Chip Enable on the RF module
-     * @param _cspin The pin attached to Chip Select
-     * @param _spispeed The SPI speed in Hz ie: 1000000 == 1Mhz
+     * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
+     * <br><br>For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
+     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     * @param _spispeed The SPI speed in Hz ie: 1000000 == 1Mhz <br><br>Users can specify default SPI speed by modifying
+     * `#define RF24_SPI_SPEED` in RF24_config.h
+     * - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
+     * - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
+     * - For Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed as of v1.3.7
      */
     RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spispeed = RF24_SPI_SPEED);
 
