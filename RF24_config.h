@@ -2,13 +2,14 @@
 /*
  Copyright (C)
     2011            J. Coliz <maniacbug@ymail.com>
-    2015-2019 TMRh20
+    2015-2019       TMRh20
     2015            spaniakos <spaniakos@gmail.com>
     2015            nerdralph
     2015            zador-blood-stained
     2016            akatran
-    2017-2019 Avamander <avamander@gmail.com>
+    2017-2019       Avamander <avamander@gmail.com>
     2019            IkpeohaGodson
+    2021            2bndy5
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -90,6 +91,10 @@
             const uint8_t SPI_MODE = 0;
             #define _SPI SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE>
             #define RF24_SPI_PTR
+
+        #elif defined (ARDUINO_SAM_DUE)
+            #include <SPI.h>
+            #define _SPI SPI
 
         #else // !defined (SPI_UART) && !defined (SOFTSPI)
             #include <SPI.h>
