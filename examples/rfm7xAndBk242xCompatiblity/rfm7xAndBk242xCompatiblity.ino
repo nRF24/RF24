@@ -2,6 +2,7 @@
  * See documentation at https://nRF24.github.io/RF24
  * See License information at root directory of this library
  * Author: Brendan Doherty (2bndy5)
+ * Adapted for RFM75 by microtronics
  */
 
 /**
@@ -45,12 +46,6 @@ void setup()
     // some boards need to wait to ensure access to serial over USB
   }
 
-  // initialize the transceiver on the SPI bus
-  if (!radio.begin()) {
-    Serial.println(F("radio hardware is not responding!!"));
-    while (1) { } // hold in infinite loop
-  }
-
   rfm7x_io_init();
   spi_init();
   if (rfm7x_is_present()) {
@@ -60,6 +55,12 @@ void setup()
     delay(2);
     rfm7x_toggle_reg4();
     delay(1);
+  }
+
+  // initialize the transceiver on the SPI bus
+  if (!radio.begin()) {
+    Serial.println(F("radio hardware is not responding!!"));
+    while (1) { } // hold in infinite loop
   }
 
   // print example's introductory prompt
