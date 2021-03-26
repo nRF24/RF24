@@ -42,7 +42,7 @@ void setup()
 
   Serial.begin(115200);
   while (!Serial) {
-      // some boards need to wait to ensure access to serial over USB
+    // some boards need to wait to ensure access to serial over USB
   }
 
   // initialize the transceiver on the SPI bus

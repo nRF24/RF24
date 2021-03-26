@@ -2,9 +2,9 @@
 #define RFM7x_H_
 
 /************************************************************************************
- *  Author: jnk0le@hotmail.com                                                      *
- *  https://github.com/jnk0le                                                       *
- *  This library is distributed under MIT license terms                             *
+    Author: jnk0le@hotmail.com
+    https://github.com/jnk0le
+    This library is distributed under MIT license terms
  ************************************************************************************/
 
 #include "rfm7x_config.h"
@@ -504,14 +504,14 @@ extern "C" {
 //////////////////////////////////////////////////////////////////
 //??????
 /*#if defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE0_RX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS)
-#define RFM7x_LONG_ADDR_ENTRIES 3
-#elif (defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE0_RX_ADDRESS))||(defined(RFM7x_PIPE0_RX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS))||(defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS))
-#define RFM7x_LONG_ADDR_ENTRIES 2
-#elif defined(RFM7x_TX_ADDRESS)||defined(RFM7x_PIPE0_RX_ADDRESS)||defined(RFM7x_PIPE1_RX_ADDRESS)
-#define RFM7x_LONG_ADDR_ENTRIES 1
-#else
-#define RFM7x_LONG_ADDR_ENTRIES 0
-#endif*/
+  #define RFM7x_LONG_ADDR_ENTRIES 3
+  #elif (defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE0_RX_ADDRESS))||(defined(RFM7x_PIPE0_RX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS))||(defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS))
+  #define RFM7x_LONG_ADDR_ENTRIES 2
+  #elif defined(RFM7x_TX_ADDRESS)||defined(RFM7x_PIPE0_RX_ADDRESS)||defined(RFM7x_PIPE1_RX_ADDRESS)
+  #define RFM7x_LONG_ADDR_ENTRIES 1
+  #else
+  #define RFM7x_LONG_ADDR_ENTRIES 0
+  #endif*/
 
 //////////////////////////////////////////////////////////////////
 
@@ -551,43 +551,71 @@ void rfm7x_power_down(void); // this function will not wait for finishing any on
 void rfm7x_mode_receive(void);
 void rfm7x_mode_transmit(void);
 
-inline void rfm7x_mode_standby(void) { RFM7x_CE_LOW; }
+inline void rfm7x_mode_standby(void) {
+  RFM7x_CE_LOW;
+}
 
-inline uint8_t rfm7x_tx_fifo_full(void) { return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_TX_FULL) != 0; }
-inline uint8_t rfm7x_tx_fifo_empty(void) { return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_TX_EMPTY) != 0; }
+inline uint8_t rfm7x_tx_fifo_full(void) {
+  return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_TX_FULL) != 0;
+}
+inline uint8_t rfm7x_tx_fifo_empty(void) {
+  return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_TX_EMPTY) != 0;
+}
 
-inline uint8_t rfm7x_rx_fifo_full(void) { return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_RX_FULL) != 0; }
-inline uint8_t rfm7x_rx_fifo_empty(void) { return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_RX_EMPTY) != 0; }
+inline uint8_t rfm7x_rx_fifo_full(void) {
+  return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_RX_FULL) != 0;
+}
+inline uint8_t rfm7x_rx_fifo_empty(void) {
+  return (rfm7x_reg_read(RFM7x_REG_FIFO_STATUS) & RFM7x_FIFO_STATUS_RX_EMPTY) != 0;
+}
 
-inline uint8_t rfm7x_receive_next_pipe(void) { return (rfm7x_reg_read(RFM7x_REG_STATUS) >> 1) & 0x07; }
-inline uint8_t rfm7x_receive_next_length(void) { return rfm7x_cmd_read(RFM7x_CMD_R_RX_PL_WID); }
+inline uint8_t rfm7x_receive_next_pipe(void) {
+  return (rfm7x_reg_read(RFM7x_REG_STATUS) >> 1) & 0x07;
+}
+inline uint8_t rfm7x_receive_next_length(void) {
+  return rfm7x_cmd_read(RFM7x_CMD_R_RX_PL_WID);
+}
 
 uint8_t rfm7x_receive(uint8_t* buff); // returns received length // 0x00 - nothing received, or empty packet
 void rfm7x_receive_nocheck(uint8_t* buff);
 
 uint8_t rfm7x_receive_p_(uint8_t* pipe, uint8_t* buff); // returns received length // 0x00 - nothing received
 static inline uint8_t rfm7x_receive_p(uint8_t* buff, uint8_t* pipe) __attribute__((always_inline));
-static inline uint8_t rfm7x_receive_p(uint8_t* buff, uint8_t* pipe) { return rfm7x_receive_p_(pipe, buff); }
+static inline uint8_t rfm7x_receive_p(uint8_t* buff, uint8_t* pipe) {
+  return rfm7x_receive_p_(pipe, buff);
+}
 
-inline void rfm7x_receive_nocheck_s(uint8_t* buff, uint8_t length) { rfm7x_cmd_buff_read(RFM7x_CMD_R_RX_PAYLOAD, buff, length); }
+inline void rfm7x_receive_nocheck_s(uint8_t* buff, uint8_t length) {
+  rfm7x_cmd_buff_read(RFM7x_CMD_R_RX_PAYLOAD, buff, length);
+}
 uint8_t rfm7x_receive_s(uint8_t* buff, uint8_t length); // returns number of received pipe // 0x07 - nothing received
 
 uint8_t rfm7x_receive_f(uint8_t* buff, uint8_t* pipe, uint8_t* length);
 
-inline void rfm7x_transmit(uint8_t* buff, uint8_t length) { rfm7x_cmd_buff_write(RFM7x_CMD_W_TX_PAYLOAD, buff, length); }
-inline void rfm7x_transmit_noack(uint8_t* buff, uint8_t length) { rfm7x_cmd_buff_write(RFM7x_CMD_W_TX_PAYLOAD_NOACK, buff, length); }
+inline void rfm7x_transmit(uint8_t* buff, uint8_t length) {
+  rfm7x_cmd_buff_write(RFM7x_CMD_W_TX_PAYLOAD, buff, length);
+}
+inline void rfm7x_transmit_noack(uint8_t* buff, uint8_t length) {
+  rfm7x_cmd_buff_write(RFM7x_CMD_W_TX_PAYLOAD_NOACK, buff, length);
+}
 
 // used in RX mode // transmit message while ACK'ing received packet on selected pipe
-inline void rfm7x_rx_ack_transmit(uint8_t pipe, uint8_t* buff, uint8_t length) { rfm7x_cmd_buff_write(RFM7x_CMD_W_ACK_PAYLOAD | pipe, buff, length); }
+inline void rfm7x_rx_ack_transmit(uint8_t pipe, uint8_t* buff, uint8_t length) {
+  rfm7x_cmd_buff_write(RFM7x_CMD_W_ACK_PAYLOAD | pipe, buff, length);
+}
 
 //uint8_t rfm7x_available(uint8_t *pipe); // normal receive mode //
 // reset irq flags??
 
 void rfm7x_set_rssi_threshold_step(uint8_t level); // usually linear scale from 0 (-97/100dBm) to 15 (-67/70dBm) // bk2423 is also linearized by this function, some levels may be out of useable range (over -105dBm)
-inline uint8_t rfm7x_read_CD(void) { return rfm7x_reg_read(RFM7x_REG_CD); }
+inline uint8_t rfm7x_read_CD(void) {
+  return rfm7x_reg_read(RFM7x_REG_CD);
+}
 
 //config
-inline void rfm7x_set_channel(uint8_t channel) { rfm7x_reg_write(RFM7x_REG_RF_CH, channel); } // 0-83 , 0-127 , clears MAX_RT counter
+inline void rfm7x_set_channel(uint8_t channel) {
+  rfm7x_reg_write(RFM7x_REG_RF_CH, channel);  // 0-83 , 0-127 , clears MAX_RT counter
+}
 void rfm7x_set_crc_length(uint8_t len);
 
 //bk2421/bk2423 aka rfm70/73
@@ -642,13 +670,19 @@ void rfm7x_dreg_enable(uint8_t enable);
 #endif
 
 //250us steps
-inline void rfm7x_set_retransmits(uint8_t retransmits, uint8_t delay) { rfm7x_reg_write(RFM7x_REG_SETUP_RETR, (retransmits) | (delay << 4)); }
+inline void rfm7x_set_retransmits(uint8_t retransmits, uint8_t delay) {
+  rfm7x_reg_write(RFM7x_REG_SETUP_RETR, (retransmits) | (delay << 4));
+}
 
 // 3 to 5 bytes (2 byte width is reserved)
-inline void rfm7x_set_addres_width(uint8_t width) { rfm7x_reg_write(RFM7x_REG_SETUP_AW, width - 2); }
+inline void rfm7x_set_addres_width(uint8_t width) {
+  rfm7x_reg_write(RFM7x_REG_SETUP_AW, width - 2);
+}
 
 //0-32
-inline void rfm7x_set_rx_pyaload_size(uint8_t pipe, uint8_t size) { rfm7x_reg_write(RFM7x_REG_RX_PW_P0 + pipe, size); }
+inline void rfm7x_set_rx_pyaload_size(uint8_t pipe, uint8_t size) {
+  rfm7x_reg_write(RFM7x_REG_RX_PW_P0 + pipe, size);
+}
 
 //void rfm7x_set_receiving_pipes(uint8_t mask);
 //void rfm7x_set_autoack_pipes(uint8_t mask);
@@ -668,7 +702,9 @@ void rfm7x_open_writing_pipe(uint64_t addr);
 
 //pipe 1 and 2 (??)
 void rfm7x_set_receive_address(uint8_t pipe, uint8_t* addr); // LSB first
-inline void rfm7x_set_receive_address_pn(uint8_t pipe, uint8_t LSB_addr) { rfm7x_reg_write(RFM7x_REG_RX_ADDR_P0 + pipe, LSB_addr); }
+inline void rfm7x_set_receive_address_pn(uint8_t pipe, uint8_t LSB_addr) {
+  rfm7x_reg_write(RFM7x_REG_RX_ADDR_P0 + pipe, LSB_addr);
+}
 
 //all pipes
 void rfm7x_open_reading_pipe(uint8_t pipe, uint64_t addr);
