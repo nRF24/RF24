@@ -3,12 +3,12 @@
 
 #define RFM7x_MODULECHIP_USED 3
 // 0 // BK2401 ??? // same as BK2421 without 2 mbps data-rate
-// 1 // BK2421 aka RFM70 
+// 1 // BK2421 aka RFM70
 // 2 // BK2423 aka RFM73 // usually full component COBs - (VDDPA path present) - mostly 0.6$ "power enhanced" mini-modules on aliexpress
 // 3 // BK2425 aka RFM75 // pinout clearly suggests that, it is well known "COB-with-missing-components-module" nrf24l01+ fakes
 // 4 // BK2411/BK2412 // those are especially designed as an nrf24L01 (without +) fake (green PCB with 5 row header), but none of them can be found // NOT TESTED
 // 5 // BK5811 // 5.1/5.8GHz RF chip // NOT TESTED
-	
+
 // bk2491 is probably a canceled chip, which name appears as a title of various number of datasheets
 // bk2461 // bk2535 // bk2533 // undocumented SOC
 // bk2433 // bk2451 // bk2452 // undocumented SOCs with usb
@@ -24,20 +24,20 @@
 #define RFM7x_USE_PIPE0_ADDRESS_FOR_TX_ADDRESS // initialize TX address with the data from PIPE0_RX_ADDRESS // those have to be the same in AUTO_ACK mode // RFM7x_TX_ADDRESS is ignored
 
 #define RFM7x_DO_NOT_INITIALIZE_RX_PAYLOAD_LEN_REGS // only 2 bytes gain on avr // by omiting initialization of pyload length registers and dummy bytes
-#define RFM7x_DO_NOT_INITIALIZE_P2_RX_ADDRESS_AND_PAYLOAD_LEN_REGS // only 8 bytes gain on avr // by omiting initialization of payload length, pipe 2-5 addr, and dummy bytes 
+#define RFM7x_DO_NOT_INITIALIZE_P2_RX_ADDRESS_AND_PAYLOAD_LEN_REGS // only 8 bytes gain on avr // by omiting initialization of payload length, pipe 2-5 addr, and dummy bytes
 
 #define RFM7x_AVR_DO_NOT_PUT_INIT_STRUCT_IN_FLASH // currently workaround rfm7x_reg_buff_write_P() function is used that might make bigger code in some cases
 
 /**************** hardcoded config of bank0 registers ****************/
 
 //comment out to free space in init_struct // LSB byte is first
-#define RFM7x_PIPE0_RX_ADDRESS 0x34, 0x43, 0x10, 0x10, 0x01    // have to be the same as TX_ADDRESS in order to communiacate in AUTO_ACK mode.
+#define RFM7x_PIPE0_RX_ADDRESS 0x34, 0x43, 0x10, 0x10, 0x01 // have to be the same as TX_ADDRESS in order to communiacate in AUTO_ACK mode.
 //#define RFM7x_PIPE1_RX_ADDRESS 0x11, 0x02, 0x03, 0x04, 0x05
 //#define RFM7x_TX_ADDRESS       0x34, 0x43, 0x10, 0x10, 0x01    // have to be the same as PIPE0_RX_ADDRESS in order to communiacate in AUTO_ACK mode.
 
 // do not comment out config below
 
-#define RFM7x_PIPE0_RX_ADDRESS_SIZE 5 
+#define RFM7x_PIPE0_RX_ADDRESS_SIZE 5
 #define RFM7x_PIPE1_RX_ADDRESS_SIZE 5
 #define RFM7x_TX_ADDRESS_SIZE 5
 //size of the vectors above
@@ -52,20 +52,20 @@
 #define RFM7x_BANK0_CONF_PWR_UP 1
 // usually we want to power chip up during initialization
 // in some rare cases (battery operated) it have to be initialized in PWR_DOWN just to save some power
-// 1: POWER UP 
-// 0: POWER DOWN   
+// 1: POWER UP
+// 0: POWER DOWN
 
 #define RFM7x_BANK0_CONF_EN_CRC 1
 // Enable CRC. Forced high if one of the bits in the EN_AA is high
 // 0: CRC disabled
 // 1: CRC enabled
 
-#define RFM7x_BANK0_CONF_CRCO 1 
+#define RFM7x_BANK0_CONF_CRCO 1
 // CRC encoding scheme
 // '0' - 1 byte
 // '1' - 2 bytes
 
-#define RFM7x_BANK0_CONF_MASK_RX_DR 1 
+#define RFM7x_BANK0_CONF_MASK_RX_DR 1
 // Mask interrupt caused by RX_DR
 // 1: Interrupt not reflected on the IRQ pin
 // 0: Reflect RX_DR as active low interrupt on the IRQ pin
@@ -108,7 +108,7 @@
 
 #define RFM7x_BANK0_CONF_ARD 15
 // Auto Retransmission Delay (Delay defined from end of transmission to start of next transmission)
-// according to nrf24l01+ datasheet ARD should be 500us or more if ACK payload mode is used (W_ACK_PAYLOAD command) 
+// according to nrf24l01+ datasheet ARD should be 500us or more if ACK payload mode is used (W_ACK_PAYLOAD command)
 // 250kbps mode requires 500us retransmit delay even if ACK payload is not used but is activated
 // 0 - Wait 250 us
 // 1 - Wait 500 us
@@ -120,7 +120,6 @@
 // 0 - Re-Transmit disabled
 // 1 - Up to 1 Re-Transmission on fail of AA
 // 15 - Up to 15 Re-Transmission on fail of AA
-
 
 #define RFM7x_BANK0_CONF_RF_CH 10
 // select used frequency channel in 1 MHz steps (kb2411 starts at 2397, rest at 2400)
@@ -216,11 +215,11 @@
 
 // magic values that have to be written into read-only status registers, otherwise chips will refuse to work after some time or a few power cycles
 
-#define RFM7x_BANK0_REG_STATUS      0x70
+#define RFM7x_BANK0_REG_STATUS 0x70
 // The default value that comes from all example codes (0x07) might be intended as a fix for hidden silicon bug, or just erratum from 0x70 that should clear all pending flags
 
-#define RFM7x_BANK0_REG_OBSERVE_TX  0x00
-#define RFM7x_BANK0_REG_CD          0x00
+#define RFM7x_BANK0_REG_OBSERVE_TX 0x00
+#define RFM7x_BANK0_REG_CD 0x00
 #define RFM7x_BANK0_REG_FIFO_STATUS 0x00
 
 /******** bk2421/01 aka RFM70 - compatibility and sensitivity *******/
@@ -239,7 +238,7 @@
 // 5 // "single carrier mode" from datasheet - constant wave mode (after translation from chienglish) // instead of 'PLL_LOCK' ?? // testing purposes only
 // 6 // NOT DOCUMENTED NOR TESTED // value for rfm73 in replace manual (rfm70->rfm73)
 // 7 // NOT DOCUMENTED NOR TESTED // undocumented "high power mode" up to 15dBm (rfm73/bk2423)
-// 8 // NOT DOCUMENTED NOR TESTED // (7) mixed with (6) - (0x0B -> 0x1B), (0x9E -> 0xB6) 
+// 8 // NOT DOCUMENTED NOR TESTED // (7) mixed with (6) - (0x0B -> 0x1B), (0x9E -> 0xB6)
 // 9 // NOT DOCUMENTED NOR TESTED // (7) mixed with (6) - (0x0B -> 0x1B), (0xBE -> 0xB6), (0x84 -> 0x80)
 // 10 // NOT DOCUMENTED NOR TESTED // (7) mixed with (6) - (0x0B -> 0x1B), (0xBE -> 0xB6), (0x84 -> 0x82)
 // 11 // "In order to smooth the use of RF-2400PA" (Inhaos rebrand of bk2421 + PA)
@@ -270,28 +269,28 @@
 
 #define RFM70_BANK1_REGD_MODE 0
 // 0 // recommended datasheet value
-// 1 // NOT DOCUMENTED NOR TESTED // value for rfm73, from replace manual (rfm70->rfm73) // (bank1 is so documented that it might be obtained experimentally) 
+// 1 // NOT DOCUMENTED NOR TESTED // value for rfm73, from replace manual (rfm70->rfm73) // (bank1 is so documented that it might be obtained experimentally)
 
 #define RFM70_BANK1_RAMP_CURVE_MODE 0
 // 0 // rfm70/bk2421 // default recommended datasheet value
-// 1 // NOT DOCUMENTED NOR TESTED // rfm73 datasheet and power-up value 
+// 1 // NOT DOCUMENTED NOR TESTED // rfm73 datasheet and power-up value
 
 /********************************************************************/
 
 /********** bk2423 aka RFM73 - compatibility and sensitivity ********/
 
 #define RFM73_BANK1_REG3_MODE 0
-// 0 // default recommended value 
+// 0 // default recommended value
 // 1 // AN0007 "high power mode" 3-15dBm - may require additional low/band-pass filter for compliance with FCC rules // also "In order to smooth the use of RF-2400PA" (Inhaos rebrand of bk2421 + PA)
 // 2 // datasheet "reset value"
 
 #define RFM73_BANK1_REG4_MODE 1 // literally the worst register - all datasheets/AN's have different "correct" values for this register
 // 0 // rfm70/bk2421 and rfm73/bk2423 datasheet values // AN0007 and AN0008 "default setting of reg4"
-// 1 // replace manual (rfm70->rfm73), also used in all libraries which are not plain conversion from rfm70 // is said to be 3 dB gain in 1MHz and required for proper operation at 2MHz 
+// 1 // replace manual (rfm70->rfm73), also used in all libraries which are not plain conversion from rfm70 // is said to be 3 dB gain in 1MHz and required for proper operation at 2MHz
 // 2 // AN0007 "high power mode" up to 15dBm // RF_PWR in bank 0 should be set to 5dBm // may require additional low/band-pass filter for compliance with FCC rules
 // 3 // (0) mixed with (1) // only obvious parts - (0x0B -> 0x1B), (0xBE -> 0xB6)
 // 4 // (2) mixed with (1) // only obvious parts - (0x0B -> 0x1B), (0xBE -> 0xB6)
-// 5 // (2) mixed with (1) // clear also bit 10 - (0x0B -> 0x1B), (0xBE -> 0xB6), (0x84 -> 0x80) 
+// 5 // (2) mixed with (1) // clear also bit 10 - (0x0B -> 0x1B), (0xBE -> 0xB6), (0x84 -> 0x80)
 // 6 // "single carrier mode" from datasheet - constant wave mode (after translation from chienglish) // instead of 'PLL_LOCK' ?? // testing purposes only
 // 7 // (4) with (0x84 -> 0x82)
 // 8 // (0) with (0xD9 -> 0xF9) // found in some codes/libs for rfm70/73
@@ -319,7 +318,7 @@
 // 0 // RSSI disabled
 // 1 // RSSI enabled
 
-#define RFM73_RSSI_THRESHOLD_LEVEL 9 // 0-15 
+#define RFM73_RSSI_THRESHOLD_LEVEL 9 // 0-15
 // in bk2423/rfm73 RSSI level is not linear to threshold level
 // RSSI levels are different at 250k/1M and 2M air data rate
 // refering to AN0007, high sense mode affects rssi levels, so the default level is in N/A region // actually not true
@@ -338,18 +337,18 @@
 
 #define RFM73_BANK1_REGD_MODE 1
 // 0 // rfm70/bk2421 and rfm73/bk2423 datasheet values, also initial value that can be read after module power-up
-// 1 // replace manual (rfm70->rfm73), also used in all libraries which are not plain conversion from rfm70 // it is said to be 3 dB gain in 1MHz and required for proper operation at 2MHz 
+// 1 // replace manual (rfm70->rfm73), also used in all libraries which are not plain conversion from rfm70 // it is said to be 3 dB gain in 1MHz and required for proper operation at 2MHz
 
 #define RFM73_BANK1_RAMP_CURVE_MODE 1
 // 0 // value recommended in rfm73/bk2423 datasheets, also the initial value that can be read after module power-up
-// 1 // value recommended in rfm70/bk2421 datasheets and replace manual (rfm70->rfm73), also used in all libraries  
+// 1 // value recommended in rfm70/bk2421 datasheets and replace manual (rfm70->rfm73), also used in all libraries
 
 /********************************************************************/
 
 /********** bk2425 aka RFM75 - compatibility and sensitivity ********/
 
 #define RFM75_BANK1_REG3_MODE 0
-// 0 // recommended bk2425/rfm75 value 
+// 0 // recommended bk2425/rfm75 value
 // 1 // datasheet "reset value"
 // 3 // NOT DOCUMENTED NOR TESTED // (0) with undocumented high power mode bits set // no high power ??
 // 4 // adapt rfm73 value from replace manual (rfm70->rfm73)
@@ -358,7 +357,7 @@
 #define RFM75_BANK1_REG4_MODE 0
 // 0 // recommended value for 1Mbps
 // 1 // recommended value for 2Mbps
-// 2 // recommended value for 250kbps 
+// 2 // recommended value for 250kbps
 // 3 // "single carrier mode" from datasheet - constant wave mode (after translation from chienglish) // instead of 'PLL_LOCK' ??
 // 4 // NOT DOCUMENTED NOR TESTED // (0) with adapted rfm73 "high power" mode (AN0007) // clear undocumented bit 9 // no high power ??
 // 5 // NOT DOCUMENTED NOR TESTED // (1) with adapted rfm73 "high power" mode (AN0007) // clear undocumented bit 9 // no high power ??
@@ -388,8 +387,8 @@
 // 8 // rfm73 value adapted for 1Mbps // RSSI with selectable threshold
 // 9 // rfm73 value adapted for 2Mbps and 250kbps // RSSI with selectable threshold
 
-#define RFM75_UNDOCUMENTED_RSSI_THRESHOLD_LEVEL 9 // 0-15? // value is left shifted by 2 into MSB // 9 
-// officially there is no RSSI threshold for this chip, but obviously it's so undocumented that it could be implemented 
+#define RFM75_UNDOCUMENTED_RSSI_THRESHOLD_LEVEL 9 // 0-15? // value is left shifted by 2 into MSB // 9
+// officially there is no RSSI threshold for this chip, but obviously it's so undocumented that it could be implemented
 
 #define RFM75_BANK1_REGC_MODE 1
 // 0 // rfm70/bk2421 compatible // 120 us PLL settling time
@@ -397,7 +396,7 @@
 // 2 // rfm73 adapt // initial value after power up // 120 us PLL settling time // not used/mentioned anywhere
 // 3 // rfm73 adapt // initial value after power up // 130 us PLL settling time // not used/mentioned anywhere
 
-#define RFM75_CONFIG_COMPATIBLE_MODE 0  //0 works when rfm receives and nrf24 transmits
+#define RFM75_CONFIG_COMPATIBLE_MODE 0 //0 works when rfm receives and nrf24 transmits
 // transmitter and receiver have to use the same mode, otherwise transmitter is seeing 100% packet loss
 // This field probably controls the inversion of NO_ACK bit in the air payload in DPL mode
 // 0:Static compatible // SI24R1 compatible
@@ -409,7 +408,7 @@
 
 #define RFM75_BANK1_RAMP_CURVE_MODE 0
 // 0 // recommended bk2425/rfm75 value
-// 1 // adapt rfm73 datasheet value 
+// 1 // adapt rfm73 datasheet value
 
 /*********************************************************************/
 
@@ -431,15 +430,15 @@
 // Crystal offset compensation, center at 8.
 // User can adjust this register to compensate crystal offset
 
-#define BK2411_RSSI_THRESHOLD_LEVEL 9 // 0-15 
-// 0: -97 dBm, 2 dB/step, 15: -67 dBm 
+#define BK2411_RSSI_THRESHOLD_LEVEL 9 // 0-15
+// 0: -97 dBm, 2 dB/step, 15: -67 dBm
 
 #define BK2411_BANK1_REGC_MODE 0
 // 0 // default recommended value // 300 us PLL, 110 us ramping
 // 1 // NOT TESTED // bk2421 compatible // 120 us PLL, 40 us ramping
 // 2 // PLL lock and ramping time configurable below
 
-#define BK2411_TX_LOCK_SEL 1 
+#define BK2411_TX_LOCK_SEL 1
 // Tx PLL lock time selection
 // 0: 120 us, 1: 200 us, 2: 300 us, 3: 500 us
 
@@ -448,8 +447,8 @@
 // 0: 10 us, 1: 20us, 2: 30 us, \85 , 15: 160 us
 
 #define BK2411_BANK1_REGD_MODE 0
-// 0 // reccomended value for 1 mpbs // <100ppm crystal accurancy, GFSK, BT = 1 
-// 1 // recommended value for 2 mbps // <5ppm (!) crystal accurancy, FSK 
+// 0 // reccomended value for 1 mpbs // <100ppm crystal accurancy, GFSK, BT = 1
+// 1 // recommended value for 2 mbps // <5ppm (!) crystal accurancy, FSK
 // 2 // (1) with <100ppm crystal accurancy
 // 3 // (0) in long payload mode (255 bytes)
 // 4 // (1) in long payload mode (255 bytes)
@@ -466,7 +465,7 @@
 // 0: GFSK mode // cleaner spectrum
 // 1: FSK mode // better sensitivity
 
-#define BK2411_GFSK_BT 1 
+#define BK2411_GFSK_BT 1
 // GFSK filter bandwidth ?? // BT = filter\92s -3dB BW / data rate
 // 0: BT = 1 // less adjecent bits interference, better sensitivity
 // 1: BT = 0.5 // less out of band emmisions
@@ -483,13 +482,13 @@
 
 /*************** bk5811 - compatibility and sensitivity **************/
 
-#define BK5811_BANK1_DEFAULT_BAND 1 
+#define BK5811_BANK1_DEFAULT_BAND 1
 // reg 0, 2 and 3
 // 0: tune to 5.1GHz band
 // 1: tune to 5.8GHz band
 
 #define BK5811_BANK1_REG4_MODE 0
-// 0: default recommended value 
+// 0: default recommended value
 // 1: "single carrier mode" - constant wave mode (after translation from chienglish)
 
 #define BK5811_RSSI_THRESHOLD_LEVEL 9 // 0-15
