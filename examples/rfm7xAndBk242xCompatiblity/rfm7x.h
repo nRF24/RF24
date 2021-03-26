@@ -504,13 +504,13 @@ extern "C" {
 //////////////////////////////////////////////////////////////////
 //??????
 /*#if defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE0_RX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS)
-	#define RFM7x_LONG_ADDR_ENTRIES 3
+#define RFM7x_LONG_ADDR_ENTRIES 3
 #elif (defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE0_RX_ADDRESS))||(defined(RFM7x_PIPE0_RX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS))||(defined(RFM7x_TX_ADDRESS)&&defined(RFM7x_PIPE1_RX_ADDRESS))
-	#define RFM7x_LONG_ADDR_ENTRIES 2
+#define RFM7x_LONG_ADDR_ENTRIES 2
 #elif defined(RFM7x_TX_ADDRESS)||defined(RFM7x_PIPE0_RX_ADDRESS)||defined(RFM7x_PIPE1_RX_ADDRESS)
-	#define RFM7x_LONG_ADDR_ENTRIES 1
+#define RFM7x_LONG_ADDR_ENTRIES 1
 #else
-	#define RFM7x_LONG_ADDR_ENTRIES 0
+#define RFM7x_LONG_ADDR_ENTRIES 0
 #endif*/
 
 //////////////////////////////////////////////////////////////////
