@@ -25,6 +25,10 @@
 //#define SPI_UART    // Requires library from https://github.com/TMRh20/Sketches/tree/master/SPI_UART
 //#define SOFTSPI     // Requires library from https://github.com/greiman/DigitalIO
 
+//This introduces some changes to make the library work with RFM73/75 and other bk242x derivates. See examples/rfm7xAndBk242xCompatiblity
+//Those modules require additional initialization which can be done with https://github.com/jnk0le/RFM7x-lib
+//#define RF24_COMPATIBILITY_MODE_FOR_RFM7X_BK242X
+
 /**
  * User access to internally used delay time (in microseconds) during RF24::powerUp()
  * @warning This default value compensates for all supported hardware. Only adjust this if you

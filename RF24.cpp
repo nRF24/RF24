@@ -1065,7 +1065,17 @@ bool RF24::txStandBy()
     #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
     uint32_t timeout = millis();
     #endif
+
+#if defined(RF24_COMPATIBILITY_MODE_FOR_RFM7X_BK242X)
+    while (!((read_register(FIFO_STATUS)) & _BV(TX_EMPTY)) || !(status & _BV(TX_DS))) {     //rfm75 might set TX_EMPTY although a packet is in transmission
+        if (status & _BV(TX_DS)) {                                                          //at least one packet has been sent
+            if (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {                            //check fifo again, because rfm75 might set tx_empty although packet in transmission
+                write_register(NRF_STATUS, _BV(TX_DS));                                     //this is not the last payload, so clear data sent flag
+            }
+        }
+#else
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
+#endif
         if (status & _BV(MAX_RT)) {
             write_register(NRF_STATUS, _BV(MAX_RT));
             ce(LOW);
@@ -1097,7 +1107,16 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
     }
     uint32_t start = millis();
 
+#if defined(RF24_COMPATIBILITY_MODE_FOR_RFM7X_BK242X)
+    while (!((read_register(FIFO_STATUS)) & _BV(TX_EMPTY)) || !(status & _BV(TX_DS))) {     //rfm75 might set TX_EMPTY although a packet is in transmission
+        if (status & _BV(TX_DS)) {                                                          //at least one packet has been sent
+            if (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {                            //check fifo again, because rfm75 might set tx_empty although packet in transmission
+                write_register(NRF_STATUS, _BV(TX_DS));                                     //this is not the last payload, so clear data sent flag
+            }
+        }
+#else
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
+#endif
         if (status & _BV(MAX_RT)) {
             write_register(NRF_STATUS, _BV(MAX_RT));
             ce(LOW); // Set re-transmit
