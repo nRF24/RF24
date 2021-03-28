@@ -187,22 +187,20 @@ default for certain Teensy boards.
 RF24 radio(2, 0); // the (ce_pin, csn_pin) connected to the radio
 
 void setup() {
-   Serial.begin(115200);
-   while (!Serial) {} //some boards need this
+  Serial.begin(115200);
+  while (!Serial) {} //some boards need this
 
-   SPI.setMOSI(MY_MOSI);
-   SPI.setMISO(MY_MISO);
-   SPI.setSCK(MY_SCLK);
-   SPI.begin();
-   // to use the custom defined pins, uncomment the following
-   // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
+  SPI.setMOSI(MY_MOSI);
+  SPI.setMISO(MY_MISO);
+  SPI.setSCK(MY_SCLK);
+  SPI.begin();
 
-   if (!radio.begin(&SPI)) {
-     Serial.println(F("radio hardware not responding!!"));
-     while (1) {} // hold program in infinite loop to prevent subsequent errors
-   }
+  if (!radio.begin(&SPI)) {
+    Serial.println(F("radio hardware not responding!!"));
+    while (1) {} // hold program in infinite loop to prevent subsequent errors
+  }
 
-   // ... continue with program as normal (see library examples/ folder)
+  // ... continue with program as normal (see library examples/ folder)
 }
 ```
 
@@ -231,22 +229,22 @@ SPIClass MY_SPI(&sercom2, MY_MISO, MY_SCLK, MY_MOSI, SPI_PAD_0_SCK_3, SERCOM_RX_
 RF24 radio(7, 6); // the (ce_pin, csn_pin) connected to the radio
 
 void setup() {
-   Serial.begin(115200);
-   while (!Serial) {} //some boards need this
+  Serial.begin(115200);
+  while (!Serial) {} //some boards need this
 
-   // enable the alternate functionality for our secondary SPI bus' pins
-   pinPeripheral(MY_MISO, PIO_SERCOM_ALT);
-   pinPeripheral(MY_MOSI, PIO_SERCOM_ALT);
-   pinPeripheral(MY_SCLK, PIO_SERCOM);
+  // enable the alternate functionality for our secondary SPI bus' pins
+  pinPeripheral(MY_MISO, PIO_SERCOM_ALT);
+  pinPeripheral(MY_MOSI, PIO_SERCOM_ALT);
+  pinPeripheral(MY_SCLK, PIO_SERCOM);
 
-   MY_SPI.begin(); // initialize the secondary SPI bus
+  MY_SPI.begin(); // initialize the secondary SPI bus
 
-   if (!radio.begin(&MY_SPI)) {
-     Serial.println(F("radio hardware not responding!!"));
-     while (1) {} // hold program in infinite loop to prevent subsequent errors
-   }
+  if (!radio.begin(&MY_SPI)) {
+    Serial.println(F("radio hardware not responding!!"));
+    while (1) {} // hold program in infinite loop to prevent subsequent errors
+  }
 
-   // ... continue with program as normal (see library examples/ folder)
+  // ... continue with program as normal (see library examples/ folder)
 }
 ```
 
