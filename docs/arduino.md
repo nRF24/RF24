@@ -100,26 +100,27 @@ for [other ESP8266-based boards](https://arduino-esp8266.readthedocs.io/en/lates
 // notice these pin numbers are not the same used in the library examples
 RF24 radio(D4, D3); // the (ce_pin, csn_pin) connected to the radio
 
-// by default (with no arguments passed) SPI uses D5 (HSCLK), D6 (HMISO), D7 (HMOSI)
-SPI.pins(6, 7, 8, 0);
-// this means the following pins are used for the SPI bus:
-// MOSI = SD1
-// MISO = SD0
-// SCLK = CLK
-// CSN = GPIO0 (labeled D3 on the board)
-// **notice we also passed `D3` to the RF24 contructor's csn_pin parameter**
-
 void setup() {
-   Serial.begin(115200);
-   while (!Serial) {} //some boards need this
+  Serial.begin(115200);
+  while (!Serial) {} //some boards need this
 
-   SPI.begin();
-   if (!radio.begin(&SPI)) {
-      Serial.println(F("radio hardware not responding!!"));
-      while (1) {} // hold program in infinite loop to prevent subsequent errors
-   }
+  // by default (with no arguments passed) SPI uses D5 (HSCLK), D6 (HMISO), D7 (HMOSI)
+  SPI.pins(6, 7, 8, 0);
+  // this means the following pins are used for the SPI bus:
+  // MOSI = SD1
+  // MISO = SD0
+  // SCLK = CLK
+  // CSN = GPIO0 (labeled D3 on the board)
+  // **notice we also passed `D3` to the RF24 contructor's csn_pin parameter**
 
-   // ... continue with program as normal (see library examples/ folder)
+  SPI.begin();
+
+  if (!radio.begin(&SPI)) {
+     Serial.println(F("radio hardware not responding!!"));
+     while (1) {} // hold program in infinite loop to prevent subsequent errors
+  }
+
+  // ... continue with program as normal (see library examples/ folder)
 }
 ```
 
@@ -149,20 +150,20 @@ SPIClass* hspi = nullptr; // we'll instantiate this in the `setup()` function
 // HSPI_SS   = 15
 
 void setup() {
-   Serial.begin(115200);
-   while (!Serial) {} //some boards need this
+  Serial.begin(115200);
+  while (!Serial) {} //some boards need this
 
-   hspi = new SPIClass(HSPI); // by default VSPI is used
-   hspi->begin();
-   // to use the custom defined pins, uncomment the following
-   // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
+  hspi = new SPIClass(HSPI); // by default VSPI is used
+  hspi->begin();
+  // to use the custom defined pins, uncomment the following
+  // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
 
-   if (!radio.begin(hspi)) {
-      Serial.println(F("radio hardware not responding!!"));
-      while (1) {} // hold program in infinite loop to prevent subsequent errors
-   }
+  if (!radio.begin(hspi)) {
+     Serial.println(F("radio hardware not responding!!"));
+     while (1) {} // hold program in infinite loop to prevent subsequent errors
+  }
 
-   // ... continue with program as normal (see library examples/ folder)
+  // ... continue with program as normal (see library examples/ folder)
 }
 ```
 
