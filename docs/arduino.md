@@ -116,8 +116,8 @@ void setup() {
   SPI.begin();
 
   if (!radio.begin(&SPI)) {
-     Serial.println(F("radio hardware not responding!!"));
-     while (1) {} // hold program in infinite loop to prevent subsequent errors
+    Serial.println(F("radio hardware not responding!!"));
+    while (1) {} // hold program in infinite loop to prevent subsequent errors
   }
 
   // ... continue with program as normal (see library examples/ folder)
@@ -159,8 +159,8 @@ void setup() {
   // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
 
   if (!radio.begin(hspi)) {
-     Serial.println(F("radio hardware not responding!!"));
-     while (1) {} // hold program in infinite loop to prevent subsequent errors
+    Serial.println(F("radio hardware not responding!!"));
+    while (1) {} // hold program in infinite loop to prevent subsequent errors
   }
 
   // ... continue with program as normal (see library examples/ folder)
@@ -198,8 +198,8 @@ void setup() {
    // hspi->begin(MY_SCLK, MY_MISO, MY_MOSI, MY_SS)
 
    if (!radio.begin(&SPI)) {
-      Serial.println(F("radio hardware not responding!!"));
-      while (1) {} // hold program in infinite loop to prevent subsequent errors
+     Serial.println(F("radio hardware not responding!!"));
+     while (1) {} // hold program in infinite loop to prevent subsequent errors
    }
 
    // ... continue with program as normal (see library examples/ folder)
@@ -242,8 +242,8 @@ void setup() {
    MY_SPI.begin(); // initialize the secondary SPI bus
 
    if (!radio.begin(&MY_SPI)) {
-      Serial.println(F("radio hardware not responding!!"));
-      while (1) {} // hold program in infinite loop to prevent subsequent errors
+     Serial.println(F("radio hardware not responding!!"));
+     while (1) {} // hold program in infinite loop to prevent subsequent errors
    }
 
    // ... continue with program as normal (see library examples/ folder)
@@ -262,16 +262,16 @@ Arduino Portenta boards.
 RF24 radio(7, 8); // the (ce_pin, csn_pin) connected to the radio
 
 void setup() {
-   Serial.begin(115200);
-   while (!Serial) {} //some boards need this
+  Serial.begin(115200);
+  while (!Serial) {} //some boards need this
 
-   SPI1.begin();
+  SPI1.begin();
 
-   if (!radio.begin(&SPI1)) {
-      Serial.println(F("radio hardware not responding!!"));
-      while (1) {} // hold program in infinite loop to prevent subsequent errors
-   }
+  if (!radio.begin(&SPI1)) {
+    Serial.println(F("radio hardware not responding!!"));
+    while (1) {} // hold program in infinite loop to prevent subsequent errors
+  }
 
-   // ... continue with program as normal (see library examples/ folder)
+  // ... continue with program as normal (see library examples/ folder)
 }
 ```
