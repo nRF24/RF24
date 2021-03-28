@@ -87,7 +87,6 @@ calling the overloaded `RF24::begin(_SPI*)` method.
 
 Below are some example snippets that demonstrate how this can be done.
 
-
 #### ESP8266 example
 @see The following example code is meant for the popular NodeMCU board. Please refer to the
 [ESP8266 ArduinoCore's SPI documentation](https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#spi)
@@ -204,6 +203,33 @@ void setup() {
 }
 ```
 
+<!--
+#### MBED example
+@see The [ArduinoCore-mbed SPI library](https://github.com/arduino/ArduinoCore-mbed/tree/master/libraries/SPI)
+has predefined the possible hardware-driven SPI buses. This applies to Arduino Nano 33 BLE and
+Arduino Portenta boards.
+
+```cpp
+#include <SPI.h>
+#include <RF24.h>
+
+RF24 radio(7, 8); // the (ce_pin, csn_pin) connected to the radio
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) {} //some boards need this
+
+  SPI1.begin();
+
+  if (!radio.begin(&SPI1)) {
+    Serial.println(F("radio hardware not responding!!"));
+    while (1) {} // hold program in infinite loop to prevent subsequent errors
+  }
+
+  // ... continue with program as normal (see library examples/ folder)
+}
+```
+
 #### ATSAMD21 example
 @see The Suport for secondary SPI bus on ATSAMD21 chips is sparcely documented. However,
 [Sparkfun has a tutorial about using a second SPI bus](https://learn.sparkfun.com/tutorials/adding-more-sercom-ports-for-samd-boards/adding-an-spi)
@@ -246,30 +272,4 @@ void setup() {
 
   // ... continue with program as normal (see library examples/ folder)
 }
-```
-
-#### MBED example
-@see The [ArduinoCore-mbed SPI library](https://github.com/arduino/ArduinoCore-mbed/tree/master/libraries/SPI)
-has predefined the possible hardware-driven SPI buses. This applies to Arduino Nano 33 BLE and
-Arduino Portenta boards.
-
-```cpp
-#include <SPI.h>
-#include <RF24.h>
-
-RF24 radio(7, 8); // the (ce_pin, csn_pin) connected to the radio
-
-void setup() {
-  Serial.begin(115200);
-  while (!Serial) {} //some boards need this
-
-  SPI1.begin();
-
-  if (!radio.begin(&SPI1)) {
-    Serial.println(F("radio hardware not responding!!"));
-    while (1) {} // hold program in infinite loop to prevent subsequent errors
-  }
-
-  // ... continue with program as normal (see library examples/ folder)
-}
-```
+``` -->
