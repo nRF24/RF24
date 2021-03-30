@@ -44,7 +44,11 @@ changes.
 - [Cross-compilation](md_docs_cross_compile.html) for linux devices
 - [Python wrapper](md_docs_python_wrapper.html) available for Linux devices
 
-### General µC Pin layout (See also the individual board support pages for more info)
+### General µC Pin layout
+@see also the individual board [support pages](pages.html) for more info
+
+Observe: [![radio module pinout picture](https://github.com/nRF24/RF24/blob/master/images/pinout.png)](https://github.com/nRF24/RF24/blob/master/images/pinout.png)
+
 The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
 CE and CSN are configurable.
 
