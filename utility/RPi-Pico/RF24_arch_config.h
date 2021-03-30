@@ -34,6 +34,9 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <stdio.h>
+#include "pico/stdlib.h"
+
 #define _BV(x) (1 << (x))
 #define _SPI spi
 
@@ -44,16 +47,6 @@ static SPI spi;
     #define IF_SERIAL_DEBUG(x) ({x;})
 #else
     #define IF_SERIAL_DEBUG(x)
-#endif
-
-// Avoid spurious warnings
-#if 1
-    #if !defined(NATIVE) && defined(ARDUINO)
-        #undef PROGMEM
-        #define PROGMEM __attribute__(( section(".progmem.data") ))
-        #undef PSTR
-        #define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
-    #endif
 #endif
 
 typedef uint16_t prog_uint16_t;
@@ -74,8 +67,8 @@ typedef uint16_t prog_uint16_t;
 #define OUTPUT GPIO::DIRECTION_OUT
 #define digitalWrite(pin, value) GPIO::write(pin, value)
 #define pinMode(pin, direction) GPIO::open(pin, direction)
-#define delay(milisec) __msleep(milisec)
-#define delayMicroseconds(usec) __usleep(usec)
+#define delay(milisec) sleep_ms(milisec)
+#define delayMicroseconds(usec) sleep_us(usec)
 #define millis() __millis()
 
 #endif // __ARCH_CONFIG_H__
