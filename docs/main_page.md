@@ -47,7 +47,10 @@ changes.
 ### General µC Pin layout
 @see also the individual board [support pages](pages.html) for more info
 
-Observe: [![radio module pinout picture](https://github.com/nRF24/RF24/blob/master/images/pinout.png)](https://github.com/nRF24/RF24/blob/master/images/pinout.png)
+Observe <br>
+![
+    @image html pinout.jpg
+    ](https://github.com/nRF24/RF24/blob/master/images/pinout.png)
 
 The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
 CE and CSN are configurable.
