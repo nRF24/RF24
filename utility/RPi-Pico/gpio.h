@@ -15,7 +15,7 @@
 
 #include <cstdio>
 
-// class GPIO {
+class GPIO {
 public:
     /* Constants */
     static const int DIRECTION_OUT = 1;

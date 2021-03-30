@@ -24,8 +24,6 @@
 #ifndef __ARCH_CONFIG_H__
 #define __ARCH_CONFIG_H__
 
-#define RF24_LINUX
-
 #include <stddef.h>
 #include "spi.h"
 #include "gpio.h"
@@ -38,6 +36,8 @@
 
 #define _BV(x) (1 << (x))
 #define _SPI spi
+
+static SPI spi;
 
 #undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
@@ -64,6 +64,8 @@ typedef uint16_t prog_uint16_t;
 #define pgm_read_word(p) (*(p))
 #define PRIPSTR "%s"
 #define pgm_read_byte(p) (*(p))
+
+#define pgm_read_ptr(p) (*(p))
 
 // Function, constant map as a result of migrating from Arduino
 #define LOW GPIO::OUTPUT_LOW
