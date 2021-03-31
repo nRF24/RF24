@@ -266,9 +266,10 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
 
     // ******************** RF24 class  **************************
     //
-    bp::class_< RF24 >("RF24", bp::init< bp::optional< uint16_t, uint16_t > >((bp::arg("_cepin"), bp::arg("_cspin"))))
+    bp::class_< RF24 >("RF24", bp::init< uint16_t, uint16_t >((bp::arg("_cepin"), bp::arg("_cspin"))))
         #if defined (RF24_LINUX) && !defined (MRAA)
-        .def(bp::init< bp::optional< uint16_t, uint16_t, uint32_t > >((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
+        .def(bp::init< uint16_t, uint16_t, bp::optional< uint32_t > >((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
+        .def(bp::init< bp::optional< uint32_t > >((bp::arg("spispeed"))))
         #endif
         .def("available", (bool (::RF24::*)())(&::RF24::available))
         .def("available_pipe", &available_wrap)    // needed to rename this method as python does not allow such overloading
