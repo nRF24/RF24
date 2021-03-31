@@ -167,7 +167,7 @@ void setup() {
 ```
 
 #### Teensy example
-@see The overloaded RF24::begin(_SPI*) may not be needed according to the
+@see The overloaded RF24::begin(_SPI*) is not needed according to the
 [Teensyduino SPI documentation](https://www.pjrc.com/teensy/td_libs_SPI.html).
 Please review the table provided in the
 [Teensyduino documentation](https://www.pjrc.com/teensy/td_libs_SPI.html) for what pins are used by
@@ -192,9 +192,8 @@ void setup() {
   SPI.setMOSI(MY_MOSI);
   SPI.setMISO(MY_MISO);
   SPI.setSCK(MY_SCLK);
-  SPI.begin();
 
-  if (!radio.begin(&SPI)) {
+  if (!radio.begin()) {
     Serial.println(F("radio hardware not responding!!"));
     while (1) {} // hold program in infinite loop to prevent subsequent errors
   }
