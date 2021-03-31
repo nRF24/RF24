@@ -131,10 +131,13 @@ void setPALevel_wrap(RF24& ref, rf24_pa_dbm_e level)
     ref.setPALevel(level, 1);
 }
 
+bool begin_with_pins(RF24& ref, uint16_t _cepin, uint16_t _cspin)
+{
+    return ref.begin(_cepin, _cspin);
+}
+
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
 //BOOST_PYTHON_FUNCTION_OVERLOADS(txStandBy_wrap2, RF24::txStandBy, 1, 2)
-
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(begin_wrap, RF24::begin, 0, 2)
 
 // ******************** enums **************************
 // from both RF24 and bcm2835
@@ -269,7 +272,8 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         #endif
         .def("available", (bool (::RF24::*)())(&::RF24::available))
         .def("available_pipe", &available_wrap)    // needed to rename this method as python does not allow such overloading
-        .def("begin", (bool (::RF24::*)(uint16_t, uint16_t))(&RF24::begin), begin_wrap(bp::args("_cepin","_cspin")))
+        .def("begin", &RF24::begin)
+        .def("begin_with_pins", &begin_with_pins)
         .def("closeReadingPipe", &RF24::closeReadingPipe)
         .def("disableCRC", &RF24::disableCRC)
         .def("enableAckPayload", &RF24::enableAckPayload)
