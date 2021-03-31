@@ -69,7 +69,7 @@ typedef uint16_t prog_uint16_t;
 #define pinMode(pin, direction) GPIO::open(pin, direction)
 #define delay(milisec) sleep_ms(milisec)
 #define delayMicroseconds(usec) sleep_us(usec)
-#define millis() __millis()
+#define millis() to_ms_since_boot(get_absolute_time())
 
 #endif // __ARCH_CONFIG_H__
 

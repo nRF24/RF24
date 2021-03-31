@@ -20,6 +20,9 @@
 //#include <sys/ioctl.h>
 #include <inttypes.h>
 
+#include "pico/stdlib.h"
+#include "hardware/spi.h"
+
 using namespace std;
 
 class SPI {

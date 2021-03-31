@@ -15,6 +15,9 @@
 
 #include <cstdio>
 
+#include <stdio.h>
+#include "pico/stdlib.h"
+
 class GPIO {
 public:
     /* Constants */
