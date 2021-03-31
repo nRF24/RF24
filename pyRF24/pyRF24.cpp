@@ -272,7 +272,7 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         #endif
         .def("available", (bool (::RF24::*)())(&::RF24::available))
         .def("available_pipe", &available_wrap)    // needed to rename this method as python does not allow such overloading
-        .def("begin", (bool (::RF24::*)(void))(&::RF24::begin), ())
+        .def("begin", (bool (::RF24::*)(void))(&::RF24::begin))
         .def("begin_with_pins", &begin_with_pins)
         .def("closeReadingPipe", &RF24::closeReadingPipe)
         .def("disableCRC", &RF24::disableCRC)
