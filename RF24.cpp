@@ -754,6 +754,7 @@ void RF24::printPrettyDetails(void) {
 
 /****************************************************************************/
 #if defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+// does not apply to RF24_LINUX
 
 bool RF24::begin(_SPI* spiBus)
 {
@@ -769,7 +770,7 @@ bool RF24::begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin)
 {
     ce_pin = _cepin;
     csn_pin = _cspin;
-    return begin();
+    return begin(spiBus);
 }
 
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
@@ -818,9 +819,7 @@ bool RF24::begin(void)
 
     #endif // !defined(XMEGA_D3) && !defined(RF24_LINUX)
 
-    if (_init_pins())
-        return _init_radio();
-    return false;
+    return _init_pins() && _init_radio();
 }
 
 /****************************************************************************/
