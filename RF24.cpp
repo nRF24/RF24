@@ -488,8 +488,24 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
-        :ce_pin(_cepin), csn_pin(_cspin),spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5), _is_p_variant(false),
+        :ce_pin(_cepin), csn_pin(_cspin), spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5), _is_p_variant(false),
          csDelay(5)
+{
+    _init_obj();
+}
+
+/****************************************************************************/
+
+RF24::RF24(uint32_t _spi_speed = RF24_SPI_SPEED)
+        :ce_pin(0xFFFF), csn_pin(0xFFFF), spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5), _is_p_variant(false),
+         csDelay(5)
+{
+    _init_obj();
+}
+
+/****************************************************************************/
+
+void RF24::_init_obj()
 {
     // Use a pointer on the Arduino platform
     #if defined (RF24_SPI_PTR)
@@ -502,7 +518,7 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
 
     pipe0_reading_address[0] = 0;
     if(spi_speed <= 35000){ //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
-      spi_speed = RF24_SPI_SPEED;
+        spi_speed = RF24_SPI_SPEED;
     }
 }
 
@@ -742,11 +758,30 @@ void RF24::printPrettyDetails(void) {
 bool RF24::begin(_SPI* spiBus)
 {
     _spi = spiBus;
-    _init_pins();
-    return _init_radio();
+    if (_init_pins())
+        return _init_radio();
+    return false;
+}
+
+/****************************************************************************/
+
+bool RF24::begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin)
+{
+    ce_pin = _cepin;
+    csn_pin = _cspin;
+    return begin();
 }
 
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+
+/****************************************************************************/
+
+bool RF24::begin(uint16_t _cepin, uint16_t _cspin)
+{
+    ce_pin = _cepin;
+    csn_pin = _cspin;
+    return begin();
+}
 
 /****************************************************************************/
 
@@ -783,14 +818,20 @@ bool RF24::begin(void)
 
     #endif // !defined(XMEGA_D3) && !defined(RF24_LINUX)
 
-    _init_pins();
-    return _init_radio();
+    if (_init_pins())
+        return _init_radio();
+    return false;
 }
 
 /****************************************************************************/
 
-void RF24::_init_pins()
+bool RF24::_init_pins()
 {
+    if (!isValid()) {
+        // didn't specify the CSN & CE pins to c'tor nor begin()
+        return false;
+    }
+
     #if defined (RF24_LINUX)
 
         #if defined (MRAA)
@@ -829,6 +870,8 @@ void RF24::_init_pins()
     delay(100);
         #endif
     #endif // !defined(XMEGA_D3) && !defined(LITTLEWIRE) && !defined(RF24_LINUX)
+
+    return true; // assuming pins are connected properly
 }
 
 /****************************************************************************/
@@ -913,6 +956,13 @@ bool RF24::isChipConnected()
     }
 
     return false;
+}
+
+/****************************************************************************/
+
+bool RF24::isValid()
+{
+    return ce_pin != 0xFFFF && csn_pin != 0xFFFF;
 }
 
 /****************************************************************************/

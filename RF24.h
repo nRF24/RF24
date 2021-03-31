@@ -181,7 +181,19 @@ public:
      * - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
      * - For Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed as of v1.3.7
      */
-    RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spispeed = RF24_SPI_SPEED);
+    RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed = RF24_SPI_SPEED);
+
+    /**
+     * A constructor for initializing the radio's hardware dynamically
+     * @warning You MUST use begin(uint16_t, uint16_t) or begin(_SPI*, uint16_t, uint16_t) to pass both the digital output pin
+     * numbers connected to the radio's CE and CSN pins.
+     * @param _spispeed The SPI speed in Hz ie: 1000000 == 1Mhz <br><br>Users can specify default SPI speed by modifying
+     * `#define RF24_SPI_SPEED` in RF24_config.h
+     * - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
+     * - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
+     * - For Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed as of v1.3.7
+     */
+    RF24(uint32_t _spi_speed = RF24_SPI_SPEED);
 
     #if defined (RF24_LINUX)
     virtual ~RF24() {};
@@ -220,7 +232,39 @@ public:
      * @return same result as begin()
      */
     bool begin(_SPI* spiBus);
+
+    /**
+     * Same as begin(), but allows dynamically specifying a SPI bus, CE pin,
+     * and CSN pin to use.
+     * @note This function assumes the `SPI::begin()` method was called before to
+     * calling this function.
+     *
+     * @warning This function is for the Arduino platform only
+     *
+     * @param spiBus A pointer or reference to an instantiated SPI bus object.
+     * @param _cepin The pin attached to Chip Enable on the RF module
+     * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
+     * <br><br>For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
+     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     *
+     * @note The _SPI datatype is a "wrapped" definition that will represent
+     * various SPI implementations based on the specified platform (or SoftSPI).
+     * @see Review the [Arduino support page](md_docs_arduino.html).
+     *
+     * @return same result as begin()
+     */
+    bool begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin);
     #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+
+    /**
+     * Same as begin(), but allows dynamically specifying a CE pin
+     * and CSN pin to use.
+     * @param _cepin The pin attached to Chip Enable on the RF module
+     * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
+     * <br><br>For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
+     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     */
+    bool begin(uint16_t _cepin, uint16_t _cspin);
 
     /**
      * Checks if the chip is connected to the SPI bus
@@ -1079,10 +1123,7 @@ public:
      *
      * @return true if this is a legitimate radio
      */
-    bool isValid()
-    {
-        return ce_pin != 0xff && csn_pin != 0xff;
-    }
+    bool isValid();
 
     /**
      * Close a pipe after it has been previously opened.
@@ -1579,7 +1620,6 @@ public:
      */
     /**@{*/
 
-
     /**
      * Open a pipe for reading
      * @deprecated For compatibility with old code only, see newer function
@@ -1639,6 +1679,12 @@ private:
     /**@{*/
 
     /**
+     * initializing function specific to all constructors
+     * (regardless of constructor parameters)
+     */
+    void _init_obj();
+
+    /**
      * initialize radio by performing a soft reset.
      * @warning This function assumes the SPI bus object's begin() method has been
      * previously called.
@@ -1648,7 +1694,7 @@ private:
     /**
      * initialize the GPIO pins
      */
-    void _init_pins();
+    bool _init_pins();
 
     /**
      * Set chip select pin
