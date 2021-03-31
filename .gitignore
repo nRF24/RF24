@@ -33,4 +33,5 @@ examples_linux/**/*
 doxygenAction
 .vscode/
 *venv
+*env
 *.pyc
