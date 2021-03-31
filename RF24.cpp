@@ -496,7 +496,7 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
 
 /****************************************************************************/
 
-RF24::RF24(uint32_t _spi_speed = RF24_SPI_SPEED)
+RF24::RF24(uint32_t _spi_speed)
         :ce_pin(0xFFFF), csn_pin(0xFFFF), spi_speed(_spi_speed), payload_size(32), dynamic_payloads_enabled(true), addr_width(5), _is_p_variant(false),
          csDelay(5)
 {
