@@ -175,7 +175,7 @@ public:
      * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
      * <br><br>For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
-     * @param _spispeed The SPI speed in Hz ie: 1000000 == 1Mhz <br><br>Users can specify default SPI speed by modifying
+     * @param _spi_speed The SPI speed in Hz ie: 1000000 == 1Mhz <br><br>Users can specify default SPI speed by modifying
      * `#define RF24_SPI_SPEED` in RF24_config.h
      * - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
      * - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
@@ -187,7 +187,7 @@ public:
      * A constructor for initializing the radio's hardware dynamically
      * @warning You MUST use begin(uint16_t, uint16_t) or begin(_SPI*, uint16_t, uint16_t) to pass both the digital output pin
      * numbers connected to the radio's CE and CSN pins.
-     * @param _spispeed The SPI speed in Hz ie: 1000000 == 1Mhz <br><br>Users can specify default SPI speed by modifying
+     * @param _spi_speed The SPI speed in Hz ie: 1000000 == 1Mhz <br><br>Users can specify default SPI speed by modifying
      * `#define RF24_SPI_SPEED` in RF24_config.h
      * - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
      * - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
@@ -263,6 +263,7 @@ public:
      * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
      * <br><br>For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     * @return same result as begin()
      */
     bool begin(uint16_t _cepin, uint16_t _cspin);
 
