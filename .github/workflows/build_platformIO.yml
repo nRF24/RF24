@@ -1,0 +1,81 @@
+name: PlatformIO build
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/build_platformIO.yml"
+      - "examples/**"
+      - "!examples/old_backups/recipes/pingpair_maple/**"
+
+  push:
+    paths:
+      - ".github/workflows/build_platformIO.yml"
+      - "examples/**"
+      - "!examples/old_backups/recipes/pingpair_maple/**"
+
+jobs:
+  check_formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check code formatting
+        uses: per1234/artistic-style-action@main
+        with:
+          options-file-path: ./examples/examples_formatter.conf
+          name-patterns: |
+            - '*.ino'
+            - '*.cpp'
+            - '*.hpp'
+            - '*.h'
+          target-paths: |
+            - examples
+
+  build:
+    needs: check_formatting
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        example:
+          - "examples/GettingStarted/GettingStarted.ino"
+          - "examples/AcknowledgementPayloads/AcknowledgementPayloads.ino"
+          - "examples/ManualAcknowledgements/ManualAcknowledgements.ino"
+          - "examples/StreamingData/StreamingData.ino"
+          - "examples/MulticeiverDemo/MulticeiverDemo.ino"
+          - "examples/InterruptConfigure/InterruptConfigure.ino"
+        board:
+          - "teensy31"
+          - "teensy35"
+          - "teensy36"
+          - "teensy40"
+          - "teensy41"
+          - "teensylc"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+    - name: Run PlatformIO
+      run: pio ci --lib="." --board=${{ matrix.board }}
+      env:
+        PLATFORMIO_CI_SRC: ${{ matrix.example }}

@@ -82,6 +82,7 @@ jobs:
           - "arduino:samd:tian"
           - "arduino:megaavr:uno2018"
           # - "arduino:megaavr:nano4809"  # board not found
+          - "arduino:sam:arduino_due_x_dbg"
 
     steps:
       - name: Checkout
@@ -97,6 +98,7 @@ jobs:
             - examples/StreamingData
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
+          # The following examples still exist for posterity
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn
           #   - examples/old_backups/pingpair_irq

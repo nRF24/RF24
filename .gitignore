@@ -3,7 +3,8 @@
 .*.swp
 *.orig
 .swp
-docs/
+docs/html/
+docs/xml/
 output/
 ojam/
 out/
@@ -32,4 +33,5 @@ examples_linux/**/*
 doxygenAction
 .vscode/
 *venv
+*env
 *.pyc

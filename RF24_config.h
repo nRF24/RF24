@@ -2,13 +2,14 @@
 /*
  Copyright (C)
     2011            J. Coliz <maniacbug@ymail.com>
-    2015-2019 TMRh20
+    2015-2019       TMRh20
     2015            spaniakos <spaniakos@gmail.com>
     2015            nerdralph
     2015            zador-blood-stained
     2016            akatran
-    2017-2019 Avamander <avamander@gmail.com>
+    2017-2019       Avamander <avamander@gmail.com>
     2019            IkpeohaGodson
+    2021            2bndy5
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -41,7 +42,8 @@
 #define RF24_SPI_SPEED 10000000
 
 //ATXMega
-#if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__) // In order to be available both in Windows and Linux this should take presence here.
+#if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__)
+// In order to be available both in Windows and Linux this should take presence here.
     #define XMEGA
     #define XMEGA_D3
     #include "utility/ATXMegaD3/RF24_arch_config.h"
@@ -91,36 +93,46 @@
             #endif // SOFT_SPI_SCK_PIN
 
             const uint8_t SPI_MODE = 0;
-            #define _SPI spi
+            #define _SPI SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE>
+            #define RF24_SPI_PTR
+
+        #elif defined (ARDUINO_SAM_DUE)
+            #include <SPI.h>
+            #define _SPI SPI
 
         #else // !defined (SPI_UART) && !defined (SOFTSPI)
             #include <SPI.h>
-            #define _SPI SPI
+            #define _SPI SPIClass
+            #define RF24_SPI_PTR
         #endif // !defined (SPI_UART) && !defined (SOFTSPI)
 
-    #else // defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
+    #else // !defined(ARDUINO) || defined (__arm__) || defined (__ARDUINO_X86__)
         // Define _BV for non-Arduino platforms and for Arduino DUE
         #include <stdint.h>
         #include <stdio.h>
         #include <string.h>
 
-        #if defined(__arm__) || defined (__ARDUINO_X86__)
+        #if defined (__arm__) || defined (__ARDUINO_X86__)
             #if defined (__arm__) && defined (SPI_UART)
                 #include <SPI_UART.h>
                 #define _SPI uspi
 
             #else // !defined (__arm__) || !defined (SPI_UART)
                 #include <SPI.h>
-                #define _SPI SPI
+                #define _SPI SPIClass
+                #define RF24_SPI_PTR
 
             #endif // !defined (__arm__) || !defined (SPI_UART)
         #elif !defined(__arm__) && !defined (__ARDUINO_X86__)
+            // fallback to unofficially supported Hardware (courtesy of ManiacBug)
             extern HardwareSPI SPI;
+            #define _SPI HardwareSPI
+            #define RF24_SPI_PTR
 
         #endif // !defined(__arm__) && !defined (__ARDUINO_X86__)
 
         #ifndef _BV
-          #define _BV(x) (1<<(x))
+            #define _BV(x) (1<<(x))
         #endif
     #endif // defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
 
@@ -141,53 +153,59 @@
     #endif // defined (__ARDUINO_X86__)
 
     // Progmem is Arduino-specific
-    // Arduino DUE is arm and does not include avr/pgmspace
     #if defined (ARDUINO_ARCH_ESP8266) || defined (ESP32)
         #include <pgmspace.h>
         #define PRIPSTR "%s"
         #ifndef pgm_read_ptr
           #define pgm_read_ptr(p) (*(p))
         #endif
-    #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && ! defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
+    #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && !defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
         #include <avr/pgmspace.h>
         #define PRIPSTR "%S"
 
     #else // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)
         #if !defined (ARDUINO) // This doesn't work on Arduino DUE
             typedef char const char;
+        #else // Fill in pgm_read_byte that is used
+            #if defined (ARDUINO_ARCH_AVR) || defined (ARDUINO_ARCH_SAMD) || defined (ARDUINO_SAM_DUE)
+                #include <avr/pgmspace.h> // added to ArduinoCore-sam (Due core) in 2013
+            #endif
 
-        #else // Fill in pgm_read_byte that is used, but missing from DUE
-          #ifdef ARDUINO_ARCH_AVR
-            #include <avr/pgmspace.h>
-          #endif
-          #ifndef pgm_read_byte
-            #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-          #endif
+            // Since the official arduino/ArduinoCore-samd repo switched to a unified API in 2016,
+            // Serial.printf() is no longer defined in the unifying Arduino/ArduinoCore-API repo
+            #if defined (ARDUINO_ARCH_SAMD) && !defined (ARDUINO_API_VERSION)
+                // likely using the adafruit/ArduinoCore-samd repo
+                #define printf_P Serial.printf
+            #endif // defined (ARDUINO_ARCH_SAMD)
+
+            #ifndef pgm_read_byte
+                #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+            #endif
         #endif // !defined (ARDUINO)
 
         #ifndef prog_uint16_t
-          typedef uint16_t prog_uint16_t;
+            typedef uint16_t prog_uint16_t;
         #endif
         #ifndef PSTR
-          #define PSTR(x) (x)
+            #define PSTR(x) (x)
         #endif
         #ifndef printf_P
-          #define printf_P printf
+            #define printf_P printf
         #endif
         #ifndef strlen_P
-          #define strlen_P strlen
+            #define strlen_P strlen
         #endif
         #ifndef PROGMEM
-          #define PROGMEM
+            #define PROGMEM
         #endif
         #ifndef pgm_read_word
-          #define pgm_read_word(p) (*(p))
+            #define pgm_read_word(p) (*(p))
         #endif
         #if !defined pgm_read_ptr || defined ARDUINO_ARCH_MBED
-          #define pgm_read_ptr(p) (*(p))
+            #define pgm_read_ptr(p) (*(p))
         #endif
         #ifndef PRIPSTR
-          #define PRIPSTR "%s"
+            #define PRIPSTR "%s"
         #endif
 
     #endif // !defined (ARDUINO) || defined (ESP_PLATFORM) || defined (__arm__) || defined (__ARDUINO_X86__) && !defined (XMEGA)

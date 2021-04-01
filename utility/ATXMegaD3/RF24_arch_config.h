@@ -37,7 +37,8 @@
 //#include <sys/time.h>
 
 //#define _BV(x) (1<<(x))
-#define _SPI spi
+#define _SPI SPI
+#define RF24_SPI_PTR
 
 #undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG

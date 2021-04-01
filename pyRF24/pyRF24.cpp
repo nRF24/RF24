@@ -126,12 +126,17 @@ bp::tuple available_wrap(RF24& ref)
     return bp::make_tuple(result, pipe);
 }
 
-void setPALevel_wrap(RF24& ref, rf24_pa_dbm_e level) {
+void setPALevel_wrap(RF24& ref, rf24_pa_dbm_e level)
+{
     ref.setPALevel(level, 1);
 }
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy,
-0, 2)
+bool begin_with_pins(RF24& ref, uint16_t _cepin, uint16_t _cspin)
+{
+    return ref.begin(_cepin, _cspin);
+}
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
 //BOOST_PYTHON_FUNCTION_OVERLOADS(txStandBy_wrap2, RF24::txStandBy, 1, 2)
 
 // ******************** enums **************************
@@ -239,17 +244,19 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
 
 #endif  // BCM2835_H
 
-        bp::enum_<rf24_crclength_e>("rf24_crclength_e").value("RF24_CRC_DISABLED", RF24_CRC_DISABLED).value("RF24_CRC_8", RF24_CRC_8).value(
-                "RF24_CRC_16", RF24_CRC_16).export_values()
-        ;
+    bp::enum_<rf24_crclength_e>("rf24_crclength_e")
+        .value("RF24_CRC_DISABLED", RF24_CRC_DISABLED)
+        .value("RF24_CRC_8", RF24_CRC_8)
+        .value("RF24_CRC_16", RF24_CRC_16)
+        .export_values();
 
-        bp::enum_<rf24_datarate_e>("rf24_datarate_e")
+    bp::enum_<rf24_datarate_e>("rf24_datarate_e")
         .value("RF24_1MBPS", RF24_1MBPS)
         .value("RF24_2MBPS", RF24_2MBPS)
         .value("RF24_250KBPS", RF24_250KBPS)
         .export_values();
 
-        bp::enum_<rf24_pa_dbm_e>("rf24_pa_dbm_e")
+    bp::enum_<rf24_pa_dbm_e>("rf24_pa_dbm_e")
         .value("RF24_PA_MIN", RF24_PA_MIN)
         .value("RF24_PA_LOW", RF24_PA_LOW)
         .value("RF24_PA_HIGH", RF24_PA_HIGH)
@@ -257,15 +264,18 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         .value("RF24_PA_ERROR", RF24_PA_ERROR)
         .export_values();
 
-        // ******************** RF24 class  **************************
-        //
-        bp::class_< RF24 >("RF24", bp::init< uint8_t, uint8_t >((bp::arg("_cepin"), bp::arg("_cspin"))))
+    // ******************** RF24 class  **************************
+    //
+    bp::class_< RF24 >("RF24", bp::init< uint16_t, uint16_t >((bp::arg("_cepin"), bp::arg("_cspin"))))
         #if defined (RF24_LINUX) && !defined (MRAA)
-        .def(bp::init< uint8_t, uint8_t, uint32_t >((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
+        .def(bp::init< uint16_t, uint16_t, uint32_t >((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
+        .def(bp::init< uint32_t >((bp::arg("spispeed"))))
+        .def(bp::init< >())
         #endif
         .def("available", (bool (::RF24::*)())(&::RF24::available))
         .def("available_pipe", &available_wrap)    // needed to rename this method as python does not allow such overloading
-        .def("begin", &RF24::begin)
+        .def("begin", (bool (::RF24::*)(void))(&::RF24::begin))
+        .def("begin", &begin_with_pins)
         .def("closeReadingPipe", &RF24::closeReadingPipe)
         .def("disableCRC", &RF24::disableCRC)
         .def("enableAckPayload", &RF24::enableAckPayload)
@@ -311,7 +321,7 @@ bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         .def("txStandBy", (bool (::RF24::*)(::uint32_t, bool))(&RF24::txStandBy), txStandBy_wrap1(bp::args("timeout", "startTx")))
         .def("whatHappened", &whatHappened_wrap)
         .def("startConstCarrier", &RF24::startConstCarrier, (bp::arg("level"), bp::arg("channel")))
-        .def("stopConstCarrier",&RF24::stopConstCarrier)
+        .def("stopConstCarrier", &RF24::stopConstCarrier)
         .def("write", &write_wrap1, (bp::arg("buf")))
         .def("write", &write_wrap2, (bp::arg("buf"), bp::arg("multicast")))
         .def("writeAckPayload", writeAckPayload_wrap, (bp::arg("pipe"), bp::arg("buf")))

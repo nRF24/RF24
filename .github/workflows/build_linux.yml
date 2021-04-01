@@ -15,6 +15,7 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           # - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
           - "--driver=SPIDEV"
+          # - "--driver=MRAA"
 
     steps:
       - uses: actions/checkout@v1
@@ -24,7 +25,6 @@ jobs:
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
           arm-linux-gnueabihf-gcc -v
           arm-linux-gnueabihf-g++ -v
-          python3 --version
       - name: provide WiringPi
         if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
         run: |
@@ -32,6 +32,17 @@ jobs:
           cd WiringPi/wiringPi
           CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
           sudo make install
+      - name: provide MRAA
+        if: ${{ matrix.config-options == '--driver=MRAA' }}
+        run: |
+          git clone https://github.com/intel-iot-devkit/mraa.git
+          cd mraa
+          mkdir build
+          cd build
+          cmake .. -DBUILDSWIGNODE=OFF
+          sudo make install
+          sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
+          sudo ldconfig
       - name: library configure
         run: ./configure ${{ matrix.config-options }}
       - name: library make
@@ -40,7 +51,7 @@ jobs:
         run: sudo make install
       - name: make linux examples
         # compiling examples for wiringPi is broken see nRF24#669 issue
-        if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
+        # if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
         run: |
           cd examples_linux
           make
