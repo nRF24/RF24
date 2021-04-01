@@ -1,5 +1,4 @@
 #include "spi.h"
-#include <unistd.h>
 
 SPI::SPI()
 {

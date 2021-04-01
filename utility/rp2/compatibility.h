@@ -1,8 +1,8 @@
 /*
  * File:   compatiblity.h
- * Author: purinda
+ * Author: kripton
  *
- * Created on 24 June 2012, 3:08 PM
+ * Created on 01 April 2021
  */
 
 /**
@@ -24,10 +24,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stddef.h>
-#include <time.h>
-#include <sys/time.h>
 
 void __msleep(int milisec);
 

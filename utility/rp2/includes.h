@@ -17,12 +17,12 @@
 /**
  * Define a specific platform for this configuration
  */
-#define RF24_RPI_PICO
+#define RF24_RP2
 
 /**
  * Load the correct configuration for this platform
  */
-#include "RPi-Pico/RF24_arch_config.h"
+#include "RF24_arch_config.h"
 
 #endif
 
