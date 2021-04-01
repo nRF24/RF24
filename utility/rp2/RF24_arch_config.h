@@ -24,18 +24,10 @@
 #ifndef __ARCH_CONFIG_H__
 #define __ARCH_CONFIG_H__
 
-#include <stddef.h>
 #include "spi.h"
 #include "gpio.h"
 #include "compatibility.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <time.h>
 #include <string.h>
-#include <sys/time.h>
-
-#include <stdio.h>
-#include "pico/stdlib.h"
 
 #define _BV(x) (1 << (x))
 #define _SPI spi

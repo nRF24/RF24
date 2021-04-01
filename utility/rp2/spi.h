@@ -11,14 +11,6 @@
  * @{
  */
 #include <string>
-#include <stdint.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <getopt.h>
-#include <fcntl.h>
-//#include <sys/ioctl.h>
-#include <inttypes.h>
 
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
