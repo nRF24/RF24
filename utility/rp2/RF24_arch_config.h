@@ -30,7 +30,8 @@
 #include <string.h>
 
 #define _BV(x) (1 << (x))
-#define _SPI spi
+#define _SPI SPI
+#define RF24_SPI_PTR
 
 static SPI spi;
 

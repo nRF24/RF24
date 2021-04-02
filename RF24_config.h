@@ -49,7 +49,7 @@
     #include "utility/ATXMegaD3/RF24_arch_config.h"
 
 // RaspberryPi rp2xxx-based devices (e.g. RPi Pico board)
-#elif ( defined (PICO_BUILD) )
+#elif defined (PICO_BUILD) && !defined (ARDUINO)
     #include "utility/rp2/includes.h"
 
 #elif ( !defined (ARDUINO) ) // Any non-arduino device (except RaspberryPi rp2-based devices) is handled via configure/Makefile
