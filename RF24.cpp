@@ -545,7 +545,7 @@ RF24::RF24(uint32_t _spi_speed)
 void RF24::_init_obj()
 {
     // Use a pointer on the Arduino platform
-    #if defined (RF24_SPI_PTR)
+    #if defined (RF24_SPI_PTR) && !defined (RF24_RP2)
         #if defined (SOFTSPI)
     _spi = &spi;
         #else  // !defined(SOFTSPI)

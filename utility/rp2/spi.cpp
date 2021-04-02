@@ -1,5 +1,7 @@
 #include "spi.h"
 
+spi_inst_t* SPI::_hw_id;
+
 SPI::SPI()
 {
     printf("PicoRF24: SPI::SPI\n");
@@ -8,10 +10,10 @@ SPI::SPI()
 void SPI::begin(spi_inst_t* hw_id)
 {
     printf("PicoRF24: SPI::begin\n");
-    begin(*hw_id, PICO_DEFAULT_SPI_SCK_PIN, PICO_DEFAULT_SPI_TX_PIN, PICO_DEFAULT_SPI_RX_PIN);
+    begin(hw_id, PICO_DEFAULT_SPI_SCK_PIN, PICO_DEFAULT_SPI_TX_PIN, PICO_DEFAULT_SPI_RX_PIN);
 }
 
-void begin(spi_inst_t* hw_id, uint8_t _sck, uint8_t _tx, uint8_t _rx)
+void SPI::begin(spi_inst_t* hw_id, uint8_t _sck, uint8_t _tx, uint8_t _rx)
 {
     printf("PicoRF24: SPI::begin overload\n");
     _hw_id = hw_id;
@@ -48,7 +50,7 @@ void SPI::beginTransaction(uint32_t _spi_speed)
     spi_set_format(_hw_id, RF24_SPI_BYTE_SIZE, RF24_SPI_CPOL, RF24_SPI_CPHA, RF24_SPI_ENDIAN);
 }
 
-void endTransaction()
+void SPI::endTransaction()
 {
     printf("PicoRF24: SPI::endTransaction()\n");
     spi_deinit(_hw_id);

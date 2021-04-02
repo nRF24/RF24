@@ -2,6 +2,7 @@
  * @file spi.h
  * Class declaration for SPI wrapping the Pico SDK
  */
+#include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 
@@ -73,7 +74,7 @@ public:
      * init the SPI bus (using hw_id passed to begin())
      * @param _spi_speed The frequency to use for SPI transactions with the radio.
      */
-    static void beginTransaction(uint32_t _spi_speed)
+    static void beginTransaction(uint32_t _spi_speed);
 
     /** deinit the SPI bus (using hw_id passed to begin()) */
     static void endTransaction();
@@ -83,7 +84,7 @@ public:
 private:
 
     /** the ID of the hardware driven SPI bus */
-    spi_inst_t* _hw_id;
+    static spi_inst_t* _hw_id;
 
 };
 

@@ -1,5 +1,3 @@
-
-
 /**
  * @file gpio.h
  * Class declaration for SPI helper files
