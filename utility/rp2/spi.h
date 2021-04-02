@@ -60,7 +60,7 @@ public:
      * @param rbuf Receive buffer
      * @param len Length of the data
      */
-    static void transfernb(const uint8* tbuf, uint8_t* rbuf, uint32_t len);
+    static void transfernb(const uint8_t* tbuf, uint8_t* rbuf, uint32_t len);
 
     /**
      * Transfer a buffer of data without an rx buffer
