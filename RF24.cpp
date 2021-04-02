@@ -32,7 +32,7 @@ void RF24::csn(bool mode)
     // Return, CSN toggle complete
     return;
 
-    #elif defined(ARDUINO) && !defined(RF24_SPI_TRANSACTIONS)
+    #elif defined (ARDUINO) && !defined(RF24_SPI_TRANSACTIONS)
     // Minimum ideal SPI bus speed is 2x data rate
     // If we assume 2Mbs data rate and 16Mhz clock, a
     // divider of 4 is the minimum we want.
@@ -188,7 +188,7 @@ uint8_t RF24::read_register(uint8_t reg)
 {
     uint8_t result;
 
-    #if defined(RF24_LINUX) || defined (RF24_RP2)
+    #if defined (RF24_LINUX) || defined (RF24_RP2)
     beginTransaction();
 
     uint8_t * prx = spi_rxbuff;
@@ -795,9 +795,7 @@ void RF24::printPrettyDetails(void) {
 bool RF24::begin(_SPI* spiBus)
 {
     _spi = spiBus;
-    if (_init_pins())
-        return _init_radio();
-    return false;
+    return _init_pins() && _init_radio();
 }
 
 /****************************************************************************/
@@ -824,7 +822,6 @@ bool RF24::begin(uint16_t _cepin, uint16_t _cspin)
 
 bool RF24::begin(void)
 {
-
     #if defined (RF24_LINUX)
         #if defined (RF24_RPi)
     switch(csn_pin) {                 // Ensure valid hardware CS pin

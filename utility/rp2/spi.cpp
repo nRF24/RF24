@@ -29,13 +29,13 @@ uint8_t SPI::transfer(uint8_t tx_)
     return recv;
 }
 
-void SPI::transfernb(const uint8* tbuf, uint8_t* rbuf, uint32_t len)
+void SPI::transfernb(const uint8_t* tbuf, uint8_t* rbuf, uint32_t len)
 {
     printf("PicoRF24: SPI::transfernb(char* tbuf, char* rbuf, uint32_t len: %ld)\n", len);
     spi_write_read_blocking(_hw_id, tbuf, rbuf, len);
 }
 
-void SPI::transfern(const uint8* buf, uint32_t len)
+void SPI::transfern(const uint8_t* buf, uint32_t len)
 {
     printf("PicoRF24: SPI::transfern(char* buf, uint32_t len: %ld)\n", len);
     spi_write_blocking(_hw_id, buf, len);
