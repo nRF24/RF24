@@ -5,7 +5,6 @@ on: [push, pull_request]
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  PICO_SDK_PATH: /$GITHUB_WORKSPACE/pico-sdk
 
 jobs:
   build:
@@ -31,8 +30,6 @@ jobs:
     steps:
     - name: checkout RF24 lib
       uses: actions/checkout@v2
-      with:
-        path: RF24
 
     - name: Install toolchain
       run: sudo apt update && sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
@@ -51,14 +48,18 @@ jobs:
       run: git submodule update --init
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${{ github.workspace }}/RF24/build
+      env:
+        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
+      run: cmake -E make_directory ${{ github.workspace }}/build
 
     - name: Configure CMake
-      working-directory: ${{ github.workspace }}/RF24/build
+      working-directory: ${{ github.workspace }}/build
+      env:
+        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
       run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Build
-      working-directory: ${{ github.workspace }}/RF24/build
+      working-directory: ${{ github.workspace }}/build
       # Execute the build. You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config $BUILD_TYPE -DPICO_BOARD=${{ matrix.board }}
 
@@ -66,4 +67,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: examples_pico_${{ matrix.board }}
-        path: ${{ github.workspace }}/RF24/build/*.uf2
+        path: ${{ github.workspace }}/build/*.uf2
