@@ -1,32 +1,23 @@
 /*
- * Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
+ * Copyright (C)
+ *  2021 Jannis Achstetter (kripton)
+ *  2021 Brendan Doherty (2bndy5)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * version 2 as published by the Free Software Foundation.
- *
  */
 
 /**
  * @file RF24_arch_config.h
- * General defines and includes for RF24/Linux
+ * General defines and includes for RF24 using The Pico SDK
  */
-
-/**
- * Example of RF24_arch_config.h for RF24 portability
- *
- * @defgroup Porting_General Porting: General
- *
- * @{
- */
-
 
 #ifndef __ARCH_CONFIG_H__
 #define __ARCH_CONFIG_H__
 
 #include "spi.h"
 #include "gpio.h"
-#include "compatibility.h"
 #include <string.h>
 
 #define _BV(x) (1 << (x))
@@ -65,6 +56,5 @@ typedef uint16_t prog_uint16_t;
 #define millis() to_ms_since_boot(get_absolute_time())
 
 #endif // __ARCH_CONFIG_H__
-
 
 /**@}*/

@@ -35,3 +35,4 @@ doxygenAction
 *venv
 *env
 *.pyc
+build/
