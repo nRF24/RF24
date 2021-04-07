@@ -35,7 +35,7 @@ bool role = false; // true = TX role, false = RX role
 float payload = 0.0;
 
 
-void setup()
+bool setup()
 {
     // initialize the transceiver on the SPI bus
     if (!radio.begin()) {
@@ -127,7 +127,7 @@ void loop()
     } // role
 
     if (uart_is_readable(uart_default)) {
-        // change the role via the serial monitor
+        // change the role via the default serial IO
 
         char c = uart_getc(uart_default);
         if ((c == 'T' || c == 't') && !role) {
