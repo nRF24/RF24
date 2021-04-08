@@ -1,12 +1,6 @@
-add_executable(hello_gpio_irq
-        hello_gpio_irq.c
-        )
+add_executable(RF24_examples gettingStarted.cpp)
 
-# Pull in our pico_stdlib which pulls in commonly used features
-target_link_libraries(hello_gpio_irq pico_stdlib)
+target_link_libraries(RF24_examples PUBLIC RF24 pico_stdlib hardware_spi hardware_gpio)
 
 # create map/bin/hex file etc.
-pico_add_extra_outputs(hello_gpio_irq)
-
-# add url via pico_set_program_url
-example_auto_set_url(hello_gpio_irq)
+pico_add_extra_outputs(RF24_examples)

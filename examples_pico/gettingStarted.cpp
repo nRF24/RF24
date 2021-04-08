@@ -11,8 +11,7 @@
  * Use the Serial Monitor to change each node's behavior.
  */
 #include "pico/stdlib.h"
-#include <SPI.h>
-#include "RF24.h"
+#include "../RF24.h"
 
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
@@ -147,7 +146,7 @@ void loop()
     }
 } // loop
 
-void main()
+int main()
 {
     stdio_init_all(); // init default UART IO
 
@@ -155,4 +154,5 @@ void main()
     while (begin_ok) {
         loop();
     }
+    return (int)begin_ok;
 }

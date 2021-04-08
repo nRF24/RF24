@@ -13,7 +13,7 @@ pico_sdk_init()
 # add the RF24 core library
 add_library(RF24 RF24.h)
 
-target_link_libraries(RF24_examples PUBLIC RF24)
+set_target_properties(RF24 PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add pico examples
 add_subdirectory(examples_pico)

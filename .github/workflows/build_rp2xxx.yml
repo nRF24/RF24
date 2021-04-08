@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: raspberrypi/pico-sdk
-        ref: 1.1.1
+        ref: 1.1.2
         path: pico-sdk
         clean: false
         submodules: true
@@ -56,12 +56,12 @@ jobs:
       working-directory: ${{ github.workspace }}/build
       env:
         PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
-      run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPICO_BOARD=${{ matrix.board }}
 
     - name: Build
       working-directory: ${{ github.workspace }}/build
       # Execute the build. You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE -DPICO_BOARD=${{ matrix.board }}
+      run: cmake --build . --config $BUILD_TYPE
 
     - name: Save artifact
       uses: actions/upload-artifact@v2
