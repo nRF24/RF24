@@ -67,4 +67,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: examples_pico_${{ matrix.board }}
-        path: ${{ github.workspace }}/build/*.uf2
+        path: ${{ github.workspace }}/build/examples_*/*.uf2
