@@ -99,7 +99,7 @@ void loop()
 
         if (report) {
             // payload was delivered; print the payload sent & the timer result
-            printf("Transmission successful! Time to transmit = %ul us. Sent: %f\n", end_timer - start_timer, payload);
+            printf("Transmission successful! Time to transmit = %llu us. Sent: %f\n", end_timer - start_timer, payload);
 
             // increment float payload
             payload += 0.01;
@@ -121,7 +121,7 @@ void loop()
             radio.read(&payload, bytes);            // fetch payload from FIFO
 
             // print the size of the payload, the pipe number, payload's value
-            printf("Received %d bytes on pipe %d: %s\n", bytes, pipe, payload);
+            printf("Received %d bytes on pipe %d: %f\n", bytes, pipe, payload);
         }
     } // role
 
