@@ -1,3 +1,17 @@
+cmake_minimum_required(VERSION 3.12)
+
+# Pull in SDK (must be before project)
+include(pico_sdk_import.cmake)
+
+project(gettingStarted)
+
+# Initialize the Pico SDK
+pico_sdk_init()
+
+# In YOUR project, include RF24's CMakeLists.txt
+# giving the path depending on where the library
+# is cloned to in your project
+include(../CMakeLists.txt)
 
 #[[ for each example, we have to perform the following
 #make a target
@@ -10,10 +24,6 @@ target_link_libraries(gettingStarted PUBLIC
     hardware_spi
     hardware_gpio
     )
-
-# enable usb output, disable uart output
-pico_enable_stdio_usb(gettingStarted 1)
-pico_enable_stdio_uart(gettingStarted 0)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(gettingStarted)
