@@ -68,7 +68,7 @@ jobs:
       with:
         name: examples_pico_${{ matrix.board }}
         path: |
-          ${{ github.workspace }}/build/examples_pico/*.uf2
-        # ${{ github.workspace }}/build/examples_pico/*.elf
-        # ${{ github.workspace }}/build/examples_pico/*.hex
-        # ${{ github.workspace }}/build/examples_pico/*.bin
+          ${{ github.workspace }}/build/*.uf2
+        # ${{ github.workspace }}/build/*.elf
+        # ${{ github.workspace }}/build/*.hex
+        # ${{ github.workspace }}/build/*.bin
