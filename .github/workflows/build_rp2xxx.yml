@@ -15,17 +15,17 @@ jobs:
 
       matrix:
         board:
+          - "pico"
+          - "vgaboard"
           - "adafruit_feather_rp2040"
           - "adafruit_itsybitsy_rp2040"
           - "adafruit_qtpy_rp2040"
-          - "pico"
-          - "pimoroni_keybow2040"
-          - "pimoroni_picosystem"
-          - "pimoroni_tiny2040"
-          - "sparkfun_micromod"
-          - "sparkfun_promicro"
-          - "sparkfun_thingplus"
-          - "vgaboard"
+          # - "sparkfun_micromod" # awaiting resolution of https://github.com/raspberrypi/pico-sdk/issues/328
+          # - "sparkfun_promicro" # awaiting resolution of https://github.com/raspberrypi/pico-sdk/issues/328
+          # - "sparkfun_thingplus" # awaiting resolution of https://github.com/raspberrypi/pico-sdk/issues/328
+          # - "pimoroni_keybow2040" # no SPI bus exposed
+          # - "pimoroni_picosystem" # missing links to schematics/pinout
+          # - "pimoroni_tiny2040" # boards' pins not labeled for SPI usage
 
     steps:
     - name: checkout RF24 lib
@@ -67,4 +67,8 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: examples_pico_${{ matrix.board }}
-        path: ${{ github.workspace }}/build/examples_*/*.uf2
+        path: |
+          ${{ github.workspace }}/build/examples_pico/*.uf2
+        # ${{ github.workspace }}/build/examples_pico/*.elf
+        # ${{ github.workspace }}/build/examples_pico/*.hex
+        # ${{ github.workspace }}/build/examples_pico/*.bin
