@@ -10,8 +10,9 @@
  * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Monitor to change each node's behavior.
  */
-#include "pico/stdlib.h"
-#include "../RF24.h"
+#include "pico/stdlib.h"    // printf, ...
+#include <tusb.h>           // tud_cdc_connected()
+#include "../RF24.h"        // RF24 radio object
 
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
@@ -33,6 +34,8 @@ bool role = false; // true = TX role, false = RX role
 // on every successful transmission
 float payload = 0.0;
 
+bool setup_ok = false;
+
 
 bool setup()
 {
@@ -42,16 +45,18 @@ bool setup()
         return false;
     }
 
+    // Okay, radio setup worked. Now wait here until the CDC ACM
+    // (serial port emulation) is connected
+    while (!tud_cdc_connected()) {
+        sleep_ms(10);
+    }
+
     // print example's introductory prompt
     printf("RF24/examples/GettingStarted\n");
 
     // To set the radioNumber via the Serial monitor on startup
     printf("Which radio is this? Enter '0' or '1'. Defaults to '0' ");
-    while (!uart_is_readable(uart_default)) {
-        // wait for user input
-        sleep_ms(1);
-    }
-    char input = uart_getc(uart_default);
+    char input = getchar();
     radioNumber = input == 49;
     printf("radioNumber = %d\n", (int)radioNumber);
 
@@ -99,7 +104,7 @@ void loop()
 
         if (report) {
             // payload was delivered; print the payload sent & the timer result
-            printf("Transmission successful! Time to transmit = %ul us. Sent: %f\n", end_timer - start_timer, payload);
+            printf("Transmission successful! Time to transmit = %llu us. Sent: %f\n", end_timer - start_timer, payload);
 
             // increment float payload
             payload += 0.01;
@@ -121,22 +126,22 @@ void loop()
             radio.read(&payload, bytes);            // fetch payload from FIFO
 
             // print the size of the payload, the pipe number, payload's value
-            printf("Received %d bytes on pipe %d: %s\n", bytes, pipe, payload);
+            printf("Received %d bytes on pipe %d: %f\n", bytes, pipe, payload);
         }
     } // role
 
-    if (uart_is_readable(uart_default)) {
+    char input = getchar_timeout_us(1000);
+    if (input != PICO_ERROR_TIMEOUT) {
         // change the role via the default serial IO
 
-        char c = uart_getc(uart_default);
-        if ((c == 'T' || c == 't') && !role) {
+        if ((input == 'T' || input == 't') && !role) {
             // Become the TX node
 
             role = true;
             printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
             radio.stopListening();
         }
-        else if ((c == 'R' || c == 'r') && role) {
+        else if ((input == 'R' || input == 'r') && role) {
             // Become the RX node
 
             role = false;
@@ -150,9 +155,18 @@ int main()
 {
     stdio_init_all(); // init default UART IO
 
-    bool begin_ok = setup();
-    while (begin_ok) {
+    // Loop setup as long as it fails but inform user via printfs
+    setup_ok = setup();
+    while (!setup_ok) {
+        setup();
+	if (!setup_ok) {
+            printf("(Radio) setup failed :(\n");
+            sleep_ms(1000);
+        }
+    }
+
+    // Setup worked :)
+    while (true) {
         loop();
     }
-    return (int)begin_ok;
 }

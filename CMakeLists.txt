@@ -11,7 +11,12 @@ set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 
 # add the RF24 core library
-add_library(RF24 RF24.h)
+add_library(RF24 INTERFACE)
+target_sources(RF24 INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/RF24.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utility/rp2/gpio.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utility/rp2/spi.cpp
+    )
 
 set_target_properties(RF24 PROPERTIES LINKER_LANGUAGE CXX)
 
