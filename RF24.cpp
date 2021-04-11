@@ -357,7 +357,6 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
         #if defined (RF24_SPI_PTR)
     status = _spi->transfer(writeType);
     while (data_len--) { _spi->transfer(*current++); }
-
     while (blank_len--) { _spi->transfer(0); }
 
         #else // !defined(RF24_SPI_PTR)
@@ -429,7 +428,6 @@ void RF24::read_payload(void* buf, uint8_t data_len)
         #else // !defined(RF24_SPI_PTR)
     status = _SPI.transfer(R_RX_PAYLOAD);
     while (data_len--) { *current++ = _SPI.transfer(0xFF); }
-
     while (blank_len--) { _SPI.transfer(0xff); }
 
         #endif // !defined(RF24_SPI_PTR)

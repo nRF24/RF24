@@ -52,7 +52,7 @@
 #elif defined (PICO_BUILD) && !defined (ARDUINO)
     #include "utility/rp2/includes.h"
 
-#elif ( !defined (ARDUINO) ) // Any non-arduino device (except RaspberryPi rp2-based devices) is handled via configure/Makefile
+#elif (!defined (ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
     // This behavior can be overridden by calling configure with respective parameters
     // The includes.h file defines either RF24_RPi, MRAA, LITTLEWIRE or RF24_SPIDEV and includes the correct RF24_arch_config.h file
