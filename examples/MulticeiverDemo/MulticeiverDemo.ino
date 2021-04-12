@@ -120,7 +120,7 @@ void loop() {
     payload.payloadID++;                                     // increment payload number
 
     // to make this example readable in the serial monitor
-    delay(500); // slow transmissions down by 1 second
+    delay(1000); // slow transmissions down by 1 second
 
   } else if (role == 'R') {
     // This device is the RX node

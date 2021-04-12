@@ -88,7 +88,7 @@ bool setup()
 
     // For debugging info
     // radio.printDetails();       // (smaller) function that prints raw register values
-    radio.printPrettyDetails(); // (larger) function that prints human readable data
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // role variable is hardcoded to RX behavior, inform the user of this
     printf("*** PRESS 'T' to begin transmitting to the other node\n");
@@ -127,7 +127,7 @@ void loop() {
         printf("Time to transmit = %llu us with %d failures detected\n", end_timer - start_timer, failures);
 
         // to make this example readable in the serial terminal
-        sleep_ms(500); // slow transmissions down by 0.5 second (+ another 0.5 second for user input later)
+        sleep_ms(1000); // slow transmissions down by 1 second
     }
     else {
         // This device is a RX node

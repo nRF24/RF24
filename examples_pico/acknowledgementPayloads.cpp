@@ -153,7 +153,7 @@ void loop() {
         }
 
         // to make this example readable in the serial terminal
-        sleep_ms(500); // slow transmissions down by 0.5 second (+ another 0.5 second for user input later)
+        sleep_ms(1000); // slow transmissions down by 1 second
     }
     else {
         // This device is a RX node
