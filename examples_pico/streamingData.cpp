@@ -55,10 +55,10 @@ bool setup()
     }
 
     // print example's introductory prompt
-    printf("RF24/examples_pico/streamingData");
+    printf("RF24/examples_pico/streamingData\n");
 
     // To set the radioNumber via the Serial monitor on startup
-    printf("Which radio is this? Enter '0' or '1'. Defaults to '0' ");
+    printf("Which radio is this? Enter '0' or '1'. Defaults to '0'\n");
     char input = getchar();
     radioNumber = input == 49;
     printf("radioNumber = %d\n", (int)radioNumber);
@@ -117,14 +117,14 @@ void loop() {
             }
 
             if (failures >= 100) {
-                printf("Too many failures detected. Aborting at payload %c", buffer[0]);
+                printf("Too many failures detected. Aborting at payload %c\n", buffer[0]);
                 break;
             }
         }
         uint64_t end_timer = to_us_since_boot(get_absolute_time()); // end the timer
 
         // print results from transmitting stream
-        printf("Time to transmit = %d us with %d failures detected", end_timer - start_timer, failures);
+        printf("Time to transmit = %llu us with %d failures detected\n", end_timer - start_timer, failures);
 
         // to make this example readable in the serial terminal
         sleep_ms(500); // slow transmissions down by 0.5 second (+ another 0.5 second for user input later)
@@ -136,7 +136,7 @@ void loop() {
             radio.read(&buffer, SIZE);     // fetch payload from FIFO
 
             // print the received payload and its counter
-            printf("Received: %s - #d", buffer, counter++);
+            printf("Received: %s - %d\n", buffer, counter++);
         }
     } // role
 

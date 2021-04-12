@@ -66,7 +66,7 @@ bool setup()
 
     // initialize the transceiver on the SPI bus
     if (!radio.begin()) {
-        printf("radio hardware is not responding!!");
+        printf("radio hardware is not responding!!\n");
         return false;
     }
 
@@ -89,7 +89,7 @@ bool setup()
     // For debugging info
     // printf_begin();             // needed only once for printing details
     // radio.printDetails();       // (smaller) function that prints raw register values
-    radio.printPrettyDetails(); // (larger) function that prints human readable data
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // role variable is hardcoded to RX behavior, inform the user of this
     printf("*** Enter a number between 0 and 5 (inclusive) to change\n");
@@ -110,7 +110,7 @@ void loop()
 
         if (report) {
             // payload was delivered
-            printf("Transmission of payloadID %d as node %d successful! Time to transmit: %d us\n",
+            printf("Transmission of payloadID %d as node %d successful! Time to transmit: %llu us\n",
                    payload.payloadID,
                    payload.nodeID,
                    end_timer - start_timer);
@@ -133,7 +133,7 @@ void loop()
             radio.read(&payload, bytes);            // fetch payload from FIFO
 
             // print details about incoming payload
-            printf("Received %d bytes on pipe %d from node %d. PayloadID: %d",
+            printf("Received %d bytes on pipe %d from node %d. PayloadID: %d\n",
                    bytes,
                    pipe,
                    payload.nodeID,

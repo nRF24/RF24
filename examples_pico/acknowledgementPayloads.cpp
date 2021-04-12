@@ -55,8 +55,11 @@ bool setup() {
         return false;
     }
 
+    // print example's introductory prompt
+    printf("RF24/examples_pico/acknowledgementPayloads\n");
+
     // To set the radioNumber via the Serial monitor on startup
-    printf("Which radio is this? Enter '0' or '1'. Defaults to '0' ");
+    printf("Which radio is this? Enter '0' or '1'. Defaults to '0'\n");
     char input = getchar();
     radioNumber = input == 49;
     printf("radioNumber = %d\n", (int)radioNumber);
@@ -98,7 +101,7 @@ bool setup() {
 
     // For debugging info
     // radio.printDetails();       // (smaller) function that prints raw register values
-    radio.printPrettyDetails(); // (larger) function that prints human readable data
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // role variable is hardcoded to RX behavior, inform the user of this
     printf("*** PRESS 'T' to begin transmitting to the other node\n");
@@ -118,7 +121,7 @@ void loop() {
         if (report) {
 
             // print details about outgoing payload
-            printf("Transmission successful! Time to transmit = %lu us. Sent: %s%d",
+            printf("Transmission successful! Time to transmit = %llu us. Sent: %s%d",
                    end_timer - start_timer,
                    payload.message,
                    payload.counter);

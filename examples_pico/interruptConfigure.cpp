@@ -60,15 +60,15 @@ bool setup()
 
     // initialize the transceiver on the SPI bus
     if (!radio.begin()) {
-        printf("radio hardware is not responding!!");
+        printf("radio hardware is not responding!!\n");
         return false;
     }
 
     // print example's introductory prompt
-    printf("RF24/examples_pico/InterruptConfigure\n");
+    printf("RF24/examples_pico/interruptConfigure\n");
 
     // To set the radioNumber via the Serial terminal on startup
-    printf("Which radio is this? Enter '0' or '1'. Defaults to '0' ");
+    printf("Which radio is this? Enter '0' or '1'. Defaults to '0'\n");
     char input = getchar();
     radioNumber = input == 49;
     printf("radioNumber = %d\n", (int)radioNumber);
@@ -277,7 +277,7 @@ void loop()
             radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
             radio.startListening();
         }
-    } // Serial.available()
+    } // user input
 } // loop
 
 
