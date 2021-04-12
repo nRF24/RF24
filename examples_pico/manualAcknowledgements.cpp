@@ -218,13 +218,14 @@ void loop()
     }
 } // loop
 
-int main()
+void main()
 {
     stdio_init_all(); // init necessary IO for the RP2040
 
-    bool setup_ok = setup();
-    while (setup_ok) {
+    while (!setup()) { // if radio.begin() failed
+        // hold program in infinite attempts to initialize radio
+    }
+    while (true) {
         loop();
     }
-    return (int)setup_ok;
 }

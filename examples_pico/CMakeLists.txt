@@ -36,6 +36,7 @@ set(EXAMPLES_LIST
     streamingData
     manualAcknowledgements
     multiceiverDemo
+    interruptConfigure
     )
 
 foreach(example ${EXAMPLES_LIST})
