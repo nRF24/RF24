@@ -351,7 +351,7 @@ void printRxFifo()
     }
 }
 
-void main()
+int main()
 {
     stdio_init_all(); // init necessary IO for the RP2040
 
@@ -361,4 +361,5 @@ void main()
     while (true) {
         loop();
     }
+    return 0; // we will never reach this
 }
