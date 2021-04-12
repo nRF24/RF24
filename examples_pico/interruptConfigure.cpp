@@ -37,8 +37,9 @@ uint8_t pl_iterator = 0;
 char tx_payloads[][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
 char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
-void interruptHandler(); // prototype to handle IRQ events
-void printRxFifo();      // prototype to print RX FIFO with 1 buffer
+void interruptHandler(uint gpio, uint32_t events); // prototype to handle IRQ events
+
+void printRxFifo(); // prototype to print RX FIFO with 1 buffer
 
 
 bool setup()
