@@ -110,7 +110,7 @@ void loop()
 
         if (report) {
             // payload was delivered
-            printf("Transmission of payloadID %d as node %d successful! Time to transmit: %llu us\n",
+            printf("Transmission of payloadID %ld as node %ld successful! Time to transmit: %llu us\n",
                    payload.payloadID,
                    payload.nodeID,
                    end_timer - start_timer);
@@ -133,7 +133,7 @@ void loop()
             radio.read(&payload, bytes);            // fetch payload from FIFO
 
             // print details about incoming payload
-            printf("Received %d bytes on pipe %d from node %d. PayloadID: %d\n",
+            printf("Received %d bytes on pipe %d from node %ld. PayloadID: %ld\n",
                    bytes,
                    pipe,
                    payload.nodeID,
