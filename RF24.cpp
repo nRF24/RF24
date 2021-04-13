@@ -1297,7 +1297,6 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
 
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
         if (status & _BV(MAX_RT)) {
-            printf("re-transmiting failed payload\n");
             write_register(NRF_STATUS, _BV(MAX_RT));
             ce(LOW); // Set re-transmit
             ce(HIGH);
