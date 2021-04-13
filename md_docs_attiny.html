@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.12</span>
+   &#160;<span id="projectnumber">v1.4.0</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -96,24 +96,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <p>Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny<br  />
  See <a href="https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC">https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC</a> for ATTiny patch</p>
 <p>ATTiny board support initially added from <a href="https://github.com/jscrane/RF24">https://github.com/jscrane/RF24</a></p>
-<h1><a class="anchor" id="Hardware"></a>
+<h1><a class="anchor" id="autotoc_md17"></a>
 Hardware Configuration</h1>
-<p>By tong67 ( <a href="https://github.com/tong67">https://github.com/tong67</a> )</p>
-<p><b>ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4</b> </p><div class="fragment"><div class="line">                             +-\/-+</div>
+<p>By <a href="https://github.com/tong67">tong67</a></p>
+<h2><a class="anchor" id="autotoc_md18"></a>
+ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4</h2>
+<div class="fragment"><div class="line">                             +-\/-+</div>
 <div class="line">               NC      PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 --- LED --- 5V</div>
 <div class="line">nRF24L01  CE, pin3 --- PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5</div>
 <div class="line">nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6</div>
 <div class="line">nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7</div>
 <div class="line">                             +----+</div>
-</div><!-- fragment --><p><br  />
- <b>ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3</b> =&gt; PB3 and PB4 are free to use for application <br  />
- Circuit idea from <a href="http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html">http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html</a> <br  />
- Original RC combination was 1K/100nF. 22K/10nF combination worked better. <br  />
- For best settletime delay value in RF24::csn() the timingSearch3pin.ino sketch can be used. <br  />
- This configuration is enabled when CE_PIN and CSN_PIN are equal, e.g. both 3 <br  />
- Because CE is always high the power consumption is higher than for 5 pins solution <br  />
- </p><div class="fragment"><div class="line">                                                                                       ^^</div>
-<div class="line">                             +-\/-+           nRF24L01   CE, pin3 ------|              <span class="comment">//</span></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md19"></a>
+ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3 - PB3 and PB4 are free to use for application</h2>
+<ul>
+<li>Circuit idea from <a href="http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html">http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html</a></li>
+<li>Original RC combination was 1K/100nF. 22K/10nF combination worked better.</li>
+<li>For best settletime delay value in RF24::csn() the timingSearch3pin.ino sketch can be used.</li>
+<li>This configuration is enabled when CE_PIN and CSN_PIN are equal, e.g. both 3</li>
+<li>Because CE is always high the power consumption is higher than for 5 pins solution</li>
+</ul>
+<div class="fragment"><div class="line">                                                                                       ^^</div>
+<div class="line">                             +-\/-+           nRF24L01   CE, pin3 ------|              //</div>
 <div class="line">                       PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 ------x----------x--|&lt;|-- 5V</div>
 <div class="line">               NC      PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5 --|&lt;|---x-[22k]--|  LED</div>
 <div class="line">               NC      PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6  1n4148 |</div>
@@ -121,10 +125,12 @@ Hardware Configuration</h1>
 <div class="line">                    |        +----+                                       |</div>
 <div class="line">                    |-----------------------------------------------||----x-- nRF24L01 CSN, pin4</div>
 <div class="line">                                                                  10nF</div>
-</div><!-- fragment --><p><br  />
- <b>ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7</b> <br  />
- Schematic provided and successfully tested by Carmine Pastore (<a href="https://github.com/Carminepz">https://github.com/Carminepz</a>) <br  />
- </p><div class="fragment"><div class="line">                              +-\/-+</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md20"></a>
+ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7</h2>
+<ul>
+<li>Schematic provided and successfully tested by <a href="https://github.com/Carminepz">Carmine Pastore</a></li>
+</ul>
+<div class="fragment"><div class="line">                              +-\/-+</div>
 <div class="line">nRF24L01  VCC, pin2 --- VCC  1|o   |14 GND --- nRF24L01  GND, pin1</div>
 <div class="line">                        PB0  2|    |13 AREF</div>
 <div class="line">                        PB1  3|    |12 PA1</div>
@@ -133,9 +139,9 @@ Hardware Configuration</h1>
 <div class="line">                        PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5</div>
 <div class="line">nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6</div>
 <div class="line">                              +----+</div>
-</div><!-- fragment --><p><br  />
- <b>ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13</b> <br  />
- </p><div class="fragment"><div class="line">                              +-\/-+</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md21"></a>
+ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13</h2>
+<div class="fragment"><div class="line">                              +-\/-+</div>
 <div class="line">                        PA2  1|o   |20 VCC --- nRF24L01  VCC, pin2</div>
 <div class="line">                        PD0  2|    |19 PB7 --- nRF24L01  SCK, pin5</div>
 <div class="line">                        PD1  3|    |18 PB6 --- nRF24L01 MOSI, pin6</div>
@@ -147,15 +153,11 @@ Hardware Configuration</h1>
 <div class="line">                        PD5  9|    |12 PB0</div>
 <div class="line">nRF24L01  GND, pin1 --- GND 10|    |11 PD6</div>
 <div class="line">                              +----+</div>
-</div><!-- fragment --><p><br  />
-<br  />
-<br  />
- </p>
-</div></div><!-- contents -->
+</div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 1 2021 08:44:55 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Apr 13 2021 01:38:06 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

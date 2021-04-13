@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Optimized high speed nRF24L01+ driver class documentation: Python Wrapper (by https://github.com/mz-fuzzy)</title>
+<title>Optimized high speed nRF24L01+ driver class documentation: docs/attiny.md File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.12</span>
+   &#160;<span id="projectnumber">v1.4.0</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -46,10 +46,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,6 +69,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+    </ul>
+  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -84,54 +90,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div>
 
 </div><!-- top -->
-<div class="PageDoc"><div class="header">
+<div class="header">
   <div class="headertitle">
-<div class="title">Python Wrapper (by <a href="https://github.com/mz-fuzzy">https://github.com/mz-fuzzy</a>) </div>  </div>
+<div class="title">docs/attiny.md File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="Prerequisites"></a>
-Prerequisites</h1>
-<p><b>Python2:</b></p>
-<div class="fragment"><div class="line">sudo apt-get install python-dev libboost-python-dev python-setuptools python-rpi.gpio </div>
-</div><!-- fragment --><p><b>Python3:</b></p>
-<div class="fragment"><div class="line">sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-rpi.gpio </div>
-</div><!-- fragment --><p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a>:</p>
-<p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> lib needs to be built in C++ &amp; installed for the python wrapper to wrap it <br  />
- See <a href="Linux.html">Linux Installation</a> and <a href="RPi.html">Linux/RPi General</a> <br  />
-<br  />
- </p>
-<h1><a class="anchor" id="Install"></a>
-Installation:</h1>
-<ol type="1">
-<li>For python3 in Raspbian, it's needed to manually link python boost library, like this: <div class="fragment"><div class="line">sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python3-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so </div>
-</div><!-- fragment --></li>
-<li>Build the library. From the rf24libs/RF24/pyRF24 directory: <div class="fragment"><div class="line">./setup.py build   </div>
-</div><!-- fragment --> or<div class="fragment"><div class="line">python3 setup.py build </div>
-</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>Build takes several minutes on arm-based machines. Machines with RAM &lt;1GB may need to increase amount of swap for build.</dd></dl>
-</li>
-<li>Install the library <div class="fragment"><div class="line">sudo ./setup.py install  </div>
-</div><!-- fragment --> or<div class="fragment"><div class="line">sudo python3 setup.py install </div>
-</div><!-- fragment --> See the additional <a href="pages.html">Platform Support pages</a> for information on connecting your hardware <br  />
-</li>
-</ol>
-<p>See the included <a href="examples.html">*.py files in the "examples_linux" folder</a> for usage information.</p>
-<ol type="1">
-<li>Running the Example: <br  />
- Edit the getting_started.py example to configure the appropriate pins per the above documentation: <div class="fragment"><div class="line">nano getting_started.py   </div>
-</div><!-- fragment --> Configure another device, Arduino or RPi with the <a href="examples_linux_2getting_started_8py-example.html">getting_started.py example</a><br  />
- Run the example <div class="fragment"><div class="line">sudo python getting_started.py </div>
-</div><!-- fragment --> or<div class="fragment"><div class="line">sudo python3 getting_started.py </div>
-</div><!-- fragment --></li>
-</ol>
-<p><br  />
-<br  />
-<br  />
- </p>
-</div></div><!-- contents -->
-</div><!-- PageDoc -->
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 1 2021 08:44:55 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Apr 13 2021 01:38:06 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

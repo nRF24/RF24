@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.12</span>
+   &#160;<span id="projectnumber">v1.4.0</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -89,13 +89,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="title"><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> Portability </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> radio driver mainly utilizes the <a href="http://arduino.cc/en/reference/homePage">Arduino API</a> for GPIO, SPI, and timing functions, which are easily replicated on various platforms. <br  />
-Support files for these platforms are stored under RF24/utility, and can be modified to provide the required functionality.</p>
-<p><br  />
- </p>
-<h1><a class="anchor" id="Hardware_Templates"></a>
+<div class="textblock"><p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> radio driver mainly utilizes the <a href="http://arduino.cc/en/reference/homePage">Arduino API</a> for GPIO, SPI, and timing functions, which are easily replicated on various platforms.<br  />
+ Support files for these platforms are stored under RF24/utility, and can be modified to provide the required functionality.</p>
+<h1><a class="anchor" id="autotoc_md45"></a>
 Basic Hardware Template</h1>
-<p><b>RF24/utility</b></p>
+<h2><a class="anchor" id="autotoc_md46"></a>
+RF24/utility</h2>
 <p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library now includes a basic hardware template to assist in porting to various platforms. <br  />
  The following files can be included to replicate standard Arduino functions as needed, allowing devices from ATTiny to Raspberry Pi to utilize the same core <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> driver.</p>
 <table class="markdownTable">
@@ -106,42 +105,31 @@ Basic Hardware Template</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="includes_8h.html">includes.h</a>   </td><td class="markdownTableBodyNone">Linux only. Defines specific platform, include correct RF24_arch_config file    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="spi_8h.html">spi.h</a>   </td><td class="markdownTableBodyNone">Provides standardized SPI ( <a class="el" href="group__Porting__SPI.html#gad8a210abb2138c105350cc91972edfa9">transfer()</a> ) methods    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="spi_8h.html">spi.h</a>   </td><td class="markdownTableBodyNone">Provides standardized SPI (<code><a class="el" href="group__Porting__SPI.html#gad8a210abb2138c105350cc91972edfa9">transfer()</a></code>) methods    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="gpio_8h.html">gpio.h</a>   </td><td class="markdownTableBodyNone">Provides standardized GPIO ( <a class="el" href="group__Porting__General.html#gabda89b115581947337690b2f85bfab6e">digitalWrite()</a> ) methods    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="gpio_8h.html">gpio.h</a>   </td><td class="markdownTableBodyNone">Provides standardized GPIO (<code><a class="el" href="group__Porting__General.html#gabda89b115581947337690b2f85bfab6e">digitalWrite()</a></code>) methods    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="compatibility_8h.html">compatibility.h</a>   </td><td class="markdownTableBodyNone">Provides standardized timing (<a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a>, <a class="el" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay()</a>) methods    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="compatibility_8h.html">compatibility.h</a>   </td><td class="markdownTableBodyNone">Provides standardized timing (<code><a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a></code>, <code><a class="el" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay()</a></code>) methods    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">your_custom_file.h   </td><td class="markdownTableBodyNone">Provides access to custom drivers for spi,gpio, etc   </td></tr>
+<td class="markdownTableBodyNone">your_custom_file.h   </td><td class="markdownTableBodyNone">Provides access to custom drivers for spi, gpio, etc   </td></tr>
 </table>
-<p><br  />
- Examples are provided via the included hardware support templates in <b>RF24/utility</b> <br  />
- See the <a href="modules.html">modules</a> page for examples of class declarations</p>
-<p><br  />
- </p>
-<h1><a class="anchor" id="Device_Detection"></a>
+<p>Examples are provided via the included hardware support templates in <b>RF24/utility</b> <br  />
+ See the <a href="modules.html">modules</a> page for examples of class declarations.</p>
+<h1><a class="anchor" id="autotoc_md47"></a>
 Device Detection</h1>
 <ol type="1">
-<li>The main detection for Linux devices is done in the configure script, with the <a class="el" href="includes_8h.html">includes.h</a> from the proper hardware directory copied to RF24/utility/includes.h <br  />
-</li>
-<li>Secondary detection is completed in <a class="el" href="RF24__config_8h.html">RF24_config.h</a>, causing the include.h file to be included for all supported Linux devices <br  />
-</li>
+<li>The main detection for Linux devices is done in the configure script, with the <a class="el" href="includes_8h.html">includes.h</a> from the proper hardware directory copied to RF24/utility/includes.h</li>
+<li>Secondary detection is completed in <a class="el" href="RF24__config_8h.html">RF24_config.h</a>, causing the include.h file to be included for all supported Linux devices</li>
 <li><a class="el" href="RF24_8h.html">RF24.h</a> contains the declaration for SPI and GPIO objects 'spi' and 'gpio' to be used for porting-in related functions.</li>
 </ol>
-<p><br  />
- </p>
-<h1><a class="anchor" id="Ported_Code"></a>
+<h1><a class="anchor" id="autotoc_md48"></a>
 Code</h1>
-<p>To have your ported code included in this library, or for assistance in porting, create a pull request or open an issue at <a href="https://github.com/TMRh20/RF24">https://github.com/TMRh20/RF24</a></p>
-<p><br  />
-<br  />
-<br  />
- </p>
+<p>To have your ported code included in this library, or for assistance in porting, create a pull request or open an issue at <a href="https://github.com/nRF24/RF24">https://github.com/nRF24/RF24</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 1 2021 08:44:55 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Apr 13 2021 01:38:06 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

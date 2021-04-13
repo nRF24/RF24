@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.12</span>
+   &#160;<span id="projectnumber">v1.4.0</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -97,61 +97,60 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <p>Following prerequisites need to be assured:</p><ul>
 <li>ssh passwordless access to target machine (<a href="https://linuxconfig.org/passwordless-ssh">https://linuxconfig.org/passwordless-ssh</a>)</li>
 <li>sudo of a remote user without password (<a href="http://askubuntu.com/questions/334318/sudoers-file-enable-nopasswd-for-user-all-commands">http://askubuntu.com/questions/334318/sudoers-file-enable-nopasswd-for-user-all-commands</a>)</li>
-<li>cross-compilation toolchain for your target machine; for RPi <div class="fragment"><div class="line">git clone https:<span class="comment">//github.com/raspberrypi/tools rpi_tools </span></div>
-</div><!-- fragment --> and cross-compilation tools must be in PATH, for example <div class="fragment"><div class="line">export PATH=$PATH:/your/dir/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin </div>
+<li>cross-compilation toolchain for your target machine; for RPi <div class="fragment"><div class="line">git clone https://github.com/raspberrypi/tools rpi_tools</div>
+</div><!-- fragment --> and cross-compilation tools must be in PATH, for example <div class="fragment"><div class="line">export PATH=$PATH:/your/dir/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin</div>
 </div><!-- fragment --></li>
 </ul>
-<h1><a class="anchor" id="CxSteps"></a>
+<h1><a class="anchor" id="autotoc_md26"></a>
 Cross compilation steps:</h1>
 <ol type="1">
-<li>clone <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> to a machine for cross-compilation <div class="fragment"><div class="line">git clone https:<span class="comment">//github.com/TMRh20/RF24</span></div>
-<div class="line">cd <a class="code" href="classRF24.html">RF24</a></div>
-<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00111">RF24.h:111</a></div></div>
+<li>clone <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> to a machine for cross-compilation <div class="fragment"><div class="line">git clone https://github.com/nRF24/RF24</div>
+<div class="line">cd RF24</div>
 </div><!-- fragment --></li>
-<li>configure for cross compilation <div class="fragment"><div class="line">./configure --remote=pi@target_linux_host </div>
-</div><!-- fragment --> eventually <div class="fragment"><div class="line">./configure --remote=pi@target_linux_host --driver=&lt;driver&gt; </div>
+<li>configure for cross compilation <div class="fragment"><div class="line">./configure --remote=pi@target_linux_host</div>
+</div><!-- fragment --> eventually <div class="fragment"><div class="line">./configure --remote=pi@target_linux_host --driver=&lt;driver&gt;</div>
 </div><!-- fragment --></li>
-<li>build <div class="fragment"><div class="line">make </div>
+<li>build <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --></li>
-<li>(opt) install library to cross-compilation machine into cross-exvironment - important for compilation of examples <div class="fragment"><div class="line">sudo make install </div>
+<li>(optional) install library to cross-compilation machine into cross-exvironment - important for compilation of examples <div class="fragment"><div class="line">sudo make install</div>
 </div><!-- fragment --></li>
-<li>upload library to target machine <div class="fragment"><div class="line">make upload </div>
+<li>upload library to target machine <div class="fragment"><div class="line">make upload</div>
 </div><!-- fragment --></li>
-<li>(opt) compile examples <div class="fragment"><div class="line">cd examples_linux</div>
+<li>(optional) compile examples <div class="fragment"><div class="line">cd examples_linux</div>
 <div class="line">make</div>
 </div><!-- fragment --></li>
-<li>(opt) upload examples to target machine <div class="fragment"><div class="line">make upload </div>
+<li>(optional) upload examples to target machine <div class="fragment"><div class="line">make upload</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="CxStepsPython"></a>
+<h1><a class="anchor" id="autotoc_md27"></a>
 Cross comilation steps for python wrapper</h1>
-<p>Prerequisites:</p><ul>
-<li>Python setuptools must be installed on both target and cross-compilation machines <div class="fragment"><div class="line">sudo pip install setuptools </div>
-</div><!-- fragment --> or <div class="fragment"><div class="line">sudo apt-get install python-setuptools </div>
+<h2><a class="anchor" id="autotoc_md28"></a>
+Prerequisites</h2>
+<ul>
+<li>Python setuptools must be installed on both target and cross-compilation machines <div class="fragment"><div class="line">sudo pip install setuptools</div>
+</div><!-- fragment --> or <div class="fragment"><div class="line">sudo apt-get install python-setuptools</div>
 </div><!-- fragment --></li>
 </ul>
-<p>Installation steps:</p><ol type="1">
+<h2><a class="anchor" id="autotoc_md29"></a>
+Installation steps</h2>
+<ol type="1">
 <li>Assure having libboost-python-dev library in your cross-compilation environment. Alternatively, you can install it into your target machine and copy /usr and /lib directories to the cross-compilation machine. For example <div class="fragment"><div class="line">mkdir -p rpi_root &amp;&amp; rsync -a pi@target_linux_host:/usr :/lib rpi_root</div>
-<div class="line">export CFLAGS=<span class="stringliteral">&quot;--sysroot=/your/dir/rpi_root -I/your/dir/rpi_root/usr/include/python2.7/&quot;</span></div>
+<div class="line">export CFLAGS=&quot;--sysroot=/your/dir/rpi_root -I/your/dir/rpi_root/usr/include/python2.7/&quot;</div>
 </div><!-- fragment --></li>
 <li>Build the python wrapper <div class="fragment"><div class="line">cd pyRF24</div>
 <div class="line">./setup.py build --compiler=crossunix</div>
 </div><!-- fragment --></li>
-<li>Make the egg package <div class="fragment"><div class="line">./setup.py bdist_egg --plat-name=cross </div>
+<li>Make the egg package <div class="fragment"><div class="line">./setup.py bdist_egg --plat-name=cross</div>
 </div><!-- fragment --> <code>dist/RF24-&lt;version&gt;-cross.egg</code> should be created.</li>
-<li>Upload it to the target machine and install there: <div class="fragment"><div class="line">scp dist/<a class="code" href="classRF24.html">RF24</a>-*-cross.egg pi@target_linux_host:</div>
-<div class="line">ssh pi@target_linux_host <span class="stringliteral">&#39;sudo easy_install RF24-*-cross.egg&#39;</span></div>
-</div><!-- fragment --></li>
+<li>Upload it to the target machine and install there: <div class="fragment"><div class="line">scp dist/RF24-*-cross.egg pi@target_linux_host:</div>
+<div class="line">ssh pi@target_linux_host &#39;sudo easy_install RF24-*-cross.egg&#39;</div>
+</div><!-- fragment --> </li>
 </ol>
-<p><br  />
-<br  />
-<br  />
- </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 1 2021 08:44:55 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Apr 13 2021 01:38:06 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

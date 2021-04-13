@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.3.12</span>
+   &#160;<span id="projectnumber">v1.4.0</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -92,66 +92,63 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="textblock"><p>Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or using LittleWire.</p>
 <dl class="section note"><dt>Note</dt><dd>The SPIDEV option should work with most Linux systems supporting spi userspace device. <br  />
 </dd></dl>
-<p><br  />
- </p>
-<h1><a class="anchor" id="AutoInstall"></a>
+<h1><a class="anchor" id="autotoc_md31"></a>
 Automated Install</h1>
-<p>(<b>Designed &amp; Tested on RPi</b> - Defaults to SPIDEV on devices supporting it)</p>
+<p><b>Designed &amp; Tested on RPi</b> - Defaults to SPIDEV on devices supporting it</p>
 <ol type="1">
 <li>Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc)</li>
-<li>Download the install.sh file from <a href="http://tmrh20.github.io/RF24Installer/RPi/install.sh">http://tmrh20.github.io/RF24Installer/RPi/install.sh</a> <div class="fragment"><div class="line">wget http:<span class="comment">//tmrh20.github.io/RF24Installer/RPi/install.sh </span></div>
+<li>Download the install.sh file from <a href="http://tmrh20.github.io/RF24Installer/RPi/install.sh">http://tmrh20.github.io/RF24Installer/RPi/install.sh</a> <div class="fragment"><div class="line">wget http://tmrh20.github.io/RF24Installer/RPi/install.sh</div>
 </div><!-- fragment --></li>
-<li>Make it executable <div class="fragment"><div class="line">chmod +x install.sh </div>
+<li>Make it executable <div class="fragment"><div class="line">chmod +x install.sh</div>
 </div><!-- fragment --></li>
-<li>Run it and choose your options <div class="fragment"><div class="line">./install.sh </div>
+<li>Run it and choose your options <div class="fragment"><div class="line">./install.sh</div>
 </div><!-- fragment --></li>
-<li>Run an example from one of the libraries <div class="fragment"><div class="line">cd rf24libs/<a class="code" href="classRF24.html">RF24</a>/examples_linux</div>
-<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00111">RF24.h:111</a></div></div>
+<li>Run an example from one of the libraries <div class="fragment"><div class="line">cd rf24libs/RF24/examples_linux</div>
 </div><!-- fragment --> Edit the gettingstarted example, to set your pin configuration <div class="fragment"><div class="line">nano gettingstarted.cpp</div>
 <div class="line">make</div>
 <div class="line">sudo ./gettingstarted</div>
-</div><!-- fragment --></li>
+</div><!-- fragment --> </li>
 </ol>
-<p><br  />
- </p>
-<h1><a class="anchor" id="ManInstall"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Manual Install</h1>
 <ol type="1">
-<li>Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc) <dl class="section note"><dt>Note</dt><dd>See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA </a> documentation for more info on installing MRAA <br  />
+<li>Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc) <dl class="section note"><dt>Note</dt><dd>See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA</a> documentation for more info on installing MRAA <br  />
 </dd></dl>
 </li>
 <li>Make a directory to contain the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> and possibly RF24Network lib and enter it <div class="fragment"><div class="line">mkdir ~/rf24libs</div>
 <div class="line">cd ~/rf24libs</div>
 </div><!-- fragment --></li>
-<li>Clone the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> repo <div class="fragment"><div class="line">git clone https:<span class="comment">//github.com/tmrh20/RF24.git RF24 </span></div>
+<li>Clone the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> repo <div class="fragment"><div class="line">git clone https://github.com/tmrh20/RF24.git RF24</div>
 </div><!-- fragment --></li>
-<li>Change to the new <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> directory <div class="fragment"><div class="line">cd <a class="code" href="classRF24.html">RF24</a> </div>
+<li>Change to the new <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> directory <div class="fragment"><div class="line">cd RF24</div>
 </div><!-- fragment --></li>
-<li>Configure build environment using<div class="fragment"><div class="line">./configure </div>
-</div><!-- fragment --> script. It auto detectes device and build environment. For overriding autodetections, use command-line switches, see<div class="fragment"><div class="line">./configure --help </div>
+<li>Configure build environment using <div class="fragment"><div class="line">./configure</div>
+</div><!-- fragment --> script. It auto detectes device and build environment.<br  />
+ For overriding autodetections, use command-line switches, see <div class="fragment"><div class="line">./configure --help</div>
 </div><!-- fragment --> for description.</li>
-<li>Build the library, and run an example file <div class="fragment"><div class="line">make; sudo make install </div>
+<li>Build the library, and run an example file <div class="fragment"><div class="line">make</div>
+<div class="line">sudo make install</div>
 </div><!-- fragment --> <div class="fragment"><div class="line">cd examples_linux</div>
-</div><!-- fragment --> Edit the gettingstarted example, to set your pin configuration <div class="fragment"><div class="line">nano gettingstarted.cpp</div>
+</div><!-- fragment --> Edit the gettingstarted example, to set your pin configuration <div class="fragment"><div class="line">ano gettingstarted.cpp</div>
 <div class="line">make</div>
 <div class="line">sudo ./gettingstarted</div>
 </div><!-- fragment --></li>
 </ol>
-<p>Build using <b>SPIDEV</b></p>
+<h2><a class="anchor" id="autotoc_md33"></a>
+Build using SPIDEV</h2>
 <ol type="1">
 <li>Make sure that spi device support is enabled and /dev/spidev&lt;a&gt;.&lt;b&gt; is present</li>
 <li>Manual Install using SPIDEV: <div class="fragment"><div class="line">./configure --driver=SPIDEV</div>
-<div class="line">make; sudo make install</div>
+<div class="line">make</div>
+<div class="line">sudo make install</div>
 </div><!-- fragment --></li>
-<li>See the gettingstarted example for an example of pin configuration <br  />
-<br  />
- </li>
+<li>See the gettingstarted example for an example of pin configuration </li>
 </ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 1 2021 08:44:55 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Apr 13 2021 01:38:06 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
