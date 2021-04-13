@@ -1297,9 +1297,10 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
 
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
         if (status & _BV(MAX_RT)) {
-            write_register(NRF_STATUS, _BV(MAX_RT));
-            ce(LOW); // Set re-transmit
-            ce(HIGH);
+            // transmission failure detected
+            ce(LOW);                                 // exit active TX mode
+            write_register(NRF_STATUS, _BV(MAX_RT)); // clear data_fail flag
+            ce(HIGH);                                // re-enter active TX mode
             if (millis() - start >= timeout) {
                 ce(LOW);
                 flush_tx();
