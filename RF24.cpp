@@ -1301,6 +1301,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
             ce(LOW); // Set re-transmit
             ce(HIGH);
             if (millis() - start >= timeout) {
+                print_status(status);
                 ce(LOW);
                 flush_tx();
                 return 0;
