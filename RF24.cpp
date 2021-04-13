@@ -1294,14 +1294,15 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
         ce(HIGH);
     }
     uint32_t start = millis();
-
+uint32_t count = 0;
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
+        count++;
         if (status & _BV(MAX_RT)) {
             write_register(NRF_STATUS, _BV(MAX_RT));
             ce(LOW); // Set re-transmit
             ce(HIGH);
             if (millis() - start >= timeout) {
-                print_status(status);
+                printf("\tfetched status byte %d times in %d ms\n", count, millis() - start);
                 ce(LOW);
                 flush_tx();
                 return 0;
