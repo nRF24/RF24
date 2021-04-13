@@ -18,7 +18,7 @@
 #include <RF24.h>        // RF24 radio object
 
 // We will be using the nRF24L01's IRQ pin for this example
-#define IRQ_PIN 5 // this needs to be a digital input capable pin
+#define IRQ_PIN 6 // this needs to be a digital input capable pin
 volatile bool wait_for_event = false; // used to wait for an IRQ event to trigger
 
 // instantiate an object for the nRF24L01 transceiver
