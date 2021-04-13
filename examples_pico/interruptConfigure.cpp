@@ -125,7 +125,7 @@ bool setup()
     // For debugging info
     // printf_begin();             // needed only once for printing details
     // radio.printDetails();       // (smaller) function that prints raw register values
-    radio.printPrettyDetails(); // (larger) function that prints human readable data
+    // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // role variable is hardcoded to RX behavior, inform the user of this
     printf("*** PRESS 'T' to begin transmitting to the other node\n");
@@ -286,16 +286,16 @@ void loop()
  */
 void interruptHandler(uint gpio, uint32_t events)
 {
+    /*
     if (gpio != IRQ_PIN && events != GPIO_IRQ_EDGE_FALL) {
         // the gpio pin and event does not match the configuration we specified
-        // return;
-        printf("gpio = %i, event = %d\n", gpio, events);
-    }
+        return;
+    } */
+    printf("gpio = %i, event = %d\n", gpio, events);
 
 
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n");   // show that this function was called
-    sleep_us(250);
     bool tx_ds, tx_df, rx_dr;                // declare variables for IRQ masks
     radio.whatHappened(tx_ds, tx_df, rx_dr); // get values for IRQ masks
     // whatHappened() clears the IRQ masks also. This is required for
