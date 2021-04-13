@@ -303,7 +303,7 @@ void interruptHandler(uint gpio, uint32_t events)
     // clearing the IRQ masks resets the IRQ pin to its inactive state (HIGH)
 
     // print "data sent", "data fail", "data ready" mask states
-    printf("\tdata_sent: %s, data_fail: %s, data_ready: %s",
+    printf("\tdata_sent: %s, data_fail: %s, data_ready: %s\n",
            tx_ds ? "true" : "false",
            tx_df ? "true" : "false",
            rx_dr ? "true" : "false");
@@ -349,7 +349,7 @@ void printRxFifo()
             }
             rx_fifo[i * pl_size] = 0;            // add a NULL terminating char to use as a c-string
         }
-        printf("Complete RX FIFO: %s", rx_fifo); // print the entire RX FIFO with 1 buffer
+        printf("Complete RX FIFO: %s\n", rx_fifo); // print the entire RX FIFO with 1 buffer
     }
 }
 
