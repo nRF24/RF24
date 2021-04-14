@@ -1,0 +1,2 @@
+add_library(LittleWireDriver INTERFACE)
+target_include_directories(LittleWireDriver INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

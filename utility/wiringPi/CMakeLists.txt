@@ -1,0 +1,2 @@
+add_library(wiringPiDriver STATIC spi.cpp)
+target_link_libraries(wiringPiDriver wiringPi)
