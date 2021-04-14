@@ -6,7 +6,9 @@ Follow the Raspberry Pi Foundation's
 setup a proper development environment on your host PC (the machine that
 will build your project).
 
-It is important to remember that the pico-sdk repository should exist in the same directory that the RF24 repository (or your project's directory) exists.
+Either set an environment variable named `PICO_SDK_PATH` that points to your
+local clone of the pico-sdk or put the pico-sdk next to the `RF24` folder or
+the folder containing your project using the `RF24` library:
 
     path/to/github/repos/
         pico-sdk/
@@ -14,11 +16,12 @@ It is important to remember that the pico-sdk repository should exist in the sam
 
 Alternatively, the RF24 repository (and optionally the RF24Network and RF24Mesh
 repositories) can be included into your project's "lib" folder as copies or
-git submodules. for more detail, see the below instructions to incorporate RF24 libs into your project.
+git submodules. For more detail, see the below instructions to incorporate
+RF24 libs into your project.
 
 ## Building the RF24 examples for the Pico SDK
-1. Create a "build" directory in the RF24 repository's root directory, then navigate to
-   the new "build" directory.
+1. Create a `build` directory in the RF24 repository's root directory and
+   navigate to it:
    ```shell
    cd RF24
    mkdir build
@@ -50,7 +53,7 @@ git submodules. for more detail, see the below instructions to incorporate RF24 
 In order to use the RF24 libraries in your RP2040 based project:
 
 1. Make a copy of the RF24 library (and optionally RF24Network and RF24Mesh
-   libraries) in a "lib" directory located in your project's root directory.
+   libraries) in a `lib` directory located in your project's root directory.
 
         path/to/my/project/
             lib/
@@ -63,21 +66,28 @@ In order to use the RF24 libraries in your RP2040 based project:
 
    Alternatively you can add the RF24* repositories as [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 2. Include their CMakeLists.txt files from the RF24 libraries in your project's top-level
-   CMakeLists.txt file (usually located in the "src" directory). The following snippet
-   assumes that your project's "src" directory is on the same level as the previously
-   mentioned "lib" directory.
+   CMakeLists.txt file (usually located in the `src` directory). The following snippet
+   assumes that your project's `src` directory is on the same level as the previously
+   mentioned `lib` directory.
    ```txt
    include(../lib/RF24/CMakeLists.txt)
    include(../lib/RF24Network/CMakeLists.txt)
    include(../lib/RF24Mesh/CMakeLists.txt)
    ```
 3. In the same CMakeLists.txt file from step 2, add the RF24 libraries into the
-   `target_link_libraries` configuration.
+   `target_link_libraries` configuration:
    ```txt
-   target_include_directories(target_name PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+   target_link_libraries(${CMAKE_PROJECT_NAME}
+   ... Your project's other libraries ...
+    RF24
+    RF24Network
+    RF24Mesh
+   )
    ```
-   Where `target_name` is specified prior to this call using
-   [`add_executable()`](https://cmake.org/cmake/help/latest/command/add_executable.html#command:add_executable)
+   If you are using tinyUSB, this line (or similar) should already exist:
+   ```txt
+   target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+   ```
 4. Finally, remember to include the necessary RF24* libraries' header files in your
    project's source code where applicable.
    ```cpp
@@ -125,7 +135,7 @@ void main()
 To specify the default SPI pins used at build time, you can use either:
 1. declare these pins in the CMakeLists.txt file
    ```txt
-   target_compile_definitions(target_name
+   target_compile_definitions(${CMAKE_PROJECT_NAME}
        PUBLIC PICO_DEFAULT_SPI=0 # can only be 0 or 1 (as in `spi0` or `spi1`)
        PUBLIC PICO_DEFAULT_SPI_SCK_PIN=2 # depends on which SPI bus (0 or 1) is being used
        PUBLIC PICO_DEFAULT_SPI_TX_PIN=3  # depends on which SPI bus (0 or 1) is being used
