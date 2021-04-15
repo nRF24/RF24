@@ -124,7 +124,7 @@ def slave(timeout=10):
             )
             start_timer = time.monotonic()  # reset timer with every payload
 
-    print("Nothing received in 6 seconds. Leaving RX role")
+    print("Nothing received in ", timeout, " seconds. Leaving RX role")
     radio.stopListening()
 
 
