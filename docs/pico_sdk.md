@@ -20,7 +20,7 @@ git submodules. For more detail, see the below instructions to incorporate
 RF24 libs into your project.
 
 ## Building the RF24 examples for the Pico SDK
-1. Create a `build` directory in the RF24 repository's root directory and
+1. Create a "build" directory in the RF24 repository's root directory and
    navigate to it:
    ```shell
    cd RF24
@@ -53,7 +53,7 @@ RF24 libs into your project.
 In order to use the RF24 libraries in your RP2040 based project:
 
 1. Make a copy of the RF24 library (and optionally RF24Network and RF24Mesh
-   libraries) in a `lib` directory located in your project's root directory.
+   libraries) in a "lib" directory located in your project's root directory.
 
         path/to/my/project/
             lib/
@@ -66,9 +66,9 @@ In order to use the RF24 libraries in your RP2040 based project:
 
    Alternatively you can add the RF24* repositories as [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 2. Include their CMakeLists.txt files from the RF24 libraries in your project's top-level
-   CMakeLists.txt file (usually located in the `src` directory). The following snippet
-   assumes that your project's `src` directory is on the same level as the previously
-   mentioned `lib` directory.
+   CMakeLists.txt file (usually located in the "src" directory). The following snippet
+   assumes that your project's "src" directory is on the same level as the previously
+   mentioned "lib" directory.
    ```txt
    include(../lib/RF24/CMakeLists.txt)
    include(../lib/RF24Network/CMakeLists.txt)
@@ -78,7 +78,7 @@ In order to use the RF24 libraries in your RP2040 based project:
    `target_link_libraries` configuration:
    ```txt
    target_link_libraries(${CMAKE_PROJECT_NAME}
-   ... Your project's other libraries ...
+    # ... Your project's other libraries ...
     RF24
     RF24Network
     RF24Mesh
