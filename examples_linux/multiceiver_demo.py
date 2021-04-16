@@ -94,7 +94,7 @@ def master(node_number):
         else:
             failures += 1
             print("failed or timed out")
-        time.sleep(0.5)  # slow down the test for readability
+        time.sleep(1)  # slow down the test for readability
     print(failures, "failures detected. Leaving TX role.")
 
 
