@@ -7,12 +7,13 @@ setup a proper development environment on your host PC (the machine that
 will build your project).
 
 Either set an environment variable named `PICO_SDK_PATH` that points to your
-local clone of the pico-sdk or put the pico-sdk next to the `RF24` folder or
-the folder containing your project using the `RF24` library:
+local clone of the pico-sdk or put the pico-sdk next to the RF24 folder or
+next to the folder containing your project using the RF24 library:
 
     path/to/github/repos/
         pico-sdk/
         RF24/
+        my_rf24_project/
 
 Alternatively, the RF24 repository (and optionally the RF24Network and RF24Mesh
 repositories) can be included into your project's "lib" folder as copies or
@@ -43,10 +44,9 @@ RF24 libs into your project.
    Notice we specified the build type again using the `--config` option.
 
    @note If you see an error stating
-   `PICO_DEFAULT_SPI_SCK_PIN' was not declared in this scope`, then it means
+   `'PICO_DEFAULT_SPI_SCK_PIN' was not declared in this scope`, then it means
    the board you selected with the `-DPICO_BOARD` option (in step 2) does not have a
-   default set of SPI pins defined for it. To workaround this error, you can either
-   define the missing macros in your project's CMakeLists.txt file or use the
+   default set of SPI pins defined for it. To workaround this error, see the
    below instructions to use different pins for the SPI bus.
 
 ## Incorporating RF24 libs into your project
@@ -98,8 +98,8 @@ In order to use the RF24 libraries in your RP2040 based project:
 ## Using different pins for the SPI bus
 Initially (without modification), the SPI bus uses the default pins defined in the
 Pico SDK repository's [pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards).
-However, the some boards (by Pimoroni and Sparkfun) do not define the necessary pins to
-use as defaults. This can be rememdied using either project source code or build-time configuration.
+However, the some boards do not define the necessary pins to use as defaults. This can
+be rememdied using either project source code or build-time configuration.
 
 @warning There is no support for software driven SPI on RP2040 based boards at this time.
 If someone is so inclined to implement this using the Pico SDK's PIO (Programable Input
@@ -119,7 +119,7 @@ then passing the `SPI` object to `RF24::begin()`.
 
 RF24 radio(7, 8); // pin numbers connected to the radio's CE and CSN pins (respectively)
 
-void main()
+int main()
 {
     // again please review the GPIO pins' "Function Select Table" in the Pico SDK docs
     SPI.begin(spi0, 2, 3, 4); // must use spi0 or spi1 as 1st parameter
