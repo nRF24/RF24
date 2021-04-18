@@ -11,11 +11,11 @@ set(CMAKE_CXX_STANDARD 17)
 add_library(RF24 INTERFACE)
 
 target_sources(RF24 INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/RF24.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/utility/rp2/gpio.cpp # TODO: Only for pico
-    ${CMAKE_CURRENT_LIST_DIR}/utility/rp2/spi.cpp  # TODO: Only for pico
-    )
+    ${CMAKE_CURRENT_LIST_DIR}/../../RF24.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/spi.cpp
+)
 
 target_include_directories(RF24 INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/
-    )
+    ${CMAKE_CURRENT_LIST_DIR}/../../
+)
