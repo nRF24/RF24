@@ -39,7 +39,9 @@
 #define rf24_max(a, b) (a>b?a:b)
 #define rf24_min(a, b) (a<b?a:b)
 
+#ifndef RF24_SPI_SPEED
 #define RF24_SPI_SPEED 10000000
+#endif
 
 //ATXMega
 #if defined (__AVR_ATxmega64D3__) || defined (__AVR_ATxmega128D3__) || defined (__AVR_ATxmega192D3__) || defined (__AVR_ATxmega256D3__) || defined (__AVR_ATxmega384D3__)
