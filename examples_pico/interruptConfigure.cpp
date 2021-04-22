@@ -301,7 +301,7 @@ void interruptHandler(uint gpio, uint32_t events)
     }
 
     gpio_event_string(event_str, events);
-    printf("event(s) = %d occured on gpio pin %i\n", event_str, gpio);
+    printf("event(s) = %s occured on gpio pin %i\n", event_str, gpio);
 
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n");   // show that this function was called
