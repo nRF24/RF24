@@ -38,8 +38,17 @@ char tx_payloads[][tx_pl_size + 1] = {"Ping ", "Pong ", "Radio", "1FAIL"};
 char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
 void interruptHandler(uint gpio, uint32_t events); // prototype to handle IRQ events
+void printRxFifo();                                // prototype to print RX FIFO with 1 buffer
 
-void printRxFifo(); // prototype to print RX FIFO with 1 buffer
+static char event_str[128];           // global string buffer
+static const char *gpio_irq_str[] = { // const string buffers
+        "LEVEL_LOW",  // 0x1
+        "LEVEL_HIGH", // 0x2
+        "EDGE_FALL",  // 0x4
+        "EDGE_RISE"   // 0x8
+};
+void gpio_event_string(char *buf, uint32_t events); // prototype to translate event name(s)
+
 
 
 bool setup()
@@ -210,8 +219,8 @@ void loop()
             pl_iterator++;
 
             // inform user what to do next
-            printf("*** PRESS 'T' to restart the transmissions\n");
-            printf("*** PRESS 'R' to change to Receive role\n");
+            printf("\n*** PRESS 'T' to restart the transmissions");
+            printf("\n*** PRESS 'R' to change to Receive role\n");
 
         }
         else if (pl_iterator == 2) {
@@ -266,7 +275,7 @@ void loop()
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
             role = false;
-
+            pl_iterator = 0;        // reset the iterator
             radio.maskIRQ(0, 0, 0); // the IRQ pin should only trigger on "data ready" event
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
@@ -280,19 +289,19 @@ void loop()
     } // user input
 } // loop
 
-
 /**
  * when the IRQ pin goes active LOW, call this fuction print out why
  */
 void interruptHandler(uint gpio, uint32_t events)
 {
-    /*
-    if (gpio != IRQ_PIN && events != GPIO_IRQ_EDGE_FALL) {
-        // the gpio pin and event does not match the configuration we specified
-        return;
-    } */
-    printf("gpio = %i, event = %d\n", gpio, events);
 
+    if (gpio != IRQ_PIN) {
+        // the gpio pin does not match the configuration we specified
+        return;
+    }
+
+    gpio_event_string(event_str, events);
+    printf("event(s) = %d occured on gpio pin %i\n", event_str, gpio);
 
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n");   // show that this function was called
@@ -364,4 +373,30 @@ int main()
         loop();
     }
     return 0; // we will never reach this
+}
+
+
+/**
+ * translate event number into event names
+ * (taken from the hello_gpio_irq example )
+ */
+void gpio_event_string(char *buf, uint32_t events) {
+    for (uint i = 0; i < 4; i++) {
+        uint mask = (1 << i);
+        if (events & mask) {
+            // Copy this event string into the user string
+            const char *event_str = gpio_irq_str[i];
+            while (*event_str != '\0') {
+                *buf++ = *event_str++;
+            }
+            events &= ~mask;
+
+            // If more events add ", "
+            if (events) {
+                *buf++ = ',';
+                *buf++ = ' ';
+            }
+        }
+    }
+    *buf++ = '\0';
 }
