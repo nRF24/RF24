@@ -180,7 +180,7 @@ void loop() {
         }
     } // role
 
-    char input = getchar_timeout_us(500); // wait 0.5 second for user input
+    char input = getchar_timeout_us(0); // get char from buffer for user input
     if (input != PICO_ERROR_TIMEOUT) {
         // change the role via the serial terminal
 

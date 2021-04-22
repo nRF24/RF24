@@ -40,6 +40,7 @@ changes.
 ## Platform Support Pages
 - [Arduino](md_docs_arduino.html) (Uno, Nano, Mega, Due, Galileo, etc)
 - [ATTiny](md_docs_attiny.html)
+- [Pico SDK support](md_docs_pico_sdk.html)
 - [Linux Installation](md_docs_linux_install.html) ([Linux/RPi General](md_docs_rpi_general.html), [MRAA](md_docs_mraa.html) supported boards (Galileo, Edison, etc), LittleWire)
 - [Cross-compilation](md_docs_cross_compile.html) for linux devices
 - [Python wrapper](md_docs_python_wrapper.html) available for Linux devices

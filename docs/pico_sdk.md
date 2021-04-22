@@ -78,11 +78,11 @@ In order to use the RF24 libraries in your RP2040 based project:
    `target_link_libraries` configuration:
    ```txt
    target_link_libraries(${CMAKE_PROJECT_NAME}
-    # ... Your project's other libraries ...
-    RF24
-    RF24Network
-    RF24Mesh
-   )
+       # ... Your project's other libraries ...
+       RF24
+       RF24Network
+       RF24Mesh
+       )
    ```
    If you are using tinyUSB, this line (or similar) should already exist:
    ```txt
@@ -112,7 +112,7 @@ There are essentially 2 SPI buses with multiple pin options for each.
 
 ### Project Source code option
 This option is the most reliable and flexible. It involves calling `SPI.begin()` and
-then passing the `SPI` object to `RF24::begin()`.
+then passing the `SPI` object to `RF24::begin(_SPI*)`.
 
 ```cpp
 #include <RF24.h>
