@@ -234,7 +234,7 @@ void loop()
         if (radio.rxFifoFull()) {
             // wait until RX FIFO is full then stop listening
 
-            sleep_ms(100);          // let ACK payload finish transmitting
+            // sleep_ms(100);          // let ACK payload finish transmitting
             radio.stopListening();  // also discards unused ACK payloads
             printRxFifo();          // flush the RX FIFO
 
