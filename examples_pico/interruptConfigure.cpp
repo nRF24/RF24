@@ -233,7 +233,7 @@ void loop()
 
         if (radio.rxFifoFull()) {
             // wait until RX FIFO is full then stop listening
-
+            printf("RX FIFO is Full!!\n");
             // sleep_ms(100);          // let ACK payload finish transmitting
             radio.stopListening();  // also discards unused ACK payloads
             printRxFifo();          // flush the RX FIFO
@@ -270,13 +270,13 @@ void loop()
             // continued TX operations when a transmission fails.
             radio.stopListening(); // this also discards any unused ACK payloads
         }
-        else if ((input == 'R' || input == 'r') && role) {
+        else if ((input == 'R' || input == 'r')/*  && role */) {
             // Become the RX node
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
             role = false;
             pl_iterator = 0;        // reset the iterator
-            radio.maskIRQ(0, 0, 0); // the IRQ pin should only trigger on "data ready" event
+            radio.maskIRQ(1, 1, 0); // the IRQ pin should only trigger on "data ready" event
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
             // transmissions on pipe 1
@@ -301,7 +301,7 @@ void interruptHandler(uint gpio, uint32_t events)
     }
 
     gpio_event_string(event_str, events);
-    printf("event(s) = %s occured on gpio pin %i\n", event_str, gpio);
+    printf("\tevent(s) = %s occured on gpio pin %i\n", event_str, gpio);
 
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n");   // show that this function was called
