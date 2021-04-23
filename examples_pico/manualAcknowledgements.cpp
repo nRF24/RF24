@@ -215,6 +215,11 @@ void loop()
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
             radio.startListening();               // put in RX mode
         }
+        else if (input == 'b' || input == 'B') {
+            // reset to bootloader
+            radio.powerDown();
+            reset_usb_boot(0, 0);
+        }
     }
 } // loop
 

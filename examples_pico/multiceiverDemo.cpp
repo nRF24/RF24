@@ -165,6 +165,11 @@ void loop()
             printf("--- PRESS 'R' to act as the RX node.\n");
             setRole(); // change address on pipe 0 to the RX node
         }
+        else if (input == 'b' || input == 'B') {
+            // reset to bootloader
+            radio.powerDown();
+            reset_usb_boot(0, 0);
+        }
     }
 
 } // loop
