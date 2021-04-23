@@ -647,13 +647,6 @@ public:
     bool rxFifoFull();
 
     /**
-     * @brief is the TX FIFO empty?
-     *
-     * @return `true` if the TX FIFO is empty or `false` if it is not empty
-     */
-    bool txFifoEmpty();
-
-    /**
      * Enter low-power mode
      *
      * To return to normal power mode, call powerUp().

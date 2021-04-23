@@ -222,11 +222,13 @@ void loop()
         }
 
     }
-    else if (!role && wait_for_event) {
+    else if (!role && radio.rxFifoFull()) {
         // This device is a RX node
-        // the RX role is partially performed by interruptHandler()
+        //
         // The RX role waits until RX FIFO is full then stops listening while
         // the FIFOs get reset and starts listening again.
+        radio.stopListening(); // also calls flush_tx() when ACKs are enabled
+        printRxFifo();         // also clears RX FIFO
 
         // Fill the TX FIFO with 3 ACK payloads for the first 3 received
         // transmissions on pipe 1.
@@ -234,8 +236,8 @@ void loop()
         radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
         radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
 
+        sleep_ms(200);          // let radio TX role complete
         radio.startListening(); // We're ready to start over. Begin listening.
-        sleep_us(130);          // let radio enter TX role
 
     } // role
 
@@ -311,24 +313,14 @@ void interruptHandler(uint gpio, uint32_t events)
     // pl_iterator has already been incremented by now
     if (pl_iterator <= 1) {
         printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
-        if (radio.rxFifoFull()){
-
-            radio.stopListening();  // also discards unused ACK payloads
-            printRxFifo();
-            wait_for_event = true; // ready to continue with loop() operations
-        }
-        else {
-            wait_for_event = false; // ready to continue with loop() operations
-        }
     }
     else if (pl_iterator == 2) {
         printf("   'Data Sent' event test %s\n", tx_ds ? "passed" : "failed");
-        wait_for_event = false; // ready to continue with loop() operations
     }
     else if (pl_iterator == 4) {
         printf("   'Data Fail' event test %s\n", tx_df ? "passed" : "failed");
-        wait_for_event = false; // ready to continue with loop() operations
     }
+    wait_for_event = false; // ready to continue with loop() operations
 } // interruptHandler
 
 
