@@ -219,24 +219,10 @@ void loop()
 
     }
     else if (!role) {
-        // This device is a RX node
-
-        if (radio.txFifoEmpty()) {
-            // wait until RX FIFO is full then stop listening
-            printf("TX FIFO is Empty!!\n");
-
-            radio.stopListening();  // also discards unused ACK payloads
-            // printRxFifo();          // flush the RX FIFO
-
-            // Fill the TX FIFO with 3 ACK payloads for the first 3 received
-            // transmissions on pipe 1.
-            radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
-            radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
-            radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
-
-            sleep_ms(100);          // let TX node finish its role
-            radio.startListening(); // We're ready to start over. Begin listening.
-        }
+        // This device is a RX node, the RX role is performed by interruptHandler()
+        //
+        // The RX role waits until RX FIFO is full then stops listening while
+        // the FIFOs get reset and starts listening again.
 
     } // role
 
@@ -312,7 +298,17 @@ void interruptHandler(uint gpio, uint32_t events)
     if (pl_iterator <= 1) {
         printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
         if (radio.rxFifoFull()){
+            radio.stopListening();  // also discards unused ACK payloads
             printRxFifo();
+
+            // Fill the TX FIFO with 3 ACK payloads for the first 3 received
+            // transmissions on pipe 1.
+            radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+            radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+            radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
+
+            // sleep_ms(100);          // let TX node finish its role
+            radio.startListening(); // We're ready to start over. Begin listening.
         }
     }
     else if (pl_iterator == 2) {
