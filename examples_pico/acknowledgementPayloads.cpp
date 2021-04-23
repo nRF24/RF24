@@ -11,9 +11,10 @@
  * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Terminal to change each node's behavior.
  */
-#include "pico/stdlib.h" // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
-#include <tusb.h>        // tud_cdc_connected()
-#include <RF24.h>        // RF24 radio object
+#include "pico/stdlib.h"  // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
+#include "pico/bootrom.h" // reset_usb_boot()
+#include <tusb.h>         // tud_cdc_connected()
+#include <RF24.h>         // RF24 radio object
 
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
@@ -26,8 +27,8 @@ bool role = false;  // true = TX role, false = RX role
 // on every successful transmission.
 // Make a data structure to store the entire payload of different datatypes
 struct PayloadStruct {
-  char message[7];          // only using 6 characters for TX & ACK payloads
-  uint8_t counter;
+    char message[7];   // only using 6 characters for TX & ACK payloads
+    uint8_t counter;
 };
 PayloadStruct payload;
 
@@ -204,6 +205,11 @@ void loop() {
             // load the payload for the first received transmission on pipe 0
             radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
             radio.startListening();
+        }
+        else if (input == 'b' || input == 'B') {
+            // reset to bootloader
+            radio.powerDown();
+            reset_usb_boot(0, 0);
         }
     }
 } // loop
