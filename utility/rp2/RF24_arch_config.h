@@ -26,7 +26,6 @@
 
 static SPI spi;
 
-#undef SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
     #define IF_SERIAL_DEBUG(x) ({x;})
 #else
