@@ -13,10 +13,12 @@
  * This example was written to be used on 2 devices acting as "nodes".
  * Use the Serial Terminal to change each node's behavior.
  */
-#include "pico/stdlib.h" // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
-#include <tusb.h>        // tud_cdc_connected()
+#include "pico/stdlib.h"  // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
+#include "pico/bootrom.h" // reset_usb_boot()
+#include <tusb.h>         // tud_cdc_connected()
+
 #define RF24_POWERUP_DELAY 0 // avoid busy sleep during ISR
-#include <RF24.h>        // RF24 radio object
+#include <RF24.h>            // RF24 radio object
 
 // We will be using the nRF24L01's IRQ pin for this example
 #define IRQ_PIN 6 // this needs to be a digital input capable pin
@@ -80,7 +82,7 @@ bool setup()
     // IRQ pin FALLING event. According to the datasheet, the pipe information
     // is unreliable during the IRQ pin FALLING transition.
 
-    // we'll manage the TX delay time in this example
+    // we'll manage the TX delay time in this example. (avoids busy sleep during ISR)
     radio.txDelay = 0; // gets reset to default (non-zero) value every time begin() or setDataRate() is called
 
     // Set the PA Level low to try preventing power supply related problems
@@ -266,9 +268,8 @@ void loop()
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
             role = false;
-            wait_for_event = false; // RX role uses this to trigger refill of TX FIFO
             pl_iterator = 0;        // reset the iterator
-            radio.maskIRQ(1, 1, 0); // the IRQ pin should only trigger on "data ready" event
+            radio.maskIRQ(1, 1, 1); // the IRQ pin should only trigger on "data ready" event
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
             // transmissions on pipe 1
