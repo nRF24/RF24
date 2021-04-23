@@ -15,6 +15,7 @@
  */
 #include "pico/stdlib.h" // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
 #include <tusb.h>        // tud_cdc_connected()
+#define RF24_POWERUP_DELAY 0 // avoid busy sleep during ISR
 #include <RF24.h>        // RF24 radio object
 
 // We will be using the nRF24L01's IRQ pin for this example
@@ -221,11 +222,20 @@ void loop()
         }
 
     }
-    else if (!role) {
-        // This device is a RX node, the RX role is performed by interruptHandler()
-        //
+    else if (!role && wait_for_event) {
+        // This device is a RX node
+        // the RX role is partially performed by interruptHandler()
         // The RX role waits until RX FIFO is full then stops listening while
         // the FIFOs get reset and starts listening again.
+
+        // Fill the TX FIFO with 3 ACK payloads for the first 3 received
+        // transmissions on pipe 1.
+        radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+        radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+        radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
+
+        radio.startListening(); // We're ready to start over. Begin listening.
+        sleep_us(130);          // let radio enter TX role
 
     } // role
 
@@ -254,6 +264,7 @@ void loop()
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
             role = false;
+            wait_for_event = false; // RX role uses this to trigger refill of TX FIFO
             pl_iterator = 0;        // reset the iterator
             radio.maskIRQ(1, 1, 0); // the IRQ pin should only trigger on "data ready" event
 
@@ -302,26 +313,22 @@ void interruptHandler(uint gpio, uint32_t events)
         printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
         if (radio.rxFifoFull()){
 
-            printRxFifo();
             radio.stopListening();  // also discards unused ACK payloads
-
-            // Fill the TX FIFO with 3 ACK payloads for the first 3 received
-            // transmissions on pipe 1.
-            radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
-            radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
-            radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
-
-            // sleep_ms(100);          // let TX node finish its role
-            radio.startListening(); // We're ready to start over. Begin listening.
+            printRxFifo();
+            wait_for_event = true; // ready to continue with loop() operations
+        }
+        else {
+            wait_for_event = false; // ready to continue with loop() operations
         }
     }
     else if (pl_iterator == 2) {
         printf("   'Data Sent' event test %s\n", tx_ds ? "passed" : "failed");
+        wait_for_event = false; // ready to continue with loop() operations
     }
     else if (pl_iterator == 4) {
         printf("   'Data Fail' event test %s\n", tx_df ? "passed" : "failed");
+        wait_for_event = false; // ready to continue with loop() operations
     }
-    wait_for_event = false; // ready to continue with loop() operations
 } // interruptHandler
 
 
