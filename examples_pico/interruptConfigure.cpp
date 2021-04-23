@@ -246,6 +246,8 @@ void loop()
             // Become the TX node
             if (!role)
                 printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
+            else if (role && wait_for_event) // don't interrupt on ongoing test
+                continue;
             else
                 printf("*** RESTARTING IRQ PIN TEST ***\n");
 
@@ -263,7 +265,6 @@ void loop()
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
             role = false;
-            pl_iterator = 0;        // reset the iterator
             radio.maskIRQ(1, 1, 1); // the IRQ pin should not trigger in this example's RX rode
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
