@@ -1491,6 +1491,12 @@ void RF24::closeReadingPipe(uint8_t pipe)
     write_register(EN_RXADDR, read_register(EN_RXADDR) & ~_BV(pgm_read_byte(&child_pipe_enable[pipe])));
 }
 
+
+bool RF24::txFifoEmpty()
+{
+    return read_register(FIFO_STATUS) & _BV(TX_EMPTY);
+}
+
 /****************************************************************************/
 
 void RF24::toggle_features(void)

@@ -220,13 +220,13 @@ void loop()
     }
     else if (!role) {
         // This device is a RX node
-        printf("in active rx role\n");
-        if (radio.rxFifoFull()) {
+
+        if (radio.txFifoEmpty()) {
             // wait until RX FIFO is full then stop listening
-            printf("RX FIFO is Full!!\n");
+            printf("TX FIFO is Empty!!\n");
 
             radio.stopListening();  // also discards unused ACK payloads
-            printRxFifo();          // flush the RX FIFO
+            // printRxFifo();          // flush the RX FIFO
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
             // transmissions on pipe 1.
@@ -310,9 +310,10 @@ void interruptHandler(uint gpio, uint32_t events)
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     // pl_iterator has already been incremented by now
     if (pl_iterator <= 1) {
-        printf("   'Data Ready' event test %s; RX FIFO full? %s\n",
-               rx_dr ? "passed" : "failed",
-               radio.rxFifoFull() ? "yes" : "no");
+        printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
+        if (radio.rxFifoFull()){
+            printRxFifo();
+        }
     }
     else if (pl_iterator == 2) {
         printf("   'Data Sent' event test %s\n", tx_ds ? "passed" : "failed");
