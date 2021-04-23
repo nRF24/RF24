@@ -160,7 +160,7 @@ void loop()
             // Become a TX node with identifier 'input'
 
             role = input - 48;
-            printf("*** CHANGING ROLE TO NODE %d ***\n", (int)input);
+            printf("*** CHANGING ROLE TO NODE %c ***\n", input);
             printf("--- Enter a number between 0 and 5 (inclusive) to change\n");
             printf("    the identifying node number that transmits.\n");
             printf("--- PRESS 'R' to act as the RX node.\n");
