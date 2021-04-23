@@ -238,7 +238,7 @@ void loop()
         radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
         radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
 
-        // sleep_ms(200);          // let radio TX role complete
+        sleep_ms(200);          // let radio TX role complete
         radio.startListening(); // We're ready to start over. Begin listening.
 
     } // role
