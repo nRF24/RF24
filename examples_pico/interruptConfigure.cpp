@@ -40,16 +40,6 @@ char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 void interruptHandler(uint gpio, uint32_t events); // prototype to handle IRQ events
 void printRxFifo();                                // prototype to print RX FIFO with 1 buffer
 
-static char event_str[128];           // global string buffer
-static const char *gpio_irq_str[] = { // const string buffers
-        "LEVEL_LOW",  // 0x1
-        "LEVEL_HIGH", // 0x2
-        "EDGE_FALL",  // 0x4
-        "EDGE_RISE"   // 0x8
-};
-void gpio_event_string(char *buf, uint32_t events); // prototype to translate event name(s)
-
-
 
 bool setup()
 {
@@ -230,11 +220,11 @@ void loop()
     }
     else if (!role) {
         // This device is a RX node
-
+        printf("in active rx role\n");
         if (radio.rxFifoFull()) {
             // wait until RX FIFO is full then stop listening
             printf("RX FIFO is Full!!\n");
-            // sleep_ms(100);          // let ACK payload finish transmitting
+
             radio.stopListening();  // also discards unused ACK payloads
             printRxFifo();          // flush the RX FIFO
 
@@ -295,13 +285,10 @@ void loop()
 void interruptHandler(uint gpio, uint32_t events)
 {
 
-    if (gpio != IRQ_PIN) {
+    if (gpio != IRQ_PIN && !(events | GPIO_IRQ_EDGE_FALL)) {
         // the gpio pin does not match the configuration we specified
         return;
     }
-
-    gpio_event_string(event_str, events);
-    printf("\tevent(s) = %s occured on gpio pin %i\n", event_str, gpio);
 
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n");   // show that this function was called
@@ -323,7 +310,9 @@ void interruptHandler(uint gpio, uint32_t events)
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     // pl_iterator has already been incremented by now
     if (pl_iterator <= 1) {
-        printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
+        printf("   'Data Ready' event test %s; RX FIFO full? %s\n",
+               rx_dr ? "passed" : "failed",
+               radio.rxFifoFull() ? "yes" : "no");
     }
     else if (pl_iterator == 2) {
         printf("   'Data Sent' event test %s\n", tx_ds ? "passed" : "failed");
@@ -373,30 +362,4 @@ int main()
         loop();
     }
     return 0; // we will never reach this
-}
-
-
-/**
- * translate event number into event names
- * (taken from the hello_gpio_irq example )
- */
-void gpio_event_string(char *buf, uint32_t events) {
-    for (uint i = 0; i < 4; i++) {
-        uint mask = (1 << i);
-        if (events & mask) {
-            // Copy this event string into the user string
-            const char *event_str = gpio_irq_str[i];
-            while (*event_str != '\0') {
-                *buf++ = *event_str++;
-            }
-            events &= ~mask;
-
-            // If more events add ", "
-            if (events) {
-                *buf++ = ',';
-                *buf++ = ' ';
-            }
-        }
-    }
-    *buf++ = '\0';
 }
