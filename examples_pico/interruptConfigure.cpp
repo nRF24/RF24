@@ -79,6 +79,9 @@ bool setup()
     // IRQ pin FALLING event. According to the datasheet, the pipe information
     // is unreliable during the IRQ pin FALLING transition.
 
+    // we'll manage the TX delay time in this example
+    radio.txDelay = 0; // gets reset to default (non-zero) value every time begin() or setDataRate() is called
+
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
@@ -298,8 +301,9 @@ void interruptHandler(uint gpio, uint32_t events)
     if (pl_iterator <= 1) {
         printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
         if (radio.rxFifoFull()){
-            radio.stopListening();  // also discards unused ACK payloads
+
             printRxFifo();
+            radio.stopListening();  // also discards unused ACK payloads
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
             // transmissions on pipe 1.

@@ -1026,8 +1026,10 @@ void RF24::stopListening(void)
 {
     ce(LOW);
 
-    //delayMicroseconds(100);
-    delayMicroseconds(txDelay);
+    if (txDelay) {
+        //delayMicroseconds(100);
+        delayMicroseconds(txDelay);
+    }
     if (ack_payloads_enabled){
         flush_tx();
     }
@@ -1051,7 +1053,7 @@ void RF24::powerDown(void)
 {
     ce(LOW); // Guarantee CE is low on powerDown
     config_reg &= ~_BV(PWR_UP);
-    write_register(NRF_CONFIG,config_reg);
+    write_register(NRF_CONFIG, config_reg);
 }
 
 /****************************************************************************/
