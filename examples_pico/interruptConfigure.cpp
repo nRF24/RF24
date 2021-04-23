@@ -247,7 +247,7 @@ void loop()
             if (!role)
                 printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
             else if (role && wait_for_event) // don't interrupt on ongoing test
-                continue;
+                return;                      // exiy now; start next loop()
             else
                 printf("*** RESTARTING IRQ PIN TEST ***\n");
 
