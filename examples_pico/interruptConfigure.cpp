@@ -247,7 +247,7 @@ void loop()
             if (!role)
                 printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
             else if (role && wait_for_event) // don't interrupt on ongoing test
-                return;                      // exiy now; start next loop()
+                return;                      // exit now; start next loop()
             else
                 printf("*** RESTARTING IRQ PIN TEST ***\n");
 
@@ -290,7 +290,7 @@ void interruptHandler(uint gpio, uint32_t events)
 {
 
     if (gpio != IRQ_PIN && !(events | GPIO_IRQ_EDGE_FALL)) {
-        // the gpio pin does not match the configuration we specified
+        // the gpio pin and event does not match the configuration we specified
         return;
     }
 

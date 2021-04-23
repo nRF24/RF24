@@ -127,7 +127,7 @@ void loop()
                 if (to_ms_since_boot(get_absolute_time()) - start_timeout > 200)                  // only wait 200 ms
                     break;
             }
-            unsigned long end_timer = to_us_since_boot(get_absolute_time());     // end the timer
+            uint64_t end_timer = to_us_since_boot(get_absolute_time());          // end the timer
             radio.stopListening();                                               // put back in TX mode
 
             // print summary of transactions
