@@ -1,4 +1,4 @@
-# Using the RaspberryPi Pico SDK (for the RP2040)
+# RaspberryPi Pico SDK (for the RP2040)
 
 ## Prerequisite
 Follow the Raspberry Pi Foundation's
@@ -21,6 +21,11 @@ git submodules. For more detail, see the below instructions to incorporate
 RF24 libs into your project.
 
 ## Building the RF24 examples for the Pico SDK
+Each example imports a set of constants (`CE_PIN`, `CSN_PIN`, `IRQ_PIN`) from the
+examples_pico/defaultPins.h file. Default values for SPI pins (SCK, MOSI, MISO)
+come from the Pico SDK repository's
+[pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards)
+
 1. Create a "build" directory in the RF24 repository's root directory and
    navigate to it:
    ```shell
