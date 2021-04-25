@@ -1,4 +1,6 @@
 // pre-chossen pins on small sized boards
+#ifndef DEFAULTPINS_H
+#define DEFAULTPINS_H
 
 #if defined (ADAFRUIT_QTPY_RP2040)
 // for this board, you can still use the Stemma QT connector as a separate I2C bus (`i2c1`)
@@ -25,4 +27,5 @@
 #define CE_PIN 7
 #define CSN_PIN 8  // pin 8 is not available on the Sparkfun_ThingPlus board
 #define IRQ_PIN 6
-#endif
+#endif // board detection macro defs
+#endif // DEFAULTPINS_H

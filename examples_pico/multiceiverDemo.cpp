@@ -17,7 +17,7 @@
 #include "pico/bootrom.h" // reset_usb_boot()
 #include <tusb.h>         // tud_cdc_connected()
 #include <RF24.h>         // RF24 radio object
-#include <defaultPins.h>  // board presumptive default pin numbers for CE_PIN and CSN_PIN
+#include "defaultPins.h"  // board presumptive default pin numbers for CE_PIN and CSN_PIN
 
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);

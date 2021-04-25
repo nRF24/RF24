@@ -16,7 +16,8 @@
 #include "pico/stdlib.h"  // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
 #include "pico/bootrom.h" // reset_usb_boot()
 #include <tusb.h>         // tud_cdc_connected()
-#include <defaultPins.h>  // board presumptive default pin numbers for IRQ_PIN, CE_PIN, and CSN_PIN
+#include <RF24.h>         // RF24 radio object
+#include "defaultPins.h"  // board presumptive default pin numbers for IRQ_PIN, CE_PIN, and CSN_PIN
 
 // We will be using the nRF24L01's IRQ pin for this example
 volatile bool wait_for_event = false; // used to wait for an IRQ event to trigger
