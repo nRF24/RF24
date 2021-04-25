@@ -16,16 +16,16 @@ jobs:
       matrix:
         board:
           - "pico"
-          - "vgaboard"
           - "adafruit_feather_rp2040"
           - "adafruit_itsybitsy_rp2040"
           - "adafruit_qtpy_rp2040"
-          # - "sparkfun_micromod" # awaiting resolution of https://github.com/raspberrypi/pico-sdk/issues/328
-          # - "sparkfun_promicro" # awaiting resolution of https://github.com/raspberrypi/pico-sdk/issues/328
-          # - "sparkfun_thingplus" # awaiting resolution of https://github.com/raspberrypi/pico-sdk/issues/328
+          # - "pimoroni_tiny2040" # awaiting fix in next release as of v1.1.2
+          # - "sparkfun_micromod" # awaiting fix in next release as of v1.1.2
+          # - "sparkfun_promicro" # awaiting fix in next release as of v1.1.2
+          # - "sparkfun_thingplus" # examples' CSN_PIN use pin 8 (reserved usage on this board)
+          # - "vgaboard" # can enable this if requested
           # - "pimoroni_keybow2040" # no SPI bus exposed
-          # - "pimoroni_picosystem" # missing links to schematics/pinout
-          # - "pimoroni_tiny2040" # boards' pins not labeled for SPI usage
+          # - "pimoroni_picosystem" # SPI is reserved for LCD
 
     steps:
     - name: checkout RF24 lib
@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: raspberrypi/pico-sdk
-        ref: 1.1.2
+        # master branch is latest stable release
         path: pico-sdk
         clean: false
         submodules: true

@@ -15,9 +15,10 @@
 #include "pico/bootrom.h" // reset_usb_boot()
 #include <tusb.h>         // tud_cdc_connected()
 #include <RF24.h>         // RF24 radio object
+#include <defaultPins.h>  // board presumptive default pin numbers for CE_PIN and CSN_PIN
 
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(CE_PIN, CSN_PIN);
 
 // Used to control whether this node is sending or receiving
 bool role = false;  // true = TX role, false = RX role
@@ -95,7 +96,7 @@ bool setup() {
 
         memcpy(payload.message, "World ", 6);                       // set the payload message
         // load the payload for the first received transmission on pipe 0
-        radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
+        radio.writeAckPayload(1, &payload, sizeof(payload));
 
         radio.startListening();                                     // put radio in RX mode
     }
@@ -203,7 +204,7 @@ void loop() {
             memcpy(payload.message, "World ", 6); // change payload message
 
             // load the payload for the first received transmission on pipe 0
-            radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
+            radio.writeAckPayload(1, &payload, sizeof(payload));
             radio.startListening();
         }
         else if (input == 'b' || input == 'B') {
