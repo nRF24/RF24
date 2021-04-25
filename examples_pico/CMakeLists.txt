@@ -40,7 +40,7 @@ set(EXAMPLES_LIST
     )
 
 foreach(example ${EXAMPLES_LIST})
-    add_executable(${example} ${example}.cpp)
+    add_executable(${example} ${example}.cpp defaulPins.h)
 
     target_link_libraries(${example} PUBLIC
         RF24
