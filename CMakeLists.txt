@@ -9,13 +9,14 @@ endif()
 cmake_minimum_required(VERSION 3.15)
 
 # Set the project name to your project name, my project isn't very descriptive
-project(nRF24 CXX)
+project(nRF24 C CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
-target_compile_features(project_options INTERFACE cxx_std_17)
+target_compile_features(project_options INTERFACE cxx_std_17 )
+add_compile_options(-Ofast -Wall -pthread)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
     option(ENABLE_BUILD_WITH_TIME_TRACE "Enable -ftime-trace to generate time tracing .json files on clang" OFF)
@@ -69,10 +70,17 @@ message("RF24 library version: ${${LibTargetName}_VERSION_STRING}")
 
 #####################################
 ### Now we actually build the library
-######################################
+#####################################
 include (cmake/copy_includes.cmake)
+add_subdirectory(utility)
 
-add_library(${LibTargetName} SHARED RF24.cpp)
+add_library(${LibTargetName} SHARED
+    RF24.cpp
+    ${rf24DriverUtilitySources}
+    )
+
+target_include_directories(${LibTargetName} PUBLIC utility)
+
 set_target_properties(
     ${LibTargetName}
     PROPERTIES
@@ -80,12 +88,36 @@ set_target_properties(
     VERSION ${${LibTargetName}_VERSION_STRING}
     )
 
-target_include_directories(${LibTargetName} PUBLIC utility/)
-add_subdirectory(utility)
-
-target_link_libraries(${LibTargetName}
-    INTERFACE
-        rf24DriverUtility
+if(NOT ${rf24DriverUtility} STREQUAL "")
+    message("rf24DriverUtility=${rf24DriverUtility}")
+    target_link_libraries(${LibTargetName} INTERFACE
         project_options
         project_warnings
+        STATIC rf24DriverUtility
+        )
+else()
+    target_link_libraries(${LibTargetName} INTERFACE
+        project_options
+        project_warnings
+        )
+endif()
+
+#####################################
+### Install rules for root source dir. There are separate install rules defined for each driver utility
+#####################################
+install(TARGETS ${LibTargetName}
+    DESTINATION lib
+    )
+
+install(FILES
+        RF24.h
+        nRF24L01.h
+        printf.h
+        RF24_config.h
+    DESTINATION include/RF24
+    )
+
+install(FILES
+        utility/includes.h
+    DESTINATION include/RF24/utility
     )

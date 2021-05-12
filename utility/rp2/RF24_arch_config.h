@@ -20,6 +20,9 @@
 #include "gpio.h"
 #include <string.h>
 
+/** Define a specific platform name for this configuration */
+#define RF24_RP2
+
 #define _BV(x) (1 << (x))
 #define _SPI SPI
 #define RF24_SPI_PTR

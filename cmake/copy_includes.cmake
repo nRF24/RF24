@@ -2,6 +2,6 @@
 #
 # target - cmake target that has this file added in its target_include_directories
 # source - path to source file for the original includes
-function (copy_includes target source)
+function (copy_includes source)
     execute_process(COMMAND cp ${source} ${CMAKE_SOURCE_DIR}/utility/includes.h)
 endfunction()
