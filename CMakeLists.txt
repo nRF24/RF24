@@ -8,14 +8,14 @@ endif()
 
 cmake_minimum_required(VERSION 3.15)
 
-# Set the project name to your project name, my project isn't very descriptive
-project(nRF24 C CXX)
+# Set the project name to your project name
+project(RF24_lib C CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
-target_compile_features(project_options INTERFACE cxx_std_17 )
+target_compile_features(project_options INTERFACE cxx_std_17)
 add_compile_options(-Ofast -Wall -pthread)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
