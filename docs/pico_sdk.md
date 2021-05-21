@@ -9,7 +9,8 @@ for RP2040 based boards.
 Follow the Raspberry Pi Foundation's
 ["Getting Started with Pico" document](https://rptl.io/pico-get-started) to
 setup a proper development environment on your host PC (the machine that
-will build your project).
+will build your project). Notice that the setup instructions are a little
+different for building on a Windows PC.
 
 Either set an environment variable named `PICO_SDK_PATH` that points to your
 local clone of the pico-sdk or put the pico-sdk next to the RF24 folder or
