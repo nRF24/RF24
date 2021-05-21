@@ -46,7 +46,7 @@ if(NOT RF24_DRIVER)
 endif()
 
 ###########################
-### declare the sppropriate sources and install rules based on driver selected
+### declare the appropriate sources and install rules based on driver selected
 ###########################
 if ("${RF24_DRIVER}" STREQUAL  "wiringPi") # Use wiringPi
     set(rf24DriverUtility wiringPi PARENT_SCOPE)

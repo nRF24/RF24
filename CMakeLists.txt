@@ -103,7 +103,9 @@ else()
 endif()
 
 #####################################
-### Install rules for root source dir. There are separate install rules defined for each driver utility
+### Install rules for root source dir
+### There are separate install rules defined for each driver utility
+### Installing the library requires sudo privileges
 #####################################
 install(TARGETS ${LibTargetName}
     DESTINATION lib
@@ -121,3 +123,6 @@ install(FILES
         utility/includes.h
     DESTINATION include/RF24/utility
     )
+
+install(CODE "message(\"updating ldconfig.\")")
+install(CODE "execute_process(COMMAND ldconfig)")

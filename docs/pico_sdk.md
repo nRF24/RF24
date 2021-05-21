@@ -1,4 +1,9 @@
 # RaspberryPi Pico SDK (for the RP2040)
+Just to be very clear and concise: The following instructions are
+**not required to use the Arduino IDE** with any RP2040-based boards.
+These instructions pertain to using only the
+[Raspberry Pi foundation's Pico SDK](https://github.com/raspberrypi/pico-sdk)
+for RP2040 based boards.
 
 ## Prerequisite
 Follow the Raspberry Pi Foundation's
@@ -36,6 +41,10 @@ come from the Pico SDK repository's
 2. Configure CMake for your desired build type and specific RP2040-based board
    ```shell
    cmake ../examples_pico -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico
+   ```
+   Or if building on a Windows PC:
+   ```shell
+   cmake -G "NMake Makefiles" ../examples_pico -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico
    ```
    The supported RP2040-based boards are listed in header files in the Pico SDK
    repository's [pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards).
