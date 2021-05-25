@@ -27,6 +27,7 @@ examples_linux/**/*
 !examples_linux/**/*.cpp
 !examples_linux/Makefile
 !examples_linux/**/Makefile
+!examples_linux/CMakeLists.txt
 *__pycache__/
 .directory
 .idea

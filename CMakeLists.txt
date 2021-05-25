@@ -1,27 +1,28 @@
 # Check if we are building a pico-sdk based project
 # (or more exactly: if we just got included in a pico-sdk based project)
 if (PICO_SDK_PATH)
-  # If so, load the relevant CMakeLists-file but don't do anything else
-  include(${CMAKE_CURRENT_LIST_DIR}/utility/rp2/CMakeLists.txt)
-  return()
+    # If so, load the relevant CMakeLists-file but don't do anything else
+    include(${CMAKE_CURRENT_LIST_DIR}/utility/rp2/CMakeLists.txt)
+    return()
 endif()
 
 cmake_minimum_required(VERSION 3.15)
 
-# Set the project name to your project name, my project isn't very descriptive
-project(nRF24 CXX)
+# Set the project name to your project name
+project(RF24_lib C CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
+add_compile_options(-Ofast -Wall -pthread)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-  option(ENABLE_BUILD_WITH_TIME_TRACE "Enable -ftime-trace to generate time tracing .json files on clang" OFF)
-  if(ENABLE_BUILD_WITH_TIME_TRACE)
-    add_compile_definitions(project_options INTERFACE -ftime-trace)
-  endif()
+    option(ENABLE_BUILD_WITH_TIME_TRACE "Enable -ftime-trace to generate time tracing .json files on clang" OFF)
+    if(ENABLE_BUILD_WITH_TIME_TRACE)
+        add_compile_definitions(project_options INTERFACE -ftime-trace)
+    endif()
 endif()
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
@@ -50,21 +51,78 @@ option(ENABLE_TESTING "Enable Test Builds" OFF)
 option(ENABLE_FUZZING "Enable Fuzzing Builds" OFF)
 
 if(ENABLE_TESTING)
-  enable_testing()
-  message("Building Tests.")
-  add_subdirectory(test)
+    enable_testing()
+    message("Building Tests.")
+    add_subdirectory(test)
 endif()
 
 if(ENABLE_FUZZING)
-  message("Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
-  add_subdirectory(fuzz_test)
+    message("Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
+    add_subdirectory(fuzz_test)
 endif()
+
+# set a variable to reuse the target name
+set(LibTargetName rf24) # this var is used in the GetLibVersion.cmake module
+
+# get library version number (major, minor, patch) from Arduino IDE's required library.properties file
+include(cmake/GetLibVersion.cmake)
+message("RF24 library version: ${${LibTargetName}_VERSION_STRING}")
 
 #####################################
 ### Now we actually build the library
-######################################
-
+#####################################
+include (cmake/copy_includes.cmake)
 add_subdirectory(utility)
-# RF24.cpp is common for every library
-add_library(RF24 STATIC RF24.cpp)
-target_link_libraries(RF24 INTERFACE rf24DriverUtility project_options project_warnings)
+
+add_library(${LibTargetName} SHARED
+    RF24.cpp
+    ${rf24DriverUtilitySources}
+    )
+
+target_include_directories(${LibTargetName} PUBLIC utility)
+
+set_target_properties(
+    ${LibTargetName}
+    PROPERTIES
+    SOVERSION ${${LibTargetName}_VERSION_MAJOR}
+    VERSION ${${LibTargetName}_VERSION_STRING}
+    )
+
+if(NOT ${rf24DriverUtility} STREQUAL "")
+    message("rf24DriverUtility=${rf24DriverUtility}")
+    target_link_libraries(${LibTargetName} INTERFACE
+        project_options
+        project_warnings
+        STATIC rf24DriverUtility
+        )
+else()
+    target_link_libraries(${LibTargetName} INTERFACE
+        project_options
+        project_warnings
+        )
+endif()
+
+#####################################
+### Install rules for root source dir
+### There are separate install rules defined for each driver utility
+### Installing the library requires sudo privileges
+#####################################
+install(TARGETS ${LibTargetName}
+    DESTINATION lib
+    )
+
+install(FILES
+        RF24.h
+        nRF24L01.h
+        printf.h
+        RF24_config.h
+    DESTINATION include/RF24
+    )
+
+install(FILES
+        utility/includes.h
+    DESTINATION include/RF24/utility
+    )
+
+install(CODE "message(\"updating ldconfig.\")")
+install(CODE "execute_process(COMMAND ldconfig)")

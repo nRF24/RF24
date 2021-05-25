@@ -1,1 +1,0 @@
-add_library(MRAADriver STATIC compatibility.cpp gpio.cpp spi.cpp)

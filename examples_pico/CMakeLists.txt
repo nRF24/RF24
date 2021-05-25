@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 # Pull in SDK (must be before project)
-include(pico_sdk_import.cmake)
+include(../cmake/pico_sdk_import.cmake)
 
 project(pico_examples C CXX ASM)
 
@@ -12,22 +12,6 @@ pico_sdk_init()
 # giving the path depending on where the library
 # is cloned to in your project
 include(../CMakeLists.txt)
-
-#[[ for each example, we have to perform the following
-#make a target
-add_executable(gettingStarted gettingStarted.cpp)
-
-# link the necessary libs to the target
-target_link_libraries(gettingStarted PUBLIC
-    RF24
-    pico_stdlib
-    hardware_spi
-    hardware_gpio
-    )
-
-# create map/bin/hex file etc.
-pico_add_extra_outputs(gettingStarted)
-]]
 
 # iterate over a list of examples by name
 set(EXAMPLES_LIST
@@ -40,8 +24,10 @@ set(EXAMPLES_LIST
     )
 
 foreach(example ${EXAMPLES_LIST})
+    # make a target
     add_executable(${example} ${example}.cpp defaultPins.h)
 
+    # link the necessary libs to the target
     target_link_libraries(${example} PUBLIC
         RF24
         pico_stdlib
@@ -49,7 +35,10 @@ foreach(example ${EXAMPLES_LIST})
         hardware_gpio
         )
 
+    # specify USB port as default serial communication's interface (not UART RX/TX pins)
     pico_enable_stdio_usb(${example} 1)
     pico_enable_stdio_uart(${example} 0)
+
+    # create map/bin/hex file etc.
     pico_add_extra_outputs(${example})
 endforeach()
