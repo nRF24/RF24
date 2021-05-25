@@ -160,7 +160,7 @@
         #include <pgmspace.h>
         #define PRIPSTR "%s"
         #ifndef pgm_read_ptr
-          #define pgm_read_ptr(p) (*(p))
+            #define pgm_read_ptr(p) (*(p))
         #endif
     #elif defined (ARDUINO) && !defined (ESP_PLATFORM) && !defined (__arm__) && !defined (__ARDUINO_X86__) || defined (XMEGA)
         #include <avr/pgmspace.h>
