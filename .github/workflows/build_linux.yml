@@ -74,6 +74,7 @@ jobs:
       - name: provide 32-bit headers
         run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
       - name: configure lib with CMake
+        working-directory: ${{ github.workspace }}
         run: |
           mkdir build
           ls
