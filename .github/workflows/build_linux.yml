@@ -76,6 +76,7 @@ jobs:
       - name: configure lib with CMake
         run: |
           mkdir build
+          ls
           cd build
           cmake .. -DRF24_DRIVER=${{ matrix.driver }}
       - name: build lib with CMake
