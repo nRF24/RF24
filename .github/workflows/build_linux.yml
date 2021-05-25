@@ -56,3 +56,41 @@ jobs:
           cd examples_linux
           make
           file ./gettingstarted
+
+  using_cmake:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        driver:
+          - "RPi"
+          # - "wiringPi"
+          - "--driver=SPIDEV"
+          # - "--driver=MRAA"
+
+    steps:
+      - name: provide 32-bit headers
+        run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
+      - name: configure lib with CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DRF24_DRIVER=${{ matrix.driver }}
+      - name: build lib with CMake
+        working-directory: ${{ github.workspace }}/build
+        run: cmake --build .
+      - name: install lib with CMake
+        working-directory: ${{ github.workspace }}/build
+        run: sudo cmake --install .
+      - name: clean build environment
+        working-directory: ${{ github.workspace }}/build
+        run: rm -r ./*
+      - name: configure examples with CMake
+        run: cmake ../examples_linux
+      - name: build examples with CMake
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          cmake --build .
+          file ./gettingStarted
