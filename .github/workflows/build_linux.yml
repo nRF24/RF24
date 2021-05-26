@@ -95,4 +95,4 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake --build .
-          file ./gettingStarted
+          file ./gettingstarted
