@@ -89,6 +89,7 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: rm -r ./*
       - name: configure examples with CMake
+        working-directory: ${{ github.workspace }}/build
         run: cmake ../examples_linux
       - name: build examples with CMake
         working-directory: ${{ github.workspace }}/build
