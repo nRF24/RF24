@@ -17,9 +17,6 @@ foreach(example ${EXAMPLES_LIST})
     #make a target
     add_executable(${example} ${example}.cpp)
 
-    # ensure the executables are 32-bit alligned
-    set_target_properties(${example} PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
-
     # link the RF24 lib to the target
     target_link_libraries(${example} PUBLIC rf24 pthread) # this command looks for the installed librf24.so
     # Notice that we specify pthread as a linked lib here instead passing the compiler a `-pthread` flag

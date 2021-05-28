@@ -79,9 +79,6 @@ add_library(${LibTargetName} SHARED
     ${rf24DriverUtilitySources}
     )
 
-# ensure library is 32-bit aligned
-set_target_properties(${LibTargetName} PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
-
 target_include_directories(${LibTargetName} PUBLIC utility)
 
 set_target_properties(

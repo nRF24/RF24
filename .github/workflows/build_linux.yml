@@ -72,8 +72,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: provide 32-bit headers
-        run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
+      # - name: provide 32-bit headers
+      #   run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
       - name: configure lib with CMake
