@@ -66,32 +66,50 @@ jobs:
       matrix:
         driver:
           - "RPi"
-          # - "wiringPi"
+          - "wiringPi"
           - "SPIDEV"
-          # - "MRAA"
+          - "MRAA"
 
     steps:
       - uses: actions/checkout@v1
       # - name: provide 32-bit headers
       #   run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
+      - name: provide MRAA
+        if: ${{ matrix.driver == 'MRAA' }}
+        run: |
+          git clone https://github.com/intel-iot-devkit/mraa.git
+          cd mraa
+          mkdir build
+          cd build
+          cmake .. -DBUILDSWIGNODE=OFF
+          sudo make install
+      - name: provide WiringPi
+        if: ${{ matrix.driver == 'wiringPi' }}
+        run: |
+          git clone https://github.com/WiringPi/WiringPi
+          cd WiringPi
+          ./build
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
-      - name: configure lib with CMake
+      - name: configure lib
         working-directory: ${{ github.workspace }}/build
         run: cmake .. -DRF24_DRIVER=${{ matrix.driver }}
-      - name: build lib with CMake
+      - name: build lib
         working-directory: ${{ github.workspace }}/build
         run: cmake --build .
-      - name: install lib with CMake
+      - name: install lib
         working-directory: ${{ github.workspace }}/build
         run: sudo cmake --install .
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
         run: rm -r ./*
-      - name: configure examples with CMake
+      - name: configure examples (& link to MRAA or wiringPi accordingly)
         working-directory: ${{ github.workspace }}/build
-        run: cmake ../examples_linux
-      - name: build examples with CMake
+        # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
+        # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
+        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
+        run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }}
+      - name: build examples
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake --build .
