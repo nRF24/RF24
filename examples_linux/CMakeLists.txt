@@ -1,25 +1,19 @@
 cmake_minimum_required(VERSION 3.12)
 set(RF24_DRIVER "SPIDEV" CACHE STRING "Specify 'MRAA' or 'wiringPi' to compensate for the specialized supported driver")
 
-if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi")
 # iterate over a list of examples by name
-    set(EXAMPLES_LIST
-        gettingstarted
-        acknowledgementPayloads
-        manualAcknowledgements
-        streamingData
-        multiceiverDemo
-        )
+set(EXAMPLES_LIST
+    gettingstarted
+    acknowledgementPayloads
+    manualAcknowledgements
+    streamingData
+    multiceiverDemo
+    )
+
+if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi")
     message("skipping interruptConfigure example - as it is incompatible with wiringPi and MRAA drivers")
 else() # not using MRAA or wiringPi drivers
-    set(EXAMPLES_LIST
-        gettingstarted
-        acknowledgementPayloads
-        manualAcknowledgements
-        streamingData
-        multiceiverDemo
-        interruptConfigure
-        )
+    list(APPEND EXAMPLES_LIST interruptConfigure)
 endif()
 
 project(RF24LogExamples)
