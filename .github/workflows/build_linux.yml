@@ -115,7 +115,7 @@ jobs:
           cmake --build .
           file ./gettingstarted
       - name: provide python wrapper prerequisites
-        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-rpi.gpio
+        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools # python3-rpi.gpio
       - name: create alias symlink to libboost_python3*.so
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
       - name: build python wrapper
