@@ -57,15 +57,15 @@ This also applies to the [python wrapper](md_docs_python_wrapper.html).
    cd build
    ```
 5. Configure build environment using
-   - If using CMake<br>
+   If using CMake
    ```shell
    cmake .. -D RF24_DRIVER=SPIDEV
    ```
    Instead of using `SPIDEV` driver (recommended), you can also specify the `RPi`, `wiringPi`,
    `MRAA`, or `LittleWire` as alternative drivers. If the `RF24_DRIVER` option is not specified,
    then it will be automatically configured based on the detected CPU or installed libraries
-   (defaults to `SPIDEV` when auto-detection fails).
-   - If not using CMake, run
+   (defaults to `SPIDEV` when auto-detection fails).<br>
+   Or if not using CMake, run
    ```shell
    ./configure
    ```
@@ -80,37 +80,43 @@ This also applies to the [python wrapper](md_docs_python_wrapper.html).
    make
    sudo make install
    ```
-7. Build the examples <br>
+7. Build the examples
+
+   Navigate to the examples_linux directory
+   ```shell
+   cd examples_linux
+   ```
+   or if using CMake
+   ```shell
+   cd ../examples_linux
+   ```
+
    Make sure the pins used in the examples match the pins you used to connect the radio module
    ```shell
    nano examples_linux/gettingstarted.cpp
    ```
-   or if in the CMake build directory
-   ```shell
-   nano ../examples_linux/gettingstarted.cpp
-   ```
-   and edit the pin numbers as directed in the [linux/RPi general documation](md_docs_rpi_general.html)
+   and edit the pin numbers as directed in the [linux/RPi general documation](md_docs_rpi_general.html). <br>
 
-   - If using CMake, you need to clear the build directory you used to build & install the library
-      <br> **It is VERY IMPORTANT that you only delete the files in the build directory.**
-      <br> DO NOT DELETE THE FILES IN THE RF24 DIRECTORY!<br>
+   If using CMake, then you also need to create a build directory in the examples_linux directory and navigate to it.
    ```shell
-   rm -r ./*
+   mkdir build
+   cd build
    ```
-      Now you are ready to build the examples.
+
+   Now you are ready to build the examples.<br>
+   If not using CMake
    ```shell
-   cmake ../examples_linux
    make
    ```
-      If you are using the `MRAA` or `wiringPi` drivers, then you need to specify the `RF24_DRIVER`
-      option again.
+   or if using CMake
    ```shell
-   cmake ../examples_linux -D RF24_DRIVER=wiringPi
+   cmake ..
    make
    ```
-   - If not using CMake
+   If using CMake and the `MRAA` or `wiringPi` drivers, then you need to specify the `RF24_DRIVER`
+   option again.
    ```shell
-   cd examples_linux
+   cmake .. -D RF24_DRIVER=wiringPi
    make
    ```
 8. Run an example file

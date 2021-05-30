@@ -6,11 +6,13 @@
 # 3rd party library that that will be linked to the RF24 library
 # This is passed to target_link_libraries() in top-level CMakeLists.txt
 set(RF24_LINKED_DRIVER "")
-option(RF24_DRIVER
-    "override automatic configuration of RF24's utility driver.
+set(RF24_DRIVER OFF CACHE STRING "override automatic configuration of RF24's utility driver.
     Specify 1 of the following supported drivers (ie -DRF24_DRIVER=SPIDEV):
-    \n\twiringPi\n\tRPi\n\tSPIDEV\n\tMRAA\n\tLittleWire"
-    OFF
+    wiringPi
+    RPi
+    SPIDEV
+    MRAA
+    LittleWire"
     )
 
 ###########################
@@ -24,15 +26,15 @@ if(${RF24_DRIVER} STREQUAL "OFF") # invokes automatic configuration
     find_library(LibLittleWire littlewire-spi)
 
     if("${SOC}" STREQUAL "BCM2708" OR "${SOC}" STREQUAL "BCM2709" OR "${SOC}" STREQUAL "BCM2835")
-        set(RF24_DRIVER RPi)
+        set(RF24_DRIVER RPi CACHE STRING "using folder /utility/RPi" FORCE)
     elseif(NOT ${LibMRAA} STREQUAL "LibMRAA-NOTFOUND")
-        set(RF24_DRIVER MRAA)
+        set(RF24_DRIVER MRAA CACHE STRING "using folder /utility/MRAA" FORCE)
     elseif(NOT ${LibWiringPi} STREQUAL "LibWiringPi-NOTFOUND")
-        set(RF24_DRIVER wiringPi)
+        set(RF24_DRIVER wiringPi CACHE STRING "using folder /utility/wiringPi" FORCE)
     elseif(NOT ${LibLittleWire} STREQUAL "LibLittleWire-NOTFOUND")
-        set(RF24_DRIVER LittleWire)
+        set(RF24_DRIVER LittleWire CACHE STRING "using folder /utility/LittleWire" FORCE)
     else()
-        set(RF24_DRIVER SPIDEV)
+        set(RF24_DRIVER SPIDEV CACHE STRING "using folder /utility/SPIDEV" FORCE)
     endif()
 endif()
 
