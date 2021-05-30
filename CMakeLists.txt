@@ -40,6 +40,7 @@ include(cmake/Sanitizers.cmake)
 enable_sanitizers(project_options)
 
 # enable doxygen
+# THIS IS NOT OUR PREFERRED METHOD OF BUILDING DOCS - use doxygen executable directly
 include(cmake/Doxygen.cmake)
 enable_doxygen()
 
@@ -47,18 +48,18 @@ enable_doxygen()
 include(cmake/StaticAnalyzers.cmake)
 
 option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
-option(ENABLE_TESTING "Enable Test Builds" OFF)
-option(ENABLE_FUZZING "Enable Fuzzing Builds" OFF)
+option(ENABLE_TESTING "Enable Test Builds" OFF) # for end-user projects
+option(ENABLE_FUZZING "Enable Fuzzing Builds" OFF) # for end-user projects
 
 if(ENABLE_TESTING)
     enable_testing()
     message("Building Tests.")
-    add_subdirectory(test)
+    add_subdirectory(test) # directory doesn't exist, so this does nothing.
 endif()
 
 if(ENABLE_FUZZING)
     message("Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
-    add_subdirectory(fuzz_test)
+    add_subdirectory(fuzz_test) # directory doesn't exist, so this does nothing.
 endif()
 
 # set a variable to reuse the target name
@@ -66,17 +67,23 @@ set(LibTargetName rf24) # this var is used in the GetLibVersion.cmake module
 
 # get library version number (major, minor, patch) from Arduino IDE's required library.properties file
 include(cmake/GetLibVersion.cmake)
-message("RF24 library version: ${${LibTargetName}_VERSION_STRING}")
 
 #####################################
 ### Now we actually build the library
 #####################################
+# pull in function to copy the appropriate includes.h file from a utility sub directory
 include (cmake/copy_includes.cmake)
+
+#[[ adding the utility sub-directory will
+    1. set variables RF24_DRIVER, SOC, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
+    2. copy the approriate /utility/*/includes.h file to the /utility folder
+    3. set additional install rules according to the RF24_DRIVER specified
+]]
 add_subdirectory(utility)
 
 add_library(${LibTargetName} SHARED
     RF24.cpp
-    ${rf24DriverUtilitySources}
+    ${RF24_DRIVER_SOURCES}
     )
 
 target_include_directories(${LibTargetName} PUBLIC utility)
@@ -88,14 +95,14 @@ set_target_properties(
     VERSION ${${LibTargetName}_VERSION_STRING}
     )
 
-if(NOT ${rf24DriverUtility} STREQUAL "")
-    message("rf24DriverUtility=${rf24DriverUtility}")
+if(NOT "${RF24_LINKED_DRIVER}" STREQUAL "") # linking to a pre-compiled utility driver
+    message(STATUS "Using utility library: ${RF24_LINKED_DRIVER}")
     target_link_libraries(${LibTargetName} INTERFACE
         project_options
         project_warnings
-        STATIC rf24DriverUtility
+        STATIC RF24_LINKED_DRIVER
         )
-else()
+else() # utility driver is compiled with the library - not linking to a pre-compiled utility driver
     target_link_libraries(${LibTargetName} INTERFACE
         project_options
         project_warnings
@@ -104,7 +111,7 @@ endif()
 
 #####################################
 ### Install rules for root source dir
-### There are separate install rules defined for each driver utility
+### There are separate install rules defined for each utility driver
 ### Installing the library requires sudo privileges
 #####################################
 install(TARGETS ${LibTargetName}

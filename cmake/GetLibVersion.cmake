@@ -13,3 +13,5 @@ set(${LibTargetName}_VERSION_MAJOR ${VERSION_MAJOR})
 set(${LibTargetName}_VERSION_MINOR ${VERSION_MINOR})
 set(${LibTargetName}_VERSION_PATCH ${VERSION_PATCH})
 set(${LibTargetName}_VERSION_STRING ${${LibTargetName}_VERSION_MAJOR}.${${LibTargetName}_VERSION_MINOR}.${${LibTargetName}_VERSION_PATCH})
+
+message(STATUS "RF24 library version: ${${LibTargetName}_VERSION_STRING}")
