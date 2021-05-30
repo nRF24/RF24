@@ -56,7 +56,7 @@ This also applies to the [python wrapper](md_docs_python_wrapper.html).
    mkdir build
    cd build
    ```
-5. Configure build environment using
+5. Configure build environment
 
    If using CMake
    ```shell
