@@ -114,3 +114,13 @@ jobs:
         run: |
           cmake --build .
           file ./gettingstarted
+      - name: provide python wrapper prerequisites
+        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-rpi.gpio
+      - name: create alias symlink to libboost_python3*.so
+        run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
+      - name: build python wrapper
+        working-directory: ${{ github.workspace }}/pyRF24
+        run: python3 setup.py build
+      - name: install python wrapper
+        working-directory: ${{ github.workspace }}/pyRF24
+        run: sudo python3 setup.py install
