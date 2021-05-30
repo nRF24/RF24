@@ -3,7 +3,7 @@
 import os
 import sys
 import setuptools
-from . import crossunixccompiler
+import crossunixccompiler
 
 version = ""
 
