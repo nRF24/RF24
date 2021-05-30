@@ -57,6 +57,7 @@ This also applies to the [python wrapper](md_docs_python_wrapper.html).
    cd build
    ```
 5. Configure build environment using
+
    If using CMake
    ```shell
    cmake .. -D RF24_DRIVER=SPIDEV
@@ -64,7 +65,8 @@ This also applies to the [python wrapper](md_docs_python_wrapper.html).
    Instead of using `SPIDEV` driver (recommended), you can also specify the `RPi`, `wiringPi`,
    `MRAA`, or `LittleWire` as alternative drivers. If the `RF24_DRIVER` option is not specified,
    then it will be automatically configured based on the detected CPU or installed libraries
-   (defaults to `SPIDEV` when auto-detection fails).<br>
+   (defaults to `SPIDEV` when auto-detection fails).
+
    Or if not using CMake, run
    ```shell
    ./configure
