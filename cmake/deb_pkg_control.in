@@ -5,4 +5,5 @@ Architecture: ${TARGET_ARCH}
 Maintainer: ${LibMaintainer}
 Section: libs
 Description: ${LibDescription}
+ ${LibParagraph}
 Homepage: ${LibUrl}
