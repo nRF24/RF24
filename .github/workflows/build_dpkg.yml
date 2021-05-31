@@ -56,12 +56,12 @@ jobs:
       - name: Configure CMake (with default compilers)
         if: ${{ matrix.toolchain-file == 'none' }}
         working-directory: ${{ github.workspace }}/build
-        run: cmake ../src -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D BUILD_DEB_PKG=ON -D RF24_DRIVER=${{ matrix.driver }}
+        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D BUILD_DEB_PKG=ON -D RF24_DRIVER=${{ matrix.driver }}
 
       - name: Configure CMake (with toolchain compilers)
         if: ${{ matrix.toolchain-file != 'none' }}
         working-directory: ${{ github.workspace }}/build
-        run: cmake ../src -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D BUILD_DEB_PKG=ON -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=${{ matrix.toolchain-file }}
+        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D BUILD_DEB_PKG=ON -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=${{ matrix.toolchain-file }}
 
       - name: Build lib
         working-directory: ${{ github.workspace }}/build
