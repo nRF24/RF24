@@ -109,11 +109,6 @@ else() # utility driver is compiled with the library - not linking to a pre-comp
         )
 endif()
 
-# prepare to build a debian package
-if(BUILD_DEB_PKG)
-    include(cmake/createDebianPkg.cmake)
-endif()
-
 #####################################
 ### Install rules for root source dir
 ### There are separate install rules defined for each utility driver
@@ -137,7 +132,13 @@ install(FILES
     )
 
 # CMAKE_CROSSCOMPILING is only TRUE when CMAKE_TOOLCHAIN_FILE is specified via CLI
-if("${CMAKE_CROSSCOMPILING}" STREQUAL "FALSE")
+if("${CMAKE_CROSSCOMPILING}" STREQUAL "FALSE" AND NOT BUILD_DEB_PKG)
     install(CODE "message(STATUS \"Updating ldconfig\")")
     install(CODE "execute_process(COMMAND ldconfig)")
+endif()
+
+# prepare & build a debian package
+if(BUILD_DEB_PKG)
+    # This needs to be last so that the files are installed to the DEB_PKG_DIR in the CMAKE_BINARY_DIR
+    include(cmake/createDebianPkg.cmake)
 endif()

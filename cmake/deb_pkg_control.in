@@ -1,6 +1,8 @@
-Package: ${LibName}
+Source: ${LibTargetName}
+Package: ${LibTargetName}
 Version: ${${LibName}_VERSION_STRING}
 Architecture: ${TARGET_ARCH}
 Maintainer: ${LibMaintainer}
+Section: libs
 Description: ${LibDescription}
- source code hosted at ${LibUrl}
+Homepage: ${LibUrl}

@@ -21,6 +21,9 @@ set(PKG_DIR ${CMAKE_BINARY_DIR}/${DEB_PKG_NAME})
 # copy over templated control file while replacing variables within
 configure_file(cmake/deb_pkg_control.in ${DEB_PKG_NAME}/DEBIAN/control)
 
+# copy file describing the license information (could be done w/ file(COPY) but this way allows CMake to modify it if needed)
+configure_file(cmake/deb_pkg_copyright.in ${DEB_PKG_NAME}/debian/copyright)
+
 # create a post-install & post-removal scripts to update linker
 set(POST_SCRIPTS
     ${PKG_DIR}/DEBIAN/postrm

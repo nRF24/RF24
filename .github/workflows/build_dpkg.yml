@@ -69,10 +69,10 @@ jobs:
 
       - name: Install & package lib
         working-directory: ${{ github.workspace }}/build
-        run: cmake --install .
+        run: sudo cmake --install .
 
       - name: Save artifact
         uses: actions/upload-artifact@v2
         with:
-          name: "deb_pkg"
+          name: "deb_pkg_RF24"
           path: ${{ github.workspace }}/build/*.deb
