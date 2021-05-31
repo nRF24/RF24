@@ -91,8 +91,8 @@ target_include_directories(${LibTargetName} PUBLIC utility)
 set_target_properties(
     ${LibTargetName}
     PROPERTIES
-    SOVERSION ${${LibTargetName}_VERSION_MAJOR}
-    VERSION ${${LibTargetName}_VERSION_STRING}
+    SOVERSION ${${LibName}_VERSION_MAJOR}
+    VERSION ${${LibName}_VERSION_STRING}
     )
 
 if(NOT "${RF24_LINKED_DRIVER}" STREQUAL "") # linking to a pre-compiled utility driver
