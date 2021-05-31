@@ -95,9 +95,9 @@ This also applies to the [python wrapper](md_docs_python_wrapper.html).
 
    Make sure the pins used in the examples match the pins you used to connect the radio module
    ```shell
-   nano examples_linux/gettingstarted.cpp
+   nano gettingstarted.cpp
    ```
-   and edit the pin numbers as directed in the [linux/RPi general documation](md_docs_rpi_general.html). <br>
+   and edit the pin numbers as directed in the [linux/RPi general documation](md_docs_rpi_general.html).
 
    If using CMake, then you also need to create a build directory in the examples_linux directory and navigate to it.
    ```shell
