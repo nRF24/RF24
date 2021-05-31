@@ -19,12 +19,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+
       - name: provide toolchain
         run: |
           sudo apt-get update
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
           arm-linux-gnueabihf-gcc -v
           arm-linux-gnueabihf-g++ -v
+
       - name: provide WiringPi
         if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
         run: |
@@ -32,6 +34,7 @@ jobs:
           cd WiringPi/wiringPi
           CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
           sudo make install
+
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
         run: |
@@ -43,12 +46,16 @@ jobs:
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
+
       - name: library configure
         run: ./configure ${{ matrix.config-options }}
+
       - name: library make
         run: make
+
       - name: library make install
         run: sudo make install
+
       - name: make linux examples
         # compiling examples for wiringPi is broken see nRF24#669 issue
         # if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
@@ -66,14 +73,16 @@ jobs:
       matrix:
         driver:
           - "RPi"
-          - "wiringPi"
           - "SPIDEV"
+          - "wiringPi"
           - "MRAA"
 
     steps:
       - uses: actions/checkout@v1
+
       # - name: provide 32-bit headers
       #   run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
+
       - name: provide MRAA
         if: ${{ matrix.driver == 'MRAA' }}
         run: |
@@ -83,44 +92,56 @@ jobs:
           cd build
           cmake .. -DBUILDSWIGNODE=OFF
           sudo make install
+
       - name: provide WiringPi
         if: ${{ matrix.driver == 'wiringPi' }}
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
           ./build
+
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
+
       - name: configure lib
         working-directory: ${{ github.workspace }}/build
         run: cmake .. -DRF24_DRIVER=${{ matrix.driver }}
+
       - name: build lib
         working-directory: ${{ github.workspace }}/build
         run: cmake --build .
+
       - name: install lib
         working-directory: ${{ github.workspace }}/build
         run: sudo cmake --install .
+
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
         run: rm -r ./*
+
       - name: configure examples (& link to MRAA or wiringPi accordingly)
         working-directory: ${{ github.workspace }}/build
         # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
         run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }}
+
       - name: build examples
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake --build .
           file ./gettingstarted
+
       - name: provide python wrapper prerequisites
         run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools # python3-rpi.gpio
+
       - name: create alias symlink to libboost_python3*.so
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
+
       - name: build python wrapper
         working-directory: ${{ github.workspace }}/pyRF24
         run: sudo python3 setup.py build
+
       - name: install python wrapper
         working-directory: ${{ github.workspace }}/pyRF24
         run: sudo python3 setup.py install

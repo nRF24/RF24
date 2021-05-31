@@ -1,0 +1,78 @@
+name: dpkg-deb
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  make_deb_pkg:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        toolchain-file:
+          - "cmake/toolchain_arm.cmake"
+          # - "none"
+        driver:
+          - "RPi"
+          - "SPIDEV"
+          # - "wiringPi"
+          # - "MRAA"
+
+    steps:
+      - name: checkout RF24Log lib
+        uses: actions/checkout@v2
+
+      - name: provide toolchain
+        if: ${{ matrix.toolchain-file != 'none' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{ github.workspace }}/build
+
+      # - name: provide MRAA
+      #   if: ${{ matrix.driver == 'MRAA' }}
+      #   run: |
+      #     git clone https://github.com/intel-iot-devkit/mraa.git
+      #     cd mraa
+      #     mkdir build
+      #     cd build
+      #     cmake .. -D BUILDSWIGNODE=OFF -D CMAKE_INSTALL_PREFIX
+      #     sudo make install
+
+      # - name: provide WiringPi
+      #   if: ${{ matrix.driver == 'wiringPi' }}
+      #   run: |
+      #     git clone https://github.com/WiringPi/WiringPi
+      #     cd WiringPi
+      #     ./build
+
+      - name: Configure CMake (with default compilers)
+        if: ${{ matrix.toolchain-file == 'none' }}
+        working-directory: ${{ github.workspace }}/build
+        run: cmake ../src -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D BUILD_DEB_PKG=ON -D RF24_DRIVER=${{ matrix.driver }}
+
+      - name: Configure CMake (with toolchain compilers)
+        if: ${{ matrix.toolchain-file != 'none' }}
+        working-directory: ${{ github.workspace }}/build
+        run: cmake ../src -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D BUILD_DEB_PKG=ON -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=${{ matrix.toolchain-file }}
+
+      - name: Build lib
+        working-directory: ${{ github.workspace }}/build
+        run: cmake --build .
+
+      - name: Install & package lib
+        working-directory: ${{ github.workspace }}/build
+        run: cmake --install .
+
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: "deb_pkg"
+          path: ${{ github.workspace }}/build/*.deb

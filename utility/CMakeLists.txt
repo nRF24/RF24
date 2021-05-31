@@ -20,11 +20,13 @@ set(RF24_DRIVER OFF CACHE STRING "override automatic configuration of RF24's uti
 ###########################
 include(../cmake/detectCPU.cmake) # sets the variable SOC accordingly
 
-if(${RF24_DRIVER} STREQUAL "OFF") # invokes automatic configuration
-    find_library(LibMRAA mraa)
-    find_library(LibWiringPi wiringPi)
-    find_library(LibLittleWire littlewire-spi)
+# detect installed libraries despite what RF24_DRIVER is set to
+# this is always done for cross-compiling purposes
+find_library(LibMRAA mraa)
+find_library(LibWiringPi wiringPi)
+find_library(LibLittleWire littlewire-spi)
 
+if(${RF24_DRIVER} STREQUAL "OFF") # invokes automatic configuration
     if("${SOC}" STREQUAL "BCM2708" OR "${SOC}" STREQUAL "BCM2709" OR "${SOC}" STREQUAL "BCM2835")
         set(RF24_DRIVER RPi CACHE STRING "using folder /utility/RPi" FORCE)
     elseif(NOT ${LibMRAA} STREQUAL "LibMRAA-NOTFOUND")
@@ -42,7 +44,7 @@ endif()
 ### declare the appropriate sources and install rules based on driver selected
 ###########################
 if ("${RF24_DRIVER}" STREQUAL  "wiringPi") # Use wiringPi
-    set(RF24_LINKED_DRIVER wiringPi PARENT_SCOPE)
+    set(RF24_LINKED_DRIVER ${LibWiringPi} PARENT_SCOPE)
     add_compile_options(-pthread)
     set(RF24_DRIVER_SOURCES
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h
@@ -95,7 +97,7 @@ elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
         DESTINATION include/RF24/utility/${RF24_DRIVER}
         )
 elseif("${RF24_DRIVER}" STREQUAL "MRAA") # use MRAA
-    set(RF24_LINKED_DRIVER mraa PARENT_SCOPE)
+    set(RF24_LINKED_DRIVER ${LibMRAA} PARENT_SCOPE)
     set(RF24_DRIVER_SOURCES
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/gpio.cpp
@@ -113,7 +115,7 @@ elseif("${RF24_DRIVER}" STREQUAL "MRAA") # use MRAA
         DESTINATION include/RF24/utility/${RF24_DRIVER}
         )
 elseif("${RF24_DRIVER}" STREQUAL "LittleWire") # use LittleWire
-    set(RF24_LINKED_DRIVER littlewire-spi PARENT_SCOPE)
+    set(RF24_LINKED_DRIVER ${LibLittleWire} PARENT_SCOPE)
     set(RF24_DRIVER_SOURCES
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/RF24_arch_config.h

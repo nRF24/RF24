@@ -8,6 +8,9 @@ endif()
 
 cmake_minimum_required(VERSION 3.15)
 
+# optionally build a debian install-able package (.deb file) instead of installing library
+option(BUILD_DEB_PKG "set to on to build a debian package" OFF)
+
 # Set the project name to your project name
 project(RF24_lib C CXX)
 include(cmake/StandardProjectSettings.cmake)
@@ -62,11 +65,8 @@ if(ENABLE_FUZZING)
     add_subdirectory(fuzz_test) # directory doesn't exist, so this does nothing.
 endif()
 
-# set a variable to reuse the target name
-set(LibTargetName rf24) # this var is used in the GetLibVersion.cmake module
-
-# get library version number (major, minor, patch) from Arduino IDE's required library.properties file
-include(cmake/GetLibVersion.cmake)
+# get library info from Arduino IDE's required library.properties file
+include(cmake/GetLibInfo.cmake) # sets the variable LibTargetName
 
 #####################################
 ### Now we actually build the library
@@ -109,6 +109,11 @@ else() # utility driver is compiled with the library - not linking to a pre-comp
         )
 endif()
 
+# prepare to build a debian package
+if(BUILD_DEB_PKG)
+    include(cmake/createDebianPkg.cmake)
+endif()
+
 #####################################
 ### Install rules for root source dir
 ### There are separate install rules defined for each utility driver
@@ -131,5 +136,8 @@ install(FILES
     DESTINATION include/RF24/utility
     )
 
-install(CODE "message(STATUS \"Updating ldconfig\")")
-install(CODE "execute_process(COMMAND ldconfig)")
+# CMAKE_CROSSCOMPILING is only TRUE when CMAKE_TOOLCHAIN_FILE is specified via CLI
+if("${CMAKE_CROSSCOMPILING}" STREQUAL "FALSE")
+    install(CODE "message(STATUS \"Updating ldconfig\")")
+    install(CODE "execute_process(COMMAND ldconfig)")
+endif()
