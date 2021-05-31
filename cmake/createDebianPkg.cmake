@@ -12,7 +12,7 @@ if(NOT DEFINED TARGET_ARCH) # TARGET_ARCH is defined only in the toolchain_<ARCH
 endif()
 
 # assemble a debian package filename from known info
-set(DEB_PKG_NAME "lib${LibName}-${RF24_DRIVER}_${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}_${TARGET_ARCH}")
+set(DEB_PKG_NAME "lib${LibTargetName}-${RF24_DRIVER}_${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}_${TARGET_ARCH}")
 message(STATUS "ready to package: ${DEB_PKG_NAME}.deb")
 
 # declare the package folder location
