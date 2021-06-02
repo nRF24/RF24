@@ -60,6 +60,11 @@ def master(node_number):
     :param int node_number: the node's identifying index (from the
         the `addresses` list). This is a required parameter
     """
+    # According to the datasheet, the auto-retry features's delay value should
+    # be "skewed" to allow the RX node to receive 1 transmission at a time.
+    # So, use varying delay between retry attempts and 15 (at most) retry attempts
+    radio.setRetries(((node_number * 3) % 12) + 3, 15); # maximum value is 15 for both args
+
     radio.stopListening()  # put radio in TX mode
     # set the TX address to the address of the base station.
     radio.openWritingPipe(addresses[node_number])
@@ -89,7 +94,7 @@ def master(node_number):
         else:
             failures += 1
             print("failed or timed out")
-        time.sleep(0.5)  # slow down the test for readability
+        time.sleep(1)  # slow down the test for readability
     print(failures, "failures detected. Leaving TX role.")
 
 
@@ -124,7 +129,7 @@ def slave(timeout=10):
             )
             start_timer = time.monotonic()  # reset timer with every payload
 
-    print("Nothing received in 6 seconds. Leaving RX role")
+    print("Nothing received in", timeout, "seconds. Leaving RX role")
     radio.stopListening()
 
 

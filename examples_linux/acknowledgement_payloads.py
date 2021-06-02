@@ -135,7 +135,7 @@ def slave(timeout=6):
             radio.writeAckPayload(1, buffer)  # load ACK for next response
             start_timer = time.monotonic()  # reset timer
 
-    print("Nothing received in 6 seconds. Leaving RX role")
+    print("Nothing received in", timeout, "seconds. Leaving RX role")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put radio in TX mode & flush unused ACK payloads
 

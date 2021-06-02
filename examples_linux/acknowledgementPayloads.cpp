@@ -154,13 +154,13 @@ void master() {
             uint8_t pipe;
             if (radio.available(&pipe)) {
                 PayloadStruct received;
-                radio.read(&received, sizeof(received));          // get incoming ACK payload
+                radio.read(&received, sizeof(received));             // get incoming ACK payload
                 cout << " Received ";
-                cout << radio.getDynamicPayloadSize();            // print incoming payload size
-                cout << " bytes on pipe " << (unsigned int)pipe;  // print pipe that received it
-                cout << ": " << received.message;                 // print incoming message
-                cout << (unsigned int)received.counter << endl;   // print incoming counter
-                payload.counter = received.counter + 1;           // save incoming counter & increment for next outgoing
+                cout << (unsigned int)radio.getDynamicPayloadSize(); // print incoming payload size
+                cout << " bytes on pipe " << (unsigned int)pipe;     // print pipe that received it
+                cout << ": " << received.message;                    // print incoming message
+                cout << (unsigned int)received.counter << endl;      // print incoming counter
+                payload.counter = received.counter + 1;              // save incoming counter & increment for next outgoing
             } // if got an ACK payload
             else {
                 cout << " Received an empty ACK packet." << endl; // ACK had no payload

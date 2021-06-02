@@ -207,7 +207,7 @@ void master(unsigned int role) {
         payload.payloadID++;                                   // increment payload number
 
         // to make this example readable in the terminal
-        delay(500); // slow transmissions down by 0.5 second
+        delay(1000); // slow transmissions down by 1 second
     } // while
     cout << failures << " failures detected. Leaving TX role." << endl;
 } // master
