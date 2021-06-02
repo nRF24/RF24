@@ -99,7 +99,7 @@ void setup() {
 
     memcpy(payload.message, "World ", 6);                       // set the payload message
     // load the payload for the first received transmission on pipe 0
-    radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
+    radio.writeAckPayload(1, &payload, sizeof(payload));
 
     radio.startListening();                                     // put radio in RX mode
   }
@@ -201,7 +201,7 @@ void loop() {
       memcpy(payload.message, "World ", 6); // change payload message
 
       // load the payload for the first received transmission on pipe 0
-      radio.writeAckPayload(1, &payload, sizeof(PayloadStruct));
+      radio.writeAckPayload(1, &payload, sizeof(payload));
       radio.startListening();
     }
   }
