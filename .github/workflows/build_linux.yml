@@ -127,7 +127,7 @@ jobs:
 
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
-        run: rm -r ./*
+        run: sudo rm -r ./*
 
       - name: configure examples (& link to MRAA or wiringPi accordingly)
         working-directory: ${{ github.workspace }}/build
