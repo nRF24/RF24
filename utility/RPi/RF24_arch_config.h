@@ -16,9 +16,11 @@
 
 #define _SPI spi
 
-#if defined SPI_HAS_TRANSACTION && !defined SPI_UART && !defined SOFTSPI
+#if defined (SPI_HAS_TRANSACTION)
+    // this gets triggered as /utility/RPi/spi.h defines SPI_HAS_TRANSACTION (unless modified by end-user)
     #define RF24_SPI_TRANSACTIONS
 #endif
+
 // GCC a Arduino Missing
 #define _BV(x) (1<<(x))
 #define pgm_read_word(p) (*(p))
@@ -39,7 +41,7 @@
 #endif
 
 #define digitalWrite(pin, value) bcm2835_gpio_write(pin, value)
-#define pinMode(pin, value) bcm2835_gpio_fsel(pin,value)
+#define pinMode(pin, value) bcm2835_gpio_fsel(pin, value)
 #define OUTPUT BCM2835_GPIO_FSEL_OUTP
 #define INPUT BCM2835_GPIO_FSEL_INPT
 #endif

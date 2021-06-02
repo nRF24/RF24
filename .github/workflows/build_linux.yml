@@ -115,6 +115,16 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: sudo cmake --install .
 
+      - name: package lib
+        working-directory: ${{ github.workspace }}/build
+        run: sudo cpack
+
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: "deb_pkg_RF24"
+          path: ${{ github.workspace }}/build/*.deb
+
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
         run: rm -r ./*

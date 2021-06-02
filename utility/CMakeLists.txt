@@ -18,13 +18,18 @@ set(RF24_DRIVER OFF CACHE STRING "override automatic configuration of RF24's uti
 ###########################
 # detect pre-existing (locally installed) 3rd party libraries
 ###########################
-include(../cmake/detectCPU.cmake) # sets the variable SOC accordingly
 
 # detect installed libraries despite what RF24_DRIVER is set to
 # this is always done for cross-compiling purposes
 find_library(LibMRAA mraa)
 find_library(LibWiringPi wiringPi)
 find_library(LibLittleWire littlewire-spi)
+execute_process(COMMAND ls /dev/spidev*
+    OUTPUT_VARIABLE SPIDEV_EXISTS
+    ERROR_VARIABLE CHECK_SPIDEV_ERROR
+    )
+
+include(../cmake/detectCPU.cmake) # sets the variable SOC accordingly
 
 if(${RF24_DRIVER} STREQUAL "OFF") # invokes automatic configuration
     if("${SOC}" STREQUAL "BCM2708" OR "${SOC}" STREQUAL "BCM2709" OR "${SOC}" STREQUAL "BCM2835")
@@ -35,7 +40,7 @@ if(${RF24_DRIVER} STREQUAL "OFF") # invokes automatic configuration
         set(RF24_DRIVER wiringPi CACHE STRING "using folder /utility/wiringPi" FORCE)
     elseif(NOT ${LibLittleWire} STREQUAL "LibLittleWire-NOTFOUND")
         set(RF24_DRIVER LittleWire CACHE STRING "using folder /utility/LittleWire" FORCE)
-    else()
+    elseif(SPIDEV_EXISTS) # should be a list if SPI is enabled on RPi
         set(RF24_DRIVER SPIDEV CACHE STRING "using folder /utility/SPIDEV" FORCE)
     endif()
 endif()
@@ -78,6 +83,9 @@ elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
         DESTINATION include/RF24/utility/${RF24_DRIVER}
         )
 elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
+    if(CHECK_SPIDEV_ERROR)
+        message(WARNING "Detecting /dev/spidev* failed - continuing anyway. Please make sure SPI is enabled.")
+    endif()
     set(RF24_DRIVER_SOURCES
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/gpio.cpp
@@ -126,11 +134,15 @@ elseif("${RF24_DRIVER}" STREQUAL "LittleWire") # use LittleWire
             ${RF24_DRIVER}/RF24_arch_config.h
         DESTINATION include/RF24/utility/${RF24_DRIVER}
         )
-else() # No valid/supported driver selected... this is bad
-    message(FATAL_ERROR "No valid/supported driver selected! "
-        "Please specify 1 of the following supported drivers (ie -DRF24_DRIVER=SPIDEV):"
-        "\n\twiringPi\n\tRPi\n\tSPIDEV\n\tMRAA\n\tLittleWire"
-    )
+else() # No valid/supported driver selected nor detected... this is vital
+    message(FATAL_ERROR "No valid/supported driver selected or auto-detection failed to resolve one.
+        Please specify 1 of the following supported drivers (ie `-D RF24_DRIVER=SPIDEV`):
+        \twiringPi
+        \tRPi
+        \tSPIDEV
+        \tMRAA
+        \tLittleWire"
+        )
 endif()
 
 # copy the includes file to the project source directory's utility folder

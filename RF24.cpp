@@ -544,11 +544,7 @@ void RF24::_init_obj()
 {
     // Use a pointer on the Arduino platform
     #if defined (RF24_SPI_PTR) && !defined (RF24_RP2)
-        #if defined (SOFTSPI)
-    _spi = &spi;
-        #else  // !defined(SOFTSPI)
     _spi = &SPI;
-        #endif // !defined(SOFTSPI)
     #endif // defined (RF24_SPI_PTR)
 
     pipe0_reading_address[0] = 0;

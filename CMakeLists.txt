@@ -8,11 +8,8 @@ endif()
 
 cmake_minimum_required(VERSION 3.15)
 
-# optionally build a debian install-able package (.deb file) instead of installing library
-option(BUILD_DEB_PKG "set to on to build a debian package" OFF)
-
 # Set the project name to your project name
-project(RF24_lib C CXX)
+project(RF24 C CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
@@ -65,14 +62,15 @@ if(ENABLE_FUZZING)
     add_subdirectory(fuzz_test) # directory doesn't exist, so this does nothing.
 endif()
 
-# get library info from Arduino IDE's required library.properties file
-include(cmake/GetLibInfo.cmake) # sets the variable LibTargetName
-
 #####################################
 ### Now we actually build the library
 #####################################
+
 # pull in function to copy the appropriate includes.h file from a utility sub directory
-include (cmake/copy_includes.cmake)
+include(cmake/copy_includes.cmake)
+
+# get library info from Arduino IDE's required library.properties file
+include(cmake/GetLibInfo.cmake)
 
 #[[ adding the utility sub-directory will
     1. set variables RF24_DRIVER, SOC, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
@@ -80,6 +78,10 @@ include (cmake/copy_includes.cmake)
     3. set additional install rules according to the RF24_DRIVER specified
 ]]
 add_subdirectory(utility)
+
+# setup CPack options
+# package dependencies are resolved correctly only after utility subdirectory is added
+include(cmake/CPackInfo.cmake)
 
 add_library(${LibTargetName} SHARED
     RF24.cpp
@@ -132,13 +134,7 @@ install(FILES
     )
 
 # CMAKE_CROSSCOMPILING is only TRUE when CMAKE_TOOLCHAIN_FILE is specified via CLI
-if("${CMAKE_CROSSCOMPILING}" STREQUAL "FALSE" AND NOT BUILD_DEB_PKG)
+if("${CMAKE_CROSSCOMPILING}" STREQUAL "FALSE")
     install(CODE "message(STATUS \"Updating ldconfig\")")
     install(CODE "execute_process(COMMAND ldconfig)")
-endif()
-
-# prepare & build a debian package
-if(BUILD_DEB_PKG)
-    # This needs to be last so that the files are installed to the DEB_PKG_DIR in the CMAKE_BINARY_DIR
-    include(cmake/createDebianPkg.cmake)
 endif()

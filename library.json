@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/nRF24/RF24.git"
   },
-  "version": "1.4.0",
+  "version": "1.4.1",
   "frameworks": "arduino",
   "platforms": [
     "atmelavr",
