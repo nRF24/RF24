@@ -90,7 +90,7 @@
 
             const uint8_t SPI_MODE = 0;
             #define _SPI SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE>
-            #define RF24_SPI_PTR
+
 
         #elif defined (ARDUINO_SAM_DUE)
             #include <SPI.h>
