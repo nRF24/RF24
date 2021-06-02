@@ -2,6 +2,10 @@ name: Linux build
 
 on: [push]
 
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -71,6 +75,9 @@ jobs:
       fail-fast: false
 
       matrix:
+        toolchain-file:
+          - "cmake/toolchain_arm.cmake"
+          - "none"
         driver:
           - "RPi"
           - "SPIDEV"
@@ -80,8 +87,11 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      # - name: provide 32-bit headers
-      #   run: sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib
+      - name: provide toolchain arm
+        if: ${{ matrix.toolchain-file != 'cmake/toolchain_arm.cmake' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
       - name: provide MRAA
         if: ${{ matrix.driver == 'MRAA' }}
@@ -103,9 +113,15 @@ jobs:
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
 
-      - name: configure lib
+      - name: configure lib  (with default compilers)
+        if: ${{ matrix.toolchain-file == 'none' }}
         working-directory: ${{ github.workspace }}/build
-        run: cmake .. -DRF24_DRIVER=${{ matrix.driver }}
+        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }}
+
+      - name: configure lib  (with toolchain compilers)
+        if: ${{ matrix.toolchain-file != 'none' }}
+        working-directory: ${{ github.workspace }}/build
+        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=${{ matrix.toolchain-file }}
 
       - name: build lib
         working-directory: ${{ github.workspace }}/build
