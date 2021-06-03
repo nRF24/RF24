@@ -76,6 +76,10 @@ jobs:
           make
           file ./gettingstarted
 
+      - name: provide python wrapper prerequisites
+        # python3-rpi.gpio is only required for physical hardware
+        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools
+
       - name: create alias symlink to libboost_python3*.so
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
 
