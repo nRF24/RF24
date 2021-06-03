@@ -174,7 +174,7 @@ jobs:
         run: sudo cpack
 
       - name: Save artifact
-        if: ${{ matrix.toolchain == 'arm' }}
+        # if: ${{ matrix.toolchain == 'arm' }}
         uses: actions/upload-artifact@v2
         with:
           name: "deb_pkg_RF24"
