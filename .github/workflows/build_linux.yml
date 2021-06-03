@@ -36,11 +36,13 @@ jobs:
 
       - name: provide WiringPi
         if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi' }}
+        env:
+          CC: /usr/bin/arm-linux-gnueabihf-gcc
+          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard"
         run: |
           git clone https://github.com/WiringPi/WiringPi
-          cd WiringPi/wiringPi
-          CC="arm-linux-gnueabihf-gcc -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard" V=1 make -j5
-          sudo make install
+          cd WiringPi
+          ./build
 
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
@@ -140,7 +142,7 @@ jobs:
         if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain == 'arm' }}
         env:
           CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CFLAGS: "-I /usr/local/include"
+          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard"
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
@@ -198,8 +200,17 @@ jobs:
       - name: build python wrapper
         working-directory: ${{ github.workspace }}/pyRF24
         env:
-          CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CXX: /usr/bin/arm-linux-gnueabihf-g++
+          CC: "/usr/bin/arm-linux-gnueabihf-gcc"
+          CXX: "/usr/bin/arm-linux-gnueabihf-g++"
+          CFLAGS: "-I /usr/local/include -L /usr/local/lib"
+        run: sudo python3 setup.py build
+
+      - name: build python wrapper (for arm)
+        if: ${{ matrix.toolchain == 'arm' }}
+        working-directory: ${{ github.workspace }}/pyRF24
+        env:
+          CC: "/usr/bin/arm-linux-gnueabihf-gcc"
+          CXX: "/usr/bin/arm-linux-gnueabihf-g++"
           CFLAGS: "-I /usr/local/include -L /usr/local/lib"
         run: sudo python3 setup.py build
 
