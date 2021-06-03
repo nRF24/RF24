@@ -198,11 +198,8 @@ jobs:
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
 
       - name: build python wrapper
+        if: ${{ matrix.toolchain == 'arm' }}
         working-directory: ${{ github.workspace }}/pyRF24
-        env:
-          CC: "/usr/bin/arm-linux-gnueabihf-gcc"
-          CXX: "/usr/bin/arm-linux-gnueabihf-g++"
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib"
         run: sudo python3 setup.py build
 
       - name: build python wrapper (for arm)
