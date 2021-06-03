@@ -32,7 +32,7 @@ Setup:
    ```
 3. In your sketch, add
    ```cpp
-   #include DigitalIO.h
+   #include <DigitalIO.h>
    ```
 
 @note Note: Pins are listed as follows and can be modified by editing the RF24_config.h file.

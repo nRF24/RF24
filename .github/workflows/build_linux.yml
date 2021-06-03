@@ -17,9 +17,12 @@ jobs:
         config-options:
           - "--soc=BCM2835 --driver=RPi"
           - "--soc=BCM2836 --driver=RPi"
-          # - "--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include"
+          - "--soc=BCM2835 --driver=wiringPi"
           - "--driver=SPIDEV"
-          # - "--driver=MRAA"
+          - "--driver=MRAA"
+
+    env:
+      CFLAGS: "-I /usr/local/include"
 
     steps:
       - uses: actions/checkout@v1
@@ -32,7 +35,7 @@ jobs:
           arm-linux-gnueabihf-g++ -v
 
       - name: provide WiringPi
-        if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
+        if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi' }}
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi/wiringPi
@@ -41,12 +44,15 @@ jobs:
 
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
+        env:
+          CC: /usr/bin/arm-linux-gnueabihf-gcc
+          CXX: /usr/bin/arm-linux-gnueabihf-g++
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
           cd build
-          cmake .. -DBUILDSWIGNODE=OFF
+          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
@@ -61,13 +67,17 @@ jobs:
         run: sudo make install
 
       - name: make linux examples
-        # compiling examples for wiringPi is broken see nRF24#669 issue
-        # if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi --extra-cflags=-I/usr/local/include' }}
+        # compiling examples for wiringPi is broken see issue #669
+        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
+        # interruptConfigure.cpp example is incompatible with MRAA & wiringPi drivers
+        if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi' && matrix.config-options != '--driver=MRAA' }}
         run: |
           cd examples_linux
           make
           file ./gettingstarted
 
+
+  ####################### using CMake ################################
   using_cmake:
     runs-on: ubuntu-latest
 
@@ -75,9 +85,9 @@ jobs:
       fail-fast: false
 
       matrix:
-        toolchain-file:
-          - "cmake/toolchain_arm.cmake"
-          - "none"
+        toolchain:
+          - "arm"
+          - "default"
         driver:
           - "RPi"
           - "SPIDEV"
@@ -88,19 +98,21 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: provide toolchain arm
-        if: ${{ matrix.toolchain-file == 'cmake/toolchain_arm.cmake' }}
+        if: ${{ matrix.toolchain == 'arm' }}
         run: |
           sudo apt-get update
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
       - name: provide MRAA
         if: ${{ matrix.driver == 'MRAA' }}
+        env:
+          ToolchainFile: ${{ github.workspace }}/RF24/cmake/toolchains/${{ matrix.toolchain }}.cmake
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
           cd build
-          cmake .. -DBUILDSWIGNODE=OFF
+          cmake .. -D BUILDSWIGNODE=OFF -D CMAKE_TOOLCHAIN_FILE=$ToolchainFile
           sudo make install
 
       - name: provide WiringPi
@@ -110,18 +122,22 @@ jobs:
           cd WiringPi
           ./build
 
+      - name: provide WiringPi (for arm toolchain)
+        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain == 'arm' }}
+        env:
+          CC: /usr/bin/arm-linux-gnueabihf-gcc
+          CFLAGS: "-I /usr/local/include"
+        run: |
+          git clone https://github.com/WiringPi/WiringPi
+          cd WiringPi
+          ./build
+
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
 
-      - name: configure lib  (with default compilers)
-        if: ${{ matrix.toolchain-file == 'none' }}
+      - name: configure lib
         working-directory: ${{ github.workspace }}/build
-        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }}
-
-      - name: configure lib  (with toolchain compilers)
-        if: ${{ matrix.toolchain-file != 'none' }}
-        working-directory: ${{ github.workspace }}/build
-        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=${{ matrix.toolchain-file }}
+        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain }}.cmake
 
       - name: build lib
         working-directory: ${{ github.workspace }}/build
@@ -145,7 +161,7 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: sudo rm -r ./*
 
-      - name: configure examples (& link to MRAA or wiringPi accordingly)
+      - name: configure examples
         working-directory: ${{ github.workspace }}/build
         # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
