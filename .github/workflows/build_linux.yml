@@ -17,9 +17,9 @@ jobs:
         config-options:
           - "--soc=BCM2835 --driver=RPi"
           - "--soc=BCM2836 --driver=RPi"
-          - "--soc=BCM2835 --driver=wiringPi"
           - "--driver=SPIDEV"
           - "--driver=MRAA"
+          # - "--soc=BCM2835 --driver=wiringPi"
 
     env:
       CFLAGS: "-I /usr/local/include"
@@ -93,8 +93,8 @@ jobs:
         driver:
           - "RPi"
           - "SPIDEV"
-          - "wiringPi"
           - "MRAA"
+          # - "wiringPi"
 
     steps:
       - uses: actions/checkout@v1
@@ -208,11 +208,11 @@ jobs:
       - name: build python wrapper (for arm)
         if: ${{ matrix.toolchain == 'arm' }}
         working-directory: ${{ github.workspace }}/pyRF24
-        env:
-          CC: "/usr/bin/arm-linux-gnueabihf-gcc"
-          CXX: "/usr/bin/arm-linux-gnueabihf-g++"
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib"
-        run: sudo python3 setup.py build
+        run: |
+          export CC=/usr/bin/arm-linux-gnueabihf-gcc
+          export CXX=/usr/bin/arm-linux-gnueabihf-g++
+          export CFLAGS="-I /usr/local/include -L /usr/local/lib"
+          sudo python3 setup.py build
 
       - name: install python wrapper
         working-directory: ${{ github.workspace }}/pyRF24
