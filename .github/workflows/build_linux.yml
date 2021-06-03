@@ -200,7 +200,7 @@ jobs:
       - name: build python wrapper
         if: ${{ matrix.toolchain != 'arm' }}
         working-directory: ${{ github.workspace }}/pyRF24
-        run: sudo python3 setup.py build
+        run: python3 setup.py build
 
       - name: build python wrapper (for arm)
         if: ${{ matrix.toolchain == 'arm' }}
