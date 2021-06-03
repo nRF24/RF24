@@ -198,7 +198,7 @@ jobs:
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
 
       - name: build python wrapper
-        if: ${{ matrix.toolchain == 'arm' }}
+        if: ${{ matrix.toolchain != 'arm' }}
         working-directory: ${{ github.workspace }}/pyRF24
         run: sudo python3 setup.py build
 
