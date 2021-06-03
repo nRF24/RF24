@@ -112,24 +112,20 @@ jobs:
           cd mraa
           mkdir build
           cd build
-          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm
+          cmake .. -D BUILDSWIGNODE=OFF
           sudo make install
 
       - name: provide MRAA (for arm toolchain)
         if: ${{ matrix.driver == 'MRAA' && matrix.toolchain == 'arm'  }}
-        env:
-          CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CXX: /usr/bin/arm-linux-gnueabihf-g++
-          CFLAGS: "-I /usr/local/include"
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
           cd build
-          cmake .. -D BUILDSWIGNODE=OFF
+          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm \
+          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/RF24/cmake/toolchains/${{ matrix.toolchain }}.cmake
           sudo make install
-          sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
-          sudo ldconfig
 
       - name: provide WiringPi
         if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain != 'arm' }}
@@ -168,6 +164,7 @@ jobs:
         run: sudo cpack
 
       - name: Save artifact
+        if: ${{ matrix.toolchain == 'arm' }}
         uses: actions/upload-artifact@v2
         with:
           name: "deb_pkg_RF24"
