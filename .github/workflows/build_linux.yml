@@ -213,5 +213,6 @@ jobs:
       #   run: python3 setup.py build
 
       - name: install python wrapper
+        if: ${{ matrix.toolchain != 'arm' }}
         working-directory: ${{ github.workspace }}/pyRF24
         run: sudo python3 setup.py install
