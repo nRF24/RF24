@@ -76,6 +76,17 @@ jobs:
           make
           file ./gettingstarted
 
+      - name: create alias symlink to libboost_python3*.so
+        run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
+
+      - name: build python wrapper
+        working-directory: ${{ github.workspace }}/pyRF24
+        run: sudo python3 setup.py build
+
+      - name: install python wrapper
+        working-directory: ${{ github.workspace }}/pyRF24
+        run: sudo python3 setup.py install
+
 
   ####################### using CMake ################################
   using_cmake:
@@ -104,19 +115,33 @@ jobs:
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
       - name: provide MRAA
-        if: ${{ matrix.driver == 'MRAA' }}
-        env:
-          ToolchainFile: ${{ github.workspace }}/RF24/cmake/toolchains/${{ matrix.toolchain }}.cmake
+        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain != 'arm'  }}
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
           cd build
-          cmake .. -D BUILDSWIGNODE=OFF -D CMAKE_TOOLCHAIN_FILE=$ToolchainFile
+          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm
           sudo make install
 
+      - name: provide MRAA (for arm toolchain)
+        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain == 'arm'  }}
+        env:
+          CC: /usr/bin/arm-linux-gnueabihf-gcc
+          CXX: /usr/bin/arm-linux-gnueabihf-g++
+          CFLAGS: "-I /usr/local/include"
+        run: |
+          git clone https://github.com/intel-iot-devkit/mraa.git
+          cd mraa
+          mkdir build
+          cd build
+          cmake .. -D BUILDSWIGNODE=OFF
+          sudo make install
+          sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
+          sudo ldconfig
+
       - name: provide WiringPi
-        if: ${{ matrix.driver == 'wiringPi' }}
+        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain != 'arm' }}
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
@@ -166,7 +191,7 @@ jobs:
         # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
-        run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }}
+        run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain }}.cmake
 
       - name: build examples
         working-directory: ${{ github.workspace }}/build
@@ -175,7 +200,8 @@ jobs:
           file ./gettingstarted
 
       - name: provide python wrapper prerequisites
-        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools # python3-rpi.gpio
+        # python3-rpi.gpio is only required for physical hardware
+        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools
 
       - name: create alias symlink to libboost_python3*.so
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
