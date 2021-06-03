@@ -73,10 +73,8 @@ def process_configparams():
                     print("librf24.so found at", symlink_loc)
                 break
             except FileNotFoundError:
-                raise FileNotFoundError("RF24 library is not installed. "
-                                        "{}}/librf24.so does not exist.".format(
-                                            symlink_loc
-                                        ))
+                raise FileNotFoundError("RF24 library is not installed. {}/librf24.so "
+                                        "does not exist.".format(symlink_loc))
 
     os.environ["CFLAGS"] = cflags
     return version
