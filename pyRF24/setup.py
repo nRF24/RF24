@@ -3,6 +3,7 @@
 import os
 import sys
 import setuptools
+import argparse
 import crossunixccompiler
 
 version = ""
@@ -70,13 +71,12 @@ def process_configparams():
             print("install location of librf24.so isn't explicit; trying default location.")
             symlink_directory = "/usr/local/lib"
         for symlink_loc in symlink_directory.split():
-            try:
-                with open(symlink_directory + "/librf24.so", "r+b") as f:
-                    print("librf24.so found at", symlink_loc)
+            if os.path.isfile(symlink_directory + "/librf24.so"):
+                print("librf24.so found at", symlink_loc)
                 break
-            except FileNotFoundError:
-                raise FileNotFoundError("RF24 library is not installed. {}/librf24.so "
-                                        "does not exist.".format(symlink_loc))
+            else:
+                print("RF24 library is not installed. {}/librf24.so "
+                      "does not exist.".format(symlink_loc))
 
     os.environ["CFLAGS"] = cflags
     return version
