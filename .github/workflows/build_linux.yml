@@ -124,7 +124,7 @@ jobs:
           cd build
           cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm \
           -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/RF24/cmake/toolchains/${{ matrix.toolchain }}.cmake
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain }}.cmake
           sudo make install
 
       - name: provide WiringPi
@@ -148,8 +148,18 @@ jobs:
         run: cmake -E make_directory ${{ github.workspace }}/build
 
       - name: configure lib
+        if: ${{ matrix.toolchain != 'arm' }}
         working-directory: ${{ github.workspace }}/build
-        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain }}.cmake
+        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }}
+
+      - name: configure lib (for arm)
+        if: ${{ matrix.toolchain == 'arm' }}
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
+          -D RF24_DRIVER=${{ matrix.driver }} \
+          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
+          -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain }}.cmake
 
       - name: build lib
         working-directory: ${{ github.workspace }}/build
@@ -179,7 +189,9 @@ jobs:
         # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
-        run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain }}.cmake
+        run: |
+          cmake ../examples_linux -D RF24_DRIVER=${{ matrix.driver }} \
+          -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain }}.cmake
 
       - name: build examples
         working-directory: ${{ github.workspace }}/build

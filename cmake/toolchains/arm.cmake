@@ -26,7 +26,8 @@ example using MRAA:
 (for MRAA/build dir) `cmake .. -D CMAKE_TOOLCHAIN_FILE=path/to/RF24/repo/cmake/toolchains/arm.cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr/arm-linux-gnueabihf
 (for RF24/build dir) `cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm.cmake
 ]]
-list(APPEND ${CMAKE_FIND_ROOT_PATH} /usr/arm-linux-gnueabihf)
+list(APPEND CMAKE_FIND_ROOT_PATH /usr/arm-linux-gnueabihf)
+# message("CMAKE_FIND_ROOT_PATH = ${CMAKE_FIND_ROOT_PATH}")
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER) # search CMAKE_SYSROOT when find_program() is called
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY) # search CMAKE_FIND_ROOT_PATH entries when find_library() is called
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY) # search CMAKE_FIND_ROOT_PATH entries when find_file() is called
