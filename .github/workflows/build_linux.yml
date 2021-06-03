@@ -202,14 +202,15 @@ jobs:
         working-directory: ${{ github.workspace }}/pyRF24
         run: python3 setup.py build
 
-      - name: build python wrapper (for arm)
-        if: ${{ matrix.toolchain == 'arm' }}
-        working-directory: ${{ github.workspace }}/pyRF24
-        env:
-          CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CXX: /usr/bin/arm-linux-gnueabihf-g++
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib"
-        run: python3 setup.py build
+      # Apparently we need python3 for ARM installed (or at least the Python-C API for arm)
+      # - name: build python wrapper (for arm)
+      #   if: ${{ matrix.toolchain == 'arm' }}
+      #   working-directory: ${{ github.workspace }}/pyRF24
+      #   env:
+      #     CC: /usr/bin/arm-linux-gnueabihf-gcc
+      #     CXX: /usr/bin/arm-linux-gnueabihf-g++
+      #     CFLAGS: "-I /usr/local/include -L /usr/local/lib"
+      #   run: python3 setup.py build
 
       - name: install python wrapper
         working-directory: ${{ github.workspace }}/pyRF24
