@@ -191,7 +191,7 @@ jobs:
         # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
-        run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain }}.cmake
+        run: cmake ../examples_linux -DRF24_DRIVER=${{ matrix.driver }} -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain }}.cmake
 
       - name: build examples
         working-directory: ${{ github.workspace }}/build
