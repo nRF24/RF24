@@ -19,13 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
     - name: get latest release version number
       id: latest_ver
-      uses: pozetroninc/github-action-get-latest-release@master
-      with:
-        repository: nRF24/RF24
-    - name: checkout
-      uses: actions/checkout@v2
+      run: echo "::set-output name=release::$(awk -F "=" '/version/ {print $2}' library.properties)"
     - name: overwrite doxygen tags
       run: |
         touch doxygenAction
