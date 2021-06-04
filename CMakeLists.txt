@@ -72,6 +72,13 @@ include(cmake/copy_includes.cmake)
 # get library info from Arduino IDE's required library.properties file
 include(cmake/GetLibInfo.cmake)
 
+# detect the CPU make and type
+include(cmake/detectCPU.cmake) # sets the variable SOC accordingly
+
+# auto-detect what driver to use
+# auto-detect can be overriden using `cmake .. -D RF24_DRIVER=<supported driver>`
+include(cmake/AutoConfig_RF24_DRIVER.cmake)
+
 #[[ adding the utility sub-directory will
     1. set variables RF24_DRIVER, SOC, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
     2. copy the approriate /utility/*/includes.h file to the /utility folder
