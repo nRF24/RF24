@@ -37,3 +37,4 @@ doxygenAction
 *env
 *.pyc
 build/
+*CMakeUserPresets.json

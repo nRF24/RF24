@@ -7,6 +7,7 @@ env:
   BUILD_TYPE: Release
 
 jobs:
+  ####################### using Makefile #############################
   build:
     runs-on: ubuntu-latest
 
@@ -19,7 +20,7 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           - "--driver=SPIDEV"
           - "--driver=MRAA"
-          # - "--soc=BCM2835 --driver=wiringPi"
+          - "--soc=BCM2835 --driver=wiringPi"
 
     env:
       CFLAGS: "-I /usr/local/include"
@@ -38,7 +39,7 @@ jobs:
         if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi' }}
         env:
           CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard"
+          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -lcrypt -lrt"
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
@@ -88,25 +89,56 @@ jobs:
 
       matrix:
         toolchain:
-          - "arm"
-          - "default"
+          - compiler: "arm"
+            usr_dir: "arm-linux-gnueabihf"
+          - compiler: "aarch64"
+            usr_dir: "aarch64-linux-gnu"
+          - compiler: "x86_64"
+            usr_dir: "x86_64-linux-gnux32"
+          - compiler: "i686"
+            usr_dir: "i686-linux-gnu"
+          - compiler: "default" # github runner is hosted on a "amd64"
+            usr_dir: "local"
         driver:
           - "RPi"
           - "SPIDEV"
           - "MRAA"
-          # - "wiringPi"
+        include:
+          - driver: "wiringPi"
+            toolchain: "default"
 
     steps:
       - uses: actions/checkout@v1
+      - name: install rpmbuild
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt-get install rpm
 
-      - name: provide toolchain arm
-        if: ${{ matrix.toolchain == 'arm' }}
+      - name: provide toolchain (for x86_64)
+        if: ${{ matrix.toolchain.compiler == 'x86_64' }}
         run: |
           sudo apt-get update
-          sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+          sudo apt-get install gcc-x86-64-linux-gnux32 g++-x86-64-linux-gnux32
+
+      - name: provide toolchain (for i686)
+        if: ${{ matrix.toolchain.compiler == 'i686' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-i686-linux-gnu g++-i686-linux-gnu
+
+      - name: provide toolchain (for aarch64)
+        if: ${{ matrix.toolchain.compiler == 'aarch64' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: provide toolchain (for arm)
+        if: ${{ matrix.toolchain.compiler == 'arm' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
       - name: provide MRAA
-        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain != 'arm'  }}
+        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain.compiler == 'default' }}
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
@@ -115,30 +147,30 @@ jobs:
           cmake .. -D BUILDSWIGNODE=OFF
           sudo make install
 
-      - name: provide MRAA (for arm toolchain)
-        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain == 'arm'  }}
+      - name: provide MRAA (with toolchain compilers)
+        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain.compiler != 'default' }}
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
           cd build
-          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm \
-          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain }}.cmake
+          cmake .. -D BUILDSWIGNODE=OFF \
+          -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
           sudo make install
 
       - name: provide WiringPi
-        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain != 'arm' }}
+        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler == 'default' }}
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
           ./build
 
-      - name: provide WiringPi (for arm toolchain)
-        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain == 'arm' }}
+      - name: provide WiringPi (with toolchain compilers)
+        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler != 'default' }}
         env:
           CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard"
+          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -lcrypt -lrt"
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
@@ -148,18 +180,18 @@ jobs:
         run: cmake -E make_directory ${{ github.workspace }}/build
 
       - name: configure lib
-        if: ${{ matrix.toolchain != 'arm' }}
+        if: ${{ matrix.toolchain.compiler == 'default' }}
         working-directory: ${{ github.workspace }}/build
         run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }}
 
-      - name: configure lib (for arm)
-        if: ${{ matrix.toolchain == 'arm' }}
+      - name: configure lib (with toolchain compilers)
+        if: ${{ matrix.toolchain.compiler != 'default' }}
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
           -D RF24_DRIVER=${{ matrix.driver }} \
-          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
-          -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain }}.cmake
+          -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
+          -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
 
       - name: build lib
         working-directory: ${{ github.workspace }}/build
@@ -174,11 +206,12 @@ jobs:
         run: sudo cpack
 
       - name: Save artifact
-        # if: ${{ matrix.toolchain == 'arm' }}
         uses: actions/upload-artifact@v2
         with:
-          name: "deb_pkg_RF24"
-          path: ${{ github.workspace }}/build/*.deb
+          name: "pkg_RF24"
+          path: |
+            ${{ github.workspace }}/build/*.deb
+            ${{ github.workspace }}/build/*.rpm
 
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
@@ -191,7 +224,7 @@ jobs:
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
         run: |
           cmake ../examples_linux -D RF24_DRIVER=${{ matrix.driver }} \
-          -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain }}.cmake
+          -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
 
       - name: build examples
         working-directory: ${{ github.workspace }}/build
@@ -199,31 +232,22 @@ jobs:
           cmake --build .
           file ./gettingstarted
 
+      # Apparently we need python3 for ARM installed (or at least the Python-C API for arm)
       - name: provide python wrapper prerequisites
+        if: ${{ matrix.toolchain.compiler == 'default' }}
         # python3-rpi.gpio is only required for physical hardware
-        if: ${{ matrix.toolchain != 'arm' }}
         run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools
 
       - name: create alias symlink to libboost_python3*.so
-        if: ${{ matrix.toolchain != 'arm' }}
+        if: ${{ matrix.toolchain.compiler == 'default' }}
         run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
 
       - name: build python wrapper
-        if: ${{ matrix.toolchain != 'arm' }}
+        if: ${{ matrix.toolchain.compiler == 'default' }}
         working-directory: ${{ github.workspace }}/pyRF24
         run: python3 setup.py build
 
-      # Apparently we need python3 for ARM installed (or at least the Python-C API for arm)
-      # - name: build python wrapper (for arm)
-      #   if: ${{ matrix.toolchain == 'arm' }}
-      #   working-directory: ${{ github.workspace }}/pyRF24
-      #   env:
-      #     CC: /usr/bin/arm-linux-gnueabihf-gcc
-      #     CXX: /usr/bin/arm-linux-gnueabihf-g++
-      #     CFLAGS: "-I /usr/local/include -L /usr/local/lib"
-      #   run: python3 setup.py build
-
       - name: install python wrapper
-        if: ${{ matrix.toolchain != 'arm' }}
+        if: ${{ matrix.toolchain.compiler == 'default' }}
         working-directory: ${{ github.workspace }}/pyRF24
         run: sudo python3 setup.py install

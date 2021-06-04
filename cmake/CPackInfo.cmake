@@ -18,6 +18,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${${LibName}_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${${LibName}_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${${LibName}_VERSION_PATCH}")
+
 ###############################
 # info specific debian packages
 ###############################
@@ -26,13 +27,25 @@ set(CPACK_DEBIAN_PACKAGE_SECTION libs)
 set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
 set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
 
+
+###############################
+# info specific rpm (fedora) packages
+###############################
+set(CPACK_RPM_FILE_NAME "lib${LibTargetName}-${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}.${TARGET_ARCH}.rpm")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
+set(CPACK_RPM_PACKAGE_LICENSE "GPLv2.0")
+set(CPACK_RPM_PACKAGE_VENDOR "Humanity")
+
 # set dependencies based on utility drivers
 if("${RF24_DRIVER}" STREQUAL "MRAA")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS mraa)
+    set(CPACK_RPM_PACKAGE_REQUIRES "mraa")
 elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS wiringPi)
+    set(CPACK_RPM_PACKAGE_REQUIRES "wiringPi")
 elseif("${RF24_DRIVER}" STREQUAL "littlewire-spi")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS littlewire-spi)
+    set(CPACK_RPM_PACKAGE_REQUIRES "littlewire-spi")
 endif()
 
 # create a post-install & post-removal scripts to update linker
@@ -45,15 +58,14 @@ foreach(script ${POST_SCRIPTS})
     execute_process(COMMAND chmod +x ${script})
     execute_process(COMMAND chmod 775 ${script})
 endforeach()
+# declare scripts for deb pkgs
 list(JOIN POST_SCRIPTS ";" EXTRA_CTRL_FILES)
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA EXTRA_CTRL_FILES)
-message(STATUS "ready to package: ${CPACK_PACKAGE_FILE_NAME}.deb")
+# declare scripts for rpm pkgs
+list(POP_FRONT POST_SCRIPTS CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE)
+list(POP_FRONT POST_SCRIPTS CPACK_RPM_POST_INSTALL_SCRIPT_FILE)
 
 include(CPack)
-#[[
-# copy over templated control file while replacing variables within
-configure_file(cmake/deb_pkg_control.in ${DEB_PKG_NAME}/DEBIAN/control)
 
-# copy file describing the license information (could be done w/ file(COPY) but this way allows CMake to modify it if needed)
-configure_file(cmake/deb_pkg_copyright.in ${DEB_PKG_NAME}/debian/copyright)
-]]
+message(STATUS "ready to package: ${CPACK_PACKAGE_FILE_NAME}.deb")
+message(STATUS "ready to package: ${CPACK_RPM_FILE_NAME}.rpm")
