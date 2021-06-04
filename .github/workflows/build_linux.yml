@@ -91,7 +91,7 @@ jobs:
         toolchain:
           - compiler: "armhf"
             usr_dir: "arm-linux-gnueabihf"
-          - compiler: "aarch64"
+          - compiler: "arm64"
             usr_dir: "aarch64-linux-gnu"
           - compiler: "x86_64"
             usr_dir: "x86_64-linux-gnux32"
@@ -132,8 +132,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install gcc-i686-linux-gnu g++-i686-linux-gnu
 
-      - name: provide toolchain (for aarch64)
-        if: ${{ matrix.toolchain.compiler == 'aarch64' }}
+      - name: provide toolchain (for arm64)
+        if: ${{ matrix.toolchain.compiler == 'arm64' }}
         run: |
           sudo apt-get update
           sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu

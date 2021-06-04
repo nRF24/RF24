@@ -1,7 +1,7 @@
 # This module will build a debian compatible package to install - handy for cross-compiling
 
 # get target arch if not cross-compiling
-if(NOT EXISTS TARGET_ARCH) # TARGET_ARCH is defined only in the toolchain_<ARCH_TYPE>.cmake files
+if(NOT TARGET_ARCH) # TARGET_ARCH is defined only in the toolchain_<ARCH_TYPE>.cmake files
     execute_process(COMMAND dpkg --print-architecture
         OUTPUT_VARIABLE TARGET_ARCH
         )
@@ -25,7 +25,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${${LibName}_VERSION_PATCH}")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
 set(CPACK_DEBIAN_PACKAGE_SECTION libs)
 set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
-set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+# set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
 
 
 ###############################
@@ -65,7 +65,7 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA EXTRA_CTRL_FILES)
 list(POP_FRONT POST_SCRIPTS CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE)
 list(POP_FRONT POST_SCRIPTS CPACK_RPM_POST_INSTALL_SCRIPT_FILE)
 
-include(CPack)
-
 message(STATUS "ready to package: ${CPACK_PACKAGE_FILE_NAME}.deb")
 message(STATUS "ready to package: ${CPACK_RPM_FILE_NAME}")
+
+include(CPack)

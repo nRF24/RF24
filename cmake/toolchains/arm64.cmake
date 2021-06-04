@@ -4,8 +4,8 @@
 # this toolchain file's cmds was copied from the CMake docs then modified for better explanation and re-use
 
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR aarch64)
-set(TARGET_ARCH aarch64) # only used in cmake/createDebianPkg.cmake
+set(CMAKE_SYSTEM_PROCESSOR arm64)
+set(TARGET_ARCH arm64) # only used in cmake/createDebianPkg.cmake
 set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++)
 
@@ -23,8 +23,8 @@ CMAKE_FIND_ROOT_PATH is an empty list by default (this list can be modified wher
 if cross-compiling a dependent lib (like MRAA - which is optional), then
 set the lib's CMAKE_INSTALL_PREFIX to a value that is appended to RF24 lib's CMAKE_FIND_ROOT_PATH
 example using MRAA:
-(for MRAA/build dir) `cmake .. -D CMAKE_TOOLCHAIN_FILE=path/to/RF24/repo/cmake/toolchains/aarch64.cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr/aarch64-linux-gnu
-(for RF24/build dir) `cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/aarch64.cmake
+(for MRAA/build dir) `cmake .. -D CMAKE_TOOLCHAIN_FILE=path/to/RF24/repo/cmake/toolchains/arm64.cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr/aarch64-linux-gnu
+(for RF24/build dir) `cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm64.cmake
 ]]
 list(APPEND CMAKE_FIND_ROOT_PATH /usr/aarch64-linux-gnu)
 # message("CMAKE_FIND_ROOT_PATH = ${CMAKE_FIND_ROOT_PATH}")
