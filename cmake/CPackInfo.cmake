@@ -9,7 +9,7 @@ if(NOT DEFINED TARGET_ARCH) # TARGET_ARCH is defined only in the toolchain_<ARCH
 endif()
 
 # set the Cpack generators (specific to types of packages to create)
-set(CPACK_GENERATOR DEB) # RPM requires rpmbuild executable
+set(CPACK_GENERATOR DEB RPM) # RPM requires rpmbuild executable
 
 # assemble a debian package filename from known info
 include(InstallRequiredSystemLibraries)
