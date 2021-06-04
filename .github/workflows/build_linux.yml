@@ -220,6 +220,16 @@ jobs:
             ${{ github.workspace }}/build/*.deb
             ${{ github.workspace }}/build/*.rpm
 
+      - name: Upload Release assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ${{ github.workspace }}/build/*.deb
+            ${{ github.workspace }}/build/*.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
         run: sudo rm -r ./*
