@@ -13,7 +13,7 @@ set(CPACK_GENERATOR DEB RPM) # RPM requires rpmbuild executable
 
 # assemble a debian package filename from known info
 include(InstallRequiredSystemLibraries)
-set(CPACK_PACKAGE_FILE_NAME "lib${LibTargetName}-${RF24_DRIVER}_${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "lib${LibTargetName}-${RF24_DRIVER}_${${LibName}_VERSION_STRING}-1_${TARGET_ARCH}")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${${LibName}_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${${LibName}_VERSION_MINOR}")
@@ -31,7 +31,7 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
 ###############################
 # info specific rpm (fedora) packages
 ###############################
-set(CPACK_RPM_FILE_NAME "lib${LibTargetName}-${RF24_DRIVER}-${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}.${TARGET_ARCH}.rpm")
+set(CPACK_RPM_FILE_NAME "lib${LibTargetName}-${RF24_DRIVER}-${${LibName}_VERSION_STRING}-1.${TARGET_ARCH}.rpm")
 set(CPACK_RPM_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
 set(CPACK_RPM_PACKAGE_LICENSE "GPLv2.0")
 set(CPACK_RPM_PACKAGE_VENDOR "Humanity")
