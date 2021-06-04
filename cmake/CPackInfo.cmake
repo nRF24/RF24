@@ -31,7 +31,7 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
 ###############################
 # info specific rpm (fedora) packages
 ###############################
-set(CPACK_RPM_FILE_NAME "lib${LibTargetName}-${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}.${TARGET_ARCH}.rpm")
+set(CPACK_RPM_FILE_NAME "lib${LibTargetName}-${RF24_DRIVER}-${${LibName}_VERSION_MAJOR}.${${LibName}_VERSION_MINOR}-${${LibName}_VERSION_PATCH}.${TARGET_ARCH}.rpm")
 set(CPACK_RPM_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
 set(CPACK_RPM_PACKAGE_LICENSE "GPLv2.0")
 set(CPACK_RPM_PACKAGE_VENDOR "Humanity")
