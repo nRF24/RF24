@@ -89,7 +89,7 @@ jobs:
 
       matrix:
         toolchain:
-          - compiler: "arm"
+          - compiler: "armhf"
             usr_dir: "arm-linux-gnueabihf"
           - compiler: "aarch64"
             usr_dir: "aarch64-linux-gnu"
@@ -138,8 +138,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
-      - name: provide toolchain (for arm)
-        if: ${{ matrix.toolchain.compiler == 'arm' }}
+      - name: provide toolchain (for armhf)
+        if: ${{ matrix.toolchain.compiler == 'armhf' }}
         run: |
           sudo apt-get update
           sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
