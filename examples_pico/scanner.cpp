@@ -4,11 +4,10 @@
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
- 
- 
- 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
-              Modified to use with Arduipi board http://hallard.me/arduipi
-						  Changed to use modified bcm2835 and RF24 library 
+
+
+ 06/04/2021 : Brendan Doherty (https://github.com/2bndy5)
+              Modified to use with PicoSDK
 
  */
 
@@ -23,52 +22,28 @@
  * See http://arduino.cc/forum/index.php/topic,54795.0.html
  */
 
-#include <cstdlib>
-#include <iostream>
-#include <RF24/RF24.h>
+#include "pico/stdlib.h"  // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
+#include "pico/bootrom.h" // reset_usb_boot()
+#include <tusb.h>         // tud_cdc_connected()
+#include <RF24.h>         // RF24 radio object
+#include "defaultPins.h"  // board presumptive default pin numbers for CE_PIN and CSN_PIN
 
-using namespace std;
+// instantiate an object for the nRF24L01 transceiver
+RF24 radio(CE_PIN, CSN_PIN);
 
-//
-// Hardware configuration
-//
-
-// CE Pin, CSN Pin, SPI Speed
-
-// Setup for GPIO 22 CE and GPIO 25 CSN with SPI Speed @ 1Mhz
-//RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_18, BCM2835_SPI_SPEED_1MHZ);
-
-// Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
-//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ); 
-
-// Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
-//RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);  
-
-// Generic setup
-RF24 radio(22, 0);
-
-//
 // Channel info
-//
 const uint8_t num_channels = 126;
 uint8_t values[num_channels];
 
 const int num_reps = 100;
 int reset_array = 0;
 
-int main(int argc, char** argv)
+int main()
 {
-    //
-    // Print preamble
-    //
+    // print example's name
+    printf("RF24/examples_pico/scanner\n");
 
-    //Serial.begin(115200);
-    //printf_begin();
-    printf("RF24/examples/scanner/\n");
-
-    //
     // Setup and configure rf radio
-    //
     radio.begin();
 
     radio.setAutoAck(false);
@@ -77,7 +52,7 @@ int main(int argc, char** argv)
     radio.startListening();
     radio.stopListening();
 
-    radio.printDetails();
+    // radio.printDetails();
 
     // Print out header, high then low digit
     int i = 0;
@@ -112,7 +87,7 @@ int main(int argc, char** argv)
 
                 // Listen for a little
                 radio.startListening();
-                delayMicroseconds(128);
+                sleep_us(128);
                 radio.stopListening();
 
                 // Did we get a carrier?
@@ -125,7 +100,11 @@ int main(int argc, char** argv)
         // Print out channel measurements, clamped to a single hex digit
         i = 0;
         while (i < num_channels) {
-            printf("%x", min(0xf, (values[i] & 0xf)));
+            if (values[i])
+                printf("%x", min(0xf, (values[i] & 0xf)));
+            else
+                printf("-");
+
             ++i;
         }
         printf("\n");

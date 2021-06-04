@@ -21,6 +21,7 @@ set(EXAMPLES_LIST
     manualAcknowledgements
     multiceiverDemo
     interruptConfigure
+    scanner
     )
 
 foreach(example ${EXAMPLES_LIST})

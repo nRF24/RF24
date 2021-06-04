@@ -17,17 +17,17 @@
 #define IRQ_PIN PICO_DEFAULT_I2C_SDA_PIN // pin 2
 
 
-// #elif defined(Sparkfun_ThingPlus) // cannot detect Sparkfun_ThingPlus board via macros
-// #define CSN_PIN 16 // the pin labeled 16
-// #define CE_PIN 7   // the pin labeled SCL
-// #define IRQ_PIN 6  // the pin labeled SDA
+#elif defined(SPARFUN_THINGPLUS)
+#define CSN_PIN 16 // the pin labeled 16
+#define CE_PIN 7   // the pin labeled SCL
+#define IRQ_PIN 6  // the pin labeled SDA
 
 #else
 // pins available on (ADAFRUIT_ITSYBITSY_RP2040 || ADAFRUIT_FEATHER_RP2040 || Pico_board || Sparkfun_ProMicro || SparkFun MicroMod)
 
 #define CE_PIN 7
-#define CSN_PIN 8 // pin 8 is not available on the Sparkfun_ThingPlus board
-#define IRQ_PIN 6 // pin 6 is the SDA pin on the Sparkfun_ThingPlus board
+#define CSN_PIN 8
+#define IRQ_PIN 6
 #endif // board detection macro defs
 
 #endif // DEFAULTPINS_H

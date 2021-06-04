@@ -7,6 +7,7 @@ set(EXAMPLES_LIST
     manualAcknowledgements
     streamingData
     multiceiverDemo
+    scanner
     )
 
 project(RF24LogExamples)

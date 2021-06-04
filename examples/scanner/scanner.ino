@@ -144,7 +144,11 @@ void loop(void)
     int i = 0;
     while ( i < num_channels )
     {
-      Serial.print(min(0xf, values[i]), HEX);
+      if (values[i])
+        Serial.print(min(0xf, values[i]), HEX);
+      else
+        Serial.print(F("-"));
+
       ++i;
     }
     Serial.println();
