@@ -40,11 +40,20 @@ int reset_array = 0;
 
 int main()
 {
+    stdio_init_all(); // init necessary IO for the RP2040
+
+    // wait here until the CDC ACM (serial port emulation) is connected
+    while (!tud_cdc_connected()) {
+        sleep_ms(10);
+    }
+
+    // initialize the transceiver on the SPI bus
+    while (!radio.begin()) {
+        printf("radio hardware is not responding!!\n");
+    }
+
     // print example's name
     printf("RF24/examples_pico/scanner\n");
-
-    // Setup and configure rf radio
-    radio.begin();
 
     radio.setAutoAck(false);
 
@@ -112,5 +121,3 @@ int main()
 
     return 0;
 }
-
-// vim:ai:cin:sts=2 sw=2 ft=cpp
