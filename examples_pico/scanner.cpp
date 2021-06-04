@@ -25,7 +25,7 @@
 #include "pico/stdlib.h"  // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
 #include "pico/bootrom.h" // reset_usb_boot()
 #include <tusb.h>         // tud_cdc_connected()
-#include <RF24.h>         // RF24 radio object
+#include <RF24.h>         // RF24 radio object, rf24_min()
 #include "defaultPins.h"  // board presumptive default pin numbers for CE_PIN and CSN_PIN
 
 // instantiate an object for the nRF24L01 transceiver
@@ -101,7 +101,7 @@ int main()
         i = 0;
         while (i < num_channels) {
             if (values[i])
-                printf("%x", min(0xf, (values[i] & 0xf)));
+                printf("%x", rf24_min(0xf, (values[i] & 0xf)));
             else
                 printf("-");
 
