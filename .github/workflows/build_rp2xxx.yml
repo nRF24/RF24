@@ -3,7 +3,7 @@ name: RP2xxx build
 on:
   push:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
 
 
 env:
