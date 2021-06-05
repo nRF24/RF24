@@ -120,6 +120,7 @@ def slave(timeout=6):
             print("Received: {} - {}".format(receive_payload, count))
             start_timer = time.monotonic()  # reset timer on every RX payload
 
+    print("Nothing received in", timeout, "seconds. Leaving RX role")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put the radio in TX mode
 
