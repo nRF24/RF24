@@ -222,8 +222,8 @@ jobs:
         with:
           name: "pkg_RF24"
           path: |
-            ${{ github.workspace }}/build/*.deb
-            ${{ github.workspace }}/build/*.rpm
+            ${{ github.workspace }}/build/pkgs/*.deb
+            ${{ github.workspace }}/build/pkgs/*.rpm
 
       - name: Upload Release assets
         if: github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')

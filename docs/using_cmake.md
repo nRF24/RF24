@@ -153,5 +153,5 @@ cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake
 make
 cpack
 ```
-This will create a deb file and a rpm file that you can use to install to your target machine (see the
-above instructions about using a package manager).
+This will create a deb file and a rpm file in a new sub-directory called "pkgs" within the build directory.
+You can use to install to your target machine (see the above instructions about using a package manager).
