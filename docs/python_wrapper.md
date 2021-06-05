@@ -5,9 +5,8 @@ By [mz-fuzzy](https://github.com/mz-fuzzy)
 
 ## RF24
 The RF24 lib needs to be built in C++ & installed for the python wrapper to wrap it <br>
-See [Linux Installation](md_docs_linux_install.html) and [Linux/RPi General](md_docs_rpi_general.html)
-
-@warning Cross-compiling the python wrapper after using CMake to install the RF24 library won't work.
+See [Linux Installation](md_docs_linux_install.html) (or [installing with CMake](md_docs_using_cmake.html)
+alternatively) and [Linux/RPi General](md_docs_rpi_general.html)
 
 ## Python2
 ```shell
@@ -26,11 +25,11 @@ sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-
    ```
 2. Build the library from the rf24libs/RF24/pyRF24 directory:
    ```shell
-   sudo ./setup.py build
+   ./setup.py build
    ```
    or
    ```shell
-   sudo python3 setup.py build
+   python3 setup.py build
    ```
 @note Build takes several minutes on arm-based machines. Machines with RAM less than 1GB may need to increase amount of swap for build.
 
