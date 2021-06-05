@@ -30,9 +30,9 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    For Raspberry Pi 4 variants using a 64-bit OS (like Ubuntu), you need the file marked for
    _arm64_ architecture.
 
-   Notice that the filenames will include the name of the utility driver that the package was built with.
+   <!-- Notice that the filenames will include the name of the utility driver that the package was built with.
    This does not mean that the MRAA or wiringPi libraries are included in the package (you will still
-   need to install those yourself).
+   need to install those yourself). -->
 2. Install the downloaded pkg
 
    If you downloaded the file directly from your target machine using the desktop environment, then

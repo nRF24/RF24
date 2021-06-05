@@ -222,7 +222,7 @@ jobs:
 
       - name: Upload Release assets
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')
         with:
           files: |
             ${{ github.workspace }}/build/*.deb
