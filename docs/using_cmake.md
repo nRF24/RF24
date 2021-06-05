@@ -39,7 +39,7 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    scp pkg_filename.deb pi@host_name:~/Downloads
    ```
 
-   @note You do not need to do this from within an ssh session. Also, you can you the target machine's IP
+   @note You do not need to do this from within an ssh session. Also, you can use the target machine's IP
    address instead of its host name.<br>
 
    The `scp` command will ask you for a password belonging to the user's name on the remote machine (we used
@@ -140,6 +140,7 @@ sudo make install
 Remember to also specify the `RF24_DRIVER` option if not using the auto-configuration feature (see step 5
 in the above instructions to build from source).
 
+### Installing the library remotely
 To install remotely, you can create an installable package file using CMake's built-in program called CPack.
 ```shell
 cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake
