@@ -58,8 +58,10 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
 ### Building from source code
 1. Install prerequisites if there are any (wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
 
-   It mamy need to be installed (`sudo apt-get install cmake`).
-
+   CMake may need to be installed
+   ```shell
+   sudo apt-get install cmake
+   ```
    @note See the [MRAA](http://iotdk.intel.com/docs/master/mraa/index.html) documentation for
    more info on installing MRAA <br>
 2. Make a directory to contain the RF24 and possibly RF24Network lib and enter it
