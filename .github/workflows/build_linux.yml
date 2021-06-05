@@ -1,6 +1,11 @@
 name: Linux build
 
-on: [push]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+  release:
+    types: [published, edited]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -221,14 +226,11 @@ jobs:
             ${{ github.workspace }}/build/*.rpm
 
       - name: Upload Release assets
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')
+        if: github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')
+        uses: csexton/release-asset-action@master
         with:
-          files: |
-            ${{ github.workspace }}/build/*.deb
-            ${{ github.workspace }}/build/*.rpm
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pattern: "${{ github.workspace }}/build/pkgs/librf24*"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build

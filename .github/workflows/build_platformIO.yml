@@ -2,6 +2,7 @@ name: PlatformIO build
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - ".github/workflows/build_platformIO.yml"
       - "examples/**"

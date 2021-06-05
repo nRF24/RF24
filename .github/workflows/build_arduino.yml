@@ -2,6 +2,7 @@ name: Arduino CLI build
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
