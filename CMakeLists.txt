@@ -61,9 +61,6 @@ endif()
 ### Now we actually build the library
 #####################################
 
-# pull in function to copy the appropriate includes.h file from a utility sub directory
-include(cmake/copy_includes.cmake)
-
 # get library info from Arduino IDE's required library.properties file
 include(cmake/GetLibInfo.cmake)
 
@@ -75,7 +72,7 @@ include(cmake/detectCPU.cmake) # sets the variable SOC accordingly
 include(cmake/AutoConfig_RF24_DRIVER.cmake)
 
 #[[ adding the utility sub-directory will
-    1. set variables RF24_DRIVER, SOC, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
+    1. set variables RF24_DRIVER, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
     2. copy the approriate /utility/*/includes.h file to the /utility folder
     3. set additional install rules according to the RF24_DRIVER specified
 ]]

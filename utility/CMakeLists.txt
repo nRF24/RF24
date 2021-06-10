@@ -99,4 +99,4 @@ else() # No valid/supported driver selected nor detected... this is vital
 endif()
 
 # copy the includes file to the project source directory's utility folder
-copy_includes(${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h)
+execute_process(COMMAND cp ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h ${CMAKE_SOURCE_DIR}/utility/includes.h)

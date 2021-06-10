@@ -2119,7 +2119,20 @@ private:
  */
 
 /**
- * @example{lineno} examples/old_backups/scanner/scanner.ino
+ * @example{lineno} examples_linux/scanner.cpp
+ *
+ * Example to detect interference on the various channels available.
+ * This is a good diagnostic tool to check whether you're picking a
+ * good channel for your application.
+ *
+ * Inspired by cpixip.
+ * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ *
+ * Use ctrl+C to exit
+ */
+
+/**
+ * @example{lineno} examples/scanner/scanner.ino
  *
  * Example to detect interference on the various channels available.
  * This is a good diagnostic tool to check whether you're picking a
