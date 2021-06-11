@@ -8,7 +8,7 @@ endif()
 if(NOT TARGET_ARCH) # TARGET_ARCH is defined only in the toolchain_<ARCH_TYPE>.cmake files
     execute_process(COMMAND dpkg --print-architecture
         OUTPUT_VARIABLE TARGET_ARCH
-        )
+    )
     string(STRIP "${TARGET_ARCH}" TARGET_ARCH)
 endif()
 
@@ -56,7 +56,7 @@ endif()
 set(POST_SCRIPTS
     ${CMAKE_BINARY_DIR}/DEBIAN/postrm
     ${CMAKE_BINARY_DIR}/DEBIAN/postinst
-    )
+)
 foreach(script ${POST_SCRIPTS})
     file(WRITE ${script} ldconfig)
     execute_process(COMMAND chmod +x ${script})

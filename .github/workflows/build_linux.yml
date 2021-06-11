@@ -181,8 +181,8 @@ jobs:
       - name: provide WiringPi (with toolchain compilers)
         if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler != 'default' }}
         env:
-          CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -lcrypt -lrt"
+          CC: /usr/bin/${{ matrix.toolchain.usr_dir }}-gcc
+          CFLAGS: "-I/usr/${{ matrix.toolchain.usr_dir }}"
         run: |
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi

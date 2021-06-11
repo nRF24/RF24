@@ -20,21 +20,21 @@ find_library(LibLittleWire littlewire-spi)
 execute_process(COMMAND ls /dev/spidev*
     OUTPUT_VARIABLE SPIDEV_EXISTS
     ERROR_VARIABLE CHECK_SPIDEV_ERROR
-    )
+)
 
 if(${RF24_DRIVER} STREQUAL "UNKNOWN") # invokes automatic configuration
     if("${SOC}" STREQUAL "BCM2708" OR "${SOC}" STREQUAL "BCM2709" OR "${SOC}" STREQUAL "BCM2835")
         set(RF24_DRIVER RPi CACHE STRING "using folder /utility/RPi" FORCE)
-    elseif(NOT ${LibMRAA} STREQUAL "LibMRAA-NOTFOUND")
+    elseif(NOT "${LibMRAA}" STREQUAL "LibMRAA-NOTFOUND")
         message(STATUS "Found MRAA library: ${LibMRAA}")
         set(RF24_DRIVER MRAA CACHE STRING "using folder /utility/MRAA" FORCE)
-    elseif(NOT ${LibWiringPi} STREQUAL "LibWiringPi-NOTFOUND")
+    elseif(NOT "${LibWiringPi}" STREQUAL "LibWiringPi-NOTFOUND")
         message(STATUS "Found wiringPi library: ${LibWiringPi}")
         set(RF24_DRIVER wiringPi CACHE STRING "using folder /utility/wiringPi" FORCE)
-    elseif(NOT ${LibLittleWire} STREQUAL "LibLittleWire-NOTFOUND")
+    elseif(NOT "${LibLittleWire}" STREQUAL "LibLittleWire-NOTFOUND")
         message(STATUS "Found LittleWire library: ${LibLittleWire}")
         set(RF24_DRIVER LittleWire CACHE STRING "using folder /utility/LittleWire" FORCE)
-    elseif(SPIDEV_EXISTS) # should be a list if SPI is enabled on RPi
+    elseif(SPIDEV_EXISTS) # should be a non-empty string if SPI is enabled
         message(STAUS "detected that SPIDEV is enabled: ${SPIDEV_EXISTS}")
         set(RF24_DRIVER SPIDEV CACHE STRING "using folder /utility/SPIDEV" FORCE)
     endif()

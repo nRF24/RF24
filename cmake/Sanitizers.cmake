@@ -43,12 +43,7 @@ function(enable_sanitizers project_name)
             endif()
         endif()
 
-        list(
-            JOIN
-            SANITIZERS
-            ","
-            LIST_OF_SANITIZERS
-            )
+        list(JOIN SANITIZERS "," LIST_OF_SANITIZERS)
 
     endif()
 

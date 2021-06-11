@@ -1,7 +1,7 @@
 # try to get the CPU model using a Linux bash command
 execute_process(COMMAND cat /proc/cpuinfo
     OUTPUT_VARIABLE CPU_MODEL
-    )
+)
 
 # If above command is not executed on an actual SOC board (& compatible OS), then
 # there won't be a "Hardware" field to describe the CPU model
@@ -16,7 +16,8 @@ endif()
 
 # detect machine hardware name
 execute_process(COMMAND uname -m
-    OUTPUT_VARIABLE CPU_TYPE)
+    OUTPUT_VARIABLE CPU_TYPE
+)
 string(STRIP "${CPU_TYPE}" CPU_TYPE)
 message(STATUS "detected CPU type: ${CPU_TYPE}")
 

@@ -1,98 +1,113 @@
 #!/usr/bin/env python
 
 import os
-import sys
-import setuptools
+from sys import version_info
+from setuptools import setup, Extension
 import crossunixccompiler
 
 version = ""
+cflags = os.getenv("CFLAGS", "")
+symlink_directory = []
 
+# NOTE current repo directory structure requires the use of
+# `python3 setup.py build` and `python3 setup.py install`
+# where `pip3 install ./pyRF24` copies pyRF24 directory to
+# `tmp` folder that doesn't have the needed `../Makefile.inc`
+# NOTE can't access "../Makefile.inc" from working dir because
+# it's relative. Brute force absolute path dynamically.
+rf24_git_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
 
-def process_configparams():
-    version = ""  # using python keyword `global` is bad practice
-    cflags = os.getenv("CFLAGS", "")
-    symlink_directory = ""
-    # check for possible linker flags  set via CFLAGS environment varible
+try:  # get compiler options from the generated Makefile.inc
+    with open(os.path.join(rf24_git_dir, "Makefile.inc"), "r") as f:
+        for line in f.read().splitlines():
+            identifier, value = line.split('=', 1)
+            if identifier == "CPUFLAGS":
+                # this is never reached as CPUFLAGS var is concatenated into CFLAGS var.
+                # however the CFLAGS var may conditionally contain "-lwiringPi"
+                cflags += " " + value
+            elif identifier == "HEADER_DIR":
+                cflags += " -I" + os.path.dirname(value)
+            elif identifier == "LIB_DIR":
+                cflags += " -L" + value
+            elif identifier == "LIB_VERSION":
+                version = value
+            elif identifier in ("CC", "CXX"):
+                os.environ[identifier] = value
+
+except FileNotFoundError:  # assuming lib was built & installed with CMake
+
+    # get LIB_VERSION from library.properties file for Arduino IDE
+    with open(os.path.join(rf24_git_dir, "library.properties"), "r") as f:
+        for line in f.read().splitlines():
+            if line.startswith("version"):
+                version = line.split("=")[1]
+
+    # add default values for compilation
+    # NOTE for cross-compilation purposes, these values are best left to be
+    #   set by the user with the CFLAGS environment variable
+    # cflags += "-Ofast -Wall -pthread"  # default flags to compiler
+    # cflags += " -I/usr/local/include/RF24"  # default HEADER_DIR
+    # cflags += " -L/usr/local/lib"  # default LIB_DIR
+
+    compilers = (os.getenv("CC", ""), os.getenv("CXX", ""))
+    # use default compilers if not specified with environment variables
+    if not compilers[0]:
+        os.environ["CC"] = "/usr/bin/cc"
+    if not compilers[1]:
+        os.environ["CXX"] = "/usr/bin/c++"
+
+# check C++ RF24 lib is installed
+finally:
+
+    # check for possible linker flags set via CFLAGS environment varible
     for flag in cflags.split("-"):
         if flag.startswith("L"):
-            symlink_directory = flag[1:].strip() + (" " if len(symlink_directory) else "")
+            symlink_directory.append(
+                flag[1:].strip() + (" " if len(symlink_directory) else "")
+            )
 
-    # NOTE current repo directory structure requires the use of
-    # `python3 setup.py build` and `python3 setup.py install`
-    # where `pip3 install ./pyRF24` copies pyRF24 directory to
-    # `tmp` folder that doesn't have the needed `../Makefile.inc`
-    # NOTE can't access "../Makefile.inc" from working dir because
-    # it's relative. Brute force absolute path dynamically.
-    rf24_git_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
-    try:  # get compiler options from the generated Makefile.inc
-        with open(os.path.join(rf24_git_dir, "Makefile.inc"), "r") as f:
-            for line in f.read().splitlines():
-                identifier, value = line.split('=', 1)
-                if identifier == "CPUFLAGS":
-                    # this is never reached as CPUFLAGS var is concatenated into CFLAGS var.
-                    # however the CFLAGS var may conditionally contain "-lwiringPi"
-                    cflags += " " + value
-                elif identifier == "HEADER_DIR":
-                    cflags += " -I" + os.path.dirname(value)
-                elif identifier == "LIB_DIR":
-                    symlink_directory += value
-                    cflags += " -L" + value
-                elif identifier == "LIB_VERSION":
-                    version = value
-                elif identifier in ("CC", "CXX"):
-                    os.environ[identifier] = value
+    if not symlink_directory:
+        print("install location of librf24.so isn't explicit; trying default locations.")
+        symlink_directory = ["/usr/local/lib", "/usr/lib"]
 
-    except FileNotFoundError:  # assuming lib was built & installed with CMake
+    found_symlink = False
+    for symlink_loc in symlink_directory:
+        if os.path.isfile(symlink_loc + "/librf24.so"):
+            print("librf24.so found at", symlink_loc)
+            found_symlink = True
 
-        # get LIB_VERSION from library.properties file for Arduino IDE
-        with open(os.path.join(rf24_git_dir, "library.properties"), "r") as f:
-            for line in f.read().splitlines():
-                if line.startswith("version"):
-                    version = line.split("=")[1]
+    if not found_symlink:
+        raise FileNotFoundError(
+            "RF24 library is not installed. librf24.so does not exist in {}.".format(
+                 " or ".join(symlink_directory)
+            )
+        )
 
-        # add default values for compilation
-        # NOTE for cross-compilation purposes, these values are best left to be
-        #   set by the user with the CFLAGS environment variable
-        # cflags += "-Ofast -Wall -pthread"  # default flags to compiler
-        # cflags += " -I/usr/local/include/RF24"  # default HEADER_DIR
-        # cflags += " -L/usr/local/lib"  # default LIB_DIR
+# append any additionally found compiler flags
+os.environ["CFLAGS"] = cflags
 
-        compilers = (os.getenv("CC", ""), os.getenv("CXX", ""))
-        # use default compilers if not specified with environment variables
-        if not compilers[0]:
-            os.environ["CC"] = "/usr/bin/cc"
-        if not compilers[1]:
-            os.environ["CXX"] = "/usr/bin/c++"
-
-    finally:
-        # check C++ RF24 lib is installed
-        if not symlink_directory:
-            print("install location of librf24.so isn't explicit; trying default location.")
-            symlink_directory = "/usr/local/lib"
-        for symlink_loc in symlink_directory.split():
-            if os.path.isfile(symlink_directory + "/librf24.so"):
-                print("librf24.so found at", symlink_loc)
-                break
-            else:
-                print("RF24 library is not installed. {}/librf24.so "
-                      "does not exist.".format(symlink_loc))
-
-    os.environ["CFLAGS"] = cflags
-    return version
-
-
-if sys.version_info >= (3,):
+# get the proper boost.python lib symlink name according to version of python
+if version_info >= (3,):
     BOOST_LIB = "boost_python3"
 else:
     BOOST_LIB = "boost_python"
 
-version = process_configparams()
 crossunixccompiler.register()
 
-module_RF24 = setuptools.Extension("RF24",
-                                   libraries=["rf24", BOOST_LIB],
-                                   sources=["pyRF24.cpp"])
-
-setuptools.setup(name="RF24",
-                 version=version,
-                 ext_modules=[module_RF24])
+setup(
+    name="RF24",
+    version=version,
+    classifiers = [
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: C++",
+        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    ],
+    ext_modules=[
+        Extension(
+            "RF24",
+            libraries=["rf24", BOOST_LIB],
+            sources=["pyRF24.cpp"]
+        )
+    ]
+)

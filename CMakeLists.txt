@@ -85,7 +85,7 @@ include(cmake/CPackInfo.cmake)
 add_library(${LibTargetName} SHARED
     RF24.cpp
     ${RF24_DRIVER_SOURCES}
-    )
+)
 
 target_include_directories(${LibTargetName} PUBLIC utility)
 
@@ -94,7 +94,7 @@ set_target_properties(
     PROPERTIES
     SOVERSION ${${LibName}_VERSION_MAJOR}
     VERSION ${${LibName}_VERSION_STRING}
-    )
+)
 
 if(NOT "${RF24_LINKED_DRIVER}" STREQUAL "") # linking to a pre-compiled utility driver
     message(STATUS "Using utility library: ${RF24_LINKED_DRIVER}")
@@ -102,12 +102,12 @@ if(NOT "${RF24_LINKED_DRIVER}" STREQUAL "") # linking to a pre-compiled utility 
         project_options
         project_warnings
         STATIC RF24_LINKED_DRIVER
-        )
+    )
 else() # utility driver is compiled with the library - not linking to a pre-compiled utility driver
     target_link_libraries(${LibTargetName} INTERFACE
         project_options
         project_warnings
-        )
+    )
 endif()
 
 #####################################
@@ -117,7 +117,7 @@ endif()
 #####################################
 install(TARGETS ${LibTargetName}
     DESTINATION lib
-    )
+)
 
 install(FILES
         RF24.h
@@ -125,12 +125,12 @@ install(FILES
         printf.h
         RF24_config.h
     DESTINATION include/RF24
-    )
+)
 
 install(FILES
         utility/includes.h
     DESTINATION include/RF24/utility
-    )
+)
 
 # CMAKE_CROSSCOMPILING is only TRUE when CMAKE_TOOLCHAIN_FILE is specified via CLI
 if("${CMAKE_CROSSCOMPILING}" STREQUAL "FALSE")

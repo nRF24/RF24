@@ -33,7 +33,7 @@ if(NOT PICO_SDK_PATH)
             pico_sdk
             GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
             GIT_TAG master
-            )
+        )
         if(NOT pico_sdk)
             message("Downloading Raspberry Pi Pico SDK")
             FetchContent_Populate(pico_sdk)
@@ -43,7 +43,7 @@ if(NOT PICO_SDK_PATH)
     else ()
         message(FATAL_ERROR
             "SDK location was not specified. Please set PICO_SDK_PATH or set PICO_SDK_FETCH_FROM_GIT to on to fetch from git."
-            )
+        )
     endif()
 endif()
 
