@@ -120,22 +120,20 @@ jobs:
               usr_dir: "local"
 
     steps:
-      - uses: actions/checkout@v1
-      - name: install rpmbuild
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: sudo apt-get install rpm
+      - name: Checkout RF24 repo
+        uses: actions/checkout@v1
 
-      - name: provide toolchain (for x86_64)
-        if: ${{ matrix.toolchain.compiler == 'x86_64' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-x86-64-linux-gnux32 g++-x86-64-linux-gnux32
+      # - name: provide toolchain (for x86_64)
+      #   if: ${{ matrix.toolchain.compiler == 'x86_64' }}
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install gcc-x86-64-linux-gnux32 g++-x86-64-linux-gnux32
 
-      - name: provide toolchain (for i686)
-        if: ${{ matrix.toolchain.compiler == 'i686' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-i686-linux-gnu g++-i686-linux-gnu
+      # - name: provide toolchain (for i686)
+      #   if: ${{ matrix.toolchain.compiler == 'i686' }}
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install gcc-i686-linux-gnu g++-i686-linux-gnu
 
       - name: provide toolchain (for arm64)
         if: ${{ matrix.toolchain.compiler == 'arm64' }}
@@ -178,15 +176,15 @@ jobs:
           cd WiringPi
           ./build
 
-      - name: provide WiringPi (with toolchain compilers)
-        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler != 'default' }}
-        env:
-          CC: /usr/bin/${{ matrix.toolchain.usr_dir }}-gcc
-          CFLAGS: "-I/usr/${{ matrix.toolchain.usr_dir }}"
-        run: |
-          git clone https://github.com/WiringPi/WiringPi
-          cd WiringPi
-          ./build
+      # - name: provide WiringPi (with toolchain compilers)
+      #   if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler != 'default' }}
+      #   env:
+      #     CC: /usr/bin/${{ matrix.toolchain.usr_dir }}-gcc
+      #     CFLAGS: "-I/usr/${{ matrix.toolchain.usr_dir }}"
+      #   run: |
+      #     git clone https://github.com/WiringPi/WiringPi
+      #     cd WiringPi
+      #     ./build
 
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
@@ -251,7 +249,7 @@ jobs:
           cmake --build .
           file ./gettingstarted
 
-      # Apparently we need python3 for ARM installed (or at least the Python-C API for arm)
+      # cross-compiling a python C extension is better done with pypa/cibuildwheel action
       - name: provide python wrapper prerequisites
         if: ${{ matrix.toolchain.compiler == 'default' }}
         # python3-rpi.gpio is only required for physical hardware
