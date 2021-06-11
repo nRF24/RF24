@@ -1,11 +1,11 @@
 # try to get the CPU model using a Linux bash command
 if(EXISTS "/sys/class/sunxi_info/sys_info")
-    execute_process(COMMAND grep sunxi_platform  /sys/class/sunxi_info/sys_info 2>/dev/null
+    execute_process(COMMAND grep sunxi_platform  /sys/class/sunxi_info/sys_info
         OUTPUT_VARIABLE CPU_MODEL
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 else()
-    execute_process(COMMAND grep Hardware /proc/cpuinfo 2>/dev/null
+    execute_process(COMMAND grep Hardware /proc/cpuinfo
         OUTPUT_VARIABLE CPU_MODEL
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
