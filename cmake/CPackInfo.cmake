@@ -8,8 +8,8 @@ endif()
 if(NOT TARGET_ARCH) # TARGET_ARCH is defined only in the toolchain_<ARCH_TYPE>.cmake files
     execute_process(COMMAND dpkg --print-architecture
         OUTPUT_VARIABLE TARGET_ARCH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    string(STRIP "${TARGET_ARCH}" TARGET_ARCH)
 endif()
 
 # set the Cpack generators (specific to types of packages to create)
