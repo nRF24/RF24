@@ -42,20 +42,6 @@ except FileNotFoundError:  # assuming lib was built & installed with CMake
             if line.startswith("version"):
                 version = line.split("=")[1]
 
-    # add default values for compilation
-    # NOTE for cross-compilation purposes, these values are best left to be
-    #   set by the user with the CFLAGS environment variable
-    # cflags += "-Ofast -Wall -pthread"  # default flags to compiler
-    # cflags += " -I/usr/local/include/RF24"  # default HEADER_DIR
-    # cflags += " -L/usr/local/lib"  # default LIB_DIR
-
-    compilers = (os.getenv("CC", ""), os.getenv("CXX", ""))
-    # use default compilers if not specified with environment variables
-    if not compilers[0]:
-        os.environ["CC"] = "/usr/bin/cc"
-    if not compilers[1]:
-        os.environ["CXX"] = "/usr/bin/c++"
-
 # check C++ RF24 lib is installed
 finally:
 
