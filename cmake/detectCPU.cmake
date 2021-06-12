@@ -1,29 +1,35 @@
 # try to get the CPU model using a Linux bash command
-if(EXISTS "/sys/class/sunxi_info/sys_info")
-    execute_process(COMMAND grep sunxi_platform  /sys/class/sunxi_info/sys_info
-        OUTPUT_VARIABLE CPU_MODEL
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-else()
-    execute_process(COMMAND grep Hardware /proc/cpuinfo
-        OUTPUT_VARIABLE CPU_MODEL
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-endif()
+if(NOT SOC) # if SOC variable not defined by user at CLI
+    if(EXISTS "/sys/class/sunxi_info/sys_info")
+        execute_process(COMMAND grep sunxi_platform  /sys/class/sunxi_info/sys_info
+            OUTPUT_VARIABLE CPU_MODEL
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+    else()
+        execute_process(COMMAND grep Hardware /proc/cpuinfo
+            OUTPUT_VARIABLE CPU_MODEL
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+    endif()
 
-string(FIND "${CPU_MODEL}" ":" cpu_is_described)
-if(${cpu_is_described} GREATER 0) # Hardware field does exist
-    math(EXPR cpu_is_described "${cpu_is_described} + 1")
-    string(SUBSTRING "${CPU_MODEL}" ${cpu_is_described} -1 SOC)
-    string(STRIP "${SOC}" SOC)
-else() # Hardware field does not exist
-    set(SOC "UNKNOWN") # use this string as a sentinel
+    string(FIND "${CPU_MODEL}" ":" cpu_is_described)
+    if(${cpu_is_described} GREATER 0) # Hardware field does exist
+        math(EXPR cpu_is_described "${cpu_is_described} + 1")
+        string(SUBSTRING "${CPU_MODEL}" ${cpu_is_described} -1 SOC)
+        string(STRIP "${SOC}" SOC)
+    else() # Hardware field does not exist
+        set(SOC "UNKNOWN") # use this string as a sentinel
+    endif()
+    message(STATUS "detected SoC: ${SOC}")
+else()
+    message(STATUS "SOC set to ${SOC}")
 endif()
-message(STATUS "detected SoC: ${SOC}")
 
 string(FIND "${SOC}" "Generic AM33XX" is_AM33XX)
 
-# detect machine hardware name
+#[[ detect machine hardware name
+This CPU_TYPE variable is not used anywhere.
+It remains as useful prompt info & to be consistent with old build system ]]
 execute_process(COMMAND uname -m
     OUTPUT_VARIABLE CPU_TYPE
     OUTPUT_STRIP_TRAILING_WHITESPACE

@@ -2,6 +2,7 @@ name: DoxyGen build
 
 on:
   pull_request:
+    types: [opened, reopened]
     branches: [master]
     paths:
       - '*.h'
