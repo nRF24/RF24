@@ -18,8 +18,10 @@ setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
     ext_modules=[
-        "RF24Network",
-        libraries=["rf24network", BOOST_LIB],
-        sources=["pyRF24Network.cpp"]
+        Extension(
+            "RF24Network",
+            libraries = ["rf24network", BOOST_LIB],
+            sources=["pyRF24Network.cpp"]
+        )
     ]
 )
