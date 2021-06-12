@@ -6,7 +6,7 @@ have already installed the library using [these older instructions](md_docs_linu
 ## Installing the library
 
 ### Using a package manager
-The RF24 library now has pre-built packages (*.deb or *.rpm files) that can be installed on a
+The RF24 library now (as of v1.4.1) has pre-built packages (*.deb or *.rpm files) that can be installed on a
 Raspberry Pi. These packages can be found on the library's
 [GitHub release page](https://GitHub.com/nRF24/RF24/releases)
 
@@ -27,12 +27,12 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    For all Raspberry Pi variants using the Raspberry Pi OS (aka Raspbian), you need the file marked
    for _armhf_ architecture.
 
-   For Raspberry Pi 4 variants using a 64-bit OS (like Ubuntu), you need the file marked for
+   For Raspberry Pi variants using a 64-bit OS (like Ubuntu), you need the file marked for
    _arm64_ architecture.
 
-   <!-- Notice that the filenames will include the name of the utility driver that the package was built with.
-   This does not mean that the MRAA or wiringPi libraries are included in the package (you will still
-   need to install those yourself). -->
+   Notice that the filenames will include the name of the utility driver that the package was built with.
+   This does not mean that the LittleWire, MRAA, or wiringPi libraries are included in the package (you will still
+   need to install those yourself beforehand).
 2. Install the downloaded pkg
 
    If you downloaded the file directly from your target machine using the desktop environment, then
@@ -64,7 +64,7 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    ```
    @note See the [MRAA](http://iotdk.intel.com/docs/master/mraa/index.html) documentation for
    more info on installing MRAA <br>
-2. Make a directory to contain the RF24 and possibly RF24Network lib and enter it
+2. Make a directory to contain the RF24 library and possibly other RF24* libraries and enter it
    ```shell
    mkdir ~/rf24libs
    cd ~/rf24libs
