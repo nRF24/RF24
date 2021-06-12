@@ -154,4 +154,5 @@ make
 cpack
 ```
 This will create a deb file and a rpm file in a new sub-directory called "pkgs" within the build directory.
-You can use to install to your target machine (see the above instructions about using a package manager).
+You can use either of these packages to install the library to your target machine (see the above
+instructions about using a package manager).
