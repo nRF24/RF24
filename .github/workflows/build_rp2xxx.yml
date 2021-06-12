@@ -3,25 +3,25 @@ name: RP2xxx build
 on:
   push:
     paths:
-      - '.github/workflows/build_rp2xxx.yml'
-      - '*.h'
-      - '!printf.h' # Pico SDK has its own printf solution
-      - '*.cpp'
-      - 'CMakeLists.txt'
-      - 'cmake/'
-      - 'utility/rp2/*'
-      - 'examples_pico/*'
+      - ".github/workflows/build_rp2xxx.yml"
+      - "*.h"
+      - "!printf.h" # Pico SDK has its own printf solution
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/"
+      - "utility/rp2/*"
+      - "examples_pico/*"
   pull_request:
     types: [opened, reopened]
     paths:
-      - '.github/workflows/build_rp2xxx.yml'
-      - '*.h'
-      - '!printf.h' # Pico SDK has its own printf solution
-      - '*.cpp'
-      - 'CMakeLists.txt'
-      - 'cmake/**'
-      - 'utility/rp2/*'
-      - 'examples_pico/*'
+      - ".github/workflows/build_rp2xxx.yml"
+      - "*.h"
+      - "!printf.h" # Pico SDK has its own printf solution
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "utility/rp2/*"
+      - "examples_pico/*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)

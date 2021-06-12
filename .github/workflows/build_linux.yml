@@ -4,42 +4,42 @@ on:
   pull_request:
     types: [opened, reopened]
     paths:
-      - '*.h'
-      - '*.cpp'
-      - 'CMakeLists.txt'
-      - 'cmake/**'
-      - 'library.properties' # CMake & 'configure' gets lib info from here
-      - 'configure'
-      - 'Makefile'
-      - 'utility/CMakeLists.txt'
-      # - 'utility/LittleWire/*' # this is not tested (anymore)
-      - 'utility/wiringPi/*'
-      - 'utility/MRAAA/*'
-      - 'utility/SPIDEV/*'
-      - 'examples_linux/*'
-      - '!examples_linux/*.py'
-      - '!examples_linux/*.md'
-      - 'pyRF24/setup.py'
-      - '.github/workflows/build_linux.yml'
+      - "*.h"
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "library.properties" # CMake & 'configure' gets lib info from here
+      - "configure"
+      - "Makefile"
+      - "utility/CMakeLists.txt"
+      # - "utility/LittleWire/*"" # this is not tested (anymore)
+      - "utility/wiringPi/*"
+      - "utility/MRAAA/*"
+      - "utility/SPIDEV/*"
+      - "examples_linux/*"
+      - "!examples_linux/*.py"
+      - "!examples_linux/*.md"
+      - "pyRF24/setup.py"
+      - ".github/workflows/build_linux.yml"
   push:
     paths:
-      - '*.h'
-      - '*.cpp'
-      - 'CMakeLists.txt'
-      - 'cmake/**'
-      - 'library.properties' # CMake & 'configure' gets lib info from here
-      - 'configure'
-      - 'Makefile'
-      - 'utility/CMakeLists.txt'
-      # - 'utility/LittleWire/*' # this is not tested (anymore)
-      - 'utility/wiringPi/*'
-      - 'utility/MRAAA/*'
-      - 'utility/SPIDEV/*'
-      - 'examples_linux/*'
-      - '!examples_linux/*.py'
-      - '!examples_linux/*.md'
-      - 'pyRF24/setup.py'
-      - '.github/workflows/build_linux.yml'
+      - "*.h"
+      - "*.cpp"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "library.properties" # CMake & 'configure' gets lib info from here
+      - "configure"
+      - "Makefile"
+      - "utility/CMakeLists.txt"
+      # - "utility/LittleWire/*"" # this is not tested (anymore)
+      - "utility/wiringPi/*"
+      - "utility/MRAAA/*"
+      - "utility/SPIDEV/*"
+      - "examples_linux/*"
+      - "!examples_linux/*.py"
+      - "!examples_linux/*.md"
+      - "pyRF24/setup.py"
+      - ".github/workflows/build_linux.yml"
   release:
     types: [published, edited]
 

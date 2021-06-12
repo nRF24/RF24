@@ -4,32 +4,32 @@ on:
   pull_request:
     types: [opened, reopened]
     paths:
-      - '*.h'
-      - 'docs/**'
-      - '!docs/README.md'
-      - '*.md'
-      - 'utility/template/*.h'
-      - 'examples**.cpp'
-      - 'examples**.ino'
-      - 'images/**'
-      - 'datasheets/**'
-      - '.github/workflows/doxygen.yml'
-      - 'Doxyfile'
-      - 'library.properties' # get lib version from here
+      - "*.h"
+      - "docs/**"
+      - "!docs/README.md"
+      - "*.md"
+      - "utility/template/*.h"
+      - "examples**.cpp"
+      - "examples**.ino"
+      - "images/**"
+      - "datasheets/**"
+      - ".github/workflows/doxygen.yml"
+      - "Doxyfile"
+      - "library.properties" # get lib version from here
   push:
     paths:
-      - '*.h'
-      - 'docs/**'
-      - '!docs/README.md'
-      - '*.md'
-      - 'utility/template/*.h'
-      - 'examples**.cpp'
-      - 'examples**.ino'
-      - 'images/**'
-      - 'datasheets/**'
-      - '.github/workflows/doxygen.yml'
-      - 'Doxyfile'
-      - 'library.properties' # get lib version from here
+      - "*.h"
+      - "docs/**"
+      - "!docs/README.md"
+      - "*.md"
+      - "utility/template/*.h"
+      - "examples**.cpp"
+      - "examples**.ino"
+      - "images/**"
+      - "datasheets/**"
+      - ".github/workflows/doxygen.yml"
+      - "Doxyfile"
+      - "library.properties" # get lib version from here
   release:
     types: [published, edited]
     branches: [master]

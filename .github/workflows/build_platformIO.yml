@@ -4,18 +4,18 @@ on:
   pull_request:
     types: [opened, reopened]
     paths:
-      - '.github/workflows/build_platformIO.yml'
-      - 'library.json'
-      - 'examples/**'
-      - '!examples/old_backups/**'
-      - '!examples/rf24_ATTiny/**'
+      - ".github/workflows/build_platformIO.yml"
+      - "library.json"
+      - "examples/**"
+      - "!examples/old_backups/**"
+      - "!examples/rf24_ATTiny/**"
   push:
     paths:
-      - '.github/workflows/build_platformIO.yml'
-      - 'library.json'
-      - 'examples/**'
-      - '!examples/old_backups/**'
-      - '!examples/rf24_ATTiny/**'
+      - ".github/workflows/build_platformIO.yml"
+      - "library.json"
+      - "examples/**"
+      - "!examples/old_backups/**"
+      - "!examples/rf24_ATTiny/**"
 
 jobs:
   check_formatting:

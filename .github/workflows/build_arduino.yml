@@ -4,14 +4,14 @@ on:
   pull_request:
     types: [opened, reopened]
     paths:
-      - '.github/workflows/build_arduino.yml'
-      - 'examples/**'
-      - '!examples/old_backups/**'
+      - ".github/workflows/build_arduino.yml"
+      - "examples/**"
+      - "!examples/old_backups/**"
   push:
     paths:
-      - '.github/workflows/build_arduino.yml'
-      - 'examples/**'
-      - '!examples/old_backups/**'
+      - ".github/workflows/build_arduino.yml"
+      - "examples/**"
+      - "!examples/old_backups/**"
 
 jobs:
   check_formatting:
