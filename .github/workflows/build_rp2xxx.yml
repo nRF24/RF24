@@ -1,4 +1,4 @@
-name: RP2xxx build
+name: Pico SDK build
 
 on:
   push:
