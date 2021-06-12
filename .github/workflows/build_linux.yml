@@ -3,7 +3,43 @@ name: Linux build
 on:
   pull_request:
     types: [opened, reopened]
+    paths:
+      - '*.h'
+      - '*.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'library.properties' # CMake & 'configure' gets lib info from here
+      - 'configure'
+      - 'Makefile'
+      - 'utility/CMakeLists.txt'
+      # - 'utility/LittleWire/*' # this is not tested (anymore)
+      - 'utility/wiringPi/*'
+      - 'utility/MRAAA/*'
+      - 'utility/SPIDEV/*'
+      - 'examples_linux/*'
+      - '!examples_linux/*.py'
+      - '!examples_linux/*.md'
+      - 'pyRF24/setup.py'
+      - '.github/workflows/build_linux.yml'
   push:
+    paths:
+      - '*.h'
+      - '*.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'library.properties' # CMake & 'configure' gets lib info from here
+      - 'configure'
+      - 'Makefile'
+      - 'utility/CMakeLists.txt'
+      # - 'utility/LittleWire/*' # this is not tested (anymore)
+      - 'utility/wiringPi/*'
+      - 'utility/MRAAA/*'
+      - 'utility/SPIDEV/*'
+      - 'examples_linux/*'
+      - '!examples_linux/*.py'
+      - '!examples_linux/*.md'
+      - 'pyRF24/setup.py'
+      - '.github/workflows/build_linux.yml'
   release:
     types: [published, edited]
 
@@ -103,20 +139,23 @@ jobs:
           # - compiler: "i686"
           #   usr_dir: "i686-linux-gnu"
           - compiler: "default" # github runner is hosted on a "amd64"
-            usr_dir: "local"
+            usr_dir: "local" # using this toolchain to test python wrapper
         driver:
           - "RPi"
           - "SPIDEV"
           - "MRAA"
         exclude:
+          # MRAA is not compatible with i686 arch
           - driver: "MRAA"
             toolchain:
               compiler: "i686"
               usr_dir: "i686-linux-gnu"
         include:
+          # need to cross-compile wiringPi dependencies (libcrypt)
+          # only test default compiler with wiringPi
           - driver: "wiringPi"
             toolchain:
-              compiler: "default"
+              compiler: "default" # github runner is hosted on a "amd64"
               usr_dir: "local"
 
     steps:
@@ -148,17 +187,7 @@ jobs:
           sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
       - name: provide MRAA
-        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain.compiler == 'default' }}
-        run: |
-          git clone https://github.com/intel-iot-devkit/mraa.git
-          cd mraa
-          mkdir build
-          cd build
-          cmake .. -D BUILDSWIGNODE=OFF
-          sudo make install
-
-      - name: provide MRAA (with toolchain compilers)
-        if: ${{ matrix.driver == 'MRAA' && matrix.toolchain.compiler != 'default' }}
+        if: ${{ matrix.driver == 'MRAA' }}
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
@@ -190,12 +219,6 @@ jobs:
         run: cmake -E make_directory ${{ github.workspace }}/build
 
       - name: configure lib
-        if: ${{ matrix.toolchain.compiler == 'default' }}
-        working-directory: ${{ github.workspace }}/build
-        run: cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE -D RF24_DRIVER=${{ matrix.driver }}
-
-      - name: configure lib (with toolchain compilers)
-        if: ${{ matrix.toolchain.compiler != 'default' }}
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
@@ -252,7 +275,7 @@ jobs:
       # cross-compiling a python C extension is better done with pypa/cibuildwheel action
       - name: provide python wrapper prerequisites
         if: ${{ matrix.toolchain.compiler == 'default' }}
-        # python3-rpi.gpio is only required for physical hardware
+        # python3-rpi.gpio is only required for physical hardware (namely the IRQ example)
         run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools
 
       - name: create alias symlink to libboost_python3*.so

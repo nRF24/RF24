@@ -3,8 +3,32 @@ name: DoxyGen build
 on:
   pull_request:
     branches: [master]
+    paths:
+      - '*.h'
+      - 'docs/**'
+      - '!docs/README.md'
+      - '*.md'
+      - 'utility/template/*.h'
+      - 'examples**.cpp'
+      - 'examples**.ino'
+      - 'images/**'
+      - 'datasheets/**'
+      - '.github/workflows/doxygen.yml'
+      - 'Doxyfile'
   push:
     branches: [master]
+    paths:
+      - '*.h'
+      - 'docs/**'
+      - '!docs/README.md'
+      - '*.md'
+      - 'utility/template/*.h'
+      - 'examples**.cpp'
+      - 'examples**.ino'
+      - 'images/**'
+      - 'datasheets/**'
+      - '.github/workflows/doxygen.yml'
+      - 'Doxyfile'
   release:
     types: [published, edited]
     branches: [master]

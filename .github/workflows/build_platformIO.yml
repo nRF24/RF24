@@ -2,17 +2,20 @@ name: PlatformIO build
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
     paths:
-      - ".github/workflows/build_platformIO.yml"
-      - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
-
+      - '.github/workflows/build_platformIO.yml'
+      - 'library.json'
+      - 'examples/**'
+      - '!examples/old_backups/**'
+      - '!examples/rf24_ATTiny/**'
   push:
     paths:
-      - ".github/workflows/build_platformIO.yml"
-      - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
+      - '.github/workflows/build_platformIO.yml'
+      - 'library.json'
+      - 'examples/**'
+      - '!examples/old_backups/**'
+      - '!examples/rf24_ATTiny/**'
 
 jobs:
   check_formatting:

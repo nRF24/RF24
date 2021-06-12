@@ -13,7 +13,8 @@ add_library(RF24 INTERFACE)
 target_sources(RF24 INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/../../RF24.cpp
     ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/spi.cpp)
+    ${CMAKE_CURRENT_LIST_DIR}/spi.cpp
+)
 
 target_include_directories(RF24 INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/../../

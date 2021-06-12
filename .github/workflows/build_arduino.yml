@@ -2,17 +2,16 @@ name: Arduino CLI build
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
     paths:
-      - ".github/workflows/build_arduino.yml"
-      - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
-
+      - '.github/workflows/build_arduino.yml'
+      - 'examples/**'
+      - '!examples/old_backups/**'
   push:
     paths:
-      - ".github/workflows/build_arduino.yml"
-      - "examples/**"
-      - "!examples/old_backups/recipes/pingpair_maple/**"
+      - '.github/workflows/build_arduino.yml'
+      - 'examples/**'
+      - '!examples/old_backups/**'
 
 jobs:
   check_formatting:
@@ -99,13 +98,13 @@ jobs:
             - examples/StreamingData
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
-          # The following examples still exist for posterity
+            - examples/scanner
+          # The following examples still exist for posterity. They don't trigger this workflow
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn
           #   - examples/old_backups/pingpair_irq
           #   - examples/old_backups/pingpair_multi_dyn
           #   - examples/old_backups/pingpair_sleepy
-          #   - examples/old_backups/scanner
           #   - examples/old_backups/TransferTimeouts
           #   - examples/old_backups/recipes/led_remote
           #   - examples/old_backups/recipes/nordic_fob
