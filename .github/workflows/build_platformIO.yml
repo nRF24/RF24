@@ -39,7 +39,7 @@ jobs:
       - name: Save artifact
         uses: actions/upload-artifact@v2
         with:
-          name: "PIO_pkg_RF24Mesh"
+          name: "PIO_pkg_RF24"
           path: PlatformIO*.tar.gz
       - name: Upload Release assets
         if: github.event_name == 'release'
