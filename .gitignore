@@ -37,3 +37,4 @@ __pycache__/
 *.pyc
 build/
 *CMakeUserPresets*.json
+*.tar.gz
