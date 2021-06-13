@@ -11,10 +11,18 @@
     "export": {
         "exclude": [
             "examples_pico/*",
+            "examples_linux/*",
             "pyRF24/*",
             "cmake/*",
             "CMakeLists.txt",
-            "Makefile"
+            "Makefile",
+            "utility/CMakeLists.txt",
+            "utility/wiringPi/*",
+            "utility/MRAA/*",
+            "utility/LittleWire/*",
+            "utility/RPi/*",
+            "utility/SPIDEV/*",
+            "utility/ATXMegaD3/*"
         ]
     },
     "frameworks": "arduino",
