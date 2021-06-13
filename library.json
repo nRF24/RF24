@@ -10,6 +10,10 @@
     "version": "1.4.1",
     "export": {
         "exclude": [
+            "datasheets",
+            ".github/*",
+            "keywords.txt",
+            "configure",
             "examples_pico/*",
             "examples_linux/*",
             "pyRF24/*",
@@ -22,6 +26,7 @@
             "utility/LittleWire/*",
             "utility/RPi/*",
             "utility/SPIDEV/*",
+            "utility/rp2/*",
             "utility/ATXMegaD3/*"
         ]
     },
