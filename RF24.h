@@ -226,7 +226,7 @@ public:
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      *
      * @note The _SPI datatype is a "wrapped" definition that will represent
-     * various SPI implementations based on the specified platform (or SoftSPI).
+     * various SPI implementations based on the specified platform.
      * @see Review the [Arduino support page](md_docs_arduino.html).
      *
      * @return same result as begin()
@@ -248,7 +248,7 @@ public:
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
      *
      * @note The _SPI datatype is a "wrapped" definition that will represent
-     * various SPI implementations based on the specified platform (or SoftSPI).
+     * various SPI implementations based on the specified platform.
      * @see Review the [Arduino support page](md_docs_arduino.html).
      *
      * @return same result as begin()
