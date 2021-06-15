@@ -80,11 +80,16 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    cd build
    ```
 5. Configure build environment
+
+   @note When using these instructions to install RF24Mesh, RF24Network, or RF24Gateway,
+   the following `RF24_DRIVER` option is not needed (it is only for the RF24 library).
+
    ```shell
    cmake .. -D RF24_DRIVER=SPIDEV
    ```
    Instead of using `SPIDEV` driver (recommended), you can also specify the `RPi`, `wiringPi`,
-   `MRAA`, or `LittleWire` as alternative drivers.<br>
+   `MRAA`, or `LittleWire` as alternative drivers.
+
    If the `RF24_DRIVER` option is not specified, then it will be automatically configured based
    on the detected CPU or installed libraries (defaults to `SPIDEV` when auto-detection fails).
 6. Build and install the library
