@@ -1134,6 +1134,7 @@ public:
      */
     void closeReadingPipe(uint8_t pipe);
 
+    #if defined (FAILURE_HANDLING)
     /**
      *
      * If a failure has been detected, it usually indicates a hardware issue. By default the library
@@ -1163,9 +1164,8 @@ public:
      *  }
      * @endcode
      */
-    //#if defined (FAILURE_HANDLING)
     bool failureDetected;
-    //#endif
+    #endif // defined (FAILURE_HANDLING)
 
     /**@}*/
     /**
