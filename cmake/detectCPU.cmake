@@ -45,7 +45,7 @@ if(NOT CMAKE_CROSSCOMPILING) # need to use /usr/lib/gcc soft symlink
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
-    # use only last entry if multiple entries are returned
+    # use only last entry if multiple entries are returned; this tactic is a possible point of error
     string(FIND "${tool_name}" "\n" last_list_delimiter REVERSE)
     if(last_list_delimiter GREATER -1)
         math(EXPR last_list_delimiter "${last_list_delimiter} + 1")
@@ -56,7 +56,7 @@ else() # we can use the compiler's name of the path set in the toolchain file
     string(REGEX REPLACE "^\/usr\/bin\/(.*)-gcc.*" "\\1" tool_name "${CMAKE_C_COMPILER}")
 endif()
 
-message(STATUS "tool name being used is ${tool_name}")
+message(STATUS "tool name being used: ${tool_name}")
 
 # add compiler flags to optomize builds with arm-linux-gnueabihf-g* compilers
 if("${tool_name}" STREQUAL "arm-linux-gnueabihf")
