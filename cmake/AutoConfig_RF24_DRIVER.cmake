@@ -17,10 +17,12 @@ set(RF24_DRIVER "UNKNOWN" CACHE STRING "override automatic configuration of RF24
 find_library(LibMRAA mraa)
 find_library(LibWiringPi wiringPi)
 find_library(LibLittleWire littlewire-spi)
-execute_process(COMMAND ls /dev/spidev*
-    OUTPUT_VARIABLE SPIDEV_EXISTS
-    ERROR_VARIABLE CHECK_SPIDEV_ERROR
-)
+if(EXISTS /dev/spidev0.0)
+    set(SPIDEV_EXISTS TRUE)
+else()
+    set(SPIDEV_EXISTS FALSE)
+endif()
+
 
 if(${RF24_DRIVER} STREQUAL "UNKNOWN") # invokes automatic configuration
     if("${SOC}" STREQUAL "BCM2708" OR "${SOC}" STREQUAL "BCM2709" OR "${SOC}" STREQUAL "BCM2835")

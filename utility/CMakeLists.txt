@@ -36,8 +36,8 @@ elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
 elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
-    if(CHECK_SPIDEV_ERROR)
-        message(WARNING "Detecting /dev/spidev* failed - continuing anyway. Please make sure SPI is enabled.")
+    if(NOT SPIDEV_EXISTS)
+        message(WARNING "Detecting /dev/spidev0.0 failed - continuing anyway. Please make sure SPI is enabled.")
     endif()
     set(RF24_DRIVER_SOURCES
         ${CMAKE_SOURCE_DIR}/utility/${RF24_DRIVER}/includes.h
