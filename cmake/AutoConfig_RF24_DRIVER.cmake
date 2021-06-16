@@ -6,7 +6,7 @@ set(RF24_DRIVER "UNKNOWN" CACHE STRING "override automatic configuration of RF24
     SPIDEV
     MRAA
     LittleWire"
-    )
+)
 
 ###########################
 # detect pre-existing (locally installed) 3rd party libraries
