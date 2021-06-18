@@ -13,6 +13,10 @@ project(RF24 C CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
+# allow CMake CLI options to configure RF24_config.h macros
+option(SERIAL_DEBUG "enable/disable debugging output" OFF)
+option(MINIMAL "exclude optional source code to keep compile size compact" OFF)
+
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
@@ -109,6 +113,30 @@ else() # utility driver is compiled with the library - not linking to a pre-comp
         project_warnings
     )
 endif()
+
+# assert the appropriate preprocessor macros for RF24_config.h
+if(SERIAL_DEBUG)
+    message(STATUS "SERIAL_DEBUG asserted")
+    target_compile_definitions(${LibTargetName} PUBLIC SERIAL_DEBUG)
+endif()
+if(MINIMAL)
+    message(STATUS "MINIMAL asserted")
+    target_compile_definitions(${LibTargetName} PUBLIC MINIMAL)
+endif()
+# for RF24_POWERUP_DELAY & RF24_SPI_SPEED, let the default be configured in source code
+if(DEFINED RF24_POWERUP_DELAY)
+    message(STATUS "RF24_POWERUP_DELAY set to ${RF24_POWERUP_DELAY}")
+    target_compile_definitions(${LibTargetName} PUBLIC
+        RF24_POWERUP_DELAY=${RF24_POWERUP_DELAY}
+    )
+endif()
+if(DEFINED RF24_SPI_SPEED)
+    message(STATUS "RF24_SPI_SPEED set to ${RF24_SPI_SPEED}")
+    target_compile_definitions(${LibTargetName} PUBLIC
+        RF24_SPI_SPEED=${RF24_SPI_SPEED}
+    )
+endif()
+
 
 #####################################
 ### Install rules for root source dir
