@@ -1752,6 +1752,8 @@ private:
      *
      * @param reg Which register. Use constants from nRF24L01.h
      * @param value The new value to write
+     * @param is_cmd_only if this parameter is true, then the `reg` parameter
+     * is written, and the `value` param is ignored.
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
@@ -1764,6 +1766,7 @@ private:
      *
      * @param buf Where to get the data
      * @param len Number of bytes to be sent
+     * @param writeType Specify if individual payload should be acknowledged
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
