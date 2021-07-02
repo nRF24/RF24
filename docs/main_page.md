@@ -52,7 +52,7 @@ changes.
 Observe <br>
 ![
     @image html pinout.jpg
-    ](https://github.com/nRF24/RF24/blob/master/images/pinout.png)
+    ](https://github.com/nRF24/RF24/blob/master/images/pinout.jpg)
 
 The table below shows how to connect the the pins of the NRF24L01(+) to different boards.
 CE and CSN are configurable.
