@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.0</span>
+   &#160;<span id="projectnumber">v1.4.1</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -448,7 +448,7 @@ Users can specify default SPI speed by modifying <code>#define RF24_SPI_SPEED</c
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00789">789</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00785">785</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -479,7 +479,7 @@ Users can specify default SPI speed by modifying <code>#define RF24_SPI_SPEED</c
 <dl class="section see"><dt>See also</dt><dd>Review the <a href="md_docs_arduino.html">Arduino support page</a>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>same result as <a class="el" href="classRF24.html#a048a20c73c7d9b2e02dcbae6fb9c4ba8">begin()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00759">759</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00755">755</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -530,7 +530,7 @@ For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueE
 <dl class="section see"><dt>See also</dt><dd>Review the <a href="md_docs_arduino.html">Arduino support page</a>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>same result as <a class="el" href="classRF24.html#a048a20c73c7d9b2e02dcbae6fb9c4ba8">begin()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00769">769</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00765">765</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -570,7 +570,7 @@ For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueE
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>same result as <a class="el" href="classRF24.html#a048a20c73c7d9b2e02dcbae6fb9c4ba8">begin()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00780">780</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00776">776</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -590,7 +590,7 @@ For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueE
 </div><div class="memdoc">
 <p>Checks if the chip is connected to the SPI bus </p>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00950">950</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00946">946</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -620,7 +620,7 @@ For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueE
 <div class="line">radio.startListening();</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>If there was a call to <a class="el" href="classRF24.html#a9edc910ccc1ffcff56814b08faca5535">openReadingPipe()</a> about pipe 0 prior to calling this function, then this function will re-write the address that was last set to reading pipe 0. This is because <a class="el" href="classRF24.html#af2e409e62d49a23e372a70b904ae30e1">openWritingPipe()</a> will overwrite the address to reading pipe 0 for proper auto-ack functionality. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00969">969</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00965">965</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -644,7 +644,7 @@ For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueE
 <div class="line">radio.write(&amp;data, <span class="keyword">sizeof</span>(data));</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>When the ACK payloads feature is enabled, the TX FIFO buffers are flushed when calling this function. This is meant to discard any ACK payloads that were not appended to acknowledgment packets. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00991">991</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00987">987</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -683,7 +683,7 @@ For example: <div class="fragment"><div class="line"><span class="keywordtype">v
 <div class="ttc" id="agroup__Porting__General_html_ga361649efb4f1e2fa3c870ca203497d5e"><div class="ttname"><a href="group__Porting__General.html#ga361649efb4f1e2fa3c870ca203497d5e">pinMode</a></div><div class="ttdeci">#define pinMode(pin, direction)</div><div class="ttdef"><b>Definition:</b> <a href="RF24__arch__config_8h_source.html#l00074">RF24_arch_config.h:74</a></div></div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01317">1317</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01313">1313</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -743,7 +743,7 @@ For example: <div class="fragment"><div class="line"><span class="keywordtype">v
 <div class="line">}</div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01340">1340</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01336">1336</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -796,7 +796,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01095">1095</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01091">1091</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -836,7 +836,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>There is no address length parameter because this function will always write the number of bytes that the radio addresses are configured to use (set with <a class="el" href="classRF24.html#ad5aea7f9a3bd9c7d357fb296ce751f21">setAddressWidth()</a>). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01377">1377</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01373">1373</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -876,7 +876,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line"><a class="code" href="classRF24.html#a9edc910ccc1ffcff56814b08faca5535">openReadingPipe</a>(1, addresses[1]); <span class="comment">// address used is &quot;2Node&quot;</span></div>
 <div class="line"><a class="code" href="classRF24.html#a9edc910ccc1ffcff56814b08faca5535">openReadingPipe</a>(2, addresses[2]); <span class="comment">// address used is &quot;3Node&quot;</span></div>
 <div class="line"><a class="code" href="classRF24.html#a9edc910ccc1ffcff56814b08faca5535">openReadingPipe</a>(3, addresses[3]); <span class="comment">// address used is &quot;4Node&quot;</span></div>
-<div class="ttc" id="aclassRF24_html_a9edc910ccc1ffcff56814b08faca5535"><div class="ttname"><a href="classRF24.html#a9edc910ccc1ffcff56814b08faca5535">RF24::openReadingPipe</a></div><div class="ttdeci">void openReadingPipe(uint8_t number, const uint8_t *address)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01429">RF24.cpp:1429</a></div></div>
+<div class="ttc" id="aclassRF24_html_a9edc910ccc1ffcff56814b08faca5535"><div class="ttname"><a href="classRF24.html#a9edc910ccc1ffcff56814b08faca5535">RF24::openReadingPipe</a></div><div class="ttdeci">void openReadingPipe(uint8_t number, const uint8_t *address)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01425">RF24.cpp:1425</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>If the reading pipe 0 is opened by this function, the address passed to this function (for pipe 0) will be restored at every call to <a class="el" href="classRF24.html#a30a2733a3889bdc331fe2d2f4f0f7b39">startListening()</a>, but the address for pipe 0 is ONLY restored if the LSB is a non-zero value.<br  />
  Read <a href="http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html">http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html</a> to understand how to avoid using malformed addresses. This address restoration is implemented because of the underlying neccessary functionality of <a class="el" href="classRF24.html#af2e409e62d49a23e372a70b904ae30e1">openWritingPipe()</a>.</dd></dl>
@@ -889,7 +889,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>There is no address length parameter because this function will always write the number of bytes (for pipes 0 and 1) that the radio addresses are configured to use (set with <a class="el" href="classRF24.html#ad5aea7f9a3bd9c7d357fb296ce751f21">setAddressWidth()</a>). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01429">1429</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01425">1425</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -919,7 +919,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="ttc" id="aprintf_8h_html_afc0d9ca32710dff550ebe56ab6b39d23"><div class="ttname"><a href="printf_8h.html#afc0d9ca32710dff550ebe56ab6b39d23">printf_begin</a></div><div class="ttdeci">void printf_begin(void)</div><div class="ttdef"><b>Definition:</b> <a href="printf_8h_source.html#l00033">printf.h:33</a></div></div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00620">620</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00616">616</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -948,7 +948,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </div><!-- fragment --></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>If the automatic acknowledgements feature is configured differently for each pipe, then a binary representation is used in which bits 0-5 represent pipes 0-5 respectively. A <code>0</code> means the feature is disabled and a <code>1</code> means the feature is enabled. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00664">664</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00660">660</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1010,7 +1010,7 @@ For example: <div class="fragment"><div class="line"><span class="keywordtype">v
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01324">1324</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01320">1320</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1034,7 +1034,7 @@ For example: <div class="fragment"><div class="line"><span class="keywordtype">v
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01219">1219</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01215">1215</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1060,7 +1060,7 @@ For example: <div class="fragment"><div class="line"><span class="keywordtype">v
 <div class="line">avr_enter_sleep_mode(); <span class="comment">// Custom function to sleep the device</span></div>
 <div class="line">radio.powerUp();</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01016">1016</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01012">1012</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1082,7 +1082,7 @@ For example: <div class="fragment"><div class="line"><span class="keywordtype">v
 <p>Leave low-power mode - required for normal radio operation after calling <a class="el" href="classRF24.html#aa0a51923a09ba4f3478aba9be0f8a6a1">powerDown()</a></p>
 <p>To return to low power mode, call <a class="el" href="classRF24.html#aa0a51923a09ba4f3478aba9be0f8a6a1">powerDown()</a>. </p><dl class="section note"><dt>Note</dt><dd>This will take up to 5ms for maximum compatibility </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01026">1026</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01022">1022</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1140,7 +1140,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line">radio.write(buffer, <span class="keyword">False</span>)  <span class="comment"># False = the multicast parameter</span></div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01059">1059</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01055">1055</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1177,8 +1177,8 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line"> </div>
 <div class="line">        radio.writeFast(&amp;buf,32);  <span class="comment">// Writes 1 payload to the buffers</span></div>
 <div class="line">        <a class="code" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy</a>(1000);           <span class="comment">// Using extended timeouts, returns 1 if success. Retries failed payloads for 1 seconds before returning 0.</span></div>
-<div class="ttc" id="aclassRF24_html_a12cc453453c94969d4d3f0edb3778c83"><div class="ttname"><a href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">RF24::txStandBy</a></div><div class="ttdeci">bool txStandBy()</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01226">RF24.cpp:1226</a></div></div>
-<div class="ttc" id="aclassRF24_html_a47b2516993481b58e724d1274a7fd9cb"><div class="ttname"><a href="classRF24.html#a47b2516993481b58e724d1274a7fd9cb">RF24::writeFast</a></div><div class="ttdeci">bool writeFast(const void *buf, uint8_t len)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01179">RF24.cpp:1179</a></div></div>
+<div class="ttc" id="aclassRF24_html_a12cc453453c94969d4d3f0edb3778c83"><div class="ttname"><a href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">RF24::txStandBy</a></div><div class="ttdeci">bool txStandBy()</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01222">RF24.cpp:1222</a></div></div>
+<div class="ttc" id="aclassRF24_html_a47b2516993481b58e724d1274a7fd9cb"><div class="ttname"><a href="classRF24.html#a47b2516993481b58e724d1274a7fd9cb">RF24::writeFast</a></div><div class="ttdeci">bool writeFast(const void *buf, uint8_t len)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01175">RF24.cpp:1175</a></div></div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a> </dd>
 <dd>
 <a class="el" href="classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58">write()</a> </dd>
@@ -1202,7 +1202,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line">radio.writeFast(buffer)</div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01179">1179</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01175">1175</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1258,7 +1258,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line">radio.writeFast(buffer, <span class="keyword">False</span>)  <span class="comment"># False = the multicast parameter</span></div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01148">1148</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01144">1144</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1322,7 +1322,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01102">1102</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01098">1098</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1355,7 +1355,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01226">1226</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01222">1222</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1404,7 +1404,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01255">1255</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01251">1251</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1467,7 +1467,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01562">1562</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01558">1558</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1519,7 +1519,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line">print(<span class="stringliteral">&quot;tx_ds: {}, tx_df: {}, rx_dr: {}&quot;</span>.format(tx_ds, tx_df, rx_dr))</div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01353">1353</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01349">1349</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1588,7 +1588,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line"><span class="comment">#     True means initiate transmission (startTx parameter)</span></div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01191">1191</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01187">1187</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1652,7 +1652,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line">radio.startWrite(buffer, <span class="keyword">False</span>)  <span class="comment"># False = the multicast parameter</span></div>
 </div><!-- fragment --> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01204">1204</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01200">1200</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1675,7 +1675,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <dl class="section remark"><dt>Remarks</dt><dd>This function only applies when taking advantage of the auto-retry feature. See <a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">setAutoAck()</a> and <a class="el" href="classRF24.html#a4c6d3959c8320e64568395f4ef507aef">setRetries()</a> to configure the auto-retry feature.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This is to be used AFTER auto-retry fails if wanting to resend using the built-in payload reuse feature. After issuing <a class="el" href="classRF24.html#aeaf7fa54d3ab2a85ce215b4bf6ae933b">reUseTX()</a>, it will keep resending the same payload until a transmission failure occurs or the CE pin is set to LOW (whichever comes first). In the event of a re-transmission failure, simply call this function again to resume re-transmission of the same payload. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01138">1138</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01134">1134</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1742,7 +1742,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <p>Useful to check for interference on the current channel.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if was carrier, false if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01622">1622</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01618">1618</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1770,7 +1770,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="line">}</div>
 </div><!-- fragment --> <dl class="section return"><dt>Returns</dt><dd>true if a signal less than or equal to -64dBm was detected, false if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01629">1629</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01625">1625</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1791,7 +1791,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <p>Test whether this is a real radio, or a mock shim for debugging. Setting either pin to 0xff is the way to indicate that this is not a real radio.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if this is a legitimate radio </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00962">962</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00958">958</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1817,7 +1817,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01455">1455</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01451">1451</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1844,7 +1844,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01414">1414</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01410">1410</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1883,7 +1883,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Disable the auto-retry feature on a transmitter still uses the auto-ack feature (if enabled), except it will not retry to transmit if the payload was not acknowledged on the first attempt. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01779">1779</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01775">1775</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1914,7 +1914,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00527">527</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00523">523</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1940,7 +1940,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </div><!-- fragment --></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The currently configured RF Channel </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00533">533</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00529">529</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1972,7 +1972,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00541">541</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00537">537</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -1999,7 +1999,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classRF24.html#a343e5d23477181011dea030fafb1954f">setPayloadSize()</a></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes in the payload </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00553">553</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l00549">549</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2030,7 +2030,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 </div><!-- fragment --></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Payload length of last-received dynamic payload </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01303">1303</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01299">1299</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2055,7 +2055,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">setAutoAck()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>ACK payloads are dynamic payloads. This function automatically enables dynamic payloads on pipe 0 by default. Call <a class="el" href="classRF24.html#a443888504975d7441d6452a09d09a8fa">enableDynamicPayloads()</a> to enable on all pipes (especially for RX nodes that use pipes other than pipe 0 to receive transmissions expecting responses with ACK payloads). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01517">1517</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01513">1513</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2077,7 +2077,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <p>Disable custom payloads on the ackowledge packets</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classRF24.html#abf8efced2ee9edbcc6510878b20edc1b">enableAckPayload()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01535">1535</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01531">1531</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2099,7 +2099,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <p>Enable dynamically-sized payloads</p>
 <p>This way you don't always have to send large packets just to send them once in a while. This enables dynamic payloads on ALL pipes. </p>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01477">1477</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01473">1473</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2121,7 +2121,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <p>Disable dynamically-sized payloads</p>
 <p>This disables dynamic payloads on ALL pipes. Since Ack Payloads requires Dynamic Payloads, Ack Payloads are also disabled. If dynamic payloads are later re-enabled and ack payloads are desired then <a class="el" href="classRF24.html#abf8efced2ee9edbcc6510878b20edc1b">enableAckPayload()</a> must be called again as well. </p>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01496">1496</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01492">1492</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2148,7 +2148,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <div class="fragment"><div class="line">radio.write(&amp;data, 32, 1); <span class="comment">// Sends a payload with no acknowledgement requested</span></div>
 <div class="line">radio.write(&amp;data, 32, 0); <span class="comment">// Sends a payload using auto-retry/autoACK</span></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01549">1549</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01545">1545</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2170,7 +2170,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
 <p>Determine whether the hardware is an nRF24L01+ or not.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if the hardware is nRF24L01+ (or compatible) and false if its not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01582">1582</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01578">1578</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2209,7 +2209,7 @@ To use this function in the python wrapper: <div class="fragment"><div class="li
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01589">1589</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01585">1585</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2263,7 +2263,7 @@ disableAckPayloads()</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01604">1604</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01600">1600</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2320,7 +2320,7 @@ description when<br  />
 </table>
 <dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classRF24.html#af7c4dcd84466168c5816382ceb366067">getPALevel()</a> function does not care what was passed <code>lnaEnable</code> parameter. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01636">1636</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01632">1632</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2343,7 +2343,7 @@ description when<br  />
 <dl class="section return"><dt>Returns</dt><dd>One of the values defined by <a class="el" href="group__PALevel.html#ga1e4cd0bea93e6b43422855fb0120aace">rf24_pa_dbm_e</a>.<br  />
  See tables in <a class="el" href="group__PALevel.html#ga1e4cd0bea93e6b43422855fb0120aace">rf24_pa_dbm_e</a> or <a class="el" href="classRF24.html#ab6a711a9cc14fb459a4a1698b8665d82">setPALevel()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01652">1652</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01648">1648</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2366,7 +2366,7 @@ description when<br  />
 <p>Value resets with each new transmission. Allows roughly estimating signal strength.</p>
 <dl class="section return"><dt>Returns</dt><dd>Returns values from 0 to 15. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01660">1660</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01656">1656</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2405,7 +2405,7 @@ description when<br  />
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the change was successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01668">1668</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01664">1664</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2428,7 +2428,7 @@ description when<br  />
 <dl class="section return"><dt>Returns</dt><dd>One of the values defined by <a class="el" href="group__Datarate.html#ga82745de4aa1251b7561564b3ed1d6522">rf24_datarate_e</a>.<br  />
  See table in <a class="el" href="group__Datarate.html#ga82745de4aa1251b7561564b3ed1d6522">rf24_datarate_e</a> or <a class="el" href="classRF24.html#aeb9920e7a95699748b003c4a839b0814">setDataRate()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01713">1713</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01709">1709</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2465,7 +2465,7 @@ CRC cannot be disabled if auto-ack is enabled </p><dl class="params"><dt>Paramet
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01735">1735</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01731">1731</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2488,7 +2488,7 @@ CRC cannot be disabled if auto-ack is enabled </p><dl class="params"><dt>Paramet
 CRC checking cannot be disabled if auto-ack is enabled </p><dl class="section return"><dt>Returns</dt><dd>One of the values defined by <a class="el" href="group__CRCLength.html#gadbe00719f3f835c82bd007081d040a7e">rf24_crclength_e</a>.<br  />
  See table in <a class="el" href="group__CRCLength.html#gadbe00719f3f835c82bd007081d040a7e">rf24_crclength_e</a> or <a class="el" href="classRF24.html#a89f626fc4a58dd997153bcc0f8198b9e">setCRCLength()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01753">1753</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01749">1749</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2510,7 +2510,7 @@ CRC checking cannot be disabled if auto-ack is enabled </p><dl class="section re
 <p>Disable CRC validation</p>
 <dl class="section warning"><dt>Warning</dt><dd>CRC cannot be disabled if auto-ack/ESB is enabled. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01772">1772</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01768">1768</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2561,7 +2561,7 @@ CRC checking cannot be disabled if auto-ack is enabled </p><dl class="section re
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01292">1292</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01288">1288</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2608,7 +2608,7 @@ CRC checking cannot be disabled if auto-ack is enabled </p><dl class="section re
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01785">1785</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01781">1781</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2633,14 +2633,14 @@ CRC checking cannot be disabled if auto-ack is enabled </p><dl class="section re
 <div class="line"><a class="code" href="classRF24.html#a89f626fc4a58dd997153bcc0f8198b9e">setCRCLength</a>(<a class="code" href="group__CRCLength.html#ggadbe00719f3f835c82bd007081d040a7ea6eeb0379e23be63559106d96ada47a56">RF24_CRC_16</a>);</div>
 <div class="line"><a class="code" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">setAutoAck</a>(<span class="keyword">true</span>);</div>
 <div class="line"><a class="code" href="classRF24.html#a4c6d3959c8320e64568395f4ef507aef">setRetries</a>(5, 15);</div>
-<div class="ttc" id="aclassRF24_html_a4c6d3959c8320e64568395f4ef507aef"><div class="ttname"><a href="classRF24.html#a4c6d3959c8320e64568395f4ef507aef">RF24::setRetries</a></div><div class="ttdeci">void setRetries(uint8_t delay, uint8_t count)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01779">RF24.cpp:1779</a></div></div>
-<div class="ttc" id="aclassRF24_html_a89f626fc4a58dd997153bcc0f8198b9e"><div class="ttname"><a href="classRF24.html#a89f626fc4a58dd997153bcc0f8198b9e">RF24::setCRCLength</a></div><div class="ttdeci">void setCRCLength(rf24_crclength_e length)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01735">RF24.cpp:1735</a></div></div>
-<div class="ttc" id="aclassRF24_html_aec71746d59da978bcbb975167886a2cc"><div class="ttname"><a href="classRF24.html#aec71746d59da978bcbb975167886a2cc">RF24::setAutoAck</a></div><div class="ttdeci">void setAutoAck(bool enable)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01589">RF24.cpp:1589</a></div></div>
+<div class="ttc" id="aclassRF24_html_a4c6d3959c8320e64568395f4ef507aef"><div class="ttname"><a href="classRF24.html#a4c6d3959c8320e64568395f4ef507aef">RF24::setRetries</a></div><div class="ttdeci">void setRetries(uint8_t delay, uint8_t count)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01775">RF24.cpp:1775</a></div></div>
+<div class="ttc" id="aclassRF24_html_a89f626fc4a58dd997153bcc0f8198b9e"><div class="ttname"><a href="classRF24.html#a89f626fc4a58dd997153bcc0f8198b9e">RF24::setCRCLength</a></div><div class="ttdeci">void setCRCLength(rf24_crclength_e length)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01731">RF24.cpp:1731</a></div></div>
+<div class="ttc" id="aclassRF24_html_aec71746d59da978bcbb975167886a2cc"><div class="ttname"><a href="classRF24.html#aec71746d59da978bcbb975167886a2cc">RF24::setAutoAck</a></div><div class="ttdeci">void setAutoAck(bool enable)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01585">RF24.cpp:1585</a></div></div>
 <div class="ttc" id="agroup__CRCLength_html_ggadbe00719f3f835c82bd007081d040a7ea6eeb0379e23be63559106d96ada47a56"><div class="ttname"><a href="group__CRCLength.html#ggadbe00719f3f835c82bd007081d040a7ea6eeb0379e23be63559106d96ada47a56">RF24_CRC_16</a></div><div class="ttdeci">@ RF24_CRC_16</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00104">RF24.h:103</a></div></div>
 </div><!-- fragment --> </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classRF24.html#ac43ad43c34337ec0de189105bab2213b">startConstCarrier()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01819">1819</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01815">1815</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2686,7 +2686,7 @@ Pipe 0 is also used by the writing pipe so should typically be avoided as a read
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01389">1389</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01385">1385</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2708,7 +2708,7 @@ Pipe 0 is also used by the writing pipe so should typically be avoided as a read
 <p>Open a pipe for writing </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>For compatibility with old code only, see newer function <a class="el" href="classRF24.html#af2e409e62d49a23e372a70b904ae30e1">openWritingPipe()</a></dd></dl>
 <p>Addresses are 40-bit hex values, e.g.:</p>
 <div class="fragment"><div class="line"><a class="code" href="classRF24.html#af2e409e62d49a23e372a70b904ae30e1">openWritingPipe</a>(0xF0F0F0F0F0);</div>
-<div class="ttc" id="aclassRF24_html_af2e409e62d49a23e372a70b904ae30e1"><div class="ttname"><a href="classRF24.html#af2e409e62d49a23e372a70b904ae30e1">RF24::openWritingPipe</a></div><div class="ttdeci">void openWritingPipe(const uint8_t *address)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01377">RF24.cpp:1377</a></div></div>
+<div class="ttc" id="aclassRF24_html_af2e409e62d49a23e372a70b904ae30e1"><div class="ttname"><a href="classRF24.html#af2e409e62d49a23e372a70b904ae30e1">RF24::openWritingPipe</a></div><div class="ttdeci">void openWritingPipe(const uint8_t *address)</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01373">RF24.cpp:1373</a></div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">address</td><td>The 40-bit address of the pipe to open. </td></tr>
@@ -2716,7 +2716,7 @@ Pipe 0 is also used by the writing pipe so should typically be avoided as a read
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01367">1367</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01363">1363</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2739,7 +2739,7 @@ Pipe 0 is also used by the writing pipe so should typically be avoided as a read
 <dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Call <a class="el" href="classRF24.html#a8e2eacacfba96426c192066f04054c5b">read()</a> to retrieve the ack payload.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>True if an ack payload is available. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01575">1575</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01571">1571</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
 </div>
 </div>
@@ -2823,7 +2823,7 @@ Pipe 0 is also used by the writing pipe so should typically be avoided as a read
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 14 2021 23:21:35 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Jul 2 2021 11:33:28 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

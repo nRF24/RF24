@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.0</span>
+   &#160;<span id="projectnumber">v1.4.1</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -186,7 +186,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    memcpy(payload.message, <span class="stringliteral">&quot;World &quot;</span>, 6);                       <span class="comment">// set the payload message</span></div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">// load the payload for the first received transmission on pipe 0</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    radio.writeAckPayload(1, &amp;payload, <span class="keyword">sizeof</span>(PayloadStruct));</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    radio.writeAckPayload(1, &amp;payload, <span class="keyword">sizeof</span>(payload));</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    radio.startListening();                                     <span class="comment">// put radio in RX mode</span></div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  }</div>
@@ -288,7 +288,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      memcpy(payload.message, <span class="stringliteral">&quot;World &quot;</span>, 6); <span class="comment">// change payload message</span></div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="comment">// load the payload for the first received transmission on pipe 0</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      radio.writeAckPayload(1, &amp;payload, <span class="keyword">sizeof</span>(PayloadStruct));</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      radio.writeAckPayload(1, &amp;payload, <span class="keyword">sizeof</span>(payload));</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      radio.startListening();</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
@@ -301,7 +301,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 14 2021 23:21:35 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Jul 2 2021 11:33:28 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
