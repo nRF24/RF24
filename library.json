@@ -1,7 +1,7 @@
 {
     "name": "RF24",
     "keywords": "rf, radio, wireless, spi",
-    "description": "Radio driver, OSI layer 2 library for nrf24L01(+) modules.",
+    "description": "Radio driver, OSI layer 2 library for nRF24L01(+) transceiver modules.",
     "license": "GPL-2.0-only",
     "repository": {
         "type": "git",
