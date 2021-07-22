@@ -15,12 +15,12 @@ symlink_directory = []
 # `tmp` folder that doesn't have the needed `../Makefile.inc`
 # NOTE can't access "../Makefile.inc" from working dir because
 # it's relative. Brute force absolute path dynamically.
-rf24_git_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
+git_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
 
 try:  # get compiler options from the generated Makefile.inc
-    with open(os.path.join(rf24_git_dir, "Makefile.inc"), "r") as f:
+    with open(os.path.join(git_dir, "Makefile.inc"), "r") as f:
         for line in f.read().splitlines():
-            identifier, value = line.split('=', 1)
+            identifier, value = line.split("=", 1)
             if identifier == "CPUFLAGS":
                 # this is never reached as CPUFLAGS var is concatenated into CFLAGS var.
                 # however the CFLAGS var may conditionally contain "-lwiringPi"
@@ -37,7 +37,7 @@ try:  # get compiler options from the generated Makefile.inc
 except FileNotFoundError:  # assuming lib was built & installed with CMake
 
     # get LIB_VERSION from library.properties file for Arduino IDE
-    with open(os.path.join(rf24_git_dir, "library.properties"), "r") as f:
+    with open(os.path.join(git_dir, "library.properties"), "r") as f:
         for line in f.read().splitlines():
             if line.startswith("version"):
                 version = line.split("=")[1]
@@ -53,7 +53,9 @@ finally:
             )
 
     if not symlink_directory:
-        print("install location of librf24.so isn't explicit; trying default locations.")
+        print(
+            "install location of librf24.so isn't explicit; trying default locations."
+        )
         symlink_directory = ["/usr/local/lib", "/usr/lib"]
 
     found_symlink = False
@@ -65,7 +67,7 @@ finally:
     if not found_symlink:
         raise FileNotFoundError(
             "RF24 library is not installed. librf24.so does not exist in {}.".format(
-                 " or ".join(symlink_directory)
+                " or ".join(symlink_directory)
             )
         )
 
@@ -80,20 +82,26 @@ else:
 
 crossunixccompiler.register()
 
+long_description = """
+.. warning:: This python wrapper for the RF24 C++ library was not intended
+    for distribution on pypi.org. If you're reading this, then this package
+    is likely unauthorized or unofficial.
+"""
+
+
 setup(
     name="RF24",
     version=version,
-    classifiers = [
+    license_files=os.path.join(git_dir, "LICENSE"),
+    long_description=long_description,
+    long_description_content_type="text/x-rst",
+    classifiers=[
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "Programming Language :: C++",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
     ext_modules=[
-        Extension(
-            "RF24",
-            libraries=["rf24", BOOST_LIB],
-            sources=["pyRF24.cpp"]
-        )
-    ]
+        Extension("RF24", sources=["pyRF24.cpp"], libraries=["rf24", BOOST_LIB])
+    ],
 )
