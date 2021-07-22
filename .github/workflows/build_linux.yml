@@ -273,10 +273,18 @@ jobs:
           file ./gettingstarted
 
       # cross-compiling a python C extension is better done with pypa/cibuildwheel action
+      - name: Set up Python 3.7
+        if: ${{ matrix.toolchain.compiler == 'default' }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
       - name: provide python wrapper prerequisites
         if: ${{ matrix.toolchain.compiler == 'default' }}
         # python3-rpi.gpio is only required for physical hardware (namely the IRQ example)
-        run: sudo apt-get install python3-dev libboost-python-dev python3-setuptools
+        run: |
+          sudo apt-get install python3-dev libboost-python-dev python3-pip
+          python3 -m pip install --upgrade pip setuptools
 
       - name: create alias symlink to libboost_python3*.so
         if: ${{ matrix.toolchain.compiler == 'default' }}

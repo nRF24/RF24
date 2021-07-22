@@ -10,12 +10,20 @@ alternatively) and [Linux/RPi General](md_docs_rpi_general.html)
 
 ## Python2
 ```shell
-sudo apt-get install python-dev libboost-python-dev python-setuptools python-rpi.gpio
+sudo apt-get install python-dev libboost-python-dev python-pip python-rpi.gpio
+```
+Next, install some up-to-date python packages.
+```shell
+python -m pip install --upgrade pip setuptools
 ```
 
 ## Python3
 ```shell
-sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-rpi.gpio
+sudo apt-get install python3-dev libboost-python-dev python3-pip python3-rpi.gpio
+```
+Next, install some up-to-date python3 packages.
+```shell
+python3 -m pip install --upgrade pip setuptools
 ```
 
 # Installation:
