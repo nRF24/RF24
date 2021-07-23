@@ -35,6 +35,7 @@ doxygenAction
 __pycache__/
 *env
 *.pyc
+*.egg*
 build/
 *CMakeUserPresets*.json
 *.tar.gz

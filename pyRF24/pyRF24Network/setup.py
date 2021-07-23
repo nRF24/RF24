@@ -24,7 +24,8 @@ long_description = """
 setup(
     name="RF24Network",
     version="1.0",
-    license_files=os.path.join(git_dir, "LICENSE"),
+    license="GPLv2",
+    license_files=(os.path.join(git_dir, "LICENSE"),),
     long_description=long_description,
     long_description_content_type="text/x-rst",
     classifiers=[
