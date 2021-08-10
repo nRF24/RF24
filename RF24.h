@@ -154,6 +154,25 @@ protected:
 
     inline void endTransaction();
 
+    /**
+     * Read a chunk of data in from a register
+     *
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param buf Where to put the data
+     * @param len How many bytes of data to transfer
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
+     */
+    void read_register(uint8_t reg, uint8_t* buf, uint8_t len);
+
+    /**
+     * Read single byte from a register
+     *
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @return Current value of register @p reg
+     */
+    uint8_t read_register(uint8_t reg);
+
 public:
 
     /**
@@ -1716,25 +1735,6 @@ private:
      * for a much more detailed description of this pin.
      */
     void ce(bool level);
-
-    /**
-     * Read a chunk of data in from a register
-     *
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @param buf Where to put the data
-     * @param len How many bytes of data to transfer
-     * @return Nothing. Older versions of this function returned the status
-     * byte, but that it now saved to a private member on all SPI transactions.
-     */
-    void read_register(uint8_t reg, uint8_t* buf, uint8_t len);
-
-    /**
-     * Read single byte from a register
-     *
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @return Current value of register @p reg
-     */
-    uint8_t read_register(uint8_t reg);
 
     /**
      * Write a chunk of data to a register
