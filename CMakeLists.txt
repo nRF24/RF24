@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.15)
 # Set the project name to your project name
 project(RF24 C CXX)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/StandardProjectSettings.cmake)
-if(not "${CMAKE_CURRENT_LIST_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+if(NOT "${CMAKE_CURRENT_LIST_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     # python wrapper builds in source, but not in submodules' source
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/PreventInSourceBuilds.cmake)
 endif()
