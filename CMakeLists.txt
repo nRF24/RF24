@@ -10,8 +10,11 @@ cmake_minimum_required(VERSION 3.15)
 
 # Set the project name to your project name
 project(RF24 C CXX)
-include(cmake/StandardProjectSettings.cmake)
-include(cmake/PreventInSourceBuilds.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/StandardProjectSettings.cmake)
+if(not "${CMAKE_CURRENT_LIST_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+    # python wrapper builds in source, but not in submodules' source
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/PreventInSourceBuilds.cmake)
+endif()
 
 # allow CMake CLI options to configure RF24_config.h macros
 option(SERIAL_DEBUG "enable/disable debugging output" OFF)
@@ -36,15 +39,15 @@ add_library(project_warnings INTERFACE)
 include(cmake/Cache.cmake)
 
 # standard compiler warnings
-include(cmake/CompilerWarnings.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/CompilerWarnings.cmake)
 set_project_warnings(project_warnings)
 
 # sanitizer options if supported by compiler
-include(cmake/Sanitizers.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Sanitizers.cmake)
 enable_sanitizers(project_options)
 
 # allow for static analysis options
-include(cmake/StaticAnalyzers.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/StaticAnalyzers.cmake)
 
 option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
 option(ENABLE_TESTING "Enable Test Builds" OFF) # for end-user projects
@@ -66,14 +69,14 @@ endif()
 #####################################
 
 # get library info from Arduino IDE's required library.properties file
-include(cmake/GetLibInfo.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/GetLibInfo.cmake)
 
 # detect the CPU make and type
-include(cmake/detectCPU.cmake) # sets the variable SOC accordingly
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/detectCPU.cmake) # sets the variable SOC accordingly
 
 # auto-detect what driver to use
 # auto-detect can be overriden using `cmake .. -D RF24_DRIVER=<supported driver>`
-include(cmake/AutoConfig_RF24_DRIVER.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/AutoConfig_RF24_DRIVER.cmake)
 
 #[[ adding the utility sub-directory will
     1. set variables RF24_DRIVER, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
@@ -84,7 +87,7 @@ add_subdirectory(utility)
 
 # setup CPack options
 # package dependencies are resolved correctly only after utility subdirectory is added
-include(cmake/CPackInfo.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/CPackInfo.cmake)
 
 add_library(${LibTargetName} SHARED
     RF24.cpp

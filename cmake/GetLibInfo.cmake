@@ -1,5 +1,5 @@
 # get lib info from the maintained library.properties required by the Arduino IDE
-file(STRINGS ${CMAKE_SOURCE_DIR}/library.properties LibInfo)
+file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/library.properties LibInfo)
 foreach(line ${LibInfo})
     string(FIND ${line} "=" label_delimiter)
     if(${label_delimiter} GREATER 0)

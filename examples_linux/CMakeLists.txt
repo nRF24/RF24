@@ -8,7 +8,7 @@ set(EXAMPLES_LIST
     streamingData
     multiceiverDemo
     scanner
-    )
+)
 
 project(RF24LogExamples)
 add_compile_options(-Ofast -Wall) # passing the compiler a `-pthread` flag doesn't work here

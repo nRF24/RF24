@@ -22,7 +22,7 @@ set(EXAMPLES_LIST
     multiceiverDemo
     interruptConfigure
     scanner
-    )
+)
 
 foreach(example ${EXAMPLES_LIST})
     # make a target
@@ -34,7 +34,7 @@ foreach(example ${EXAMPLES_LIST})
         pico_stdlib
         hardware_spi
         hardware_gpio
-        )
+    )
 
     # specify USB port as default serial communication's interface (not UART RX/TX pins)
     pico_enable_stdio_usb(${example} 1)
