@@ -39,3 +39,15 @@ __pycache__/
 build/
 *CMakeUserPresets*.json
 *.tar.gz
+
+# Cmake build-in-source generated stuff
+CMakeCache.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CMakeFiles
+DEBIAN
+cmake_install.cmake
+compile_commands.json
+utility/Makefile
+# Makefile is modified when `cmake .` is run
+# Makefile # preserve old/traditional build system
