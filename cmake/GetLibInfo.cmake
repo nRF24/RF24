@@ -26,7 +26,7 @@ foreach(line ${LibInfo})
     endif()
 endforeach()
 
-# convert the LibName to lower case & strip surrounding whitespace
+# convert the LibName to lower case
 string(TOLOWER ${LibName} LibTargetName)
 
 #parse the version information into pieces.
