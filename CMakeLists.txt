@@ -106,14 +106,14 @@ set_target_properties(
 if(NOT "${RF24_LINKED_DRIVER}" STREQUAL "") # linking to a pre-compiled utility driver
     message(STATUS "Using utility library: ${RF24_LINKED_DRIVER}")
     target_link_libraries(${LibTargetName} INTERFACE
-        project_options
-        project_warnings
+        ${LibTargetName}_project_options
+        ${LibTargetName}_project_warnings
         STATIC RF24_LINKED_DRIVER
     )
 else() # utility driver is compiled with the library - not linking to a pre-compiled utility driver
     target_link_libraries(${LibTargetName} INTERFACE
-        project_options
-        project_warnings
+        ${LibTargetName}_project_options
+        ${LibTargetName}_project_warnings
     )
 endif()
 
