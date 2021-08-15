@@ -11,10 +11,7 @@ cmake_minimum_required(VERSION 3.15)
 # Set the project name to your project name
 project(RF24 C CXX)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/StandardProjectSettings.cmake)
-
-if(NOT pybind11_FOUND) # python wrapper builds in source
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/PreventInSourceBuilds.cmake)
-endif()
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/PreventInSourceBuilds.cmake)
 
 # get library info from Arduino IDE's required library.properties file
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/GetLibInfo.cmake)
