@@ -199,10 +199,6 @@ if __name__ == "__main__":
             )
         )
 
-    # set the Power Amplifier level to -12 dBm since this test example is
-    # usually run with nRF24L01 transceivers in close proximity of each other
-    radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
     # ACK payloads are dynamically sized.
     radio.enableDynamicPayloads()  # to use ACK payloads
 

@@ -135,10 +135,7 @@ private:
     #endif
     uint8_t status; /** The status byte returned from every SPI transaction */
     uint8_t payload_size; /** Fixed size of payloads */
-    bool dynamic_payloads_enabled; /** Whether dynamic payloads are enabled. */
-    bool ack_payloads_enabled; /** Whether ack payloads are enabled. */
     uint8_t pipe0_reading_address[5]; /** Last address set on pipe 0 for reading. */
-    uint8_t addr_width; /** The address width to use (3, 4 or 5 bytes). */
     uint8_t config_reg; /** For storing the value of the NRF_CONFIG register */
     bool _is_p_variant; /** For storing the result of testing the toggleFeatures() affect */
 
@@ -153,6 +150,10 @@ protected:
     inline void beginTransaction();
 
     inline void endTransaction();
+
+    bool ack_payloads_enabled; /** Whether ack payloads are enabled. */
+    uint8_t addr_width; /** The address width to use (3, 4 or 5 bytes). */
+    bool dynamic_payloads_enabled; /** Whether dynamic payloads are enabled. */
 
     /**
      * Read a chunk of data in from a register
@@ -1499,11 +1500,11 @@ public:
      *
      * @param speed Specify one of the following values (as defined by
      * @ref rf24_datarate_e):
-     * | @p speed (enum value) | description |
-     * |:---------------------:|:-----------:|
-     * | @ref RF24_1MBPS (0)   | for 1 Mbps  |
-     * | @ref RF24_2MBPS (1)   | for 2 Mbps  |
-     * | @ref RF24_250KBPS (2) | for 250 kbs |
+     * | @p speed (enum value) | description  |
+     * |:---------------------:|:------------:|
+     * | @ref RF24_1MBPS (0)   | for 1 Mbps   |
+     * | @ref RF24_2MBPS (1)   | for 2 Mbps   |
+     * | @ref RF24_250KBPS (2) | for 250 kbps |
      *
      * @return true if the change was successful
      */
