@@ -175,8 +175,8 @@
 
             // Since the official arduino/ArduinoCore-samd repo switched to a unified API in 2016,
             // Serial.printf() is no longer defined in the unifying Arduino/ArduinoCore-API repo
-            #if defined (ARDUINO_ARCH_SAMD) && !defined (ARDUINO_API_VERSION)
-                // likely using the adafruit/ArduinoCore-samd repo
+            #if defined (ARDUINO_ARCH_SAMD) && defined (ARDUINO_SAMD_ADAFRUIT)
+                // it is defined if using the adafruit/ArduinoCore-samd repo
                 #define printf_P Serial.printf
             #endif // defined (ARDUINO_ARCH_SAMD)
 
