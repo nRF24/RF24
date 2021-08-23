@@ -61,6 +61,7 @@ jobs:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
         run: pio package publish --owner nrf24
 
+
   check_formatting:
     runs-on: ubuntu-latest
 
