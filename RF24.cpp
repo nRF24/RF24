@@ -681,16 +681,16 @@ void RF24::printDetails(void)
 
     printf_P(PSTR("Data Rate\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])));
     printf_P(PSTR("Model\t\t= "
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_model_e_str_P[isPVariant()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_model_e_str_P[isPVariant()])));
     printf_P(PSTR("CRC Length\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])));
     printf_P(PSTR("PA Power\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])));
     printf_P(PSTR("ARC\t\t= %d\r\n"), getARC());
 }
 
@@ -714,16 +714,16 @@ void RF24::printPrettyDetails(void) {
 
     printf_P(PSTR("RF Data Rate\t\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])));
     printf_P(PSTR("RF Power Amplifier\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])));
     printf_P(PSTR("RF Low Noise Amplifier\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])));
     printf_P(PSTR("CRC Length\t\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])));
     printf_P(PSTR("Address Length\t\t= %d bytes\r\n"), (read_register(SETUP_AW) & 3) + 2);
     printf_P(PSTR("Static Payload Length\t= %d bytes\r\n"), getPayloadSize());
 
@@ -738,22 +738,22 @@ void RF24::printPrettyDetails(void) {
     uint8_t features = read_register(FEATURE);
     printf_P(PSTR("Multicast\t\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(features & _BV(EN_DYN_ACK)) * 2])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(features & _BV(EN_DYN_ACK)) * 2])));
     printf_P(PSTR("Custom ACK Payload\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(features & _BV(EN_ACK_PAY)) * 1])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(features & _BV(EN_ACK_PAY)) * 1])));
 
     uint8_t dynPl = read_register(DYNPD);
     printf_P(PSTR("Dynamic Payloads\t"
     PRIPSTR
-    "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[(dynPl && (features &_BV(EN_DPL))) * 1])));
+    "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[(dynPl && (features &_BV(EN_DPL))) * 1])));
 
     uint8_t autoAck = read_register(EN_AA);
     if (autoAck == 0x3F || autoAck == 0) {
         // all pipes have the same configuration about auto-ack feature
         printf_P(PSTR("Auto Acknowledgment\t"
         PRIPSTR
-        "\r\n"), static_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1])));
+        "\r\n"), reinterpret_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1])));
     } else {
         // representation per pipe
         printf_P(PSTR("Auto Acknowledgment\t= 0b%c%c%c%c%c%c\r\n"),
@@ -774,7 +774,7 @@ void RF24::printPrettyDetails(void) {
         bool isOpen = openPipes & _BV(i);
         printf_P(PSTR("pipe %u ("
         PRIPSTR
-        ") bound"), i, static_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[isOpen + 3])));
+        ") bound"), i, reinterpret_cast<char *>(pgm_read_ptr(&rf24_feature_e_str_P[isOpen + 3])));
         if (i < 2) {
             print_address_register(PSTR(""), static_cast<uint8_t>(RX_ADDR_P0 + i));
         }
