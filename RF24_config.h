@@ -68,6 +68,8 @@
 #else //Everything else
     #include <Arduino.h>
 
+    // This macro assumes that MCP23017::begin() was called by the application prior to RF24::begin().
+    #define USE_MCP23XXX_AS_CE mcp // the global MCP23017 object declared in main application's code space
 
     #if defined (ARDUINO) && !defined (__arm__) && !defined (__ARDUINO_X86__)
         #if defined SPI_UART
