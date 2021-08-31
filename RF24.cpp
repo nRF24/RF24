@@ -101,11 +101,16 @@ void RF24::csn(bool mode)
 
 void RF24::ce(bool level)
 {
-    //Allow for 3-pin use on ATTiny
-    if (ce_pin != csn_pin) {
+#if defined USE_MCP23XXX_AS_CE
+    USE_MCP23XXX_AS_CE.digitalWrite(ce_pin, level);
+#else // !defined(USE_MCP23XXX_AS_CE)
+    if (ce_pin != csn_pin)
+    {
         digitalWrite(ce_pin, level);
     }
+#endif // !defined(USE_MCP23XXX_AS_CE)
 }
+
 
 /****************************************************************************/
 
@@ -820,6 +825,8 @@ bool RF24::begin(void)
 
 /****************************************************************************/
 
+// This modification assumes you passed the MCP23017 pin number to the RF24 constructor's _ce_pin parameter
+
 bool RF24::_init_pins()
 {
     if (!isValid()) {
@@ -854,9 +861,15 @@ bool RF24::_init_pins()
 
     // Initialize pins
     if (ce_pin != csn_pin) {
+        #if !defined (USE_MCP23XXX_AS_CE)
         pinMode(ce_pin, OUTPUT);
+        #endif // !defined (USE_MCP23XXX_AS_CE)
         pinMode(csn_pin, OUTPUT);
     }
+  
+        #if defined (USE_MCP23XXX_AS_CE)
+    USE_MCP23XXX_AS_CE.pinMode(ce_pin, OUTPUT);
+        #endif // defined(USE_MCP23XXX_AS_CE)
 
     ce(LOW);
     csn(HIGH);
@@ -868,6 +881,7 @@ bool RF24::_init_pins()
 
     return true; // assuming pins are connected properly
 }
+
 
 /****************************************************************************/
 
