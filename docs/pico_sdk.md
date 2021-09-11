@@ -63,6 +63,9 @@ come from the Pico SDK repository's
    the board you selected with the `-DPICO_BOARD` option (in step 2) does not have a
    default set of SPI pins defined for it. To workaround this error, see the
    below instructions to use different pins for the SPI bus.
+   
+   @warning If doing consecutive build attempts, it is strongly encouraged to delete all files in the build
+   directory before re-attempting to build the project.
 
 ## Incorporating RF24 libs into your project
 In order to use the RF24 libraries in your RP2040 based project:
@@ -84,23 +87,23 @@ In order to use the RF24 libraries in your RP2040 based project:
    CMakeLists.txt file (usually located in the "src" directory). The following snippet
    assumes that your project's "src" directory is on the same level as the previously
    mentioned "lib" directory.
-   ```txt
+   ```cmake
    include(../lib/RF24/CMakeLists.txt)
    include(../lib/RF24Network/CMakeLists.txt)
    include(../lib/RF24Mesh/CMakeLists.txt)
    ```
 3. In the same CMakeLists.txt file from step 2, add the RF24 libraries into the
    `target_link_libraries` configuration:
-   ```txt
+   ```cmake
    target_link_libraries(${CMAKE_PROJECT_NAME}
        # ... Your project's other libraries ...
        RF24
        RF24Network
        RF24Mesh
-       )
+   )
    ```
    If you are using tinyUSB, this line (or similar) should already exist:
-   ```txt
+   ```cmake
    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
    ```
 4. Finally, remember to include the necessary RF24* libraries' header files in your
@@ -121,7 +124,7 @@ If someone is so inclined to implement this using the Pico SDK's PIO (Programabl
 Output) feature, please submit an issue or pull request to the
 [RF24 repository](http://github.com/nRF24/RF24).
 
-@warning Before deciding what pins to use for the SPI bus, review the
+@note Before deciding what pins to use for the SPI bus, review the
 [GPIO pins' "Function Select Table" in the Pico SDK documentation](https://raspberrypi.github.io/pico-sdk-doxygen/group__hardware__gpio.html#details).
 There are essentially 2 SPI buses with multiple pin options for each.
 
@@ -149,13 +152,13 @@ int main()
 ### Build-time configuration option
 To specify the default SPI pins used at build time, you can use either:
 1. declare these pins in the CMakeLists.txt file
-   ```txt
+   ```cmake
    target_compile_definitions(${CMAKE_PROJECT_NAME}
        PUBLIC PICO_DEFAULT_SPI=0 # can only be 0 or 1 (as in `spi0` or `spi1`)
        PUBLIC PICO_DEFAULT_SPI_SCK_PIN=2 # depends on which SPI bus (0 or 1) is being used
        PUBLIC PICO_DEFAULT_SPI_TX_PIN=3  # depends on which SPI bus (0 or 1) is being used
        PUBLIC PICO_DEFAULT_SPI_RX_PIN=4  # depends on which SPI bus (0 or 1) is being used
-       )
+   )
    ```
 2. additional command line arguments
    ```shell
