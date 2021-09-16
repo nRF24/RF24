@@ -113,6 +113,9 @@ In order to use the RF24 libraries in your RP2040 based project:
    #include <RF24Network.h>
    #include <RF24Mesh.h>
    ```
+   @note Any of the project's source file(s) that includes any of RF24* libraries must be a C++ file.
+   It is highly recommended to use the `.cpp` file extension for such project source files.
+
 ## Using different pins for the SPI bus
 Initially (without modification), the SPI bus uses the default pins defined in the
 Pico SDK repository's [pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards).
