@@ -143,9 +143,9 @@ RF24 radio(7, 8); // pin numbers connected to the radio's CE and CSN pins (respe
 int main()
 {
     // again please review the GPIO pins' "Function Select Table" in the Pico SDK docs
-    SPI.begin(spi0, 2, 3, 4); // must use spi0 or spi1 as 1st parameter
+    spi.begin(spi0, 2, 3, 4); // spi0 or spi1 bus, SCK, TX, RX
 
-    if (!radio.begin(&SPI)) {
+    if (!radio.begin(&spi)) {
         printf("Radio hardware is not responding!\n");
     }
     // continue with program as normal ...
