@@ -139,14 +139,13 @@ then passing the `SPI` object to `RF24::begin(_SPI*)`.
 #include <RF24.h>
 
 RF24 radio(7, 8); // pin numbers connected to the radio's CE and CSN pins (respectively)
-SPI spi_;
 
 int main()
 {
     // again please review the GPIO pins' "Function Select Table" in the Pico SDK docs
-    spi_.begin(spi0, 2, 3, 4); // spi0 or spi1 bus, SCK, TX, RX
+    spi.begin(spi0, 2, 3, 4); // spi0 or spi1 bus, SCK, TX, RX
 
-    if (!radio.begin(&spi_)) {
+    if (!radio.begin(&spi)) {
         printf("Radio hardware is not responding!\n");
     }
     // continue with program as normal ...
