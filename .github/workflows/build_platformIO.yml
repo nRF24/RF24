@@ -17,7 +17,7 @@ on:
       - "!examples/old_backups/**"
       - "!examples/rf24_ATTiny/**"
   release:
-    types: [published, edited]
+    types: [created]
 
 jobs:
   validate_lib_json:
@@ -55,7 +55,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: upload package to PlatformIO Registry
-        if: github.event_name == 'release' && github.event_type != 'edited'
+        if: github.event_name == 'release' && github.event_type != 'created'
         # PIO lib packages cannot be re-published under the same tag
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
