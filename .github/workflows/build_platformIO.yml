@@ -59,7 +59,7 @@ jobs:
         # PIO lib packages cannot be re-published under the same tag
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
-        run: pio package publish --owner nrf24
+        run: pio package publish --owner nrf24 --non-interactive
 
 
   check_formatting:
