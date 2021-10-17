@@ -525,7 +525,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 /****************************************************************************/
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
-        :ce_pin(_cepin), csn_pin(_cspin), spi_speed(_spi_speed), payload_size(32), _is_p_variant(false), addr_width(5), dynamic_payloads_enabled(true),
+        :ce_pin(_cepin), csn_pin(_cspin), spi_speed(_spi_speed), payload_size(32), _is_p_variant(false), _is_p0_rx(false), addr_width(5), dynamic_payloads_enabled(true),
          csDelay(5)
 {
     _init_obj();
@@ -534,7 +534,7 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed)
 /****************************************************************************/
 
 RF24::RF24(uint32_t _spi_speed)
-        :ce_pin(0xFFFF), csn_pin(0xFFFF), spi_speed(_spi_speed), payload_size(32), _is_p_variant(false), addr_width(5), dynamic_payloads_enabled(true),
+        :ce_pin(0xFFFF), csn_pin(0xFFFF), spi_speed(_spi_speed), payload_size(32), _is_p_variant(false), _is_p0_rx(false), addr_width(5), dynamic_payloads_enabled(true),
          csDelay(5)
 {
     _init_obj();
@@ -1010,7 +1010,7 @@ void RF24::startListening(void)
     ce(HIGH);
 
     // Restore the pipe0 address, if exists
-    if (pipe0_reading_address[0] > 0) {
+    if (_is_p0_rx) {
         write_register(RX_ADDR_P0, pipe0_reading_address, addr_width);
     } else {
         closeReadingPipe(0);
@@ -1426,6 +1426,7 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
     // startListening() will have to restore it.
     if (child == 0) {
         memcpy(pipe0_reading_address, &address, addr_width);
+        _is_p0_rx = true;
     }
 
     if (child <= 5) {
@@ -1467,6 +1468,7 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t* address)
     // startListening() will have to restore it.
     if (child == 0) {
         memcpy(pipe0_reading_address, address, addr_width);
+        _is_p0_rx = true;
     }
     if (child <= 5) {
         // For pipes 2-5, only write the LSB
@@ -1489,6 +1491,10 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t* address)
 void RF24::closeReadingPipe(uint8_t pipe)
 {
     write_register(EN_RXADDR, static_cast<uint8_t>(read_register(EN_RXADDR) & ~_BV(pgm_read_byte(&child_pipe_enable[pipe]))));
+    if (!pipe) {
+        // keep track of pipe 0's RX state to avoid null vs 0 in addr cache
+        _is_p0_rx = false;
+    }
 }
 
 /****************************************************************************/

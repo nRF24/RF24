@@ -138,7 +138,7 @@ private:
     uint8_t pipe0_reading_address[5]; /** Last address set on pipe 0 for reading. */
     uint8_t config_reg; /** For storing the value of the NRF_CONFIG register */
     bool _is_p_variant; /** For storing the result of testing the toggleFeatures() affect */
-
+    bool _is_p0_rx; /** For keeping track of pipe 0's usage in user-triggered RX mode. */
 
 protected:
     /**
