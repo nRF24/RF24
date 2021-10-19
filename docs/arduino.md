@@ -1,7 +1,9 @@
 # Arduino
+
+<!-- markdownlint-disable MD031 -->
 RF24 is fully compatible with Arduino boards.
 
-See http://www.arduino.cc/en/Reference/Board and http://arduino.cc/en/Reference/SPI for more information
+See [Arduino Board reference](http://www.arduino.cc/en/Reference/Board) and [Arduino SPI reference](http://arduino.cc/en/Reference/SPI) for more information
 
 RF24 makes use of the standard hardware SPI pins (MISO, MOSI, SCK) and requires two additional pins, to control
 the chip-select and chip-enable functions.
@@ -9,6 +11,7 @@ the chip-select and chip-enable functions.
 ```cpp
 RF24 radio(ce_pin, cs_pin);
 ```
+
 These pins must be chosen and designated by the user and can use any
 available pins.
 
@@ -17,9 +20,11 @@ available pins.
 RF24 supports alternate SPI methods, in case the standard hardware SPI pins are otherwise unavailable.
 
 ### Software Driven SPI
+
 Software driven SPI is provided by the [DigitalIO library](https://github.com/greiman/DigitalIO).
 
 Setup:
+
 1. Install the digitalIO library
 2. Open RF24_config.h in a text editor.
    Uncomment the line
@@ -36,23 +41,28 @@ Setup:
    ```
 
 @note Note: Pins are listed as follows and can be modified by editing the RF24_config.h file.
+
 ```cpp
 #define SOFT_SPI_MISO_PIN 16
 #define SOFT_SPI_MOSI_PIN 15
 #define SOFT_SPI_SCK_PIN 14
 ```
+
 Or add the build flag/option
+
 ```shell
 -DSOFT_SPI_MISO_PIN=16 -DSOFT_SPI_MOSI_PIN=15 -DSOFT_SPI_SCK_PIN=14
 ```
 
-### Alternate Hardware (UART) Driven  SPI
+### Alternate Hardware (UART) Driven SPI
+
 The Serial Port (UART) on Arduino can also function in SPI mode, and can double-buffer data, while the
 default SPI hardware cannot.
 
-The SPI_UART library is available at https://github.com/TMRh20/Sketches/tree/master/SPI_UART
+The SPI_UART library is available at [TMRh20/Sketches](https://github.com/TMRh20/Sketches/tree/master/SPI_UART)
 
 Enabling:
+
 1. Install the SPI_UART library
 2. Edit RF24_config.h and uncomment
    ```cpp
@@ -66,28 +76,28 @@ Enabling:
 SPI_UART SPI Pin Connections:
 | NRF |Arduino Uno Pin|
 |----:|:--------------|
-| MOSI| TX(0)         |
-| MISO| RX(1)         |
-| SCK | XCK(4)        |
-| CE  | User Specified|
+| MOSI| TX(0) |
+| MISO| RX(1) |
+| SCK | XCK(4) |
+| CE | User Specified|
 | CSN | User Specified|
 
-
-@note SPI_UART on Mega boards requires soldering to an unused pin on the chip. <br>See
-https://github.com/TMRh20/RF24/issues/24 for more information on SPI_UART.
+@note SPI_UART on Mega boards requires soldering to an unused pin on the chip. See [#24](https://github.com/TMRh20/RF24/issues/24) for more information on SPI_UART.
 
 ### Using a specific SPI Bus
+
 An alternate SPI bus can be specified using the overloaded `RF24::begin(_SPI*)` method.
 This is useful for some boards that offer more than 1 hardware-driven SPI bus or cetain Arduino
 cores that implement a software-driven (AKA bit-banged) SPI bus that does not use the DigitalIO
 library.
 
-@warning The SPI bus object's <b>`SPIClass::begin()`</b> method <b>must</b> be called before
+@warning The SPI bus object's `SPIClass::begin()` method **must** be called before
 calling the overloaded `RF24::begin(_SPI*)` method.
 
 Below are some example snippets that demonstrate how this can be done.
 
 #### ESP8266 example
+
 @see The following example code is meant for the popular NodeMCU board. Please refer to the
 [ESP8266 ArduinoCore's SPI documentation](https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#spi)
 for [other ESP8266-based boards](https://arduino-esp8266.readthedocs.io/en/latest/boards.html#).
@@ -124,6 +134,7 @@ void setup() {
 ```
 
 #### ESP32 example
+
 @see Please review the Espressif's
 [SPI_Multiple_Buses.ino example for the ESP32](https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino)
 located in their ArduinoCore repository (along with the SPI library for the ESP32).
@@ -167,7 +178,8 @@ void setup() {
 ```
 
 #### Teensy example
-@see The overloaded RF24::begin(_SPI*) is not needed according to the
+
+@see The overloaded RF24::begin(\_SPI\*) is not needed according to the
 [Teensyduino SPI documentation](https://www.pjrc.com/teensy/td_libs_SPI.html).
 Please review the table provided in the
 [Teensyduino documentation](https://www.pjrc.com/teensy/td_libs_SPI.html) for what pins are used by

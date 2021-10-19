@@ -1,4 +1,6 @@
 # RaspberryPi Pico SDK (for the RP2040)
+
+<!-- markdownlint-disable MD031 MD046 -->
 Just to be very clear and concise: The following instructions are
 **not required to use the Arduino IDE** with any RP2040-based boards.
 These instructions pertain to using only the
@@ -6,6 +8,7 @@ These instructions pertain to using only the
 for RP2040 based boards.
 
 ## Prerequisite
+
 Follow the Raspberry Pi Foundation's
 ["Getting Started with Pico" document](https://rptl.io/pico-get-started) to
 setup a proper development environment on your host PC (the machine that
@@ -27,6 +30,7 @@ git submodules. For more detail, see the below instructions to incorporate
 RF24 libs into your project.
 
 ## Building the RF24 examples for the Pico SDK
+
 Each example imports a set of constants (`CE_PIN`, `CSN_PIN`, `IRQ_PIN`) from the
 examples_pico/defaultPins.h file. Default values for SPI pins (SCK, MOSI, MISO)
 come from the Pico SDK repository's
@@ -49,8 +53,7 @@ come from the Pico SDK repository's
    ```
    The supported RP2040-based boards are listed in header files in the Pico SDK
    repository's [pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards).
-   If the `-DPICO_BOARD` option is not specified, then the Pico SDK will default to
-   building for the Raspberry Pi Pico board.
+   If the `-DPICO_BOARD` option is not specified, then the Pico SDK will default to building for the Raspberry Pi Pico board.
 3. Build the examples using the CMakeLists.txt file located in the
    RF24/examples_pico directory.
    ```shell
@@ -63,26 +66,27 @@ come from the Pico SDK repository's
    the board you selected with the `-DPICO_BOARD` option (in step 2) does not have a
    default set of SPI pins defined for it. To workaround this error, see the
    below instructions to use different pins for the SPI bus.
-   
+
    @warning If doing consecutive build attempts, it is strongly encouraged to delete all files in the build
    directory before re-attempting to build the project.
 
 ## Incorporating RF24 libs into your project
+
 In order to use the RF24 libraries in your RP2040 based project:
 
 1. Make a copy of the RF24 library (and optionally RF24Network and RF24Mesh
    libraries) in a "lib" directory located in your project's root directory.
 
-        path/to/my/project/
-            lib/
-                RF24/
-                RF24Network/
-                RF24Mesh/
-            src/
-                CMakeLists.txt
-                ...
+         path/to/my/project/
+             lib/
+                 RF24/
+                 RF24Network/
+                 RF24Mesh/
+             src/
+                 CMakeLists.txt
+                 ...
 
-   Alternatively you can add the RF24* repositories as [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+   Alternatively you can add the RF24\* repositories as [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 2. Include their CMakeLists.txt files from the RF24 libraries in your project's top-level
    CMakeLists.txt file (usually located in the "src" directory). The following snippet
    assumes that your project's "src" directory is on the same level as the previously
@@ -106,17 +110,18 @@ In order to use the RF24 libraries in your RP2040 based project:
    ```cmake
    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
    ```
-4. Finally, remember to include the necessary RF24* libraries' header files in your
+4. Finally, remember to include the necessary RF24\* libraries' header files in your
    project's source code where applicable.
    ```cpp
    #include <RF24.h>
    #include <RF24Network.h>
    #include <RF24Mesh.h>
    ```
-   @note Any of the project's source file(s) that includes any of RF24* libraries must be a C++ file.
+   @note Any of the project's source file(s) that includes any of RF24\* libraries must be a C++ file.
    It is highly recommended to use the `.cpp` file extension for such project source files.
 
 ## Using different pins for the SPI bus
+
 Initially (without modification), the SPI bus uses the default pins defined in the
 Pico SDK repository's [pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards).
 However, there may be some boards that do not define the necessary pins to use as defaults. This can
@@ -132,8 +137,8 @@ Output) feature, please submit an issue or pull request to the
 There are essentially 2 SPI buses with multiple pin options for each.
 
 ### Project Source code option
-This option is the most reliable and flexible. It involves calling `SPI.begin()` and
-then passing the `SPI` object to `RF24::begin(_SPI*)`.
+
+This option is the most reliable and flexible. It involves calling `SPI.begin()` and then passing the `SPI` object to `RF24::begin(_SPI*)`.
 
 ```cpp
 #include <RF24.h>
@@ -153,7 +158,9 @@ int main()
 ```
 
 ### Build-time configuration option
+
 To specify the default SPI pins used at build time, you can use either:
+
 1. declare these pins in the CMakeLists.txt file
    ```cmake
    target_compile_definitions(${CMAKE_PROJECT_NAME}
