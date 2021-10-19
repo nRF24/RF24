@@ -61,11 +61,10 @@ come from the Pico SDK repository's
    ```
    Notice we specified the build type again using the `--config` option.
 
-   @note If you see an error stating
-   `'PICO_DEFAULT_SPI_SCK_PIN' was not declared in this scope`, then it means
-   the board you selected with the `-DPICO_BOARD` option (in step 2) does not have a
-   default set of SPI pins defined for it. To workaround this error, see the
-   below instructions to use different pins for the SPI bus.
+   @note If you see an error stating "'PICO_DEFAULT_SPI_SCK_PIN' was not declared in this scope",
+   then it means the board you selected with the `-DPICO_BOARD` option (in step 2) does not have a
+   default set of SPI pins defined for it. To workaround this error, see the below instructions to
+   use different pins for the SPI bus.
 
    @warning If doing consecutive build attempts, it is strongly encouraged to delete all files in the build
    directory before re-attempting to build the project.
