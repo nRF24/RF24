@@ -64,7 +64,7 @@ breathe_default_project = "RF24"
 READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
 
 if READTHEDOCS:
-    subprocess.run(["cd", "../../doxygen;", "doxygen"], check=True)
+    subprocess.call("cd ../../doxygen; doxygen", shell=True)
 
 # -- Options for HTML output -------------------------------------------------
 
