@@ -72,7 +72,7 @@ python3 -m pip install --upgrade pip setuptools
    ```shell
    nano getting_started.py
    ```
-   Configure another device, Arduino or RPi with the [getting_started.py example](examples_linux_2getting_started_8py-example.html)
+   Configure another device, Arduino or RPi with the same example code. It could be C++ or python (see the [list of available examples](examples.html)), but we'll use the same example file on a different device in this tutorial.
 
    Run the example
    ```shell

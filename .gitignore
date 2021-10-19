@@ -29,7 +29,9 @@ examples_linux/**/*
 .directory
 .idea
 docs/html/
-docs/xml/
+docs/latex/
+docs/*/xml/
+docs/_build/
 doxygenAction
 .vscode/
 __pycache__/
