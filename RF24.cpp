@@ -982,12 +982,7 @@ bool RF24::_init_radio()
 
 bool RF24::isChipConnected()
 {
-    uint8_t setup = read_register(SETUP_AW);
-    if (setup >= 1 && setup <= 3) {
-        return true;
-    }
-
-    return false;
+    return read_register(SETUP_AW) == (addr_width - static_cast<uint8_t>(2));
 }
 
 /****************************************************************************/
