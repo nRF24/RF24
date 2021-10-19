@@ -13,7 +13,8 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
+import subprocess
+import os
 
 # -- Project information -----------------------------------------------------
 
@@ -59,6 +60,11 @@ add_function_parentheses = True
 
 breathe_projects = {"RF24": "xml"}
 breathe_default_project = "RF24"
+
+READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
+
+if READTHEDOCS:
+    subprocess.run(["cd", "../../doxygen;", "doxygen"], check=True)
 
 # -- Options for HTML output -------------------------------------------------
 
