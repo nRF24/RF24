@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "RF24_doxygen_docs"
-          path: ${{ github.workspace }}docs/html
+          path: ${{ github.workspace }}/docs/html
       - name: upload to github pages
         if: ${{ github.event_name == 'release'}}
         uses: peaceiris/actions-gh-pages@v3
@@ -76,4 +76,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "RF24_sphinx_docs"
-          path: ${{ github.workspace }}docs/build
+          path: ${{ github.workspace }}/docs/build
