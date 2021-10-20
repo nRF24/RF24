@@ -36,7 +36,7 @@ Because the RF24 library uses `millis()` to implement a timeout and `delay()` fo
 - `RF24::writeBlocking()`
 - `RF24::writeFast()`
 - `RF24::startWrite()`
-- `RF24::txStandby()`
+- `RF24::txStandBy()` & `RF24::txStandBy(uint32_t, bool)`
 - `RF24::powerUp()`
 - `RF24::startListening()`
 - `RF24::stopListening()`

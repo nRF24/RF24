@@ -20,6 +20,9 @@ Site Index
     classRF24
     enums
     deprecated
+    nRF24L01_8h
+    RF24_config_8h
+
 
 .. toctree::
     :maxdepth: 1

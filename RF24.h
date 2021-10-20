@@ -869,11 +869,11 @@ public:
      * @code
      * radio.writeFast(&buf,32);
      * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-     * bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
-     * 		  				      //Blocks only until MAX_RT timeout or success. Data flushed on fail.
+     * radio.writeFast(&buf,32);    //Fills the FIFO buffers up
+     * bool ok = radio.txStandBy(); //Returns 0 if failed. 1 if success.
+     *                              //Blocks only until MAX_RT timeout or success. Data flushed on fail.
      * @endcode
-     * @see txStandBy(unsigned long timeout)
+     * @see txStandBy(uint32_t timeout, bool startTx)
      * @return
      * - `true` if all payloads in the TX FIFO were delivered successfully and
      *   an acknowledgement (ACK packet) was received for each. If auto-ack is
@@ -892,9 +892,9 @@ public:
      * @code
      * radio.writeFast(&buf,32);
      * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);   //Fills the FIFO buffers up
-     * bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
-     *					  		   //Blocks only until user defined timeout or success. Data flushed on fail.
+     * radio.writeFast(&buf,32);        //Fills the FIFO buffers up
+     * bool ok = radio.txStandBy(1000); //Returns 0 if failed after 1 second of retries. 1 if success.
+     *                                  //Blocks only until user defined timeout or success. Data flushed on fail.
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
      * @param timeout Number of milliseconds to retry failed payloads
