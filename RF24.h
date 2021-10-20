@@ -1690,7 +1690,8 @@ public:
      * Determine if an ack payload was received in the most recent call to
      * write(). The regular available() can also be used.
      *
-     * @deprecated Call read() to retrieve the ack payload.
+     * @deprecated For compatibility with old code only, see synonomous function available().
+     * Use read() to retrieve the ack payload and getDynamicPayloadSize() to get the ACK payload size.
      *
      * @return True if an ack payload is available.
      */
