@@ -867,9 +867,9 @@ public:
      *
      * Example (Partial blocking):
      * @code
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);    //Fills the FIFO buffers up
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);   //Fills the FIFO buffers up
      * bool ok = radio.txStandBy(); //Returns 0 if failed. 1 if success.
      *                              //Blocks only until MAX_RT timeout or success. Data flushed on fail.
      * @endcode
@@ -890,9 +890,9 @@ public:
      *
      * Fully Blocking Example:
      * @code
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);        //Fills the FIFO buffers up
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);       //Fills the FIFO buffers up
      * bool ok = radio.txStandBy(1000); //Returns 0 if failed after 1 second of retries. 1 if success.
      *                                  //Blocks only until user defined timeout or success. Data flushed on fail.
      * @endcode
