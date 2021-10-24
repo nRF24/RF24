@@ -86,6 +86,7 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
 
    @note When using these instructions to install RF24Mesh, RF24Network, or RF24Gateway,
    the following `RF24_DRIVER` option is not needed (it is only for the RF24 library).
+
    ```shell
    cmake .. -D RF24_DRIVER=SPIDEV
    ```
