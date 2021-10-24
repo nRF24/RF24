@@ -1,7 +1,7 @@
 Scanner.ino
 ==================
 
-.. literalinclude:: ../../../../examples/Scanner/Scanner.ino
-    :lines: 7-
+.. literalinclude:: ../../../../examples/scanner/scanner.ino
+    :lines: 10-
     :linenos:
     :lineno-match:
