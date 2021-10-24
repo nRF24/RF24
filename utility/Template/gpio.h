@@ -15,7 +15,11 @@
 
 #include <cstdio>
 
-// class GPIO {
+#ifndef DOXYGEN_FORCED
+// exclude this line from the docs to prevent displaying in the list of classes
+class GPIO
+#endif
+{
 public:
     /* Constants */
     static const int DIRECTION_OUT = 1;
@@ -52,7 +56,10 @@ public:
     */
     static void write(int port, int value);
 
+#ifndef DOXYGEN_FORCED
+// exclude this line from the docs to prevent warnings docs generators
     virtual ~ GPIO();
+#endif
 };
 
 /**@}*/

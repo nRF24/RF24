@@ -1,19 +1,21 @@
 # ATTiny
-ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with the following guide:<br>
-http://highlowtech.org/?p=1695 <br>
+
+ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with [this install guide](http://highlowtech.org/?p=1695)
+
 See the included rf24ping85 example for pin info and usage
 
 @warning The ATTiny2313 is unsupported due to lack of sufficient memory resources
 
-Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny<br>
-See https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC for ATTiny patch
+Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny. See [this resource](https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC) for the ATTiny patch.
 
-ATTiny board support initially added from https://github.com/jscrane/RF24
+ATTiny board support initially added from [jscrane/RF24](https://github.com/jscrane/RF24)
 
 ## Hardware Configuration
+
 By [tong67](https://github.com/tong67)
 
 ### ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4
+
 ```text
                              +-\/-+
                NC      PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 --- LED --- 5V
@@ -24,7 +26,8 @@ nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7
 ```
 
 ### ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3 - PB3 and PB4 are free to use for application
-- Circuit idea from http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html
+
+- Circuit idea from [NerdRalph's 3 pin solution](http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html)
 - Original RC combination was 1K/100nF. 22K/10nF combination worked better.
 - For best settletime delay value in RF24::csn() the timingSearch3pin.ino sketch can be used.
 - This configuration is enabled when CE_PIN and CSN_PIN are equal, e.g. both 3
@@ -43,6 +46,7 @@ nRF24L01 GND, pin1 -x- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7         |
 ```
 
 ### ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7
+
 - Schematic provided and successfully tested by [Carmine Pastore](https://github.com/Carminepz)
 
 ```text
@@ -58,6 +62,7 @@ nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6
 ```
 
 ### ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13
+
 ```text
                               +-\/-+
                         PA2  1|o   |20 VCC --- nRF24L01  VCC, pin2

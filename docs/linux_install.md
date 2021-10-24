@@ -1,13 +1,20 @@
 # Linux Installation
+
+<!-- markdownlint-disable MD031 -->
 Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or using LittleWire.
 
-@note The SPIDEV option should work with most Linux systems supporting spi userspace device. <br>
+@note The SPIDEV option should work with most Linux systems supporting spi userspace device.
+
+@warning These instructions are beginning to age because they were designed with the assumption that
+the arm-linux-gnueabihf-g\*\* compilers were available and default for the system. If you have problems
+using these instructions, please try the [instructions using CMake](md_docs_using_cmake.html).
 
 ## Automated Install
+
 **Designed & Tested on RPi** - Defaults to SPIDEV on devices supporting it
 
 1. Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc)
-2. Download the install.sh file from http://tmrh20.github.io/RF24Installer/RPi/install.sh
+2. Download the install.sh file from [tmrh20.github.io/RF24Installer/RPi](http://tmrh20.github.io/RF24Installer/RPi/install.sh)
    ```shell
    wget http://tmrh20.github.io/RF24Installer/RPi/install.sh
    ```
@@ -29,10 +36,11 @@ Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or
    make
    sudo ./gettingstarted
    ```
+
 ## Manual Install
 
 1. Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc)
-@note See the [MRAA](http://iotdk.intel.com/docs/master/mraa/index.html) documentation for more info on installing MRAA <br>
+   @note See the [MRAA](http://iotdk.intel.com/docs/master/mraa/index.html) documentation for more info on installing MRAA
 2. Make a directory to contain the RF24 and possibly RF24Network lib and enter it
    ```shell
    mkdir ~/rf24libs
@@ -50,7 +58,8 @@ Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or
    ```shell
    ./configure
    ```
-   script. It auto detectes device and build environment.<br>
+   script. It auto detectes device and build environment.
+
    For overriding autodetections, use command-line switches, see
    ```shell
    ./configure --help

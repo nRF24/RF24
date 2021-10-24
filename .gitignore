@@ -3,8 +3,6 @@
 .*.swp
 *.orig
 .swp
-docs/html/
-docs/xml/
 output/
 ojam/
 out/
@@ -27,11 +25,31 @@ examples_linux/**/*
 !examples_linux/**/*.cpp
 !examples_linux/Makefile
 !examples_linux/**/Makefile
-*__pycache__/
+!examples_linux/CMakeLists.txt
 .directory
 .idea
+docs/html/
+docs/latex/
+docs/*/xml/
+docs/_build/
 doxygenAction
 .vscode/
-*venv
+__pycache__/
 *env
 *.pyc
+*.egg*
+build/
+*CMakeUserPresets*.json
+*.tar.gz
+
+# Cmake build-in-source generated stuff
+CMakeCache.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CMakeFiles
+DEBIAN
+cmake_install.cmake
+compile_commands.json
+utility/Makefile
+# Makefile is modified when `cmake .` is run
+# Makefile # preserve old/traditional build system

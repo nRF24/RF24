@@ -24,7 +24,11 @@
 
 using namespace std;
 
-// class SPI {
+#ifndef DOXYGEN_FORCED
+// exclude this line from the docs to prevent displaying in the list of classes
+class SPI
+#endif
+{
 public:
 
 	/**
@@ -59,8 +63,10 @@ public:
 	 */
 	void transfern(char* buf, uint32_t len);
 
+#ifndef DOXYGEN_FORCED
+// exclude this line from the docs to prevent warnings docs generators
 	virtual ~ SPI();
-
+#endif
 private:
 
 	/** Default SPI device */

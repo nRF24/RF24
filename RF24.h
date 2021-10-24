@@ -28,8 +28,9 @@
  * @defgroup PALevel Power Amplifier level
  * Power Amplifier level. The units dBm (decibel-milliwatts or dB<sub>mW</sub>)
  * represents a logarithmic signal loss.
- * @see RF24::setPALevel()
- * @see RF24::getPALevel()
+ * @see
+ * - RF24::setPALevel()
+ * - RF24::getPALevel()
  * @{
  */
 typedef enum {
@@ -71,8 +72,9 @@ typedef enum {
  * @}
  * @defgroup Datarate datarate
  * How fast data moves through the air. Units are in bits per second (bps).
- * @see RF24::setDataRate()
- * @see RF24::getDataRate()
+ * @see
+ * - RF24::setDataRate()
+ * - RF24::getDataRate()
  * @{
  */
 typedef enum {
@@ -89,9 +91,10 @@ typedef enum {
  * @defgroup CRCLength CRC length
  * The length of a CRC checksum that is used (if any).<br>Cyclical Redundancy
  * Checking (CRC) is commonly used to ensure data integrity.
- * @see RF24::setCRCLength()
- * @see RF24::getCRCLength()
- * @see RF24::disableCRC()
+ * @see
+ * - RF24::setCRCLength()
+ * - RF24::getCRCLength()
+ * - RF24::disableCRC()
  * @{
  */
 typedef enum {
@@ -116,7 +119,7 @@ private:
     SPIUARTClass uspi;
     #endif
 
-    #if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
+    #if defined (RF24_LINUX) || defined (XMEGA_D3) || defined (RF24_RP2) /* XMEGA can use SPI class */
     SPI spi;
     #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
     #if defined (RF24_SPI_PTR)
@@ -126,22 +129,19 @@ private:
     GPIO gpio;
     #endif
 
-    uint16_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-    uint16_t csn_pin; /**< SPI Chip select */
-    uint32_t spi_speed; /**< SPI Bus Speed */
-    #if defined (RF24_LINUX) || defined (XMEGA_D3)
+    uint16_t ce_pin; /** "Chip Enable" pin, activates the RX or TX role */
+    uint16_t csn_pin; /** SPI Chip select */
+    uint32_t spi_speed; /** SPI Bus Speed */
+    #if defined (RF24_LINUX) || defined (XMEGA_D3) || defined (RF24_RP2)
     uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
     #endif
     uint8_t status; /** The status byte returned from every SPI transaction */
-    uint8_t payload_size; /**< Fixed size of payloads */
-    bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
-    bool ack_payloads_enabled; /**< Whether ack payloads are enabled. */
-    uint8_t pipe0_reading_address[5]; /**< Last address set on pipe 0 for reading. */
-    uint8_t addr_width; /**< The address width to use - 3,4 or 5 bytes. */
-    uint8_t config_reg; /**< For storing the value of the NRF_CONFIG register */
+    uint8_t payload_size; /** Fixed size of payloads */
+    uint8_t pipe0_reading_address[5]; /** Last address set on pipe 0 for reading. */
+    uint8_t config_reg; /** For storing the value of the NRF_CONFIG register */
     bool _is_p_variant; /** For storing the result of testing the toggleFeatures() affect */
-
+    bool _is_p0_rx; /** For keeping track of pipe 0's usage in user-triggered RX mode. */
 
 protected:
     /**
@@ -153,6 +153,29 @@ protected:
     inline void beginTransaction();
 
     inline void endTransaction();
+
+    bool ack_payloads_enabled; /** Whether ack payloads are enabled. */
+    uint8_t addr_width; /** The address width to use (3, 4 or 5 bytes). */
+    bool dynamic_payloads_enabled; /** Whether dynamic payloads are enabled. */
+
+    /**
+     * Read a chunk of data in from a register
+     *
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param buf Where to put the data
+     * @param len How many bytes of data to transfer
+     * @return Nothing. Older versions of this function returned the status
+     * byte, but that it now saved to a private member on all SPI transactions.
+     */
+    void read_register(uint8_t reg, uint8_t* buf, uint8_t len);
+
+    /**
+     * Read single byte from a register
+     *
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @return Current value of register @p reg
+     */
+    uint8_t read_register(uint8_t reg);
 
 public:
 
@@ -226,7 +249,7 @@ public:
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      *
      * @note The _SPI datatype is a "wrapped" definition that will represent
-     * various SPI implementations based on the specified platform (or SoftSPI).
+     * various SPI implementations based on the specified platform.
      * @see Review the [Arduino support page](md_docs_arduino.html).
      *
      * @return same result as begin()
@@ -248,7 +271,7 @@ public:
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
      *
      * @note The _SPI datatype is a "wrapped" definition that will represent
-     * various SPI implementations based on the specified platform (or SoftSPI).
+     * various SPI implementations based on the specified platform.
      * @see Review the [Arduino support page](md_docs_arduino.html).
      *
      * @return same result as begin()
@@ -346,8 +369,9 @@ public:
      * Read payload data from the RX FIFO buffer(s).
      *
      * The length of data read is usually the next available payload's length
-     * @see getPayloadSize()
-     * @see getDynamicPayloadSize()
+     * @see
+     * - getPayloadSize()
+     * - getDynamicPayloadSize()
      *
      * @note I specifically chose `void*` as a data type to make it easier
      * for beginners to use.  No casting needed.
@@ -363,20 +387,20 @@ public:
      * payload. A payload is not removed from the RX FIFO until it's
      * entire length (or more) is fetched using read().
      * @remarks
-     * - If @a len parameter's value is less than the available payload's
+     * - If `len` parameter's value is less than the available payload's
      *   length, then the payload remains in the RX FIFO.
-     * - If @a len parameter's value is greater than the first of multiple
-     *   available payloads, then the data saved to the @a buf
+     * - If `len` parameter's value is greater than the first of multiple
+     *   available payloads, then the data saved to the `buf`
      *   parameter's object will be supplemented with data from the next
      *   available payload.
-     * - If @a len parameter's value is greater than the last available
+     * - If `len` parameter's value is greater than the last available
      *   payload's length, then the last byte in the payload is used as
-     *   padding for the data saved to the @a buf parameter's object.
+     *   padding for the data saved to the `buf` parameter's object.
      *   The nRF24L01 will repeatedly use the last byte from the last
      *   payload even when read() is called with an empty RX FIFO.
      *
      * @note To use this function in the python wrapper, remember that
-     * only the @a len parameter is required because this function (in the
+     * only the `len` parameter is required because this function (in the
      * python wrapper) returns the payload data as a buffer protocol object
      * (bytearray object).
      * @code{.py}
@@ -420,7 +444,7 @@ public:
      * radio.write(&data,sizeof(data));
      * @endcode
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -469,8 +493,9 @@ public:
      * disabled, then this function will still overwrite the address for
      * reading pipe 0 regardless.
      *
-     * @see setAddressWidth()
-     * @see startListening()
+     * @see
+     * - setAddressWidth()
+     * - startListening()
      *
      * @param address The address to be used for outgoing transmissions (uses
      * pipe 0). Coordinate this address amongst other receiving nodes (the
@@ -489,8 +514,9 @@ public:
      * Up to 6 pipes can be open for reading at once.  Open all the required
      * reading pipes, and then call startListening().
      *
-     * @see openWritingPipe()
-     * @see setAddressWidth()
+     * @see
+     * - openWritingPipe()
+     * - setAddressWidth()
      *
      * @note Pipes 0 and 1 will store a full 5-byte address. Pipes 2-5 will technically
      * only store a single byte, borrowing up to 4 additional bytes from pipe 1 per the
@@ -507,8 +533,7 @@ public:
      *
      * @warning If the reading pipe 0 is opened by this function, the address
      * passed to this function (for pipe 0) will be restored at every call to
-     * startListening(), but the address for pipe 0 is ONLY restored if the LSB is a
-     * non-zero value.<br> Read
+     * startListening().<br> Read
      * http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
      * to understand how to avoid using malformed addresses. This address
      * restoration is implemented because of the underlying neccessary
@@ -605,7 +630,7 @@ public:
      * }
      * @endcode
      *
-     * @warning According to the datasheet, the data saved to @a pipe_num is
+     * @warning According to the datasheet, the data saved to `pipe_num` is
      * "unreliable" during a FALLING transition on the IRQ pin. This means you
      * should call whatHappened() before calling this function during
      * an ISR (Interrupt Service Routine).<br>For example:
@@ -679,8 +704,9 @@ public:
      * multicast parameter set to true.
      *
      * Can be used with enableAckPayload() to request a response
-     * @see setAutoAck()
-     * @see write()
+     * @see
+     * - setAutoAck()
+     * - write()
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -696,7 +722,7 @@ public:
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -717,19 +743,19 @@ public:
      * retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
-     * @code
      * Example (Partial blocking):
+     * @code
+     * radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
+     * txStandBy();     		   // Returns 0 if failed. 1 if success. Blocks only until MAX_RT timeout or success. Data flushed on fail.
      *
-     *			radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
-     *			txStandBy();     		   // Returns 0 if failed. 1 if success. Blocks only until MAX_RT timeout or success. Data flushed on fail.
-     *
-     *			radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
-     *			txStandBy(1000);		   // Using extended timeouts, returns 1 if success. Retries failed payloads for 1 seconds before returning 0.
+     * radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
+     * txStandBy(1000);		   // Using extended timeouts, returns 1 if success. Retries failed payloads for 1 seconds before returning 0.
      * @endcode
      *
-     * @see txStandBy()
-     * @see write()
-     * @see writeBlocking()
+     * @see
+     * - txStandBy()
+     * - write()
+     * - writeBlocking()
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -742,7 +768,7 @@ public:
      *   packet. This condition can only be reported if the auto-ack feature
      *   is on.
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -766,13 +792,13 @@ public:
      * (true). Be sure to have called enableDynamicAck() at least once before
      * setting this parameter.
      * @return
-     * - `true` if the payload passed to @a buf was loaded in the TX FIFO.
-     * - `false` if the payload passed to @a buf was not loaded in the TX FIFO
+     * - `true` if the payload passed to `buf` was loaded in the TX FIFO.
+     * - `false` if the payload passed to `buf` was not loaded in the TX FIFO
      *   because a previous payload already in the TX FIFO failed to
      *   transmit. This condition can only be reported if the auto-ack feature
      *   is on.
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -799,15 +825,16 @@ public:
      *                                               // Blocks only until user timeout or success. Data flushed on fail.
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
-     * @see txStandBy()
-     * @see write()
-     * @see writeFast()
+     * @see
+     * - txStandBy()
+     * - write()
+     * - writeFast()
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @param timeout User defined timeout in milliseconds.
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -817,8 +844,8 @@ public:
      * @endcode
      *
      * @return
-     * - `true` if the payload passed to @a buf was loaded in the TX FIFO.
-     * - `false` if the payload passed to @a buf was not loaded in the TX FIFO
+     * - `true` if the payload passed to `buf` was loaded in the TX FIFO.
+     * - `false` if the payload passed to `buf` was not loaded in the TX FIFO
      *   because a previous payload already in the TX FIFO failed to
      *   transmit. This condition can only be reported if the auto-ack feature
      *   is on.
@@ -840,13 +867,13 @@ public:
      *
      * Example (Partial blocking):
      * @code
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);  //Fills the FIFO buffers up
-     * bool ok = txStandBy();     //Returns 0 if failed. 1 if success.
-     * 		  				      //Blocks only until MAX_RT timeout or success. Data flushed on fail.
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);   //Fills the FIFO buffers up
+     * bool ok = radio.txStandBy(); //Returns 0 if failed. 1 if success.
+     *                              //Blocks only until MAX_RT timeout or success. Data flushed on fail.
      * @endcode
-     * @see txStandBy(unsigned long timeout)
+     * @see txStandBy(uint32_t timeout, bool startTx)
      * @return
      * - `true` if all payloads in the TX FIFO were delivered successfully and
      *   an acknowledgement (ACK packet) was received for each. If auto-ack is
@@ -863,11 +890,11 @@ public:
      *
      * Fully Blocking Example:
      * @code
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);
-     * radio.writeFast(&buf,32);   //Fills the FIFO buffers up
-     * bool ok = txStandBy(1000);  //Returns 0 if failed after 1 second of retries. 1 if success.
-     *					  		   //Blocks only until user defined timeout or success. Data flushed on fail.
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);
+     * radio.writeFast(&buf, 32);       //Fills the FIFO buffers up
+     * bool ok = radio.txStandBy(1000); //Returns 0 if failed after 1 second of retries. 1 if success.
+     *                                  //Blocks only until user defined timeout or success. Data flushed on fail.
      * @endcode
      * @note If used from within an interrupt, the interrupt should be disabled until completion, and sei(); called to enable millis().
      * @param timeout Number of milliseconds to retry failed payloads
@@ -888,11 +915,12 @@ public:
     /**
      * Write an acknowledgement (ACK) payload for the specified pipe
      *
-     * The next time a message is received on a specified @a pipe, the data in
-     * @a buf will be sent back in the ACK payload.
+     * The next time a message is received on a specified `pipe`, the data in
+     * `buf` will be sent back in the ACK payload.
      *
-     * @see enableAckPayload()
-     * @see enableDynamicPayloads()
+     * @see
+     * - enableAckPayload()
+     * - enableDynamicPayloads()
      *
      * @note ACK payloads are handled automatically by the radio chip when a
      * regular payload is received. It is important to discard regular payloads
@@ -913,7 +941,7 @@ public:
      * @param len Length of the data to send, up to 32 bytes max.  Not affected
      * by the static payload set by setPayloadSize().
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -972,13 +1000,12 @@ public:
      * retransmit/autoAck is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
-     * @see write()
-     * @see writeFast()
-     * @see startWrite()
-     * @see writeBlocking()
-     *
-     * For single noAck writes:
-     * @see setAutoAck()
+     * @see
+     * - write()
+     * - writeFast()
+     * - startWrite()
+     * - writeBlocking()
+     * - setAutoAck() (for single noAck writes)
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -990,7 +1017,7 @@ public:
      * effect on the nRF24L01's CE pin and simply loads the payload into the
      * TX FIFO.
      *
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -1009,13 +1036,12 @@ public:
      * Just like write(), but it returns immediately. To find out what happened
      * to the send, catch the IRQ and then call whatHappened().
      *
-     * @see write()
-     * @see writeFast()
-     * @see startFastWrite()
-     * @see whatHappened()
-     *
-     * For single noAck writes see:
-     * @see setAutoAck()
+     * @see
+     * - write()
+     * - writeFast()
+     * - startFastWrite()
+     * - whatHappened()
+     * - setAutoAck() (for single noAck writes)
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -1028,7 +1054,7 @@ public:
      *   transmission was started.
      * - `false` if the TX FIFO is full and the payload could not be written. In
      *   this condition, the transmission process is restarted.
-     * @note The @a len parameter must be omitted when using the python
+     * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
      * <br>To use this function in the python wrapper:
      * @code{.py}
@@ -1134,6 +1160,7 @@ public:
      */
     void closeReadingPipe(uint8_t pipe);
 
+    #if defined (FAILURE_HANDLING)
     /**
      *
      * If a failure has been detected, it usually indicates a hardware issue. By default the library
@@ -1155,17 +1182,16 @@ public:
      *
      *  @code
      *  if(radio.failureDetected){
-     *    radio.begin();                       // Attempt to re-configure the radio with defaults
-     *    radio.failureDetected = 0;           // Reset the detection value
-     *	 radio.openWritingPipe(addresses[1]); // Re-configure pipe addresses
-     *    radio.openReadingPipe(1,addresses[0]);
-     *    report_failure();                    // Blink leds, send a message, etc. to indicate failure
+     *    radio.begin();                        // Attempt to re-configure the radio with defaults
+     *    radio.failureDetected = 0;            // Reset the detection value
+     *	 radio.openWritingPipe(addresses[1]);  // Re-configure pipe addresses
+     *    radio.openReadingPipe(1, addresses[0]);
+     *    report_failure();                     // Blink leds, send a message, etc. to indicate failure
      *  }
      * @endcode
      */
-    //#if defined (FAILURE_HANDLING)
     bool failureDetected;
-    //#endif
+    #endif // defined (FAILURE_HANDLING)
 
     /**@}*/
     /**
@@ -1348,8 +1374,9 @@ public:
      * about all outgoing payloads (using pipe 0) or incoming payloads
      * (concerning all RX pipes), use setAutoAck()
      *
-     * @see setAutoAck() for all pipes
-     * @see setAutoAck(uint8_t, bool) for individual pipes
+     * @see
+     * - setAutoAck() for all pipes
+     * - setAutoAck(uint8_t, bool) for individual pipes
      *
      * @code
      * radio.write(&data, 32, 1); // Sends a payload with no acknowledgement requested
@@ -1386,11 +1413,12 @@ public:
      * feature is also disabled as this feature is required to send ACK
      * payloads.
      *
-     * @see write()
-     * @see writeFast()
-     * @see startFastWrite()
-     * @see startWrite()
-     * @see writeAckPayload()
+     * @see
+     * - write()
+     * - writeFast()
+     * - startFastWrite()
+     * - startWrite()
+     * - writeAckPayload()
      *
      * @param enable Whether to enable (true) or disable (false) the
      * auto-acknowledgment feature for all pipes
@@ -1421,13 +1449,14 @@ public:
      * payloads feature is also disabled as this feature is required on pipe 0
      * to send ACK payloads.
      *
-     * @see write()
-     * @see writeFast()
-     * @see startFastWrite()
-     * @see startWrite()
-     * @see writeAckPayload()
-     * @see enableAckPayloads()
-     * @see disableAckPayloads()
+     * @see
+     * - write()
+     * - writeFast()
+     * - startFastWrite()
+     * - startWrite()
+     * - writeAckPayload()
+     * - enableAckPayload()
+     * - disableAckPayload()
      *
      * @param pipe Which pipe to configure. This number should be in range
      * [0, 5].
@@ -1480,11 +1509,11 @@ public:
      *
      * @param speed Specify one of the following values (as defined by
      * @ref rf24_datarate_e):
-     * | @p speed (enum value) | description |
-     * |:---------------------:|:-----------:|
-     * | @ref RF24_1MBPS (0)   | for 1 Mbps  |
-     * | @ref RF24_2MBPS (1)   | for 2 Mbps  |
-     * | @ref RF24_250KBPS (2) | for 250 kbs |
+     * | @p speed (enum value) | description  |
+     * |:---------------------:|:------------:|
+     * | @ref RF24_1MBPS (0)   | for 1 Mbps   |
+     * | @ref RF24_2MBPS (1)   | for 2 Mbps   |
+     * | @ref RF24_250KBPS (2) | for 250 kbps |
      *
      * @return true if the change was successful
      */
@@ -1629,13 +1658,13 @@ public:
      * @warning Pipes 1-5 should share the first 32 bits.
      * Only the least significant byte should be unique, e.g.
      * @code
-     *   openReadingPipe(1, 0xF0F0F0F0AA);
-     *   openReadingPipe(2, 0xF0F0F0F066);
+     * openReadingPipe(1, 0xF0F0F0F0AA);
+     * openReadingPipe(2, 0xF0F0F0F066);
      * @endcode
      *
      * @warning Pipe 0 is also used by the writing pipe so should typically be avoided as a reading pipe.<br>
-     * If used, the reading pipe 0 address needs to be restored at avery call to startListening(), and the address<br>
-     * is ONLY restored if the LSB is a non-zero value.<br> See http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
+     * If used, the reading pipe 0 address needs to be restored at every call to startListening().
+     * <br> See http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
      *
      * @param number Which pipe# to open, 0-5.
      * @param address The 40-bit address of the pipe to open.
@@ -1650,7 +1679,7 @@ public:
      * Addresses are 40-bit hex values, e.g.:
      *
      * @code
-     *   openWritingPipe(0xF0F0F0F0F0);
+     * openWritingPipe(0xF0F0F0F0F0);
      * @endcode
      *
      * @param address The 40-bit address of the pipe to open.
@@ -1661,7 +1690,8 @@ public:
      * Determine if an ack payload was received in the most recent call to
      * write(). The regular available() can also be used.
      *
-     * @deprecated Call read() to retrieve the ack payload.
+     * @deprecated For compatibility with old code only, see synonomous function available().
+     * Use read() to retrieve the ack payload and getDynamicPayloadSize() to get the ACK payload size.
      *
      * @return True if an ack payload is available.
      */
@@ -1718,25 +1748,6 @@ private:
     void ce(bool level);
 
     /**
-     * Read a chunk of data in from a register
-     *
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @param buf Where to put the data
-     * @param len How many bytes of data to transfer
-     * @return Nothing. Older versions of this function returned the status
-     * byte, but that it now saved to a private member on all SPI transactions.
-     */
-    void read_register(uint8_t reg, uint8_t* buf, uint8_t len);
-
-    /**
-     * Read single byte from a register
-     *
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @return Current value of register @p reg
-     */
-    uint8_t read_register(uint8_t reg);
-
-    /**
      * Write a chunk of data to a register
      *
      * @param reg Which register. Use constants from nRF24L01.h
@@ -1752,6 +1763,8 @@ private:
      *
      * @param reg Which register. Use constants from nRF24L01.h
      * @param value The new value to write
+     * @param is_cmd_only if this parameter is true, then the `reg` parameter
+     * is written, and the `value` param is ignored.
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
@@ -1764,6 +1777,7 @@ private:
      *
      * @param buf Where to get the data
      * @param len Number of bytes to be sent
+     * @param writeType Specify if individual payload should be acknowledged
      * @return Nothing. Older versions of this function returned the status
      * byte, but that it now saved to a private member on all SPI transactions.
      */
@@ -2119,7 +2133,20 @@ private:
  */
 
 /**
- * @example{lineno} examples/old_backups/scanner/scanner.ino
+ * @example{lineno} examples_linux/scanner.cpp
+ *
+ * Example to detect interference on the various channels available.
+ * This is a good diagnostic tool to check whether you're picking a
+ * good channel for your application.
+ *
+ * Inspired by cpixip.
+ * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ *
+ * Use ctrl+C to exit
+ */
+
+/**
+ * @example{lineno} examples/scanner/scanner.ino
  *
  * Example to detect interference on the various channels available.
  * This is a good diagnostic tool to check whether you're picking a
