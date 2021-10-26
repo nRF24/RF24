@@ -69,3 +69,8 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
 .md-header__button.md-logo img, .md-header__button.md-logo svg {
   width: auto;
 }
+
+.linenos {
+	background-color: var(--md-default-bg-color--light);
+	margin-right: 0.5rem;
+}
