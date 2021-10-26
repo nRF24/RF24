@@ -1642,6 +1642,15 @@ public:
      */
     void stopConstCarrier(void);
 
+    /**
+     * @brief Open or close all data pipes.
+     *
+     * This function does not alter the addresses assigned to pipes. It is simply a
+     * convenience function that allows controling all pipes at once.
+     * @param isEnabled `true` opens all pipes; `false` closes all pipes.
+     */
+    void toggleAllPipes(bool isEnabled);
+
     /**@}*/
     /**
      * @name Deprecated

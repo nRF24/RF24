@@ -1851,6 +1851,7 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel)
 }
 
 /****************************************************************************/
+
 void RF24::stopConstCarrier()
 {
     /*
@@ -1862,4 +1863,11 @@ void RF24::stopConstCarrier()
     powerDown();  // per datasheet recommendation (just to be safe)
     write_register(RF_SETUP, static_cast<uint8_t>(read_register(RF_SETUP) & ~_BV(CONT_WAVE) & ~_BV(PLL_LOCK)));
     ce(LOW);
+}
+
+/****************************************************************************/
+
+void RF24::toggleAllPipes(bool isEnabled)
+{
+    write_register(EN_RXADDR, static_cast<uint8_t>(isEnabled ? 0x3F : 0));
 }
