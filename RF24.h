@@ -1885,7 +1885,7 @@ private:
     #endif
 
     /**
-     * @brief Manipulate the @ref DataRate and txDelay
+     * @brief Manipulate the @ref Datarate and txDelay
      *
      * This is a helper function to setRadiation() and setDataRate()
      * @param speed The desired data rate.
