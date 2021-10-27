@@ -30,6 +30,7 @@ jobs:
           files-changed-only: false
           thread-comments: false
           ignore: examples/old_backups
+          verbosity: 20
 
       - name: Linter checks failed?
         if: steps.linter.outputs.checks-failed > 0

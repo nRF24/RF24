@@ -36,7 +36,6 @@ PayloadStruct payload;
 
 bool setup()
 {
-
     // an identifying device destination
     // Let these addresses be used for the pair
     uint8_t address[][6] = {"1Node", "2Node"};
