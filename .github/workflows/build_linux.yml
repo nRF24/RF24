@@ -53,8 +53,29 @@ env:
   BUILD_TYPE: Release
 
 jobs:
+  check_formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: shenxianpeng/cpp-linter-action@master
+        id: linter
+        with:
+          version: 12
+          style: file
+          tidy-checks: '-*'
+          files-changed-only: false
+          thread-comments: false
+          ignore: examples|utility/Template
+
+      - name: Linter checks failed?
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
+
   ####################### using Makefile #############################
   build:
+    needs: check_formatting
     runs-on: ubuntu-latest
 
     strategy:
@@ -144,6 +165,7 @@ jobs:
 
   ####################### using CMake ################################
   using_cmake:
+    needs: check_formatting
     runs-on: ubuntu-latest
 
     env:
