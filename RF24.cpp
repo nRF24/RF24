@@ -1877,7 +1877,7 @@ uint8_t RF24::_data_rate_reg_value(rf24_datarate_e speed)
 
 /****************************************************************************/
 
-uint8_t RF24::_pa_level_reg_value(rf24_pa_dbm_e level, bool lnaEnable)
+uint8_t RF24::_pa_level_reg_value(uint8_t level, bool lnaEnable)
 {
     // If invalid level, go to max PA
     // Else set level as requested
@@ -1887,7 +1887,7 @@ uint8_t RF24::_pa_level_reg_value(rf24_pa_dbm_e level, bool lnaEnable)
 
 /****************************************************************************/
 
-void RF24::setRadiation(rf24_pa_dbm_e level, rf24_datarate_e speed, bool lnaEnable)
+void RF24::setRadiation(uint8_t level, rf24_datarate_e speed, bool lnaEnable)
 {
     uint8_t setup = _data_rate_reg_value(speed);
     setup |= _pa_level_reg_value(level, lnaEnable);

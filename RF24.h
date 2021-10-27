@@ -1660,7 +1660,7 @@ public:
      * @param lnaEnable This optional parameter is the same as setPALevel()'s `lnaEnable`
      * optional parameter. Defaults to `true` (meaning LNA feature is enabled) when not specified.
      */
-    void setRadiation(rf24_pa_dbm_e level, rf24_datarate_e speed, bool lnaEnable = true);
+    void setRadiation(uint8_t level, rf24_datarate_e speed, bool lnaEnable = true);
 
     /**@}*/
     /**
@@ -1899,7 +1899,7 @@ private:
      * @param level The desired @ref PALevel.
      * @param lnaEnable Toggle the LNA feature.
      */
-    inline uint8_t _pa_level_reg_value(rf24_pa_dbm_e level, bool lnaEnable);
+    inline uint8_t _pa_level_reg_value(uint8_t level, bool lnaEnable);
 
     /**@}*/
 
