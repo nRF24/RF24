@@ -924,8 +924,9 @@ bool RF24::_init_radio()
     setRetries(5, 15);
 
     // Then set the data rate to the slowest (and most reliable) speed supported by all
-    // hardware.
-    setDataRate(RF24_1MBPS);
+    // hardware. Since this value occupies the same register as the PA level value, set
+    // the PA level to MAX
+    setRadiation(RF24_PA_MAX, RF24_1MBPS); // LNA enabled by default
 
     // detect if is a plus variant & use old toggle features command accordingly
     uint8_t before_toggle = read_register(FEATURE);
@@ -1670,16 +1671,9 @@ bool RF24::testRPD(void)
 
 void RF24::setPALevel(uint8_t level, bool lnaEnable)
 {
-
-    uint8_t setup = read_register(RF_SETUP) & 0xF8;
-
-    if (level > 3) {                                                  // If invalid level, go to max PA
-        level = static_cast<uint8_t>((RF24_PA_MAX << 1) + lnaEnable); // +1 to support the SI24R1 chip extra bit
-    } else {
-        level = static_cast<uint8_t>((level << 1) + lnaEnable);       // Else set level as requested
-    }
-
-    write_register(RF_SETUP, setup |= level);   // Write it to the chip
+    uint8_t setup = read_register(RF_SETUP) & static_cast<uint8_t>(0xF8);
+    setup |= _pa_level_reg_value(level, lnaEnable);
+    write_register(RF_SETUP, setup);
 }
 
 /****************************************************************************/
@@ -1707,33 +1701,8 @@ bool RF24::setDataRate(rf24_datarate_e speed)
 
     // HIGH and LOW '00' is 1Mbs - our default
     setup = static_cast<uint8_t>(setup & ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)));
+    setup |= _data_rate_reg_value(speed);
 
-    #if !defined(F_CPU) || F_CPU > 20000000
-    txDelay = 280;
-    #else //16Mhz Arduino
-    txDelay=85;
-    #endif
-    if (speed == RF24_250KBPS) {
-        // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
-        // Making it '10'.
-        setup |= _BV(RF_DR_LOW);
-        #if !defined(F_CPU) || F_CPU > 20000000
-        txDelay = 505;
-        #else //16Mhz Arduino
-        txDelay = 155;
-        #endif
-    } else {
-        // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
-        // Making it '01'
-        if (speed == RF24_2MBPS) {
-            setup |= _BV(RF_DR_HIGH);
-            #if !defined(F_CPU) || F_CPU > 20000000
-            txDelay = 240;
-            #else // 16Mhz Arduino
-            txDelay = 65;
-            #endif
-        }
-    }
     write_register(RF_SETUP, setup);
 
     // Verify our result
@@ -1870,4 +1839,57 @@ void RF24::stopConstCarrier()
 void RF24::toggleAllPipes(bool isEnabled)
 {
     write_register(EN_RXADDR, static_cast<uint8_t>(isEnabled ? 0x3F : 0));
+}
+
+/****************************************************************************/
+
+uint8_t RF24::_data_rate_reg_value(rf24_datarate_e speed)
+{
+    #if !defined(F_CPU) || F_CPU > 20000000
+    txDelay = 280;
+    #else //16Mhz Arduino
+    txDelay=85;
+    #endif
+    if (speed == RF24_250KBPS) {
+        #if !defined(F_CPU) || F_CPU > 20000000
+        txDelay = 505;
+        #else //16Mhz Arduino
+        txDelay = 155;
+        #endif
+        // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
+        // Making it '10'.
+        return static_cast<uint8_t>(_BV(RF_DR_LOW));
+    }
+    else if (speed == RF24_2MBPS) {
+        #if !defined(F_CPU) || F_CPU > 20000000
+        txDelay = 240;
+        #else // 16Mhz Arduino
+        txDelay = 65;
+        #endif
+        // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
+        // Making it '01'
+        return static_cast<uint8_t>(_BV(RF_DR_HIGH));
+    }
+    // HIGH and LOW '00' is 1Mbs - our default
+    return static_cast<uint8_t>(0);
+
+}
+
+/****************************************************************************/
+
+uint8_t RF24::_pa_level_reg_value(rf24_pa_dbm_e level, bool lnaEnable)
+{
+    // If invalid level, go to max PA
+    // Else set level as requested
+    // + lnaEnable (1 or 0) to support the SI24R1 chip extra bit
+    return static_cast<uint8_t>(((level > 3 ? RF24_PA_MAX : level) << 1) + lnaEnable);
+}
+
+/****************************************************************************/
+
+void RF24::setRadiation(rf24_pa_dbm_e level, rf24_datarate_e speed, bool lnaEnable)
+{
+    uint8_t setup = _data_rate_reg_value(speed);
+    setup |= _pa_level_reg_value(level, lnaEnable);
+    write_register(RF_SETUP, setup);
 }

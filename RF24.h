@@ -1651,6 +1651,17 @@ public:
      */
     void toggleAllPipes(bool isEnabled);
 
+    /**
+     * @brief configure the RF_SETUP register in 1 transaction
+     * @param level This parameter is the same input as setPALevel()'s `level` parameter.
+     * See @ref rf24_pa_dbm_e enum for accepted values.
+     * @param speed This parameter is the same input as setDataRate()'s `speed` parameter.
+     * See @ref rf24_datarate_e enum for accepted values.
+     * @param lnaEnable This optional parameter is the same as setPALevel()'s `lnaEnable`
+     * optional parameter. Defaults to `true` (meaning LNA feature is enabled) when not specified.
+     */
+    void setRadiation(rf24_pa_dbm_e level, rf24_datarate_e speed, bool lnaEnable = true);
+
     /**@}*/
     /**
      * @name Deprecated
@@ -1872,6 +1883,23 @@ private:
     void errNotify(void);
 
     #endif
+
+    /**
+     * @brief Manipulate the @ref DataRate and txDelay
+     *
+     * This is a helper function to setRadiation() and setDataRate()
+     * @param speed The desired data rate.
+     */
+    inline uint8_t _data_rate_reg_value(rf24_datarate_e speed);
+
+    /**
+     * @brief Manipulate the @ref PALevel
+     *
+     * This is a helper function to setRadiation() and setPALevel()
+     * @param level The desired @ref PALevel.
+     * @param lnaEnable Toggle the LNA feature.
+     */
+    inline uint8_t _pa_level_reg_value(rf24_pa_dbm_e level, bool lnaEnable);
 
     /**@}*/
 
