@@ -26,15 +26,16 @@
 RF24 radio(CE_PIN, CSN_PIN);
 
 // Used to control whether this node is sending or receiving
-bool role = false;  // true = TX node, false = RX node
+bool role = false; // true = TX node, false = RX node
 
 // For this example, we'll be using a payload containing
 // a string & an integer number that will be incremented
 // on every successful transmission.
 // Make a data structure to store the entire payload of different datatypes
-struct PayloadStruct {
-  char message[7];          // only using 6 characters for TX & RX payloads
-  uint8_t counter;
+struct PayloadStruct
+{
+    char message[7]; // only using 6 characters for TX & RX payloads
+    uint8_t counter;
 };
 PayloadStruct payload;
 
@@ -82,7 +83,7 @@ bool setup()
     radio.setPayloadSize(sizeof(payload)); // char[7] & uint8_t datatypes occupy 8 bytes
 
     // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
@@ -125,16 +126,16 @@ void loop()
             radio.startListening();                                              // put in RX mode
             uint64_t start_timeout = to_ms_since_boot(get_absolute_time());      // timer to detect timeout
             while (!radio.available()) {                                         // wait for response
-                if (to_ms_since_boot(get_absolute_time()) - start_timeout > 200)                  // only wait 200 ms
+                if (to_ms_since_boot(get_absolute_time()) - start_timeout > 200) // only wait 200 ms
                     break;
             }
-            uint64_t end_timer = to_us_since_boot(get_absolute_time());          // end the timer
-            radio.stopListening();                                               // put back in TX mode
+            uint64_t end_timer = to_us_since_boot(get_absolute_time()); // end the timer
+            radio.stopListening();                                      // put back in TX mode
 
             // print summary of transactions
-            printf("Transmission successful!");            // payload was delivered
+            printf("Transmission successful!"); // payload was delivered
             uint8_t pipe;
-            if (radio.available(&pipe)) {                  // is there a payload received
+            if (radio.available(&pipe)) { // is there a payload received
                 // print details about outgoing payload
                 printf(" Round-trip delay: %llu us. Sent: %s%d",
                        end_timer - start_timer,
@@ -159,7 +160,7 @@ void loop()
         }
         else {
             printf("Transmission failed or timed out\n"); // payload was not delivered
-        } // report
+        }                                                 // report
 
         // to make this example readable in the serial terminal
         sleep_ms(1000); // slow transmissions down by 1 second
@@ -168,16 +169,16 @@ void loop()
         // This device is a RX node
 
         uint8_t pipe;
-        if (radio.available(&pipe)) {                // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) { // is there a payload? get the pipe number that recieved it
             PayloadStruct received;
             radio.read(&received, sizeof(received)); // get incoming payload
             payload.counter = received.counter + 1;  // increment incoming counter for next outgoing response
 
             // transmit response & save result to `report`
-            radio.stopListening();                       // put in TX mode
-            radio.writeFast(&payload, sizeof(payload));  // load response to TX FIFO
-            bool report = radio.txStandBy(150);          // keep retrying for 150 ms
-            radio.startListening();                      // put back in RX mode
+            radio.stopListening();                      // put in TX mode
+            radio.writeFast(&payload, sizeof(payload)); // load response to TX FIFO
+            bool report = radio.txStandBy(150);         // keep retrying for 150 ms
+            radio.startListening();                     // put back in RX mode
 
             // print summary of transactions, starting with details about incoming payload
             printf("Received %d bytes on pipe %d: %s%d",
@@ -191,7 +192,7 @@ void loop()
                 printf(" Sent: %s%d", payload.message, payload.counter);
             }
             else {
-                printf(" Response failed.\n");   // failed to send response
+                printf(" Response failed.\n"); // failed to send response
             }
         }
     } // role
@@ -206,8 +207,7 @@ void loop()
             role = true;
             memcpy(payload.message, "Hello ", 6); // set the outgoing message
             printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
-            radio.stopListening();                // put in TX mode
-
+            radio.stopListening(); // put in TX mode
         }
         else if ((input == 'R' || input == 'r') && role) {
             // Become the RX node
@@ -215,7 +215,7 @@ void loop()
             role = false;
             memcpy(payload.message, "World ", 6); // set the response message
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
-            radio.startListening();               // put in RX mode
+            radio.startListening(); // put in RX mode
         }
         else if (input == 'b' || input == 'B') {
             // reset to bootloader

@@ -7,9 +7,11 @@
  * Example of spi.h class declaration for SPI portability
  *
  * @defgroup Porting_SPI Porting: SPI
- *
  * @{
  */
+#ifndef RF24_UTILITY_TEMPLATE_SPI_H_
+#define RF24_UTILITY_TEMPLATE_SPI_H_
+
 #include <string>
 #include <stdint.h>
 #include <unistd.h>
@@ -29,58 +31,59 @@ using namespace std;
 class SPI
 #endif
 {
-public:
 
-	/**
+public:
+    /**
 	 * SPI constructor
 	 */
-	SPI();
+    SPI();
 
-	/**
+    /**
 	 * Start SPI
 	 */
-	void begin(int busNo);
+    void begin(int busNo);
 
-	/**
+    /**
 	 * Transfer a single byte
 	 * @param tx_ Byte to send
 	 * @return Data returned via spi
 	 */
-	uint8_t transfer(uint8_t tx_);
+    uint8_t transfer(uint8_t tx_);
 
-	/**
+    /**
 	 * Transfer a buffer of data
 	 * @param tbuf Transmit buffer
 	 * @param rbuf Receive buffer
 	 * @param len Length of the data
 	 */
-	void transfernb(char* tbuf, char* rbuf, uint32_t len);
+    void transfernb(char* tbuf, char* rbuf, uint32_t len);
 
-	/**
+    /**
 	 * Transfer a buffer of data without an rx buffer
 	 * @param buf Pointer to a buffer of data
 	 * @param len Length of the data
 	 */
-	void transfern(char* buf, uint32_t len);
+    void transfern(char* buf, uint32_t len);
 
 #ifndef DOXYGEN_FORCED
-// exclude this line from the docs to prevent warnings docs generators
-	virtual ~ SPI();
+    // exclude this line from the docs to prevent warnings docs generators
+    virtual ~SPI();
 #endif
+
 private:
+    /** Default SPI device */
+    string device;
+    /** SPI Mode set */
+    uint8_t mode;
+    /** word size*/
+    uint8_t bits;
+    /** Set SPI speed*/
+    uint32_t speed;
+    int fd;
 
-	/** Default SPI device */
-	string device;
-	/** SPI Mode set */
-	uint8_t mode;
-	/** word size*/
-	uint8_t bits;
-	/** Set SPI speed*/
-	uint32_t speed;
-	int fd;
-
-	void init();
-
+    void init();
 };
 
 /**@}*/
+
+#endif // RF24_UTILITY_TEMPLATE_SPI_H_

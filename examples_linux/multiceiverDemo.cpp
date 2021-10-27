@@ -35,7 +35,6 @@ RF24 radio(22, 0);
 // See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
-
 // For this example, we'll be using 6 addresses; 1 for each TX node
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
@@ -49,15 +48,14 @@ uint64_t address[6] = {0x7878787878LL,
                        0xB3B4B5B60FLL,
                        0xB3B4B5B605LL};
 
-
 // For this example, we'll be using a payload containing
 // a node ID number and a single integer number that will be incremented
 // on every successful transmission.
 // Make a data structure to use as a payload.
 struct PayloadStruct
 {
-  unsigned int nodeID;
-  unsigned int payloadID;
+    unsigned int nodeID;
+    unsigned int payloadID;
 };
 PayloadStruct payload;
 
@@ -70,8 +68,8 @@ void printHelp(string);    // prototype to function that explain CLI arg usage
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
-
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
     // perform hardware check
     if (!radio.begin()) {
@@ -118,7 +116,7 @@ int main(int argc, char** argv) {
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    radio.setPALevel(RF24_PA_LOW);         // RF24_PA_MAX is default.
+    radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
     // save on transmission time by setting the radio to only transmit the
     // number of bytes we need to transmit a float
@@ -138,12 +136,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-
 /**
  * set this node's role from stdin stream.
  * this only considers the first char as input.
  */
-void setRole() {
+void setRole()
+{
 
     string input = "";
     while (!input.length()) {
@@ -164,14 +162,14 @@ void setRole() {
                 cout << input[0] << " is an invalid input. Please try again." << endl;
         }
         input = ""; // stay in the while loop
-    } // while
+    }               // while
 } // setRole
-
 
 /**
  * act as unique TX node identified by the `role` number
  */
-void master(unsigned int role) {
+void master(unsigned int role)
+{
     // set the payload's nodeID & reset the payload's identifying number
     payload.nodeID = role;
     payload.payloadID = 0;
@@ -187,64 +185,64 @@ void master(unsigned int role) {
 
     unsigned int failures = 0;
     while (failures < 6) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);       // start the timer
-        bool report = radio.write(&payload, sizeof(payload));  // transmit & save the report
-        uint32_t timerEllapsed = getMicros();                  // end the timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);      // start the timer
+        bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
+        uint32_t timerEllapsed = getMicros();                 // end the timer
 
         if (report) {
             // payload was delivered
             cout << "Transmission of PayloadID ";
-            cout << payload.payloadID;                         // print payload number
-            cout << " as node " << payload.nodeID;             // print node number
+            cout << payload.payloadID;             // print payload number
+            cout << " as node " << payload.nodeID; // print node number
             cout << " successful! Time to transmit = ";
-            cout << timerEllapsed << " us" << endl;            // print the timer result
+            cout << timerEllapsed << " us" << endl; // print the timer result
         }
         else {
             // payload was not delivered
             failures++;
             cout << "Transmission failed or timed out" << endl;
         }
-        payload.payloadID++;                                   // increment payload number
+        payload.payloadID++; // increment payload number
 
         // to make this example readable in the terminal
         delay(1000); // slow transmissions down by 1 second
-    } // while
+    }                // while
     cout << failures << " failures detected. Leaving TX role." << endl;
 } // master
-
 
 /**
  * act as the RX node that receives from up to 6 other TX nodes
  */
-void slave() {
+void slave()
+{
 
     // Set the addresses for all pipes to TX nodes
     for (uint8_t i = 0; i < 6; ++i)
-      radio.openReadingPipe(i, address[i]);
+        radio.openReadingPipe(i, address[i]);
 
-    radio.startListening();                                        // put radio in RX mode
+    radio.startListening(); // put radio in RX mode
 
-    time_t startTimer = time(nullptr);                             // start a timer
-    while (time(nullptr) - startTimer < 6) {                       // use 6 second timeout
+    time_t startTimer = time(nullptr);       // start a timer
+    while (time(nullptr) - startTimer < 6) { // use 6 second timeout
         uint8_t pipe;
-        if (radio.available(&pipe)) {                              // is there a payload? get the pipe number that recieved it
-            uint8_t bytes = radio.getPayloadSize();                // get the size of the payload
-            radio.read(&payload, bytes);                           // fetch payload from FIFO
-            cout << "Received " << (unsigned int)bytes;            // print the size of the payload
-            cout << " bytes on pipe " << (unsigned int)pipe;       // print the pipe number
-            cout << " from node " << payload.nodeID;               // print the payload's origin
-            cout << ". PayloadID: " << payload.payloadID << endl;  // print the payload's number
-            startTimer = time(nullptr);                            // reset timer
+        if (radio.available(&pipe)) {                             // is there a payload? get the pipe number that recieved it
+            uint8_t bytes = radio.getPayloadSize();               // get the size of the payload
+            radio.read(&payload, bytes);                          // fetch payload from FIFO
+            cout << "Received " << (unsigned int)bytes;           // print the size of the payload
+            cout << " bytes on pipe " << (unsigned int)pipe;      // print the pipe number
+            cout << " from node " << payload.nodeID;              // print the payload's origin
+            cout << ". PayloadID: " << payload.payloadID << endl; // print the payload's number
+            startTimer = time(nullptr);                           // reset timer
         }
     }
     cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
 } // slave
 
-
 /**
  * Calculate the ellapsed time in microseconds
  */
-uint32_t getMicros() {
+uint32_t getMicros()
+{
     // this function assumes that the timer was started using
     // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
 
@@ -252,14 +250,14 @@ uint32_t getMicros() {
     uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
-    return ((seconds) * 1000 + useconds) + 0.5;
+    return ((seconds)*1000 + useconds) + 0.5;
 }
-
 
 /**
  * print a manual page of instructions on how to use this example's CLI args
  */
-void printHelp(string progName) {
+void printHelp(string progName)
+{
     cout << "usage: " << progName << " [-h] [-n {0,1,2,3,4,5,r,R}]\n\n"
          << "A simple example of sending data from as many as 6 nRF24L01 transceivers to\n"
          << "1 receiving transceiver. This technique is trademarked by\n"

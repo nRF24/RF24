@@ -1,17 +1,17 @@
-/* 
+/*
  *
  *  Filename : rpi-hub.cpp
  *
  *  This program makes the RPi as a hub listening to all six pipes from the remote sensor nodes ( usually Arduino )
  *  and will return the packet back to the sensor on pipe0 so that the sender can calculate the round trip delays
  *  when the payload matches.
- *  
+ *
  *  I encounter that at times, it also receive from pipe7 ( or pipe0 ) with content of FFFFFFFFF that I will not sent
  *  back to the sender
  *
  *  Refer to RF24/examples/rpi_hub_arduino/ for the corresponding Arduino sketches to work with this code.
- * 
- *  
+ *
+ *
  *  CE is not used and CSN is GPIO25 (not pinout)
  *
  *  Refer to RPi docs for GPIO numbers
@@ -22,7 +22,7 @@
  *
  * 03/17/2013 : Charles-Henri Hallard (http://hallard.me)
  *              Modified to use with Arduipi board http://hallard.me/arduipi
- *						  Changed to use modified bcm2835 and RF24 library 
+ *						  Changed to use modified bcm2835 and RF24 library
  *
  *
  */
@@ -43,7 +43,7 @@ const uint64_t pipes[6] = {0xF0F0F0F0D2LL, 0xF0F0F0F0E1LL, 0xF0F0F0F0E2LL, 0xF0F
 //RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_18, BCM2835_SPI_SPEED_1MHZ);
 
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 4Mhz
-//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ); 
+//RF24 radio(RPI_V2_GPIO_P1_15, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_4MHZ);
 
 // Setup for GPIO 22 CE and CE1 CSN with SPI Speed @ 8Mhz
 RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ);
@@ -105,7 +105,8 @@ int main(int argc, char** argv)
                 radio.write(receivePayload, len);
                 receivePayload[len] = 0;
                 printf("\t Send: size=%i payload=%s pipe:%i\n", len, receivePayload, pipe);
-            } else {
+            }
+            else {
                 printf("\n");
             }
 
@@ -122,4 +123,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-

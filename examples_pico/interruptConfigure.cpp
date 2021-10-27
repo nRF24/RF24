@@ -26,7 +26,7 @@ volatile bool wait_for_event = false; // used to wait for an IRQ event to trigge
 RF24 radio(CE_PIN, CSN_PIN);
 
 // Used to control whether this node is sending or receiving
-bool role = false;  // true = TX node, false = RX node
+bool role = false; // true = TX node, false = RX node
 
 // For this example, we'll be using a payload containing
 // a string that changes on every transmission. (successful or not)
@@ -40,7 +40,6 @@ char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
 void interruptHandler(uint gpio, uint32_t events); // prototype to handle IRQ events
 void printRxFifo();                                // prototype to print RX FIFO with 1 buffer
-
 
 bool setup()
 {
@@ -83,12 +82,12 @@ bool setup()
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    radio.setPALevel(RF24_PA_LOW);    // RF24_PA_MAX is default.
+    radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
     // For this example we use acknowledgment (ACK) payloads to trigger the
     // IRQ pin when data is received on the TX node.
     // to use ACK payloads, we need to enable dynamic payload lengths
-    radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
+    radio.enableDynamicPayloads(); // ACK payloads are dynamically sized
 
     // Acknowledgement packets have no payloads by default. We need to enable
     // this feature for all nodes (TX & RX) to use ACK payloads.
@@ -96,7 +95,7 @@ bool setup()
     // Fot this example, we use the same address to send data back and forth
 
     // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
@@ -105,7 +104,6 @@ bool setup()
     if (role) {
         // setup for TX mode
         radio.stopListening(); // put radio in TX mode
-
     }
     else {
         // setup for RX mode
@@ -145,7 +143,6 @@ void loop()
             printf("\nConfiguring IRQ pin to ignore the 'data sent' event\n");
             radio.maskIRQ(true, false, false); // args = "data_sent", "data_fail", "data_ready"
             printf("   Pinging RX node for 'data ready' event...\n");
-
         }
         else if (pl_iterator == 1) {
             // Test the "data sent" event with the IRQ pin
@@ -153,7 +150,6 @@ void loop()
             printf("\nConfiguring IRQ pin to ignore the 'data ready' event\n");
             radio.maskIRQ(false, false, true); // args = "data_sent", "data_fail", "data_ready"
             printf("   Pinging RX node for 'data sent' event...\n");
-
         }
         else if (pl_iterator == 2) {
             // Use this iteration to fill the RX node's FIFO which sets us up for the next test.
@@ -175,7 +171,6 @@ void loop()
                 printf("Transmission failed or timed out. Continuing anyway.\n");
                 radio.flush_tx(); // discard payload(s) that failed to transmit
             }
-
         }
         else if (pl_iterator == 3) {
             // test the "data fail" event with the IRQ pin
@@ -212,12 +207,10 @@ void loop()
             // inform user what to do next
             printf("\n*** PRESS 'T' to restart the transmissions");
             printf("\n*** PRESS 'R' to change to Receive role\n");
-
         }
         else if (pl_iterator == 2) {
             pl_iterator++; // proceed from step 3 to last step (stop at step 4 for readability)
         }
-
     }
     else if (!role && radio.rxFifoFull()) {
         // This device is a RX node
@@ -253,14 +246,14 @@ void loop()
 
             role = true;
             wait_for_event = false;
-            pl_iterator = 0;   // reset the iterator
-            radio.flush_tx();  // discard any payloads in the TX FIFO
+            pl_iterator = 0;  // reset the iterator
+            radio.flush_tx(); // discard any payloads in the TX FIFO
 
             // startListening() clears the IRQ masks also. This is required for
             // continued TX operations when a transmission fails.
             radio.stopListening(); // this also discards any unused ACK payloads
         }
-        else if ((input == 'R' || input == 'r')/*  && role */) {
+        else if ((input == 'R' || input == 'r') /*  && role */) {
             // Become the RX node
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
@@ -325,18 +318,17 @@ void interruptHandler(uint gpio, uint32_t events)
     wait_for_event = false; // ready to continue with loop() operations
 } // interruptHandler
 
-
 /**
  * Print the entire RX FIFO with one buffer. This will also flush the RX FIFO.
  * Remember that the payload sizes are declared as tx_pl_size and ack_pl_size.
  */
 void printRxFifo()
 {
-    if (radio.available()) {                   // if there is data in the RX FIFO
+    if (radio.available()) { // if there is data in the RX FIFO
         // to flush the data from the RX FIFO, we'll fetch it all using 1 buffer
 
         uint8_t pl_size = !role ? tx_pl_size : ack_pl_size;
-        char rx_fifo[pl_size * 3 + 1];         // RX FIFO is full & we know ACK payloads' size
+        char rx_fifo[pl_size * 3 + 1]; // RX FIFO is full & we know ACK payloads' size
         if (radio.rxFifoFull()) {
             rx_fifo[pl_size * 3] = 0;          // add a NULL terminating char to use as a c-string
             radio.read(&rx_fifo, pl_size * 3); // this clears the RX FIFO (for this example)
@@ -347,7 +339,7 @@ void printRxFifo()
                 radio.read(&rx_fifo + (i * pl_size), pl_size);
                 i++;
             }
-            rx_fifo[i * pl_size] = 0;            // add a NULL terminating char to use as a c-string
+            rx_fifo[i * pl_size] = 0; // add a NULL terminating char to use as a c-string
         }
         printf("Complete RX FIFO: %s\n", rx_fifo); // print the entire RX FIFO with 1 buffer
     }

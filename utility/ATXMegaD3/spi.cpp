@@ -17,7 +17,8 @@ void SPI::begin(uint8_t _port)
     {
         device = &SPIC;
         port = &PORTC;
-    } else if (_port == XMEGA_SPI_PORT_D) // Select SPI on PORTD
+    }
+    else if (_port == XMEGA_SPI_PORT_D) // Select SPI on PORTD
     {
         device = &SPID;
         port = &PORTD;
@@ -45,20 +46,16 @@ void SPI::init()
     //device->CTRL = 0;
     device->CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | SPI_MODE_0_gc | SPI_PRESCALER_DIV4_gc;
     device->INTCTRL = 0; //Disable interrupts
-
 }
 
 SPI::SPI()
 {
-
 }
 
 SPI::~SPI()
 {
-
 }
 
 void operator delete(void* p) // or delete(void *, std::size_t)
 {
-
 }

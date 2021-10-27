@@ -24,12 +24,12 @@ extern "C" {
  *      back to the user supplied function.
  *********************************************************************************
  */
-extern int attachInterrupt(int pin, int mode, void (* function)(void));
+extern int attachInterrupt(int pin, int mode, void (*function)(void));
 
 /*
  * detachInterrupt:
  *      Pi Specific detachInterrupt.
- *      Will cancel the interrupt thread, close the filehandle and 
+ *      Will cancel the interrupt thread, close the filehandle and
  *		setting wiringPi back to 'none' mode.
  *********************************************************************************
  */

@@ -1,5 +1,5 @@
-#ifndef __RF24_INCLUDES_H__
-#define __RF24_INCLUDES_H__
+#ifndef RF24_UTILITY_INCLUDES_H_
+#define RF24_UTILITY_INCLUDES_H_
 
 #define RF24_SPIDEV
 
@@ -8,4 +8,4 @@
     #include "SPIDEV/interrupt.h"
 #endif
 
-#endif
+#endif // RF24_UTILITY_INCLUDES_H_

@@ -6,7 +6,7 @@ Interrupt functions
 #include <pigpio.h>
 
 
-int attachInterrupt(int pin, int mode, void (* function)(void))
+int attachInterrupt(int pin, int mode, void (*function)(void))
 {
     gpioInitialise();
     return gpioSetISRFunc(pin,mode,0,(gpioISRFunc_t)function);

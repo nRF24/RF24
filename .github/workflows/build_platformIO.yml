@@ -68,17 +68,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Check code formatting
-        uses: per1234/artistic-style-action@main
+      - uses: shenxianpeng/cpp-linter-action@master
+        id: linter
         with:
-          options-file-path: ./examples/examples_formatter.conf
-          name-patterns: |
-            - '*.ino'
-            - '*.cpp'
-            - '*.hpp'
-            - '*.h'
-          target-paths: |
-            - examples
+          version: 12
+          extensions: ino
+          style: file
+          tidy-chwcks: '-*'
+          files-changed-only: false
+          thread-comments: false
+
+      - name: Linter checks failed?
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
 
   build:
     needs: [check_formatting, validate_lib_json]

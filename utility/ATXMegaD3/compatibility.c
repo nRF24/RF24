@@ -27,7 +27,6 @@ void __usleep(int usec)
 
 void __start_timer()
 {
-
     // Timer details : Clock is 32MHz, Timer resolution is 8bit, Prescaler is 256, Period is 124, Real Time is 0.001s
 
     /* Set the timer to run at the fastest rate. */
@@ -46,7 +45,7 @@ void __start_timer()
     /* Enable this interrupt level. */
     PMIC.CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
 
-    _millis = 0;
+    _millis   = 0;
 }
 
 long __millis()
@@ -58,7 +57,3 @@ void update_milisec()
 {
     _millis++;
 }
-
-
-
-

@@ -7,12 +7,12 @@
 */
 
 /**
-   Example Nordic FOB Receiver
+  Example Nordic FOB Receiver
 
-   This is an example of how to use the RF24 class to receive signals from the
-   Sparkfun Nordic FOB.  Thanks to Kirk Mower for providing test hardware.
+  This is an example of how to use the RF24 class to receive signals from the
+  Sparkfun Nordic FOB.  Thanks to Kirk Mower for providing test hardware.
 
-   See blog post at http://maniacbug.wordpress.com/2012/01/08/nordic-fob/
+  See blog post at http://maniacbug.wordpress.com/2012/01/08/nordic-fob/
 */
 
 #include <SPI.h>
@@ -32,8 +32,7 @@ RF24 radio(9, 10);
 // Payload
 //
 
-struct payload_t
-{
+struct payload_t {
   uint8_t buttons;
   uint16_t id;
   uint8_t empty;
@@ -52,8 +51,7 @@ uint16_t flip_endian(uint16_t in);
 // Setup
 //
 
-void setup(void)
-{
+void setup(void) {
   //
   // Print preamble
   //
@@ -91,18 +89,16 @@ void setup(void)
 // Loop
 //
 
-void loop(void)
-{
+void loop(void) {
   //
   // Receive each packet, dump it out
   //
 
   // if there is data ready
-  if ( radio.available() )
-  {
+  if (radio.available()) {
     // Get the packet from the radio
     payload_t payload;
-    radio.read( &payload, sizeof(payload) );
+    radio.read(&payload, sizeof(payload));
 
     // Print the ID of this message.  Note that the message
     // is sent 'big-endian', so we have to flip it.
@@ -110,16 +106,14 @@ void loop(void)
 
     // Print the name of each button
     int i = num_buttons;
-    while (i--)
-    {
-      if ( ! ( payload.buttons & _BV(i) ) )
-      {
+    while (i--) {
+      if (!(payload.buttons & _BV(i))) {
         printf("%s ", button_names[i]);
       }
     }
 
     // If no buttons, print None
-    if ( payload.buttons == _BV(num_buttons) - 1 )
+    if (payload.buttons == _BV(num_buttons) - 1)
       printf("None");
 
     printf("\r\n");
@@ -131,8 +125,7 @@ void loop(void)
 //
 
 // Change a big-endian word into a little-endian
-uint16_t flip_endian(uint16_t in)
-{
+uint16_t flip_endian(uint16_t in) {
   uint16_t low = in >> 8;
   uint16_t high = in << 8;
 

@@ -16,17 +16,17 @@
 #include "RF24.h"
 
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(7, 8);  // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 // an identifying device destination
 // Let these addresses be used for the pair
-uint8_t address[][6] = {"1Node", "2Node"};
+uint8_t address[][6] = { "1Node", "2Node" };
 // It is very helpful to think of an address as a path instead of as
 // an identifying device destination
 // to use different addresses on a pair of radios, we need a variable to
 
 // uniquely identify which address this radio will use to transmit
-bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
+bool radioNumber = 1;  // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 // Used to control whether this node is sending or receiving
 bool role = false;  // true = TX role, false = RX role
@@ -36,7 +36,7 @@ bool role = false;  // true = TX role, false = RX role
 // on every successful transmission.
 // Make a data structure to store the entire payload of different datatypes
 struct PayloadStruct {
-  char message[7];          // only using 6 characters for TX & ACK payloads
+  char message[7];  // only using 6 characters for TX & ACK payloads
   uint8_t counter;
 };
 PayloadStruct payload;
@@ -51,7 +51,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("radio hardware is not responding!!"));
-    while (1) {} // hold in infinite loop
+    while (1) {}  // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -73,42 +73,41 @@ void setup() {
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity to
   // each other.
-  radio.setPALevel(RF24_PA_LOW);     // RF24_PA_MAX is default.
+  radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
 
   // to use ACK payloads, we need to enable dynamic payload lengths (for all nodes)
-  radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
+  radio.enableDynamicPayloads();  // ACK payloads are dynamically sized
 
   // Acknowledgement packets have no payloads by default. We need to enable
   // this feature for all nodes (TX & RX) to use ACK payloads.
   radio.enableAckPayload();
 
   // set the TX address of the RX node into the TX pipe
-  radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+  radio.openWritingPipe(address[radioNumber]);  // always uses pipe 0
 
   // set the RX address of the TX node into a RX pipe
-  radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
+  radio.openReadingPipe(1, address[!radioNumber]);  // using pipe 1
 
   // additional setup specific to the node's role
   if (role) {
     // setup the TX payload
 
-    memcpy(payload.message, "Hello ", 6);                       // set the payload message
-    radio.stopListening();                                      // put radio in TX mode
+    memcpy(payload.message, "Hello ", 6);  // set the payload message
+    radio.stopListening();                 // put radio in TX mode
   } else {
     // setup the ACK payload & load the first response into the FIFO
 
-    memcpy(payload.message, "World ", 6);                       // set the payload message
+    memcpy(payload.message, "World ", 6);  // set the payload message
     // load the payload for the first received transmission on pipe 0
     radio.writeAckPayload(1, &payload, sizeof(payload));
 
-    radio.startListening();                                     // put radio in RX mode
+    radio.startListening();  // put radio in RX mode
   }
 
   // For debugging info
   // printf_begin();             // needed only once for printing details
   // radio.printDetails();       // (smaller) function that prints raw register values
   // radio.printPrettyDetails(); // (larger) function that prints human readable data
-
 }
 
 void loop() {
@@ -116,39 +115,39 @@ void loop() {
   if (role) {
     // This device is a TX node
 
-    unsigned long start_timer = micros();                    // start the timer
-    bool report = radio.write(&payload, sizeof(payload));    // transmit & save the report
-    unsigned long end_timer = micros();                      // end the timer
+    unsigned long start_timer = micros();                  // start the timer
+    bool report = radio.write(&payload, sizeof(payload));  // transmit & save the report
+    unsigned long end_timer = micros();                    // end the timer
 
     if (report) {
-      Serial.print(F("Transmission successful! "));          // payload was delivered
+      Serial.print(F("Transmission successful! "));  // payload was delivered
       Serial.print(F("Time to transmit = "));
-      Serial.print(end_timer - start_timer);                 // print the timer result
+      Serial.print(end_timer - start_timer);  // print the timer result
       Serial.print(F(" us. Sent: "));
-      Serial.print(payload.message);                         // print the outgoing message
-      Serial.print(payload.counter);                         // print the outgoing counter
+      Serial.print(payload.message);  // print the outgoing message
+      Serial.print(payload.counter);  // print the outgoing counter
       uint8_t pipe;
-      if (radio.available(&pipe)) {                          // is there an ACK payload? grab the pipe number that received it
+      if (radio.available(&pipe)) {  // is there an ACK payload? grab the pipe number that received it
         PayloadStruct received;
-        radio.read(&received, sizeof(received));             // get incoming ACK payload
+        radio.read(&received, sizeof(received));  // get incoming ACK payload
         Serial.print(F(" Recieved "));
-        Serial.print(radio.getDynamicPayloadSize());         // print incoming payload size
+        Serial.print(radio.getDynamicPayloadSize());  // print incoming payload size
         Serial.print(F(" bytes on pipe "));
-        Serial.print(pipe);                                  // print pipe number that received the ACK
+        Serial.print(pipe);  // print pipe number that received the ACK
         Serial.print(F(": "));
-        Serial.print(received.message);                      // print incoming message
-        Serial.println(received.counter);                    // print incoming counter
+        Serial.print(received.message);    // print incoming message
+        Serial.println(received.counter);  // print incoming counter
 
         // save incoming counter & increment for next outgoing
         payload.counter = received.counter + 1;
 
       } else {
-        Serial.println(F(" Recieved: an empty ACK packet")); // empty ACK packet received
+        Serial.println(F(" Recieved: an empty ACK packet"));  // empty ACK packet received
       }
 
 
     } else {
-      Serial.println(F("Transmission failed or timed out"));    // payload was not delivered
+      Serial.println(F("Transmission failed or timed out"));  // payload was not delivered
     }
 
     // to make this example readable in the serial monitor
@@ -158,27 +157,27 @@ void loop() {
     // This device is a RX node
 
     uint8_t pipe;
-    if (radio.available(&pipe)) {                    // is there a payload? get the pipe number that recieved it
-      uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
+    if (radio.available(&pipe)) {                     // is there a payload? get the pipe number that recieved it
+      uint8_t bytes = radio.getDynamicPayloadSize();  // get the size of the payload
       PayloadStruct received;
-      radio.read(&received, sizeof(received));       // get incoming payload
+      radio.read(&received, sizeof(received));  // get incoming payload
       Serial.print(F("Received "));
-      Serial.print(bytes);                           // print the size of the payload
+      Serial.print(bytes);  // print the size of the payload
       Serial.print(F(" bytes on pipe "));
-      Serial.print(pipe);                            // print the pipe number
+      Serial.print(pipe);  // print the pipe number
       Serial.print(F(": "));
-      Serial.print(received.message);                // print incoming message
-      Serial.print(received.counter);                // print incoming counter
+      Serial.print(received.message);  // print incoming message
+      Serial.print(received.counter);  // print incoming counter
       Serial.print(F(" Sent: "));
-      Serial.print(payload.message);                 // print outgoing message
-      Serial.println(payload.counter);               // print outgoing counter
+      Serial.print(payload.message);    // print outgoing message
+      Serial.println(payload.counter);  // print outgoing counter
 
       // save incoming counter & increment for next outgoing
       payload.counter = received.counter + 1;
       // load the payload for the first received transmission on pipe 0
       radio.writeAckPayload(1, &payload, sizeof(payload));
     }
-  } // role
+  }  // role
 
   if (Serial.available()) {
     // change the role via the serial monitor
@@ -190,19 +189,19 @@ void loop() {
       role = true;
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
 
-      memcpy(payload.message, "Hello ", 6); // change payload message
-      radio.stopListening();                // this also discards any unused ACK payloads
+      memcpy(payload.message, "Hello ", 6);  // change payload message
+      radio.stopListening();                 // this also discards any unused ACK payloads
 
     } else if (c == 'R' && role) {
       // Become the RX node
 
       role = false;
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
-      memcpy(payload.message, "World ", 6); // change payload message
+      memcpy(payload.message, "World ", 6);  // change payload message
 
       // load the payload for the first received transmission on pipe 0
       radio.writeAckPayload(1, &payload, sizeof(payload));
       radio.startListening();
     }
   }
-} // loop
+}  // loop

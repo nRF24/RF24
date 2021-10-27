@@ -7,12 +7,12 @@
 */
 
 /**
-   Example RF Radio Ping Pair ... for Maple
+  Example RF Radio Ping Pair ... for Maple
 
-   This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
-   connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
-   which responds by sending the value back.  The ping node can then see how long the whole cycle
-   took.
+  This is an example of how to use the RF24 class.  Write this sketch to two different nodes,
+  connect the role_pin to ground on one.  The ping node sends the current time to the pong node,
+  which responds by sending the value back.  The ping node can then see how long the whole cycle
+  took.
 */
 
 #include "WProgram.h"
@@ -70,16 +70,16 @@ const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 //
 
 // The various roles supported by this sketch
-typedef enum { role_ping_out = 1, role_pong_back } role_e;
+typedef enum { role_ping_out = 1,
+               role_pong_back } role_e;
 
 // The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
+const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back" };
 
 // The role of the current running sketch
 role_e role;
 
-void setup(void)
-{
+void setup(void) {
   //
   // Role
   //
@@ -87,10 +87,10 @@ void setup(void)
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin, HIGH);
-  delay(20); // Just to get a solid reading on the role pin
+  delay(20);  // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
-  if ( digitalRead(role_pin) )
+  if (digitalRead(role_pin))
     role = role_ping_out;
   else
     role = role_pong_back;
@@ -124,13 +124,10 @@ void setup(void)
   // Open 'our' pipe for writing
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
 
-  if ( role == role_ping_out )
-  {
+  if (role == role_ping_out) {
     radio.openWritingPipe(pipes[0]);
     radio.openReadingPipe(1, pipes[1]);
-  }
-  else
-  {
+  } else {
     radio.openWritingPipe(pipes[1]);
     radio.openReadingPipe(1, pipes[0]);
   }
@@ -148,14 +145,12 @@ void setup(void)
   radio.printDetails();
 }
 
-void loop(void)
-{
+void loop(void) {
   //
   // Ping out role.  Repeatedly send the current time
   //
 
-  if (role == role_ping_out)
-  {
+  if (role == role_ping_out) {
     toggleLED();
 
     // First, stop listening so we can talk.
@@ -164,7 +159,7 @@ void loop(void)
     // Take the time, and send it.  This will block until complete
     unsigned long time = millis();
     printf("Now sending %lu...", time);
-    bool ok = radio.write( &time, sizeof(unsigned long) );
+    bool ok = radio.write(&time, sizeof(unsigned long));
 
     if (ok)
       printf("ok...\r\n");
@@ -177,20 +172,17 @@ void loop(void)
     // Wait here until we get a response, or timeout (250ms)
     unsigned long started_waiting_at = millis();
     bool timeout = false;
-    while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 200 )
+    while (!radio.available() && !timeout)
+      if (millis() - started_waiting_at > 200)
         timeout = true;
 
     // Describe the results
-    if ( timeout )
-    {
+    if (timeout) {
       printf("Failed, response timed out.\r\n");
-    }
-    else
-    {
+    } else {
       // Grab the response, compare, and send to debugging spew
       unsigned long got_time;
-      radio.read( &got_time, sizeof(unsigned long) );
+      radio.read(&got_time, sizeof(unsigned long));
 
       // Spew it
       printf("Got response %lu, round-trip delay: %lu\r\n", got_time, millis() - got_time);
@@ -206,18 +198,15 @@ void loop(void)
   // Pong back role.  Receive each packet, dump it out, and send it back
   //
 
-  if ( role == role_pong_back )
-  {
+  if (role == role_pong_back) {
     // if there is data ready
-    if ( radio.available() )
-    {
+    if (radio.available()) {
       // Dump the payloads until we've gotten everything
       unsigned long got_time;
       bool done = false;
-      while (!done)
-      {
+      while (!done) {
         // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+        done = radio.read(&got_time, sizeof(unsigned long));
 
         // Spew it
         printf("Got payload %lu...", got_time);
@@ -231,7 +220,7 @@ void loop(void)
       radio.stopListening();
 
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );
+      radio.write(&got_time, sizeof(unsigned long));
       printf("Sent response.\r\n");
 
       // Now, resume listening so we catch the next packets.
