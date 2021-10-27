@@ -1882,7 +1882,7 @@ uint8_t RF24::_pa_level_reg_value(uint8_t level, bool lnaEnable)
     // If invalid level, go to max PA
     // Else set level as requested
     // + lnaEnable (1 or 0) to support the SI24R1 chip extra bit
-    return static_cast<uint8_t>(((level > 3 ? RF24_PA_MAX : level) << 1) + lnaEnable);
+    return static_cast<uint8_t>(((level > RF24_PA_MAX ? static_cast<uint8_t>(RF24_PA_MAX) : level) << 1) + lnaEnable);
 }
 
 /****************************************************************************/
