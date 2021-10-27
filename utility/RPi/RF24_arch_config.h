@@ -17,8 +17,8 @@
 #define _SPI spi
 
 #if defined(SPI_HAS_TRANSACTION)
-// this gets triggered as /utility/RPi/spi.h defines SPI_HAS_TRANSACTION (unless modified by end-user)
-#define RF24_SPI_TRANSACTIONS
+    // this gets triggered as /utility/RPi/spi.h defines SPI_HAS_TRANSACTION (unless modified by end-user)
+    #define RF24_SPI_TRANSACTIONS
 #endif
 
 // GCC a Arduino Missing
@@ -35,9 +35,9 @@
 #define PRIPSTR "%s"
 
 #ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) ({ x; })
+    #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
-#define IF_SERIAL_DEBUG(x)
+    #define IF_SERIAL_DEBUG(x)
 #endif
 
 #define digitalWrite(pin, value) bcm2835_gpio_write(pin, value)

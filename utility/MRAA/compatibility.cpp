@@ -11,8 +11,8 @@
 void __msleep(int milisec)
 {
     struct timespec req = {0};
-    req.tv_sec          = 0;
-    req.tv_nsec         = milisec * 1000000L;
+    req.tv_sec = 0;
+    req.tv_nsec = milisec * 1000000L;
     nanosleep(&req, (struct timespec*)NULL);
     //usleep(milisec*1000);
 }
@@ -20,8 +20,8 @@ void __msleep(int milisec)
 void __usleep(int milisec)
 {
     struct timespec req = {0};
-    req.tv_sec          = 0;
-    req.tv_nsec         = milisec * 1000L;
+    req.tv_sec = 0;
+    req.tv_nsec = milisec * 1000L;
     nanosleep(&req, (struct timespec*)NULL);
     //usleep(milisec);
 }

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 static pthread_mutex_t spiMutex = PTHREAD_MUTEX_INITIALIZER;
-bool bcmIsInitialized           = false;
+bool bcmIsInitialized = false;
 
 SPI::SPI()
 {

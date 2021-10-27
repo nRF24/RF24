@@ -2,10 +2,10 @@
 #define RF24_UTILITY_TEENSY_RF24_ARCH_CONFIG_H_
 #if ARDUINO < 100
 
-#include <WProgram.h>
+    #include <WProgram.h>
 
 #else
-#include <Arduino.h>
+    #include <Arduino.h>
 #endif
 
 #include <stddef.h>
@@ -22,9 +22,9 @@
 #define printf Serial.printf
 
 #ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) ({ x; })
+    #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
-#define IF_SERIAL_DEBUG(x)
+    #define IF_SERIAL_DEBUG(x)
 #endif
 
 #define PRIPSTR "%s"

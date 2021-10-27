@@ -24,7 +24,7 @@ see <http://www.gnu.org/licenses/>
 //#define delay(x) bcm2835_delay(x)
 
 static pthread_mutex_t pinMutex = PTHREAD_MUTEX_INITIALIZER;
-static volatile int pinPass     = -1;
+static volatile int pinPass = -1;
 
 pthread_t threadId[64];
 
@@ -51,7 +51,7 @@ int waitForInterrupt(int pin, int mS)
 
     // Setup poll structure
 
-    polls.fd     = fd;
+    polls.fd = fd;
     polls.events = POLLPRI; // Urgent data!
 
     // Wait for it ...
@@ -89,7 +89,7 @@ void* interruptHandler(void* arg)
 
     (void)piHiPri(55); // Only effective if we run as root
 
-    myPin   = pinPass;
+    myPin = pinPass;
     pinPass = -1;
 
     for (;;) {

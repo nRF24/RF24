@@ -30,9 +30,9 @@
 static SPI spi;
 
 #ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) ({ x; })
+    #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
-#define IF_SERIAL_DEBUG(x)
+    #define IF_SERIAL_DEBUG(x)
 #endif
 
 typedef uint16_t prog_uint16_t;

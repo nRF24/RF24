@@ -15,9 +15,9 @@
 #define rf24_min(a, b) (a < b ? a : b)
 
 #if ARDUINO < 100
-#include <WProgram.h>
+    #include <WProgram.h>
 #else
-#include <Arduino.h>
+    #include <Arduino.h>
 #endif
 
 #include <stddef.h>
@@ -27,21 +27,22 @@
 #define _SPI SPI
 
 #if !defined(RF24_CSN_SETTLE_LOW_DELAY)
-#define RF24_CSN_SETTLE_LOW_DELAY 11
+    #define RF24_CSN_SETTLE_LOW_DELAY 11
 #endif
 
 #if !defined(RF24_CSN_SETTLE_HIGH_DELAY)
-#define RF24_CSN_SETTLE_HIGH_DELAY 100
+    #define RF24_CSN_SETTLE_HIGH_DELAY 100
 #endif
 
 #ifdef SERIAL_DEBUG
     #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
     #define IF_SERIAL_DEBUG(x)
+
     #if defined(RF24_TINY)
         #define printf_P(...)
     #endif
-#endif
+#endif // !defined(SERIAL_DEBUG)
 
 #include <avr/pgmspace.h>
 

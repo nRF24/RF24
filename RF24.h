@@ -113,7 +113,8 @@ typedef enum
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
-class RF24 {
+class RF24
+{
 private:
 #ifdef SOFTSPI
     SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;

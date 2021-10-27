@@ -19,7 +19,8 @@
 #define SPI_MODE0 BCM2835_SPI_MODE0
 //#define RF24_SPI_SPEED 10000000 //BCM2835_SPI_SPEED_4MHZ
 
-class SPISettings {
+class SPISettings
+{
 public:
     SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode)
     {
@@ -38,15 +39,16 @@ public:
 private:
     void init(uint32_t clock, uint8_t bitOrder, uint8_t dataMode)
     {
-        clck   = clock;
+        clck = clock;
         border = bitOrder;
-        dmode  = dataMode;
+        dmode = dataMode;
     }
 
     friend class SPIClass;
 };
 
-class SPI {
+class SPI
+{
 public:
     SPI();
 
