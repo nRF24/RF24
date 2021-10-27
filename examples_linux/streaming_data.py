@@ -10,22 +10,21 @@ from RF24 import RF24, RF24_PA_LOW
 
 
 parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument(
     "-n",
     "--node",
     type=int,
     choices=range(2),
-    help="the identifying radio number (or node ID number)"
+    help="the identifying radio number (or node ID number)",
 )
 parser.add_argument(
     "-r",
     "--role",
     type=int,
     choices=range(2),
-    help="'1' specifies the TX role. '0' specifies the RX role."
+    help="'1' specifies the TX role. '0' specifies the RX role.",
 )
 
 ########### USER CONFIGURATION ###########
@@ -84,10 +83,7 @@ def master(count=1):
                 failures += 1  # increment manual retry count
                 if failures > 99 and buf_iter < 7 and multiplier < 2:
                     # we need to prevent an infinite loop
-                    print(
-                        "Too many failures detected. Aborting at payload ",
-                        buffer[0]
-                    )
+                    print("Too many failures detected. Aborting at payload ", buffer[0])
                     multiplier = count  # be sure to exit the for loop
                     break  # exit the while loop
                 radio.reUseTX()  # resend payload in top level of TX FIFO
@@ -96,8 +92,7 @@ def master(count=1):
     end_timer = time.monotonic_ns()  # end timer
     print(
         "Time to transmit data = {} us. Detected {} failures.".format(
-            (end_timer - start_timer) / 1000,
-            failures
+            (end_timer - start_timer) / 1000, failures
         )
     )
 
@@ -126,6 +121,7 @@ def slave(timeout=6):
 
     print("Nothing received in ", timeout, " seconds. Leaving RX role")
 
+
 def set_role():
     """Set the role using stdin stream. Role args can be specified using space
     delimiters (e.g. 'R 10' calls `slave(10)` & 'T 3' calls `master(3)`)
@@ -134,11 +130,14 @@ def set_role():
         - True when role is complete & app should continue running.
         - False when app should exit
     """
-    user_input = input(
-        "*** Enter 'R' for receiver role.\n"
-        "*** Enter 'T' for transmitter role.\n"
-        "*** Enter 'Q' to quit example.\n"
-    ) or "?"
+    user_input = (
+        input(
+            "*** Enter 'R' for receiver role.\n"
+            "*** Enter 'T' for transmitter role.\n"
+            "*** Enter 'Q' to quit example.\n"
+        )
+        or "?"
+    )
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
         if len(user_input) > 1:
@@ -181,11 +180,7 @@ if __name__ == "__main__":
     radio_number = args.node  # uses default value from `parser`
     if args.node is None:  # if '--node' arg wasn't specified
         radio_number = bool(
-            int(
-                input(
-                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-                ) or 0
-            )
+            int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
         )
 
     # set the Power Amplifier level to -12 dBm since this test example is

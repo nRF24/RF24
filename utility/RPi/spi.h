@@ -4,19 +4,18 @@
  */
 /**
  * @file spi.h
- * \cond HIDDEN_SYMBOLS
  * Class declaration for SPI helper files
  */
-#ifndef _SPI_H_INCLUDED
-#define _SPI_H_INCLUDED
+#ifndef RF24_UTILITY_RPI_SPI_H_
+#define RF24_UTILITY_RPI_SPI_H_
 
 #include <stdio.h>
 #include "bcm2835.h"
 #include "interrupt.h"
-#include "../../RF24_config.h"
+#include "../../RF24_config.h" // This is cyclical and should be fixed
 
 #define SPI_HAS_TRANSACTION
-#define MSBFIRST BCM2835_SPI_BIT_ORDER_MSBFIRST
+#define MSBFIRST  BCM2835_SPI_BIT_ORDER_MSBFIRST
 #define SPI_MODE0 BCM2835_SPI_MODE0
 //#define RF24_SPI_SPEED 10000000 //BCM2835_SPI_SPEED_4MHZ
 
@@ -35,13 +34,13 @@ public:
     uint32_t clck;
     uint8_t border;
     uint8_t dmode;
-private:
 
+private:
     void init(uint32_t clock, uint8_t bitOrder, uint8_t dataMode)
     {
-        clck = clock;
+        clck   = clock;
         border = bitOrder;
-        dmode = dataMode;
+        dmode  = dataMode;
     }
 
     friend class SPIClass;
@@ -49,7 +48,6 @@ private:
 
 class SPI {
 public:
-
     SPI();
 
     virtual ~SPI();
@@ -75,8 +73,6 @@ public:
     static void beginTransaction(SPISettings settings);
 
     static void endTransaction();
-
-
 };
 
 uint8_t SPI::transfer(uint8_t _data)
@@ -94,7 +90,5 @@ void SPI::transfern(char* buf, uint32_t len)
 {
     transfernb(buf, buf, len);
 }
-/**
- * \endcond
- */
-#endif
+
+#endif // RF24_UTILITY_RPI_SPI_H_

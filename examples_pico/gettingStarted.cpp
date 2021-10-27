@@ -27,7 +27,6 @@ bool role = false; // true = TX role, false = RX role
 // on every successful transmission
 float payload = 0.0;
 
-
 bool setup()
 {
     // Let these addresses be used for the pair

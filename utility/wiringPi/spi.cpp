@@ -19,9 +19,9 @@
 #include <string.h>
 #include <errno.h>
 
-#define RF24_SPI_CHANNEL    0
+#define RF24_SPI_CHANNEL 0
 
-SPI::SPI():fd(-1)
+SPI::SPI() : fd(-1)
 {
     printf("wiringPi RF24 DRIVER\n");
 }
@@ -34,7 +34,8 @@ void SPI::begin(int csn_pin, uint32_t spi_speed)
         printf("Cannot configure the SPI device!\n");
         fflush(stdout);
         abort();
-    } else {
+    }
+    else {
         printf("Configured SPI fd: %d - pin: %d\n", fd, csn_pin);
     }
 }
@@ -57,7 +58,7 @@ void SPI::transfern(char* buf, uint32_t len)
 {
     printf("transfern(tx: %s)\n", buf);
 
-    if (wiringPiSPIDataRW(RF24_SPI_CHANNEL, (uint8_t*) buf, len) < 0) {
+    if (wiringPiSPIDataRW(RF24_SPI_CHANNEL, (uint8_t*)buf, len) < 0) {
         printf("transfern(): Cannot send data %s\n", strerror(errno));
         fflush(stdout);
         abort();

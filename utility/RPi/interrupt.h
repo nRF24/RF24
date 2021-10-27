@@ -6,13 +6,15 @@ https://projects.drogon.net/raspberry-pi/wiringpi
 wiringPi is free software: GNU Lesser General Public License
 see <http://www.gnu.org/licenses/>
 */
+#ifndef RF24_UTILITY_RPI_INTERRUPT_H_
+#define RF24_UTILITY_RPI_INTERRUPT_H_
 
 #include "RF24_arch_config.h"
 
-#define INT_EDGE_SETUP          0
-#define INT_EDGE_FALLING        1
-#define INT_EDGE_RISING         2
-#define INT_EDGE_BOTH           3
+#define INT_EDGE_SETUP   0
+#define INT_EDGE_FALLING 1
+#define INT_EDGE_RISING  2
+#define INT_EDGE_BOTH    3
 
 /*
  * interruptHandler:
@@ -52,12 +54,12 @@ extern int piHiPri(const int pri);
  *      back to the user supplied function.
  *********************************************************************************
  */
-extern int attachInterrupt(int pin, int mode, void (* function)(void));
+extern int attachInterrupt(int pin, int mode, void (*function)(void));
 
 /*
  * detachInterrupt:
  *      Pi Specific detachInterrupt.
- *      Will cancel the interrupt thread, close the filehandle and 
+ *      Will cancel the interrupt thread, close the filehandle and
  *		setting wiringPi back to 'none' mode.
  *********************************************************************************
  */
@@ -70,3 +72,5 @@ extern void rfInterrupts();
 #ifdef __cplusplus
 }
 #endif
+
+#endif // RF24_UTILITY_RPI_INTERRUPT_H_

@@ -11,22 +11,21 @@ from RF24 import RF24, RF24_PA_LOW
 
 
 parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument(
     "-n",
     "--node",
     type=int,
     choices=range(2),
-    help="the identifying radio number (or node ID number)"
+    help="the identifying radio number (or node ID number)",
 )
 parser.add_argument(
     "-r",
     "--role",
     type=int,
     choices=range(2),
-    help="'1' specifies the TX role. '0' specifies the RX role."
+    help="'1' specifies the TX role. '0' specifies the RX role.",
 )
 
 ########### USER CONFIGURATION ###########
@@ -49,6 +48,7 @@ radio = RF24(22, 0)
 # 1 item list to store our integer number for the payloads' counter
 counter = [0]
 
+
 def master():
     """Transmits a message and an incrementing integer every second."""
     radio.stopListening()  # put radio in TX mode
@@ -68,9 +68,9 @@ def master():
                 "{} us. Sent: {}{}".format(
                     int((end_timer - start_timer) / 1000),
                     buffer[:6].decode("utf-8"),
-                    counter[0]
+                    counter[0],
                 ),
-                end=" "
+                end=" ",
             )
             has_payload, pipe_number = radio.available_pipe()
             if has_payload:
@@ -82,7 +82,7 @@ def master():
                         length,
                         pipe_number,
                         bytes(response[:6]).decode("utf-8"),
-                        response[7:8][0]
+                        response[7:8][0],
                     )
                 )
                 # increment counter from received payload
@@ -128,7 +128,7 @@ def slave(timeout=6):
                     bytes(received[:6]).decode("utf-8"),
                     received[7:8][0],
                     buffer[:6].decode("utf-8"),
-                    buffer[7:8][0]
+                    buffer[7:8][0],
                 )
             )
             buffer = b"World \x00" + bytes(counter)  # build a new ACK payload
@@ -148,11 +148,14 @@ def set_role():
         - True when role is complete & app should continue running.
         - False when app should exit
     """
-    user_input = input(
-        "*** Enter 'R' for receiver role.\n"
-        "*** Enter 'T' for transmitter role.\n"
-        "*** Enter 'Q' to quit example.\n"
-    ) or "?"
+    user_input = (
+        input(
+            "*** Enter 'R' for receiver role.\n"
+            "*** Enter 'T' for transmitter role.\n"
+            "*** Enter 'Q' to quit example.\n"
+        )
+        or "?"
+    )
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
         if len(user_input) > 1:
@@ -192,11 +195,7 @@ if __name__ == "__main__":
     radio_number = args.node  # uses default value from `parser`
     if args.node is None:  # if '--node' arg wasn't specified
         radio_number = bool(
-            int(
-                input(
-                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-                ) or 0
-            )
+            int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
         )
 
     # ACK payloads are dynamically sized.

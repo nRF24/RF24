@@ -1,19 +1,19 @@
-/*
- * File:   compatiblity.h
- * Author: purinda
+/**
+ * @file compatiblity.h
+ * @author purinda
  *
  * Created on 24 June 2012, 3:08 PM
  * patch for safer monotonic clock & millis() correction for 64bit LDV 2018
  */
 
-#ifndef COMPATIBLITY_H
-#define COMPATIBLITY_H
+#ifndef RF24_UTILITY_SPIDEV_COMPATIBLITY_H_
+#define RF24_UTILITY_SPIDEV_COMPATIBLITY_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdint.h>  // for uintXX_t types
+#include <stdint.h> // for uintXX_t types
 #include <stddef.h>
 #include <time.h>
 #include <sys/time.h>
@@ -30,5 +30,4 @@ uint32_t __millis();
 }
 #endif
 
-#endif    /* COMPATIBLITY_H */
-
+#endif // RF24_UTILITY_SPIDEV_COMPATIBLITY_H_

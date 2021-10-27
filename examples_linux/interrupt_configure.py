@@ -14,22 +14,21 @@ from RF24 import RF24, RF24_PA_LOW
 
 
 parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument(
     "-n",
     "--node",
     type=int,
     choices=range(2),
-    help="the identifying radio number (or node ID number)"
+    help="the identifying radio number (or node ID number)",
 )
 parser.add_argument(
     "-r",
     "--role",
     type=int,
     choices=range(2),
-    help="'1' specifies the TX role. '0' specifies the RX role."
+    help="'1' specifies the TX role. '0' specifies the RX role.",
 )
 
 ########### USER CONFIGURATION ###########
@@ -62,28 +61,16 @@ ack_payloads = (b"Yak ", b"Back", b" ACK")
 def interrupt_handler(channel):
     """This function is called when IRQ pin is detected active LOW"""
     print("IRQ pin", channel, "went active LOW.")
-    tx_ds, tx_df, rx_dr = radio.whatHappened()   # get IRQ status flags
+    tx_ds, tx_df, rx_dr = radio.whatHappened()  # get IRQ status flags
     if tx_df:
         radio.flush_tx()
     print("\ttx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
     if pl_iterator[0] == 0:
-        print(
-            "    'data ready' event test {}".format(
-                "passed" if rx_dr else "failed"
-            )
-        )
+        print("    'data ready' event test {}".format("passed" if rx_dr else "failed"))
     elif pl_iterator[0] == 1:
-        print(
-            "    'data sent' event test {}".format(
-                "passed" if tx_ds else "failed"
-            )
-        )
+        print("    'data sent' event test {}".format("passed" if tx_ds else "failed"))
     elif pl_iterator[0] == 3:
-        print(
-            "    'data fail' event test {}".format(
-                "passed" if tx_df else "failed"
-            )
-        )
+        print("    'data fail' event test {}".format("passed" if tx_df else "failed"))
 
 
 # setup IRQ GPIO pin
@@ -108,7 +95,7 @@ def _ping_n_wait(pl_iter):
     pl_iterator[0] = pl_iter
     # the following False parameter means we're expecting an ACK packet
     radio.startFastWrite(tx_payloads[pl_iter], False)
-    time.sleep(0.1) # wait 100 ms for interrupt_handler() to complete
+    time.sleep(0.1)  # wait 100 ms for interrupt_handler() to complete
 
 
 def print_rx_fifo(pl_size):
@@ -117,12 +104,9 @@ def print_rx_fifo(pl_size):
     :param int pl_size: the expected size of each payload
     """
     if radio.rxFifoFull():
-            # all 3 payloads received were 5 bytes each, and RX FIFO is full
-            # so, fetching 15 bytes from the RX FIFO also flushes RX FIFO
-            print(
-                "Complete RX FIFO:",
-                radio.read(pl_size * 3).decode("utf-8")
-            )
+        # all 3 payloads received were 5 bytes each, and RX FIFO is full
+        # so, fetching 15 bytes from the RX FIFO also flushes RX FIFO
+        print("Complete RX FIFO:", radio.read(pl_size * 3).decode("utf-8"))
     else:
         buffer = bytearray()
         while radio.available():
@@ -134,11 +118,11 @@ def print_rx_fifo(pl_size):
 def master():
     """Transmits 4 times and reports results
 
-        1. successfully receive ACK payload first
-        2. successfully transmit on second
-        3. send a third payload to fill RX node's RX FIFO
-           (supposedly making RX node unresponsive)
-        4. intentionally fail transmit on the fourth
+    1. successfully receive ACK payload first
+    2. successfully transmit on second
+    3. send a third payload to fill RX node's RX FIFO
+       (supposedly making RX node unresponsive)
+    4. intentionally fail transmit on the fourth
     """
     radio.stopListening()  # put radio in TX mode
 
@@ -163,8 +147,7 @@ def master():
             print("RX node's FIFO is full; it is not listening any more")
         else:
             print(
-                "Transmission successful, but the RX node might still be "
-                "listening."
+                "Transmission successful, but the RX node might still be " "listening."
             )
     else:
         radio.flush_tx()
@@ -212,11 +195,14 @@ def set_role():
         - True when role is complete & app should continue running.
         - False when app should exit
     """
-    user_input = input(
-        "*** Enter 'R' for receiver role.\n"
-        "*** Enter 'T' for transmitter role.\n"
-        "*** Enter 'Q' to quit example.\n"
-    ) or "?"
+    user_input = (
+        input(
+            "*** Enter 'R' for receiver role.\n"
+            "*** Enter 'T' for transmitter role.\n"
+            "*** Enter 'Q' to quit example.\n"
+        )
+        or "?"
+    )
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
         if len(user_input) > 1:
@@ -257,11 +243,7 @@ if __name__ == "__main__":
     radio_number = args.node  # uses default value from `parser`
     if args.node is None:  # if '--node' arg wasn't specified
         radio_number = bool(
-            int(
-                input(
-                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-                ) or 0
-            )
+            int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
         )
 
     # set the Power Amplifier level to -12 dBm since this test example is

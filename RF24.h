@@ -17,12 +17,11 @@
 
 #include "RF24_config.h"
 
-#if defined (RF24_LINUX) || defined (LITTLEWIRE)
+#if defined(RF24_LINUX) || defined(LITTLEWIRE)
     #include "utility/includes.h"
 #elif defined SOFTSPI
     #include <DigitalIO.h>
 #endif
-
 
 /**
  * @defgroup PALevel Power Amplifier level
@@ -33,7 +32,8 @@
  * - RF24::getPALevel()
  * @{
  */
-typedef enum {
+typedef enum
+{
     /**
      * (0) represents:
      * nRF24L01 | Si24R1 with<br>lnaEnabled = 1 | Si24R1 with<br>lnaEnabled = 0
@@ -77,7 +77,8 @@ typedef enum {
  * - RF24::getDataRate()
  * @{
  */
-typedef enum {
+typedef enum
+{
     /** (0) represents 1 Mbps */
     RF24_1MBPS = 0,
     /** (1) represents 2 Mbps */
@@ -97,7 +98,8 @@ typedef enum {
  * - RF24::disableCRC()
  * @{
  */
-typedef enum {
+typedef enum
+{
     /** (0) represents no CRC checksum is used */
     RF24_CRC_DISABLED = 0,
     /** (1) represents CRC 8 bit checksum is used */
@@ -113,35 +115,35 @@ typedef enum {
 
 class RF24 {
 private:
-    #ifdef SOFTSPI
+#ifdef SOFTSPI
     SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
-    #elif defined (SPI_UART)
+#elif defined(SPI_UART)
     SPIUARTClass uspi;
-    #endif
+#endif
 
-    #if defined (RF24_LINUX) || defined (XMEGA_D3) || defined (RF24_RP2) /* XMEGA can use SPI class */
+#if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2) /* XMEGA can use SPI class */
     SPI spi;
-    #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
-    #if defined (RF24_SPI_PTR)
+#endif // defined (RF24_LINUX) || defined (XMEGA_D3)
+#if defined(RF24_SPI_PTR)
     _SPI* _spi;
-    #endif // defined (RF24_SPI_PTR)
-    #if defined (MRAA)
+#endif // defined (RF24_SPI_PTR)
+#if defined(MRAA)
     GPIO gpio;
-    #endif
+#endif
 
-    uint16_t ce_pin; /** "Chip Enable" pin, activates the RX or TX role */
-    uint16_t csn_pin; /** SPI Chip select */
+    uint16_t ce_pin;    /** "Chip Enable" pin, activates the RX or TX role */
+    uint16_t csn_pin;   /** SPI Chip select */
     uint32_t spi_speed; /** SPI Bus Speed */
-    #if defined (RF24_LINUX) || defined (XMEGA_D3) || defined (RF24_RP2)
-    uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
-    uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
-    #endif
-    uint8_t status; /** The status byte returned from every SPI transaction */
-    uint8_t payload_size; /** Fixed size of payloads */
+#if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2)
+    uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
+    uint8_t spi_txbuff[32 + 1]; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
+#endif
+    uint8_t status;                   /** The status byte returned from every SPI transaction */
+    uint8_t payload_size;             /** Fixed size of payloads */
     uint8_t pipe0_reading_address[5]; /** Last address set on pipe 0 for reading. */
-    uint8_t config_reg; /** For storing the value of the NRF_CONFIG register */
-    bool _is_p_variant; /** For storing the result of testing the toggleFeatures() affect */
-    bool _is_p0_rx; /** For keeping track of pipe 0's usage in user-triggered RX mode. */
+    uint8_t config_reg;               /** For storing the value of the NRF_CONFIG register */
+    bool _is_p_variant;               /** For storing the result of testing the toggleFeatures() affect */
+    bool _is_p0_rx;                   /** For keeping track of pipe 0's usage in user-triggered RX mode. */
 
 protected:
     /**
@@ -154,8 +156,8 @@ protected:
 
     inline void endTransaction();
 
-    bool ack_payloads_enabled; /** Whether ack payloads are enabled. */
-    uint8_t addr_width; /** The address width to use (3, 4 or 5 bytes). */
+    bool ack_payloads_enabled;     /** Whether ack payloads are enabled. */
+    uint8_t addr_width;            /** The address width to use (3, 4 or 5 bytes). */
     bool dynamic_payloads_enabled; /** Whether dynamic payloads are enabled. */
 
     /**
@@ -178,7 +180,6 @@ protected:
     uint8_t read_register(uint8_t reg);
 
 public:
-
     /**
      * @name Primary public interface
      *
@@ -218,9 +219,9 @@ public:
      */
     RF24(uint32_t _spi_speed = RF24_SPI_SPEED);
 
-    #if defined (RF24_LINUX)
+#if defined(RF24_LINUX)
     virtual ~RF24() {};
-    #endif
+#endif
 
     /**
      * Begin operation of the chip
@@ -238,7 +239,7 @@ public:
      */
     bool begin(void);
 
-    #if defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+#if defined(RF24_SPI_PTR) || defined(DOXYGEN_FORCED)
     /**
      * Same as begin(), but allows specifying a non-default SPI bus to use.
      * @note This function assumes the `SPI::begin()` method was called before to
@@ -277,7 +278,7 @@ public:
      * @return same result as begin()
      */
     bool begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin);
-    #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+#endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
 
     /**
      * Same as begin(), but allows dynamically specifying a CE pin
@@ -1160,7 +1161,7 @@ public:
      */
     void closeReadingPipe(uint8_t pipe);
 
-    #if defined (FAILURE_HANDLING)
+#if defined(FAILURE_HANDLING)
     /**
      *
      * If a failure has been detected, it usually indicates a hardware issue. By default the library
@@ -1191,7 +1192,7 @@ public:
      * @endcode
      */
     bool failureDetected;
-    #endif // defined (FAILURE_HANDLING)
+#endif // defined (FAILURE_HANDLING)
 
     /**@}*/
     /**
@@ -1698,7 +1699,6 @@ public:
     bool isAckPayloadAvailable(void);
 
 private:
-
     /**@}*/
     /**
      * @name Low-level internal interface.
@@ -1802,7 +1802,7 @@ private:
      */
     uint8_t get_status(void);
 
-    #if !defined (MINIMAL)
+#if !defined(MINIMAL)
 
     /**
      * Decode and print the given status to stdout
@@ -1848,7 +1848,7 @@ private:
      */
     void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
-    #endif
+#endif
 
     /**
      * Turn on or off the special features of the chip
@@ -1858,16 +1858,14 @@ private:
      */
     void toggle_features(void);
 
-    #if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
+#if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
 
     void errNotify(void);
 
-    #endif
+#endif
 
     /**@}*/
-
 };
-
 
 /**
  * @example{lineno} examples/GettingStarted/GettingStarted.ino

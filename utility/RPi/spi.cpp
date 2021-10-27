@@ -4,11 +4,10 @@
 #include <stdexcept>
 
 static pthread_mutex_t spiMutex = PTHREAD_MUTEX_INITIALIZER;
-bool bcmIsInitialized = false;
+bool bcmIsInitialized           = false;
 
 SPI::SPI()
 {
-
 }
 
 void SPI::begin(int busNo, uint32_t spi_speed)
@@ -62,5 +61,4 @@ void SPI::chipSelect(int csn_pin)
 
 SPI::~SPI()
 {
-
 }

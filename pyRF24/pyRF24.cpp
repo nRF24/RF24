@@ -46,7 +46,7 @@ bp::object read_wrap(RF24& ref, int maxlen)
     char* buf = new char[maxlen + 1];
     ref.read(buf, maxlen);
     bp::object
-    py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
+        py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
     delete[] buf;
     return py_ba;
 }
@@ -98,12 +98,12 @@ void startWrite_wrap(RF24& ref, bp::object buf, const bool multicast)
 
 void openWritingPipe_wrap(RF24& ref, const bp::object address)
 {
-    ref.openWritingPipe((const uint8_t*) (get_bytes_or_bytearray_str(address)));
+    ref.openWritingPipe((const uint8_t*)(get_bytes_or_bytearray_str(address)));
 }
 
 void openReadingPipe_wrap(RF24& ref, uint8_t number, const bp::object address)
 {
-    ref.openReadingPipe(number, (const uint8_t*) (get_bytes_or_bytearray_str(address)));
+    ref.openReadingPipe(number, (const uint8_t*)(get_bytes_or_bytearray_str(address)));
 }
 
 bp::tuple whatHappened_wrap(RF24& ref)
@@ -145,7 +145,7 @@ BOOST_PYTHON_MODULE(RF24)
 {
 
 #ifdef BCM2835_H
-    bp::enum_< RPiGPIOPin>("RPiGPIOPin")
+    bp::enum_<RPiGPIOPin>("RPiGPIOPin")
         .value("RPI_GPIO_P1_03", RPI_GPIO_P1_03)
         .value("RPI_GPIO_P1_05", RPI_GPIO_P1_05)
         .value("RPI_GPIO_P1_07", RPI_GPIO_P1_07)
@@ -210,10 +210,9 @@ BOOST_PYTHON_MODULE(RF24)
         .value("RPI_BPLUS_GPIO_J8_37", RPI_BPLUS_GPIO_J8_37)
         .value("RPI_BPLUS_GPIO_J8_38", RPI_BPLUS_GPIO_J8_38)
         .value("RPI_BPLUS_GPIO_J8_40", RPI_BPLUS_GPIO_J8_40)
-        .export_values()
-        ;
+        .export_values();
 
-    bp::enum_< bcm2835SPIClockDivider>("bcm2835SPIClockDivider")
+    bp::enum_<bcm2835SPIClockDivider>("bcm2835SPIClockDivider")
         .value("BCM2835_SPI_CLOCK_DIVIDER_65536", BCM2835_SPI_CLOCK_DIVIDER_65536)
         .value("BCM2835_SPI_CLOCK_DIVIDER_32768", BCM2835_SPI_CLOCK_DIVIDER_32768)
         .value("BCM2835_SPI_CLOCK_DIVIDER_16384", BCM2835_SPI_CLOCK_DIVIDER_16384)
@@ -233,15 +232,14 @@ BOOST_PYTHON_MODULE(RF24)
         .value("BCM2835_SPI_CLOCK_DIVIDER_1", BCM2835_SPI_CLOCK_DIVIDER_1)
         .export_values();
 
-
-    bp::enum_< bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
+    bp::enum_<bcm2835SPIChipSelect>("bcm2835SPIChipSelect")
         .value("BCM2835_SPI_CS0", BCM2835_SPI_CS0)
         .value("BCM2835_SPI_CS1", BCM2835_SPI_CS1)
         .value("BCM2835_SPI_CS2", BCM2835_SPI_CS2)
         .value("BCM2835_SPI_CS_NONE", BCM2835_SPI_CS_NONE)
         .export_values();
 
-#endif  // BCM2835_H
+#endif // BCM2835_H
 
     bp::enum_<rf24_crclength_e>("rf24_crclength_e")
         .value("RF24_CRC_DISABLED", RF24_CRC_DISABLED)
@@ -264,14 +262,14 @@ BOOST_PYTHON_MODULE(RF24)
         .export_values();
 
     // ******************** RF24 class  **************************
-    bp::class_< RF24 >("RF24", bp::init< uint16_t, uint16_t >((bp::arg("_cepin"), bp::arg("_cspin"))))
-        #if defined (RF24_LINUX) && !defined (MRAA)
-        .def(bp::init< uint16_t, uint16_t, uint32_t >((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
-        .def(bp::init< uint32_t >((bp::arg("spispeed"))))
-        .def(bp::init< >())
-        #endif
+    bp::class_<RF24>("RF24", bp::init<uint16_t, uint16_t>((bp::arg("_cepin"), bp::arg("_cspin"))))
+#if defined(RF24_LINUX) && !defined(MRAA)
+        .def(bp::init<uint16_t, uint16_t, uint32_t>((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
+        .def(bp::init<uint32_t>((bp::arg("spispeed"))))
+        .def(bp::init<>())
+#endif
         .def("available", (bool (::RF24::*)())(&::RF24::available))
-        .def("available_pipe", &available_wrap)    // needed to rename this method as python does not allow such overloading
+        .def("available_pipe", &available_wrap) // needed to rename this method as python does not allow such overloading
         .def("begin", (bool (::RF24::*)(void))(&::RF24::begin))
         .def("begin", &begin_with_pins)
         .def("closeReadingPipe", &RF24::closeReadingPipe)
@@ -291,7 +289,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("isValid", &RF24::isValid)
         .def("maskIRQ", &RF24::maskIRQ, (bp::arg("tx_ok"), bp::arg("tx_fail"), bp::arg("rx_ready")))
         .def("openReadingPipe", &openReadingPipe_wrap, (bp::arg("number"), bp::arg("address")))
-        .def("openReadingPipe", (void (::RF24::*)(::uint8_t,::uint64_t))(&::RF24::openReadingPipe), (bp::arg("number"), bp::arg("address")))
+        .def("openReadingPipe", (void (::RF24::*)(::uint8_t, ::uint64_t))(&::RF24::openReadingPipe), (bp::arg("number"), bp::arg("address")))
         .def("openWritingPipe", &openWritingPipe_wrap, (bp::arg("address")))
         .def("openWritingPipe", (void (::RF24::*)(::uint64_t))(&::RF24::openWritingPipe), (bp::arg("address")))
         .def("powerDown", &RF24::powerDown)
@@ -306,7 +304,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("setAutoAck", (void (::RF24::*)(::uint8_t, bool))(&::RF24::setAutoAck), (bp::arg("pipe"), bp::arg("enable")))
         .def("setCRCLength", &RF24::setCRCLength, (bp::arg("length")))
         .def("setDataRate", &RF24::setDataRate, (bp::arg("speed")))
-        .def("setPALevel", &RF24::setPALevel, (bp::arg("level"), bp::arg("lnaEnable")=1))
+        .def("setPALevel", &RF24::setPALevel, (bp::arg("level"), bp::arg("lnaEnable") = 1))
         .def("setPALevel", &setPALevel_wrap, (bp::arg("level")))
         .def("setRetries", &RF24::setRetries, (bp::arg("delay"), bp::arg("count")))
         .def("startFastWrite", &startFastWrite_wrap1, (bp::arg("buf"), bp::arg("len"), bp::arg("multicast")))

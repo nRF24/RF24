@@ -36,9 +36,10 @@ RF24 radio(22, 0);
 // a string & an integer number that will be incremented
 // on every successful transmission.
 // Make a data structure to store the entire payload of different datatypes
-struct PayloadStruct {
-  char message[7]; // only using 6 characters for TX & ACK payloads
-  uint8_t counter;
+struct PayloadStruct
+{
+    char message[7]; // only using 6 characters for TX & ACK payloads
+    uint8_t counter;
 };
 PayloadStruct payload;
 
@@ -50,8 +51,8 @@ void slave();   // prototype of the RX node's behavior
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
-
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     // perform hardware check
     if (!radio.begin()) {
         cout << "radio hardware is not responding!!" << endl;
@@ -77,7 +78,7 @@ int main(int argc, char** argv) {
     radioNumber = input.length() > 0 && (uint8_t)input[0] == 49;
 
     // to use ACK payloads, we need to enable dynamic payload lengths
-    radio.enableDynamicPayloads();    // ACK payloads are dynamically sized
+    radio.enableDynamicPayloads(); // ACK payloads are dynamically sized
 
     // Acknowledgement packets have no payloads by default. We need to enable
     // this feature for all nodes (TX & RX) to use ACK payloads.
@@ -86,10 +87,10 @@ int main(int argc, char** argv) {
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+    radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
     // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
@@ -103,12 +104,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-
 /**
  * set this node's role from stdin stream.
  * this only considers the first char as input.
  */
-void setRole() {
+void setRole()
+{
     string input = "";
     while (!input.length()) {
         cout << "*** PRESS 'T' to begin transmitting to the other node\n";
@@ -126,18 +127,18 @@ void setRole() {
                 cout << input[0] << " is an invalid input. Please try again." << endl;
         }
         input = ""; // stay in the while loop
-    } // while
+    }               // while
 } // setRole()
-
 
 /**
  * make this node act as the transmitter
  */
-void master() {
-    memcpy(payload.message, "Hello ", 6);                     // set the payload message
-    radio.stopListening();                                    // put radio in TX mode
+void master()
+{
+    memcpy(payload.message, "Hello ", 6); // set the payload message
+    radio.stopListening();                // put radio in TX mode
 
-    unsigned int failures = 0;                                // keep track of failures
+    unsigned int failures = 0; // keep track of failures
     while (failures < 6) {
         clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);      // start the timer
         bool report = radio.write(&payload, sizeof(payload)); // transmit & save the report
@@ -146,79 +147,79 @@ void master() {
         if (report) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
-            cout << timerEllapsed;                                  // print the timer result
+            cout << timerEllapsed; // print the timer result
             cout << " us. Sent: ";
-            cout << payload.message;                                // print outgoing message
-            cout << (unsigned int)payload.counter;                  // print outgoing counter counter
+            cout << payload.message;               // print outgoing message
+            cout << (unsigned int)payload.counter; // print outgoing counter counter
 
             uint8_t pipe;
             if (radio.available(&pipe)) {
                 PayloadStruct received;
-                radio.read(&received, sizeof(received));             // get incoming ACK payload
+                radio.read(&received, sizeof(received)); // get incoming ACK payload
                 cout << " Received ";
                 cout << (unsigned int)radio.getDynamicPayloadSize(); // print incoming payload size
                 cout << " bytes on pipe " << (unsigned int)pipe;     // print pipe that received it
                 cout << ": " << received.message;                    // print incoming message
                 cout << (unsigned int)received.counter << endl;      // print incoming counter
                 payload.counter = received.counter + 1;              // save incoming counter & increment for next outgoing
-            } // if got an ACK payload
+            }                                                        // if got an ACK payload
             else {
                 cout << " Received an empty ACK packet." << endl; // ACK had no payload
             }
         } // if delivered
         else {
-            cout << "Transmission failed or timed out" << endl;   // payload was not delivered
-            failures++;                                           // increment failures
+            cout << "Transmission failed or timed out" << endl; // payload was not delivered
+            failures++;                                         // increment failures
         }
 
         // to make this example readable in the terminal
-        delay(1000);  // slow transmissions down by 1 second
-    } // while
+        delay(1000); // slow transmissions down by 1 second
+    }                // while
     cout << failures << " failures detected. Leaving TX role." << endl;
 } // master
-
 
 /**
  * make this node act as the receiver
  */
-void slave() {
-    memcpy(payload.message, "World ", 6);                    // set the payload message
+void slave()
+{
+    memcpy(payload.message, "World ", 6); // set the payload message
 
     // load the payload for the first received transmission on pipe 0
     radio.writeAckPayload(1, &payload, sizeof(payload));
 
-    radio.startListening();                                  // put radio in RX mode
-    time_t startTimer = time(nullptr);                       // start a timer
-    while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
+    radio.startListening();                  // put radio in RX mode
+    time_t startTimer = time(nullptr);       // start a timer
+    while (time(nullptr) - startTimer < 6) { // use 6 second timeout
         uint8_t pipe;
-        if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
-            uint8_t bytes = radio.getDynamicPayloadSize();   // get the size of the payload
+        if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
+            uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
             PayloadStruct received;
             radio.read(&received, sizeof(received));         // fetch payload from RX FIFO
             cout << "Received " << (unsigned int)bytes;      // print the size of the payload
             cout << " bytes on pipe " << (unsigned int)pipe; // print the pipe number
             cout << ": " << received.message;
-            cout << (unsigned int)received.counter;          // print received payload
+            cout << (unsigned int)received.counter; // print received payload
             cout << " Sent: ";
             cout << payload.message;
-            cout << (unsigned int)payload.counter << endl;   // print ACK payload sent
-            startTimer = time(nullptr);                      // reset timer
+            cout << (unsigned int)payload.counter << endl; // print ACK payload sent
+            startTimer = time(nullptr);                    // reset timer
 
             // save incoming counter & increment for next outgoing
             payload.counter = received.counter + 1;
             // load the payload for the first received transmission on pipe 0
             radio.writeAckPayload(1, &payload, sizeof(payload));
         } // if received something
-    } // while
+    }     // while
     cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
     radio.stopListening(); // recommended idle behavior is TX mode
 } // slave
 
-
 /**
  * Calculate the ellapsed time in microseconds
  */
-uint32_t getMicros() {
+uint32_t getMicros()
+{
     // this function assumes that the timer was started using
     // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
 
@@ -226,5 +227,5 @@ uint32_t getMicros() {
     uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
-    return ((seconds) * 1000 + useconds) + 0.5;
+    return ((seconds)*1000 + useconds) + 0.5;
 }

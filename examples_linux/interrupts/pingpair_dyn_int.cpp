@@ -79,7 +79,6 @@ void intHandler()
 int main(int argc, char** argv)
 {
 
-
     // Print preamble:
     cout << "RF24/examples/pingpair_dyn/\n";
 
@@ -88,7 +87,6 @@ int main(int argc, char** argv)
     radio.enableDynamicPayloads();
     radio.setRetries(5, 15);
     radio.printDetails();
-
 
     /********* Role chooser ***********/
 
@@ -101,9 +99,12 @@ int main(int argc, char** argv)
     if (input.length() == 1) {
         myChar = input[0];
         if (myChar == '0') {
-            cout << "Role: Pong Back, awaiting transmission " << endl << endl;
-        } else {
-            cout << "Role: Ping Out, starting transmission " << endl << endl;
+            cout << "Role: Pong Back, awaiting transmission " << endl
+                 << endl;
+        }
+        else {
+            cout << "Role: Ping Out, starting transmission " << endl
+                 << endl;
             role = role_ping_out;
         }
     }
@@ -112,7 +113,8 @@ int main(int argc, char** argv)
     if (role == role_ping_out) {
         radio.openWritingPipe(pipes[0]);
         radio.openReadingPipe(1, pipes[1]);
-    } else {
+    }
+    else {
         radio.openWritingPipe(pipes[1]);
         radio.openReadingPipe(1, pipes[0]);
         radio.startListening();
@@ -148,7 +150,8 @@ int main(int argc, char** argv)
             // Describe the results
             if (timeout) {
                 printf("Failed, response timed out.\n\r");
-            } else {
+            }
+            else {
                 // Grab the response, compare, and send to debugging spew
                 uint8_t len = radio.getDynamicPayloadSize();
                 radio.read(receive_payload, len);
@@ -169,9 +172,5 @@ int main(int argc, char** argv)
             // Try again 1s later
             delay(100);
         }
-
-
     }
 }
-
-

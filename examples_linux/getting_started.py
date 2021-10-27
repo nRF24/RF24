@@ -10,22 +10,21 @@ from RF24 import RF24, RF24_PA_LOW
 
 
 parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument(
     "-n",
     "--node",
     type=int,
     choices=range(2),
-    help="the identifying radio number (or node ID number)"
+    help="the identifying radio number (or node ID number)",
 )
 parser.add_argument(
     "-r",
     "--role",
     type=int,
     choices=range(2),
-    help="'1' specifies the TX role. '0' specifies the RX role."
+    help="'1' specifies the TX role. '0' specifies the RX role.",
 )
 
 
@@ -67,10 +66,7 @@ def master():
         else:
             print(
                 "Transmission successful! Time to Transmit: "
-                "{} us. Sent: {}".format(
-                    (end_timer - start_timer) / 1000,
-                    payload[0]
-                )
+                "{} us. Sent: {}".format((end_timer - start_timer) / 1000, payload[0])
             )
             payload[0] += 0.01
         time.sleep(1)
@@ -98,9 +94,7 @@ def slave(timeout=6):
             # print details about the received packet
             print(
                 "Received {} bytes on pipe {}: {}".format(
-                    radio.payloadSize,
-                    pipe_number,
-                    payload[0]
+                    radio.payloadSize, pipe_number, payload[0]
                 )
             )
             start_timer = time.monotonic()  # reset the timeout timer
@@ -118,11 +112,14 @@ def set_role():
         - True when role is complete & app should continue running.
         - False when app should exit
     """
-    user_input = input(
-        "*** Enter 'R' for receiver role.\n"
-        "*** Enter 'T' for transmitter role.\n"
-        "*** Enter 'Q' to quit example.\n"
-    ) or "?"
+    user_input = (
+        input(
+            "*** Enter 'R' for receiver role.\n"
+            "*** Enter 'T' for transmitter role.\n"
+            "*** Enter 'Q' to quit example.\n"
+        )
+        or "?"
+    )
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
         if len(user_input) > 1:
@@ -162,11 +159,7 @@ if __name__ == "__main__":
     radio_number = args.node  # uses default value from `parser`
     if args.node is None:  # if '--node' arg wasn't specified
         radio_number = bool(
-            int(
-                input(
-                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-                ) or 0
-            )
+            int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
         )
 
     # set the Power Amplifier level to -12 dBm since this test example is

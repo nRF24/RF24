@@ -14,9 +14,9 @@ void throw_ba_exception(void)
     bp::throw_error_already_set();
 }
 
-char *get_bytes_or_bytearray_str(bp::object buf)
+char* get_bytes_or_bytearray_str(bp::object buf)
 {
-    PyObject *py_ba;
+    PyObject* py_ba;
     py_ba = buf.ptr();
     if (PyByteArray_Check(py_ba))
         return PyByteArray_AsString(py_ba);
@@ -30,7 +30,7 @@ char *get_bytes_or_bytearray_str(bp::object buf)
 
 int get_bytes_or_bytearray_ln(bp::object buf)
 {
-    PyObject *py_ba;
+    PyObject* py_ba;
     py_ba = buf.ptr();
     if (PyByteArray_Check(py_ba))
         return PyByteArray_Size(py_ba);
@@ -42,17 +42,17 @@ int get_bytes_or_bytearray_ln(bp::object buf)
     return 0;
 }
 
-bool write_wrap1(RF24Mesh &ref, bp::object buf, uint8_t msg_type)
+bool write_wrap1(RF24Mesh& ref, bp::object buf, uint8_t msg_type)
 {
     return ref.write(get_bytes_or_bytearray_str(buf), msg_type, get_bytes_or_bytearray_ln(buf));
 }
 
-bool write_wrap2(RF24Mesh &ref, bp::object buf, uint8_t msg_type, uint8_t nodeID)
+bool write_wrap2(RF24Mesh& ref, bp::object buf, uint8_t msg_type, uint8_t nodeID)
 {
     return ref.write(get_bytes_or_bytearray_str(buf), msg_type, get_bytes_or_bytearray_ln(buf), nodeID);
 }
 
-bool write_to_node_wrap(RF24Mesh &ref, uint16_t to_node, bp::object buf, uint8_t msg_type)
+bool write_to_node_wrap(RF24Mesh& ref, uint16_t to_node, bp::object buf, uint8_t msg_type)
 {
     return ref.write(to_node, get_bytes_or_bytearray_str(buf), msg_type, get_bytes_or_bytearray_ln(buf));
 }
@@ -66,7 +66,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(renewAddress_overload, RF24Mesh::renewAdd
 BOOST_PYTHON_MODULE(RF24Mesh)
 {
     { //::RF24Mesh
-        bp::class_<RF24Mesh>("RF24Mesh", bp::init<RF24 &, RF24Network &>((bp::arg("_radio"), bp::arg("_network"))))
+        bp::class_<RF24Mesh>("RF24Mesh", bp::init<RF24&, RF24Network&>((bp::arg("_radio"), bp::arg("_network"))))
             //bool begin(uint8_t channel = MESH_DEFAULT_CHANNEL, rf24_datarate_e data_rate = RF24_1MBPS, uint32_t timeout=MESH_RENEWAL_TIMEOUT );
             .def("begin", &RF24Mesh::begin, begin_overload(bp::args("channel", "data_rate", "timeout")))
             //uint8_t update();

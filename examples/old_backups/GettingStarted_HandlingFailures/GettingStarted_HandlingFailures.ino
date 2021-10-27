@@ -48,7 +48,7 @@ bool radioNumber = 0;
 RF24 radio(7, 8);
 /**********************************************************/
 
-byte addresses[][6] = {"1Node", "2Node"};
+byte addresses[][6] = { "1Node", "2Node" };
 
 // Used to control whether this node is sending or receiving
 bool role = 0;
@@ -91,7 +91,7 @@ void setup() {
   configureRadio();
 }
 
-uint32_t configTimer =  millis();
+uint32_t configTimer = millis();
 
 void loop() {
 
@@ -116,23 +116,23 @@ void loop() {
 
   if (role == 1) {
 
-    radio.stopListening();                                     // First, stop listening so we can talk.
+    radio.stopListening();  // First, stop listening so we can talk.
 
     Serial.println(F("Now sending"));
 
-    unsigned long start_time = micros();                       // Take the time, and send it.  This will block until complete
+    unsigned long start_time = micros();  // Take the time, and send it.  This will block until complete
     if (!radio.write(&start_time, sizeof(unsigned long))) {
       Serial.println(F("failed"));
     }
 
-    radio.startListening();                                    // Now, continue listening
+    radio.startListening();  // Now, continue listening
 
-    unsigned long started_waiting_at = micros();               // Set up a timeout period, get the current microseconds
-    bool timeout = false;                                      // Set up a variable to indicate if a response was received or not
+    unsigned long started_waiting_at = micros();  // Set up a timeout period, get the current microseconds
+    bool timeout = false;                         // Set up a variable to indicate if a response was received or not
 
-    while (!radio.available())                                 // While nothing is received
+    while (!radio.available())  // While nothing is received
     {
-      if (micros() - started_waiting_at > 200000 )             // If waited longer than 200ms, indicate timeout and exit while loop
+      if (micros() - started_waiting_at > 200000)  // If waited longer than 200ms, indicate timeout and exit while loop
       {
         timeout = true;
         break;
@@ -145,11 +145,11 @@ void loop() {
     } else {
       // Grab the response, compare, and send to debugging spew
 
-      unsigned long got_time;                                  // Variable for the received timestamp
+      unsigned long got_time;  // Variable for the received timestamp
 
       // Failure Handling
       uint32_t failTimer = millis();
-      while (radio.available())                                // If available() always returns true, there is a problem
+      while (radio.available())  // If available() always returns true, there is a problem
       {
         if (millis() - failTimer > 250) {
           radio.failureDetected = true;
@@ -170,31 +170,31 @@ void loop() {
       Serial.println(F(" microseconds"));
     }
 
-    delay(1000);                                               // Try again 1s later
+    delay(1000);  // Try again 1s later
   }
 
 
   /****************** Pong Back Role ***************************/
 
   if (role == 0) {
-    unsigned long got_time;                                    // Variable for the received timestamp
+    unsigned long got_time;  // Variable for the received timestamp
 
     if (radio.available()) {
       uint32_t failTimer = millis();
 
-      while (radio.available())                                // While there is data ready
+      while (radio.available())  // While there is data ready
       {
         if (millis() - failTimer > 500) {
           Serial.println("Radio available failure detected");
           radio.failureDetected = true;
           break;
         }
-        radio.read(&got_time, sizeof(unsigned long));          // Get the payload
+        radio.read(&got_time, sizeof(unsigned long));  // Get the payload
       }
 
-      radio.stopListening();                                   // First, stop listening so we can talk
-      radio.write(&got_time, sizeof(unsigned long));           // Send the final one back.
-      radio.startListening();                                  // Now, resume listening so we catch the next packets.
+      radio.stopListening();                          // First, stop listening so we can talk
+      radio.write(&got_time, sizeof(unsigned long));  // Send the final one back.
+      radio.startListening();                         // Now, resume listening so we catch the next packets.
       Serial.print(F("Sent response "));
       Serial.println(got_time);
     }
@@ -207,11 +207,11 @@ void loop() {
     char c = toupper(Serial.read());
     if (c == 'T' && role == 0) {
       Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
-      role = 1;                  // Become the primary transmitter (ping out)
-    } else if ( c == 'R' && role == 1 ) {
+      role = 1;  // Become the primary transmitter (ping out)
+    } else if (c == 'R' && role == 1) {
       Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));
-      role = 0;                  // Become the primary receiver (pong back)
+      role = 0;  // Become the primary receiver (pong back)
       radio.startListening();
     }
   }
-} // Loop
+}  // Loop

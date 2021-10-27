@@ -31,7 +31,6 @@ char buffer[SIZE + 1];     // for the RX node
 uint8_t counter = 0;       // for counting the number of received payloads
 void makePayload(uint8_t); // prototype to construct a payload dynamically
 
-
 bool setup()
 {
     buffer[SIZE] = 0; // add a NULL terminating character (for easy printing)
@@ -68,21 +67,21 @@ bool setup()
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
     // each other.
-    radio.setPALevel(RF24_PA_LOW);  // RF24_PA_MAX is default.
+    radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
     // save on transmission time by setting the radio to only transmit the
     // number of bytes we need to transmit
-    radio.setPayloadSize(SIZE);     // default value is the maximum 32 bytes
+    radio.setPayloadSize(SIZE); // default value is the maximum 32 bytes
 
     // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
     // additional setup specific to the node's role
     if (role) {
-        radio.stopListening();  // put radio in TX mode
+        radio.stopListening(); // put radio in TX mode
     }
     else {
         radio.startListening(); // put radio in RX mode
@@ -98,8 +97,8 @@ bool setup()
     return true;
 } // setup()
 
-
-void loop() {
+void loop()
+{
 
     if (role) {
         // This device is a TX node
@@ -109,7 +108,7 @@ void loop() {
         uint8_t failures = 0;
         uint64_t start_timer = to_us_since_boot(get_absolute_time()); // start the timer
         while (i < SIZE) {
-            makePayload(i);                                           // make the payload
+            makePayload(i); // make the payload
             if (!radio.writeFast(&buffer, SIZE)) {
                 failures++;
                 radio.reUseTX();
@@ -134,8 +133,8 @@ void loop() {
     else {
         // This device is a RX node
 
-        if (radio.available()) {         // is there a payload?
-            radio.read(&buffer, SIZE);     // fetch payload from FIFO
+        if (radio.available()) {       // is there a payload?
+            radio.read(&buffer, SIZE); // fetch payload from FIFO
 
             // print the received payload and its counter
             printf("Received: %s - %d\n", buffer, counter++);
@@ -153,7 +152,6 @@ void loop() {
             counter = 0; //reset the RX node's counter
             printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
             radio.stopListening();
-
         }
         else if ((input == 'R' || input == 'r') && role) {
             // Become the RX node
@@ -170,8 +168,8 @@ void loop() {
     }
 } // loop
 
-
-void makePayload(uint8_t i) {
+void makePayload(uint8_t i)
+{
     // Make a single payload based on position in stream.
     // This example employs function to save memory on certain boards.
 
