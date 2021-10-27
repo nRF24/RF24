@@ -74,9 +74,10 @@ jobs:
           version: 12
           extensions: ino
           style: file
-          tidy-chwcks: '-*'
+          tidy-checks: '-*'
           files-changed-only: false
           thread-comments: false
+          ignore: examples/old_backups
 
       - name: Linter checks failed?
         if: steps.linter.outputs.checks-failed > 0
