@@ -16,7 +16,8 @@
 
 #include "../../RF24_config.h" // This is cyclical and should be fixed
 
-class SPI {
+class SPI
+{
 public:
     SPI();
 

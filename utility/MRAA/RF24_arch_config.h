@@ -37,9 +37,9 @@
 #define PRIPSTR "%s"
 
 #ifdef SERIAL_DEBUG
-#define IF_SERIAL_DEBUG(x) ({ x; })
+    #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
-#define IF_SERIAL_DEBUG(x)
+    #define IF_SERIAL_DEBUG(x)
 #endif
 
 #define digitalWrite(pin, value) gpio.write(pin, value)
@@ -47,10 +47,10 @@
 #define pinMode(pin, direction)  gpio.open(pin, direction)
 
 #ifndef __TIME_H__
-// Prophet: Redefine time functions only if precompiled arduino time is not included
-#define delay(milisec)          __msleep(milisec)
-#define delayMicroseconds(usec) __usleep(usec)
-#define millis()                __millis()
+    // Prophet: Redefine time functions only if precompiled arduino time is not included
+    #define delay(milisec)          __msleep(milisec)
+    #define delayMicroseconds(usec) __usleep(usec)
+    #define millis()                __millis()
 #endif
 
 #define INPUT  mraa::DIR_IN

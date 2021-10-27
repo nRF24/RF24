@@ -67,7 +67,7 @@ jobs:
           tidy-checks: '-*'
           files-changed-only: false
           thread-comments: false
-          ignore: examples|utility/Template
+          ignore: examples|utility/Template|utility/RPi/bcm2835.h|utility/RPi/bcm2835.c
 
       - name: Linter checks failed?
         if: steps.linter.outputs.checks-failed > 0

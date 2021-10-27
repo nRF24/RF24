@@ -14,6 +14,6 @@
 /**
  * Load the correct configuration for this platform
  */
-//#include "BBB/RF24_arch_config.h"
+// #include "BBB/RF24_arch_config.h"
 
 #endif // RF24_UTILITY_INCLUDES_H_

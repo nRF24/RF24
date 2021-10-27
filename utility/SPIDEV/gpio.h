@@ -18,7 +18,8 @@
 #include <stdexcept>
 
 /** Specific excpetion for SPI errors */
-class GPIOException : public std::runtime_error {
+class GPIOException : public std::runtime_error
+{
 public:
     explicit GPIOException(const std::string& msg)
         : std::runtime_error(msg)
@@ -33,10 +34,10 @@ class GPIO
 
 public:
     static const int DIRECTION_OUT = 1;
-    static const int DIRECTION_IN  = 0;
+    static const int DIRECTION_IN = 0;
 
-    static const int OUTPUT_HIGH   = 1;
-    static const int OUTPUT_LOW    = 0;
+    static const int OUTPUT_HIGH = 1;
+    static const int OUTPUT_LOW = 0;
 
     GPIO();
 

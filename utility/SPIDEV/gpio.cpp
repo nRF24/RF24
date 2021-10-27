@@ -66,7 +66,7 @@ void GPIO::open(int port, int DDR)
     // Caches the GPIO descriptor;
     sprintf(file, "/sys/class/gpio/gpio%d/value", port);
     int flags = (DDR == 0) ? O_RDONLY : O_WRONLY;
-    int fd    = ::open(file, flags);
+    int fd = ::open(file, flags);
     if (fd < 0) {
         throw GPIOException("Can't open the GPIO");
     }

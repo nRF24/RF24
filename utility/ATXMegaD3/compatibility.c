@@ -45,7 +45,7 @@ void __start_timer()
     /* Enable this interrupt level. */
     PMIC.CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
 
-    _millis   = 0;
+    _millis = 0;
 }
 
 long __millis()

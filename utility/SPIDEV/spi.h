@@ -16,7 +16,8 @@
 #include "../../RF24_config.h" // This is cyclical and should be fixed
 
 /** Specific excpetion for SPI errors */
-class SPIException : public std::runtime_error {
+class SPIException : public std::runtime_error
+{
 public:
     explicit SPIException(const std::string& msg)
         : std::runtime_error(msg)

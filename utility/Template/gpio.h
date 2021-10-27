@@ -23,10 +23,10 @@ class GPIO
 public:
     /* Constants */
     static const int DIRECTION_OUT = 1;
-    static const int DIRECTION_IN  = 0;
+    static const int DIRECTION_IN = 0;
 
-    static const int OUTPUT_HIGH   = 1;
-    static const int OUTPUT_LOW    = 0;
+    static const int OUTPUT_HIGH = 1;
+    static const int OUTPUT_LOW = 0;
 
     GPIO();
 

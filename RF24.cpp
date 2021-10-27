@@ -345,7 +345,7 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     }
 
     //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
-    IF_SERIAL_DEBUG(printf("[Writing %u bytes %u blanks]\n", data_len, blank_len); );
+    IF_SERIAL_DEBUG(printf("[Writing %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -415,7 +415,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
-    IF_SERIAL_DEBUG(printf("[Reading %u bytes %u blanks]\n", data_len, blank_len); );
+    IF_SERIAL_DEBUG(printf("[Reading %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();

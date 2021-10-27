@@ -29,7 +29,7 @@ public:
     void write(int port, int value);
 
 private:
-    int gpio_ce_pin;    /** ce_pin value of the RF24 device **/
+    int gpio_ce_pin; /** ce_pin value of the RF24 device **/
     // int gpio_cs_pin;    /** cs_pin value of the RF24 device **/
     mraa::Gpio* gpio_0; /** gpio object for ce_pin **/
     // mraa::Gpio* gpio_1; /** gpio object for cs_pin **/

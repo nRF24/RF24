@@ -29,7 +29,7 @@ void __start_timer();
 
 long __millis();
 
-#ifdef    __cplusplus
+#ifdef __cplusplus
 }
 #endif
 
