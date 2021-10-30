@@ -169,8 +169,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;uint8_t read_register(uint8_t reg)</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  csn(<a name="a3"></a><a class="code" href="group__Porting__General.html#gab811d8c6ff3a505312d3276590444289">LOW</a>);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  SPI.transfer(<a name="a4"></a><a class="code" href="nRF24L01_8h.html#afb0b251378d3b14c508e51fd2c3157d6">R_REGISTER</a> | reg);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  uint8_t result = SPI.transfer(0xff);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <a name="a4"></a><a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.transfer(<a name="a5"></a><a class="code" href="nRF24L01_8h.html#afb0b251378d3b14c508e51fd2c3157d6">R_REGISTER</a> | reg);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  uint8_t result = <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.transfer(0xff);</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  csn(<a class="code" href="group__Porting__General.html#ga5bb885982ff66a2e0a0a45a8ee9c35e2">HIGH</a>);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
@@ -179,8 +179,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keywordtype">void</span> write_register(uint8_t reg, uint8_t value)</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  csn(<a class="code" href="group__Porting__General.html#gab811d8c6ff3a505312d3276590444289">LOW</a>);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  SPI.transfer(<a name="a5"></a><a class="code" href="nRF24L01_8h.html#a3b68b214d5753039d2c156ad57cd7153">W_REGISTER</a> | reg);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  SPI.transfer(value);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.transfer(<a name="a6"></a><a class="code" href="nRF24L01_8h.html#a3b68b214d5753039d2c156ad57cd7153">W_REGISTER</a> | reg);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.transfer(value);</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  csn(<a class="code" href="group__Porting__General.html#ga5bb885982ff66a2e0a0a45a8ee9c35e2">HIGH</a>);</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
@@ -192,9 +192,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="comment">// start serial port and SPI</span></div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  Serial.begin(115200);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  SPI.begin();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.begin();</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="comment">// configure CE and CSN as output when used</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <a name="a6"></a><a class="code" href="group__Porting__General.html#ga361649efb4f1e2fa3c870ca203497d5e">pinMode</a>(CE_PIN, <a name="a7"></a><a class="code" href="group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557">OUTPUT</a>);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <a name="a7"></a><a class="code" href="group__Porting__General.html#ga361649efb4f1e2fa3c870ca203497d5e">pinMode</a>(CE_PIN, <a name="a8"></a><a class="code" href="group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557">OUTPUT</a>);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordflow">if</span> (CSN_PIN != CE_PIN)</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <a class="code" href="group__Porting__General.html#ga361649efb4f1e2fa3c870ca203497d5e">pinMode</a>(CSN_PIN, <a class="code" href="group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557">OUTPUT</a>);</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
@@ -206,8 +206,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="comment">// nRF24L01 goes from to Power Down state 100ms after Power on Reset ( Vdd &gt; 1.9V) or when PWR_UP is 0 in config register</span></div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="comment">// Goto Power Down state (Powerup or force) and set in transmit mode</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  write_register(<a name="a8"></a><a class="code" href="nRF24L01_8h.html#ab365e330ce094a191c25fdf1d3f64a94">NRF_CONFIG</a>, read_register(<a class="code" href="nRF24L01_8h.html#ab365e330ce094a191c25fdf1d3f64a94">NRF_CONFIG</a>) &amp; ~<a name="a9"></a><a class="code" href="group__Porting__General.html#ga483c9de27db573099572f5485ef841c9">_BV</a>(<a name="a10"></a><a class="code" href="nRF24L01_8h.html#af0dbd9e4c17ba0db357fcb2cedd4aa6d">PWR_UP</a>) &amp; ~<a class="code" href="group__Porting__General.html#ga483c9de27db573099572f5485ef841c9">_BV</a>(<a name="a11"></a><a class="code" href="nRF24L01_8h.html#a0b4d92f3ecccb150d4cb1cb5d0f9d4e6">PRIM_RX</a>));</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <a name="a12"></a><a class="code" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay</a>(100);</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  write_register(<a name="a9"></a><a class="code" href="nRF24L01_8h.html#ab365e330ce094a191c25fdf1d3f64a94">NRF_CONFIG</a>, read_register(<a class="code" href="nRF24L01_8h.html#ab365e330ce094a191c25fdf1d3f64a94">NRF_CONFIG</a>) &amp; ~<a name="a10"></a><a class="code" href="group__Porting__General.html#ga483c9de27db573099572f5485ef841c9">_BV</a>(<a name="a11"></a><a class="code" href="nRF24L01_8h.html#af0dbd9e4c17ba0db357fcb2cedd4aa6d">PWR_UP</a>) &amp; ~<a class="code" href="group__Porting__General.html#ga483c9de27db573099572f5485ef841c9">_BV</a>(<a name="a12"></a><a class="code" href="nRF24L01_8h.html#a0b4d92f3ecccb150d4cb1cb5d0f9d4e6">PRIM_RX</a>));</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <a name="a13"></a><a class="code" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay</a>(100);</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="comment">// Goto Standby-I</span></div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="comment">// Technically we require 4.5ms Tpd2stby+ 14us as a worst case. We&#39;ll just call it 5ms for good measure.</span></div>
@@ -241,7 +241,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      uint8_t i = 0;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      <span class="keywordflow">while</span> (i &lt; 255 &amp;&amp; success) {</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">for</span> (uint8_t j = 0; j &lt; 2; j++) {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          write_register(<a name="a13"></a><a class="code" href="nRF24L01_8h.html#aa84a282351a2c9b83dd653df6ac59216">EN_AA</a>, value[j]);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          write_register(<a name="a14"></a><a class="code" href="nRF24L01_8h.html#aa84a282351a2c9b83dd653df6ac59216">EN_AA</a>, value[j]);</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;          result = read_register(<a class="code" href="nRF24L01_8h.html#aa84a282351a2c9b83dd653df6ac59216">EN_AA</a>);</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;          <span class="keywordflow">if</span> (value[j] != result) {</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;            success = <span class="keyword">false</span>;</div>
@@ -304,6 +304,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="ttc" id="agroup__Porting__General_html_ga9384257bf5d5c1aae675b22cc3ecb91a"><div class="ttname"><a href="group__Porting__General.html#ga9384257bf5d5c1aae675b22cc3ecb91a">delayMicroseconds</a></div><div class="ttdeci">#define delayMicroseconds(usec)</div><div class="ttdef"><b>Definition:</b> <a href="RF24__arch__config_8h_source.html#l00076">RF24_arch_config.h:76</a></div></div>
 <div class="ttc" id="agroup__Porting__General_html_gab811d8c6ff3a505312d3276590444289"><div class="ttname"><a href="group__Porting__General.html#gab811d8c6ff3a505312d3276590444289">LOW</a></div><div class="ttdeci">#define LOW</div><div class="ttdef"><b>Definition:</b> <a href="RF24__arch__config_8h_source.html#l00069">RF24_arch_config.h:69</a></div></div>
 <div class="ttc" id="agroup__Porting__General_html_gabda89b115581947337690b2f85bfab6e"><div class="ttname"><a href="group__Porting__General.html#gabda89b115581947337690b2f85bfab6e">digitalWrite</a></div><div class="ttdeci">#define digitalWrite(pin, value)</div><div class="ttdef"><b>Definition:</b> <a href="RF24__arch__config_8h_source.html#l00073">RF24_arch_config.h:73</a></div></div>
+<div class="ttc" id="agroup__Porting__SPI_html_gacd293e741d829f9578b8c5ee49833608"><div class="ttname"><a href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a></div><div class="ttdeci">SPI()</div></div>
 <div class="ttc" id="anRF24L01_8h_html"><div class="ttname"><a href="nRF24L01_8h.html">nRF24L01.h</a></div></div>
 <div class="ttc" id="anRF24L01_8h_html_a0b4d92f3ecccb150d4cb1cb5d0f9d4e6"><div class="ttname"><a href="nRF24L01_8h.html#a0b4d92f3ecccb150d4cb1cb5d0f9d4e6">PRIM_RX</a></div><div class="ttdeci">#define PRIM_RX</div><div class="ttdef"><b>Definition:</b> <a href="nRF24L01_8h_source.html#l00061">nRF24L01.h:61</a></div></div>
 <div class="ttc" id="anRF24L01_8h_html_a3b68b214d5753039d2c156ad57cd7153"><div class="ttname"><a href="nRF24L01_8h.html#a3b68b214d5753039d2c156ad57cd7153">W_REGISTER</a></div><div class="ttdeci">#define W_REGISTER</div><div class="ttdef"><b>Definition:</b> <a href="nRF24L01_8h_source.html#l00105">nRF24L01.h:105</a></div></div>
@@ -314,7 +315,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 30 2021 00:14:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

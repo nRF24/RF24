@@ -90,28 +90,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>By <a href="https://github.com/mz-fuzzy">mz-fuzzy</a></p>
-<h1><a class="anchor" id="autotoc_md60"></a>
+<h1><a class="anchor" id="autotoc_md50"></a>
 Prerequisites</h1>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 RF24</h2>
-<p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> lib needs to be built in C++ &amp; installed for the python wrapper to wrap it.</p>
-<p>See <a href="md_docs_linux_install.html">Linux Installation</a> (or <a href="md_docs_using_cmake.html">installing with CMake</a> alternatively) and <a href="md_docs_rpi_general.html">Linux/RPi General</a></p>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> lib needs to be built in C++ &amp; installed for the python wrapper to wrap it <br  />
+ See <a href="md_docs_linux_install.html">Linux Installation</a> and <a href="md_docs_rpi_general.html">Linux/RPi General</a></p>
+<h2><a class="anchor" id="autotoc_md52"></a>
 Python2</h2>
-<div class="fragment"><div class="line">sudo apt-get install python-dev libboost-python-dev python-pip python-rpi.gpio</div>
-</div><!-- fragment --><p>Next, install some up-to-date python packages.</p>
-<div class="fragment"><div class="line">python -m pip install --upgrade pip setuptools</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md63"></a>
+<div class="fragment"><div class="line">sudo apt-get install python-dev libboost-python-dev python-setuptools python-rpi.gpio</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md53"></a>
 Python3</h2>
-<div class="fragment"><div class="line">sudo apt-get install python3-dev libboost-python-dev python3-pip python3-rpi.gpio</div>
-</div><!-- fragment --><p>Next, install some up-to-date python3 packages.</p>
-<div class="fragment"><div class="line">python3 -m pip install --upgrade pip setuptools</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md64"></a>
-Installation</h1>
+<div class="fragment"><div class="line">sudo apt-get install python3-dev libboost-python-dev python3-setuptools python3-rpi.gpio</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md54"></a>
+Installation:</h1>
 <ol type="1">
-<li>For python3, setup.py needs a manually created symlink for the boost.python library: <div class="fragment"><div class="line">sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so</div>
+<li>For python3 in Raspbian, it's needed to manually link python boost library, like this: <div class="fragment"><div class="line">sudo ln -s $(ls /usr/lib/arm-linux-gnueabihf/libboost_python3-py3*.so | tail -1) /usr/lib/arm-linux-gnueabihf/libboost_python3.so</div>
 </div><!-- fragment --></li>
-<li>Build the library from the rf24libs/RF24/pyRF24 directory: <div class="fragment"><div class="line">./setup.py build</div>
+<li>Build the library. From the rf24libs/RF24/pyRF24 directory: <div class="fragment"><div class="line">./setup.py build</div>
 </div><!-- fragment --> or <div class="fragment"><div class="line">python3 setup.py build</div>
 </div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>Build takes several minutes on arm-based machines. Machines with RAM less than 1GB may need to increase amount of swap for build.</dd></dl>
 </li>
@@ -120,19 +116,17 @@ Installation</h1>
 </div><!-- fragment --><p> See the additional <a href="pages.html">Platform Support pages</a> for information on connecting your hardware.</p>
 <p class="startli">See the included <a href="examples.html">*.py files in the "examples_linux" folder</a> for usage information.</p>
 </li>
-<li><p class="startli">Running the Example:</p>
-<p class="startli">Navigate to the examples_linux directory </p><div class="fragment"><div class="line">cd ../examples_linux</div>
-</div><!-- fragment --><p> Edit the getting_started.py example to configure the appropriate pins per the <a href="md_docs_rpi_general.html">Linux/RPi General</a> documentation. </p><div class="fragment"><div class="line">nano getting_started.py</div>
-</div><!-- fragment --><p> Configure another device, Arduino or RPi with the same example code. It could be C++ or python (see the <a href="examples.html">list of available examples</a>), but we'll use the same example file on a different device in this tutorial.</p>
-<p class="startli">Run the example </p><div class="fragment"><div class="line">sudo python getting_started.py</div>
-</div><!-- fragment --><p> or </p><div class="fragment"><div class="line">sudo python3 getting_started.py</div>
+<li>Running the Example: Edit the getting_started.py example to configure the appropriate pins per the <a href="md_docs_rpi_general.html">Linux/RPi General</a> documentation. <div class="fragment"><div class="line">nano getting_started.py</div>
+</div><!-- fragment --> Configure another device, Arduino or RPi with the <a href="examples_linux_2getting_started_8py-example.html">getting_started.py example</a><br  />
+ Run the example <div class="fragment"><div class="line">sudo python getting_started.py</div>
+</div><!-- fragment --> or <div class="fragment"><div class="line">sudo python3 getting_started.py</div>
 </div><!-- fragment --> </li>
 </ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 30 2021 00:14:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

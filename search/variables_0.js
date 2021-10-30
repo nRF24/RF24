@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['ack_5fpayloads_5fenabled_375',['ack_payloads_enabled',['../classRF24.html#a659ca687c6d14baea12abd716036bf9d',1,'RF24']]],
-  ['addr_5fwidth_376',['addr_width',['../classRF24.html#aa7ac962dfa3d7c7f5ce775c034f12b3f',1,'RF24']]]
+  ['child_5fpipe_373',['child_pipe',['../RF24_8cpp.html#a9a5b7ef3dcd5ba656e19a1036ef212f5',1,'RF24.cpp']]],
+  ['child_5fpipe_5fenable_374',['child_pipe_enable',['../RF24_8cpp.html#aa25724c48cf9fd6df84cfe7705d6e633',1,'RF24.cpp']]],
+  ['csdelay_375',['csDelay',['../classRF24.html#ad08121bf844f08dbe53f51576b7c4066',1,'RF24']]]
 ];
