@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['close_309',['close',['../group__Porting__GPIO.html#ga1b8cf31be61995207728f653ec11421f',1,'gpio.h']]],
-  ['closereadingpipe_310',['closeReadingPipe',['../classRF24.html#a9944d93994a80037e3586f340f5e0107',1,'RF24']]]
+  ['close_313',['close',['../group__Porting__GPIO.html#ga1b8cf31be61995207728f653ec11421f',1,'gpio.h']]],
+  ['closereadingpipe_314',['closeReadingPipe',['../classRF24.html#a9944d93994a80037e3586f340f5e0107',1,'RF24']]]
 ];

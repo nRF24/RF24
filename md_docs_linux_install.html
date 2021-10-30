@@ -90,14 +90,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or using LittleWire.</p>
-<dl class="section note"><dt>Note</dt><dd>The SPIDEV option should work with most Linux systems supporting spi userspace device. <br  />
-</dd></dl>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<dl class="section note"><dt>Note</dt><dd>The SPIDEV option should work with most Linux systems supporting spi userspace device.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>These instructions are beginning to age because they were designed with the assumption that the arm-linux-gnueabihf-g** compilers were available and default for the system. If you have problems using these instructions, please try the <a href="md_docs_using_cmake.html">instructions using CMake</a>.</dd></dl>
+<h1><a class="anchor" id="autotoc_md34"></a>
 Automated Install</h1>
 <p><b>Designed &amp; Tested on RPi</b> - Defaults to SPIDEV on devices supporting it</p>
 <ol type="1">
 <li>Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc)</li>
-<li>Download the install.sh file from <a href="http://tmrh20.github.io/RF24Installer/RPi/install.sh">http://tmrh20.github.io/RF24Installer/RPi/install.sh</a> <div class="fragment"><div class="line">wget http://tmrh20.github.io/RF24Installer/RPi/install.sh</div>
+<li>Download the install.sh file from <a href="http://tmrh20.github.io/RF24Installer/RPi/install.sh">tmrh20.github.io/RF24Installer/RPi</a> <div class="fragment"><div class="line">wget http://tmrh20.github.io/RF24Installer/RPi/install.sh</div>
 </div><!-- fragment --></li>
 <li>Make it executable <div class="fragment"><div class="line">chmod +x install.sh</div>
 </div><!-- fragment --></li>
@@ -107,13 +107,12 @@ Automated Install</h1>
 </div><!-- fragment --> Edit the gettingstarted example, to set your pin configuration <div class="fragment"><div class="line">nano gettingstarted.cpp</div>
 <div class="line">make</div>
 <div class="line">sudo ./gettingstarted</div>
-</div><!-- fragment --> </li>
+</div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md35"></a>
 Manual Install</h1>
 <ol type="1">
-<li>Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc) <dl class="section note"><dt>Note</dt><dd>See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA</a> documentation for more info on installing MRAA <br  />
-</dd></dl>
+<li>Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc) <dl class="section note"><dt>Note</dt><dd>See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA</a> documentation for more info on installing MRAA</dd></dl>
 </li>
 <li>Make a directory to contain the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> and possibly RF24Network lib and enter it <div class="fragment"><div class="line">mkdir ~/rf24libs</div>
 <div class="line">cd ~/rf24libs</div>
@@ -122,10 +121,11 @@ Manual Install</h1>
 </div><!-- fragment --></li>
 <li>Change to the new <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> directory <div class="fragment"><div class="line">cd RF24</div>
 </div><!-- fragment --></li>
-<li>Configure build environment using <div class="fragment"><div class="line">./configure</div>
-</div><!-- fragment --> script. It auto detectes device and build environment.<br  />
- For overriding autodetections, use command-line switches, see <div class="fragment"><div class="line">./configure --help</div>
-</div><!-- fragment --> for description.</li>
+<li><p class="startli">Configure build environment using </p><div class="fragment"><div class="line">./configure</div>
+</div><!-- fragment --><p> script. It auto detectes device and build environment.</p>
+<p class="startli">For overriding autodetections, use command-line switches, see </p><div class="fragment"><div class="line">./configure --help</div>
+</div><!-- fragment --><p> for description.</p>
+</li>
 <li>Build the library, and run an example file <div class="fragment"><div class="line">make</div>
 <div class="line">sudo make install</div>
 </div><!-- fragment --> <div class="fragment"><div class="line">cd examples_linux</div>
@@ -134,7 +134,7 @@ Manual Install</h1>
 <div class="line">sudo ./gettingstarted</div>
 </div><!-- fragment --></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md36"></a>
 Build using SPIDEV</h2>
 <ol type="1">
 <li>Make sure that spi device support is enabled and /dev/spidev&lt;a&gt;.&lt;b&gt; is present</li>
@@ -148,7 +148,7 @@ Build using SPIDEV</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Oct 30 2021 00:14:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

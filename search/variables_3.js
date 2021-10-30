@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['output_5fhigh_379',['OUTPUT_HIGH',['../group__Porting__GPIO.html#ga18fd76f29528fc97aadcdb78495ff6bf',1,'gpio.h']]],
-  ['output_5flow_380',['OUTPUT_LOW',['../group__Porting__GPIO.html#gaa29a50f0f8fc0a62076c7f4bc7dc70db',1,'gpio.h']]]
+  ['failuredetected_382',['failureDetected',['../classRF24.html#a2e40fe66d1231a333aa2534e8491f828',1,'RF24']]]
 ];

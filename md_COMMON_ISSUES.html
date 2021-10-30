@@ -91,7 +91,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="autotoc_md1"></a>
 Settings that must match</h1>
-<p>Before you report undesirable behavior, please make sure that the following <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> configurations match on both receiving and transmitting nRF24L01 transceivers:</p><ol type="1">
+<p>Before you report undesirable behavior, please make sure that the following <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> configurations match on both receiving and transmitting nRF24L01 transceivers:</p>
+<ol type="1">
 <li><code><a class="el" href="classRF24.html#ad5aea7f9a3bd9c7d357fb296ce751f21">RF24::setAddressWidth()</a></code></li>
 <li><code><a class="el" href="classRF24.html#a5e6e5a5f6c85d2638381cab2c0f3702e">RF24::setChannel()</a></code></li>
 <li><code><a class="el" href="classRF24.html#aeb9920e7a95699748b003c4a839b0814">RF24::setDataRate()</a></code></li>
@@ -103,16 +104,41 @@ Settings that must match</h1>
 </ol>
 <p>Also, it helps to think of an address as a path (a commonly shared route) instead of an identifying device destination. This means that addresses have to match for a payload to travel from one transceiver to another. However, the pipe numbers assigned with the matching address do not have to match. You can think of pipes as parking spots for the packets, while all packets' payloads live in a TX or RX FIFO buffer. Remember that the TX FIFO buffers and the RX FIFO buffers both have a maximum occupancy of 3 payloads (regardless of the maximum 32-byte payload size).</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
-Here are the most common issues and their solutions.</h1>
-<h2><a class="anchor" id="autotoc_md3"></a>
+Prohibited usage of write*() in Interrupt Service Routine callbacks</h1>
+<p>Because the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library uses <code><a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a></code> to implement a timeout and <code><a class="el" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay()</a></code> for mandatory wait times, the following functions cannot be used within an ISR callback method:</p>
+<ul>
+<li><code><a class="el" href="classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58">RF24::write()</a></code></li>
+<li><code><a class="el" href="classRF24.html#ae6fd8d5ee490d54ae1cb2e8fefee535f">RF24::writeBlocking()</a></code></li>
+<li><code><a class="el" href="classRF24.html#a47b2516993481b58e724d1274a7fd9cb">RF24::writeFast()</a></code></li>
+<li><code><a class="el" href="classRF24.html#adbf25b53d28d1fcc385fd9738a531b75">RF24::startWrite()</a></code></li>
+<li><code><a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">RF24::txStandBy()</a></code> &amp; <code><a class="el" href="classRF24.html#ab7f54decbe9d06cb026a5d3dfb505116">RF24::txStandBy(uint32_t, bool)</a></code></li>
+<li><code><a class="el" href="classRF24.html#a5cdaf47aa0edd6dca1b9a8bb7972a1a3">RF24::powerUp()</a></code></li>
+<li><code><a class="el" href="classRF24.html#a30a2733a3889bdc331fe2d2f4f0f7b39">RF24::startListening()</a></code></li>
+<li><code><a class="el" href="classRF24.html#a6f144d73fc447c8ac2d1a4166210fd88">RF24::stopListening()</a></code></li>
+</ul>
+<dl class="section see"><dt>See also</dt><dd>The note in the documentation for <code><a class="el" href="classRF24.html#a127105eb7a3b351cfe777c1cec50627a">RF24::available()</a></code>.</dd></dl>
+<p>More info about why you can't call <code><a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a></code> (or <code><a class="el" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay()</a></code>) from an ISR callback function is available at <a href="https://www.google.com/url?sa=t&amp;source=web&amp;rct=j&amp;url=https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/&amp;ved=2ahUKEwjMhtSRl5jzAhVUsp4KHWIPCrIQFnoECAoQAQ&amp;usg=AOvVaw1X9H0058Nz7Hck91VIC3bD">the Arduino docs</a>.</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Here are the most common issues and their solutions</h1>
+<h2><a class="anchor" id="autotoc_md4"></a>
 write() always returns true after setAutoAck(false)</h2>
 <p>Don't disabled the auto-ack feature. <a class="el" href="classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58">RF24::write()</a> has no reason to doubt that the payload was delivered if the auto-ack feature is disabled. We recommend you read the docs about <a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">RF24::setAutoAck()</a> before disabling the auto-ack feature.</p>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 write() returns false when the payload was received</h2>
 <p>If the settings match on both endpoint transceivers, then this can only mean that the receiving nRF24L01 failed to send an acknowledgement (ACK) packet back to the transmitting nRF24L01. Usually this is due to instability (electric noise) in the power lines (VCC and GND) going to the receiving nRF24L01.</p>
 <p>If you're not receiving ACK packets correctly/reliably on data rates lower than 2MBPS, try adding a big capacitor close to the module/chip. Example issues: <a href="https://github.com/nRF24/RF24/issues/264">#264</a> <a href="https://github.com/nRF24/RF24/issues/211">#211</a>.</p>
 <p>For reliability, please use Electrolytic or Tantalum capacitors. Ceramic capacitors may not be good enough (depending on the manufacturing source).</p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)</h2>
+<p>This is likely due to the SPI speed being amped up to 10MHz by default. We recommend:</p>
+<ol type="1">
+<li>Make sure the wires are not loose, and try to avoid using long wires.</li>
+<li>If the previous point does not help, then try lowering the SPI speed like so <div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(7, 8, 4000000); <span class="comment">// set SPI speed to 4MHz instead of default 10MHz</span></div>
+<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00114">RF24.h:114</a></div></div>
+</div><!-- fragment --></li>
+</ol>
+<p>In the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library's beginnings, the default value was (prior to 2014) set to 4MHz.</p>
+<h2><a class="anchor" id="autotoc_md7"></a>
 my PA/LNA module fails to transmit</h2>
 <p>You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ seperate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:</p>
 <ol type="1">
@@ -129,8 +155,7 @@ my PA/LNA module fails to transmit</h2>
 </li>
 <li>Needs shielding from electromagnetic interference. Shielding usually works best when it has a path to ground (GND pin), but this connection to the GND pin is not required. It is important that the sheilding does not touch any current carrying parts.<ul>
 <li>Professionals tend to use a faraday cage/mesh to implement electromagnetic shielding, but it can be pricey for this scenario.</li>
-<li>A quick do-it-yourself solution (as proof-of-concept) would be to wrap the PA/LNA module with electrical tape and then wrap foil around the electrical tape (for shielding) while being very careful to not let the foil touch any current carrying parts (like the GPIO pins, the antenna mount, and the soldier joints for the antenna mount). <br  />
- See <a href="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png"><img src="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png" alt="ghetto_shielding_1.png" class="inline"/></a> and <a href="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png"><img src="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png" alt="ghetto_shielding_2.png" class="inline"/></a> </li>
+<li>A quick do-it-yourself solution (as proof-of-concept) would be to wrap the PA/LNA module with electrical tape and then wrap foil around the electrical tape (for shielding) while being very careful to not let the foil touch any current carrying parts (like the GPIO pins, the antenna mount, and the soldier joints for the antenna mount). Observe <a href="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png"><img src="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png" alt="ghetto_shielding_1.png" class="inline"/></a> <a href="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png"><img src="https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png" alt="ghetto_shielding_2.png" class="inline"/></a> </li>
 </ul>
 </li>
 </ol>
@@ -138,7 +163,7 @@ my PA/LNA module fails to transmit</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Oct 30 2021 00:14:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

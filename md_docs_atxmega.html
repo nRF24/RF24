@@ -90,8 +90,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> driver can be build as a static library with Atmel Studio 7 in order to be included as any other library in another program for the XMEGA family.</p>
-<p>Currently only the <a href="https://www.microchip.com/wwwproducts/en/ATxmega64d3"><b>ATXMEGA D3</b></a> family is implemented.</p>
-<h1><a class="anchor" id="autotoc_md23"></a>
+<p>Currently only the <a href="https://www.microchip.com/wwwproducts/en/ATxmega64d3">ATXMEGA D3</a> family is implemented.</p>
+<h1><a class="anchor" id="autotoc_md26"></a>
 Preparation</h1>
 <p>Create an empty GCC Static Library project in Atmel Studio 7.</p>
 <p>As not all files are required, copy the following directory structure in the project:</p>
@@ -112,26 +112,28 @@ Preparation</h1>
 <div class="line">RF24.cpp</div>
 <div class="line">RF24.h</div>
 <div class="line">RF24_config.h</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md24"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md27"></a>
 Usage</h1>
-<p>Add the library to your project!<br  />
- In the file where the <code>main()</code> is put the following in order to update the millisecond functionality: </p><div class="fragment"><div class="line">ISR(TCE0_OVF_vect)</div>
+<p>Add the library to your project!</p>
+<p>In the file where the <code>main()</code> is put the following in order to update the millisecond functionality:</p>
+<div class="fragment"><div class="line">ISR(TCE0_OVF_vect)</div>
 <div class="line">{</div>
 <div class="line">    update_milisec();</div>
 <div class="line">}</div>
-</div><!-- fragment --><p> Declare the rf24 radio with <code><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> radio(XMEGA_PORTC_PIN3, XMEGA_SPI_PORT_C);</code></p>
+</div><!-- fragment --><p>Declare the rf24 radio with <code><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> radio(XMEGA_PORTC_PIN3, XMEGA_SPI_PORT_C);</code></p>
 <ol type="1">
 <li>First parameter is the CE pin which can be any available pin on the microcontroller.</li>
 <li>Second parameter is the CS which can be on port C (<b>XMEGA_SPI_PORT_C</b>) or on port D (<b>XMEGA_SPI_PORT_D</b>).</li>
 </ol>
 <p>Call the <code><a class="el" href="group__Porting__Timing.html#ga6c8e606d2db30ac66d24b35056a8f819">__start_timer()</a></code> to start the millisecond timer.</p>
-<dl class="section note"><dt>Note</dt><dd>The millisecond functionality is based on the TCE0 so don't use these pins as IO.<br  />
- The operating frequency of the uC is 32MHz. If you have a different frequency, change the TCE0 registers appropriatly in function <code><a class="el" href="group__Porting__Timing.html#ga6c8e606d2db30ac66d24b35056a8f819">__start_timer()</a></code> in <b>compatibility.c</b> file for your frequency. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The millisecond functionality is based on the TCE0 so don't use these pins as IO.</dd>
+<dd>
+The operating frequency of the uC is 32MHz. If you have a different frequency, change the TCE0 registers appropriatly in function <code><a class="el" href="group__Porting__Timing.html#ga6c8e606d2db30ac66d24b35056a8f819">__start_timer()</a></code> in <b>compatibility.c</b> file for your frequency. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Oct 30 2021 00:14:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -89,20 +89,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="title">Linux cross-compilation </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library supports cross-compilation. Advantages of cross-compilation:</p><ul>
+<div class="textblock"><dl class="section warning"><dt>Warning</dt><dd>These instructions are no longer recommended because they involve disabling security measures for the target system. Please try the <a href="md_docs_using_cmake.html">instructions using CMake</a>.</dd></dl>
+<p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library supports cross-compilation. Advantages of cross-compilation:</p>
+<ul>
 <li>development tools don't have to be installed on target machine</li>
 <li>resources of target machine don't have to be sufficient for compilation</li>
 <li>compilation time can be reduced for large projects</li>
 </ul>
-<p>Following prerequisites need to be assured:</p><ul>
-<li>ssh passwordless access to target machine (<a href="https://linuxconfig.org/passwordless-ssh">https://linuxconfig.org/passwordless-ssh</a>)</li>
-<li>sudo of a remote user without password (<a href="http://askubuntu.com/questions/334318/sudoers-file-enable-nopasswd-for-user-all-commands">http://askubuntu.com/questions/334318/sudoers-file-enable-nopasswd-for-user-all-commands</a>)</li>
+<p>Following prerequisites need to be assured:</p>
+<ul>
+<li>ssh passwordless access to target machine <a href="https://linuxconfig.org/passwordless-ssh">Here is a hint</a></li>
+<li>sudo of a remote user without password <a href="http://askubuntu.com/questions/334318/sudoers-file-enable-nopasswd-for-user-all-commands">Here is a hint</a></li>
 <li>cross-compilation toolchain for your target machine; for RPi <div class="fragment"><div class="line">git clone https://github.com/raspberrypi/tools rpi_tools</div>
 </div><!-- fragment --> and cross-compilation tools must be in PATH, for example <div class="fragment"><div class="line">export PATH=$PATH:/your/dir/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin</div>
 </div><!-- fragment --></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md26"></a>
-Cross compilation steps:</h1>
+<h1><a class="anchor" id="autotoc_md29"></a>
+Cross compilation steps</h1>
 <ol type="1">
 <li>clone <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> to a machine for cross-compilation <div class="fragment"><div class="line">git clone https://github.com/nRF24/RF24</div>
 <div class="line">cd RF24</div>
@@ -122,16 +125,16 @@ Cross compilation steps:</h1>
 <li>(optional) upload examples to target machine <div class="fragment"><div class="line">make upload</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md27"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 Cross comilation steps for python wrapper</h1>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h2><a class="anchor" id="autotoc_md31"></a>
 Prerequisites</h2>
 <ul>
 <li>Python setuptools must be installed on both target and cross-compilation machines <div class="fragment"><div class="line">sudo pip install setuptools</div>
 </div><!-- fragment --> or <div class="fragment"><div class="line">sudo apt-get install python-setuptools</div>
 </div><!-- fragment --></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md32"></a>
 Installation steps</h2>
 <ol type="1">
 <li>Assure having libboost-python-dev library in your cross-compilation environment. Alternatively, you can install it into your target machine and copy /usr and /lib directories to the cross-compilation machine. For example <div class="fragment"><div class="line">mkdir -p rpi_root &amp;&amp; rsync -a pi@target_linux_host:/usr :/lib rpi_root</div>
@@ -150,7 +153,7 @@ Installation steps</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sat Oct 30 2021 00:14:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

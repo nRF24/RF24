@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['direction_5fin_376',['DIRECTION_IN',['../group__Porting__GPIO.html#gafbf58b193d0f84db90a843e00f27367c',1,'gpio.h']]],
-  ['direction_5fout_377',['DIRECTION_OUT',['../group__Porting__GPIO.html#gac39c2a3ce71b0df667c227292d4ab30c',1,'gpio.h']]]
+  ['child_5fpipe_377',['child_pipe',['../RF24_8cpp.html#a9a5b7ef3dcd5ba656e19a1036ef212f5',1,'RF24.cpp']]],
+  ['child_5fpipe_5fenable_378',['child_pipe_enable',['../RF24_8cpp.html#aa25724c48cf9fd6df84cfe7705d6e633',1,'RF24.cpp']]],
+  ['csdelay_379',['csDelay',['../classRF24.html#ad08121bf844f08dbe53f51576b7c4066',1,'RF24']]]
 ];
