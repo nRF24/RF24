@@ -19,7 +19,7 @@ import os
 # -- Project information -----------------------------------------------------
 
 project = "RF24 library"
-copyright = "2021, `nRF24 org <https://github.com/nRF24>`_"
+copyright = "2021, nRF24 org"
 author = "nRF24"
 
 # The full version, including alpha/beta/rc tags
