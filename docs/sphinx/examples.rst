@@ -29,6 +29,21 @@ Linux Examples
     examples/Linux/Scanner
     examples/Linux/InterruptConfigure
 
+PicoSDK Examples
+----------------
+
+.. toctree::
+    :maxdepth: 1
+
+    examples/PicoSDK/default_pins
+    examples/PicoSDK/GettingStarted
+    examples/PicoSDK/AcknowledgementPayloads
+    examples/PicoSDK/ManualAcknowledgements
+    examples/PicoSDK/StreamingData
+    examples/PicoSDK/MulticeiverDemo
+    examples/PicoSDK/Scanner
+    examples/PicoSDK/InterruptConfigure
+
 Python Examples
 ----------------
 
