@@ -1,4 +1,4 @@
-streamingData.cpp
+streamingData
 ==================
 
 .. seealso::

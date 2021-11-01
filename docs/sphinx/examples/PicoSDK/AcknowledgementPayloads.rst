@@ -1,4 +1,4 @@
-acknowledgementPayloads.cpp
+acknowledgementPayloads
 ===========================
 
 .. seealso::

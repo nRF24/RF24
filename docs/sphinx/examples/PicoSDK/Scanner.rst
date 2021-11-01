@@ -1,4 +1,4 @@
-scanner.cpp
+scanner
 ==================
 
 .. seealso::

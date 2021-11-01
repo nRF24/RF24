@@ -44,6 +44,8 @@ language = "en"
 extensions = [
     "breathe",
     "sphinx_immaterial",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autosectionlabel",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -56,6 +58,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # code-blocks will use this as their default syntax highlighting
 highlight_language="c++"
+primary_domain="cpp"
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -64,6 +67,9 @@ add_function_parentheses = True
 
 breathe_projects = {"RF24": "xml"}
 breathe_default_project = "RF24"
+breathe_show_define_initializer = True
+breathe_show_enumvalue_initializer = True
+breathe_domain_by_extension = { "h" : "cpp" }
 
 READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
 

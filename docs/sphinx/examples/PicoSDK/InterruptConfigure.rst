@@ -1,4 +1,4 @@
-interruptConfigure.cpp
+interruptConfigure
 ======================
 
 .. seealso::

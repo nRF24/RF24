@@ -1,4 +1,4 @@
-multiceiverDemo.cpp
+multiceiverDemo
 ====================
 
 .. seealso::

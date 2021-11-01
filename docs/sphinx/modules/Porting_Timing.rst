@@ -1,9 +1,6 @@
 Porting: Timing
 ===============
 
-Sample docs
------------
-
 .. doxygengroup:: Porting_Timing
     :members:
     :undoc-members:
@@ -11,8 +8,8 @@ Sample docs
     :private-members:
     :content-only:
 
-Source code
------------
+compatibility.h
+---------------
 
 .. literalinclude:: ../../../utility/Template/compatibility.h
     :caption: utility/Template/compatibility.h

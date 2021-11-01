@@ -1,4 +1,4 @@
-gettingStarted.cpp
+gettingStarted
 ==================
 
 .. seealso::
