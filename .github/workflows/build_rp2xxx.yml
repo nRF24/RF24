@@ -49,9 +49,7 @@ jobs:
           - "pimoroni_picolipo_4mb" # requires PicoSDK v1.2.0
           - "pimoroni_picolipo_16mb" # requires PicoSDK v1.2.0
           - "pimoroni_pga2040" # requires PicoSDK v1.2.0
-          # - "pimoroni_keybow2040" # no SPI bus exposed
-          # - "pimoroni_picosystem" # SPI is reserved for LCD
-
+          
     steps:
     - name: checkout RF24 lib
       uses: actions/checkout@v2
