@@ -79,3 +79,29 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
 	background-color: var(--md-default-bg-color--light);
 	margin-right: 0.5rem;
 }
+
+/* ************* temp workaround styling multi-line API signatures ******************* */
+/* In the future, we plan to do this without CSS in a more programatic way, but for now...  */
+
+.md-typeset dl.objdesc>dt.sig-wrap .n + .sig-paren::before,
+.md-typeset dl.api-field>dt.sig-wrap .n + .sig-paren::before {
+  content: "\a ";
+  white-space: pre;
+}
+
+.md-typeset dl.objdesc>dt.sig-wrap .sig-paren + .n:not(.sig-param)::before,
+.md-typeset dl.api-field>dt.sig-wrap .sig-paren + .n:not(.sig-param)::before,
+.md-typeset dl.objdesc>dt.sig-wrap .sig-param + .sig-param::before,
+.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .kt::before,
+.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .kt::before,
+.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .n:not(.sig-param)::before,
+.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .n:not(.sig-param)::before {
+  content: "\a     ";
+  white-space: break-spaces;
+}
+
+.md-typeset dl.api-field>dt.sig-wrap .sig-param:before,
+.md-typeset dl.objdesc>dt.sig-wrap .sig-param:before {
+  content: unset;
+  white-space: pre;
+}
