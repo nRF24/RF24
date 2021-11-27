@@ -20,6 +20,7 @@ on:
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
       - "pyRF24/setup.py"
+      - "pyRF24/pyRF24.cpp"
       - ".github/workflows/build_linux.yml"
   push:
     paths:
@@ -39,6 +40,7 @@ on:
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
       - "pyRF24/setup.py"
+      - "pyRF24/pyRF24.cpp"
       - ".github/workflows/build_linux.yml"
   release:
     types: [published, edited]

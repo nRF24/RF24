@@ -84,6 +84,8 @@ Configuration API
 .. doxygenfunction:: RF24::maskIRQ
 .. doxygenfunction:: RF24::startConstCarrier
 .. doxygenfunction:: RF24::stopConstCarrier
+.. doxygenfunction:: RF24::toggleAllPipes
+.. doxygenfunction:: RF24::setRadiation
 
 Protected API
 ==============
