@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.1</span>
+   &#160;<span id="projectnumber">1.4.2</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -90,9 +90,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> supports a variety of Linux based devices via various drivers. Some boards like RPi can utilize multiple methods to drive the GPIO and SPI functionality.</p>
-<h1><a class="anchor" id="autotoc_md56"></a>
+<h1><a class="anchor" id="autotoc_md66"></a>
 Potential PreConfiguration</h1>
-<p>If SPI is not already enabled, load it on boot: </p><div class="fragment"><div class="line">sudo raspi-config</div>
+<p>If SPI is not already enabled, load it on boot:</p>
+<div class="fragment"><div class="line">sudo raspi-config</div>
 </div><!-- fragment --><ol type="1">
 <li>Update the tool via the menu as required</li>
 <li>Select <b>Advanced</b> and <b>enable the SPI kernel module</b></li>
@@ -100,35 +101,36 @@ Potential PreConfiguration</h1>
 <div class="line">sudo apt-get upgrade</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md57"></a>
+<h1><a class="anchor" id="autotoc_md67"></a>
 Build Options</h1>
-<p>The default build on Raspberry Pi utilizes the included <b>BCM2835</b> driver from <a href="http://www.airspayce.com/mikem/bcm2835">http://www.airspayce.com/mikem/bcm2835</a></p>
+<p>The default build on Raspberry Pi utilizes the included <b>BCM2835</b> driver from <a href="http://www.airspayce.com/mikem/bcm2835">the BCM2835 Library</a></p>
 <ol type="1">
 <li>See <a href="md_docs_linux_install.html">the Linux section for automated installation</a>.</li>
 <li>Manual install: <div class="fragment"><div class="line">make</div>
 <div class="line">sudo make install</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md58"></a>
+<h1><a class="anchor" id="autotoc_md68"></a>
 Connections and Pin Configuration</h1>
 <p>Using pin 15(GPIO22) for CE, pin 24(GPIO8 commonly labeled as CE0) for CSN</p>
-<p>Can use any available SPI BUS for CSN.<br  />
- In general, use </p><div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(&lt;ce_pin&gt;, &lt;a&gt;*10+&lt;b&gt;);</div>
-<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00111">RF24.h:111</a></div></div>
-</div><!-- fragment --><p> for proper constructor to address the correct spi device at /dev/spidev&lt;a&gt;.&lt;b&gt;</p>
+<p>Can use any available SPI BUS for CSN.</p>
+<p>In general, use</p>
+<div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(&lt;ce_pin&gt;, &lt;a&gt;*10+&lt;b&gt;);</div>
+<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00114">RF24.h:114</a></div></div>
+</div><!-- fragment --><p>for proper constructor to address the correct spi device at /dev/spidev&lt;a&gt;.&lt;b&gt;</p>
 <p>Choose any GPIO output pin for radio CE pin.</p>
-<h2><a class="anchor" id="autotoc_md59"></a>
+<h2><a class="anchor" id="autotoc_md69"></a>
 General</h2>
 <div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(22,0);</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md60"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md70"></a>
 MRAA Constructor</h2>
 <div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(15,0);</div>
-</div><!-- fragment --><p> See <a href="http://iotdk.intel.com/docs/master/mraa/rasppi.html">http://iotdk.intel.com/docs/master/mraa/rasppi.html</a></p>
-<h2><a class="anchor" id="autotoc_md61"></a>
+</div><!-- fragment --><p>See <a href="http://iotdk.intel.com/docs/master/mraa/rasppi.html">the MRAA documentation for Raspberry Pi support</a></p>
+<h2><a class="anchor" id="autotoc_md71"></a>
 SPI_DEV Constructor</h2>
-<div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(22,0);</div>
-</div><!-- fragment --><p> See <a href="https://www.raspberrypi.org/documentation/usage/gpio/">https://www.raspberrypi.org/documentation/usage/gpio/</a></p>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(22, 0);</div>
+</div><!-- fragment --><p>See <a href="https://www.raspberrypi.com/documentation/computers/os.html#gpio-and-the-40-pin-header">the Raspberry Pi documentation about the GPIO pins</a></p>
+<h2><a class="anchor" id="autotoc_md72"></a>
 Pins</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -150,17 +152,15 @@ Pins</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">8   </td><td class="markdownTableBodyNone">IRQ   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md63"></a>
+<h1><a class="anchor" id="autotoc_md73"></a>
 breif history of RF24 library lineage</h1>
-<p>Based on the arduino lib from <a href="maniacbug@ymail.com">J. Coliz</a> <br  />
- the library was berryfied by <a href="purinda@gmail.com">Purinda Gunasekara</a> <br  />
- then forked from github stanleyseow/RF24 to <a href="https://github.com/jscrane/RF24-rpi">https://github.com/jscrane/RF24-rpi</a> <br  />
- Network lib also based on <a href="https://github.com/farconada/RF24Network">https://github.com/farconada/RF24Network</a> </p>
+<p>Based on the arduino lib from <a href="maniacbug@ymail.com">J. Coliz</a>, the library was berryfied by <a href="purinda@gmail.com">Purinda Gunasekara</a> then forked from github <a href="https://github.com/stanleyseow/RF24">stanleyseow/RF24</a> to <a href="https://github.com/jscrane/RF24-rpi">jscrane/RF24-rpi</a></p>
+<p>Network lib also based on <a href="https://github.com/farconada/RF24Network">farconada/RF24Network</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Nov 28 2021 12:41:19 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

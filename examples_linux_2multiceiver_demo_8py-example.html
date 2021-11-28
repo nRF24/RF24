@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.1</span>
+   &#160;<span id="projectnumber">1.4.2</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -150,7 +150,7 @@ To run this example, enter </p><div class="fragment"><div class="line">python3 m
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="comment"># According to the datasheet, the auto-retry features&#39;s delay value should</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment"># be &quot;skewed&quot; to allow the RX node to receive 1 transmission at a time.</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="comment"># So, use varying delay between retry attempts and 15 (at most) retry attempts</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    radio.setRetries(((node_number * 3) % 12) + 3, 15); <span class="comment"># maximum value is 15 for both args</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    radio.setRetries(((node_number * 3) % 12) + 3, 15) <span class="comment"># maximum value is 15 for both args</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    radio.stopListening()  <span class="comment"># put radio in TX mode</span></div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="comment"># set the TX address to the address of the base station.</span></div>
@@ -289,11 +289,11 @@ To run this example, enter </p><div class="fragment"><div class="line">python3 m
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        print(<span class="stringliteral">&quot; Keyboard Interrupt detected. Exiting...&quot;</span>)</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        radio.powerDown()</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        sys.exit()</div>
-<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00111">RF24.h:111</a></div></div>
+<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00114">RF24.h:114</a></div></div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Nov 28 2021 12:41:19 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.1</span>
+   &#160;<span id="projectnumber">1.4.2</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -90,18 +90,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> is fully compatible with Arduino boards.</p>
-<p>See <a href="http://www.arduino.cc/en/Reference/Board">http://www.arduino.cc/en/Reference/Board</a> and <a href="http://arduino.cc/en/Reference/SPI">http://arduino.cc/en/Reference/SPI</a> for more information</p>
+<p>See <a href="http://www.arduino.cc/en/Reference/Board">Arduino Board reference</a> and <a href="http://arduino.cc/en/Reference/SPI">Arduino SPI reference</a> for more information</p>
 <p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> makes use of the standard hardware SPI pins (MISO, MOSI, SCK) and requires two additional pins, to control the chip-select and chip-enable functions.</p>
 <div class="fragment"><div class="line"><a class="code" href="classRF24.html">RF24</a> radio(ce_pin, cs_pin);</div>
-<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00111">RF24.h:111</a></div></div>
-</div><!-- fragment --><p> These pins must be chosen and designated by the user and can use any available pins.</p>
-<h1><a class="anchor" id="autotoc_md7"></a>
+<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00114">RF24.h:114</a></div></div>
+</div><!-- fragment --><p>These pins must be chosen and designated by the user and can use any available pins.</p>
+<h1><a class="anchor" id="autotoc_md10"></a>
 Alternate SPI Support</h1>
 <p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> supports alternate SPI methods, in case the standard hardware SPI pins are otherwise unavailable.</p>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md11"></a>
 Software Driven SPI</h2>
 <p>Software driven SPI is provided by the <a href="https://github.com/greiman/DigitalIO">DigitalIO library</a>.</p>
-<p>Setup:</p><ol type="1">
+<p>Setup:</p>
+<ol type="1">
 <li>Install the digitalIO library</li>
 <li>Open <a class="el" href="RF24__config_8h.html">RF24_config.h</a> in a text editor. Uncomment the line <div class="fragment"><div class="line"><span class="preprocessor">#define SOFTSPI</span></div>
 </div><!-- fragment --> or add the build flag/option <div class="fragment"><div class="line">-DSOFTSPI</div>
@@ -109,16 +110,18 @@ Software Driven SPI</h2>
 <li>In your sketch, add <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;DigitalIO.h&gt;</span></div>
 </div><!-- fragment --></li>
 </ol>
-<dl class="section note"><dt>Note</dt><dd>Note: Pins are listed as follows and can be modified by editing the <a class="el" href="RF24__config_8h.html">RF24_config.h</a> file. <div class="fragment"><div class="line"><span class="preprocessor">#define SOFT_SPI_MISO_PIN 16</span></div>
+<dl class="section note"><dt>Note</dt><dd>Note: Pins are listed as follows and can be modified by editing the <a class="el" href="RF24__config_8h.html">RF24_config.h</a> file.</dd></dl>
+<div class="fragment"><div class="line"><span class="preprocessor">#define SOFT_SPI_MISO_PIN 16</span></div>
 <div class="line"><span class="preprocessor">#define SOFT_SPI_MOSI_PIN 15</span></div>
 <div class="line"><span class="preprocessor">#define SOFT_SPI_SCK_PIN 14</span></div>
-</div><!-- fragment --> Or add the build flag/option <div class="fragment"><div class="line">-DSOFT_SPI_MISO_PIN=16 -DSOFT_SPI_MOSI_PIN=15 -DSOFT_SPI_SCK_PIN=14</div>
-</div><!-- fragment --></dd></dl>
-<h2><a class="anchor" id="autotoc_md9"></a>
-Alternate Hardware (UART) Driven  SPI</h2>
+</div><!-- fragment --><p>Or add the build flag/option</p>
+<div class="fragment"><div class="line">-DSOFT_SPI_MISO_PIN=16 -DSOFT_SPI_MOSI_PIN=15 -DSOFT_SPI_SCK_PIN=14</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md12"></a>
+Alternate Hardware (UART) Driven SPI</h2>
 <p>The Serial Port (UART) on Arduino can also function in SPI mode, and can double-buffer data, while the default SPI hardware cannot.</p>
-<p>The SPI_UART library is available at <a href="https://github.com/TMRh20/Sketches/tree/master/SPI_UART">https://github.com/TMRh20/Sketches/tree/master/SPI_UART</a></p>
-<p>Enabling:</p><ol type="1">
+<p>The SPI_UART library is available at <a href="https://github.com/TMRh20/Sketches/tree/master/SPI_UART">TMRh20/Sketches</a></p>
+<p>Enabling:</p>
+<ol type="1">
 <li>Install the SPI_UART library</li>
 <li>Edit <a class="el" href="RF24__config_8h.html">RF24_config.h</a> and uncomment <div class="fragment"><div class="line"><span class="preprocessor">#define SPI_UART</span></div>
 </div><!-- fragment --></li>
@@ -139,14 +142,13 @@ Alternate Hardware (UART) Driven  SPI</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyRight">CSN   </td><td class="markdownTableBodyLeft">User Specified   </td></tr>
 </table>
-<dl class="section note"><dt>Note</dt><dd>SPI_UART on Mega boards requires soldering to an unused pin on the chip. <br  />
-See <a href="https://github.com/TMRh20/RF24/issues/24">https://github.com/TMRh20/RF24/issues/24</a> for more information on SPI_UART.</dd></dl>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<dl class="section note"><dt>Note</dt><dd>SPI_UART on Mega boards requires soldering to an unused pin on the chip. See <a href="https://github.com/TMRh20/RF24/issues/24">#24</a> for more information on SPI_UART.</dd></dl>
+<h2><a class="anchor" id="autotoc_md13"></a>
 Using a specific SPI Bus</h2>
 <p>An alternate SPI bus can be specified using the overloaded <code><a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a></code> method. This is useful for some boards that offer more than 1 hardware-driven SPI bus or cetain Arduino cores that implement a software-driven (AKA bit-banged) SPI bus that does not use the DigitalIO library.</p>
-<dl class="section warning"><dt>Warning</dt><dd>The SPI bus object's <b><code>SPIClass::begin()</code></b> method <b>must</b> be called before calling the overloaded <code><a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a></code> method.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>The SPI bus object's <code>SPIClass::begin()</code> method <b>must</b> be called before calling the overloaded <code><a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a></code> method.</dd></dl>
 <p>Below are some example snippets that demonstrate how this can be done.</p>
-<h3><a class="anchor" id="autotoc_md11"></a>
+<h3><a class="anchor" id="autotoc_md14"></a>
 ESP8266 example</h3>
 <dl class="section see"><dt>See also</dt><dd>The following example code is meant for the popular NodeMCU board. Please refer to the <a href="https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#spi">ESP8266 ArduinoCore's SPI documentation</a> for <a href="https://arduino-esp8266.readthedocs.io/en/latest/boards.html#">other ESP8266-based boards</a>.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;SPI.h&gt;</span></div>
@@ -160,7 +162,7 @@ ESP8266 example</h3>
 <div class="line">  <span class="keywordflow">while</span> (!Serial) {} <span class="comment">//some boards need this</span></div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// by default (with no arguments passed) SPI uses D5 (HSCLK), D6 (HMISO), D7 (HMOSI)</span></div>
-<div class="line">  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.pins(6, 7, 8, 0);</div>
+<div class="line">  SPI.pins(6, 7, 8, 0);</div>
 <div class="line">  <span class="comment">// this means the following pins are used for the SPI bus:</span></div>
 <div class="line">  <span class="comment">// MOSI = SD1</span></div>
 <div class="line">  <span class="comment">// MISO = SD0</span></div>
@@ -168,9 +170,9 @@ ESP8266 example</h3>
 <div class="line">  <span class="comment">// CSN = GPIO0 (labeled D3 on the board)</span></div>
 <div class="line">  <span class="comment">// **notice we also passed `D3` to the RF24 contructor&#39;s csn_pin parameter**</span></div>
 <div class="line"> </div>
-<div class="line">  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.begin();</div>
+<div class="line">  SPI.begin();</div>
 <div class="line"> </div>
-<div class="line">  <span class="keywordflow">if</span> (!radio.begin(&amp;<a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>)) {</div>
+<div class="line">  <span class="keywordflow">if</span> (!radio.begin(&amp;SPI)) {</div>
 <div class="line">    Serial.println(F(<span class="stringliteral">&quot;radio hardware not responding!!&quot;</span>));</div>
 <div class="line">    <span class="keywordflow">while</span> (1) {} <span class="comment">// hold program in infinite loop to prevent subsequent errors</span></div>
 <div class="line">  }</div>
@@ -178,10 +180,9 @@ ESP8266 example</h3>
 <div class="line">  <span class="comment">// ... continue with program as normal (see library examples/ folder)</span></div>
 <div class="line">}</div>
 <div class="ttc" id="aRF24_8h_html"><div class="ttname"><a href="RF24_8h.html">RF24.h</a></div></div>
-<div class="ttc" id="agroup__Porting__SPI_html_gacd293e741d829f9578b8c5ee49833608"><div class="ttname"><a href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a></div><div class="ttdeci">SPI()</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md12"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md15"></a>
 ESP32 example</h3>
-<dl class="section see"><dt>See also</dt><dd>Please review the Espressif's <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino">SPI_Multiple_Buses.ino example for the ESP32</a> located in their ArduinoCore repository (along with the <a class="el" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a> library for the ESP32).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Please review the Espressif's <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino">SPI_Multiple_Buses.ino example for the ESP32</a> located in their ArduinoCore repository (along with the SPI library for the ESP32).</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;SPI.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="RF24_8h.html">RF24.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -217,7 +218,7 @@ ESP32 example</h3>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// ... continue with program as normal (see library examples/ folder)</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md13"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md16"></a>
 Teensy example</h3>
 <dl class="section see"><dt>See also</dt><dd>The overloaded <a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a> is not needed according to the <a href="https://www.pjrc.com/teensy/td_libs_SPI.html">Teensyduino SPI documentation</a>. Please review the table provided in the <a href="https://www.pjrc.com/teensy/td_libs_SPI.html">Teensyduino documentation</a> for what pins are used by default for certain Teensy boards.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;SPI.h&gt;</span></div>
@@ -235,9 +236,9 @@ Teensy example</h3>
 <div class="line">  Serial.begin(115200);</div>
 <div class="line">  <span class="keywordflow">while</span> (!Serial) {} <span class="comment">//some boards need this</span></div>
 <div class="line"> </div>
-<div class="line">  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.setMOSI(MY_MOSI);</div>
-<div class="line">  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.setMISO(MY_MISO);</div>
-<div class="line">  <a class="code" href="group__Porting__SPI.html#gacd293e741d829f9578b8c5ee49833608">SPI</a>.setSCK(MY_SCLK);</div>
+<div class="line">  SPI.setMOSI(MY_MOSI);</div>
+<div class="line">  SPI.setMISO(MY_MISO);</div>
+<div class="line">  SPI.setSCK(MY_SCLK);</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">if</span> (!radio.begin()) {</div>
 <div class="line">    Serial.println(F(<span class="stringliteral">&quot;radio hardware not responding!!&quot;</span>));</div>
@@ -250,7 +251,7 @@ Teensy example</h3>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Nov 28 2021 12:41:19 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

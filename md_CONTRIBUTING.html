@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Optimized high speed nRF24L01+ driver class documentation: CONTRIBUTING</title>
+<title>Optimized high speed nRF24L01+ driver class documentation: Contributing guidelines</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.1</span>
+   &#160;<span id="projectnumber">1.4.2</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -86,21 +86,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">CONTRIBUTING </div>  </div>
+<div class="title">Contributing guidelines </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>These are the current requirements for getting your code included in <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a>:</p>
 <ul>
-<li>Try your best to follow the rest of the code, if you're unsure then the NASA C style can help as it's closest to the current style: <a href="https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19950022400.pdf">https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19950022400.pdf</a></li>
+<li>Try your best to follow the rest of the code, if you're unsure then <a href="https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19950022400.pdf">the NASA C style guide</a> can help as it's closest to the current style.</li>
 <li>Definetly follow <a href="https://www.python.org/dev/peps/pep-0008/">PEP-8</a> if it's Python code.</li>
 <li>Follow the <a href="https://www.arduino.cc/en/Reference/StyleGuide">Arduino IDE formatting style</a> for Arduino examples</li>
-<li>Add <a href="https://www.doxygen.nl/manual/docblocks.html">doxygen-compatible documentation</a> to any new functions you add, or update existing documentation if you change behaviour </li>
+<li>Add <a href="https://www.doxygen.nl/manual/docblocks.html">doxygen-compatible documentation</a> to any new functions you add, or update existing documentation if you change behaviour</li>
+<li>CMake modules and CMakeLists.txt files should also have a uniform syntax.<ul>
+<li>Indentation is a mandatory 4 spaces (not a <code>\t</code> character).</li>
+<li>Closing parenthesis for multi-line commands should have the same indentation as the line that opened the parenthesis.</li>
+<li>For other useful CMake syntax convention, please see <a href="https://cmake.org/cmake/help/v3.20/manual/cmake-developer.7.html">CMake docs for developers</a> and <a href="https://gist.github.com/mbinna/c61dbb39bca0e4fb7d1f73b0d66a4fd1">this useful best CMake practices article</a>. The qiBuild project has some <a href="http://doc.aldebaran.com/qibuild/hacking/contrib/cmake/coding_guide.html">well-reasoned "Dos &amp; Don'ts" guideline</a>, but beware that the nRF24 organization is not related to the qiBuild project in any way. </li>
+</ul>
+</li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Nov 28 2021 12:41:19 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

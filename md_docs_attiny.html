@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Optimized high speed nRF24L01+ driver class documentation
-   &#160;<span id="projectnumber">v1.4.1</span>
+   &#160;<span id="projectnumber">1.4.2</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -89,17 +89,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 <div class="title">ATTiny </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with the following guide:<br  />
- <a href="http://highlowtech.org/?p=1695">http://highlowtech.org/?p=1695</a> <br  />
- See the included rf24ping85 example for pin info and usage</p>
+<div class="textblock"><p>ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with <a href="http://highlowtech.org/?p=1695">this install guide</a></p>
+<p>See the included rf24ping85 example for pin info and usage</p>
 <dl class="section warning"><dt>Warning</dt><dd>The ATTiny2313 is unsupported due to lack of sufficient memory resources</dd></dl>
-<p>Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny<br  />
- See <a href="https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC">https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC</a> for ATTiny patch</p>
-<p>ATTiny board support initially added from <a href="https://github.com/jscrane/RF24">https://github.com/jscrane/RF24</a></p>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<p>Some versions of Arduino IDE may require a patch to allow use of the full program space on ATTiny. See <a href="https://github.com/TCWORLD/ATTinyCore/tree/master/PCREL%20Patch%20for%20GCC">this resource</a> for the ATTiny patch.</p>
+<p>ATTiny board support initially added from <a href="https://github.com/jscrane/RF24">jscrane/RF24</a></p>
+<h1><a class="anchor" id="autotoc_md20"></a>
 Hardware Configuration</h1>
 <p>By <a href="https://github.com/tong67">tong67</a></p>
-<h2><a class="anchor" id="autotoc_md18"></a>
+<h2><a class="anchor" id="autotoc_md21"></a>
 ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4</h2>
 <div class="fragment"><div class="line">                             +-\/-+</div>
 <div class="line">               NC      PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 --- LED --- 5V</div>
@@ -107,10 +105,10 @@ ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4</h2>
 <div class="line">nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6</div>
 <div class="line">nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7</div>
 <div class="line">                             +----+</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md19"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md22"></a>
 ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3 - PB3 and PB4 are free to use for application</h2>
 <ul>
-<li>Circuit idea from <a href="http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html">http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html</a></li>
+<li>Circuit idea from <a href="http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html">NerdRalph's 3 pin solution</a></li>
 <li>Original RC combination was 1K/100nF. 22K/10nF combination worked better.</li>
 <li>For best settletime delay value in RF24::csn() the timingSearch3pin.ino sketch can be used.</li>
 <li>This configuration is enabled when CE_PIN and CSN_PIN are equal, e.g. both 3</li>
@@ -125,7 +123,7 @@ ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3 - PB3 and PB4 are free to use
 <div class="line">                    |        +----+                                       |</div>
 <div class="line">                    |-----------------------------------------------||----x-- nRF24L01 CSN, pin4</div>
 <div class="line">                                                                  10nF</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md20"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md23"></a>
 ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7</h2>
 <ul>
 <li>Schematic provided and successfully tested by <a href="https://github.com/Carminepz">Carmine Pastore</a></li>
@@ -139,7 +137,7 @@ ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7</h2>
 <div class="line">                        PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5</div>
 <div class="line">nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6</div>
 <div class="line">                              +----+</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md21"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md24"></a>
 ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13</h2>
 <div class="fragment"><div class="line">                              +-\/-+</div>
 <div class="line">                        PA2  1|o   |20 VCC --- nRF24L01  VCC, pin2</div>
@@ -157,7 +155,7 @@ ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 24 2021 13:33:49 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Sun Nov 28 2021 12:41:19 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
