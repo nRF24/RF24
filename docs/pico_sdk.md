@@ -38,17 +38,17 @@ come from the Pico SDK repository's
 
 1. Create a "build" directory in the RF24 repository's root directory and
    navigate to it:
-   ```shell
+   ```sh
    cd RF24
    mkdir build
    cd build
    ```
 2. Configure CMake for your desired build type and specific RP2040-based board
-   ```shell
+   ```sh
    cmake ../examples_pico -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico
    ```
    Or if building on a Windows PC:
-   ```shell
+   ```sh
    cmake -G "NMake Makefiles" ../examples_pico -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico
    ```
    The supported RP2040-based boards are listed in header files in the Pico SDK
@@ -56,7 +56,7 @@ come from the Pico SDK repository's
    If the `-DPICO_BOARD` option is not specified, then the Pico SDK will default to building for the Raspberry Pi Pico board.
 3. Build the examples using the CMakeLists.txt file located in the
    RF24/examples_pico directory.
-   ```shell
+   ```sh
    cmake --build . --config Release
    ```
    Notice we specified the build type again using the `--config` option.

@@ -100,7 +100,7 @@ You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L
    [![ghetto_shielding_1.png](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png)](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png)
    [![ghetto_shielding_2.png](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png)](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png)
 
-### My PA/LNA module doesnt perform as well as I'd hoped or the NRF radio works better on touching it
+### My PA/LNA module doesn't perform as well as I'd hoped or the NRF radio works better on touching it
 
 As described above, the radio modules (notably the PA+LNA versions) are reliant on a stable power source. While these modules may work with a poor power supply, they often lose packets or fail to receive as many as a module with a better power source. Moreover, this can sometimes be seen in odd ways such as the radio module working better when touched. This again is likely a power stability issue because the radio module is missing a capacitor (a commonly neglected expense on behalf of the module's manufacturer).
 

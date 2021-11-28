@@ -267,6 +267,7 @@ ALIASES               += "see{1}=@rst .. seealso:: \1@endrst"
 ALIASES               += "important{1}=@rst .. important:: \1@endrst"
 ALIASES               += "hint{1}=@rst.. hint:: \1@endrst"
 ALIASES               += "tip{1}=@rst.. tip:: \1@endrst"
+ALIASES               += "inlinerst=\xmlonly<verbatim>embed:rst:inline "
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For
