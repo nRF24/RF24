@@ -1396,12 +1396,12 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for all pipes. This
      * feature is enabled by default. Auto-acknowledgement responds to every
-     * recieved payload with an empty ACK packet. These ACK packets get sent
+     * received payload with an empty ACK packet. These ACK packets get sent
      * from the receiving radio back to the transmitting radio. To attach an
      * ACK payload to a ACK packet, use writeAckPayload().
      *
      * If this feature is disabled on a transmitting radio, then the
-     * transmitting radio will always report that the payload was recieved
+     * transmitting radio will always report that the payload was received
      * (even if it was not). Please remember that this feature's configuration
      * needs to match for transmitting and receiving radios.
      *
@@ -1428,7 +1428,7 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for a specific pipe.
      * This feature is enabled by default for all pipes. Auto-acknowledgement
-     * responds to every recieved payload with an empty ACK packet. These ACK
+     * responds to every received payload with an empty ACK packet. These ACK
      * packets get sent from the receiving radio back to the transmitting
      * radio. To attach an ACK payload to a ACK packet, use writeAckPayload().
      *
@@ -1436,7 +1436,7 @@ public:
      * using this feature on both TX & RX nodes, then pipe 0 must have this
      * feature enabled for the RX & TX operations. If this feature is disabled
      * on a transmitting radio's pipe 0, then the transmitting radio will
-     * always report that the payload was recieved (even if it was not).
+     * always report that the payload was received (even if it was not).
      * Remember to also enable this feature for any pipe that is openly
      * listening to a transmitting radio with this feature enabled.
      *
@@ -1559,8 +1559,8 @@ public:
      * Request (IRQ) pin active LOW.
      * The following events can be configured:
      * 1. "data sent": This does not mean that the data transmitted was
-     * recieved, only that the attempt to send it was complete.
-     * 2. "data failed": This means the data being sent was not recieved. This
+     * received, only that the attempt to send it was complete.
+     * 2. "data failed": This means the data being sent was not received. This
      * event is only triggered when the auto-ack feature is enabled.
      * 3. "data received": This means that data from a receiving payload has
      * been loaded into the RX FIFO buffers. Remember that there are only 3
