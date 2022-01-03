@@ -96,7 +96,11 @@ jobs:
           git fetch --tags
           latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           git checkout $latestTag
-          make lib CROSS_PREFIX='arm-linux-gnueabihf-'
+          mkdir build
+          cd build
+          cmake .. -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/armhf.cmake
+          make
           sudo make install
         
       - name: provide MRAA
@@ -236,7 +240,11 @@ jobs:
           git fetch --tags
           latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           git checkout $latestTag
-          make lib CROSS_PREFIX=${{ matrix.toolchain.usr_dir }}-
+          mkdir build
+          cd build
+          cmake .. -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
+          make
           sudo make install
         
       - name: create CMake build environment
