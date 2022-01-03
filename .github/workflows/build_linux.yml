@@ -90,15 +90,13 @@ jobs:
       
       - name: provide pigpio
         if: ${{ matrix.config-options == '--driver=RPi' || matrix.config-options == '--driver=SPIDEV' }}
-        env:
-          CROSS_PREFIX: 'arm-linux-gnueabihf-'
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
           git fetch --tags
           latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           git checkout $latestTag
-          make lib
+          make lib CROSS_PREFIX='arm-linux-gnueabihf-'
           sudo make install
         
       - name: provide MRAA
@@ -232,15 +230,13 @@ jobs:
 
       - name: provide pigpio
         if: ${{ matrix.driver == 'RPi' || matrix.driver == 'SPIDEV' }}
-        env:
-          CROSS_PREFIX: ${{ matrix.toolchain.usr_dir }}
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
           git fetch --tags
           latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           git checkout $latestTag
-          make lib
+          make lib CROSS_PREFIX=${{ matrix.toolchain.usr_dir }}
           sudo make install
         
       - name: create CMake build environment
