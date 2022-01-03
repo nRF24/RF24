@@ -451,7 +451,7 @@ if [ "${LIB_DEPRECATE_NAME}" ]; then
     fi
 fi
 DRIVER_DIR=${DRIVER_DIR:-${ARCH_DIR}/${DRIVER}}
-CFLAGS="$CPUFLAGS -Ofast -Wall $CFLAGS"
+CFLAGS="$CPUFLAGS -Ofast -Wall -pthread $CFLAGS"
 
 echo "[SECTION] Preparing configuration."
 cp ${DRIVER_DIR}/includes.h ${ARCH_DIR}/includes.h
