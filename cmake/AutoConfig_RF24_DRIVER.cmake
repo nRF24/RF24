@@ -17,6 +17,7 @@ set(RF24_DRIVER "UNKNOWN" CACHE STRING "override automatic configuration of RF24
 find_library(LibMRAA mraa)
 find_library(LibWiringPi wiringPi)
 find_library(LibLittleWire littlewire-spi)
+find_library(PIGPIO pigpio)
 if(EXISTS /dev/spidev0.0)
     set(SPIDEV_EXISTS TRUE)
 else()

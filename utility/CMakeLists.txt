@@ -17,6 +17,7 @@ if ("${RF24_DRIVER}" STREQUAL  "wiringPi") # Use wiringPi
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
 elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
+    set(RF24_LINKED_DRIVER ${PIGPIO} PARENT_SCOPE)
     set(RF24_DRIVER_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/bcm2835.c
@@ -39,6 +40,7 @@ elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
     if(NOT SPIDEV_EXISTS)
         message(WARNING "Detecting /dev/spidev0.0 failed - continuing anyway. Please make sure SPI is enabled.")
     endif()
+    set(RF24_LINKED_DRIVER ${PIGPIO} PARENT_SCOPE)
     set(RF24_DRIVER_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/gpio.cpp
