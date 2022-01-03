@@ -398,14 +398,14 @@ fi
 
 case ${DRIVER} in
 wiringPi)
-    SHARED_LINKER_LIBS+=" -pthread -lwiringPi"
+    SHARED_LINKER_LIBS+=" -lpigpio -lwiringPi"
     CFLAGS+=" -lwiringPi"
     ;;
 SPIDEV)
-    SHARED_LINKER_LIBS+=" -pthread"
+    SHARED_LINKER_LIBS+=" -lpigpio"
     ;;
 RPi)
-    SHARED_LINKER_LIBS+=" -pthread"
+    SHARED_LINKER_LIBS+=" -lpigpio"
     ;;
 MRAA)
     SHARED_LINKER_LIBS+=" -lmraa"
@@ -451,7 +451,7 @@ if [ "${LIB_DEPRECATE_NAME}" ]; then
     fi
 fi
 DRIVER_DIR=${DRIVER_DIR:-${ARCH_DIR}/${DRIVER}}
-CFLAGS="$CPUFLAGS -Ofast -Wall -pthread $CFLAGS"
+CFLAGS="$CPUFLAGS -Ofast -Wall $CFLAGS"
 
 echo "[SECTION] Preparing configuration."
 cp ${DRIVER_DIR}/includes.h ${ARCH_DIR}/includes.h
