@@ -87,7 +87,13 @@ jobs:
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
           ./build
-
+      
+      - name: provide pigpio
+        if: ${{ matrix.config-options == '--driver=RPi' || '--driver=SPIDEV' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install pigpio
+        
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
         env:
@@ -217,6 +223,12 @@ jobs:
       #     cd WiringPi
       #     ./build
 
+      - name: provide pigpio
+        if: ${{ matrix.driver == 'RPi' || 'SPIDEV' }}
+          run |
+            sudo apt-get update
+            sudo apt-get install pigpio
+        
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
 
