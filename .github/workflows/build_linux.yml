@@ -225,9 +225,9 @@ jobs:
 
       - name: provide pigpio
         if: ${{ matrix.driver == 'RPi' || 'SPIDEV' }}
-          run: |
-            sudo apt-get update
-            sudo apt-get install pigpio
+        run: |
+          sudo apt-get update
+          sudo apt-get install pigpio
         
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
