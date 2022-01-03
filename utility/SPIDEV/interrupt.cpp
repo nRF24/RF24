@@ -1,10 +1,5 @@
 /*
-Interrupts functions extruded from wiringPi library by Oitzu.
-
-wiringPi Copyright (c) 2012 Gordon Henderson
-https://projects.drogon.net/raspberry-pi/wiringpi
-wiringPi is free software: GNU Lesser General Public License
-see <http://www.gnu.org/licenses/>
+Interrupt functions
 */
 
 #include "interrupt.h"
