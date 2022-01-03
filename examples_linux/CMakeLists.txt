@@ -8,7 +8,6 @@ set(EXAMPLES_LIST
     streamingData
     multiceiverDemo
     scanner
-    interruptConfigure
 )
 
 project(RF24LogExamples)
@@ -26,6 +25,13 @@ message(STATUS "using RF24 library: ${RF24}")
 
 # pigpio lib is linked for IRQ feature
 find_library(PIGPIO pigpio)
+
+# conditionally append "interruptConfigure" to the EXAMPLES_LIST
+if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi")
+    message(STATUS "Skipping interruptConfigure.cpp example as it is incompatible with selected driver library")
+else() # not using MRAA or wiringPi drivers
+    list(APPEND EXAMPLES_LIST interruptConfigure)
+endif()
 
 foreach(example ${EXAMPLES_LIST})
     #make a target
