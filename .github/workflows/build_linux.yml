@@ -225,7 +225,7 @@ jobs:
 
       - name: provide pigpio
         if: ${{ matrix.driver == 'RPi' || 'SPIDEV' }}
-          run |
+          run: |
             sudo apt-get update
             sudo apt-get install pigpio
         
