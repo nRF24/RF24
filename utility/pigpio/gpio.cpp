@@ -23,6 +23,7 @@ void GPIO::open(int port, int DDR)
         gpioInitialise();
     }
     initialized = true;
+    gpioSetMode(port, PI_OUTPUT);
 }
 
 void GPIO::close(int port)
