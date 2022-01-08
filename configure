@@ -398,20 +398,23 @@ fi
 
 case ${DRIVER} in
 wiringPi)
-    SHARED_LINKER_LIBS+=" -pthread -lwiringPi"
+    SHARED_LINKER_LIBS+=" -lpigpio -lwiringPi"
     CFLAGS+=" -lwiringPi"
     ;;
 SPIDEV)
-    SHARED_LINKER_LIBS+=" -pthread"
+    SHARED_LINKER_LIBS+=" -lpigpio"
     ;;
 RPi)
-    SHARED_LINKER_LIBS+=" -pthread"
+    SHARED_LINKER_LIBS+=" -lpigpio"
     ;;
 MRAA)
     SHARED_LINKER_LIBS+=" -lmraa"
     ;;
 LittleWire)
     SHARED_LINKER_LIBS+=" -llittlewire-spi"
+    ;;
+pigpio)
+    SHARED_LINKER_LIBS+=" -lpigpio"
     ;;
 *)
     die "Unsupported DRIVER: ${DRIVER}." 2
