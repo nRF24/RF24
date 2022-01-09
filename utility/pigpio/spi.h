@@ -46,7 +46,7 @@ public:
     /**
     * Start SPI
     */
-    void begin(int busNo, uint32_t spi_speed = RF24_SPI_SPEED);
+    void begin(int busNo, uint32_t spi_speed);
 
     /**
     * Transfer a single byte
@@ -78,9 +78,8 @@ public:
 private:
 
     unsigned spiHandle;
-    uint32_t _spi_speed;
     bool spiIsInitialized = false;
-    void init(uint32_t spi_speed = RF24_SPI_SPEED);
+    void init(uint32_t spi_speed);
 
 
 };

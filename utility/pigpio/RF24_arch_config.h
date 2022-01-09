@@ -43,8 +43,10 @@
     #endif
 #endif
 
-#undef RF24_SPI_SPEED
-#define RF24_SPI_SPEED 1000000
+#if RF24_SPI_SPEED > 1000000
+   #undef RF24_SPI_SPEED
+   #define RF24_SPI_SPEED 1000000
+#endif
     
 typedef uint16_t prog_uint16_t;
 #define PSTR(x) (x)

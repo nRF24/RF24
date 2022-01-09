@@ -7,7 +7,6 @@
 
 
 SPI::SPI()
-        :_spi_speed(RF24_SPI_SPEED)
 {
 }
 
