@@ -16,6 +16,7 @@ on:
       - "utility/wiringPi/*"
       - "utility/MRAAA/*"
       - "utility/SPIDEV/*"
+      - "utility/pigpio"
       - "examples_linux/*"
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
@@ -36,6 +37,7 @@ on:
       - "utility/wiringPi/*"
       - "utility/MRAAA/*"
       - "utility/SPIDEV/*"
+      - "utility/pigpio"
       - "examples_linux/*"
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
@@ -63,6 +65,7 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           - "--driver=SPIDEV"
           - "--driver=MRAA"
+          - "--driver=pigpio"
           # - "--soc=BCM2835 --driver=wiringPi"
 
     env:
@@ -155,12 +158,13 @@ jobs:
           #   usr_dir: "x86_64-linux-gnux32"
           # - compiler: "i686"
           #   usr_dir: "i686-linux-gnu"
-          # - compiler: "default" # github runner is hosted on a "amd64"
-          #   usr_dir: "local" # using this toolchain to test python wrapper
+          - compiler: "default" # github runner is hosted on a "amd64"
+            usr_dir: "local" # using this toolchain to test python wrapper
         driver:
           - "RPi"
           - "SPIDEV"
           - "MRAA"
+          - "pigpio"
         exclude:
           # MRAA is not compatible with i686 arch
           - driver: "MRAA"
@@ -233,7 +237,7 @@ jobs:
       #     ./build
 
       - name: provide pigpio
-        if: ${{ matrix.driver == 'RPi' || matrix.driver == 'SPIDEV' }}
+        if: ${{ matrix.driver == 'RPi' || matrix.driver == 'SPIDEV' || matrix.driver == 'pigpio' }}
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
