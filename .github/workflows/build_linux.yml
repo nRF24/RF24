@@ -241,7 +241,7 @@ jobs:
       #     ./build
 
       - name: provide pigpio
-        if: ${{ matrix.driver == 'RPi' || matrix.driver == 'SPIDEV' || matrix.driver == 'pigpio' }}
+        if: ${{ matrix.driver == 'RPi' || matrix.driver == 'SPIDEV' || matrix.driver == 'pigpio' && matrix.toolchain.compiler != 'default'}}
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
