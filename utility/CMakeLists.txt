@@ -33,8 +33,8 @@ elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
             ${RF24_DRIVER}/RF24_arch_config.h
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
-    if(NOT "${PIGPIO}" STREQUAL "PIGPIO-NOTFOUND")
-        set(RF24_LINKED_DRIVER ${PIGPIO} PARENT_SCOPE)
+    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        set(RF24_LINKED_DRIVER ${LibPIGPIO} PARENT_SCOPE)
         message(STATUS "linking to pigpio lib for interrupt functionality")
         install(FILES
                 ${RF24_DRIVER}/interrupt.h
@@ -62,8 +62,8 @@ elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
             ${RF24_DRIVER}/RF24_arch_config.h
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
-    if(NOT "${PIGPIO}" STREQUAL "PIGPIO-NOTFOUND")
-        set(RF24_LINKED_DRIVER ${PIGPIO} PARENT_SCOPE)
+    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        set(RF24_LINKED_DRIVER ${LibPIGPIO} PARENT_SCOPE)
         message(STATUS "linking to pigpio lib for interrupt functionality")
         install(FILES
                 ${RF24_DRIVER}/interrupt.h
@@ -90,7 +90,7 @@ elseif("${RF24_DRIVER}" STREQUAL "MRAA") # use MRAA
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
 elseif("${RF24_DRIVER}" STREQUAL "pigpio") # use pigpio
-    set(RF24_LINKED_DRIVER ${PIGPIO} PARENT_SCOPE)
+    set(RF24_LINKED_DRIVER ${LibPIGPIO} PARENT_SCOPE)
     set(RF24_DRIVER_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/gpio.cpp

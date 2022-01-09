@@ -171,6 +171,10 @@ jobs:
             toolchain:
               compiler: "i686"
               usr_dir: "i686-linux-gnu"
+          - driver: "pigpio"
+            toolchain:
+              compiler: "default"
+              usr_dir: "local"
         include:
           # need to cross-compile wiringPi dependencies (libcrypt)
           # only test default compiler with wiringPi

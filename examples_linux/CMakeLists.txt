@@ -24,9 +24,9 @@ find_library(RF24 rf24 REQUIRED)
 message(STATUS "using RF24 library: ${RF24}")
 
 # conditionally append "interruptConfigure" to the EXAMPLES_LIST
-if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi")
+if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi" OR "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
     message(STATUS "Skipping interruptConfigure.cpp example as it is incompatible with selected driver library")
-else() # not using MRAA or wiringPi drivers
+else() # not using MRAA or wiringPi drivers (or pigpio lib was found)
     list(APPEND EXAMPLES_LIST interruptConfigure)
 endif()
 
@@ -42,8 +42,8 @@ foreach(example ${EXAMPLES_LIST})
         target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibWiringPi} crypt rt)
     else() # not using MRAA or wiringPi drivers
         # conditionally link to pigpio if lib was detected
-        if(NOT "${PIGPIO}" STREQUAL "PIGPIO_NOTFOUND")
-            target_link_libraries(${example} PUBLIC ${RF24} pthread ${PIGPIO})
+        if(NOT "${LibPIGPIO}" STREQUAL "PIGPIO_NOTFOUND")
+            target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibPIGPIO})
         else()
             target_link_libraries(${example} PUBLIC ${RF24} pthread)
         endif()
