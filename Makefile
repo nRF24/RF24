@@ -26,6 +26,8 @@ else ifeq ($(DRIVER), SPIDEV)
 OBJECTS+=spi.o gpio.o compatibility.o interrupt.o
 else ifeq ($(DRIVER), wiringPi)
 OBJECTS+=spi.o
+else ifeq ($(DRIVER), pigpio)
+OBJECTS+=spi.o gpio.o interrupt.o compatibility.o
 endif
 
 # make all
