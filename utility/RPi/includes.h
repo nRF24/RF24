@@ -5,6 +5,8 @@
 
 #include "RPi/bcm2835.h"
 #include "RPi/RF24_arch_config.h"
-#include "RPi/interrupt.h"
+#ifndef RF24_NO_INTERRUPT
+    #include "RPi/interrupt.h"
+#endif
 
 #endif

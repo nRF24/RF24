@@ -136,6 +136,9 @@ if(DEFINED RF24_SPI_SPEED)
         RF24_SPI_SPEED=${RF24_SPI_SPEED}
     )
 endif()
+if("${libPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+    target_compile_definitions(${LibTargetName} PUBLIC RF24_NO_INTERRUPT)
+endif()
 
 
 #####################################
