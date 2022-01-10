@@ -72,8 +72,12 @@ finally:
         )
 
     # avoid IRQ support if pigpio is not available
-    if not os.path.exists("/usr/lib/libpigpio.so"):
-        cflags.append("-DRF24_NO_INTERRUPT=1")
+    found_pigpio = False
+    for symlink_loc in symlink_directory:
+        if os.path.exists(symlink_loc + "/libpigpio.so"):
+            found_pigpio = True
+    if not found_pigpio:
+        cflags += " -DRF24_NO_INTERRUPT=1"
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags
