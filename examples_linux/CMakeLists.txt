@@ -36,7 +36,7 @@ foreach(example ${EXAMPLES_LIST})
     
     # avoid including interrupt.h when pigpio is not available
     if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
-        target_compile_definitions(${LibTargetName} PUBLIC RF24_NO_INTERRUPT)
+        target_compile_definitions(${example} PUBLIC RF24_NO_INTERRUPT)
     endif()
 
     # link the RF24 lib to the target. Notice we specify pthread as a linked lib here
