@@ -30,7 +30,7 @@ if(${RF24_DRIVER} STREQUAL "UNKNOWN") # invokes automatic configuration
     if("${SOC}" STREQUAL "BCM2708" OR "${SOC}" STREQUAL "BCM2709" OR "${SOC}" STREQUAL "BCM2835")
         set(RF24_DRIVER RPi CACHE STRING "using folder /utility/RPi" FORCE)
     elseif(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
-        message(STATUS "Found MRAA library: ${LibPIGPIO}")
+        message(STATUS "Found pigpio library: ${LibPIGPIO}")
         set(RF24_DRIVER LibPIGPIO CACHE STRING "using folder /utility/pigpio" FORCE)
     elseif(NOT "${LibWiringPi}" STREQUAL "LibWiringPi-NOTFOUND")
         message(STATUS "Found wiringPi library: ${LibWiringPi}")

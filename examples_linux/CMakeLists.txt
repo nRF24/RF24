@@ -40,12 +40,10 @@ foreach(example ${EXAMPLES_LIST})
     elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
         # wiringPi additionally needs to link to crypt and shm_open libraries
         target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibWiringPi} crypt rt)
+    elseif("${RF24_DRIVER}" STREQUAL "pigpio")
+        # linking to pigpio requires pthread to be listed as last linked lib
+        target_link_libraries(${example} PUBLIC ${RF24} ${LibPIGPIO} pthread)
     else() # not using MRAA or wiringPi drivers
-        # conditionally link to pigpio if lib was detected
-        if(NOT "${LibPIGPIO}" STREQUAL "PIGPIO_NOTFOUND")
-            target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibPIGPIO})
-        else()
-            target_link_libraries(${example} PUBLIC ${RF24} pthread)
-        endif()
+        target_link_libraries(${example} PUBLIC ${RF24} pthread)
     endif()
 endforeach()
