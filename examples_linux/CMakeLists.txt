@@ -33,6 +33,11 @@ endif()
 foreach(example ${EXAMPLES_LIST})
     #make a target
     add_executable(${example} ${example}.cpp)
+    
+    # avoid including interrupt.h when pigpio is not available
+    if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        target_compile_definitions(${LibTargetName} PUBLIC RF24_NO_INTERRUPT)
+    endif()
 
     # link the RF24 lib to the target. Notice we specify pthread as a linked lib here
     if("${RF24_DRIVER}" STREQUAL "MRAA")
