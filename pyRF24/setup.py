@@ -45,7 +45,7 @@ except FileNotFoundError:  # assuming lib was built & installed with CMake
 # check C++ RF24 lib is installed
 finally:
 
-    # check for possible linker flags set via CFLAGS environment varible
+    # check for possible linker flags set via CFLAGS environment variable
     for flag in cflags.split("-"):
         if flag.startswith("L"):
             symlink_directory.append(
@@ -70,6 +70,10 @@ finally:
                 " or ".join(symlink_directory)
             )
         )
+
+    # avoid IRQ support if pigpio is not available
+    if not os.path.exists("/usr/lib/libpigpio.so"):
+        cflags.append("-DRF24_NO_INTERRUPT=1")
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags
