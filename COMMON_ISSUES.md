@@ -104,4 +104,4 @@ You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L
 
 As described above, the radio modules (notably the PA+LNA versions) are reliant on a stable power source. While these modules may work with a poor power supply, they often lose packets or fail to receive as many as a module with a better power source. Moreover, this can sometimes be seen in odd ways such as the radio module working better when touched. This again is likely a power stability issue because the radio module is missing a capacitor (a commonly neglected expense on behalf of the module's manufacturer).
 
-1. Add capacitors close to the VCC and GND pins of the NRF24, typically 10uF is used although depending upon setup even differences in these can be seen such that a low ESR rated capacitor is desirable.
+Add capacitor(s) close to the VCC and GND pins of the radio. Typically, 10uF is enough. Depending upon your circuit's layout, differences in capacitors' electrolytic properties can be seen, such that a low ESR (Equivalent Series Resistance) rated capacitor is desirable.
