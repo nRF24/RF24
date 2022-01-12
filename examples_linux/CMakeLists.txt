@@ -10,7 +10,7 @@ set(EXAMPLES_LIST
     scanner
 )
 
-project(RF24LogExamples)
+project(RF24Examples CXX)
 add_compile_options(-Ofast -Wall) # passing the compiler a `-pthread` flag doesn't work here
 
 # detect the CPU make and type
@@ -45,7 +45,7 @@ foreach(example ${EXAMPLES_LIST})
     elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
         # wiringPi additionally needs to link to crypt and shm_open libraries
         target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibWiringPi} crypt rt)
-    elseif("${RF24_DRIVER}" STREQUAL "pigpio")
+    elseif("${RF24_DRIVER}" STREQUAL "pigpio" OR NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
         # linking to pigpio requires pthread to be listed as last linked lib
         target_link_libraries(${example} PUBLIC ${RF24} ${LibPIGPIO} pthread)
     else() # not using MRAA or wiringPi drivers

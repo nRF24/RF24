@@ -17,14 +17,6 @@ if ("${RF24_DRIVER}" STREQUAL  "wiringPi") # Use wiringPi
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
 elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
-    set(RF24_DRIVER_SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/bcm2835.c
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
-        PARENT_SCOPE
-    )
     install(FILES
             ${RF24_DRIVER}/includes.h
             ${RF24_DRIVER}/bcm2835.h
@@ -40,20 +32,29 @@ elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
                 ${RF24_DRIVER}/interrupt.h
             DESTINATION include/RF24/utility/${RF24_DRIVER}
         )
-        list(APPEND RF24_DRIVER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/interrupt.cpp)
+        set(RF24_DRIVER_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/bcm2835.c
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/interrupt.cpp
+            PARENT_SCOPE
+        )
+    else()
+        set(RF24_DRIVER_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/bcm2835.c
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
+            PARENT_SCOPE
+        )
     endif()
 elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
     if(NOT SPIDEV_EXISTS)
         message(WARNING "Detecting /dev/spidev0.0 failed - continuing anyway. Please make sure SPI is enabled.")
     endif()
-    set(RF24_DRIVER_SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/gpio.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
-        PARENT_SCOPE
-    )
     install(FILES
             ${RF24_DRIVER}/includes.h
             ${RF24_DRIVER}/gpio.h
@@ -69,7 +70,24 @@ elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
                 ${RF24_DRIVER}/interrupt.h
             DESTINATION include/RF24/utility/${RF24_DRIVER}
         )
-        list(APPEND RF24_DRIVER_SOURCES ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/interrupt.cpp)
+        set(RF24_DRIVER_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/gpio.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/interrupt.cpp
+            PARENT_SCOPE
+        )
+    else()
+        set(RF24_DRIVER_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/includes.h
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/gpio.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
+            PARENT_SCOPE
+        )
     endif()
 elseif("${RF24_DRIVER}" STREQUAL "MRAA") # use MRAA
     set(RF24_LINKED_DRIVER ${LibMRAA} PARENT_SCOPE)
