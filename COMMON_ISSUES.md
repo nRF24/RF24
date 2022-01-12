@@ -82,7 +82,7 @@ This is likely due to the SPI speed being amped up to 10MHz by default. We recom
 
 In the RF24 library's beginnings, the default value was (prior to 2014) set to 4MHz.
 
-### my PA/LNA module fails to transmit
+### My PA/LNA module fails to transmit
 
 You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ seperate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:
 
@@ -93,8 +93,15 @@ You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L
    | Receive Mode current(peak)  | 45 mA  |
    | Power-down mode current     | 4.2 µA |
 
+
 2. Needs shielding from electromagnetic interference. Shielding usually works best when it has a path to ground (GND pin), but this connection to the GND pin is not required. It is important that the sheilding does not touch any current carrying parts.
    - Professionals tend to use a faraday cage/mesh to implement electromagnetic shielding, but it can be pricey for this scenario.
    - A quick do-it-yourself solution (as proof-of-concept) would be to wrap the PA/LNA module with electrical tape and then wrap foil around the electrical tape (for shielding) while being very careful to not let the foil touch any current carrying parts (like the GPIO pins, the antenna mount, and the soldier joints for the antenna mount). Observe
    [![ghetto_shielding_1.png](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png)](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png)
    [![ghetto_shielding_2.png](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png)](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png)
+
+### My PA/LNA module doesnt perform as well as I'd hoped or the NRF radio works better on touching it
+
+As described above, the radio modules (notably the PA+LNA versions) are reliant on a stable power source. While these modules may work with a poor power supply, they often lose packets or fail to receive as many as a module with a better power source. Moreover, this can sometimes be seen in odd ways such as the radio module working better when touched. This again is likely a power stability issue because the radio module is missing a capacitor (a commonly neglected expense on behalf of the module's manufacturer).
+
+Add capacitor(s) close to the VCC and GND pins of the radio. Typically, 10uF is enough. Depending upon your circuit's layout, differences in capacitors' electrolytic properties can be seen, such that a low ESR (Equivalent Series Resistance) rated capacitor is desirable.
