@@ -598,6 +598,36 @@ public:
      * a `1` means the feature is enabled.
      */
     void printPrettyDetails(void);
+    
+    /**
+     * Put a giant block of debugging information in a char array. This function
+     * differs from printDetails() because it makes the information more
+     * understandable without having to look up the datasheet or convert
+     * hexadecimal to binary. Only use this function if your application can
+     * spare extra bytes of memory.
+     *
+     * @warning use a buffer of sufficient size, start with a sizeof >= 1024
+     * 
+     * @code
+     * char buffer[1024] = {'\0};
+     * int _len = 0;
+     * RF24 radio(RF24_RADIO_CE_PIN, RF24_RADIO_CS_PIN); 
+     * setup(){
+     * radio.sprintfPrettyDetails(buffer);
+     * _len = strlen(buffer);
+     * Serial.begin(115200);
+     * Serial.print(buffer);
+     * Serial.print(F("strlen = "));
+     * Serial.println(strlen(buffer));
+     * }
+     * @endcode
+     *
+     * @note If the automatic acknowledgements feature is configured differently
+     * for each pipe, then a binary representation is used in which bits 0-5
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled and
+     * a `1` means the feature is enabled.
+     */
+    void sprintfPrettyDetails(char *debugging_information);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1396,12 +1426,12 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for all pipes. This
      * feature is enabled by default. Auto-acknowledgement responds to every
-     * received payload with an empty ACK packet. These ACK packets get sent
+     * recieved payload with an empty ACK packet. These ACK packets get sent
      * from the receiving radio back to the transmitting radio. To attach an
      * ACK payload to a ACK packet, use writeAckPayload().
      *
      * If this feature is disabled on a transmitting radio, then the
-     * transmitting radio will always report that the payload was received
+     * transmitting radio will always report that the payload was recieved
      * (even if it was not). Please remember that this feature's configuration
      * needs to match for transmitting and receiving radios.
      *
@@ -1428,7 +1458,7 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for a specific pipe.
      * This feature is enabled by default for all pipes. Auto-acknowledgement
-     * responds to every received payload with an empty ACK packet. These ACK
+     * responds to every recieved payload with an empty ACK packet. These ACK
      * packets get sent from the receiving radio back to the transmitting
      * radio. To attach an ACK payload to a ACK packet, use writeAckPayload().
      *
@@ -1436,7 +1466,7 @@ public:
      * using this feature on both TX & RX nodes, then pipe 0 must have this
      * feature enabled for the RX & TX operations. If this feature is disabled
      * on a transmitting radio's pipe 0, then the transmitting radio will
-     * always report that the payload was received (even if it was not).
+     * always report that the payload was recieved (even if it was not).
      * Remember to also enable this feature for any pipe that is openly
      * listening to a transmitting radio with this feature enabled.
      *
@@ -1559,8 +1589,8 @@ public:
      * Request (IRQ) pin active LOW.
      * The following events can be configured:
      * 1. "data sent": This does not mean that the data transmitted was
-     * received, only that the attempt to send it was complete.
-     * 2. "data failed": This means the data being sent was not received. This
+     * recieved, only that the attempt to send it was complete.
+     * 2. "data failed": This means the data being sent was not recieved. This
      * event is only triggered when the auto-ack feature is enabled.
      * 3. "data received": This means that data from a receiving payload has
      * been loaded into the RX FIFO buffers. Remember that there are only 3
@@ -1854,7 +1884,19 @@ private:
      * @param qty How many successive registers to print
      */
     void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
-
+   
+   /**
+     * Put the value of an 8-bit register in a char array
+     *
+     * Optionally it can print some quantity of successive
+     * registers on the same line.  This is useful for printing a group
+     * of related registers on one line.
+     *
+     * @param *out_buffer output buffer
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
+     */
+    void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
     /**
      * Print the name and value of a 40-bit address register to stdout
      *
@@ -1867,6 +1909,18 @@ private:
      * @param qty How many successive registers to print
      */
     void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
+    /**
+     * Put the value of a 40-bit address register in a char array
+     *
+     * Optionally it can print some quantity of successive
+     * registers on the same line.  This is useful for printing a group
+     * of related registers on one line.
+     *
+     * @param ^out_buffer output buffer
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
+     */
+    void sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
 
     #endif
 
