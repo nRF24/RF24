@@ -608,6 +608,13 @@ public:
      *
      * @warning use a buffer of sufficient size, start with a sizeof >= 1024
      * 
+     * @note http://www.cplusplus.com/reference/cstdio/sprintf/
+     ^ sprintf_P formats a C-string in the exact same way as printf_P and outputs 
+     * into a char array.  The formatting string literal for sprintf_P is stored 
+     * in nonvolatile program memory.  There is no overflow protection when using 
+     * sprintf_P, the output buffer must be sized correctly or the behavior will 
+     * be undefined.
+     * 
      * @code
      * char buffer[1024] = {'\0};
      * int _len = 0;
