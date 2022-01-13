@@ -852,7 +852,9 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                                    "Dynamic Payloads\t"
                                    PRIPSTR
                                    "\n"
-                                   "Auto Acknowledgment\t= 0b%c%c%c%c%c%c\n"
+                                   "Auto Acknowledgment\t"
+                                   PRIPSTR
+                                   "\n"
                                    "Primary Mode\t\t= %cX\n"
                                    "TX address\t\t= 0x"
                                    PRIPSTR
@@ -927,6 +929,32 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
       }
     }
   }
+  
+  char autoack_status_char_array[32] = {'\0'};
+  uint8_t autoAck = read_register(EN_AA);
+    if (autoAck == 0x3F || autoAck == 0) 
+    {
+        // all pipes have the same configuration about auto-ack feature
+        sprintf_P(autoack_status_char_array, 
+                  PSTR(""
+                       PRIPSTR
+                       ""),
+                  (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1]))
+                 );
+    } 
+    else 
+    {        
+        // representation per pipe
+        sprintf_P(autoack_status_char_array, 
+                  PSTR("= 0b%c%c%c%c%c%c"),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
+                 );
+    }
 
   sprintf_P(debugging_information,
             format_string,
@@ -948,12 +976,7 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
             (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
             (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
             (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1])),
-            static_cast<char>(static_cast<bool>(read_register(EN_AA) & _BV(ENAA_P5)) + 48),
-            static_cast<char>(static_cast<bool>(read_register(EN_AA) & _BV(ENAA_P4)) + 48),
-            static_cast<char>(static_cast<bool>(read_register(EN_AA) & _BV(ENAA_P3)) + 48),
-            static_cast<char>(static_cast<bool>(read_register(EN_AA) & _BV(ENAA_P2)) + 48),
-            static_cast<char>(static_cast<bool>(read_register(EN_AA) & _BV(ENAA_P1)) + 48),
-            static_cast<char>(static_cast<bool>(read_register(EN_AA) & _BV(ENAA_P0)) + 48),
+            (autoack_status_char_array),
             (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? 'R' : 'T'),
             (tx_address_char_array),
             ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
