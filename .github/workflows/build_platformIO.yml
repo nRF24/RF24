@@ -1,6 +1,7 @@
 name: PlatformIO build
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, synchronized]
     paths:
