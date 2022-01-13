@@ -1893,17 +1893,18 @@ private:
     void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
    
    /**
-     * Put the value of an 8-bit register in a char array
+     * Put the value of an 8-bit register into a char array
      *
      * Optionally it can print some quantity of successive
      * registers on the same line.  This is useful for printing a group
      * of related registers on one line.
      *
-     * @param *out_buffer output buffer
+     * @param out_buffer output buffer
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
-     */
+     */    
     void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+    
     /**
      * Print the name and value of a 40-bit address register to stdout
      *
@@ -1914,16 +1915,17 @@ private:
      * @param name Name of the register
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
-     */
+     */   
     void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
+    
     /**
-     * Put the value of a 40-bit address register in a char array
+     * Put the value of a 40-bit address register into a char array
      *
      * Optionally it can print some quantity of successive
      * registers on the same line.  This is useful for printing a group
      * of related registers on one line.
      *
-     * @param ^out_buffer output buffer
+     * @param out_buffer output buffer
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */
