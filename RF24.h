@@ -630,7 +630,7 @@ public:
      *     Serial.begin(115200);
      *     Serial.print(buffer);
      *     Serial.print(F("strlen = "));
-     *     Serial.println(strlen(buffer));
+     *     Serial.println(_len);
      * }
      * @endcode
      *
