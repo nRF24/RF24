@@ -219,6 +219,6 @@
 
 #ifndef sprintf_P
     #define sprintf_P sprintf
-#endif
+#endif // sprintf_P
 
 #endif // __RF24_CONFIG_H__

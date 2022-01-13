@@ -607,17 +607,18 @@ public:
      * 
      * This function is not currently available in the python wrapper.
      *
-     * @warning use a buffer of sufficient size for debugging_information, start 
-     * with a sizeof >= 1024
-     ^ @param debugging_information The c-string buffer that the debugging 
-     *  information is stored to.
+     * @warning Use a buffer of sufficient size for debugging_information.  Start 
+     * with a char array that has at least 1024 elements.
+     * @param debugging_information The c-string buffer that the debugging 
+     * information is stored to.
      * 
-     * @note http://www.cplusplus.com/reference/cstdio/sprintf/
-     ^ sprintf_P formats a C-string in the exact same way as printf_P and outputs 
+     * @remark http://www.cplusplus.com/reference/cstdio/sprintf/
+     * sprintf_P formats a C-string in the exact same way as printf_P and outputs 
      * into a char array.  The formatting string literal for sprintf_P is stored 
      * in nonvolatile program memory.  There is no overflow protection when using 
      * sprintf_P, the output buffer must be sized correctly or the behavior will 
-     * be undefined.
+     * be undefined.  A preprocessor directive in RF24_config.h redefines calls to
+     * sprintf_P as sprintf if sprintf_P is not defined in your environment.
      * 
      * @code
      * char buffer[1024] = {'\0};
@@ -1437,12 +1438,12 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for all pipes. This
      * feature is enabled by default. Auto-acknowledgement responds to every
-     * recieved payload with an empty ACK packet. These ACK packets get sent
+     * received payload with an empty ACK packet. These ACK packets get sent
      * from the receiving radio back to the transmitting radio. To attach an
      * ACK payload to a ACK packet, use writeAckPayload().
      *
      * If this feature is disabled on a transmitting radio, then the
-     * transmitting radio will always report that the payload was recieved
+     * transmitting radio will always report that the payload was received
      * (even if it was not). Please remember that this feature's configuration
      * needs to match for transmitting and receiving radios.
      *
@@ -1469,7 +1470,7 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for a specific pipe.
      * This feature is enabled by default for all pipes. Auto-acknowledgement
-     * responds to every recieved payload with an empty ACK packet. These ACK
+     * responds to every received payload with an empty ACK packet. These ACK
      * packets get sent from the receiving radio back to the transmitting
      * radio. To attach an ACK payload to a ACK packet, use writeAckPayload().
      *
@@ -1477,7 +1478,7 @@ public:
      * using this feature on both TX & RX nodes, then pipe 0 must have this
      * feature enabled for the RX & TX operations. If this feature is disabled
      * on a transmitting radio's pipe 0, then the transmitting radio will
-     * always report that the payload was recieved (even if it was not).
+     * always report that the payload was received (even if it was not).
      * Remember to also enable this feature for any pipe that is openly
      * listening to a transmitting radio with this feature enabled.
      *
@@ -1600,8 +1601,8 @@ public:
      * Request (IRQ) pin active LOW.
      * The following events can be configured:
      * 1. "data sent": This does not mean that the data transmitted was
-     * recieved, only that the attempt to send it was complete.
-     * 2. "data failed": This means the data being sent was not recieved. This
+     * received, only that the attempt to send it was complete.
+     * 2. "data failed": This means the data being sent was not received. This
      * event is only triggered when the auto-ack feature is enabled.
      * 3. "data received": This means that data from a receiving payload has
      * been loaded into the RX FIFO buffers. Remember that there are only 3
@@ -1903,7 +1904,7 @@ private:
      * registers on the same line.  This is useful for printing a group
      * of related registers on one line.
      *
-     * @param out_buffer output buffer
+     * @param out_buffer Output buffer, char array
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */    
@@ -1929,7 +1930,7 @@ private:
      * registers on the same line.  This is useful for printing a group
      * of related registers on one line.
      *
-     * @param out_buffer output buffer
+     * @param out_buffer Output buffer, char array
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */
