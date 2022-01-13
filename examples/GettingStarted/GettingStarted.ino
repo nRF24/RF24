@@ -11,7 +11,7 @@
  * Use the Serial Monitor to change each node's behavior.
  */
 #include <SPI.h>
-#include "printf.h" //
+#include "printf.h"
 #include "RF24.h"
 
 // instantiate an object for the nRF24L01 transceiver

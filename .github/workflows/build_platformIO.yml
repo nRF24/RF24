@@ -19,6 +19,7 @@ on:
   release:
     types: [created]
 
+
 jobs:
   validate_lib_json:
     runs-on: ubuntu-latest
