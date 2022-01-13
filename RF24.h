@@ -547,7 +547,6 @@ public:
      * always write the number of bytes (for pipes 0 and 1) that the radio
      * addresses are configured to use (set with setAddressWidth()).
      */
-
     void openReadingPipe(uint8_t number, const uint8_t* address);
 
     /**@}*/
@@ -605,6 +604,8 @@ public:
      * understandable without having to look up the datasheet or convert
      * hexadecimal to binary. Only use this function if your application can
      * spare extra bytes of memory.
+     * 
+     * This function is not currently available in the python wrapper.
      *
      * @warning use a buffer of sufficient size for debugging_information, start 
      * with a sizeof >= 1024

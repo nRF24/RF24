@@ -30,6 +30,7 @@ Advanced API
 .. doxygenvariable:: RF24::failureDetected
 .. doxygenfunction:: RF24::printDetails
 .. doxygenfunction:: RF24::printPrettyDetails
+.. doxygenfunction:: RF24::sprintfPrettyDetails
 .. doxygenfunction:: RF24::available (uint8_t *pipe_num)
 .. doxygenfunction:: RF24::rxFifoFull
 .. doxygenfunction:: RF24::powerDown
