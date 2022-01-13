@@ -606,7 +606,10 @@ public:
      * hexadecimal to binary. Only use this function if your application can
      * spare extra bytes of memory.
      *
-     * @warning use a buffer of sufficient size, start with a sizeof >= 1024
+     * @warning use a buffer of sufficient size for debugging_information, start 
+     * with a sizeof >= 1024
+     ^ @param debugging_information The c-string buffer that the debugging 
+     *  information is stored to.
      * 
      * @note http://www.cplusplus.com/reference/cstdio/sprintf/
      ^ sprintf_P formats a C-string in the exact same way as printf_P and outputs 
