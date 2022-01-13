@@ -620,7 +620,7 @@ public:
      * sprintf_P as sprintf if sprintf_P is not defined in your environment.
      * 
      * @code
-     * char buffer[1024] = {'\0};
+     * char buffer[1024] = {'\0'};
      * int _len = 0;
      * RF24 radio(RF24_RADIO_CE_PIN, RF24_RADIO_CS_PIN); 
      * setup(){
