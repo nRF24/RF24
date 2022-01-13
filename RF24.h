@@ -613,12 +613,12 @@ public:
      * int _len = 0;
      * RF24 radio(RF24_RADIO_CE_PIN, RF24_RADIO_CS_PIN); 
      * setup(){
-     * radio.sprintfPrettyDetails(buffer);
-     * _len = strlen(buffer);
-     * Serial.begin(115200);
-     * Serial.print(buffer);
-     * Serial.print(F("strlen = "));
-     * Serial.println(strlen(buffer));
+     *   radio.sprintfPrettyDetails(buffer);
+     *   _len = strlen(buffer);
+     *   Serial.begin(115200);
+     *   Serial.print(buffer);
+     *   Serial.print(F("strlen = "));
+     *   Serial.println(strlen(buffer));
      * }
      * @endcode
      *
