@@ -42,7 +42,7 @@ if(${RF24_DRIVER} STREQUAL "UNKNOWN") # invokes automatic configuration
         message(STATUS "Found MRAA library: ${LibMRAA}")
         set(RF24_DRIVER MRAA CACHE STRING "using folder /utility/MRAA" FORCE)
     elseif(SPIDEV_EXISTS) # should be a non-empty string if SPI is enabled
-        message(STAUS "detected that SPIDEV is enabled: ${SPIDEV_EXISTS}")
+        message(STATUS "detected that SPIDEV is enabled: ${SPIDEV_EXISTS}")
         set(RF24_DRIVER SPIDEV CACHE STRING "using folder /utility/SPIDEV" FORCE)
     endif()
 endif()
