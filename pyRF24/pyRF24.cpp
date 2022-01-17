@@ -45,8 +45,7 @@ bp::object read_wrap(RF24& ref, int maxlen)
 {
     char* buf = new char[maxlen + 1];
     ref.read(buf, maxlen);
-    bp::object
-    py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
+    bp::object py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
     delete[] buf;
     return py_ba;
 }
@@ -133,6 +132,15 @@ void setPALevel_wrap(RF24& ref, rf24_pa_dbm_e level)
 bool begin_with_pins(RF24& ref, uint16_t _cepin, uint16_t _cspin)
 {
     return ref.begin(_cepin, _cspin);
+}
+
+bp::object sprintfPrettyDetails_wrap(RF24& ref)
+{
+    char *buf = new char[870];
+    ref.sprintfPrettyDetails(buf);
+    bp::object ret_str(bp::handle<>(PyUnicode_FromString(reinterpret_cast<const char *>(buf))));
+    delete[] buf;
+    return ret_str;
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
@@ -298,6 +306,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("powerUp", &RF24::powerUp)
         .def("printDetails", &RF24::printDetails)
         .def("printPrettyDetails", &RF24::printPrettyDetails)
+        .def("sprintfPrettyDetails", &sprintfPrettyDetails_wrap)
         .def("reUseTX", &RF24::reUseTX)
         .def("read", &read_wrap, (bp::arg("maxlen")))
         .def("rxFifoFull", &RF24::rxFifoFull)
