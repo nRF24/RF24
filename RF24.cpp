@@ -862,36 +862,35 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                                      "TX address\t\t= 0x"
                                      PRIPSTR
                                      "\n"
-                                     "pipe 0 ( "
+                                     "pipe 0 ("
                                      PRIPSTR
-                                     " ) bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 1 ( "
-                                     PRIPSTR
-                                     " ) bound\t= 0x"
+                                     ") bound\t= 0x"
                                      PRIPSTR
                                      "\n"
-                                     "pipe 2 ( "
+                                     "pipe 1 ("
                                      PRIPSTR
-                                     " ) bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 3 ( "
-                                     PRIPSTR
-                                     " ) bound\t= 0x"
+                                     ") bound\t= 0x"
                                      PRIPSTR
                                      "\n"
-                                     "pipe 4 ( "
+                                     "pipe 2 ("
                                      PRIPSTR
-                                     " ) bound\t= 0x"
+                                     ") bound\t= 0x"
                                      PRIPSTR
                                      "\n"
-                                     "pipe 5 ( "
+                                     "pipe 3 ("
                                      PRIPSTR
-                                     " ) bound\t= 0x"
+                                     ") bound\t= 0x"
                                      PRIPSTR
-                                     "\n\n"
+                                     "\n"
+                                     "pipe 4 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 5 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
                                     );
 
     char tx_address_char_array[16] = {'\0'};
@@ -925,7 +924,7 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
         }
     }
 
-    char autoack_status_char_array[32] = {'\0'};
+    char autoack_status_char_array[11] = {'\0'};
     uint8_t autoAck = read_register(EN_AA);
     if (autoAck == 0x3F || autoAck == 0) {
         // all pipes have the same configuration about auto-ack feature

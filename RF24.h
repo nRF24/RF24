@@ -593,50 +593,49 @@ public:
      *
      * @note If the automatic acknowledgements feature is configured differently
      * for each pipe, then a binary representation is used in which bits 0-5
-     * represent pipes 0-5 respectively. A `0` means the feature is disabled and
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
     void printPrettyDetails(void);
-    
+
     /**
      * Put a giant block of debugging information in a char array. This function
-     * differs from printDetails() because it makes the information more
-     * understandable without having to look up the datasheet or convert
-     * hexadecimal to binary. Only use this function if your application can
-     * spare extra bytes of memory.
-     * 
-     * This function is not currently available in the python wrapper.
+     * differs from printPrettyDetails() because it uses `sprintf()` and does not use
+     * a predefined output stream (like `Serial` or stdout). Only use this function if
+     * your application can spare extra bytes of memory. This can also be used for boards that
+     * do not support `printf()` (which is required for printDetails() and printPrettyDetails()).
      *
-     * @warning Use a buffer of sufficient size for debugging_information.  Start 
-     * with a char array that has at least 1024 elements.
-     * @param debugging_information The c-string buffer that the debugging 
-     * information is stored to.
-     * 
-     * @remark http://www.cplusplus.com/reference/cstdio/sprintf/
-     * sprintf_P formats a C-string in the exact same way as printf_P and outputs 
-     * into a char array.  The formatting string literal for sprintf_P is stored 
-     * in nonvolatile program memory.  There is no overflow protection when using 
-     * sprintf_P, the output buffer must be sized correctly or the behavior will 
-     * be undefined.  A preprocessor directive in RF24_config.h redefines calls to
-     * sprintf_P as sprintf if sprintf_P is not defined in your environment.
-     * 
+     * @remark
+     * The C standard function [`sprintf()`](http://www.cplusplus.com/reference/cstdio/sprintf/)
+     * formats a C-string in the exact same way as `printf()` but outputs (by reference)
+     * into a char array. The formatted string literal for sprintf() is stored
+     * in nonvolatile program memory.
+     *
+     * @warning Use a buffer of sufficient size for the `debugging_information`. Start
+     * with a char array that has at least 870 elements. There is no overflow protection when using
+     * sprintf(), so the output buffer must be sized correctly or the resulting behavior will
+     * be undefined.
      * @code
-     * char buffer[1024] = {'\0'};
-     * int _len = 0;
-     * RF24 radio(RF24_RADIO_CE_PIN, RF24_RADIO_CS_PIN); 
-     * setup(){
-     *     radio.sprintfPrettyDetails(buffer);
-     *     _len = strlen(buffer);
-     *     Serial.begin(115200);
-     *     Serial.print(buffer);
-     *     Serial.print(F("strlen = "));
-     *     Serial.println(_len);
-     * }
+     * char buffer[870] = {'\0'};
+     * radio.sprintfPrettyDetails(buffer);
+     * Serial.println(buffer);
+     * Serial.print(F("strlen = "));
+     * Serial.println(strlen(buffer));
+     * @endcode
+     *
+     * @param debugging_information The c-string buffer that the debugging
+     * information is stored to. This must be allocated to a minimum of 870 bytes of memory.
+     *
+     * This function is available in the python wrapper, but it accepts no
+     * parameters and returns a string.
+     * @code{.py}
+     * debug_info = radio.sprintfPrettyDetails()
+     * print(debug_info)
      * @endcode
      *
      * @note If the automatic acknowledgements feature is configured differently
      * for each pipe, then a binary representation is used in which bits 0-5
-     * represent pipes 0-5 respectively. A `0` means the feature is disabled and
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
     void sprintfPrettyDetails(char *debugging_information);
@@ -656,7 +655,7 @@ public:
      *   this pipe number is invalid.
      * @note To use this function in python:
      * @code{.py}
-     * # let `radio` be the instatiated RF24 object
+     * # let `radio` be the instantiated RF24 object
      * has_payload, pipe_number = radio.available_pipe()  # expand the tuple to 2 variables
      * if has_payload:
      *     print("Received a payload with pipe", pipe_number)
@@ -1305,7 +1304,7 @@ public:
     /**
      * Set Static Payload Size
      *
-     * This implementation uses a pre-stablished fixed payload size for all
+     * This implementation uses a pre-established fixed payload size for all
      * transmissions.  If this method is never called, the driver will always
      * transmit the maximum payload size (32 bytes), no matter how much
      * was sent to write().
@@ -1381,7 +1380,7 @@ public:
     void enableAckPayload(void);
 
     /**
-     * Disable custom payloads on the ackowledge packets
+     * Disable custom payloads on the acknowledge packets
      *
      * @see enableAckPayload()
      */
@@ -1610,7 +1609,7 @@ public:
      *
      * By default, all events are configured to trigger the IRQ pin active LOW.
      * When the IRQ pin is active, use whatHappened() to determine what events
-     * triggered it. Remeber that calling whatHappened() also clears these
+     * triggered it. Remember that calling whatHappened() also clears these
      * events' status, and the IRQ pin will then be reset to inactive HIGH.
      *
      * The following code configures the IRQ pin to only reflect the "data received"
@@ -1708,7 +1707,7 @@ public:
     /**
      * @name Deprecated
      *
-     *  Methods provided for backwards compabibility.
+     *  Methods provided for backwards compatibility.
      */
     /**@{*/
 
@@ -1752,7 +1751,7 @@ public:
      * Determine if an ack payload was received in the most recent call to
      * write(). The regular available() can also be used.
      *
-     * @deprecated For compatibility with old code only, see synonomous function available().
+     * @deprecated For compatibility with old code only, see synonymous function available().
      * Use read() to retrieve the ack payload and getDynamicPayloadSize() to get the ACK payload size.
      *
      * @return True if an ack payload is available.
@@ -1896,8 +1895,8 @@ private:
      * @param qty How many successive registers to print
      */
     void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
-   
-   /**
+
+    /**
      * Put the value of an 8-bit register into a char array
      *
      * Optionally it can print some quantity of successive
@@ -1907,9 +1906,9 @@ private:
      * @param out_buffer Output buffer, char array
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
-     */    
+     */
     void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
-    
+
     /**
      * Print the name and value of a 40-bit address register to stdout
      *
@@ -1920,9 +1919,9 @@ private:
      * @param name Name of the register
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
-     */   
+     */
     void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
-    
+
     /**
      * Put the value of a 40-bit address register into a char array
      *
@@ -2126,7 +2125,7 @@ private:
  * @see RF24::csDelay
  *
  * The settle time values used here are 100/20. However, these values depend
- * on the actual used RC combiniation and voltage drop by LED. The
+ * on the actual used RC combination and voltage drop by LED. The
  * intermediate results are written to TX (PB3, pin 2 -- using Serial).
  *
  * For schematic details, see introductory comment block in the rf24ping85.ino sketch.
