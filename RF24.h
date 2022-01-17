@@ -606,7 +606,7 @@ public:
      * do not support `printf()` (which is required for printDetails() and printPrettyDetails()).
      *
      * @remark
-     * The C standard function [`sprintf()`](http://www.cplusplus.com/reference/cstdio/sprintf/)
+     * The C standard function [sprintf()](http://www.cplusplus.com/reference/cstdio/sprintf)
      * formats a C-string in the exact same way as `printf()` but outputs (by reference)
      * into a char array. The formatted string literal for sprintf() is stored
      * in nonvolatile program memory.
