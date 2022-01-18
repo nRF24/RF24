@@ -31,7 +31,7 @@ if(${RF24_DRIVER} STREQUAL "UNKNOWN") # invokes automatic configuration
         set(RF24_DRIVER RPi CACHE STRING "using folder /utility/RPi" FORCE)
     elseif(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
         message(STATUS "Found pigpio library: ${LibPIGPIO}")
-        set(RF24_DRIVER LibPIGPIO CACHE STRING "using folder /utility/pigpio" FORCE)
+        set(RF24_DRIVER pigpio CACHE STRING "using folder /utility/pigpio" FORCE)
     elseif(NOT "${LibWiringPi}" STREQUAL "LibWiringPi-NOTFOUND")
         message(STATUS "Found wiringPi library: ${LibWiringPi}")
         set(RF24_DRIVER wiringPi CACHE STRING "using folder /utility/wiringPi" FORCE)
