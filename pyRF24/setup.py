@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# pylint: disable=invalid-name
 import os
 from sys import version_info
 from setuptools import setup, Extension
@@ -18,7 +18,7 @@ symlink_directory = []
 git_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
 
 try:  # get compiler options from the generated Makefile.inc
-    with open(os.path.join(git_dir, "Makefile.inc"), "r") as f:
+    with open(os.path.join(git_dir, "Makefile.inc"), "r", encoding="utf-8") as f:
         for line in f.read().splitlines():
             identifier, value = line.split("=", 1)
             if identifier == "CPUFLAGS":
@@ -71,13 +71,15 @@ finally:
             )
         )
 
-    # avoid IRQ support if pigpio is not available
+    # avoid IRQ support if pigpio is not available; link to pigpio if it is found
     found_pigpio = False
     for symlink_loc in symlink_directory:
         if os.path.exists(symlink_loc + "/libpigpio.so"):
             found_pigpio = True
     if not found_pigpio:
         cflags += " -DRF24_NO_INTERRUPT=1"
+    elif "-lpigpio" not in cflags:
+        cflags += " -lpigpio"
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags
