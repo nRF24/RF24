@@ -136,7 +136,8 @@ if(DEFINED RF24_SPI_SPEED)
         RF24_SPI_SPEED=${RF24_SPI_SPEED}
     )
 endif()
-if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+# conditionally disable interruot support (a pigpio specific feature)
+if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND" OR DEFINED RF24_NO_INTERRUPT)
     target_compile_definitions(${LibTargetName} PUBLIC RF24_NO_INTERRUPT)
 endif()
 
