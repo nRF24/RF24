@@ -531,15 +531,15 @@ void RF24::print_byte_register(const char* name, uint8_t reg, uint8_t qty)
 
 /****************************************************************************/
 
-void RF24::sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty)
+void RF24::sprintf_byte_register(char* out_buffer, uint8_t reg, uint8_t qty)
 {
     uint8_t i = 0;
     char sprintf_buffer[4] = {'\0'};
     while (qty--) {
         sprintf_P(sprintf_buffer, PSTR("%02x"), read_register(reg++));
-        out_buffer[i+0] = sprintf_buffer[0];
-        out_buffer[i+1] = sprintf_buffer[1];
-        i=i+2;
+        out_buffer[i + 0] = sprintf_buffer[0];
+        out_buffer[i + 1] = sprintf_buffer[1];
+        i = i + 2;
     }
 }
 
@@ -567,11 +567,11 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
 /****************************************************************************/
 
-void RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty)
+void RF24::sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qty)
 {
     uint8_t i = 0;
     char sprintf_buffer[4] = {'\0'};
-    uint8_t *read_buffer = new uint8_t[addr_width];
+    uint8_t* read_buffer = new uint8_t[addr_width];
     while (qty--) {
         read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
 
@@ -580,7 +580,7 @@ void RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty)
             sprintf_P(sprintf_buffer, PSTR("%02x"), *bufptr);
             out_buffer[i] = sprintf_buffer[0];
             out_buffer[i + 1] = sprintf_buffer[1];
-            i=i+2;
+            i = i + 2;
         }
     }
     delete[] read_buffer;
@@ -852,25 +852,21 @@ void RF24::printPrettyDetails(void)
 
 /****************************************************************************/
 
-void RF24::sprintfPrettyDetails(char *debugging_information)
+void RF24::sprintfPrettyDetails(char* debugging_information)
 {
-    const char *format_string = PSTR("================ SPI Configuration ================\n"
+    const char* format_string = PSTR("================ SPI Configuration ================\n"
                                      "CSN Pin\t\t\t= %d\n"
                                      "CE Pin\t\t\t= %d\n"
                                      "SPI Frequency\t\t= %d Mhz\n"
                                      "================ NRF Configuration ================\n"
                                      "Channel\t\t\t= %u (~ %u MHz)\n"
-                                     "RF Data Rate\t\t"
-                                     PRIPSTR
+                                     "RF Data Rate\t\t" PRIPSTR
                                      "\n"
-                                     "RF Power Amplifier\t"
-                                     PRIPSTR
+                                     "RF Power Amplifier\t" PRIPSTR
                                      "\n"
-                                     "RF Low Noise Amplifier\t"
-                                     PRIPSTR
+                                     "RF Low Noise Amplifier\t" PRIPSTR
                                      "\n"
-                                     "CRC Length\t\t"
-                                     PRIPSTR
+                                     "CRC Length\t\t" PRIPSTR
                                      "\n"
                                      "Address Length\t\t= %d bytes\n"
                                      "Static Payload Length\t= %d bytes\n"
@@ -878,52 +874,34 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                                      "Auto Retry Attempts\t= %d maximum\n"
                                      "Packets lost on\n    current channel\t= %d\r\n"
                                      "Retry attempts made for\n    last transmission\t= %d\r\n"
-                                     "Multicast\t\t"
-                                     PRIPSTR
+                                     "Multicast\t\t" PRIPSTR
                                      "\n"
-                                     "Custom ACK Payload\t"
-                                     PRIPSTR
+                                     "Custom ACK Payload\t" PRIPSTR
                                      "\n"
-                                     "Dynamic Payloads\t"
-                                     PRIPSTR
+                                     "Dynamic Payloads\t" PRIPSTR
                                      "\n"
-                                     "Auto Acknowledgment\t"
-                                     PRIPSTR
+                                     "Auto Acknowledgment\t" PRIPSTR
                                      "\n"
                                      "Primary Mode\t\t= %cX\n"
-                                     "TX address\t\t= 0x"
-                                     PRIPSTR
+                                     "TX address\t\t= 0x" PRIPSTR
                                      "\n"
-                                     "pipe 0 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
+                                     "pipe 0 (" PRIPSTR
+                                     ") bound\t= 0x" PRIPSTR
                                      "\n"
-                                     "pipe 1 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
+                                     "pipe 1 (" PRIPSTR
+                                     ") bound\t= 0x" PRIPSTR
                                      "\n"
-                                     "pipe 2 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
+                                     "pipe 2 (" PRIPSTR
+                                     ") bound\t= 0x" PRIPSTR
                                      "\n"
-                                     "pipe 3 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
+                                     "pipe 3 (" PRIPSTR
+                                     ") bound\t= 0x" PRIPSTR
                                      "\n"
-                                     "pipe 4 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
+                                     "pipe 4 (" PRIPSTR
+                                     ") bound\t= 0x" PRIPSTR
                                      "\n"
-                                     "pipe 5 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                    );
+                                     "pipe 5 (" PRIPSTR
+                                     ") bound\t= 0x" PRIPSTR);
 
     char tx_address_char_array[16] = {'\0'};
     sprintf_address_register(tx_address_char_array, TX_ADDR);
@@ -961,11 +939,9 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
     if (autoAck == 0x3F || autoAck == 0) {
         // all pipes have the same configuration about auto-ack feature
         sprintf_P(autoack_status_char_array,
-                  PSTR(""
-                       PRIPSTR
+                  PSTR("" PRIPSTR
                        ""),
-                  (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1]))
-                );
+                  (char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1])));
     }
     else {
         // representation per pipe
@@ -976,8 +952,7 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                   static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
                   static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
                   static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
-                 );
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48));
     }
 
     sprintf_P(debugging_information,
@@ -987,35 +962,34 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
               static_cast<uint8_t>(spi_speed / 1000000),
               getChannel(),
               static_cast<uint16_t>(getChannel() + 2400),
-              (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
-              (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])),
-              (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
+              (char*)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
+              (char*)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
+              (char*)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])),
+              (char*)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
               ((read_register(SETUP_AW) & 3) + 2),
               getPayloadSize(),
               ((read_register(SETUP_RETR) >> ARD) * 250 + 250),
               (read_register(SETUP_RETR) & 0x0F),
               (read_register(OBSERVE_TX) >> 4),
               (read_register(OBSERVE_TX) & 0x0F),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1])),
+              (char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
+              (char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
+              (char*)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1])),
               (autoack_status_char_array),
               (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? 'R' : 'T'),
               (tx_address_char_array),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
+              ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
               (pipe_address_char_2d_array[0]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
+              ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
               (pipe_address_char_2d_array[1]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
+              ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
               (pipe_address_char_2d_array[2]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
+              ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
               (pipe_address_char_2d_array[3]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
+              ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
               (pipe_address_char_2d_array[4]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
-              (pipe_address_char_2d_array[5])
-             );
+              ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
+              (pipe_address_char_2d_array[5]));
 }
 #endif // !defined(MINIMAL)
 
@@ -2101,34 +2075,33 @@ void RF24::toggleAllPipes(bool isEnabled)
 
 uint8_t RF24::_data_rate_reg_value(rf24_datarate_e speed)
 {
-    #if !defined(F_CPU) || F_CPU > 20000000
+#if !defined(F_CPU) || F_CPU > 20000000
     txDelay = 280;
-    #else //16Mhz Arduino
-    txDelay=85;
-    #endif
+#else //16Mhz Arduino
+    txDelay = 85;
+#endif
     if (speed == RF24_250KBPS) {
-        #if !defined(F_CPU) || F_CPU > 20000000
+#if !defined(F_CPU) || F_CPU > 20000000
         txDelay = 505;
-        #else //16Mhz Arduino
+#else //16Mhz Arduino
         txDelay = 155;
-        #endif
+#endif
         // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
         // Making it '10'.
         return static_cast<uint8_t>(_BV(RF_DR_LOW));
     }
     else if (speed == RF24_2MBPS) {
-        #if !defined(F_CPU) || F_CPU > 20000000
+#if !defined(F_CPU) || F_CPU > 20000000
         txDelay = 240;
-        #else // 16Mhz Arduino
+#else // 16Mhz Arduino
         txDelay = 65;
-        #endif
+#endif
         // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
         // Making it '01'
         return static_cast<uint8_t>(_BV(RF_DR_HIGH));
     }
     // HIGH and LOW '00' is 1Mbs - our default
     return static_cast<uint8_t>(0);
-
 }
 
 /****************************************************************************/

@@ -157,6 +157,7 @@ TabWidth:        4
 UseCRLF:         false
 UseTab:          Never
 WhitespaceSensitiveMacros:
+  - PRIPSTR
   - STRINGIZE
   - PP_STRINGIZE
   - BOOST_PP_STRINGIZE

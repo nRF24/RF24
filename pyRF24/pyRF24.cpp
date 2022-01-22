@@ -136,9 +136,9 @@ bool begin_with_pins(RF24& ref, uint16_t _cepin, uint16_t _cspin)
 
 bp::object sprintfPrettyDetails_wrap(RF24& ref)
 {
-    char *buf = new char[870];
+    char* buf = new char[870];
     ref.sprintfPrettyDetails(buf);
-    bp::object ret_str(bp::handle<>(PyUnicode_FromString(reinterpret_cast<const char *>(buf))));
+    bp::object ret_str(bp::handle<>(PyUnicode_FromString(reinterpret_cast<const char*>(buf))));
     delete[] buf;
     return ret_str;
 }
