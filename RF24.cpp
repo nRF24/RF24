@@ -1091,7 +1091,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
                     uint8_t index = (*bit_index) % 32;
                     encode_bit_manipulation_methods::Set32Bit(&encoded_details[*encoded_details_index], index);
                 }
-                (*bit_index++);
+                (*bit_index)++;
                 if ((*bit_index) % 32 == 0)
                 {
                     (*encoded_details_index)++;
@@ -1321,7 +1321,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, &encoded_details_index, &bit_index);
 
     /*
-     155th bit
+     152nd bit
      uint8_t tx_address[5]
      {
         arrayify_address_register(tx_address, TX_ADDR)
@@ -1340,7 +1340,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
         arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
         arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
      }
-     307th bit
+     304th bit
     */
     arrayify_address_register(tx_address_forty_bit_array, TX_ADDR);
     _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[0], encoded_details, &encoded_details_index, &bit_index);
@@ -1382,13 +1382,12 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, &encoded_details_index, &bit_index);
 
     /*
-     308th bit
+     305th bit
      uint8_t read_register(EN_RXADDR)
-     315th bit
+     312th bit
     */
-     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 3));
-    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
-    _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, &encoded_details_index, &bit_index);
+     temp_8_bit = read_register(EN_RXADDR);
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, &encoded_details_index, &bit_index);
 
     /*
      Divide your total bits by 32 and round up to determine the amount of uint32_t array members you need to pass to this function
