@@ -189,7 +189,7 @@ jobs:
   # When using a matrix to compile for multiple boards, it's necessary to use a separate job for the deltas report
   report:
     needs: [build, attiny]
-    if: github.event_name == 'pull_request'
+    # if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Download sketches reports artifact
