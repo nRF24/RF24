@@ -1021,6 +1021,9 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
 
 void RF24::encodeRadioDetails(uint32_t *encoded_details)
 {
+    //This was made with maintainability/customisability in mind, items can be added/removed to/from the bit array in any order
+    //using encode_bit_manipulation_methods, then changing decodeRadioDetails to suit your use case
+    //it should work even if the uint32_t used as the bit array are noncontiguously allocated
     uint16_t bit_index = 0; 
     uint8_t encoded_details_index = 0;
 
@@ -1199,7 +1202,12 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
         }
     */
 
+
+    uint8_t temp_8_bit = 0; //arithmetic performed on this before passing as argument
+    uint16_t temp_16_bit = 0; //arithmetic performed on this before passing as argument
+
     /*
+     Document your bit order 
      0th bit
      uint16_t csn_pin
      uint16_t ce_pin
@@ -1207,6 +1215,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     */
     _EBIT.put16BitValueIntoOutputArray(csn_pin, encoded_details, encoded_details_index, bit_index);
     _EBIT.put16BitValueIntoOutputArray(ce_pin, encoded_details, encoded_details_index, bit_index);
+
     /*
      32nd bit
      uint8_t static_cast<uint8_t>(spi_speed / 1000000)
@@ -1215,6 +1224,12 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
      uint8_t getPALevel()
      64th bit
     */
+    temp_8_bit = static_cast<uint8_t>(spi_speed / 1000000UL);
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
+    
+    _EBIT.put8BitValueIntoOutputArray(getChannel(), encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(getDataRate(), encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(getPALevel(), encoded_details, encoded_details_index, bit_index);
 
     /*
      65th bit
@@ -1224,14 +1239,31 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
      uint8_t getPayloadSize()
      96th bit
     */
+    temp_8_bit = (read_register(RF_SETUP) & 1) * 1);   
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
+    
+    _EBIT.put8BitValueIntoOutputArray(getCRCLength(), encoded_details, encoded_details_index, bit_index);
+    
+    temp_8_bit = ((read_register(SETUP_AW) & 3) + 2);   
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
+
+    _EBIT.put8BitValueIntoOutputArray(getPayloadSize(), encoded_details, encoded_details_index, bit_index);
 
     /*
      97th bit
-     uint16_t ((read_register(SETUP_RETR) >> ARD) * 250 + 250)
+     uint16_t ((read_register(SETUP_RETR) >> ARD) * 250 + 250)  //could save 8 bits here by just reading the register and doing the math in decode
      uint8_t (read_register(SETUP_RETR) & 0x0F)
      uint8_t (read_register(OBSERVE_TX) >> 4)
      128th bit
     */
+    temp_16_bit = ((read_register(SETUP_RETR) >> ARD) * 250 + 250);
+    _EBIT.put16BitValueIntoOutputArray(temp_16_bit, encoded_details, encoded_details_index, bit_index);
+
+    temp_8_bit = (read_register(SETUP_RETR) & 0x0F);
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
+
+    temp_8_bit = (read_register(OBSERVE_TX) >> 4);
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
 
     /*
      129th bit
@@ -1250,9 +1282,9 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
      }
      bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
      154th bit
-     pad to
-     160th bit
     */
+    
+
 
     /*
      161st bit
