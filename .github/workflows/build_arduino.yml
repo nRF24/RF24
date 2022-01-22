@@ -91,7 +91,8 @@ jobs:
           # - "arduino:megaavr:nano4809"  # board not found
           - "arduino:sam:arduino_due_x_dbg"
         # By default, don't generate size deltas data.
-        enable-deltas-report: false
+        enable-deltas-report: 
+          - false
         # Generate size deltas data for this board
         include:
           - fqbn: arduino:avr:nano
