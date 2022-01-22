@@ -90,7 +90,15 @@ jobs:
           - "arduino:megaavr:uno2018"
           # - "arduino:megaavr:nano4809"  # board not found
           - "arduino:sam:arduino_due_x_dbg"
-
+        # By default, don't generate size deltas data.
+        enable-deltas-report: false
+        # Generate size deltas data for this board
+        include:
+          - fqbn: arduino:avr:nano
+            enable-deltas-report: true
+          - fqbn: arduino:samd:mkrzero
+            enable-deltas-report: true
+ 
 
     steps:
       - name: Checkout
@@ -119,11 +127,12 @@ jobs:
           #   - examples/old_backups/recipes/nordic_fob
           #   - examples/old_backups/recipes/pingpair_maple
           fqbn: ${{ matrix.fqbn }}
-          enable-deltas-report: ${{ matrix.fqbn == 'arduino:avr:nano' || matrix.fqbn == 'arduino:samd:mkrzero' }}
+          enable-deltas-report: ${{ matrix.enable-deltas-report }}
           sketches-report-path: ${{ env.SKETCHES_REPORTS }}
       
       # This step is needed to pass the size data to the report job 
       - name: Upload sketches report to workflow artifact
+        if: ${{ matrix.enable-deltas-report }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.SKETCHES_REPORTS }}
@@ -160,6 +169,13 @@ jobs:
           - ATTinyCore:avr:attiny1634
           - ATTinyCore:avr:attiny1634opti
           - ATTinyCore:avr:attinyx313
+        # By default, don't generate size deltas data.
+        enable-deltas-report:
+          - false
+        # Generate size deltas data for this board
+        include:
+          - fqbn: ATTinyCore:avr:attinyx5
+            enable-deltas-report: true
 
     steps:
       - name: Checkout
@@ -176,11 +192,12 @@ jobs:
             - examples/rf24_ATTiny/rf24ping85
             - examples/rf24_ATTiny/timingSearch3pin
           fqbn: ${{ matrix.fqbn }}
-          enable-deltas-report: ${{ matrix.fqbn == 'ATTinyCore:avr:attinyx5' }}
+          enable-deltas-report: ${{ matrix.enable-deltas-report }}
           sketches-report-path: ${{ env.SKETCHES_REPORTS }}
       
       # This step is needed to pass the size data to the report job 
       - name: Upload sketches report to workflow artifact
+        if: ${{ matrix.enable-deltas-report }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.SKETCHES_REPORTS }}
