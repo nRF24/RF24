@@ -640,7 +640,7 @@ public:
     void sprintfPrettyDetails(char *debugging_information);
 
     /**
-     * Encode radio debugging information into an array of uint32_t. This function
+     * Encode radio debugging information into an array of 10 uint32_t. This function
      * differs from other status output methods because the status information can
      * be decoded by `decodeRadioDetails()`
      *
@@ -648,7 +648,8 @@ public:
      * This function uses much less ram than other `Details` output methods
      * 
      * @code
-     * 
+     * uint32_t encoded_details[10] = {0};
+     * radio.encodeRadioDetails(encoded_details);
      * @endcode
      *
      * @param encoded_status The uint32_t array that RF24 radio details are
@@ -676,7 +677,12 @@ public:
      * be undefined.
      * 
      * @code
-     * 
+     * uint32_t rf24_details[10];
+     * char buffer[870] = {'\0'};
+     * radio.decodeRadioDetails(buffer, rf24_status);
+     * Serial.println(buffer);
+     * Serial.print(F("strlen = "));
+     * Serial.println(strlen(buffer));
      * @endcode
      *
      * @param debugging_information The c-string buffer that the debugging
