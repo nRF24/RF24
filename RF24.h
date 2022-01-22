@@ -1,6 +1,5 @@
 /*
  Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
-
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -654,11 +653,6 @@ public:
      *
      * @param encoded_status The uint32_t array that RF24 radio details are
      * encoded into.
-     *
-     * @note If the automatic acknowledgements feature is configured differently
-     * for each pipe, then a binary representation is used in which bits 0-5
-     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
-     * a `1` means the feature is enabled.
      */
     void encodeRadioDetails(uint32_t *encoded_status);
 
@@ -680,10 +674,6 @@ public:
      * with a char array that has at least 870 elements. There is no overflow protection when using
      * sprintf(), so the output buffer must be sized correctly or the resulting behavior will
      * be undefined.
-     *
-     * @remark
-     * This function uses much less ram than other output methods
-     *
      * 
      * @code
      * 
