@@ -1398,10 +1398,10 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
 {
     struct decode_bit_manipulation_methods
     {
-        static void Set32Bit(uint32_t A[], uint8_t k)
-        {
-            A[k / 32] |= 1 << (k % 32);
-        }
+        // static void Set32Bit(uint32_t A[], uint8_t k)
+        // {
+        //     A[k / 32] |= 1 << (k % 32);
+        // }
         static void Set16Bit(uint16_t A[], uint8_t k)
         {
             A[k / 32] |= 1 << (k % 32);
@@ -1410,7 +1410,140 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
         {
             A[k / 32] |= 1 << (k % 32);
         }
+        static bool Test32Bit(uint32_t A[], uint8_t k)
+        {
+            if ((A[k / 32] & (1 << (k % 32)))) // value != 0 is "true"
+            {
+                // k-th bit is 1
+                return true;
+            }
+            else
+            {
+                // k-th bit is 0
+                return false;
+            }
+            return false;
+        }
+       
+        // static void get32BitValueFromEncodedArray(uint32_t *out, uint32_t *encoded_details, uint8_t encoded_details_index, uint16_t bit_index)
+        // {
+        //     bool bit_set = false;
+        //     for (uint8_t i = 0; i < 32; i++)
+        //     {                
+        //         bit_set = (bool)decode_bit_manipulation_methods::Test32Bit(&encoded_details[encoded_details_index], i);
+        //         if(bit_set == true)
+        //         {
+        //             uint8_t index = bit_index % 32;
+        //             decode_bit_manipulation_methods::Set32Bit(&out, index);
+        //         }
+        //         bit_index++;
+        //         if (bit_index % 32 == 0)
+        //         {
+        //             encoded_details_index++;
+        //         }
+        //     }
+        // }
+        static void get16BitValueFromEncodedArray(uint16_t *out, uint32_t *encoded_details, uint8_t encoded_details_index, uint16_t bit_index)
+        {
+            bool bit_set = false;
+            for (uint8_t i = 0; i < 16; i++)
+            {
+                bit_set = (bool)decode_bit_manipulation_methods::Test32Bit(&encoded_details[encoded_details_index], i);
+                if(bit_set == true)
+                {
+                    uint8_t index = bit_index % 16;
+                    decode_bit_manipulation_methods::Set16Bit(out, index);
+                }
+                bit_index++;
+                if (bit_index % 32 == 0)
+                {
+                    encoded_details_index++;
+                }
+            }
+        }
+        static void get8BitValueFromEncodedArray(uint8_t *out, uint32_t *encoded_details, uint8_t encoded_details_index, uint16_t bit_index)
+        {
+            bool bit_set = false;            
+            for (uint8_t i = 0; i < 8; i++)
+            {
+                bit_set = (bool)decode_bit_manipulation_methods::Test32Bit(&encoded_details[encoded_details_index], i);
+                if(bit_set == true)
+                {
+                    uint8_t index = bit_index % 32;
+                    decode_bit_manipulation_methods::Set8Bit(out, index);
+                }
+                bit_index++;
+                if (bit_index % 32 == 0)
+                {
+                    encoded_details_index++;
+                }
+            }
+        }
+        static void unpackBoolValueFromEncodedArray(bool *out, uint32_t *encoded_details, uint8_t encoded_details_index, uint16_t bit_index)
+        {
+            uint8_t index = bit_index % 32;
+            bool bit_set = (bool)decode_bit_manipulation_methods::Test32Bit(&encoded_details[encoded_details_index], index);
+            if(bit_set == true) 
+                {
+                    *out = true;
+                }
+                bit_index++;
+                if (bit_index % 32 == 0)
+                {
+                    encoded_details_index++;
+                }
+        }
     };
+    /*
+     encodeRadioDetails order
+
+     1  uint16_t csn_pin
+     2  uint16_t ce_pin
+     3  uint8_t static_cast<uint8_t>(spi_speed / 1000000)
+     4  uint8_t getChannel()
+     5  uint16_t static_cast<uint16_t>(getChannel() + 2400)
+     6  uint8_t getDataRate()
+     7  uint8_t getPALevel()
+     8  uint8_t (read_register(RF_SETUP) & 1) * 1)
+     9  uint8_t getCRCLength()
+     10 uint8_t ((read_register(SETUP_AW) & 3) + 2)
+     11 uint8_t getPayloadSize()
+     12 uint16_t ((read_register(SETUP_RETR) >> ARD) * 250 + 250)
+     13 uint8_t (read_register(SETUP_RETR) & 0x0F)
+     14 uint8_t (read_register(OBSERVE_TX) >> 4)
+     15 uint8_t (read_register(OBSERVE_TX) & 0x0F)
+     16 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2)
+     17 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1)
+     18 uint8_t ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
+     19 bool autoack_status_array[6]
+        {
+            (static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
+        }
+     20 bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+     21 uint8_t tx_address[5]
+        {
+            arrayify_address_register(tx_address, TX_ADDR)
+        }
+
+        //indicate whether pipes are open or closed after first address
+     22 uint8_t pipe_forty_bit_address_2d_array [2][5]
+        {
+            arrayify_address_register(pipe_forty_bit_address_2d_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 0)),
+            arrayify_address_register(pipe_forty_bit_address_2d_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 1))
+        }
+     23 uint8_t pipe_eight_bit_register_array[4]
+        {
+            arrayify_byte_register(pipe_eight_bit_register_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 2)),
+            arrayify_byte_register(pipe_eight_bit_register_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 3)),
+            arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
+            arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
+        }
+    */
 }
 #endif // !defined(MINIMAL)
 
