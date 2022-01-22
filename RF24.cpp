@@ -1131,6 +1131,20 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
                 }
             }
         }
+        static void packBoolValueIntoOutputArray(bool source, uint32_t *encoded_details, uint8_t encoded_details_index, uint16_t bit_index)
+        {
+            bool bit_set = source;  //not necessary because source is bool
+            if(bit_set == true) //this could be if(source == true) and it would work the same way
+                {
+                    uint8_t index = bit_index % 32;
+                    encode_bit_manipulation_methods::Set32Bit(&encoded_details[encoded_details_index], index);
+                }
+                bit_index++;
+                if (bit_index % 32 == 0)
+                {
+                    encoded_details_index++;
+                }
+        }
     };
     encode_bit_manipulation_methods _EBIT;
 
