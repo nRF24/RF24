@@ -119,7 +119,7 @@ jobs:
           #   - examples/old_backups/recipes/nordic_fob
           #   - examples/old_backups/recipes/pingpair_maple
           fqbn: ${{ matrix.fqbn }}
-          enable-deltas-report: ${{ matrix.fqbn == 'arduino:avr:nano' || maxtrix.fqbn == 'arduino:samd:mkrzero'}}
+          enable-deltas-report: ${{ matrix.fqbn == 'arduino:avr:nano' || matrix.fqbn == 'arduino:samd:mkrzero' }}
           sketches-report-path: ${{ env.SKETCHES_REPORTS }}
       
       # This step is needed to pass the size data to the report job 
