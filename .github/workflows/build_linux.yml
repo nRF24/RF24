@@ -20,6 +20,7 @@ on:
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
       - "pyRF24/setup.py"
+      - "pyRF24/pyRF24.cpp"
       - ".github/workflows/build_linux.yml"
   push:
     paths:
@@ -39,9 +40,10 @@ on:
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
       - "pyRF24/setup.py"
+      - "pyRF24/pyRF24.cpp"
       - ".github/workflows/build_linux.yml"
   release:
-    types: [published, edited]
+    types: [created]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -89,7 +91,7 @@ jobs:
       CFLAGS: "-I /usr/local/include"
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: provide toolchain
         run: |
@@ -183,7 +185,7 @@ jobs:
 
     steps:
       - name: Checkout RF24 repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       # - name: provide toolchain (for x86_64)
       #   if: ${{ matrix.toolchain.compiler == 'x86_64' }}

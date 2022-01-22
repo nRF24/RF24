@@ -217,4 +217,8 @@ typedef uint16_t prog_uint16_t;
     #define RF24_SPI_TRANSACTIONS
 #endif // defined (SPI_HAS_TRANSACTION) && !defined (SPI_UART) && !defined (SOFTSPI)
 
+#ifndef sprintf_P
+    #define sprintf_P sprintf
+#endif // sprintf_P
+
 #endif // __RF24_CONFIG_H__

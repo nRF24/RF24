@@ -261,7 +261,12 @@ TAB_SIZE               = 4
 # commands \{ and \} for these it is advised to use the version @{ and @} or use
 # a double escape (\\{ and \\})
 
-ALIASES                =
+ALIASES                = "rst=\xmlonly<verbatim>embed:rst:leading-asterisk^^"
+ALIASES               += "endrst=</verbatim>\endxmlonly"
+ALIASES               += "see{1}=@rst .. seealso:: \1@endrst"
+ALIASES               += "important{1}=@rst .. important:: \1@endrst"
+ALIASES               += "hint{1}=@rst.. hint:: \1@endrst"
+ALIASES               += "tip{1}=@rst.. tip:: \1@endrst"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For

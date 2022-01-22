@@ -45,8 +45,7 @@ bp::object read_wrap(RF24& ref, int maxlen)
 {
     char* buf = new char[maxlen + 1];
     ref.read(buf, maxlen);
-    bp::object
-        py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
+    bp::object py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, maxlen < ref.getPayloadSize() ? maxlen : ref.getPayloadSize())));
     delete[] buf;
     return py_ba;
 }
@@ -133,6 +132,15 @@ void setPALevel_wrap(RF24& ref, rf24_pa_dbm_e level)
 bool begin_with_pins(RF24& ref, uint16_t _cepin, uint16_t _cspin)
 {
     return ref.begin(_cepin, _cspin);
+}
+
+bp::object sprintfPrettyDetails_wrap(RF24& ref)
+{
+    char *buf = new char[870];
+    ref.sprintfPrettyDetails(buf);
+    bp::object ret_str(bp::handle<>(PyUnicode_FromString(reinterpret_cast<const char *>(buf))));
+    delete[] buf;
+    return ret_str;
 }
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
@@ -296,6 +304,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("powerUp", &RF24::powerUp)
         .def("printDetails", &RF24::printDetails)
         .def("printPrettyDetails", &RF24::printPrettyDetails)
+        .def("sprintfPrettyDetails", &sprintfPrettyDetails_wrap)
         .def("reUseTX", &RF24::reUseTX)
         .def("read", &read_wrap, (bp::arg("maxlen")))
         .def("rxFifoFull", &RF24::rxFifoFull)
@@ -314,6 +323,8 @@ BOOST_PYTHON_MODULE(RF24)
         .def("stopListening", &RF24::stopListening)
         .def("testCarrier", &RF24::testCarrier)
         .def("testRPD", &RF24::testRPD)
+        .def("toggleAllPipes", &RF24::toggleAllPipes)
+        .def("setRadiation", &RF24::setRadiation)
         .def("txStandBy", (bool (::RF24::*)(::uint32_t, bool))(&RF24::txStandBy), txStandBy_wrap1(bp::args("timeout", "startTx")))
         .def("whatHappened", &whatHappened_wrap)
         .def("startConstCarrier", &RF24::startConstCarrier, (bp::arg("level"), bp::arg("channel")))

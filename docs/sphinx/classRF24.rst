@@ -3,11 +3,12 @@ RF24 class
 
 .. cpp:class:: RF24
 
+    .. doxygenfunction:: RF24::RF24 (uint16_t,uint16_t,uint32_t)
+    .. doxygenfunction:: RF24::RF24 (uint32_t _spi_speed=RF24_SPI_SPEED)
+
 Basic API
 ============
 
-.. doxygenfunction:: RF24::RF24 (uint16_t,uint16_t,uint32_t)
-.. doxygenfunction:: RF24::RF24 (uint32_t _spi_speed=RF24_SPI_SPEED)
 .. doxygenfunction:: RF24::begin (void)
 .. doxygenfunction:: RF24::begin (_SPI *spiBus)
 .. doxygenfunction:: RF24::begin (_SPI *spiBus, uint16_t _cepin, uint16_t _cspin)
@@ -19,7 +20,9 @@ Basic API
 .. doxygenfunction:: RF24::read
 .. doxygenfunction:: RF24::write (const void *buf, uint8_t len)
 .. doxygenfunction:: RF24::openWritingPipe (const uint8_t *address)
+.. doxygenfunction:: RF24::openWritingPipe (uint64_t address)
 .. doxygenfunction:: RF24::openReadingPipe (uint8_t number, const uint8_t *address)
+.. doxygenfunction:: RF24::openReadingPipe (uint8_t number, uint64_t address)
 
 Advanced API
 ============
@@ -27,6 +30,7 @@ Advanced API
 .. doxygenvariable:: RF24::failureDetected
 .. doxygenfunction:: RF24::printDetails
 .. doxygenfunction:: RF24::printPrettyDetails
+.. doxygenfunction:: RF24::sprintfPrettyDetails
 .. doxygenfunction:: RF24::available (uint8_t *pipe_num)
 .. doxygenfunction:: RF24::rxFifoFull
 .. doxygenfunction:: RF24::powerDown
@@ -38,6 +42,7 @@ Advanced API
 .. doxygenfunction:: RF24::txStandBy()
 .. doxygenfunction:: RF24::txStandBy (uint32_t timeout, bool startTx=0)
 .. doxygenfunction:: RF24::writeAckPayload
+.. doxygenfunction:: RF24::isAckPayloadAvailable
 .. doxygenfunction:: RF24::whatHappened
 .. doxygenfunction:: RF24::startFastWrite
 .. doxygenfunction:: RF24::startWrite
@@ -80,6 +85,8 @@ Configuration API
 .. doxygenfunction:: RF24::maskIRQ
 .. doxygenfunction:: RF24::startConstCarrier
 .. doxygenfunction:: RF24::stopConstCarrier
+.. doxygenfunction:: RF24::toggleAllPipes
+.. doxygenfunction:: RF24::setRadiation
 
 Protected API
 ==============

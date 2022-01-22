@@ -1,9 +1,6 @@
 Porting: SPI
 ============
 
-Sample docs
------------
-
 .. doxygengroup:: Porting_SPI
     :members:
     :undoc-members:
@@ -11,7 +8,7 @@ Sample docs
     :private-members:
     :content-only:
 
-Source code
+spi.h
 -----------
 
 .. literalinclude:: ../../../utility/Template/spi.h

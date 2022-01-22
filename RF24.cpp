@@ -9,6 +9,7 @@
 #include "nRF24L01.h"
 #include "RF24_config.h"
 #include "RF24.h"
+#include <stdio.h>
 
 /****************************************************************************/
 
@@ -530,6 +531,20 @@ void RF24::print_byte_register(const char* name, uint8_t reg, uint8_t qty)
 
 /****************************************************************************/
 
+void RF24::sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty)
+{
+    uint8_t i = 0;
+    char sprintf_buffer[4] = {'\0'};
+    while (qty--) {
+        sprintf_P(sprintf_buffer, PSTR("%02x"), read_register(reg++));
+        out_buffer[i+0] = sprintf_buffer[0];
+        out_buffer[i+1] = sprintf_buffer[1];
+        i=i+2;
+    }
+}
+
+/****************************************************************************/
+
 void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 {
 
@@ -548,6 +563,27 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
         delete[] buffer;
     }
     printf_P(PSTR("\r\n"));
+}
+
+/****************************************************************************/
+
+void RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty)
+{
+    uint8_t i = 0;
+    char sprintf_buffer[4] = {'\0'};
+    uint8_t *read_buffer = new uint8_t[addr_width];
+    while (qty--) {
+        read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
+
+        uint8_t* bufptr = read_buffer + addr_width;
+        while (--bufptr >= read_buffer) {
+            sprintf_P(sprintf_buffer, PSTR("%02x"), *bufptr);
+            out_buffer[i] = sprintf_buffer[0];
+            out_buffer[i + 1] = sprintf_buffer[1];
+            i=i+2;
+        }
+    }
+    delete[] read_buffer;
 }
 
 #endif // !defined(MINIMAL)
@@ -813,6 +849,174 @@ void RF24::printPrettyDetails(void)
         }
     }
 }
+
+/****************************************************************************/
+
+void RF24::sprintfPrettyDetails(char *debugging_information)
+{
+    const char *format_string = PSTR("================ SPI Configuration ================\n"
+                                     "CSN Pin\t\t\t= %d\n"
+                                     "CE Pin\t\t\t= %d\n"
+                                     "SPI Frequency\t\t= %d Mhz\n"
+                                     "================ NRF Configuration ================\n"
+                                     "Channel\t\t\t= %u (~ %u MHz)\n"
+                                     "RF Data Rate\t\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "RF Power Amplifier\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "RF Low Noise Amplifier\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "CRC Length\t\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Address Length\t\t= %d bytes\n"
+                                     "Static Payload Length\t= %d bytes\n"
+                                     "Auto Retry Delay\t= %d microseconds\n"
+                                     "Auto Retry Attempts\t= %d maximum\n"
+                                     "Packets lost on\n    current channel\t= %d\r\n"
+                                     "Retry attempts made for\n    last transmission\t= %d\r\n"
+                                     "Multicast\t\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Custom ACK Payload\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Dynamic Payloads\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Auto Acknowledgment\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Primary Mode\t\t= %cX\n"
+                                     "TX address\t\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 0 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 1 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 2 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 3 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 4 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 5 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                    );
+
+    char tx_address_char_array[16] = {'\0'};
+    sprintf_address_register(tx_address_char_array, TX_ADDR);
+
+    char pipe_address_char_2d_array[6][16] = {'\0'};
+    char pipe_address_char_array[16] = {'\0'};
+    bool isOpen_array[6] = {false};
+
+    uint8_t openPipes = read_register(EN_RXADDR);
+    for (uint8_t i = 0; i < 6; ++i) {
+        bool isOpen = openPipes & _BV(i);
+        isOpen_array[i] = isOpen;
+        if (i < 2) {
+            sprintf_address_register(pipe_address_char_array, static_cast<uint8_t>(RX_ADDR_P0 + i));
+            for (uint8_t j = 0; j < 16; j++) {
+                pipe_address_char_2d_array[i][j] = pipe_address_char_array[j];
+            }
+            for (uint8_t j = 0; j < 16; j++) {
+                pipe_address_char_array[j] = '\0';
+            }
+        }
+        else {
+            sprintf_byte_register(pipe_address_char_array, static_cast<uint8_t>(RX_ADDR_P0 + i));
+            for (uint8_t j = 0; j < 16; j++) {
+                pipe_address_char_2d_array[i][j] = pipe_address_char_array[j];
+            }
+            for (uint8_t j = 0; j < 16; j++) {
+                pipe_address_char_array[j] = '\0';
+            }
+        }
+    }
+
+    char autoack_status_char_array[11] = {'\0'};
+    uint8_t autoAck = read_register(EN_AA);
+    if (autoAck == 0x3F || autoAck == 0) {
+        // all pipes have the same configuration about auto-ack feature
+        sprintf_P(autoack_status_char_array,
+                  PSTR(""
+                       PRIPSTR
+                       ""),
+                  (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1]))
+                );
+    }
+    else {
+        // representation per pipe
+        sprintf_P(autoack_status_char_array,
+                  PSTR("= 0b%c%c%c%c%c%c"),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
+                 );
+    }
+
+    sprintf_P(debugging_information,
+              format_string,
+              csn_pin,
+              ce_pin,
+              static_cast<uint8_t>(spi_speed / 1000000),
+              getChannel(),
+              static_cast<uint16_t>(getChannel() + 2400),
+              (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
+              (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])),
+              (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
+              ((read_register(SETUP_AW) & 3) + 2),
+              getPayloadSize(),
+              ((read_register(SETUP_RETR) >> ARD) * 250 + 250),
+              (read_register(SETUP_RETR) & 0x0F),
+              (read_register(OBSERVE_TX) >> 4),
+              (read_register(OBSERVE_TX) & 0x0F),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1])),
+              (autoack_status_char_array),
+              (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? 'R' : 'T'),
+              (tx_address_char_array),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
+              (pipe_address_char_2d_array[0]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
+              (pipe_address_char_2d_array[1]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
+              (pipe_address_char_2d_array[2]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
+              (pipe_address_char_2d_array[3]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
+              (pipe_address_char_2d_array[4]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
+              (pipe_address_char_2d_array[5])
+             );
+}
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
@@ -968,8 +1172,9 @@ bool RF24::_init_radio()
     setRetries(5, 15);
 
     // Then set the data rate to the slowest (and most reliable) speed supported by all
-    // hardware.
-    setDataRate(RF24_1MBPS);
+    // hardware. Since this value occupies the same register as the PA level value, set
+    // the PA level to MAX
+    setRadiation(RF24_PA_MAX, RF24_1MBPS); // LNA enabled by default
 
     // detect if is a plus variant & use old toggle features command accordingly
     uint8_t before_toggle = read_register(FEATURE);
@@ -1719,16 +1924,9 @@ bool RF24::testRPD(void)
 
 void RF24::setPALevel(uint8_t level, bool lnaEnable)
 {
-    uint8_t setup = read_register(RF_SETUP) & 0xF8;
-
-    if (level > 3) {                                                  // If invalid level, go to max PA
-        level = static_cast<uint8_t>((RF24_PA_MAX << 1) + lnaEnable); // +1 to support the SI24R1 chip extra bit
-    }
-    else {
-        level = static_cast<uint8_t>((level << 1) + lnaEnable); // Else set level as requested
-    }
-
-    write_register(RF_SETUP, setup | level); // Write it to the chip
+    uint8_t setup = read_register(RF_SETUP) & static_cast<uint8_t>(0xF8);
+    setup |= _pa_level_reg_value(level, lnaEnable);
+    write_register(RF_SETUP, setup);
 }
 
 /****************************************************************************/
@@ -1754,34 +1952,8 @@ bool RF24::setDataRate(rf24_datarate_e speed)
 
     // HIGH and LOW '00' is 1Mbs - our default
     setup = static_cast<uint8_t>(setup & ~(_BV(RF_DR_LOW) | _BV(RF_DR_HIGH)));
+    setup |= _data_rate_reg_value(speed);
 
-#if !defined(F_CPU) || F_CPU > 20000000
-    txDelay = 280;
-#else //16Mhz Arduino
-    txDelay = 85;
-#endif
-    if (speed == RF24_250KBPS) {
-        // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
-        // Making it '10'.
-        setup |= _BV(RF_DR_LOW);
-#if !defined(F_CPU) || F_CPU > 20000000
-        txDelay = 505;
-#else //16Mhz Arduino
-        txDelay = 155;
-#endif
-    }
-    else {
-        // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
-        // Making it '01'
-        if (speed == RF24_2MBPS) {
-            setup |= _BV(RF_DR_HIGH);
-#if !defined(F_CPU) || F_CPU > 20000000
-            txDelay = 240;
-#else // 16Mhz Arduino
-            txDelay = 65;
-#endif
-        }
-    }
     write_register(RF_SETUP, setup);
 
     // Verify our result
@@ -1904,6 +2076,7 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel)
 }
 
 /****************************************************************************/
+
 void RF24::stopConstCarrier()
 {
     /*
@@ -1915,4 +2088,64 @@ void RF24::stopConstCarrier()
     powerDown(); // per datasheet recommendation (just to be safe)
     write_register(RF_SETUP, static_cast<uint8_t>(read_register(RF_SETUP) & ~_BV(CONT_WAVE) & ~_BV(PLL_LOCK)));
     ce(LOW);
+}
+
+/****************************************************************************/
+
+void RF24::toggleAllPipes(bool isEnabled)
+{
+    write_register(EN_RXADDR, static_cast<uint8_t>(isEnabled ? 0x3F : 0));
+}
+
+/****************************************************************************/
+
+uint8_t RF24::_data_rate_reg_value(rf24_datarate_e speed)
+{
+    #if !defined(F_CPU) || F_CPU > 20000000
+    txDelay = 280;
+    #else //16Mhz Arduino
+    txDelay=85;
+    #endif
+    if (speed == RF24_250KBPS) {
+        #if !defined(F_CPU) || F_CPU > 20000000
+        txDelay = 505;
+        #else //16Mhz Arduino
+        txDelay = 155;
+        #endif
+        // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
+        // Making it '10'.
+        return static_cast<uint8_t>(_BV(RF_DR_LOW));
+    }
+    else if (speed == RF24_2MBPS) {
+        #if !defined(F_CPU) || F_CPU > 20000000
+        txDelay = 240;
+        #else // 16Mhz Arduino
+        txDelay = 65;
+        #endif
+        // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
+        // Making it '01'
+        return static_cast<uint8_t>(_BV(RF_DR_HIGH));
+    }
+    // HIGH and LOW '00' is 1Mbs - our default
+    return static_cast<uint8_t>(0);
+
+}
+
+/****************************************************************************/
+
+uint8_t RF24::_pa_level_reg_value(uint8_t level, bool lnaEnable)
+{
+    // If invalid level, go to max PA
+    // Else set level as requested
+    // + lnaEnable (1 or 0) to support the SI24R1 chip extra bit
+    return static_cast<uint8_t>(((level > RF24_PA_MAX ? static_cast<uint8_t>(RF24_PA_MAX) : level) << 1) + lnaEnable);
+}
+
+/****************************************************************************/
+
+void RF24::setRadiation(uint8_t level, rf24_datarate_e speed, bool lnaEnable)
+{
+    uint8_t setup = _data_rate_reg_value(speed);
+    setup |= _pa_level_reg_value(level, lnaEnable);
+    write_register(RF_SETUP, setup);
 }

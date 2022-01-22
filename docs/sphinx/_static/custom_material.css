@@ -1,3 +1,8 @@
+.md-typeset .admonition,
+.md-typeset details {
+  font-size: 0.75rem;
+}
+
 .md-typeset .admonition.tip>.admonition-title::before,
 .md-typeset .admonition.hint>.admonition-title::before {
   mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" /></svg>');
@@ -68,4 +73,35 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
 
 .md-header__button.md-logo img, .md-header__button.md-logo svg {
   width: auto;
+}
+
+.linenos {
+	background-color: var(--md-default-bg-color--light);
+	margin-right: 0.5rem;
+}
+
+/* ************* temp workaround styling multi-line API signatures ******************* */
+/* In the future, we plan to do this without CSS in a more programatic way, but for now...  */
+
+.md-typeset dl.objdesc>dt.sig-wrap .n + .sig-paren::before,
+.md-typeset dl.api-field>dt.sig-wrap .n + .sig-paren::before {
+  content: "\a ";
+  white-space: pre;
+}
+
+.md-typeset dl.objdesc>dt.sig-wrap .sig-paren + .n:not(.sig-param)::before,
+.md-typeset dl.api-field>dt.sig-wrap .sig-paren + .n:not(.sig-param)::before,
+.md-typeset dl.objdesc>dt.sig-wrap .sig-param + .sig-param::before,
+.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .kt::before,
+.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .kt::before,
+.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .n:not(.sig-param)::before,
+.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .n:not(.sig-param)::before {
+  content: "\a     ";
+  white-space: break-spaces;
+}
+
+.md-typeset dl.api-field>dt.sig-wrap .sig-param:before,
+.md-typeset dl.objdesc>dt.sig-wrap .sig-param:before {
+  content: unset;
+  white-space: pre;
 }

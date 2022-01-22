@@ -1,9 +1,6 @@
 Porting: GPIO
 =============
 
-Sample docs
------------
-
 .. doxygengroup:: Porting_GPIO
     :members:
     :undoc-members:
@@ -11,7 +8,7 @@ Sample docs
     :private-members:
     :content-only:
 
-Source code
+gpio.h
 -----------
 
 .. literalinclude:: ../../../utility/Template/gpio.h

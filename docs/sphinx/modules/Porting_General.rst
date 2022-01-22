@@ -1,9 +1,6 @@
 Porting: General
 ================
 
-Sample docs
------------
-
 .. doxygengroup:: Porting_General
     :members:
     :undoc-members:
@@ -11,8 +8,8 @@ Sample docs
     :private-members:
     :content-only:
 
-Source code
------------
+RF24_arch_config.h
+------------------
 
 .. literalinclude:: ../../../utility/Template/RF24_arch_config.h
     :caption: utility/Template/RF24_arch_config.h

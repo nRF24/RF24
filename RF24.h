@@ -549,7 +549,6 @@ public:
      * always write the number of bytes (for pipes 0 and 1) that the radio
      * addresses are configured to use (set with setAddressWidth()).
      */
-
     void openReadingPipe(uint8_t number, const uint8_t* address);
 
     /**@}*/
@@ -596,10 +595,52 @@ public:
      *
      * @note If the automatic acknowledgements feature is configured differently
      * for each pipe, then a binary representation is used in which bits 0-5
-     * represent pipes 0-5 respectively. A `0` means the feature is disabled and
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
     void printPrettyDetails(void);
+
+    /**
+     * Put a giant block of debugging information in a char array. This function
+     * differs from printPrettyDetails() because it uses `sprintf()` and does not use
+     * a predefined output stream (like `Serial` or stdout). Only use this function if
+     * your application can spare extra bytes of memory. This can also be used for boards that
+     * do not support `printf()` (which is required for printDetails() and printPrettyDetails()).
+     *
+     * @remark
+     * The C standard function [sprintf()](http://www.cplusplus.com/reference/cstdio/sprintf)
+     * formats a C-string in the exact same way as `printf()` but outputs (by reference)
+     * into a char array. The formatted string literal for sprintf() is stored
+     * in nonvolatile program memory.
+     *
+     * @warning Use a buffer of sufficient size for the `debugging_information`. Start
+     * with a char array that has at least 870 elements. There is no overflow protection when using
+     * sprintf(), so the output buffer must be sized correctly or the resulting behavior will
+     * be undefined.
+     * @code
+     * char buffer[870] = {'\0'};
+     * radio.sprintfPrettyDetails(buffer);
+     * Serial.println(buffer);
+     * Serial.print(F("strlen = "));
+     * Serial.println(strlen(buffer));
+     * @endcode
+     *
+     * @param debugging_information The c-string buffer that the debugging
+     * information is stored to. This must be allocated to a minimum of 870 bytes of memory.
+     *
+     * This function is available in the python wrapper, but it accepts no
+     * parameters and returns a string.
+     * @code{.py}
+     * debug_info = radio.sprintfPrettyDetails()
+     * print(debug_info)
+     * @endcode
+     *
+     * @note If the automatic acknowledgements feature is configured differently
+     * for each pipe, then a binary representation is used in which bits 0-5
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
+     * a `1` means the feature is enabled.
+     */
+    void sprintfPrettyDetails(char *debugging_information);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -616,7 +657,7 @@ public:
      *   this pipe number is invalid.
      * @note To use this function in python:
      * @code{.py}
-     * # let `radio` be the instatiated RF24 object
+     * # let `radio` be the instantiated RF24 object
      * has_payload, pipe_number = radio.available_pipe()  # expand the tuple to 2 variables
      * if has_payload:
      *     print("Received a payload with pipe", pipe_number)
@@ -1265,7 +1306,7 @@ public:
     /**
      * Set Static Payload Size
      *
-     * This implementation uses a pre-stablished fixed payload size for all
+     * This implementation uses a pre-established fixed payload size for all
      * transmissions.  If this method is never called, the driver will always
      * transmit the maximum payload size (32 bytes), no matter how much
      * was sent to write().
@@ -1341,7 +1382,7 @@ public:
     void enableAckPayload(void);
 
     /**
-     * Disable custom payloads on the ackowledge packets
+     * Disable custom payloads on the acknowledge packets
      *
      * @see enableAckPayload()
      */
@@ -1398,12 +1439,12 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for all pipes. This
      * feature is enabled by default. Auto-acknowledgement responds to every
-     * recieved payload with an empty ACK packet. These ACK packets get sent
+     * received payload with an empty ACK packet. These ACK packets get sent
      * from the receiving radio back to the transmitting radio. To attach an
      * ACK payload to a ACK packet, use writeAckPayload().
      *
      * If this feature is disabled on a transmitting radio, then the
-     * transmitting radio will always report that the payload was recieved
+     * transmitting radio will always report that the payload was received
      * (even if it was not). Please remember that this feature's configuration
      * needs to match for transmitting and receiving radios.
      *
@@ -1430,7 +1471,7 @@ public:
     /**
      * Enable or disable the auto-acknowledgement feature for a specific pipe.
      * This feature is enabled by default for all pipes. Auto-acknowledgement
-     * responds to every recieved payload with an empty ACK packet. These ACK
+     * responds to every received payload with an empty ACK packet. These ACK
      * packets get sent from the receiving radio back to the transmitting
      * radio. To attach an ACK payload to a ACK packet, use writeAckPayload().
      *
@@ -1438,7 +1479,7 @@ public:
      * using this feature on both TX & RX nodes, then pipe 0 must have this
      * feature enabled for the RX & TX operations. If this feature is disabled
      * on a transmitting radio's pipe 0, then the transmitting radio will
-     * always report that the payload was recieved (even if it was not).
+     * always report that the payload was received (even if it was not).
      * Remember to also enable this feature for any pipe that is openly
      * listening to a transmitting radio with this feature enabled.
      *
@@ -1561,8 +1602,8 @@ public:
      * Request (IRQ) pin active LOW.
      * The following events can be configured:
      * 1. "data sent": This does not mean that the data transmitted was
-     * recieved, only that the attempt to send it was complete.
-     * 2. "data failed": This means the data being sent was not recieved. This
+     * received, only that the attempt to send it was complete.
+     * 2. "data failed": This means the data being sent was not received. This
      * event is only triggered when the auto-ack feature is enabled.
      * 3. "data received": This means that data from a receiving payload has
      * been loaded into the RX FIFO buffers. Remember that there are only 3
@@ -1570,7 +1611,7 @@ public:
      *
      * By default, all events are configured to trigger the IRQ pin active LOW.
      * When the IRQ pin is active, use whatHappened() to determine what events
-     * triggered it. Remeber that calling whatHappened() also clears these
+     * triggered it. Remember that calling whatHappened() also clears these
      * events' status, and the IRQ pin will then be reset to inactive HIGH.
      *
      * The following code configures the IRQ pin to only reflect the "data received"
@@ -1644,11 +1685,31 @@ public:
      */
     void stopConstCarrier(void);
 
+    /**
+     * @brief Open or close all data pipes.
+     *
+     * This function does not alter the addresses assigned to pipes. It is simply a
+     * convenience function that allows controling all pipes at once.
+     * @param isEnabled `true` opens all pipes; `false` closes all pipes.
+     */
+    void toggleAllPipes(bool isEnabled);
+
+    /**
+     * @brief configure the RF_SETUP register in 1 transaction
+     * @param level This parameter is the same input as setPALevel()'s `level` parameter.
+     * See @ref rf24_pa_dbm_e enum for accepted values.
+     * @param speed This parameter is the same input as setDataRate()'s `speed` parameter.
+     * See @ref rf24_datarate_e enum for accepted values.
+     * @param lnaEnable This optional parameter is the same as setPALevel()'s `lnaEnable`
+     * optional parameter. Defaults to `true` (meaning LNA feature is enabled) when not specified.
+     */
+    void setRadiation(uint8_t level, rf24_datarate_e speed, bool lnaEnable = true);
+
     /**@}*/
     /**
      * @name Deprecated
      *
-     *  Methods provided for backwards compabibility.
+     *  Methods provided for backwards compatibility.
      */
     /**@{*/
 
@@ -1692,7 +1753,7 @@ public:
      * Determine if an ack payload was received in the most recent call to
      * write(). The regular available() can also be used.
      *
-     * @deprecated For compatibility with old code only, see synonomous function available().
+     * @deprecated For compatibility with old code only, see synonymous function available().
      * Use read() to retrieve the ack payload and getDynamicPayloadSize() to get the ACK payload size.
      *
      * @return True if an ack payload is available.
@@ -1837,6 +1898,19 @@ private:
     void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
     /**
+     * Put the value of an 8-bit register into a char array
+     *
+     * Optionally it can print some quantity of successive
+     * registers on the same line.  This is useful for printing a group
+     * of related registers on one line.
+     *
+     * @param out_buffer Output buffer, char array
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
+     */
+    void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+
+    /**
      * Print the name and value of a 40-bit address register to stdout
      *
      * Optionally it can print some quantity of successive
@@ -1849,7 +1923,20 @@ private:
      */
     void print_address_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
-#endif
+    /**
+     * Put the value of a 40-bit address register into a char array
+     *
+     * Optionally it can print some quantity of successive
+     * registers on the same line.  This is useful for printing a group
+     * of related registers on one line.
+     *
+     * @param out_buffer Output buffer, char array
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
+     */
+    void sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+
+    #endif
 
     /**
      * Turn on or off the special features of the chip
@@ -1864,6 +1951,23 @@ private:
     void errNotify(void);
 
 #endif
+
+    /**
+     * @brief Manipulate the @ref Datarate and txDelay
+     *
+     * This is a helper function to setRadiation() and setDataRate()
+     * @param speed The desired data rate.
+     */
+    inline uint8_t _data_rate_reg_value(rf24_datarate_e speed);
+
+    /**
+     * @brief Manipulate the @ref PALevel
+     *
+     * This is a helper function to setRadiation() and setPALevel()
+     * @param level The desired @ref PALevel.
+     * @param lnaEnable Toggle the LNA feature.
+     */
+    inline uint8_t _pa_level_reg_value(uint8_t level, bool lnaEnable);
 
     /**@}*/
 };
@@ -2020,7 +2124,7 @@ private:
  * @see RF24::csDelay
  *
  * The settle time values used here are 100/20. However, these values depend
- * on the actual used RC combiniation and voltage drop by LED. The
+ * on the actual used RC combination and voltage drop by LED. The
  * intermediate results are written to TX (PB3, pin 2 -- using Serial).
  *
  * For schematic details, see introductory comment block in the rf24ping85.ino sketch.

@@ -1,9 +1,6 @@
 Porting: Includes
 ==================
 
-Sample docs
------------
-
 .. doxygengroup:: Porting_Includes
     :members:
     :undoc-members:
@@ -11,7 +8,7 @@ Sample docs
     :private-members:
     :content-only:
 
-Source code
+includes.h
 -----------
 
 .. literalinclude:: ../../../utility/Template/includes.h
