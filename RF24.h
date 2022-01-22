@@ -641,6 +641,68 @@ public:
     void sprintfPrettyDetails(char *debugging_information);
 
     /**
+     * Encode radio debugging information into an array of uint32_t. This function
+     * differs from other status output methods because the status information can
+     * be decoded by `decodeRadioDetails()`
+     *
+     * @remark
+     * This function uses much less ram than other `Details` output methods
+     * 
+     * @code
+     * 
+     * @endcode
+     *
+     * @param encoded_status The uint32_t array that RF24 radio details are
+     * encoded into.
+     *
+     * @note If the automatic acknowledgements feature is configured differently
+     * for each pipe, then a binary representation is used in which bits 0-5
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
+     * a `1` means the feature is enabled.
+     */
+    void encodeRadioDetails(uint32_t *encoded_status);
+
+    /**
+     * Decode the debugging information encoded in an array of uint32_t.  Put a giant block of 
+     * debugging information in a char array. This function differs from printPrettyDetails() 
+     * because it uses `sprintf()` and does not use a predefined output stream 
+     * (like `Serial` or stdout). Only use this function if your application can spare extra bytes 
+     * of memory. This can also be used for boards that do not support `printf()` 
+     * (which is required for printDetails() and printPrettyDetails()).
+     *
+     * @remark
+     * The C standard function [sprintf()](http://www.cplusplus.com/reference/cstdio/sprintf)
+     * formats a C-string in the exact same way as `printf()` but outputs (by reference)
+     * into a char array. The formatted string literal for sprintf() is stored
+     * in nonvolatile program memory.
+     *
+     * @warning Use a buffer of sufficient size for the `debugging_information`. Start
+     * with a char array that has at least 870 elements. There is no overflow protection when using
+     * sprintf(), so the output buffer must be sized correctly or the resulting behavior will
+     * be undefined.
+     *
+     * @remark
+     * This function uses much less ram than other output methods
+     *
+     * 
+     * @code
+     * 
+     * @endcode
+     *
+     * @param debugging_information The c-string buffer that the debugging
+     * information is stored to. This must be allocated to a minimum of 870 bytes 
+     * of memory.
+     * @param encoded_status The uint32_t array that RF24 radio details are
+     * encoded inside of.
+     * 
+     * @note If the automatic acknowledgements feature is configured differently
+     * for each pipe, then a binary representation is used in which bits 0-5
+     * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
+     * a `1` means the feature is enabled.
+     */
+    void decodeRadioDetails(char *debugging_information, uint32_t *encoded_status);
+
+    /**
      * Test whether there are bytes available to be read from the
      * FIFO buffers.
      *
@@ -1910,6 +1972,19 @@ private:
     void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
 
     /**
+     * Put the value of an 8-bit register into a uint8_t array
+     *
+     * Optionally it can output some quantity of successive
+     * registers to the same array.  This is useful for getting a group
+     * of related registers into one array.
+     *
+     * @param out_array uint8_t output array, should be equal to qty
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to put in the array
+     */
+    void arrayify_byte_register(uint8_t *out_array, uint8_t reg, uint8_t qty = 1);
+
+    /**
      * Print the name and value of a 40-bit address register to stdout
      *
      * Optionally it can print some quantity of successive
@@ -1934,6 +2009,19 @@ private:
      * @param qty How many successive registers to print
      */
     void sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+
+    /**
+     * Put the value of a 40-bit address register into a 5 byte array
+     *
+     * Optionally it can output some quantity of successive
+     * 5 byte address registers to the same array.  This is useful for getting a 
+     * group of related registers in one array.
+     *
+     * @param out_array Output array, uint8_t array
+     * @param reg Which register. Use constants from nRF24L01.h
+     * @param qty How many successive registers to print
+     */
+    void arrayify_address_register(uint8_t *out_array, uint8_t reg, uint8_t qty = 1);
 
     #endif
 
