@@ -640,7 +640,7 @@ public:
      * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
-    void sprintfPrettyDetails(char *debugging_information);
+    void sprintfPrettyDetails(char* debugging_information);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1908,7 +1908,7 @@ private:
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */
-    void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+    void sprintf_byte_register(char* out_buffer, uint8_t reg, uint8_t qty = 1);
 
     /**
      * Print the name and value of a 40-bit address register to stdout
@@ -1934,9 +1934,9 @@ private:
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
      */
-    void sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+    void sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qty = 1);
 
-    #endif
+#endif
 
     /**
      * Turn on or off the special features of the chip
