@@ -1152,13 +1152,13 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     encode_bit_manipulation_methods _EBIT;
 
     /*
-     sprintfPrettyDetails order
+     encodeRadioDetails order
 
      1  uint16_t csn_pin
      2  uint16_t ce_pin
      3  uint8_t static_cast<uint8_t>(spi_speed / 1000000)
      4  uint8_t getChannel()
-     5  uint16_t static_cast<uint16_t>(getChannel() + 2400)
+     5  uint16_t static_cast<uint16_t>(getChannel() + 2400)  //not encoded in encoded_details!
      6  uint8_t getDataRate()
      7  uint8_t getPALevel()
      8  uint8_t (read_register(RF_SETUP) & 1) * 1)
@@ -1181,19 +1181,19 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
             (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
             (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
         }
-     20 bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
-     21 uint8_t tx_address[5]
+     25 bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+     26 uint8_t tx_address[5]
         {
             arrayify_address_register(tx_address, TX_ADDR)
         }
 
         //indicate whether pipes are open or closed after first address
-     22 uint8_t pipe_forty_bit_address_2d_array [2][5]
+     31 uint8_t pipe_forty_bit_address_array[5]
         {
-            arrayify_address_register(pipe_forty_bit_address_2d_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 0)),
-            arrayify_address_register(pipe_forty_bit_address_2d_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 1))
+            arrayify_address_register(pipe_forty_bit_address_2d_array, static_cast<uint8_t>(RX_ADDR_P0 + 0)),
+            arrayify_address_register(pipe_forty_bit_address_2d_array, static_cast<uint8_t>(RX_ADDR_P0 + 1))
         }
-     23 uint8_t pipe_eight_bit_register_array[4]
+     41 uint8_t pipe_eight_bit_register_array[4]
         {
             arrayify_byte_register(pipe_eight_bit_register_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 2)),
             arrayify_byte_register(pipe_eight_bit_register_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 3)),
@@ -1407,11 +1407,11 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
         // }
         static void Set16Bit(uint16_t A[], uint8_t k)
         {
-            A[k / 32] |= 1 << (k % 32);
+            A[k / 16] |= 1 << (k % 16);
         }
         static void Set8Bit(uint8_t A[], uint8_t k)
         {
-            A[k / 32] |= 1 << (k % 32);
+            A[k / 8] |= 1 << (k % 8);
         }
         static bool Test32Bit(uint32_t A[], uint8_t k)
         {
@@ -1427,7 +1427,7 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
             }
             return false;
         }
-       
+                
         // static void get32BitValueFromEncodedArray(uint32_t *out, uint32_t *encoded_details, uint8_t encoded_details_index, uint16_t bit_index)
         // {
         //     bool bit_set = false;
