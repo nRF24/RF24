@@ -12,6 +12,9 @@ on:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/old_backups/**"
+env:
+  # convenient variable used multiple times
+  SKETCHES_REPORTS: sketches-reports
 
 jobs:
   check_formatting:
@@ -116,6 +119,16 @@ jobs:
           #   - examples/old_backups/recipes/nordic_fob
           #   - examples/old_backups/recipes/pingpair_maple
           fqbn: ${{ matrix.fqbn }}
+          enable-deltas-report: true
+          sketches-report-path: ${{ env.SKETCHES_REPORTS }}
+      
+      # This step is needed to pass the size data to the report job 
+      - name: Upload sketches report to workflow artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS }}
+          path: ${{ env.SKETCHES_REPORTS }}
+
   attiny:
     needs: check_formatting
     runs-on: ubuntu-latest
@@ -163,3 +176,28 @@ jobs:
             - examples/rf24_ATTiny/rf24ping85
             - examples/rf24_ATTiny/timingSearch3pin
           fqbn: ${{ matrix.fqbn }}
+          enable-deltas-report: true
+          sketches-report-path: ${{ env.SKETCHES_REPORTS }}
+      
+      # This step is needed to pass the size data to the report job 
+      - name: Upload sketches report to workflow artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS }}
+          path: ${{ env.SKETCHES_REPORTS }}
+
+  # When using a matrix to compile for multiple boards, it's necessary to use a separate job for the deltas report
+  report:
+    needs: [build, attiny]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download sketches reports artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS }}
+          path: ${{ env.SKETCHES_REPORTS }}
+
+      - uses: arduino/report-size-deltas@v1
+        with:
+          sketches-reports-source: ${{ env.SKETCHES_REPORTS }}
