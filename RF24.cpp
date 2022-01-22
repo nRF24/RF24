@@ -1319,9 +1319,11 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
 
     temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P0)) + 48);
     _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, &encoded_details_index, &bit_index);
-
+    
+    temp_bool = (read_register(NRF_CONFIG) & _BV(PRIM_RX));
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, &encoded_details_index, &bit_index);
     /*
-     152nd bit
+     153nd bit
      uint8_t tx_address[5]
      {
         arrayify_address_register(tx_address, TX_ADDR)
@@ -1340,7 +1342,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
         arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
         arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
      }
-     304th bit
+     305th bit
     */
     arrayify_address_register(tx_address_forty_bit_array, TX_ADDR);
     _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[0], encoded_details, &encoded_details_index, &bit_index);
@@ -1382,9 +1384,9 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, &encoded_details_index, &bit_index);
 
     /*
-     305th bit
+     306th bit
      uint8_t read_register(EN_RXADDR)
-     312th bit
+     313th bit
     */
      temp_8_bit = read_register(EN_RXADDR);
     _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, &encoded_details_index, &bit_index);
