@@ -12,7 +12,6 @@ This example was written to be used on 2 devices acting as 'nodes'.
 import sys
 import argparse
 import time
-import struct
 from RF24 import RF24, RF24_PA_LOW
 
 

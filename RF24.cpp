@@ -2025,34 +2025,33 @@ void RF24::toggleAllPipes(bool isEnabled)
 
 uint8_t RF24::_data_rate_reg_value(rf24_datarate_e speed)
 {
-    #if !defined(F_CPU) || F_CPU > 20000000
+#if !defined(F_CPU) || F_CPU > 20000000
     txDelay = 280;
-    #else //16Mhz Arduino
-    txDelay=85;
-    #endif
+#else //16Mhz Arduino
+    txDelay = 85;
+#endif
     if (speed == RF24_250KBPS) {
-        #if !defined(F_CPU) || F_CPU > 20000000
+#if !defined(F_CPU) || F_CPU > 20000000
         txDelay = 505;
-        #else //16Mhz Arduino
+#else //16Mhz Arduino
         txDelay = 155;
-        #endif
+#endif
         // Must set the RF_DR_LOW to 1; RF_DR_HIGH (used to be RF_DR) is already 0
         // Making it '10'.
         return static_cast<uint8_t>(_BV(RF_DR_LOW));
     }
     else if (speed == RF24_2MBPS) {
-        #if !defined(F_CPU) || F_CPU > 20000000
+#if !defined(F_CPU) || F_CPU > 20000000
         txDelay = 240;
-        #else // 16Mhz Arduino
+#else // 16Mhz Arduino
         txDelay = 65;
-        #endif
+#endif
         // Set 2Mbs, RF_DR (RF_DR_HIGH) is set 1
         // Making it '01'
         return static_cast<uint8_t>(_BV(RF_DR_HIGH));
     }
     // HIGH and LOW '00' is 1Mbs - our default
     return static_cast<uint8_t>(0);
-
 }
 
 /****************************************************************************/
