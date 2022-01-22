@@ -1323,7 +1323,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     temp_bool = (read_register(NRF_CONFIG) & _BV(PRIM_RX));
     _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, &encoded_details_index, &bit_index);
     /*
-     153nd bit
+     155th bit
      uint8_t tx_address[5]
      {
         arrayify_address_register(tx_address, TX_ADDR)
@@ -1395,13 +1395,6 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
      Divide your total bits by 32 and round up to determine the amount of uint32_t array members you need to pass to this function
      default is ten uint32_t 
     */
-
-    /*
-     Function debug remove from production
-    */
-    Serial.println(F("encodedRadioDetails() debug output:  !!!REMOVE FROM PRODUCTION!!!"));
-    Serial.print(F("bit_index = ")); Serial.println(bit_index);
-    Serial.print(F("encoded_details_index = ")); Serial.println(encoded_details_index);
 }
 
 /****************************************************************************/
