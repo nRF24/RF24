@@ -1202,12 +1202,18 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
         }
     */
 
-
+    bool temp_bool = false; //arithmetic performed on this before passing as argument
     uint8_t temp_8_bit = 0; //arithmetic performed on this before passing as argument
     uint16_t temp_16_bit = 0; //arithmetic performed on this before passing as argument
 
+    uint8_t tx_address_forty_bit_array[5] = {0}; //TX_ADDR 40 bit address register
+    uint8_t pipe_address_forty_bit_array[5] = {0};  //pipes 0 and 1 40 bit address registers
+    uint8_t pipe_eight_bit_register_array[2] = {0};  //pipes 2-5 8-bit registers
+
     /*
      Document your bit order 
+     boolean variables (true/false !0/0) are packed into 1 bit; 1 == true, 0 == false
+
      0th bit
      uint16_t csn_pin
      uint16_t ce_pin
@@ -1239,7 +1245,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
      uint8_t getPayloadSize()
      96th bit
     */
-    temp_8_bit = (read_register(RF_SETUP) & 1) * 1);   
+    temp_8_bit = ((read_register(RF_SETUP) & 1) * 1);   
     _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
     
     _EBIT.put8BitValueIntoOutputArray(getCRCLength(), encoded_details, encoded_details_index, bit_index);
@@ -1273,41 +1279,117 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
      uint8_t ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
      bool autoack_status_array[6]
      {
-                  (static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
-                  (static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
-                  (static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
-                  (static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
-                  (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
-                  (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
+        (static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+        (static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+        (static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+        (static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+        (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+        (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
      }
      bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
      154th bit
     */
+    temp_8_bit = (read_register(OBSERVE_TX) & 0x0F);
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
     
+    temp_bool = (static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
 
+    temp_bool = (static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
+
+    temp_8_bit = ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1);
+    _EBIT.put8BitValueIntoOutputArray(temp_8_bit, encoded_details, encoded_details_index, bit_index);
+
+    temp_8_bit = read_register(EN_AA);
+    temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P5)) + 48);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
+
+    temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P4)) + 48);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
+
+    temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P3)) + 48);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
+
+    temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P2)) + 48);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
+
+    temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P1)) + 48);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
+
+    temp_bool = (static_cast<bool>(temp_8_bit & _BV(ENAA_P0)) + 48);
+    _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, encoded_details_index, bit_index);
 
     /*
-     161st bit
+     155th bit
      uint8_t tx_address[5]
      {
-         arrayify_address_register(tx_address, TX_ADDR)
+        arrayify_address_register(tx_address, TX_ADDR)
      }
 
      //indicate whether pipes are open or closed after first address
      uint8_t pipe_forty_bit_address_2d_array [2][5]
      {
-         arrayify_address_register(pipe_forty_bit_address_2d_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 0)),
-         arrayify_address_register(pipe_forty_bit_address_2d_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 1))
+        arrayify_address_register(pipe_forty_bit_address_2d_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 0)),
+        arrayify_address_register(pipe_forty_bit_address_2d_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 1))
      }
      uint8_t pipe_eight_bit_register_array[4]
      {
-         arrayify_byte_register(pipe_eight_bit_register_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 2)),
-         arrayify_byte_register(pipe_eight_bit_register_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 3)),
-         arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
-         arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
+        arrayify_byte_register(pipe_eight_bit_register_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 2)),
+        arrayify_byte_register(pipe_eight_bit_register_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 3)),
+        arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
+        arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
      }
-     313th bit
+     307th bit
     */
+    arrayify_address_register(tx_address_forty_bit_array, TX_ADDR);
+    _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[0], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[1], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[2], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[3], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(tx_address_forty_bit_array[4], encoded_details, encoded_details_index, bit_index);
+    
+    temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 0));
+    arrayify_address_register(pipe_address_forty_bit_array, temp_8_bit);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[0], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[1], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[2], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[3], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[4], encoded_details, encoded_details_index, bit_index);
+    
+    temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 1));
+    arrayify_address_register(pipe_address_forty_bit_array, temp_8_bit);  
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[0], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[1], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[2], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[3], encoded_details, encoded_details_index, bit_index);
+    _EBIT.put8BitValueIntoOutputArray(pipe_address_forty_bit_array[4], encoded_details, encoded_details_index, bit_index);
+    
+    temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 2));
+    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, encoded_details_index, bit_index);
+
+    temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 3));
+    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, encoded_details_index, bit_index);
+    
+    temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 4));
+    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, encoded_details_index, bit_index);
+    
+    temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 5));
+    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, encoded_details_index, bit_index);
+    /*
+     Divide your total bits by 32 and round up to determine the amount of uint32_t array members you need to pass to this function
+    */
+
+    /*
+     Function debug remove from production
+    */
+    Serial.println(F("encodedRadioDetails() debug output:  !!!REMOVE FROM PRODUCTION!!!"));
+    Serial.print(F("bit_index = ")); Serial.println(bit_index);
+    Serial.print(F("encoded_details_index = ")); Serial.println(encoded_details_index);
 }
 
 /****************************************************************************/
