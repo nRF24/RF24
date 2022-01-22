@@ -1380,6 +1380,16 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 5));
     arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
     _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, encoded_details_index, bit_index);
+
+    /*
+     308th bit
+     uint8_t read_register(EN_RXADDR)
+     315th bit
+    */
+     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 3));
+    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    _EBIT.put8BitValueIntoOutputArray(pipe_eight_bit_register_array[0], encoded_details, encoded_details_index, bit_index);
+
     /*
      Divide your total bits by 32 and round up to determine the amount of uint32_t array members you need to pass to this function
     */
@@ -1497,56 +1507,6 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
                 }
         }
     };
-    /*
-     encodeRadioDetails order
-
-     1  uint16_t csn_pin
-     2  uint16_t ce_pin
-     3  uint8_t static_cast<uint8_t>(spi_speed / 1000000)
-     4  uint8_t getChannel()
-     5  uint16_t static_cast<uint16_t>(getChannel() + 2400)  //not encoded in encoded_details!
-     6  uint8_t getDataRate()
-     7  uint8_t getPALevel()
-     8  uint8_t (read_register(RF_SETUP) & 1) * 1)
-     9  uint8_t getCRCLength()
-     10 uint8_t ((read_register(SETUP_AW) & 3) + 2)
-     11 uint8_t getPayloadSize()
-     12 uint16_t ((read_register(SETUP_RETR) >> ARD) * 250 + 250)
-     13 uint8_t (read_register(SETUP_RETR) & 0x0F)
-     14 uint8_t (read_register(OBSERVE_TX) >> 4)
-     15 uint8_t (read_register(OBSERVE_TX) & 0x0F)
-     16 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2)
-     17 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1)
-     18 uint8_t ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
-     19 bool autoack_status_array[6]
-        {
-            (static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
-        }
-     25 bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
-     26 uint8_t tx_address[5]
-        {
-            arrayify_address_register(tx_address, TX_ADDR)
-        }
-
-        //indicate whether pipes are open or closed after first address
-     31 uint8_t pipe_forty_bit_address_array[5]
-        {
-            arrayify_address_register(pipe_forty_bit_address_2d_array, static_cast<uint8_t>(RX_ADDR_P0 + 0)),
-            arrayify_address_register(pipe_forty_bit_address_2d_array, static_cast<uint8_t>(RX_ADDR_P0 + 1))
-        }
-     41 uint8_t pipe_eight_bit_register_array[4]
-        {
-            arrayify_byte_register(pipe_eight_bit_register_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 2)),
-            arrayify_byte_register(pipe_eight_bit_register_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 3)),
-            arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
-            arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
-        }
-    */
 
    //unpack encoded_details
    
@@ -1688,6 +1648,275 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
    decode_bit_manipulation_methods::get8BitValueFromEncodedArray(&fourtythree, encoded_details, encoded_details_index, bit_index);
    uint8_t fourtyfour = 0;
    decode_bit_manipulation_methods::get8BitValueFromEncodedArray(&fourtyfour, encoded_details, encoded_details_index, bit_index);
+
+   //open pipes
+   uint8_t fourtyfive = 0;
+   decode_bit_manipulation_methods::get8BitValueFromEncodedArray(&fourtyfive, encoded_details, encoded_details_index, bit_index);
+
+   //output debugging_information
+    const char *format_string = PSTR("================ SPI Configuration ================\n"
+                                     "CSN Pin\t\t\t= %d\n"
+                                     "CE Pin\t\t\t= %d\n"
+                                     "SPI Frequency\t\t= %d Mhz\n"
+                                     "================ NRF Configuration ================\n"
+                                     "Channel\t\t\t= %u (~ %u MHz)\n"
+                                     "RF Data Rate\t\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "RF Power Amplifier\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "RF Low Noise Amplifier\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "CRC Length\t\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Address Length\t\t= %d bytes\n"
+                                     "Static Payload Length\t= %d bytes\n"
+                                     "Auto Retry Delay\t= %d microseconds\n"
+                                     "Auto Retry Attempts\t= %d maximum\n"
+                                     "Packets lost on\n    current channel\t= %d\r\n"
+                                     "Retry attempts made for\n    last transmission\t= %d\r\n"
+                                     "Multicast\t\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Custom ACK Payload\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Dynamic Payloads\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Auto Acknowledgment\t"
+                                     PRIPSTR
+                                     "\n"
+                                     "Primary Mode\t\t= %cX\n"
+                                     "TX address\t\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 0 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 1 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 2 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 3 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 4 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                     "\n"
+                                     "pipe 5 ("
+                                     PRIPSTR
+                                     ") bound\t= 0x"
+                                     PRIPSTR
+                                    );
+
+    char tx_address_char_array[16] = {'\0'};
+    sprintf_P(tx_address_char_array, 
+              PSTR("%02x%02x%02x%02x%02x"),
+              twentysix,
+              twentyseven,
+              twentyeight,
+              twentynine,
+              thirty
+             );
+
+    char pipe_address_char_2d_array[6][16] = {'\0'};
+    
+    bool isOpen_array[6] = {false};
+    
+    sprintf_P(pipe_address_char_2d_array[0], 
+              PSTR("%02x%02x%02x%02x%02x"),
+              thirtyone,
+              thirtytwo,
+              thirtythree,
+              thirtyfour,
+              thirtyfive
+            );
+    sprintf_P(pipe_address_char_2d_array[1], 
+              PSTR("%02x%02x%02x%02x%02x"),
+              thirtysix,
+              thirtyseven,
+              thirtyeight,
+              thirtynine,
+              fourty
+            );
+    
+    sprintf_P(pipe_address_char_2d_array[2], 
+              PSTR("%02x"),
+              fourtyone
+            );
+    sprintf_P(pipe_address_char_2d_array[3], 
+              PSTR("%02x"),
+              fourtytwo
+            );
+    sprintf_P(pipe_address_char_2d_array[4], 
+              PSTR("%02x"),
+              fourtythree
+            );
+    sprintf_P(pipe_address_char_2d_array[5], 
+              PSTR("%02x"),
+              fourtyfour
+            );
+
+    uint8_t openPipes = fourtyfive;
+    for (uint8_t i = 0; i < 6; ++i) 
+    {
+        bool isOpen = openPipes & _BV(i);
+        isOpen_array[i] = isOpen;
+    }
+
+    uint8_t autoAck = 0;
+    if (nineteen == true)
+    {
+     decode_bit_manipulation_methods::Set8Bit(&autoAck, 0);
+    }
+    if (twenty == true)
+    {
+     decode_bit_manipulation_methods::Set8Bit(&autoAck, 1);
+    }
+    if (twentyone == true)
+    {
+     decode_bit_manipulation_methods::Set8Bit(&autoAck, 2);
+    }
+    if (twentytwo == true)
+    {
+     decode_bit_manipulation_methods::Set8Bit(&autoAck, 3);
+    }
+    if (twentythree == true)
+    {
+     decode_bit_manipulation_methods::Set8Bit(&autoAck, 4);
+    }
+    if (twentyfour == true)
+    {
+     decode_bit_manipulation_methods::Set8Bit(&autoAck, 5);
+    }
+    
+    char autoack_status_char_array[11] = {'\0'};
+    if (autoAck == 0x3F || autoAck == 0) {
+        // all pipes have the same configuration about auto-ack feature
+        sprintf_P(autoack_status_char_array,
+                  PSTR(""
+                       PRIPSTR
+                       ""),
+                  (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1]))
+                );
+    }
+    else {
+        // representation per pipe
+        sprintf_P(autoack_status_char_array,
+                  PSTR("= 0b%c%c%c%c%c%c"),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
+                 );
+    }
+
+    /*
+     encodeRadioDetails order
+
+     1  uint16_t csn_pin
+     2  uint16_t ce_pin
+     3  uint8_t static_cast<uint8_t>(spi_speed / 1000000)
+     4  uint8_t getChannel()
+     5  uint16_t static_cast<uint16_t>(getChannel() + 2400)  //not encoded in encoded_details!
+     6  uint8_t getDataRate()
+     7  uint8_t getPALevel()
+     8  uint8_t (read_register(RF_SETUP) & 1) * 1)
+     9  uint8_t getCRCLength()
+     10 uint8_t ((read_register(SETUP_AW) & 3) + 2)
+     11 uint8_t getPayloadSize()
+     12 uint16_t ((read_register(SETUP_RETR) >> ARD) * 250 + 250)
+     13 uint8_t (read_register(SETUP_RETR) & 0x0F)
+     14 uint8_t (read_register(OBSERVE_TX) >> 4)
+     15 uint8_t (read_register(OBSERVE_TX) & 0x0F)
+     16 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2)
+     17 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1)
+     18 uint8_t ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
+     19 bool autoack_status_array[6]
+        {
+            (static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+            (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
+        }
+     25 bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+     26 uint8_t tx_address[5]
+        {
+            arrayify_address_register(tx_address, TX_ADDR)
+        }
+
+        //indicate whether pipes are open or closed after first address
+     31 uint8_t pipe_forty_bit_address_array[5]
+        {
+            arrayify_address_register(pipe_forty_bit_address_2d_array, static_cast<uint8_t>(RX_ADDR_P0 + 0)),
+            arrayify_address_register(pipe_forty_bit_address_2d_array, static_cast<uint8_t>(RX_ADDR_P0 + 1))
+        }
+     41 uint8_t pipe_eight_bit_register_array[4]
+        {
+            arrayify_byte_register(pipe_eight_bit_register_array[0], static_cast<uint8_t>(RX_ADDR_P0 + 2)),
+            arrayify_byte_register(pipe_eight_bit_register_array[1], static_cast<uint8_t>(RX_ADDR_P0 + 3)),
+            arrayify_byte_register(pipe_eight_bit_register_array[2], static_cast<uint8_t>(RX_ADDR_P0 + 4)),
+            arrayify_byte_register(pipe_eight_bit_register_array[3], static_cast<uint8_t>(RX_ADDR_P0 + 5))
+        }
+     45 uint8_t read_register(EN_RXADDR)
+    */
+
+    sprintf_P(debugging_information,
+              format_string,
+              one,
+              two,
+              three,
+              four,
+              five,
+              (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[six])),
+              (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[seven])),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[eight])),
+              (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[nine])),
+              ten,
+              eleven,
+              twelve,
+              thirteen,
+              fourteen,
+              fifteen,
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[sixteen])),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[seventeen])),
+              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[eighteen])),
+              (autoack_status_char_array),
+              (twentyfive ? 'R' : 'T'),
+              (tx_address_char_array),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
+              (pipe_address_char_2d_array[0]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
+              (pipe_address_char_2d_array[1]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
+              (pipe_address_char_2d_array[2]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
+              (pipe_address_char_2d_array[3]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
+              (pipe_address_char_2d_array[4]),
+              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
+              (pipe_address_char_2d_array[5])
+             );
 
 }
 #endif // !defined(MINIMAL)
