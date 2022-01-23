@@ -57,3 +57,6 @@ stopConstCarrier        KEYWORD2
 enableDynamicAck        KEYWORD2
 isAckPayloadAvailable   KEYWORD2
 printf_begin	          KEYWORD2
+sprintfPrettyDetails	          KEYWORD2
+encodeRadioDetails	          KEYWORD2
+decodeRadioDetails	          KEYWORD2
