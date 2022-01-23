@@ -679,7 +679,7 @@ public:
      * @code
      * uint32_t rf24_details[10];
      * char buffer[870] = {'\0'};
-     * radio.decodeRadioDetails(buffer, rf24_status);
+     * radio.decodeRadioDetails(buffer, rf24_details);
      * Serial.println(buffer);
      * Serial.print(F("strlen = "));
      * Serial.println(strlen(buffer));
