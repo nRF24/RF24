@@ -1021,9 +1021,12 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
 
 void RF24::encodeRadioDetails(uint32_t *encoded_details)
 {
-    //This was made with maintainability/customisability in mind, items can be added/removed to/from the bit array in any order
-    //using encode_bit_manipulation_methods, then changing decodeRadioDetails to suit your use case
-    //it should work even if the uint32_t used as the bit array are noncontiguously allocated
+    /*
+     This was made with maintainability/customisability in mind, items can be added/removed to/from 
+     the output bit array `encoded_details` in any order using encode_bit_manipulation_methods, then changing 
+     decodeRadioDetails to suit your use case.  It should work even if the uint32_t used as the bit array 
+     `encoded_details` are noncontiguously allocated.
+    */
     uint16_t bit_index = 0; 
     uint8_t encoded_details_index = 0;
 
@@ -1080,24 +1083,24 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
             return false;
         }
        
-        static void put32BitValueIntoOutputArray(uint32_t source, uint32_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
-        {
-            bool bit_set = false;
-            for (uint8_t i = 0; i < 32; i++)
-            {                
-                bit_set = (bool)encode_bit_manipulation_methods::Test32Bit(&source, i);
-                if(bit_set == true)
-                {
-                    uint8_t index = (*bit_index) % 32;
-                    encode_bit_manipulation_methods::Set32Bit(&encoded_details[*encoded_details_index], index);
-                }
-                (*bit_index)++;
-                if ((*bit_index) % 32 == 0)
-                {
-                    (*encoded_details_index)++;
-                }
-            }
-        }
+        // static void put32BitValueIntoOutputArray(uint32_t source, uint32_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
+        // {
+        //     bool bit_set = false;
+        //     for (uint8_t i = 0; i < 32; i++)
+        //     {                
+        //         bit_set = (bool)encode_bit_manipulation_methods::Test32Bit(&source, i);
+        //         if(bit_set == true)
+        //         {
+        //             uint8_t index = (*bit_index) % 32;
+        //             encode_bit_manipulation_methods::Set32Bit(&encoded_details[*encoded_details_index], index);
+        //         }
+        //         (*bit_index)++;
+        //         if ((*bit_index) % 32 == 0)
+        //         {
+        //             (*encoded_details_index)++;
+        //         }
+        //     }
+        // }
         static void put16BitValueIntoOutputArray(uint16_t source, uint32_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
         {
             bool bit_set = false;
@@ -1322,6 +1325,7 @@ void RF24::encodeRadioDetails(uint32_t *encoded_details)
     
     temp_bool = (read_register(NRF_CONFIG) & _BV(PRIM_RX));
     _EBIT.packBoolValueIntoOutputArray(temp_bool, encoded_details, &encoded_details_index, &bit_index);
+    
     /*
      155th bit
      uint8_t tx_address[5]
@@ -1437,17 +1441,17 @@ void RF24::decodeRadioDetails(char *debugging_information, uint32_t *encoded_det
         // {
         //     bool bit_set = false;
         //     for (uint8_t i = 0; i < 32; i++)
-        //     {                
-        //         bit_set = (bool)decode_bit_manipulation_methods::Test32Bit(&encoded_details[encoded_details_index], i);
+        //     {   
+        //         uint8_t index = (*bit_index) % 32;            
+        //         bit_set = (bool)decode_bit_manipulation_methods::Test32Bit(&encoded_details[*encoded_details_index], i);
         //         if(bit_set == true)
         //         {
-        //             uint8_t index = bit_index % 32;
-        //             decode_bit_manipulation_methods::Set32Bit(&out, index);
+        //             decode_bit_manipulation_methods::Set32Bit(out, index);
         //         }
-        //         bit_index++;
-        //         if (bit_index % 32 == 0)
+        //         (bit_index)++;
+        //         if ((*bit_index) % 32 == 0)
         //         {
-        //             encoded_details_index++;
+        //             (*encoded_details_index)++;
         //         }
         //     }
         // }
