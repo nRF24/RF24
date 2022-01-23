@@ -5,7 +5,7 @@
 */
 
 /**
-   A simple example of sending data from 1 nRF24L01 transceiver to another.
+   A simple example of sending debug info from 1 nRF24L01 transceiver to another.
 
    This example was written to be used on 2 devices, one acting as the encodeRadioDetails sender and another acting as the decodeRadioDetails receiver.
    Use the Serial Monitor to change each node's behavior.
