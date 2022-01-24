@@ -2142,7 +2142,7 @@ class bit_manipulation_methods {
                 }
         }
 
-        static void unpackBoolFromEncodedArray(bool * out, int number_of_bits, uint8_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
+        static void unpackBoolFromEncodedArray(bool * out, uint8_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
         {
             uint8_t index = (*bit_index) % 8;
             bool bit_set = (bool)bit_manipulation_methods::TestBit(&encoded_details[*encoded_details_index], index);
