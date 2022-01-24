@@ -155,36 +155,44 @@ void setup() {
   Enter in your binary number and this will convert it to decimal (base10) for you
   a uint16_t has 16 bits, a uint8_t has 8 bits, a boolean value is packed into one bit
   in the bit array.  Trailing zeros are padding
- */
+*/
 
 void loop() {
-
   if (role) {
-    // This device is a TX node
-
-    unsigned long start_timer = micros();                    // start the timer
-    bool report = radio.write(&payload, sizeof(payload));      // transmit & save the report
-    unsigned long end_timer = micros();                      // end the timer
-
-    if (report) {
-      Serial.print(F("Transmission successful! "));          // payload was delivered
-      Serial.print(F("Time to transmit = "));
-      Serial.print(end_timer - start_timer);                 // print the timer result
-      Serial.println(F(" us. Payload represented in binary (base2): "));      
-      int number_of_payload_elements = sizeof(payload) / sizeof(payload[0]);  // get number of elements in "payload" by dividing the size of payload by its first element
-      for (int i = 0; i < number_of_payload_elements; i++) {                  // iterate over all the elements of payload
-        Serial.println(payload[i], BIN);                                      // you can manually decode this output by following the packing order of encodeRadioDetails
-      }
-    } else {
-      Serial.println(F("Transmission failed or timed out")); // payload was not delivered
+    uint32_t split_payload_2d_array[2][6] = {{0, 0, 0, 0, 0, 99}, {0, 0, 0, 0, 0, 101}};  // split the payload to get below 32 bytes, mark the end for reassembly
+    for (int i = 5; i < 5; i++)
+    {
+      split_payload_2d_array[0][i] = payload[i]; // first five elements
+      split_payload_2d_array[1][i] = payload[i]; // second five elements
     }
-
-    // to make this example readable in the serial monitor
-    delay(60000);  // slow transmissions down by 1 minute
-
+    for (int i = 0; i < 2; i++) // iterate twice to transmit
+    {
+      // This device is a TX node
+      unsigned long start_timer = micros();                    // start the timer
+      bool report = radio.write(&split_payload_2d_array[i], sizeof(split_payload_2d_array[i]));      // transmit & save the report
+      unsigned long end_timer = micros();                      // end the timer
+      if (report) {
+        Serial.print(F("Transmission successful! "));          // payload was delivered
+        Serial.print(F("Time to transmit = "));
+        Serial.print(end_timer - start_timer);                 // print the timer result
+        Serial.print(F(" us. split_payload_2d_array["));
+        Serial.print(i);
+        Serial.println(F("] represented in binary (base2): "));
+        int number_of_payload_elements = sizeof(split_payload_2d_array[i]) / sizeof(split_payload_2d_array[i][0]);  // get number of elements by dividing the size of split_payload_2d_array by its first element
+        for (int j = 0; j < (number_of_payload_elements - 1); i++) {                // iterate over all the elements of payload except the reassembly marker
+          Serial.println(split_payload_2d_array[i][j], BIN);                                      // you can manually decode this output by following the packing order of encodeRadioDetails
+        }
+      } else {
+        Serial.println(F("Transmission failed or timed out")); // payload was not delivered
+      }
+      // to make this example readable in the serial monitor
+      delay(60000);  // slow transmissions down by 1 minute
+    }
   } else {
     // This device is a RX node
-
+    static uint32_t reassembly_buffer[10] = {0}; // place to store encoded_details
+    static bool message_one_received = false;     // message sentinel
+    static bool message_two_received = false;     // message sentinel
     uint8_t pipe;
     if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
@@ -194,12 +202,36 @@ void loop() {
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                     // print the pipe number
       Serial.println(F("; received payload represented in binary (base2): "));
-      for (int i = 0; i < bytes; i++) {       // iterate over the entire received payload
+      for (int i = 0; i < (bytes - 1); i++) {       // iterate over the entire received payload except for the reassembly marker
         Serial.println(payload[i], BIN);      // print the payload's value in binary
+
+        //reassemble payload
+        if (payload[5] == 99)   // first five array elements
+        {
+          reassembly_buffer[i] = payload[i];
+          message_one_received = true;
+        }
+        if (payload[5] == 101)  // second five array elements
+        {
+          reassembly_buffer[i + 5] = payload[i];
+          message_two_received = true;
+        }
       }
-      char debugging_information[870] = {'\0'};                   // char buffer to store output
-      radio.decodeRadioDetails(debugging_information, payload);   // decode the payload and output debugging_information
-      Serial.println(debugging_information);                      // display debugging information
+
+      if (message_one_received == true && message_two_received == true)
+      {
+        char debugging_information[870] = {'\0'};                   // char buffer to store output
+        radio.decodeRadioDetails(debugging_information, payload);   // decode the payload and output debugging_information
+        Serial.println(debugging_information);                      // display debugging information
+
+        //reinitialize message sentinels and reassembly_buffer
+        message_one_received = false;
+        message_two_received = false;
+        for (int i = 0; i < (sizeof(reassembly_buffer) / sizeof(reassembly_buffer[0])); i++)
+        {
+          reassembly_buffer[i] = 0;
+        }
+      }
     }
   } // role
 
@@ -222,5 +254,4 @@ void loop() {
       radio.startListening();
     }
   }
-
 } // loop
