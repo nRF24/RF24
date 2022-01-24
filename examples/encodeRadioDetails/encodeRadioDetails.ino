@@ -162,12 +162,12 @@ void loop() {
         Serial.println(payload[i], BIN);      // print the payload's value in binary
 
         //reassemble payload
-        if (payload[5] == 99)   // first five array elements
+        if (payload[20] == 99)   // first five array elements
         {
           reassembly_buffer[i] = payload[i];
           message_one_received = true;
         }
-        if (payload[5] == 101)  // second five array elements
+        if (payload[20] == 101)  // second five array elements
         {
           reassembly_buffer[i + 5] = payload[i];
           message_two_received = true;
