@@ -47,4 +47,10 @@ if(${RF24_DRIVER} STREQUAL "UNKNOWN") # invokes automatic configuration
     endif()
 endif()
 
+# override the auto-detect if RF24_DRIVER is defined in an env var
+if(DEFINED ENV{RF24_DRIVER})
+    message(STATUS "RF24_DRIVER (set from env var) = $ENV{RF24_DRIVER}")
+    set(RF24_DRIVER $ENV{RF24_DRIVER} CACHE STRING "" FORCE)
+endif()
+
 message(STATUS "Using driver: ${RF24_DRIVER}")
