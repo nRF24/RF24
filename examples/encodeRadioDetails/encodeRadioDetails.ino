@@ -38,7 +38,7 @@ bool role = false;  // true = TX role, false = RX role
   in binary by or blinking a led for each bit in the
   payload
 */
-uint32_t payload[10] = {0};
+uint8_t payload[40] = {0};
 
 void setup() {
 
@@ -102,52 +102,7 @@ void setup() {
 /*
      encodeRadioDetails packing order
 
-     1  uint16_t csn_pin
-     2  uint16_t ce_pin
-     3  uint8_t static_cast<uint8_t>(spi_speed / 1000000)
-     4  uint8_t getChannel()
-     5  uint16_t static_cast<uint16_t>(getChannel() + 2400)  //not encoded in encoded_details!
-     6  uint8_t getDataRate()
-     7  uint8_t getPALevel()
-     8  uint8_t (read_register(RF_SETUP) & 1) * 1)
-     9  uint8_t getCRCLength()
-     10 uint8_t ((read_register(SETUP_AW) & 3) + 2)
-     11 uint8_t getPayloadSize()
-     12 uint16_t ((read_register(SETUP_RETR) >> ARD) * 250 + 250)
-     13 uint8_t (read_register(SETUP_RETR) & 0x0F)
-     14 uint8_t (read_register(OBSERVE_TX) >> 4)
-     15 uint8_t (read_register(OBSERVE_TX) & 0x0F)
-     16 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2)
-     17 bool (static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1)
-     18 uint8_t ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
-     19 bool autoack_status_array[6]
-        {
-            (static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
-            (static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
-        }
-     25 bool (read_register(NRF_CONFIG) & _BV(PRIM_RX))
-     26 uint8_t tx_address[5]
-        {
-            TX_ADDR
-        }
-
-        //indicate whether pipes are open or closed after first address
-     31 uint8_t pipe_forty_bit_address_array[5]
-        {
-            static_cast<uint8_t>(RX_ADDR_P0 + 0),
-            static_cast<uint8_t>(RX_ADDR_P0 + 1)
-        }
-     41 uint8_t pipe_eight_bit_register_array[4]
-        {
-            static_cast<uint8_t>(RX_ADDR_P0 + 2),
-            static_cast<uint8_t>(RX_ADDR_P0 + 3),
-            static_cast<uint8_t>(RX_ADDR_P0 + 4),
-            static_cast<uint8_t>(RX_ADDR_P0 + 5)
-        }
+     rebuild packing list
 */
 
 /*
@@ -159,7 +114,8 @@ void setup() {
 
 void loop() {
   if (role) {
-    uint32_t split_payload_2d_array[2][6] = {{0, 0, 0, 0, 0, 99}, {0, 0, 0, 0, 0, 101}};  // split the payload to get below 32 bytes, mark the end for reassembly
+    uint8_t split_payload_2d_array[2][21] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99}, 
+                                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}};  // split the payload to get below 32 bytes, mark the end for reassembly
     for (int i = 5; i < 5; i++)
     {
       split_payload_2d_array[0][i] = payload[i]; // first five elements
@@ -190,7 +146,7 @@ void loop() {
     }
   } else {
     // This device is a RX node
-    static uint32_t reassembly_buffer[10] = {0}; // place to store encoded_details
+    static uint8_t reassembly_buffer[40] = {0}; // place to store encoded_details
     static bool message_one_received = false;     // message sentinel
     static bool message_two_received = false;     // message sentinel
     uint8_t pipe;
