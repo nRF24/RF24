@@ -170,9 +170,10 @@ void loop() {
       Serial.print(F("Transmission successful! "));          // payload was delivered
       Serial.print(F("Time to transmit = "));
       Serial.print(end_timer - start_timer);                 // print the timer result
-      Serial.println(F(" us. Sent: "));
-      for (int i = 0; i < 10; i++) {  //print out each member of payload[] in binary
-        Serial.println(payload[i], BIN);  //you can manually decode by following the packing order of encodeRadioDetails
+      Serial.println(F(" us. Payload represented in binary (base2): "));      
+      int number_of_payload_elements = sizeof(payload) / sizeof(payload[0]);  // get number of elements in "payload" by dividing the size of payload by its first element
+      for (int i = 0; i < number_of_payload_elements; i++) {                  // iterate over all the elements of payload
+        Serial.println(payload[i], BIN);                                      // you can manually decode this output by following the packing order of encodeRadioDetails
       }
     } else {
       Serial.println(F("Transmission failed or timed out")); // payload was not delivered
@@ -192,13 +193,13 @@ void loop() {
       Serial.print(bytes);                    // print the size of the payload
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                     // print the pipe number
-      Serial.println(F(": "));
-      for (int i = 0; i < 10; i++) {
-        Serial.println(payload[i], BIN);                // print the payload's value in binary
+      Serial.println(F("; received payload represented in binary (base2): "));
+      for (int i = 0; i < bytes; i++) {       // iterate over the entire received payload
+        Serial.println(payload[i], BIN);      // print the payload's value in binary
       }
-      char debugging_information[870] = {'\0'};
-      radio.decodeRadioDetails(debugging_information, payload);
-      Serial.println(debugging_information);
+      char debugging_information[870] = {'\0'};                   // char buffer to store output
+      radio.decodeRadioDetails(debugging_information, payload);   // decode the payload and output debugging_information
+      Serial.println(debugging_information);                      // display debugging information
     }
   } // role
 
