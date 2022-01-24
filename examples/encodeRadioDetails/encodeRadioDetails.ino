@@ -221,7 +221,7 @@ void loop() {
       if (message_one_received == true && message_two_received == true)
       {
         char debugging_information[870] = {'\0'};                   // char buffer to store output
-        radio.decodeRadioDetails(debugging_information, payload);   // decode the payload and output debugging_information
+        radio.decodeRadioDetails(debugging_information, reassembly_buffer);   // decode the payload and output debugging_information
         Serial.println(debugging_information);                      // display debugging information
 
         //reinitialize message sentinels and reassembly_buffer
