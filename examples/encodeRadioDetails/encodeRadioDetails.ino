@@ -180,7 +180,7 @@ void loop() {
         Serial.print(F(" us. split_payload_2d_array["));
         Serial.print(i);
         Serial.println(F("] represented in binary (base2):\n"));
-        int number_of_payload_elements = sizeof(split_payload_2d_array[i]) / sizeof(split_payload_2d_array[i][0]);  // get number of elements by dividing the size of split_payload_2d_array by its first element
+        int number_of_payload_elements = sizeof(split_payload_2d_array) / sizeof(split_payload_2d_array[0][0]);  // get number of elements by dividing the size of split_payload_2d_array by its first element
         for (int j = 0; j < (number_of_payload_elements - 1); i++) {                // iterate over all the elements of payload !!!except the reassembly marker!!!
           Serial.print(F("payload array index :")); // each array index points to 8 bits
           Serial.print(i);
