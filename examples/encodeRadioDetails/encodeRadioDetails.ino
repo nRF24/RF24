@@ -179,10 +179,13 @@ void loop() {
         Serial.print(end_timer - start_timer);                 // print the timer result
         Serial.print(F(" us. split_payload_2d_array["));
         Serial.print(i);
-        Serial.println(F("] represented in binary (base2): "));
+        Serial.println(F("] represented in binary (base2):\n"));
         int number_of_payload_elements = sizeof(split_payload_2d_array[i]) / sizeof(split_payload_2d_array[i][0]);  // get number of elements by dividing the size of split_payload_2d_array by its first element
         for (int j = 0; j < (number_of_payload_elements - 1); i++) {                // iterate over all the elements of payload !!!except the reassembly marker!!!
-          Serial.println(split_payload_2d_array[i][j], BIN);                                      // you can manually decode this output by following the packing order of encodeRadioDetails
+          Serial.print(F("payload array index :")); // each array index points to 8 bits
+          Serial.print(i);
+          Serial.print(F(" contents: 0b"));                     // you can manually decode this output by following the packing order of encodeRadioDetails
+          Serial.println(split_payload_2d_array[i][j], BIN);    // print the payload's value in binary, 8 bits, 0b00000000
         }
       } else {
         Serial.println(F("Transmission failed or timed out")); // payload was not delivered
@@ -203,9 +206,12 @@ void loop() {
       Serial.print(bytes);                    // print the size of the payload
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                     // print the pipe number
-      Serial.println(F("; received payload represented in binary (base2): "));
+      Serial.println(F("; received payload represented in binary (base2):\n"));
       for (int i = 0; i < (bytes - 1); i++) {       // iterate over the entire received payload !!!except for the reassembly marker!!!
-        Serial.println(payload[i], BIN);      // print the payload's value in binary
+        Serial.print(F("payload array index :"));   // each array index points to 8 bits
+        Serial.print(i);
+        Serial.print(F(" contents: 0b"));     // you can manually decode this output by following the packing order of encodeRadioDetails
+        Serial.println(payload[i], BIN);      // print the payload's value in binary, 8 bits, 0b00000000
 
         //reassemble payload
         if (payload[20] == 99)   // first message array elements
