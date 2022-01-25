@@ -161,9 +161,7 @@ void setup() {
 
 void loop() {
   if (role) {
-    uint8_t split_payload_2d_array[2][21] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99},
-                                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}
-                                            };  // split the payload to get below 32 bytes payload limit, mark the end for reassembly
+    uint8_t split_payload_2d_array[2][21] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}};  // split the payload to get below 32 bytes payload limit, mark the end for reassembly
     for (int i = 0; i < 20; i++)
     {
       split_payload_2d_array[0][i] = payload[i]; // first 20 elements
