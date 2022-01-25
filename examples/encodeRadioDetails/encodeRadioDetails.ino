@@ -100,9 +100,52 @@ void setup() {
 } // setup
 
 /*
-     encodeRadioDetails packing order
+  encodeRadioDetails packing order:
 
-     rebuild packing list
+  1 csn_pin
+  2 ce_pin
+  3 spi_speed
+  4 getChannel()
+  5 getDataRate()
+  6 getPALevel()
+  7 ((read_register(RF_SETUP) & 1) * 1)
+  8 getCRCLength()
+  9 ((read_register(SETUP_AW) & 3) + 2)
+  10 getPayloadSize()
+  11 (read_register(SETUP_RETR) >> ARD)
+  12 (read_register(SETUP_RETR) & 0x0F)
+  13 (read_register(OBSERVE_TX) >> 4)
+  14 (read_register(OBSERVE_TX) & 0x0F)
+  15 static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK))
+  16 static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY))
+  17 ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
+  18 (static_cast<bool>(temp_8_bit & _BV(ENAA_P5)) + 48)
+  19 (static_cast<bool>(temp_8_bit & _BV(ENAA_P4)) + 48)
+  20 (static_cast<bool>(temp_8_bit & _BV(ENAA_P3)) + 48)
+  21 (static_cast<bool>(temp_8_bit & _BV(ENAA_P2)) + 48)
+  22 (static_cast<bool>(temp_8_bit & _BV(ENAA_P1)) + 48)
+  23 (static_cast<bool>(temp_8_bit & _BV(ENAA_P0)) + 48)
+  24 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+  25 tx_address_forty_bit_array[0]
+  26 tx_address_forty_bit_array[1]
+  27 tx_address_forty_bit_array[2]
+  28 tx_address_forty_bit_array[3]
+  29 tx_address_forty_bit_array[4]
+  30 pipe_address_forty_bit_array[0]
+  31 pipe_address_forty_bit_array[1]
+  32 pipe_address_forty_bit_array[2]
+  33 pipe_address_forty_bit_array[3]
+  34 pipe_address_forty_bit_array[4]
+  35 pipe_address_forty_bit_array[0]
+  36 pipe_address_forty_bit_array[1]
+  37 pipe_address_forty_bit_array[2]
+  38 pipe_address_forty_bit_array[3]
+  39 pipe_address_forty_bit_array[4]
+  40 pipe_eight_bit_register_array[0]
+  41 pipe_eight_bit_register_array[0]
+  42 pipe_eight_bit_register_array[0]
+  43 pipe_eight_bit_register_array[0]
+  44 read_register(EN_RXADDR)
 */
 
 /*
@@ -114,8 +157,9 @@ void setup() {
 
 void loop() {
   if (role) {
-    uint8_t split_payload_2d_array[2][21] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99}, 
-                                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}};  // split the payload to get below 32 bytes, mark the end for reassembly
+    uint8_t split_payload_2d_array[2][21] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}
+    };  // split the payload to get below 32 bytes, mark the end for reassembly
     for (int i = 5; i < 5; i++)
     {
       split_payload_2d_array[0][i] = payload[i]; // first five elements
@@ -162,19 +206,19 @@ void loop() {
         Serial.println(payload[i], BIN);      // print the payload's value in binary
 
         //reassemble payload
-        if (payload[20] == 99)   // first five array elements
+        if (payload[20] == 99)   // first message array elements
         {
           reassembly_buffer[i] = payload[i];
           message_one_received = true;
         }
-        if (payload[20] == 101)  // second five array elements
+        if (payload[20] == 101)  // second message array elements
         {
-          reassembly_buffer[i + 5] = payload[i];
+          reassembly_buffer[i + 20] = payload[i];
           message_two_received = true;
         }
       }
 
-      if (message_one_received == true && message_two_received == true)
+      if (message_one_received == true && message_two_received == true) // we have both pieces of the message, time to reassemble
       {
         char debugging_information[870] = {'\0'};                   // char buffer to store output
         radio.decodeRadioDetails(debugging_information, reassembly_buffer);   // decode the payload and output debugging_information
