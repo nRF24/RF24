@@ -105,16 +105,11 @@ typedef enum {
     RF24_CRC_16
 } rf24_crclength_e;
 
-/*
-    forward declaration for bit_manipulation_methods
-*/
-class bit_manipulation_methods;
 
 /**
  * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
-
 class RF24 {
 private:
     #ifdef SOFTSPI
@@ -2061,102 +2056,81 @@ private:
 
 };
 
-class bit_manipulation_methods {
-    public:
-        template <typename T>
-        static bool TestBit(T A[], uint8_t k)
-        {
-            // where 8 is the width of one byte, else change 8 to your byte width
-            if ((A[k / (sizeof(T)*8)] & (1 << (k % (sizeof(T)*8))))) // value != 0 is "true"
-            {
-                // k-th bit is 1
-                return true;
-            }
-            else
-            {
-                // k-th bit is 0
-                return false;
-            }
-            return false;
-        }
+namespace BitManip
+{
 
-        template <typename T>
-        static void SetBit(T A[], uint8_t k)
-        {
-            // where 8 is the width of one byte, else change 8 to your byte width
-            A[k / (sizeof(T)*8)] |= 1 << (k % (sizeof(T)*8));
-        }
+template <typename T>
+static bool TestBit(T A[], uint8_t k)
+{
+    // where 8 is the width of one byte, else change 8 to your byte width
+    if (A[k / (sizeof(T) * 8)] & _BV(k % (sizeof(T) * 8))) // value != 0 is "true"
+    {
+        // k-th bit is 1
+        return true;
+    }
+    // k-th bit is 0
+    return false;
+}
 
-        template <typename T>
-        static void putValueIntoBitArray(T source, int number_of_bits, uint8_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
-        {
-            bool bit_set = false;
-            for (uint8_t i = 0; i < number_of_bits; i++)
-            {
-                bit_set = (bool)bit_manipulation_methods::TestBit(&source, i);
-                if(bit_set == true)
-                {
-                    uint8_t index = (*bit_index) % 8;
-                    bit_manipulation_methods::SetBit(&encoded_details[*encoded_details_index], index);
-                }
-                (*bit_index)++;
-                if ((*bit_index) % 8 == 0)
-                {
-                    (*encoded_details_index)++;
-                }
-            }
-        } 
+template <typename T>
+static void SetBit(T A[], uint8_t k)
+{
+    // where 8 is the width of one byte, else change 8 to your byte width
+    A[k / (sizeof(T) * 8)] |= _BV(k % (sizeof(T) * 8));
+}
 
-        template <typename T>
-        static void getBitsFromEncodedArray(T * out, int number_of_bits, uint8_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
-        {
-            bool bit_set = false;            
-            for (uint8_t i = 0; i < number_of_bits; i++)
-            {
-                uint8_t index = (*bit_index) % 8;
-                bit_set = (bool)bit_manipulation_methods::TestBit(&encoded_details[*encoded_details_index], index);
-                if(bit_set == true)
-                {
-                    bit_manipulation_methods::SetBit(out, i);
-                }
-                (*bit_index)++;
-                if ((*bit_index) % 8 == 0)
-                {
-                    (*encoded_details_index)++;
-                }
-            }
-        }
-               
-        static void packBoolValueIntoBitArray(bool source, uint8_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
-        {
-            bool bit_set = source;  //not necessary because source is bool
-            if(bit_set == true) //this could be if(source == true) and it would work the same way
-                {
-                    uint8_t index = (*bit_index) % 8;
-                    bit_manipulation_methods::SetBit(&encoded_details[*encoded_details_index], index);
-                }
-                (*bit_index)++;
-                if ((*bit_index) % 8 == 0)
-                {
-                    (*encoded_details_index)++;
-                }
-        }
-
-        static void unpackBoolFromEncodedArray(bool * out, uint8_t *encoded_details, uint8_t * encoded_details_index, uint16_t * bit_index)
-        {
+template <typename T>
+static void packValue(T source, int number_of_bits, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+{
+    for (uint8_t i = 0; i < number_of_bits; ++i) {
+        if(TestBit(&source, i)) {
             uint8_t index = (*bit_index) % 8;
-            bool bit_set = (bool)bit_manipulation_methods::TestBit(&encoded_details[*encoded_details_index], index);
-            if(bit_set == true) 
-                {
-                    (*out) = true;
-                }
-                (*bit_index)++;
-                if ((*bit_index) % 8 == 0)
-                {
-                    (*encoded_details_index)++;
-                }
+            SetBit(&encoded_details[*encoded_details_index], index);
         }
-};  // instantiated in encodeRadioDetails and decodeRadioDetails
+        (*bit_index)++;
+        if (*bit_index % 8 == 0) {
+            (*encoded_details_index)++;
+        }
+    }
+} 
+
+template <typename T>
+static void getBits(T *out, int number_of_bits, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+{
+    for (uint8_t i = 0; i < number_of_bits; ++i) {
+        if (TestBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8))) {
+            SetBit(out, i);
+        }
+        (*bit_index)++;
+        if (*bit_index % 8 == 0) {
+            (*encoded_details_index)++;
+        }
+    }
+}
+        
+static void packBool(bool source, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+{
+    if (source) {
+        SetBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8));
+    }
+    (*bit_index)++;
+    if (*bit_index % 8 == 0) {
+        (*encoded_details_index)++;
+    }
+}
+
+static void unpackBool(bool *out, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+{
+    if (TestBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8))) {
+        *out = true;
+    }
+    (*bit_index)++;
+    if (*bit_index % 8 == 0) {
+        (*encoded_details_index)++;
+    }
+}
+
+};  // end BitManip namespace
 
 /**
  * @example{lineno} examples/GettingStarted/GettingStarted.ino
