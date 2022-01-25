@@ -1030,11 +1030,9 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details)
     uint16_t bit_index = 0;                         // bitwise index of encoded_details
     uint8_t encoded_details_index = 0;              // encoded_details array index
     bool temp_bool = false;                         // arithmetic performed on this before passing as argument to bit manipulation method
-    uint8_t temp_8_bit = 0;                         // arithmetic performed on this before passing as argument to bit manipulation method
-    uint16_t temp_16_bit = 0;                       // arithmetic performed on this before passing as argument to bit manipulation method
-    uint8_t tx_address_forty_bit_array[5] = {0};    // TX_ADDR 40 bit address register
-    uint8_t pipe_address_forty_bit_array[5] = {0};  // pipes 0 and 1 40 bit address registers
-    uint8_t pipe_eight_bit_register_array[2] = {0}; // pipes 2-5 8-bit registers
+    uint8_t temp_8_bit = 0;                         // arithmetic performed on this before passing as argument to bit manipulation method    
+    uint8_t forty_bit_register_array[5] = {0};      // 40 bit register array    
+    uint8_t eight_bit_register_array[2] = {0};      // 8 bit register array
     /*
      * encodeRadioDetails() BitManip use primer
      *
@@ -1078,7 +1076,7 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details)
     BitManip::packValue(getPayloadSize(), 8, encoded_details, &encoded_details_index, &bit_index);
     // 11 (read_register(SETUP_RETR) >> ARD)
     temp_8_bit = (read_register(SETUP_RETR) >> ARD);
-    BitManip::packValue(temp_16_bit, 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(temp_8_bit, 8, encoded_details, &encoded_details_index, &bit_index);
     // 12 (read_register(SETUP_RETR) & 0x0F)
     temp_8_bit = (read_register(SETUP_RETR) & 0x0F);
     BitManip::packValue(temp_8_bit, 8, encoded_details, &encoded_details_index, &bit_index);
@@ -1121,69 +1119,69 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details)
     BitManip::packBool(temp_bool, encoded_details, &encoded_details_index, &bit_index);
 
     // TX_ADDR
-    arrayify_address_register(tx_address_forty_bit_array, TX_ADDR);
+    arrayify_address_register(forty_bit_register_array, TX_ADDR);
     // 25 tx_address_forty_bit_array[0]
-    BitManip::packValue(tx_address_forty_bit_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
     // 26 tx_address_forty_bit_array[1]
-    BitManip::packValue(tx_address_forty_bit_array[1], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[1], 8, encoded_details, &encoded_details_index, &bit_index);
     // 27 tx_address_forty_bit_array[2]
-    BitManip::packValue(tx_address_forty_bit_array[2], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[2], 8, encoded_details, &encoded_details_index, &bit_index);
     // 28 tx_address_forty_bit_array[3]
-    BitManip::packValue(tx_address_forty_bit_array[3], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[3], 8, encoded_details, &encoded_details_index, &bit_index);
     // 29 tx_address_forty_bit_array[4]
-    BitManip::packValue(tx_address_forty_bit_array[4], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[4], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // pipe 0 40 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 0))
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 0));
-    arrayify_address_register(pipe_address_forty_bit_array, temp_8_bit);
+    arrayify_address_register(forty_bit_register_array, temp_8_bit);
     // 30 pipe_address_forty_bit_array[0]
-    BitManip::packValue(pipe_address_forty_bit_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
     // 31 pipe_address_forty_bit_array[1]
-    BitManip::packValue(pipe_address_forty_bit_array[1], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[1], 8, encoded_details, &encoded_details_index, &bit_index);
     // 32 pipe_address_forty_bit_array[2]
-    BitManip::packValue(pipe_address_forty_bit_array[2], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[2], 8, encoded_details, &encoded_details_index, &bit_index);
     // 33 pipe_address_forty_bit_array[3]
-    BitManip::packValue(pipe_address_forty_bit_array[3], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[3], 8, encoded_details, &encoded_details_index, &bit_index);
     // 34 pipe_address_forty_bit_array[4]
-    BitManip::packValue(pipe_address_forty_bit_array[4], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[4], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // pipe 1 40 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 1))
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 1));
-    arrayify_address_register(pipe_address_forty_bit_array, temp_8_bit);
+    arrayify_address_register(forty_bit_register_array, temp_8_bit);
     // 35 pipe_address_forty_bit_array[0]
-    BitManip::packValue(pipe_address_forty_bit_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
     // 36 pipe_address_forty_bit_array[1]
-    BitManip::packValue(pipe_address_forty_bit_array[1], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[1], 8, encoded_details, &encoded_details_index, &bit_index);
     // 37 pipe_address_forty_bit_array[2]
-    BitManip::packValue(pipe_address_forty_bit_array[2], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[2], 8, encoded_details, &encoded_details_index, &bit_index);
     // 38 pipe_address_forty_bit_array[3]
-    BitManip::packValue(pipe_address_forty_bit_array[3], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[3], 8, encoded_details, &encoded_details_index, &bit_index);
     // 39 pipe_address_forty_bit_array[4]
-    BitManip::packValue(pipe_address_forty_bit_array[4], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(forty_bit_register_array[4], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // pipe 2 8 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 2)
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 2));
-    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    arrayify_byte_register(eight_bit_register_array, temp_8_bit);
     // 40 pipe_eight_bit_register_array[0]
-    BitManip::packValue(pipe_eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // pipe 3 8 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 3)
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 3));
-    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    arrayify_byte_register(eight_bit_register_array, temp_8_bit);
     // 41 pipe_eight_bit_register_array[0]
-    BitManip::packValue(pipe_eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // pipe 4 8 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 4)
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 4));
-    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    arrayify_byte_register(eight_bit_register_array, temp_8_bit);
     // 42 pipe_eight_bit_register_array[0]
-    BitManip::packValue(pipe_eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // pipe 4 8 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 5)
     temp_8_bit = (static_cast<uint8_t>(RX_ADDR_P0 + 5));
-    arrayify_byte_register(pipe_eight_bit_register_array, temp_8_bit);
+    arrayify_byte_register(eight_bit_register_array, temp_8_bit);
     // 43 pipe_eight_bit_register_array[0]
-    BitManip::packValue(pipe_eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::packValue(eight_bit_register_array[0], 8, encoded_details, &encoded_details_index, &bit_index);
 
     // 44 read_register(EN_RXADDR)
     temp_8_bit = read_register(EN_RXADDR);

@@ -100,56 +100,56 @@ void setup() {
 } // setup
 
 /*
-  encodeRadioDetails packing order:
+      encoded_details packing order
 
-  1 csn_pin
-  2 ce_pin
-  3 spi_speed
-  4 getChannel()
-  5 getDataRate()
-  6 getPALevel()
-  7 ((read_register(RF_SETUP) & 1) * 1)
-  8 getCRCLength()
-  9 ((read_register(SETUP_AW) & 3) + 2)
-  10 getPayloadSize()
-  11 (read_register(SETUP_RETR) >> ARD)
-  12 (read_register(SETUP_RETR) & 0x0F)
-  13 (read_register(OBSERVE_TX) >> 4)
-  14 (read_register(OBSERVE_TX) & 0x0F)
-  15 static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK))
-  16 static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY))
-  17 ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
-  18 (static_cast<bool>(temp_8_bit & _BV(ENAA_P5)) + 48)
-  19 (static_cast<bool>(temp_8_bit & _BV(ENAA_P4)) + 48)
-  20 (static_cast<bool>(temp_8_bit & _BV(ENAA_P3)) + 48)
-  21 (static_cast<bool>(temp_8_bit & _BV(ENAA_P2)) + 48)
-  22 (static_cast<bool>(temp_8_bit & _BV(ENAA_P1)) + 48)
-  23 (static_cast<bool>(temp_8_bit & _BV(ENAA_P0)) + 48)
-  24 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
-
-  25 tx_address_forty_bit_array[0]
-  26 tx_address_forty_bit_array[1]
-  27 tx_address_forty_bit_array[2]
-  28 tx_address_forty_bit_array[3]
-  29 tx_address_forty_bit_array[4]
-
-  30 pipe_address_forty_bit_array[0]
-  31 pipe_address_forty_bit_array[1]
-  32 pipe_address_forty_bit_array[2]
-  33 pipe_address_forty_bit_array[3]
-  34 pipe_address_forty_bit_array[4]
-  35 pipe_address_forty_bit_array[0]
-  36 pipe_address_forty_bit_array[1]
-  37 pipe_address_forty_bit_array[2]
-  38 pipe_address_forty_bit_array[3]
-  39 pipe_address_forty_bit_array[4]
-
-  40 pipe_eight_bit_register_array[0]
-  41 pipe_eight_bit_register_array[0]
-  42 pipe_eight_bit_register_array[0]
-  43 pipe_eight_bit_register_array[0]
-
-  44 read_register(EN_RXADDR)
+      1 csn_pin
+      2 ce_pin
+      3 spi_speed
+      4 getChannel()
+      5 getDataRate()
+      6 getPALevel()
+      7 ((read_register(RF_SETUP) & 1) * 1)
+      8 getCRCLength()
+      9 ((read_register(SETUP_AW) & 3) + 2)
+      10 getPayloadSize()
+      11 (read_register(SETUP_RETR) >> ARD)
+      12 (read_register(SETUP_RETR) & 0x0F)
+      13 (read_register(OBSERVE_TX) >> 4)
+      14 (read_register(OBSERVE_TX) & 0x0F)
+      15 static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK))
+      16 static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY))
+      17 ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
+      18 (static_cast<bool>(temp_8_bit & _BV(ENAA_P5)) + 48)
+      19 (static_cast<bool>(temp_8_bit & _BV(ENAA_P4)) + 48)
+      20 (static_cast<bool>(temp_8_bit & _BV(ENAA_P3)) + 48)
+      21 (static_cast<bool>(temp_8_bit & _BV(ENAA_P2)) + 48)
+      22 (static_cast<bool>(temp_8_bit & _BV(ENAA_P1)) + 48)
+      23 (static_cast<bool>(temp_8_bit & _BV(ENAA_P0)) + 48)
+      24 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+      // TX_ADDR
+      25 forty_bit_register_array[0]
+      26 forty_bit_register_array[1]
+      27 forty_bit_register_array[2]
+      28 forty_bit_register_array[3]
+      29 forty_bit_register_array[4]
+      // pipe 0 address
+      30 forty_bit_register_array[0]
+      31 forty_bit_register_array[1]
+      32 forty_bit_register_array[2]
+      33 forty_bit_register_array[3]
+      34 forty_bit_register_array[4]
+      // pipe 1 address
+      35 forty_bit_register_array[0]
+      36 forty_bit_register_array[1]
+      37 forty_bit_register_array[2]
+      38 forty_bit_register_array[3]
+      39 forty_bit_register_array[4]
+      // pipes 2-5 addresses
+      40 eight_bit_register_array[0]
+      41 eight_bit_register_array[0]
+      42 eight_bit_register_array[0]
+      43 eight_bit_register_array[0]
+      44 read_register(EN_RXADDR)
 */
 
 /*
