@@ -126,11 +126,13 @@ void setup() {
   22 (static_cast<bool>(temp_8_bit & _BV(ENAA_P1)) + 48)
   23 (static_cast<bool>(temp_8_bit & _BV(ENAA_P0)) + 48)
   24 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+
   25 tx_address_forty_bit_array[0]
   26 tx_address_forty_bit_array[1]
   27 tx_address_forty_bit_array[2]
   28 tx_address_forty_bit_array[3]
   29 tx_address_forty_bit_array[4]
+
   30 pipe_address_forty_bit_array[0]
   31 pipe_address_forty_bit_array[1]
   32 pipe_address_forty_bit_array[2]
@@ -141,10 +143,12 @@ void setup() {
   37 pipe_address_forty_bit_array[2]
   38 pipe_address_forty_bit_array[3]
   39 pipe_address_forty_bit_array[4]
+
   40 pipe_eight_bit_register_array[0]
   41 pipe_eight_bit_register_array[0]
   42 pipe_eight_bit_register_array[0]
   43 pipe_eight_bit_register_array[0]
+
   44 read_register(EN_RXADDR)
 */
 
@@ -158,18 +162,18 @@ void setup() {
 void loop() {
   if (role) {
     uint8_t split_payload_2d_array[2][21] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99},
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}
-    };  // split the payload to get below 32 bytes, mark the end for reassembly
-    for (int i = 5; i < 5; i++)
+                                             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101}
+                                            };  // split the payload to get below 32 bytes payload limit, mark the end for reassembly
+    for (int i = 0; i < 20; i++)
     {
-      split_payload_2d_array[0][i] = payload[i]; // first five elements
-      split_payload_2d_array[1][i] = payload[i]; // second five elements
+      split_payload_2d_array[0][i] = payload[i]; // first 20 elements
+      split_payload_2d_array[1][i] = payload[i]; // second 20 elements
     }
-    for (int i = 0; i < 2; i++) // iterate twice to transmit
+    for (int i = 0; i < 2; i++) // iterate twice to transmit, because we split our payload into two pieces
     {
       // This device is a TX node
       unsigned long start_timer = micros();                    // start the timer
-      bool report = radio.write(&split_payload_2d_array[i], sizeof(split_payload_2d_array[i]));      // transmit & save the report
+      bool report = radio.write(&split_payload_2d_array[i], sizeof(split_payload_2d_array[i]));      // transmit one half at a time & save the report
       unsigned long end_timer = micros();                      // end the timer
       if (report) {
         Serial.print(F("Transmission successful! "));          // payload was delivered
@@ -179,7 +183,7 @@ void loop() {
         Serial.print(i);
         Serial.println(F("] represented in binary (base2): "));
         int number_of_payload_elements = sizeof(split_payload_2d_array[i]) / sizeof(split_payload_2d_array[i][0]);  // get number of elements by dividing the size of split_payload_2d_array by its first element
-        for (int j = 0; j < (number_of_payload_elements - 1); i++) {                // iterate over all the elements of payload except the reassembly marker
+        for (int j = 0; j < (number_of_payload_elements - 1); i++) {                // iterate over all the elements of payload !!!except the reassembly marker!!!
           Serial.println(split_payload_2d_array[i][j], BIN);                                      // you can manually decode this output by following the packing order of encodeRadioDetails
         }
       } else {
@@ -202,7 +206,7 @@ void loop() {
       Serial.print(F(" bytes on pipe "));
       Serial.print(pipe);                     // print the pipe number
       Serial.println(F("; received payload represented in binary (base2): "));
-      for (int i = 0; i < (bytes - 1); i++) {       // iterate over the entire received payload except for the reassembly marker
+      for (int i = 0; i < (bytes - 1); i++) {       // iterate over the entire received payload !!!except for the reassembly marker!!!
         Serial.println(payload[i], BIN);      // print the payload's value in binary
 
         //reassemble payload
