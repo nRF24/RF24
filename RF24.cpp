@@ -1805,7 +1805,7 @@ void RF24::setAutoAck(bool enable)
     else {
         write_register(EN_AA, 0);
         // accommodate ACK payloads feature
-        if (ack_payloads_enabled){
+        if (ack_payloads_enabled) {
             disableAckPayload();
         }
     }
