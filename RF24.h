@@ -2056,80 +2056,139 @@ private:
 
 };
 
+/**
+ * @brief Bit manipulation methods used in encodeRadioDetails() and decodeRadioDetails()
+ */
 namespace BitManip
 {
-
-template <typename T>
-static bool TestBit(T A[], uint8_t k)
-{
-    // where 8 is the width of one byte, else change 8 to your byte width
-    if (A[k / (sizeof(T) * 8)] & _BV(k % (sizeof(T) * 8))) // value != 0 is "true"
+    /**
+     * @brief Test if bit `k` of variable `A` is set.
+     * 
+     * @param A The variable that contains the bit we want to check.
+     * @param k The position of the bit we want to check within `A`.
+     * 
+     * @returns true if bit == 1; false if bit == 0
+     */
+    template <typename T>
+    static bool TestBit(T A[], uint8_t k)
     {
-        // k-th bit is 1
-        return true;
+        // where 8 is the width of one byte, else change 8 to your byte width
+        if (A[k / (sizeof(T) * 8)] & _BV(k % (sizeof(T) * 8))) // value != 0 is "true"
+        {
+            // k-th bit is 1
+            return true;
+        }
+        // k-th bit is 0
+        return false;
     }
-    // k-th bit is 0
-    return false;
-}
 
-template <typename T>
-static void SetBit(T A[], uint8_t k)
-{
-    // where 8 is the width of one byte, else change 8 to your byte width
-    A[k / (sizeof(T) * 8)] |= _BV(k % (sizeof(T) * 8));
-}
+    /**
+     * @brief Set bit `k` of variable `A`.
+     *
+     * @param A The variable that contains the bit we want to set.
+     * @param k The position of the bit we want to set within `A`.
+     */
+    template <typename T>
+    static void SetBit(T A[], uint8_t k)
+    {
+        // where 8 is the width of one byte, else change 8 to your byte width
+        A[k / (sizeof(T) * 8)] |= _BV(k % (sizeof(T) * 8));
+    }
 
-template <typename T>
-static void packValue(T source, int number_of_bits, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
-{
-    for (uint8_t i = 0; i < number_of_bits; ++i) {
-        if(TestBit(&source, i)) {
-            uint8_t index = (*bit_index) % 8;
-            SetBit(&encoded_details[*encoded_details_index], index);
+    /**
+     * @brief Pack value `source` into the array `encoded_details` for `number_of_bits`.
+     *
+     * @param source The variable we want to pack into the bit array `encoded_details`.
+     * @param number_of_bits The amount of bits we want to put into the bit array `encoded_details`.
+     * @param encoded_details The bit array.
+     * @param encoded_details_index The byte index of the bit array `encoded_details`.
+     * @param bit_index The bitwise index of the bit array `encoded_details`.
+     */
+    template <typename T>    
+    static void packValue(T source, int number_of_bits, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+    {
+        for (uint8_t i = 0; i < number_of_bits; ++i)
+        {
+            if (TestBit(&source, i))
+            {
+                uint8_t index = (*bit_index) % 8;
+                SetBit(&encoded_details[*encoded_details_index], index);
+            }
+            (*bit_index)++;
+            if (*bit_index % 8 == 0)
+            {
+                (*encoded_details_index)++;
+            }
+        }
+    }
+
+    /**
+     * @brief Get bits from `encoded_details` and put them into `out` for `number_of_bits`.
+     *
+     * @param out The variable we want to populate with bits read from the bit array `encoded_details`.
+     * @param number_of_bits The number of bits we want to read out of the bit array `encoded_details`.
+     * @param encoded_details The bit array.
+     * @param encoded_details_index The byte index of the bit array `encoded_details`.
+     * @param bit_index The bitwise index of the bit array `encoded_details`.
+     */
+    template <typename T>
+    static void getBits(T *out, int number_of_bits, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+    {
+        for (uint8_t i = 0; i < number_of_bits; ++i)
+        {
+            if (TestBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8)))
+            {
+                SetBit(out, i);
+            }
+            (*bit_index)++;
+            if (*bit_index % 8 == 0)
+            {
+                (*encoded_details_index)++;
+            }
+        }
+    }
+
+    /**
+     * @brief Pack BOOLEAN value `source` into the array `encoded_details`, represented by one bit.
+     *
+     * @param source The variable we want to pack into the bit array `encoded_details`.
+     * @param encoded_details The bit array.
+     * @param encoded_details_index The byte index of the bit array `encoded_details`.
+     * @param bit_index The bitwise index of the bit array `encoded_details`.
+     */
+    static void packBool(bool source, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+    {
+        if (source)
+        {
+            SetBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8));
         }
         (*bit_index)++;
-        if (*bit_index % 8 == 0) {
+        if (*bit_index % 8 == 0)
+        {
             (*encoded_details_index)++;
         }
     }
-} 
 
-template <typename T>
-static void getBits(T *out, int number_of_bits, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
-{
-    for (uint8_t i = 0; i < number_of_bits; ++i) {
-        if (TestBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8))) {
-            SetBit(out, i);
+    /**
+     * @brief Unpack BOOLEAN value `out` from the array `encoded_details`, represented by one bit.
+     *
+     * @param source The variable we want to unpack from the bit array `encoded_details`.
+     * @param encoded_details The bit array.
+     * @param encoded_details_index The byte index of the bit array `encoded_details`.
+     * @param bit_index The bitwise index of the bit array `encoded_details`.
+     */
+    static void unpackBool(bool *out, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
+    {
+        if (TestBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8)))
+        {
+            *out = true;
         }
         (*bit_index)++;
-        if (*bit_index % 8 == 0) {
+        if (*bit_index % 8 == 0)
+        {
             (*encoded_details_index)++;
         }
     }
-}
-        
-static void packBool(bool source, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
-{
-    if (source) {
-        SetBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8));
-    }
-    (*bit_index)++;
-    if (*bit_index % 8 == 0) {
-        (*encoded_details_index)++;
-    }
-}
-
-static void unpackBool(bool *out, uint8_t *encoded_details, uint8_t *encoded_details_index, uint16_t *bit_index)
-{
-    if (TestBit(&encoded_details[*encoded_details_index], static_cast<uint8_t>(*bit_index % 8))) {
-        *out = true;
-    }
-    (*bit_index)++;
-    if (*bit_index % 8 == 0) {
-        (*encoded_details_index)++;
-    }
-}
-
 };  // end BitManip namespace
 
 /**
