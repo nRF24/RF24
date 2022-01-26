@@ -2172,7 +2172,7 @@ namespace BitManip
     /**
      * @brief Unpack BOOLEAN value `out` from the array `encoded_details`, represented by one bit.
      *
-     * @param source The variable we want to unpack from the bit array `encoded_details`.
+     * @param out The variable we want to unpack from the bit array `encoded_details`.
      * @param encoded_details The bit array.
      * @param encoded_details_index The byte index of the bit array `encoded_details`.
      * @param bit_index The bitwise index of the bit array `encoded_details`.
