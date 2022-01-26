@@ -1967,18 +1967,18 @@ private:
      */
     void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
 
-    /**
-     * Put the value of an 8-bit register into a uint8_t array
-     *
-     * Optionally it can output some quantity of successive
-     * registers to the same array.  This is useful for getting a group
-     * of related registers into one array.
-     *
-     * @param out_array uint8_t output array, should be equal to qty
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @param qty How many successive registers to put in the array
-     */
-    void arrayify_byte_register(uint8_t *out_array, uint8_t reg, uint8_t qty = 1);
+    // /**
+    //  * Put the value of an 8-bit register into a uint8_t array
+    //  *
+    //  * Optionally it can output some quantity of successive
+    //  * registers to the same array.  This is useful for getting a group
+    //  * of related registers into one array.
+    //  *
+    //  * @param out_array uint8_t output array, should be equal to qty
+    //  * @param reg Which register. Use constants from nRF24L01.h
+    //  * @param qty How many successive registers to put in the array
+    //  */
+    // void arrayify_byte_register(uint8_t *out_array, uint8_t reg, uint8_t qty = 1);
 
     /**
      * Print the name and value of a 40-bit address register to stdout
