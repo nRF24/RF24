@@ -1070,16 +1070,16 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details) {
   BitManip::packValue(getPALevel(), 3, encoded_details, &encoded_details_index,
                       &bit_index);
   // 7 ((read_register(RF_SETUP) & 1) * 1)
-  BitManip::packValue(static_cast<uint8_t>((read_register(RF_SETUP) & 1) * 1),
-                      8, encoded_details, &encoded_details_index, &bit_index);
-  // 8 getCRCLength()
-  BitManip::packValue(getCRCLength(), 8, encoded_details,
+  BitManip::packBool(static_cast<bool>((read_register(RF_SETUP) & 1) * 1),
+                      encoded_details, &encoded_details_index, &bit_index);
+  // 8 getCRCLength() 2^3
+  BitManip::packValue(getCRCLength(), 3, encoded_details,
                       &encoded_details_index, &bit_index);
   // 9 ((read_register(SETUP_AW) & 3) + 2)
   BitManip::packValue(static_cast<uint8_t>((read_register(SETUP_AW) & 3) + 2),
-                      8, encoded_details, &encoded_details_index, &bit_index);
-  // 10 getPayloadSize()
-  BitManip::packValue(getPayloadSize(), 8, encoded_details,
+                      4, encoded_details, &encoded_details_index, &bit_index);
+  // 10 getPayloadSize() 
+  BitManip::packValue(static_cast<uint8_t>(getPayloadSize()), 6, encoded_details,
                       &encoded_details_index, &bit_index);
   // 11 (read_register(SETUP_RETR) >> ARD)
   BitManip::packValue(static_cast<uint8_t>(read_register(SETUP_RETR) >> ARD), 8,
@@ -1107,16 +1107,16 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details) {
           (read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1),
       8, encoded_details, &encoded_details_index, &bit_index);
   // 18 static_cast<uint8_t>read_register(EN_AA)
-  BitManip::packValue(static_cast<uint8_t>(read_register(EN_AA)), 8,
+  BitManip::packValue(static_cast<uint8_t>(read_register(EN_AA)), 6,
                       encoded_details, &encoded_details_index, &bit_index);
-  // 24 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+  // 19 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
   BitManip::packBool(
       static_cast<bool>(read_register(NRF_CONFIG) & _BV(PRIM_RX)),
       encoded_details, &encoded_details_index, &bit_index);
 
   // TX_ADDR
   arrayify_address_register(forty_bit_register_array, TX_ADDR);
-  // 25-29 forty_bit_register_array[0-4]
+  // 20-24 forty_bit_register_array[0-4]
   for (uint8_t i = 0; i < 5; ++i) {
     BitManip::packValue(forty_bit_register_array[i], 8, encoded_details,
                         &encoded_details_index, &bit_index);
@@ -1125,7 +1125,7 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details) {
   // pipe 0 40 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 0))
   arrayify_address_register(forty_bit_register_array,
                             (static_cast<uint8_t>(RX_ADDR_P0 + 0)));
-  // 30-34 forty_bit_register_array[0-4]
+  // 25-29 forty_bit_register_array[0-4]
   for (uint8_t i = 0; i < 5; ++i) {
     BitManip::packValue(forty_bit_register_array[i], 8, encoded_details,
                         &encoded_details_index, &bit_index);
@@ -1134,20 +1134,20 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details) {
   // pipe 1 40 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 1))
   arrayify_address_register(forty_bit_register_array,
                             (static_cast<uint8_t>(RX_ADDR_P0 + 1)));
-  // 35-39 forty_bit_register_array[0-4]
+  // 30-34 forty_bit_register_array[0-4]
   for (uint8_t i = 0; i < 5; ++i) {
     BitManip::packValue(forty_bit_register_array[i], 8, encoded_details,
                         &encoded_details_index, &bit_index);
   }
 
-  // 40-43 pipe 2-5 8 bit address register
+  // 35-38 pipe 2-5 8 bit address register
   for (uint8_t i = 0; i < 4; ++i) {
     BitManip::packValue(
         read_register(static_cast<uint8_t>(RX_ADDR_P0 + (i + 2))), 8,
         encoded_details, &encoded_details_index, &bit_index);
   }
 
-  // 44 read_register(EN_RXADDR)
+  // 39 read_register(EN_RXADDR)
   BitManip::packValue(read_register(EN_RXADDR), 8, encoded_details,
                       &encoded_details_index, &bit_index);
   /*
@@ -1184,31 +1184,31 @@ void RF24::decodeRadioDetails(char *debugging_information, uint8_t *encoded_deta
      * 16 static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY))
      * 17 ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
      * 18 read_register(EN_AA)
-     * 24 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
+     * 19 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
      * // TX_ADDR
+     * 20 forty_bit_register_array[0]
+     * 21 forty_bit_register_array[1]
+     * 22 forty_bit_register_array[2]
+     * 23 forty_bit_register_array[3]
+     * 24 forty_bit_register_array[4]
+     * // pipe 0 address
      * 25 forty_bit_register_array[0]
      * 26 forty_bit_register_array[1]
      * 27 forty_bit_register_array[2]
      * 28 forty_bit_register_array[3]
      * 29 forty_bit_register_array[4]
-     * // pipe 0 address
+     * // pipe 1 address
      * 30 forty_bit_register_array[0]
      * 31 forty_bit_register_array[1]
      * 32 forty_bit_register_array[2]
      * 33 forty_bit_register_array[3]
      * 34 forty_bit_register_array[4]
-     * // pipe 1 address
-     * 35 forty_bit_register_array[0]
-     * 36 forty_bit_register_array[1]
-     * 37 forty_bit_register_array[2]
-     * 38 forty_bit_register_array[3]
-     * 39 forty_bit_register_array[4]
      * // pipes 2-5 addresses
-     * 40 
-     * 41 
-     * 42 
-     * 43 
-     * 44 read_register(EN_RXADDR)
+     * 35 (static_cast<uint8_t>(RX_ADDR_P0 + 2))
+     * 36 (static_cast<uint8_t>(RX_ADDR_P0 + 3))
+     * 37 (static_cast<uint8_t>(RX_ADDR_P0 + 4))
+     * 38 (static_cast<uint8_t>(RX_ADDR_P0 + 5))
+     * 39 read_register(EN_RXADDR)
      */
 
     /*
@@ -1247,29 +1247,29 @@ void RF24::decodeRadioDetails(char *debugging_information, uint8_t *encoded_deta
     uint16_t temp = four;
     uint16_t five = static_cast<uint16_t>(temp + 2400UL);
 
-    // getDataRate()
+    // getDataRate() 2^3
     uint8_t six = 0;
     BitManip::getBits(&six, 3, encoded_details, &encoded_details_index, &bit_index);
 
-    // getPALevel()
+    // getPALevel() 2^3
     uint8_t seven = 0;
     BitManip::getBits(&seven, 3, encoded_details, &encoded_details_index, &bit_index);
 
     //(read_register(RF_SETUP) & 1) * 1)
-    uint8_t eight = 0;
-    BitManip::getBits(&eight, 8, encoded_details, &encoded_details_index, &bit_index);
+    bool eight = 0;
+    BitManip::unpackBool(&eight, encoded_details, &encoded_details_index, &bit_index);
 
-    // getCRCLength()
-    uint8_t nine = 0;
-    BitManip::getBits(&nine, 8, encoded_details, &encoded_details_index, &bit_index);
+    // getCRCLength() 2^3
+    uint8_t nine = 0; 
+    BitManip::getBits(&nine, 3, encoded_details, &encoded_details_index, &bit_index);
 
     //((read_register(SETUP_AW) & 3) + 2)
     uint8_t ten = 0;
-    BitManip::getBits(&ten, 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::getBits(&ten, 4, encoded_details, &encoded_details_index, &bit_index);
 
-    // getPayloadSize()
+    // getPayloadSize() 
     uint8_t eleven = 0;
-    BitManip::getBits(&eleven, 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::getBits(&eleven, 6, encoded_details, &encoded_details_index, &bit_index);
 
     //((read_register(SETUP_RETR) >> ARD) * 250 + 250) STORED AS 8 bits!
     uint16_t twelve = 0;
@@ -1302,7 +1302,7 @@ void RF24::decodeRadioDetails(char *debugging_information, uint8_t *encoded_deta
 
     // auto-ack status
     uint8_t nineteen = 0;
-    BitManip::getBits(&nineteen, 8, encoded_details, &encoded_details_index, &bit_index);
+    BitManip::getBits(&nineteen, 6, encoded_details, &encoded_details_index, &bit_index);
 
     // 
     bool twentyfive = 0;
