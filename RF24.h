@@ -2064,6 +2064,9 @@ namespace BitManip
     /**
      * @brief Test if bit `k` of variable `A` is set.
      * 
+     * @tparam T T is the template parameter; the `typename` keyword means
+     * that this parameter is a placeholder for a type.  At compile time, 
+     * this parameter `T` is expanded into every type that uses it. 
      * @param A The variable that contains the bit we want to check.
      * @param k The position of the bit we want to check within `A`.
      * 
@@ -2084,7 +2087,10 @@ namespace BitManip
 
     /**
      * @brief Set bit `k` of variable `A`.
-     *
+     * 
+     * @tparam T T is the template parameter; the `typename` keyword means
+     * that this parameter is a placeholder for a type.  At compile time, 
+     * this parameter `T` is expanded into every type that uses it.
      * @param A The variable that contains the bit we want to set.
      * @param k The position of the bit we want to set within `A`.
      */
@@ -2098,6 +2104,9 @@ namespace BitManip
     /**
      * @brief Pack value `source` into the array `encoded_details` for `number_of_bits`.
      *
+     * @tparam T T is the template parameter; the `typename` keyword means
+     * that this parameter is a placeholder for a type.  At compile time, 
+     * this parameter `T` is expanded into every type that uses it.
      * @param source The variable we want to pack into the bit array `encoded_details`.
      * @param number_of_bits The amount of bits we want to put into the bit array `encoded_details`.
      * @param encoded_details The bit array.
@@ -2125,6 +2134,9 @@ namespace BitManip
     /**
      * @brief Get bits from `encoded_details` and put them into `out` for `number_of_bits`.
      *
+     * @tparam T T is the template parameter; the `typename` keyword means
+     * that this parameter is a placeholder for a type.  At compile time, 
+     * this parameter `T` is expanded into every type that uses it.
      * @param out The variable we want to populate with bits read from the bit array `encoded_details`.
      * @param number_of_bits The number of bits we want to read out of the bit array `encoded_details`.
      * @param encoded_details The bit array.
