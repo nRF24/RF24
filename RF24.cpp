@@ -1254,7 +1254,7 @@ void RF24::stopListening(void)
     write_register(NRF_CONFIG, config_reg);
 
 #if defined(RF24_TINY) || defined(LITTLEWIRE)
-    // for 3 pins solution TX mode is only left with additonal powerDown/powerUp cycle
+    // for 3 pins solution TX mode is only left with additional powerDown/powerUp cycle
     if (ce_pin == csn_pin) {
         powerDown();
         powerUp();
@@ -1401,7 +1401,7 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
 {
     //Block until the FIFO is NOT full.
     //Keep track of the MAX retries and set auto-retry if seeing failures
-    //Return 0 so the user can control the retrys and set a timer or failure counter if required
+    //Return 0 so the user can control the retries and set a timer or failure counter if required
     //The radio will auto-clear everything in the FIFO as long as CE remains high
 
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
@@ -1854,7 +1854,7 @@ void RF24::setAutoAck(bool enable)
     }
     else {
         write_register(EN_AA, 0);
-        // accomodate ACK payloads feature
+        // accommodate ACK payloads feature
         if (ack_payloads_enabled) {
             disableAckPayload();
         }

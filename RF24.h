@@ -538,7 +538,7 @@ public:
      * startListening().<br> Read
      * http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
      * to understand how to avoid using malformed addresses. This address
-     * restoration is implemented because of the underlying neccessary
+     * restoration is implemented because of the underlying necessary
      * functionality of openWritingPipe().
      *
      * @param number Which pipe to open. Only pipe numbers 0-5 are available,
@@ -1229,7 +1229,7 @@ public:
      *    radio.failureDetected = 0;            // Reset the detection value
      *	 radio.openWritingPipe(addresses[1]);  // Re-configure pipe addresses
      *    radio.openReadingPipe(1, addresses[0]);
-     *    report_failure();                     // Blink leds, send a message, etc. to indicate failure
+     *    report_failure();                     // Blink LEDs, send a message, etc. to indicate failure
      *  }
      * @endcode
      */
