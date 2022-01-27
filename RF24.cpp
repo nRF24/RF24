@@ -819,12 +819,12 @@ void RF24::printPrettyDetails(void) {
 /****************************************************************************/
 
 void RF24::sprintfPrettyDetails(char *debugging_information)
-{
-    const char *format_string = PSTR("================ SPI Configuration ================\n"
-                                     "CSN Pin\t\t\t= %d\n"
+{    
+    const char *format_string = PSTR("================ SPI Configuration ================\n"                                     
+                                     "CSN Pin\t\t\t= %d\n"                                     
                                      "CE Pin\t\t\t= %d\n"
-                                     "SPI Frequency\t\t= %d Mhz\n"
-                                     "================ NRF Configuration ================\n"
+                                     "SPI Frequency\t\t= %d Mhz\n"                                     
+                                     "================ NRF Configuration ================\n"                                    
                                      "Channel\t\t\t= %u (~ %u MHz)\n"
                                      "RF Data Rate\t\t"
                                      PRIPSTR
@@ -890,12 +890,13 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                                      ") bound\t= 0x"
                                      PRIPSTR
                                     );
+                                    
 
-    char tx_address_char_array[16] = {'\0'};
+    char tx_address_char_array[10] = {'\0'};
     sprintf_address_register(tx_address_char_array, TX_ADDR);
 
-    char pipe_address_char_2d_array[6][16] = {'\0'};
-    char pipe_address_char_array[16] = {'\0'};
+    char pipe_address_2d_char_array[2][10] = {'\0'};
+    char pipe_eight_bit_address_2d_char_array[4][2] = {'\0'};
     bool isOpen_array[6] = {false};
 
     uint8_t openPipes = read_register(EN_RXADDR);
@@ -903,22 +904,10 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
         bool isOpen = openPipes & _BV(i);
         isOpen_array[i] = isOpen;
         if (i < 2) {
-            sprintf_address_register(pipe_address_char_array, static_cast<uint8_t>(RX_ADDR_P0 + i));
-            for (uint8_t j = 0; j < 16; j++) {
-                pipe_address_char_2d_array[i][j] = pipe_address_char_array[j];
-            }
-            for (uint8_t j = 0; j < 16; j++) {
-                pipe_address_char_array[j] = '\0';
-            }
+            sprintf_address_register(pipe_address_2d_char_array[i], static_cast<uint8_t>(RX_ADDR_P0 + i));
         }
         else {
-            sprintf_byte_register(pipe_address_char_array, static_cast<uint8_t>(RX_ADDR_P0 + i));
-            for (uint8_t j = 0; j < 16; j++) {
-                pipe_address_char_2d_array[i][j] = pipe_address_char_array[j];
-            }
-            for (uint8_t j = 0; j < 16; j++) {
-                pipe_address_char_array[j] = '\0';
-            }
+            sprintf_byte_register(pipe_eight_bit_address_2d_char_array[i], static_cast<uint8_t>(RX_ADDR_P0 + i));
         }
     }
 
@@ -967,20 +956,20 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
               (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
               (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1])),
               (autoack_status_char_array),
-              (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? 'R' : 'T'),
+              (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? PSTR("R") : PSTR("T")),
               (tx_address_char_array),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
-              (pipe_address_char_2d_array[0]),
+              (pipe_address_2d_char_array[0]),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
-              (pipe_address_char_2d_array[1]),
+              (pipe_address_2d_char_array[1]),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
-              (pipe_address_char_2d_array[2]),
+              (pipe_eight_bit_address_2d_char_array[0]),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
-              (pipe_address_char_2d_array[3]),
+              (pipe_eight_bit_address_2d_char_array[1]),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
-              (pipe_address_char_2d_array[4]),
+              (pipe_eight_bit_address_2d_char_array[2]),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
-              (pipe_address_char_2d_array[5])
+              (pipe_eight_bit_address_2d_char_array[3])
              );
 }
 
