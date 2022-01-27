@@ -25,7 +25,7 @@ def hex_str_to_bytes(s_in: str) -> bytes:
     len_s = len(s_in)
     if len_s % 2:
         raise argparse.ArgumentError(
-            None, f"buffer is {len_s} characters (expected 76)"
+            None, f"buffer is {len_s} bytes (expected 38)"
         )
     return bytes([int(i, 16) for i in s_in])
 
@@ -37,7 +37,8 @@ argparser.add_argument(
     "buffer",
     type=hex_str_to_bytes,
     help="The encoded buffer from the Arduino Serial Monitor. The string passed is "
-    "expected to contain only hexadecimal digits. It should be 76 characters long.",
+    "expected to contain only hexadecimal digits. It should be 38 words long "
+    "(separated by spaces).",
 )
 
 
