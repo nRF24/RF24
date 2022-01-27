@@ -502,23 +502,11 @@ void RF24::sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty)
     char sprintf_buffer[4] = {'\0'};
     while (qty--) {
         sprintf_P(sprintf_buffer, PSTR("%02x"), read_register(reg++));
-        out_buffer[i+0] = sprintf_buffer[0];
-        out_buffer[i+1] = sprintf_buffer[1];
-        i=i+2;
+        out_buffer[i + 0] = sprintf_buffer[0];
+        out_buffer[i + 1] = sprintf_buffer[1];
+        i = i + 2;
     }
 }
-
-/****************************************************************************/
-
-// void RF24::arrayify_byte_register(uint8_t *out_array, uint8_t reg, uint8_t qty)
-// {
-//     uint8_t i = 0;
-//     while (qty--)
-//     {
-//         out_array[i] = read_register(reg++);
-//         i = i + 1;
-//     }
-// }
 
 /****************************************************************************/
 
@@ -564,27 +552,6 @@ void RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty)
     }
     delete[] read_buffer;
 }
-
-/****************************************************************************/
-
-void RF24::arrayify_address_register(uint8_t *out_array, uint8_t reg, uint8_t qty)
-{
-    uint8_t *read_buffer = new uint8_t[addr_width];
-    while (qty--)
-    {
-        uint8_t i = 0;
-        read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
-
-        uint8_t *bufptr = read_buffer + addr_width;
-        while (--bufptr >= read_buffer)
-        {
-            out_array[i] = *bufptr;
-            i = i + 1;
-        }
-    }
-    delete[] read_buffer;
-}
-
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
@@ -1020,520 +987,47 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
 /****************************************************************************/
 
 void RF24::encodeRadioDetails(uint8_t *encoded_details) {
-  /*
-   * This was made with maintainability/customisability in mind, items can be
-   * added/removed to/from the output bit array `encoded_details` in any order
-   * using encode_bit_manipulation_methods, then changing decodeRadioDetails to
-   * suit your use case.  It should work even if the variables used as the bit
-   * array `encoded_details` are noncontiguously allocated.
-   */
-  uint16_t bit_index = 0;                    // bitwise index of encoded_details
-  uint8_t encoded_details_index = 0;         // encoded_details array index
-  uint8_t forty_bit_register_array[5] = {0}; // 40 bit register array
-  /*
-   * encodeRadioDetails() BitManip use primer
-   *
-   * We use two methods in BitManip to put bits into the array
-   * encoded_details:
-   *
-   * packValue(source, number_of_bits, encoded_details,
-   * &encoded_details_index, &bit_index); and packBool(source,
-   * encoded_details, &encoded_details_index, &bit_index);
-   *
-   * The first method puts nonboolean values into the bit array, there is no
-   * overflow checking. Ensure proper buffer size by adding up the amount of
-   * bits you plan on sending and dividing by the width of an unsigned byte
-   * (eight, 8), and double check that your encoded_details array can
-   * accomodate that.
-   * The major difference between the two methods is that since boolean are
-   * always represented by a single bit in the array encoded_details we do not
-   * need to tell the method packBool() how many bits to put into the array
-   * encoded_details, it defaults to one.
-   */
+    /* Registers correspnding to index of encoded_details array
+        0:     NRF_CONFIG
+        1:     EN_AA
+        2:     EN_RXADDR
+        3:     SETUP_AW
+        4:     SETUP_RETR
+        5:     RF_CH
+        6:     RF_SETUP
+        7:     NRF_STATUS
+        8:     OBSERVE_TX
+        9:     CD (aka RPD)
+        10-14: RX_ADDR_P0
+        15-19: RX_ADDR_P1
+        20:    RX_ADDR_P2
+        21:    RX_ADDR_P3
+        22:    RX_ADDR_P4
+        23:    RX_ADDR_P5
+        24-28: TX_ADDR
+        29:    RX_PW_P0
+        30:    RX_PW_P1
+        31:    RX_PW_P2
+        32:    RX_PW_P3
+        33:    RX_PW_P4
+        34:    RX_PW_P5
+        35:    FIFO_STATUS
+        36:    DYNPD
+        37:    FEATURE
+    */
 
-  // 1 csn_pin
-  BitManip::packValue(csn_pin, 16, encoded_details, &encoded_details_index,
-                      &bit_index);
-  // 2 ce_pin
-  BitManip::packValue(ce_pin, 16, encoded_details, &encoded_details_index,
-                      &bit_index);
-  // 3 spi_speed 2^4 16MHz max
-  BitManip::packValue(static_cast<uint8_t>(spi_speed / 1000000UL), 4,
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 4 getChannel() 128 channels, 2^7
-  BitManip::packValue(getChannel(), 7, encoded_details, &encoded_details_index,
-                      &bit_index);
-  // 5 getDataRate() 2^3
-  BitManip::packValue(getDataRate(), 3, encoded_details, &encoded_details_index,
-                      &bit_index);
-  // 6 getPALevel() 2^3
-  BitManip::packValue(getPALevel(), 3, encoded_details, &encoded_details_index,
-                      &bit_index);
-  // 7 ((read_register(RF_SETUP) & 1) * 1)
-  BitManip::packBool(static_cast<bool>((read_register(RF_SETUP) & 1) * 1),
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 8 getCRCLength() 2^3
-  BitManip::packValue(getCRCLength(), 3, encoded_details,
-                      &encoded_details_index, &bit_index);
-  // 9 ((read_register(SETUP_AW) & 3) + 2)
-  BitManip::packValue(static_cast<uint8_t>((read_register(SETUP_AW) & 3) + 2),
-                      4, encoded_details, &encoded_details_index, &bit_index);
-  // 10 getPayloadSize() 
-  BitManip::packValue(static_cast<uint8_t>(getPayloadSize()), 6, encoded_details,
-                      &encoded_details_index, &bit_index);
-  // 11 (read_register(SETUP_RETR) >> ARD)
-  BitManip::packValue(static_cast<uint8_t>(read_register(SETUP_RETR) >> ARD), 8,
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 12 (read_register(SETUP_RETR) & 0x0F)
-  BitManip::packValue(static_cast<uint8_t>(read_register(SETUP_RETR) & 0x0F), 8,
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 13 (read_register(OBSERVE_TX) >> 4)
-  BitManip::packValue(static_cast<uint8_t>(read_register(OBSERVE_TX) >> 4), 8,
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 14 (read_register(OBSERVE_TX) & 0x0F)
-  BitManip::packValue(static_cast<uint8_t>(read_register(OBSERVE_TX) & 0x0F), 8,
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 15 static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK))
-  BitManip::packBool(
-      static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)),
-      encoded_details, &encoded_details_index, &bit_index);
-  // 16 static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY))
-  BitManip::packBool(
-      static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)),
-      encoded_details, &encoded_details_index, &bit_index);
-  // 17 ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
-  BitManip::packValue(
-      static_cast<uint8_t>(
-          (read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1),
-      8, encoded_details, &encoded_details_index, &bit_index);
-  // 18 static_cast<uint8_t>read_register(EN_AA)
-  BitManip::packValue(static_cast<uint8_t>(read_register(EN_AA)), 6,
-                      encoded_details, &encoded_details_index, &bit_index);
-  // 19 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
-  BitManip::packBool(
-      static_cast<bool>(read_register(NRF_CONFIG) & _BV(PRIM_RX)),
-      encoded_details, &encoded_details_index, &bit_index);
-
-  // TX_ADDR
-  arrayify_address_register(forty_bit_register_array, TX_ADDR);
-  // 20-24 forty_bit_register_array[0-4]
-  for (uint8_t i = 0; i < 5; ++i) {
-    BitManip::packValue(forty_bit_register_array[i], 8, encoded_details,
-                        &encoded_details_index, &bit_index);
-  }
-
-  // pipe 0 40 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 0))
-  arrayify_address_register(forty_bit_register_array,
-                            (static_cast<uint8_t>(RX_ADDR_P0 + 0)));
-  // 25-29 forty_bit_register_array[0-4]
-  for (uint8_t i = 0; i < 5; ++i) {
-    BitManip::packValue(forty_bit_register_array[i], 8, encoded_details,
-                        &encoded_details_index, &bit_index);
-  }
-
-  // pipe 1 40 bit address register (static_cast<uint8_t>(RX_ADDR_P0 + 1))
-  arrayify_address_register(forty_bit_register_array,
-                            (static_cast<uint8_t>(RX_ADDR_P0 + 1)));
-  // 30-34 forty_bit_register_array[0-4]
-  for (uint8_t i = 0; i < 5; ++i) {
-    BitManip::packValue(forty_bit_register_array[i], 8, encoded_details,
-                        &encoded_details_index, &bit_index);
-  }
-
-  // 35-38 pipe 2-5 8 bit address register
-  for (uint8_t i = 0; i < 4; ++i) {
-    BitManip::packValue(
-        read_register(static_cast<uint8_t>(RX_ADDR_P0 + (i + 2))), 8,
-        encoded_details, &encoded_details_index, &bit_index);
-  }
-
-  // 39 read_register(EN_RXADDR)
-  BitManip::packValue(read_register(EN_RXADDR), 8, encoded_details,
-                      &encoded_details_index, &bit_index);
-  /*
-   * Divide your total bits by 8 and round up to determine the amount of uint8_t
-   * array members you need to pass to this function default is 40 uint8_t
-   */
-}
-
-/****************************************************************************/
-
-void RF24::decodeRadioDetails(char *debugging_information, uint8_t *encoded_details)
-{
-    uint16_t bit_index = 0;
-    uint8_t encoded_details_index = 0;
-
-    /*
-     * encoded_details packing order
-     *
-     * 1 csn_pin
-     * 2 ce_pin
-     * 3 spi_speed
-     * 4 getChannel()
-     * 5 getDataRate()
-     * 6 getPALevel()
-     * 7 ((read_register(RF_SETUP) & 1) * 1)
-     * 8 getCRCLength()
-     * 9 ((read_register(SETUP_AW) & 3) + 2)
-     * 10 getPayloadSize()
-     * 11 (read_register(SETUP_RETR) >> ARD)
-     * 12 (read_register(SETUP_RETR) & 0x0F)
-     * 13 (read_register(OBSERVE_TX) >> 4)
-     * 14 (read_register(OBSERVE_TX) & 0x0F)
-     * 15 static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK))
-     * 16 static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY))
-     * 17 ((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
-     * 18 read_register(EN_AA)
-     * 19 (read_register(NRF_CONFIG) & _BV(PRIM_RX))
-     * // TX_ADDR
-     * 20 forty_bit_register_array[0]
-     * 21 forty_bit_register_array[1]
-     * 22 forty_bit_register_array[2]
-     * 23 forty_bit_register_array[3]
-     * 24 forty_bit_register_array[4]
-     * // pipe 0 address
-     * 25 forty_bit_register_array[0]
-     * 26 forty_bit_register_array[1]
-     * 27 forty_bit_register_array[2]
-     * 28 forty_bit_register_array[3]
-     * 29 forty_bit_register_array[4]
-     * // pipe 1 address
-     * 30 forty_bit_register_array[0]
-     * 31 forty_bit_register_array[1]
-     * 32 forty_bit_register_array[2]
-     * 33 forty_bit_register_array[3]
-     * 34 forty_bit_register_array[4]
-     * // pipes 2-5 addresses
-     * 35 (static_cast<uint8_t>(RX_ADDR_P0 + 2))
-     * 36 (static_cast<uint8_t>(RX_ADDR_P0 + 3))
-     * 37 (static_cast<uint8_t>(RX_ADDR_P0 + 4))
-     * 38 (static_cast<uint8_t>(RX_ADDR_P0 + 5))
-     * 39 read_register(EN_RXADDR)
-     */
-
-    /*
-     * decodeRadioDetails() BitManip use primer
-     *
-     * We use two methods in BitManip to get bits from the array encoded_details:
-     *
-     * getBits(source, number_of_bits, encoded_details, &encoded_details_index, &bit_index);
-     * and
-     * unpackBool(source, encoded_details, &encoded_details_index, &bit_index);
-     *
-     * The first method gets nonboolean values from the bit array, there is no overflow checking.
-     *
-     * The major difference between the two methods is that since boolean are always represented by
-     * a single bit in the array encoded_details we do not need to tell the method unpackBool()
-     * how many bits to get from the array encoded_details.
-     */
-
-    // csn_pin
-    uint16_t one = 0;
-    BitManip::getBits(&one, 16, encoded_details, &encoded_details_index, &bit_index);
-
-    // ce_pin
-    uint16_t two = 0;
-    BitManip::getBits(&two, 16, encoded_details, &encoded_details_index, &bit_index);
-
-    // static_cast<uint8_t>(spi_speed / 1000000)
-    uint8_t three = 0;
-    BitManip::getBits(&three, 4, encoded_details, &encoded_details_index, &bit_index);
-
-    // getChannel() 128 channels, 2^7
-    uint8_t four = 0;
-    BitManip::getBits(&four, 7, encoded_details, &encoded_details_index, &bit_index);
-
-    // static_cast<uint16_t>(getChannel() + 2400)
-    uint16_t temp = four;
-    uint16_t five = static_cast<uint16_t>(temp + 2400UL);
-
-    // getDataRate() 2^3
-    uint8_t six = 0;
-    BitManip::getBits(&six, 3, encoded_details, &encoded_details_index, &bit_index);
-
-    // getPALevel() 2^3
-    uint8_t seven = 0;
-    BitManip::getBits(&seven, 3, encoded_details, &encoded_details_index, &bit_index);
-
-    //(read_register(RF_SETUP) & 1) * 1)
-    bool eight = 0;
-    BitManip::unpackBool(&eight, encoded_details, &encoded_details_index, &bit_index);
-
-    // getCRCLength() 2^3
-    uint8_t nine = 0; 
-    BitManip::getBits(&nine, 3, encoded_details, &encoded_details_index, &bit_index);
-
-    //((read_register(SETUP_AW) & 3) + 2)
-    uint8_t ten = 0;
-    BitManip::getBits(&ten, 4, encoded_details, &encoded_details_index, &bit_index);
-
-    // getPayloadSize() 
-    uint8_t eleven = 0;
-    BitManip::getBits(&eleven, 6, encoded_details, &encoded_details_index, &bit_index);
-
-    //((read_register(SETUP_RETR) >> ARD) * 250 + 250) STORED AS 8 bits!
-    uint16_t twelve = 0;
-    BitManip::getBits(&twelve, 8, encoded_details, &encoded_details_index, &bit_index);
-    twelve = twelve * 250UL + 250UL;
-
-    //(read_register(SETUP_RETR) & 0x0F)
-    uint8_t thirteen = 0;
-    BitManip::getBits(&thirteen, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    //(read_register(OBSERVE_TX) >> 4)
-    uint8_t fourteen = 0;
-    BitManip::getBits(&fourteen, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    //(read_register(OBSERVE_TX) & 0x0F)
-    uint8_t fifteen = 0;
-    BitManip::getBits(&fifteen, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    //(static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2)
-    bool sixteen = 0;
-    BitManip::unpackBool(&sixteen, encoded_details, &encoded_details_index, &bit_index);
-
-    //(static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1)
-    bool seventeen = 0;
-    BitManip::unpackBool(&seventeen, encoded_details, &encoded_details_index, &bit_index);
-
-    //((read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1)
-    uint8_t eighteen = 0;
-    BitManip::getBits(&eighteen, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    // auto-ack status
-    uint8_t nineteen = 0;
-    BitManip::getBits(&nineteen, 6, encoded_details, &encoded_details_index, &bit_index);
-
-    // 
-    bool twentyfive = 0;
-    BitManip::unpackBool(&twentyfive, encoded_details, &encoded_details_index, &bit_index);
-
-    // TX_ADDR
-    uint8_t twentysix = 0;
-    BitManip::getBits(&twentysix, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t twentyseven = 0;
-    BitManip::getBits(&twentyseven, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t twentyeight = 0;
-    BitManip::getBits(&twentyeight, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t twentynine = 0;
-    BitManip::getBits(&twentynine, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirty = 0;
-    BitManip::getBits(&thirty, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    // pipe 0
-    uint8_t thirtyone = 0;
-    BitManip::getBits(&thirtyone, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtytwo = 0;
-    BitManip::getBits(&thirtytwo, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtythree = 0;
-    BitManip::getBits(&thirtythree, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtyfour = 0;
-    BitManip::getBits(&thirtyfour, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtyfive = 0;
-    BitManip::getBits(&thirtyfive, 8, encoded_details, &encoded_details_index, &bit_index);
-    // pipe 1
-    uint8_t thirtysix = 0;
-    BitManip::getBits(&thirtysix, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtyseven = 0;
-    BitManip::getBits(&thirtyseven, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtyeight = 0;
-    BitManip::getBits(&thirtyeight, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t thirtynine = 0;
-    BitManip::getBits(&thirtynine, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t fourty = 0;
-    BitManip::getBits(&fourty, 8, encoded_details, &encoded_details_index, &bit_index);
-    // pipes 3-5 8-bit registers
-    uint8_t fourtyone = 0;
-    BitManip::getBits(&fourtyone, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t fourtytwo = 0;
-    BitManip::getBits(&fourtytwo, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t fourtythree = 0;
-    BitManip::getBits(&fourtythree, 8, encoded_details, &encoded_details_index, &bit_index);
-    uint8_t fourtyfour = 0;
-    BitManip::getBits(&fourtyfour, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    // open pipes
-    uint8_t fourtyfive = 0;
-    BitManip::getBits(&fourtyfive, 8, encoded_details, &encoded_details_index, &bit_index);
-
-    // output debugging_information
-    const char *format_string = PSTR("================ SPI Configuration ================\n"
-                                     "CSN Pin\t\t\t= %d\n"
-                                     "CE Pin\t\t\t= %d\n"
-                                     "SPI Frequency\t\t= %d Mhz\n"
-                                     "================ NRF Configuration ================\n"
-                                     "Channel\t\t\t= %u (~ %u MHz)\n"
-                                     "RF Data Rate\t\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "RF Power Amplifier\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "RF Low Noise Amplifier\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "CRC Length\t\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Address Length\t\t= %d bytes\n"
-                                     "Static Payload Length\t= %d bytes\n"
-                                     "Auto Retry Delay\t= %d microseconds\n"
-                                     "Auto Retry Attempts\t= %d maximum\n"
-                                     "Packets lost on\n    current channel\t= %d\r\n"
-                                     "Retry attempts made for\n    last transmission\t= %d\r\n"
-                                     "Multicast\t\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Custom ACK Payload\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Dynamic Payloads\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Auto Acknowledgment\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Primary Mode\t\t= %cX\n"
-                                     "TX address\t\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 0 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 1 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 2 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 3 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 4 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 5 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                    );
-
-    char tx_address_char_array[16] = {'\0'};
-    sprintf_P(tx_address_char_array,
-              PSTR("%02x%02x%02x%02x%02x"),
-              twentysix,
-              twentyseven,
-              twentyeight,
-              twentynine,
-              thirty);
-
-    char pipe_address_char_2d_array[6][16] = {'\0'};
-
-    bool isOpen_array[6] = {false};
-
-    sprintf_P(pipe_address_char_2d_array[0],
-              PSTR("%02x%02x%02x%02x%02x"),
-              thirtyone,
-              thirtytwo,
-              thirtythree,
-              thirtyfour,
-              thirtyfive);
-    sprintf_P(pipe_address_char_2d_array[1],
-              PSTR("%02x%02x%02x%02x%02x"),
-              thirtysix,
-              thirtyseven,
-              thirtyeight,
-              thirtynine,
-              fourty);
-
-    sprintf_P(pipe_address_char_2d_array[2],
-              PSTR("%02x"),
-              fourtyone);
-    sprintf_P(pipe_address_char_2d_array[3],
-              PSTR("%02x"),
-              fourtytwo);
-    sprintf_P(pipe_address_char_2d_array[4],
-              PSTR("%02x"),
-              fourtythree);
-    sprintf_P(pipe_address_char_2d_array[5],
-              PSTR("%02x"),
-              fourtyfour);
-
-    uint8_t openPipes = fourtyfive;
-    for (uint8_t i = 0; i < 6; ++i)
-    {
-        bool isOpen = openPipes & _BV(i);
-        isOpen_array[i] = isOpen;
+    uint8_t end = FEATURE + 1;
+    for (uint8_t i = NRF_CONFIG; i < end; ++i) {
+        if (i == RX_ADDR_P0 || i == RX_ADDR_P1 || i == TX_ADDR) {
+            // get 40-bit registers
+            read_register(i, encoded_details, 5);
+            encoded_details += 5;
+        }
+        else if (i != 0x18 && i != 0x19 && i != 0x1a && i != 0x1b){ // skip undocumented registers
+            // get single byte registers
+            *encoded_details++ = read_register(i);
+        }
     }
-
-    uint8_t autoAck = nineteen;
-    char autoack_status_char_array[11] = {'\0'};
-    if (autoAck == 0x3F || autoAck == 0)
-    {
-        // all pipes have the same configuration about auto-ack feature
-        sprintf_P(autoack_status_char_array,
-                  PSTR("" PRIPSTR
-                       ""),
-                  (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1])));
-    }
-    else
-    {
-        // representation per pipe
-        sprintf_P(autoack_status_char_array,
-                  PSTR("= 0b%c%c%c%c%c%c"),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48));
-    }
-
-    sprintf_P(debugging_information,
-              format_string,
-              one,
-              two,
-              three,
-              four,
-              five,
-              (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[six])),
-              (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[seven])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[eight])),
-              (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[nine])),
-              ten,
-              eleven,
-              twelve,
-              thirteen,
-              fourteen,
-              fifteen,
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[sixteen])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[seventeen])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[eighteen])),
-              (autoack_status_char_array),
-              (twentyfive ? 'R' : 'T'),
-              (tx_address_char_array),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
-              (pipe_address_char_2d_array[0]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
-              (pipe_address_char_2d_array[1]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
-              (pipe_address_char_2d_array[2]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
-              (pipe_address_char_2d_array[3]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
-              (pipe_address_char_2d_array[4]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
-              (pipe_address_char_2d_array[5]));
 }
 #endif // !defined(MINIMAL)
 
@@ -1783,7 +1277,7 @@ void RF24::stopListening(void)
     write_register(NRF_CONFIG, config_reg);
 
     #if defined(RF24_TINY) || defined(LITTLEWIRE)
-    // for 3 pins solution TX mode is only left with additonal powerDown/powerUp cycle
+    // for 3 pins solution TX mode is only left with additional powerDown/powerUp cycle
     if (ce_pin == csn_pin) {
       powerDown();
       powerUp();
