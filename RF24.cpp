@@ -818,161 +818,116 @@ void RF24::printPrettyDetails(void) {
 
 /****************************************************************************/
 
-void RF24::sprintfPrettyDetails(char *debugging_information)
-{    
-    const char *format_string = PSTR("================ SPI Configuration ================\n"                                     
-                                     "CSN Pin\t\t\t= %d\n"                                     
-                                     "CE Pin\t\t\t= %d\n"
-                                     "SPI Frequency\t\t= %d Mhz\n"                                     
-                                     "================ NRF Configuration ================\n"                                    
-                                     "Channel\t\t\t= %u (~ %u MHz)\n"
-                                     "RF Data Rate\t\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "RF Power Amplifier\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "RF Low Noise Amplifier\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "CRC Length\t\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Address Length\t\t= %d bytes\n"
-                                     "Static Payload Length\t= %d bytes\n"
-                                     "Auto Retry Delay\t= %d microseconds\n"
-                                     "Auto Retry Attempts\t= %d maximum\n"
-                                     "Packets lost on\n    current channel\t= %d\r\n"
-                                     "Retry attempts made for\n    last transmission\t= %d\r\n"
-                                     "Multicast\t\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Custom ACK Payload\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Dynamic Payloads\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Auto Acknowledgment\t"
-                                     PRIPSTR
-                                     "\n"
-                                     "Primary Mode\t\t= "
-                                     PRIPSTR
-                                     "X\n"
-                                     "TX address\t\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 0 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 1 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 2 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 3 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 4 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                     "\n"
-                                     "pipe 5 ("
-                                     PRIPSTR
-                                     ") bound\t= 0x"
-                                     PRIPSTR
-                                    );
-                                    
+void RF24::sprintfPrettyDetails(char *debugging_information) {
+  const char *format_string =
+      PSTR("================ SPI Configuration ================\n"
+           "CSN Pin\t\t\t= %d\n"
+           "CE Pin\t\t\t= %d\n"
+           "SPI Frequency\t\t= %d Mhz\n"
+           "================ NRF Configuration ================\n"
+           "Channel\t\t\t= %u (~ %u MHz)\n"
+           "RF Data Rate\t\t" PRIPSTR "\n"
+           "RF Power Amplifier\t" PRIPSTR "\n"
+           "RF Low Noise Amplifier\t" PRIPSTR "\n"
+           "CRC Length\t\t" PRIPSTR "\n"
+           "Address Length\t\t= %d bytes\n"
+           "Static Payload Length\t= %d bytes\n"
+           "Auto Retry Delay\t= %d microseconds\n"
+           "Auto Retry Attempts\t= %d maximum\n"
+           "Packets lost on\n    current channel\t= %d\r\n"
+           "Retry attempts made for\n    last transmission\t= %d\r\n"
+           "Multicast\t\t" PRIPSTR "\n"
+           "Custom ACK Payload\t" PRIPSTR "\n"
+           "Dynamic Payloads\t" PRIPSTR "\n"
+           "Auto Acknowledgment\t" PRIPSTR "\n"
+           "Primary Mode\t\t= " PRIPSTR "X\n"
+           "TX address\t\t= 0x" PRIPSTR "\n"
+           "pipe 0 (" PRIPSTR ") bound\t= 0x" PRIPSTR "\n"
+           "pipe 1 (" PRIPSTR ") bound\t= 0x" PRIPSTR "\n"
+           "pipe 2 (" PRIPSTR ") bound\t= 0x" PRIPSTR "\n"
+           "pipe 3 (" PRIPSTR ") bound\t= 0x" PRIPSTR "\n"
+           "pipe 4 (" PRIPSTR ") bound\t= 0x" PRIPSTR "\n"
+           "pipe 5 (" PRIPSTR ") bound\t= 0x" PRIPSTR);
 
-    char tx_address_char_array[11] = {'\0'};
-    sprintf_address_register(tx_address_char_array, TX_ADDR);
+  char tx_address_char_array[11] = {'\0'};
+  sprintf_address_register(tx_address_char_array, TX_ADDR);
 
-    char pipe_address_2d_char_array[2][11] = {'\0'};
-    char pipe_eight_bit_address_2d_char_array[4][3] = {'\0'};
-    bool isOpen_array[6] = {false};
+  char pipe_address_2d_char_array[2][11] = {'\0'};
+  char pipe_eight_bit_address_2d_char_array[4][3] = {'\0'};
+  bool isOpen_array[6] = {false};
 
-    uint8_t openPipes = read_register(EN_RXADDR);
-    for (uint8_t i = 0; i < 6; ++i) {
-        bool isOpen = openPipes & _BV(i);
-        isOpen_array[i] = isOpen;
-        if (i < 2) {
-            sprintf_address_register(pipe_address_2d_char_array[i], static_cast<uint8_t>(RX_ADDR_P0 + i));
-        }
-        else {
-            sprintf_byte_register(pipe_eight_bit_address_2d_char_array[i-2], static_cast<uint8_t>(RX_ADDR_P0 + i));
-        }
+  uint8_t openPipes = read_register(EN_RXADDR);
+  for (uint8_t i = 0; i < 6; ++i) {
+    isOpen_array[i] = openPipes & _BV(i);
+    if (i < 2) {
+      sprintf_address_register(pipe_address_2d_char_array[i],
+                               static_cast<uint8_t>(RX_ADDR_P0 + i));
+    } else {
+      sprintf_byte_register(pipe_eight_bit_address_2d_char_array[i - 2],
+                            static_cast<uint8_t>(RX_ADDR_P0 + i));
     }
+  }
 
-    char autoack_status_char_array[11] = {'\0'};
-    uint8_t autoAck = read_register(EN_AA);
-    if (autoAck == 0x3F || autoAck == 0) {
-        // all pipes have the same configuration about auto-ack feature
-        sprintf_P(autoack_status_char_array,
-                  PSTR(""
-                       PRIPSTR
-                       ""),
-                  (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1]))
-                );
-    }
-    else {
-        // representation per pipe
-        sprintf_P(autoack_status_char_array,
-                  PSTR("= 0b%c%c%c%c%c%c"),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
-                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48)
-                 );
-    }
+  char autoack_status_char_array[11] = {'\0'};
+  uint8_t autoAck = read_register(EN_AA);
+  if (autoAck == 0x3F || autoAck == 0) {
+    // all pipes have the same configuration about auto-ack feature
+    sprintf_P(autoack_status_char_array, PSTR("" PRIPSTR ""),
+              (char *)(pgm_read_ptr(
+                  &rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1])));
+  } else {
+    // representation per pipe
+    sprintf_P(
+        autoack_status_char_array, PSTR("= 0b%c%c%c%c%c%c"),
+        static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P5)) + 48),
+        static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P4)) + 48),
+        static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P3)) + 48),
+        static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P2)) + 48),
+        static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P1)) + 48),
+        static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48));
+  }
 
-    sprintf_P(debugging_information,
-              format_string,
-              csn_pin,
-              ce_pin,
-              static_cast<uint8_t>(spi_speed / 1000000),
-              getChannel(),
-              static_cast<uint16_t>(getChannel() + 2400),
-              (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
-              (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])),
-              (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
-              ((read_register(SETUP_AW) & 3) + 2),
-              getPayloadSize(),
-              ((read_register(SETUP_RETR) >> ARD) * 250 + 250),
-              (read_register(SETUP_RETR) & 0x0F),
-              (read_register(OBSERVE_TX) >> 4),
-              (read_register(OBSERVE_TX) & 0x0F),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
-              (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1])),
-              (autoack_status_char_array),
-              ((char *)(read_register(NRF_CONFIG) & _BV(PRIM_RX) ? PSTR("R") : PSTR("T"))),
-              (tx_address_char_array),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
-              (pipe_address_2d_char_array[0]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
-              (pipe_address_2d_char_array[1]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
-              (pipe_eight_bit_address_2d_char_array[0]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
-              (pipe_eight_bit_address_2d_char_array[1]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
-              (pipe_eight_bit_address_2d_char_array[2]),
-              ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
-              (pipe_eight_bit_address_2d_char_array[3])
-             );
+  sprintf_P(
+      debugging_information, format_string, csn_pin, ce_pin,
+      static_cast<uint8_t>(spi_speed / 1000000), getChannel(),
+      static_cast<uint16_t>(getChannel() + 2400),
+      (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
+      (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
+      (char *)(pgm_read_ptr(
+          &rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])),
+      (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
+      ((read_register(SETUP_AW) & 3) + 2), getPayloadSize(),
+      ((read_register(SETUP_RETR) >> ARD) * 250 + 250),
+      (read_register(SETUP_RETR) & 0x0F), (read_register(OBSERVE_TX) >> 4),
+      (read_register(OBSERVE_TX) & 0x0F),
+      (char *)(pgm_read_ptr(
+          &rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) &
+                                                  _BV(EN_DYN_ACK)) *
+                                2])),
+      (char *)(pgm_read_ptr(
+          &rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) &
+                                                  _BV(EN_ACK_PAY)) *
+                                1])),
+      (char *)(pgm_read_ptr(
+          &rf24_feature_e_str_P[(read_register(DYNPD) &&
+                                 (read_register(FEATURE) & _BV(EN_DPL))) *
+                                1])),
+      (autoack_status_char_array),
+      ((char *)(read_register(NRF_CONFIG) & _BV(PRIM_RX) ? PSTR("R")
+                                                         : PSTR("T"))),
+      (tx_address_char_array),
+      ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
+      (pipe_address_2d_char_array[0]),
+      ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[1] + 3]))),
+      (pipe_address_2d_char_array[1]),
+      ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[2] + 3]))),
+      (pipe_eight_bit_address_2d_char_array[0]),
+      ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[3] + 3]))),
+      (pipe_eight_bit_address_2d_char_array[1]),
+      ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[4] + 3]))),
+      (pipe_eight_bit_address_2d_char_array[2]),
+      ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[5] + 3]))),
+      (pipe_eight_bit_address_2d_char_array[3]));
 }
 
 /****************************************************************************/
