@@ -856,7 +856,9 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                                      "Auto Acknowledgment\t"
                                      PRIPSTR
                                      "\n"
-                                     "Primary Mode\t\t= %cX\n"
+                                     "Primary Mode\t\t= "
+                                     PRIPSTR
+                                     "X\n"
                                      "TX address\t\t= 0x"
                                      PRIPSTR
                                      "\n"
@@ -892,11 +894,11 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
                                     );
                                     
 
-    char tx_address_char_array[10] = {'\0'};
+    char tx_address_char_array[11] = {'\0'};
     sprintf_address_register(tx_address_char_array, TX_ADDR);
 
-    char pipe_address_2d_char_array[2][10] = {'\0'};
-    char pipe_eight_bit_address_2d_char_array[4][2] = {'\0'};
+    char pipe_address_2d_char_array[2][11] = {'\0'};
+    char pipe_eight_bit_address_2d_char_array[4][3] = {'\0'};
     bool isOpen_array[6] = {false};
 
     uint8_t openPipes = read_register(EN_RXADDR);
@@ -907,7 +909,7 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
             sprintf_address_register(pipe_address_2d_char_array[i], static_cast<uint8_t>(RX_ADDR_P0 + i));
         }
         else {
-            sprintf_byte_register(pipe_eight_bit_address_2d_char_array[i], static_cast<uint8_t>(RX_ADDR_P0 + i));
+            sprintf_byte_register(pipe_eight_bit_address_2d_char_array[i-2], static_cast<uint8_t>(RX_ADDR_P0 + i));
         }
     }
 
@@ -956,7 +958,7 @@ void RF24::sprintfPrettyDetails(char *debugging_information)
               (char *)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
               (char *)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) &_BV(EN_DPL))) * 1])),
               (autoack_status_char_array),
-              (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? PSTR("R") : PSTR("T")),
+              ((char *)(read_register(NRF_CONFIG) & _BV(PRIM_RX) ? PSTR("R") : PSTR("T"))),
               (tx_address_char_array),
               ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[isOpen_array[0] + 3]))),
               (pipe_address_2d_char_array[0]),
