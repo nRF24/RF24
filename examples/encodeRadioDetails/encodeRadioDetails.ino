@@ -79,7 +79,7 @@ void setup() {
 
   Serial.println(F("\n\nCopy the above string of hexadecimal characters (including spaces)."));
   Serial.print(F("Then paste it into a terminal using the print_details.py located in"));
-  Serial.println(F(" this example's folder. Like so:\npython print_details.py \""));
+  Serial.print(F(" this example's folder. Like so:\npython print_details.py \""));
   dumpRegData();
   Serial.println(F("\"\n***You may need to use 'python3' (without quotes) on Linux"));
 } // setup
