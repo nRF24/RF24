@@ -552,7 +552,7 @@ public:
     /**
      * @name Advanced Operation
      *
-     *  Methods you can use to drive the chip in more advanced ways
+     * Methods you can use to drive the chip in more advanced ways
      */
     /**@{*/
 
@@ -564,9 +564,9 @@ public:
      * @code
      * #include <printf.h>
      * setup(){
-     *  Serial.begin(115200);
-     *  printf_begin();
-     *  ...
+     *   Serial.begin(115200);
+     *   printf_begin();
+     *   ...
      * }
      * @endcode
      */
@@ -584,9 +584,9 @@ public:
      * @code
      * #include <printf.h>
      * setup(){
-     *  Serial.begin(115200);
-     *  printf_begin();
-     *  ...
+     *   Serial.begin(115200);
+     *   printf_begin();
+     *   ...
      * }
      * @endcode
      *
@@ -616,20 +616,22 @@ public:
      * be undefined.
      * @code
      * char buffer[870] = {'\0'};
-     * radio.sprintfPrettyDetails(buffer);
+     * uint16_t used_chars = radio.sprintfPrettyDetails(buffer);
      * Serial.println(buffer);
      * Serial.print(F("strlen = "));
-     * Serial.println(strlen(buffer));
+     * Serial.println(used_chars);
      * @endcode
      *
      * @param debugging_information The c-string buffer that the debugging
      * information is stored to. This must be allocated to a minimum of 870 bytes of memory.
+     * @returns The number of characters altered in the given buffer.
      *
-     * This function is available in the python wrapper, but it accepts no
-     * parameters and returns a string.
+     * This function is available in the python wrapper, but it accepts no parameters and
+     * returns a string. It does not return the number of characters in the string.
      * @code{.py}
      * debug_info = radio.sprintfPrettyDetails()
      * print(debug_info)
+     * print("str_len =", len(debug_info))
      * @endcode
      *
      * @note If the automatic acknowledgements feature is configured differently
@@ -637,25 +639,25 @@ public:
      * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
-    void sprintfPrettyDetails(char *debugging_information);
+    uint16_t sprintfPrettyDetails(char *debugging_information);
 
     /**
-     * Encode radio debugging information into an array of uint8_t (unsigned char).
-     * This function differs from other debug output methods because
-     * the debug information can be decoded as a bytearray by an external program.
+     * Encode radio debugging information into an array of uint8_t. This function
+     * differs from other status output methods because the status information can
+     * be decoded by `decodeRadioDetails()`
      *
      * @remark
-     * This function uses much less ram than the other `*print*Details()` methods.
+     * This function uses much less ram than other `Details` output methods
      * 
      * @code
-     * uint8_t encoded_details[43] = {0};
+     * uint8_t encoded_details[40] = {0};
      * radio.encodeRadioDetails(encoded_details);
      * @endcode
      *
-     * @param encoded_details The uint8_t array that RF24 radio details are
-     * encoded into. This referenced array must be at least 43 bytes in length.
+     * @param encoded_status The uint8_t array that RF24 radio details are
+     * encoded into.
      */
-    void encodeRadioDetails(uint8_t *encoded_details);
+    void encodeRadioDetails(uint8_t *encoded_status);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1914,32 +1916,6 @@ private:
     void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
     /**
-     * Put the value of an 8-bit register into a char array
-     *
-     * Optionally it can print some quantity of successive
-     * registers on the same line.  This is useful for printing a group
-     * of related registers on one line.
-     *
-     * @param out_buffer Output buffer, char array
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @param qty How many successive registers to print
-     */
-    void sprintf_byte_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
-
-    // /**
-    //  * Put the value of an 8-bit register into a uint8_t array
-    //  *
-    //  * Optionally it can output some quantity of successive
-    //  * registers to the same array.  This is useful for getting a group
-    //  * of related registers into one array.
-    //  *
-    //  * @param out_array uint8_t output array, should be equal to qty
-    //  * @param reg Which register. Use constants from nRF24L01.h
-    //  * @param qty How many successive registers to put in the array
-    //  */
-    // void arrayify_byte_register(uint8_t *out_array, uint8_t reg, uint8_t qty = 1);
-
-    /**
      * Print the name and value of a 40-bit address register to stdout
      *
      * Optionally it can print some quantity of successive
@@ -1962,22 +1938,9 @@ private:
      * @param out_buffer Output buffer, char array
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
+     * @return The total number of characters written to the given buffer.
      */
-    void sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
-
-    /**
-     * Put the value of a 40-bit address register into a 5 byte array
-     *
-     * Optionally it can output some quantity of successive
-     * 5 byte address registers to the same array.  This is useful for getting a 
-     * group of related registers in one array.
-     *
-     * @param out_array Output array, uint8_t array
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @param qty How many successive registers to print
-     */
-    void arrayify_address_register(uint8_t *out_array, uint8_t reg, uint8_t qty = 1);
-
+    uint8_t sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
     #endif
 
     /**

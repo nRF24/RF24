@@ -64,8 +64,11 @@ void setup() {
 
   // For debugging info
   char *debug_info = new char[870];
-  radio.sprintfPrettyDetails(debug_info);
+  uint16_t str_len = radio.sprintfPrettyDetails(debug_info);
   Serial.println(debug_info);
+  Serial.print(F("\nThe above output used "));
+  Serial.print(str_len);
+  Serial.println(F(" characters."));
 
   // encoded_details is NOT human readable.
   // encodeRadioDetails() is very small when used on its own because it puts debugging information into a byte array
