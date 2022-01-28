@@ -29,14 +29,14 @@ RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
   will take a space-delimited string of hexadecimal characters and
   decode then print it out as human readable information.
 */
-uint8_t encoded_details[38] = {0};
+uint8_t encoded_details[43] = {0};
 
 // Use this function to print out the encoded_details as a
 // space-delimited string of hexadecimal characters.
 void dumpRegData() {
-  for (uint8_t i = 0; i < 38; ++i) {
+  for (uint8_t i = 0; i < 43; ++i) {
     Serial.print(encoded_details[i], HEX);
-    if (i < 37)
+    if (i < 42)
       Serial.print(F(" "));
   }
 }
@@ -57,7 +57,6 @@ void setup() {
   // print example's introductory prompt
   Serial.println(F("RF24/examples/encodedRadioDetails"));
 
-  // To set the radioNumber via the Serial monitor on startup
   Serial.println(F("Press any key to show debugging information"));
   while (!Serial.available()) {
     // wait for user input
@@ -77,8 +76,7 @@ void setup() {
 
   Serial.println(F("\n\nCopy the above string of hexadecimal characters (including spaces)."));
   Serial.print(F("Then paste it into a terminal using the print_details.py located in"));
-  Serial.println(F(" this example's folder. Like so:"));
-  Serial.print(F("python print_details.py \""));
+  Serial.println(F(" this example's folder. Like so:\npython print_details.py \""));
   dumpRegData();
   Serial.println(F("\"\n***You may need to use 'python3' (without quotes) on Linux"));
 } // setup
@@ -110,6 +108,9 @@ void setup() {
   35:    FIFO_STATUS
   36:    DYNPD
   37:    FEATURE
+  38-39: ce_pin
+  40-41: csn_pin
+  42:    SPI speed MHz | (isPlusVariant << 4)
 */
 
 void loop()

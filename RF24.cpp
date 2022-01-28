@@ -933,34 +933,39 @@ void RF24::sprintfPrettyDetails(char *debugging_information) {
 /****************************************************************************/
 
 void RF24::encodeRadioDetails(uint8_t *encoded_details) {
-    /* Registers correspnding to index of encoded_details array
-        0:     NRF_CONFIG
-        1:     EN_AA
-        2:     EN_RXADDR
-        3:     SETUP_AW
-        4:     SETUP_RETR
-        5:     RF_CH
-        6:     RF_SETUP
-        7:     NRF_STATUS
-        8:     OBSERVE_TX
-        9:     CD (aka RPD)
-        10-14: RX_ADDR_P0
-        15-19: RX_ADDR_P1
-        20:    RX_ADDR_P2
-        21:    RX_ADDR_P3
-        22:    RX_ADDR_P4
-        23:    RX_ADDR_P5
-        24-28: TX_ADDR
-        29:    RX_PW_P0
-        30:    RX_PW_P1
-        31:    RX_PW_P2
-        32:    RX_PW_P3
-        33:    RX_PW_P4
-        34:    RX_PW_P5
-        35:    FIFO_STATUS
-        36:    DYNPD
-        37:    FEATURE
-    */
+    /** Registers names and/or data correspnding to the index of the `encoded_details` array:
+     * | index | register/data |
+     * |------:|:--------------|
+     * | 0 |     NRF_CONFIG |
+     * | 1 |     EN_AA |
+     * | 2 |     EN_RXADDR |
+     * | 3 |     SETUP_AW |
+     * | 4 |     SETUP_RETR |
+     * | 5 |     RF_CH |
+     * | 6 |     RF_SETUP |
+     * | 7 |     NRF_STATUS |
+     * | 8 |     OBSERVE_TX |
+     * | 9 |     CD (aka RPD) |
+     * | 10-14 | RX_ADDR_P0 |
+     * | 15-19 | RX_ADDR_P1 |
+     * | 20 |    RX_ADDR_P2 |
+     * | 21 |    RX_ADDR_P3 |
+     * | 22 |    RX_ADDR_P4 |
+     * | 23 |    RX_ADDR_P5 |
+     * | 24-28 | TX_ADDR |
+     * | 29 |    RX_PW_P0 |
+     * | 30 |    RX_PW_P1 |
+     * | 31 |    RX_PW_P2 |
+     * | 32 |    RX_PW_P3 |
+     * | 33 |    RX_PW_P4 |
+     * | 34 |    RX_PW_P5 |
+     * | 35 |    FIFO_STATUS |
+     * | 36 |    DYNPD |
+     * | 37 |    FEATURE |
+     * | 38-39 | ce_pin |
+     * | 40-41 | csn_pin |
+     * | 42 |    SPI speed (in MHz) or'd with (isPlusVariant << 4) |
+     */
 
     uint8_t end = FEATURE + 1;
     for (uint8_t i = NRF_CONFIG; i < end; ++i) {
@@ -974,6 +979,11 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details) {
             *encoded_details++ = read_register(i);
         }
     }
+    *encoded_details++ = ce_pin >> 4;
+    *encoded_details++ = ce_pin & 0xFF;
+    *encoded_details++ = csn_pin >> 4;
+    *encoded_details++ = csn_pin & 0xFF;
+    *encoded_details = static_cast<uint8_t>((spi_speed / 1000000) | _BV(_is_p_variant * 4));
 }
 #endif // !defined(MINIMAL)
 
@@ -1370,7 +1380,7 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
 {
     //Block until the FIFO is NOT full.
     //Keep track of the MAX retries and set auto-retry if seeing failures
-    //Return 0 so the user can control the retrys and set a timer or failure counter if required
+    //Return 0 so the user can control the retries and set a timer or failure counter if required
     //The radio will auto-clear everything in the FIFO as long as CE remains high
 
     #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
@@ -1820,7 +1830,7 @@ void RF24::setAutoAck(bool enable)
         write_register(EN_AA, 0x3F);
     }else{
         write_register(EN_AA, 0);
-        // accomodate ACK payloads feature
+        // accommodate ACK payloads feature
         if (ack_payloads_enabled){
             disableAckPayload();
         }

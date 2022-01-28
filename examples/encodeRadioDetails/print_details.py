@@ -2,7 +2,7 @@
 output it in human readable form.
 
 Example usage:
-    print_details.py "0e3f02030002000e"
+    print_details.py "0e 3f 02 03 00 02 00 0e"
 
 Notes:
     * The radio's power state is represented under the assumption that
@@ -21,13 +21,7 @@ def hex_str_to_bytes(s_in: str) -> bytes:
     .. warning:: This function assumes that the string consists of only
         hexadecimal characters.
     """
-    s_in = s_in.split()
-    len_s = len(s_in)
-    if len_s % 2:
-        raise argparse.ArgumentError(
-            None, f"buffer is {len_s} bytes (expected 38)"
-        )
-    return bytes([int(i, 16) for i in s_in])
+    return bytes([int(i, 16) for i in s_in.split()])
 
 
 argparser = argparse.ArgumentParser(
@@ -51,7 +45,7 @@ def address_repr(buf, reverse: bool = True, delimit: str = "") -> str:
 def print_details(encoded_buf: bytearray):
     """This debuggung function outputs all details about the nRF24L01."""
     # declare sequences
-    pipes = [bytearray()] * 2 + [0] * 4
+    pipes = [bytearray(5)] * 2 + [0] * 4
     pl_len = [0] * 6
 
     # unpack bytearray
@@ -87,6 +81,8 @@ def print_details(encoded_buf: bytearray):
         dyn_pl,  # 0x1C
         features,  # 0x1D
     ) = struct.unpack("9B", encoded_buf[29:38])
+    ce_pin, csn_pin, spi_speed = struct.unpack(">2H1B", encoded_buf[38:44])
+
 
     # do some deciphering arithmetic
     addr_len += 2
@@ -110,7 +106,14 @@ def print_details(encoded_buf: bytearray):
         else "0b" + "0" * (8 - len(bin(auto_ack))) + bin(auto_ack)[2:]
     )
     pwr = "Standby" if config & 2 else "Off"
-    # print("Is a plus variant_________{}".format(is_plus_variant))
+    is_plus_variant = bool(spi_speed >> 4)
+    spi_speed = spi_speed & 0xF
+
+    # print it all out
+    print("CE pin____________________{}".format(ce_pin))
+    print("CSN pin___________________{}".format(csn_pin))
+    print("SPI speed_________________{} MHz".format(spi_speed))
+    print("Is a plus variant_________{}".format(is_plus_variant))
     print(
         "Channel___________________{}".format(channel),
         "~ {} GHz".format((channel + 2400) / 1000),

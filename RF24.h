@@ -535,7 +535,7 @@ public:
      * startListening().<br> Read
      * http://maniacalbits.blogspot.com/2013/04/rf24-addressing-nrf24l01-radios-require.html
      * to understand how to avoid using malformed addresses. This address
-     * restoration is implemented because of the underlying neccessary
+     * restoration is implemented because of the underlying necessary
      * functionality of openWritingPipe().
      *
      * @param number Which pipe to open. Only pipe numbers 0-5 are available,
@@ -640,22 +640,22 @@ public:
     void sprintfPrettyDetails(char *debugging_information);
 
     /**
-     * Encode radio debugging information into an array of uint8_t. This function
-     * differs from other status output methods because the status information can
-     * be decoded by `decodeRadioDetails()`
+     * Encode radio debugging information into an array of uint8_t (unsigned char).
+     * This function differs from other debug output methods because
+     * the debug information can be decoded as a bytearray by an external program.
      *
      * @remark
-     * This function uses much less ram than other `Details` output methods
+     * This function uses much less ram than the other `*print*Details()` methods.
      * 
      * @code
-     * uint8_t encoded_details[40] = {0};
+     * uint8_t encoded_details[43] = {0};
      * radio.encodeRadioDetails(encoded_details);
      * @endcode
      *
-     * @param encoded_status The uint8_t array that RF24 radio details are
-     * encoded into.
+     * @param encoded_details The uint8_t array that RF24 radio details are
+     * encoded into. This referenced array must be at least 43 bytes in length.
      */
-    void encodeRadioDetails(uint8_t *encoded_status);
+    void encodeRadioDetails(uint8_t *encoded_details);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1238,14 +1238,14 @@ public:
      *
      * See the included example, GettingStarted_HandlingFailures
      *
-     *  @code
-     *  if(radio.failureDetected){
-     *    radio.begin();                        // Attempt to re-configure the radio with defaults
-     *    radio.failureDetected = 0;            // Reset the detection value
-     *	 radio.openWritingPipe(addresses[1]);  // Re-configure pipe addresses
-     *    radio.openReadingPipe(1, addresses[0]);
-     *    report_failure();                     // Blink leds, send a message, etc. to indicate failure
-     *  }
+     * @code
+     * if(radio.failureDetected) {
+     *   radio.begin();                          // Attempt to re-configure the radio with defaults
+     *   radio.failureDetected = 0;              // Reset the detection value
+     *   radio.openWritingPipe(addresses[1]);    // Re-configure pipe addresses
+     *   radio.openReadingPipe(1, addresses[0]);
+     *   report_failure();                       // Blink LEDs, send a message, etc. to indicate failure
+     * }
      * @endcode
      */
     bool failureDetected;
