@@ -529,7 +529,7 @@ uint8_t RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qt
         read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
 
         uint8_t* bufptr = read_buffer + addr_width;
-        i = 0;
+        uint8_t i = 0;
         while (--bufptr >= read_buffer) {
             i += sprintf_P(out_buffer + i, PSTR("%02x"), *bufptr);
         }
