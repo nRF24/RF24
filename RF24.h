@@ -106,7 +106,6 @@ typedef enum {
     RF24_CRC_16
 } rf24_crclength_e;
 
-
 /**
  * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
@@ -1978,6 +1977,7 @@ private:
     /**@}*/
 
 };
+
 
 /**
  * @example{lineno} examples/GettingStarted/GettingStarted.ino

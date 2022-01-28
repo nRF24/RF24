@@ -537,6 +537,7 @@ uint8_t RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qt
     delete[] read_buffer;
     return offset;
 }
+
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
