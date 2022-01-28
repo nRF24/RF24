@@ -894,7 +894,7 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
 /****************************************************************************/
 
 void RF24::encodeRadioDetails(uint8_t *encoded_details) {
-    /** Registers names and/or data correspnding to the index of the `encoded_details` array:
+    /** Registers names and/or data corresponding to the index of the `encoded_details` array:
      * | index | register/data |
      * |------:|:--------------|
      * | 0 |     NRF_CONFIG |
