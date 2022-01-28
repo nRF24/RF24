@@ -528,7 +528,8 @@ uint8_t RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qt
     while (qty--) {
         read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
 
-        uint8_t* bufptr = read_buffer + addr_width, i = 0;
+        uint8_t* bufptr = read_buffer + addr_width;
+        i = 0;
         while (--bufptr >= read_buffer) {
             i += sprintf_P(out_buffer + i, PSTR("%02x"), *bufptr);
         }
@@ -847,8 +848,7 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
         (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
             static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
         (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-            (read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1]))
-    );
+            (read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1])));
     uint8_t autoAck = read_register(EN_AA);
     if (autoAck == 0x3F || autoAck == 0) {
         // all pipes have the same configuration about auto-ack feature
@@ -934,7 +934,7 @@ void RF24::encodeRadioDetails(uint8_t *encoded_details) {
             read_register(i, encoded_details, 5);
             encoded_details += 5;
         }
-        else if (i != 0x18 && i != 0x19 && i != 0x1a && i != 0x1b){ // skip undocumented registers
+        else if (i != 0x18 && i != 0x19 && i != 0x1a && i != 0x1b) { // skip undocumented registers
             // get single byte registers
             *encoded_details++ = read_register(i);
         }
