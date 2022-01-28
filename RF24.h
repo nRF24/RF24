@@ -643,19 +643,19 @@ public:
 
     /**
      * Encode radio debugging information into an array of uint8_t. This function
-     * differs from other status output methods because the status information can
-     * be decoded by `decodeRadioDetails()`
+     * differs from other debug output methods because the debug information can
+     * be decoded by an external program.
      *
      * @remark
-     * This function uses much less ram than other `Details` output methods
+     * This function uses much less ram than other `*print*Details()` methods.
      * 
      * @code
-     * uint8_t encoded_details[40] = {0};
+     * uint8_t encoded_details[43] = {0};
      * radio.encodeRadioDetails(encoded_details);
      * @endcode
      *
      * @param encoded_status The uint8_t array that RF24 radio details are
-     * encoded into.
+     * encoded into. This must array be at least 43 bytes in length.
      */
     void encodeRadioDetails(uint8_t *encoded_status);
 
