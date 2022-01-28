@@ -7,8 +7,6 @@ Example usage:
 Notes:
     * The radio's power state is represented under the assumption that
       the radio's CE pin is inactive low.
-    * The classification 'is_plus_variant' is info that cannot be obtained from
-      the radio's registers.
 """
 # pylint: disable=consider-using-f-string
 import struct
