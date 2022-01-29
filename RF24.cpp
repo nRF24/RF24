@@ -880,7 +880,7 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
         }
         else {
             offset += sprintf_P(
-                debugging_information + offset, "%0X",
+                debugging_information + offset, PSTR("%0X"),
                 read_register(static_cast<uint8_t>(RX_ADDR_P0 + i)));
         }
     }
