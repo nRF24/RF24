@@ -5,18 +5,18 @@ Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or
 
 @note The SPIDEV option should work with most Linux systems supporting spi userspace device.
 
-@warning These instructions are beginning to age because they were designed with the assumption that
+@warning The manual install instructions are beginning to age because they were designed with the assumption that
 the arm-linux-gnueabihf-g\*\* compilers were available and default for the system. If you have problems
-using these instructions, please try the [instructions using CMake](md_docs_using_cmake.html).
+using those instructions, please try the [instructions using CMake](md_docs_using_cmake.html).
 
 ## Automated Install
 
 **Designed & Tested on RPi** - Defaults to SPIDEV on devices supporting it
 
 1. Install prerequisites if there are any (MRAA, LittleWire libraries, setup SPI device etc)
-2. Download the install.sh file from [tmrh20.github.io/RF24Installer/RPi](http://tmrh20.github.io/RF24Installer/RPi/install.sh)
+2. Download the install.sh file from [https://github.com/nRF24/.github/blob/main/installer/install.sh](https://raw.githubusercontent.com/nRF24/.github/main/installer/install.sh)
    ```shell
-   wget http://tmrh20.github.io/RF24Installer/RPi/install.sh
+   wget https://raw.githubusercontent.com/nRF24/.github/main/installer/install.sh
    ```
 3. Make it executable
    ```shell
