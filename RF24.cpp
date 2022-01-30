@@ -889,40 +889,8 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
 
 /****************************************************************************/
 
-void RF24::encodeRadioDetails(uint8_t *encoded_details) {
-    /** Registers names and/or data corresponding to the index of the `encoded_details` array:
-     * | index | register/data |
-     * |------:|:--------------|
-     * | 0 |     NRF_CONFIG |
-     * | 1 |     EN_AA |
-     * | 2 |     EN_RXADDR |
-     * | 3 |     SETUP_AW |
-     * | 4 |     SETUP_RETR |
-     * | 5 |     RF_CH |
-     * | 6 |     RF_SETUP |
-     * | 7 |     NRF_STATUS |
-     * | 8 |     OBSERVE_TX |
-     * | 9 |     CD (aka RPD) |
-     * | 10-14 | RX_ADDR_P0 |
-     * | 15-19 | RX_ADDR_P1 |
-     * | 20 |    RX_ADDR_P2 |
-     * | 21 |    RX_ADDR_P3 |
-     * | 22 |    RX_ADDR_P4 |
-     * | 23 |    RX_ADDR_P5 |
-     * | 24-28 | TX_ADDR |
-     * | 29 |    RX_PW_P0 |
-     * | 30 |    RX_PW_P1 |
-     * | 31 |    RX_PW_P2 |
-     * | 32 |    RX_PW_P3 |
-     * | 33 |    RX_PW_P4 |
-     * | 34 |    RX_PW_P5 |
-     * | 35 |    FIFO_STATUS |
-     * | 36 |    DYNPD |
-     * | 37 |    FEATURE |
-     * | 38-39 | ce_pin |
-     * | 40-41 | csn_pin |
-     * | 42 |    SPI speed (in MHz) or'd with (isPlusVariant << 4) |
-     */
+void RF24::encodeRadioDetails(uint8_t *encoded_details)
+{
     uint8_t end = FEATURE + 1;
     for (uint8_t i = NRF_CONFIG; i < end; ++i) {
         if (i == RX_ADDR_P0 || i == RX_ADDR_P1 || i == TX_ADDR) {
