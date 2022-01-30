@@ -112,7 +112,8 @@ typedef enum
  * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
-class RF24 {
+class RF24
+{
 private:
 #ifdef SOFTSPI
     SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
@@ -641,7 +642,7 @@ public:
      * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
-    uint16_t sprintfPrettyDetails(char *debugging_information);
+    uint16_t sprintfPrettyDetails(char* debugging_information);
 
     /**
      * Encode radio debugging information into an array of uint8_t. This function
@@ -696,7 +697,7 @@ public:
      * | 40-41 | csn_pin |
      * | 42 |    SPI speed (in MHz) or'd with (isPlusVariant << 4) |
      */
-    void encodeRadioDetails(uint8_t *encoded_status);
+    void encodeRadioDetails(uint8_t* encoded_status);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1978,8 +1979,8 @@ private:
      * @param qty How many successive registers to print
      * @return The total number of characters written to the given buffer.
      */
-    uint8_t sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
-    #endif
+    uint8_t sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qty = 1);
+#endif
 
     /**
      * Turn on or off the special features of the chip

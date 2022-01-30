@@ -553,16 +553,16 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
 /****************************************************************************/
 
-uint8_t RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty)
+uint8_t RF24::sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qty)
 {
     uint8_t offset = 0;
-    uint8_t *read_buffer = new uint8_t[addr_width];
+    uint8_t* read_buffer = new uint8_t[addr_width];
     while (qty--) {
         read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
         uint8_t* bufptr = read_buffer + addr_width;
         while (--bufptr >= read_buffer) {
             offset += sprintf_P(out_buffer + offset, PSTR("%02X"), *bufptr);
-        }    
+        }
     }
     delete[] read_buffer;
     return offset;
@@ -833,8 +833,9 @@ void RF24::printPrettyDetails(void)
 
 /****************************************************************************/
 
-uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
-    const char *format_string = PSTR(
+uint16_t RF24::sprintfPrettyDetails(char* debugging_information)
+{
+    const char* format_string = PSTR(
         "================ SPI Configuration ================\n"
         "CSN Pin\t\t\t= %d\n"
         "CE Pin\t\t\t= %d\n"
@@ -862,28 +863,23 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
         debugging_information, format_string, csn_pin, ce_pin,
         static_cast<uint8_t>(spi_speed / 1000000), getChannel(),
         static_cast<uint16_t>(getChannel() + 2400),
-        (char *)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
-        (char *)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
-        (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-            (read_register(RF_SETUP) & 1) * 1])),
-        (char *)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
+        (char*)(pgm_read_ptr(&rf24_datarate_e_str_P[getDataRate()])),
+        (char*)(pgm_read_ptr(&rf24_pa_dbm_e_str_P[getPALevel()])),
+        (char*)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(RF_SETUP) & 1) * 1])),
+        (char*)(pgm_read_ptr(&rf24_crclength_e_str_P[getCRCLength()])),
         ((read_register(SETUP_AW) & 3) + 2), getPayloadSize(),
         ((read_register(SETUP_RETR) >> ARD) * 250 + 250),
         (read_register(SETUP_RETR) & 0x0F), (read_register(OBSERVE_TX) >> 4),
         (read_register(OBSERVE_TX) & 0x0F),
-        (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-            static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
-        (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-            static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
-        (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-            (read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1])));
+        (char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_DYN_ACK)) * 2])),
+        (char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(read_register(FEATURE) & _BV(EN_ACK_PAY)) * 1])),
+        (char*)(pgm_read_ptr(&rf24_feature_e_str_P[(read_register(DYNPD) && (read_register(FEATURE) & _BV(EN_DPL))) * 1])));
     uint8_t autoAck = read_register(EN_AA);
     if (autoAck == 0x3F || autoAck == 0) {
         // all pipes have the same configuration about auto-ack feature
         offset += sprintf_P(
             debugging_information + offset, PSTR("" PRIPSTR ""),
-            (char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-                static_cast<bool>(autoAck) * 1])));
+            (char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(autoAck) * 1])));
     }
     else {
         // representation per pipe
@@ -904,8 +900,7 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
     for (uint8_t i = 0; i < 6; ++i) {
         offset += sprintf_P(
             debugging_information + offset, format_str3,
-            i, ((char *)(pgm_read_ptr(&rf24_feature_e_str_P[
-                static_cast<bool>(openPipes & _BV(i)) + 3]))));
+            i, ((char*)(pgm_read_ptr(&rf24_feature_e_str_P[static_cast<bool>(openPipes & _BV(i)) + 3]))));
         if (i < 2) {
             offset += sprintf_address_register(
                 debugging_information + offset, static_cast<uint8_t>(RX_ADDR_P0 + i));
@@ -921,7 +916,7 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
 
 /****************************************************************************/
 
-void RF24::encodeRadioDetails(uint8_t *encoded_details)
+void RF24::encodeRadioDetails(uint8_t* encoded_details)
 {
     uint8_t end = FEATURE + 1;
     for (uint8_t i = NRF_CONFIG; i < end; ++i) {
