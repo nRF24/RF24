@@ -95,6 +95,7 @@ jobs:
           - "examples/StreamingData/StreamingData.ino"
           - "examples/MulticeiverDemo/MulticeiverDemo.ino"
           - "examples/InterruptConfigure/InterruptConfigure.ino"
+          - "examples/encodeRadioDetails/encodeRadioDetails.ino"
         board:
           - "teensy31"
           - "teensy35"

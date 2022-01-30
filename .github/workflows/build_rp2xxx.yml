@@ -1,6 +1,7 @@
 name: Pico SDK build
 
 on:
+  pull_request_target:
   push:
     paths:
       - ".github/workflows/build_rp2xxx.yml"

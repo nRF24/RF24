@@ -100,6 +100,7 @@ jobs:
             - examples/MulticeiverDemo
             - examples/InterruptConfigure
             - examples/scanner
+            - examples/encodeRadioDetails
           # The following examples still exist for posterity. They don't trigger this workflow
           #   - examples/old_backups/GettingStarted_HandlingFailures
           #   - examples/old_backups/pingpair_dyn

@@ -1,6 +1,7 @@
 name: Linux build
 
 on:
+  pull_request_target:
   pull_request:
     types: [opened, reopened]
     paths:
