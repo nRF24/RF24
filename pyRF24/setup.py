@@ -76,10 +76,10 @@ finally:
     for symlink_loc in symlink_directory:
         if os.path.exists(symlink_loc + "/libpigpio.so"):
             found_pigpio = True
-    if not found_pigpio:
-        cflags += " -DRF24_NO_INTERRUPT=1"
-    elif "-lpigpio" not in cflags:
+    if found_pigpio and "-lpigpio" not in cflags:
         cflags += " -lpigpio"
+    # IRQ pin features will be implemented in python via pigpio's python API or RPi.GPIO
+    cflags += "-DRF24_NO_INTERRUPT"
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags
