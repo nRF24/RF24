@@ -112,9 +112,7 @@ typedef enum
  * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
-
-class RF24
-{
+class RF24 {
 private:
 #ifdef SOFTSPI
     SoftSPI<SOFT_SPI_MISO_PIN, SOFT_SPI_MOSI_PIN, SOFT_SPI_SCK_PIN, SPI_MODE> spi;
@@ -555,7 +553,7 @@ public:
     /**
      * @name Advanced Operation
      *
-     *  Methods you can use to drive the chip in more advanced ways
+     * Methods you can use to drive the chip in more advanced ways
      */
     /**@{*/
 
@@ -567,9 +565,9 @@ public:
      * @code
      * #include <printf.h>
      * setup(){
-     *  Serial.begin(115200);
-     *  printf_begin();
-     *  ...
+     *   Serial.begin(115200);
+     *   printf_begin();
+     *   ...
      * }
      * @endcode
      */
@@ -587,9 +585,9 @@ public:
      * @code
      * #include <printf.h>
      * setup(){
-     *  Serial.begin(115200);
-     *  printf_begin();
-     *  ...
+     *   Serial.begin(115200);
+     *   printf_begin();
+     *   ...
      * }
      * @endcode
      *
@@ -619,20 +617,23 @@ public:
      * be undefined.
      * @code
      * char buffer[870] = {'\0'};
-     * radio.sprintfPrettyDetails(buffer);
+     * uint16_t used_chars = radio.sprintfPrettyDetails(buffer);
      * Serial.println(buffer);
      * Serial.print(F("strlen = "));
-     * Serial.println(strlen(buffer));
+     * Serial.println(used_chars + 1); // +1 for c-strings' null terminating byte
      * @endcode
      *
      * @param debugging_information The c-string buffer that the debugging
      * information is stored to. This must be allocated to a minimum of 870 bytes of memory.
+     * @returns The number of characters altered in the given buffer. Remember that,
+     * like `sprintf()`, this returned number does not include the null terminating byte.
      *
-     * This function is available in the python wrapper, but it accepts no
-     * parameters and returns a string.
+     * This function is available in the python wrapper, but it accepts no parameters and
+     * returns a string. It does not return the number of characters in the string.
      * @code{.py}
      * debug_info = radio.sprintfPrettyDetails()
      * print(debug_info)
+     * print("str_len =", len(debug_info))
      * @endcode
      *
      * @note If the automatic acknowledgements feature is configured differently
@@ -640,7 +641,62 @@ public:
      * represent pipes 0-5 respectively. A `0` means the feature is disabled, and
      * a `1` means the feature is enabled.
      */
-    void sprintfPrettyDetails(char* debugging_information);
+    uint16_t sprintfPrettyDetails(char *debugging_information);
+
+    /**
+     * Encode radio debugging information into an array of uint8_t. This function
+     * differs from other debug output methods because the debug information can
+     * be decoded by an external program.
+     *
+     * This function is not available in the python wrapper because it is intended for
+     * use on processors with very limited available resources.
+     * 
+     * @remark
+     * This function uses much less ram than other `*print*Details()` methods.
+     * 
+     * @code
+     * uint8_t encoded_details[43] = {0};
+     * radio.encodeRadioDetails(encoded_details);
+     * @endcode
+     *
+     * @param encoded_status The uint8_t array that RF24 radio details are
+     * encoded into. This array must be at least 43 bytes in length; any less would surely
+     * cause undefined behavior.
+     * 
+     * Registers names and/or data corresponding to the index of the `encoded_details` array:
+     * | index | register/data |
+     * |------:|:--------------|
+     * | 0 |     NRF_CONFIG |
+     * | 1 |     EN_AA |
+     * | 2 |     EN_RXADDR |
+     * | 3 |     SETUP_AW |
+     * | 4 |     SETUP_RETR |
+     * | 5 |     RF_CH |
+     * | 6 |     RF_SETUP |
+     * | 7 |     NRF_STATUS |
+     * | 8 |     OBSERVE_TX |
+     * | 9 |     CD (aka RPD) |
+     * | 10-14 | RX_ADDR_P0 |
+     * | 15-19 | RX_ADDR_P1 |
+     * | 20 |    RX_ADDR_P2 |
+     * | 21 |    RX_ADDR_P3 |
+     * | 22 |    RX_ADDR_P4 |
+     * | 23 |    RX_ADDR_P5 |
+     * | 24-28 | TX_ADDR |
+     * | 29 |    RX_PW_P0 |
+     * | 30 |    RX_PW_P1 |
+     * | 31 |    RX_PW_P2 |
+     * | 32 |    RX_PW_P3 |
+     * | 33 |    RX_PW_P4 |
+     * | 34 |    RX_PW_P5 |
+     * | 35 |    FIFO_STATUS |
+     * | 36 |    DYNPD |
+     * | 37 |    FEATURE |
+     * | 38-39 | ce_pin |
+     * | 40-41 | csn_pin |
+     * | 42 |    SPI speed (in MHz) or'd with (isPlusVariant << 4) |
+     */
+    void encodeRadioDetails(uint8_t *encoded_status);
 
     /**
      * Test whether there are bytes available to be read from the
@@ -1223,14 +1279,14 @@ public:
      *
      * See the included example, GettingStarted_HandlingFailures
      *
-     *  @code
-     *  if(radio.failureDetected){
-     *    radio.begin();                        // Attempt to re-configure the radio with defaults
-     *    radio.failureDetected = 0;            // Reset the detection value
-     *	 radio.openWritingPipe(addresses[1]);  // Re-configure pipe addresses
-     *    radio.openReadingPipe(1, addresses[0]);
-     *    report_failure();                     // Blink LEDs, send a message, etc. to indicate failure
-     *  }
+     * @code
+     * if(radio.failureDetected) {
+     *   radio.begin();                          // Attempt to re-configure the radio with defaults
+     *   radio.failureDetected = 0;              // Reset the detection value
+     *   radio.openWritingPipe(addresses[1]);    // Re-configure pipe addresses
+     *   radio.openReadingPipe(1, addresses[0]);
+     *   report_failure();                       // Blink LEDs, send a message, etc. to indicate failure
+     * }
      * @endcode
      */
     bool failureDetected;
@@ -1898,19 +1954,6 @@ private:
     void print_byte_register(const char* name, uint8_t reg, uint8_t qty = 1);
 
     /**
-     * Put the value of an 8-bit register into a char array
-     *
-     * Optionally it can print some quantity of successive
-     * registers on the same line.  This is useful for printing a group
-     * of related registers on one line.
-     *
-     * @param out_buffer Output buffer, char array
-     * @param reg Which register. Use constants from nRF24L01.h
-     * @param qty How many successive registers to print
-     */
-    void sprintf_byte_register(char* out_buffer, uint8_t reg, uint8_t qty = 1);
-
-    /**
      * Print the name and value of a 40-bit address register to stdout
      *
      * Optionally it can print some quantity of successive
@@ -1933,10 +1976,10 @@ private:
      * @param out_buffer Output buffer, char array
      * @param reg Which register. Use constants from nRF24L01.h
      * @param qty How many successive registers to print
+     * @return The total number of characters written to the given buffer.
      */
-    void sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qty = 1);
-
-#endif
+    uint8_t sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qty = 1);
+    #endif
 
     /**
      * Turn on or off the special features of the chip
