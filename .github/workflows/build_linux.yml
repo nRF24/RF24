@@ -145,6 +145,9 @@ jobs:
   using_cmake:
     runs-on: ubuntu-latest
 
+    env:
+      RF24_DRIVER: ${{ matrix.driver }}
+
     strategy:
       fail-fast: false
 
@@ -241,7 +244,7 @@ jobs:
       #     ./build
 
       - name: provide pigpio
-        if: matrix.toolchain.compiler != 'default' && (matrix.driver == 'RPi' || matrix.driver == 'SPIDEV' || matrix.driver == 'pigpio')
+        if: matrix.driver == 'pigpio'
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
@@ -262,7 +265,6 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-          -D RF24_DRIVER=${{ matrix.driver }} \
           -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
           -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
 
@@ -303,7 +305,7 @@ jobs:
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
         run: |
-          cmake ../examples_linux -D RF24_DRIVER=${{ matrix.driver }} \
+          cmake ../examples_linux \
           -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
 
       - name: build examples

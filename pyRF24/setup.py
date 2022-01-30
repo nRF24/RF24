@@ -79,7 +79,7 @@ finally:
     if found_pigpio and "-lpigpio" not in cflags:
         cflags += " -lpigpio"
     # IRQ pin features will be implemented in python via pigpio's python API or RPi.GPIO
-    cflags += "-DRF24_NO_INTERRUPT"
+    cflags += " -DRF24_NO_INTERRUPT"
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags

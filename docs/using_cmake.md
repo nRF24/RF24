@@ -9,7 +9,7 @@ have already installed the library using [these older instructions](md_docs_linu
 
 ### Using a package manager
 
-The RF24 library now (as of v1.4.1) has pre-built packages (_.deb_ or _.rpm_ files) that can be installed on a
+The RF24 library now (as of v1.4.1) has pre-built packages (.deb or .rpm files) that can be installed on a
 Raspberry Pi. These packages can be found on the library's
 [GitHub release page](https://GitHub.com/nRF24/RF24/releases)
 
@@ -85,7 +85,18 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
 5. Configure build environment
 
    @note When using these instructions to install RF24Mesh, RF24Network, or RF24Gateway,
-   the following `RF24_DRIVER` option is not needed (it is only for the RF24 library).
+   the following `RF24_DRIVER` option is only needed for the RF24 library and
+   examples as well as the examples for RF24Network, RF24Mesh, and RF24Gateway. The `RF24_DRIVER`
+   option is not needed when installing the libraries for RF24Network, RF24Mesh, and RF24Gateway.
+
+   Instead of specifying the `RF24_DRIVER` option in the CLI, it is recommended to use a environment
+   variable named `RF24_DRIVER`.
+
+   ```shell
+   export RF24_DRIVER=SPIDEV
+   ```
+
+   These instructions assume you have not set an environment variable.
 
    ```shell
    cmake .. -D RF24_DRIVER=SPIDEV
@@ -93,8 +104,9 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    Instead of using `SPIDEV` driver (recommended), you can also specify the `RPi`, `wiringPi`,
    `MRAA`, or `LittleWire` as alternative drivers.
 
-   If the `RF24_DRIVER` option is not specified, then it will be automatically configured based
-   on the detected CPU or installed libraries (defaults to `SPIDEV` when auto-detection fails).
+   If the `RF24_DRIVER` option is not specified (and it is not set as an environment variable), then
+   it will be automatically configured based on the detected CPU or installed libraries (which
+   defaults to `SPIDEV` when auto-detection fails).
 6. Build and install the library
    ```shell
    make
@@ -127,6 +139,10 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    cmake .. -D RF24_DRIVER=wiringPi
    make
    ```
+
+   Remember that the `RF24_DRIVER` option is needed for the RF24Network, RF24Mesh, and RF24Gateway
+   examples if you specified that option (via CLI or environment variable) when installing the
+   RF24 library and examples.
 8. Run an example file
    ```shell
    sudo ./gettingstarted
@@ -152,8 +168,8 @@ make
 sudo make install
 ```
 
-Remember to also specify the `RF24_DRIVER` option if not using the auto-configuration feature (see step 5
-in the above instructions to build from source).
+Remember to also specify the `RF24_DRIVER` option (via CLI or environment variable) if not using the
+auto-configuration feature (see step 5 in the above instructions to build from source).
 
 ### Installing the library remotely
 
