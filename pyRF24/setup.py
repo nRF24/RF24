@@ -76,8 +76,6 @@ finally:
     for symlink_loc in symlink_directory:
         if os.path.exists(symlink_loc + "/libpigpio.so"):
             found_pigpio = True
-    if found_pigpio and "-lpigpio" not in cflags:
-        cflags += " -lpigpio"
     # IRQ pin features will be implemented in python via pigpio's python API or RPi.GPIO
     cflags += " -DRF24_NO_INTERRUPT"
 
@@ -113,6 +111,10 @@ setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
     ext_modules=[
-        Extension("RF24", sources=["pyRF24.cpp"], libraries=["rf24", BOOST_LIB])
+        Extension(
+            "RF24",
+            sources=["pyRF24.cpp"],
+            libraries=["rf24", BOOST_LIB] + (["pigpio"] if found_pigpio else [])
+        )
     ],
 )
