@@ -529,7 +529,7 @@ uint8_t RF24::sprintf_address_register(char *out_buffer, uint8_t reg, uint8_t qt
         read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
         uint8_t* bufptr = read_buffer + addr_width;
         while (--bufptr >= read_buffer) {
-            offset += sprintf_P(out_buffer + offset, PSTR("%02x"), *bufptr);
+            offset += sprintf_P(out_buffer + offset, PSTR("%02X"), *bufptr);
         }    
     }
     delete[] read_buffer;
@@ -880,7 +880,7 @@ uint16_t RF24::sprintfPrettyDetails(char *debugging_information) {
         }
         else {
             offset += sprintf_P(
-                debugging_information + offset, PSTR("%0X"),
+                debugging_information + offset, PSTR("%02X"),
                 read_register(static_cast<uint8_t>(RX_ADDR_P0 + i)));
         }
     }
