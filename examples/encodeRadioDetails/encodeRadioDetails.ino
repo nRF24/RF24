@@ -18,7 +18,7 @@
 #include "RF24.h"
 
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(7, 8);  // using pin 7 for the CE pin, and pin 8 for the CSN pin
 
 /*
   For this example, we'll be using a data buffer containing
@@ -29,7 +29,7 @@ RF24 radio(7, 8); // using pin 7 for the CE pin, and pin 8 for the CSN pin
   will take a space-delimited string of hexadecimal characters and
   decode then print it out as human readable information.
 */
-uint8_t encoded_details[43] = {0};
+uint8_t encoded_details[43] = { 0 };
 
 // Use this function to print out the encoded_details as a
 // space-delimited string of hexadecimal characters.
@@ -51,7 +51,7 @@ void setup() {
   // initialize the transceiver on the SPI bus
   if (!radio.begin()) {
     Serial.println(F("radio hardware is not responding!!"));
-    while (1) {} // hold in infinite loop
+    while (1) {}  // hold in infinite loop
   }
 
   // print example's introductory prompt
@@ -82,7 +82,7 @@ void setup() {
   Serial.print(F(" this example's folder. Like so:\npython print_details.py \""));
   dumpRegData();
   Serial.println(F("\"\n***You may need to use 'python3' (without quotes) on Linux"));
-} // setup
+}  // setup
 
 /* Registers correspnding to index of encoded_details array
   0:     NRF_CONFIG
@@ -116,7 +116,6 @@ void setup() {
   42:    SPI speed MHz | (isPlusVariant << 4)
 */
 
-void loop()
-{
+void loop() {
   // Nothing to do here. We did it all at the end of setup()
 }
