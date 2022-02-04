@@ -37,7 +37,7 @@ try:  # get compiler options from the generated Makefile.inc
 except FileNotFoundError:  # assuming lib was built & installed with CMake
 
     # get LIB_VERSION from library.properties file for Arduino IDE
-    with open(os.path.join(git_dir, "library.properties"), "r") as f:
+    with open(os.path.join(git_dir, "library.properties"), "r", encoding="utf-8") as f:
         for line in f.read().splitlines():
             if line.startswith("version"):
                 version = line.split("=")[1]
