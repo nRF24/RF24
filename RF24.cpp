@@ -1698,7 +1698,7 @@ void RF24::disableAckPayload(void)
 {
     // disable ack payloads (leave dynamic payload features as is)
     if (ack_payloads_enabled){
-        write_register(FEATURE, static_cast<uint8_t>(read_register(FEATURE) | ~_BV(EN_ACK_PAY)));
+        write_register(FEATURE, static_cast<uint8_t>(read_register(FEATURE) & ~_BV(EN_ACK_PAY)));
 
         IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
