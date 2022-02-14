@@ -23,7 +23,8 @@ def hex_str_to_bytes(s_in: str) -> bytes:
 
 
 argparser = argparse.ArgumentParser(
-    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
+    description=__doc__,
+    formatter_class=argparse.RawDescriptionHelpFormatter,
 )
 argparser.add_argument(
     "buffer",
@@ -40,6 +41,7 @@ def address_repr(buf, reverse: bool = True, delimit: str = "") -> str:
     return delimit.join(["%02X" % buf[byte] for byte in order])
 
 
+# pylint: disable=too-many-locals,too-many-statements
 def print_details(encoded_buf: bytearray):
     """This debuggung function outputs all details about the nRF24L01."""
     # declare sequences
@@ -81,7 +83,6 @@ def print_details(encoded_buf: bytearray):
     ) = struct.unpack("9B", encoded_buf[29:38])
     ce_pin, csn_pin, spi_speed = struct.unpack(">2H1B", encoded_buf[38:44])
 
-
     # do some deciphering arithmetic
     addr_len += 2
     crc = (2 if config & 4 else 1) if auto_ack else max(0, ((config & 0x0C) >> 2) - 1)
@@ -89,9 +90,9 @@ def print_details(encoded_buf: bytearray):
     d_rate = (2 if d_rate == 8 else 250) if d_rate else 1
     pa_level = (3 - ((rf_setup & 6) >> 1)) * -6
     pa_level = (
-        "MIN" if pa_level == -18 else (
-            "LOW" if pa_level == -12 else ("HIGH" if pa_level == -6 else "MAX")
-        )
+        "MIN"
+        if pa_level == -18
+        else ("LOW" if pa_level == -12 else ("HIGH" if pa_level == -6 else "MAX"))
     )
     dyn_p = (
         ("_Enabled" if dyn_pl else "Disabled")
@@ -185,6 +186,9 @@ def print_details(encoded_buf: bytearray):
         )
         if is_open and not dyn_pl & (1 << i):
             print("\t\texpecting {} byte static payloads".format(pl_len[i]))
+
+
+# pylint: enable=too-many-locals,too-many-statements
 
 
 if __name__ == "__main__":
