@@ -479,14 +479,14 @@ public:
      * Addresses are assigned via a byte array, default is 5 byte address length
      *
      * @code
-     *   uint8_t addresses[][6] = {"1Node", "2Node"};
-     *   radio.openWritingPipe(addresses[0]);
+     * uint8_t addresses[][6] = {"1Node", "2Node"};
+     * radio.openWritingPipe(addresses[0]);
      * @endcode
      * @code
-     *  uint8_t address[] = { 0xCC, 0xCE, 0xCC, 0xCE, 0xCC };
-     *  radio.openWritingPipe(address);
-     *  address[0] = 0x33;
-     *  radio.openReadingPipe(1, address);
+     * uint8_t address[] = { 0xCC, 0xCE, 0xCC, 0xCE, 0xCC };
+     * radio.openWritingPipe(address);
+     * address[0] = 0x33;
+     * radio.openReadingPipe(1, address);
      * @endcode
      *
      * @warning This function will overwrite the address set to reading pipe 0
