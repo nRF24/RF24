@@ -218,8 +218,7 @@ BOOST_PYTHON_MODULE(RF24)
         .value("RPI_BPLUS_GPIO_J8_37", RPI_BPLUS_GPIO_J8_37)
         .value("RPI_BPLUS_GPIO_J8_38", RPI_BPLUS_GPIO_J8_38)
         .value("RPI_BPLUS_GPIO_J8_40", RPI_BPLUS_GPIO_J8_40)
-        .export_values()
-        ;
+        .export_values();
 
     bp::enum_< bcm2835SPIClockDivider>("bcm2835SPIClockDivider")
         .value("BCM2835_SPI_CLOCK_DIVIDER_65536", BCM2835_SPI_CLOCK_DIVIDER_65536)
@@ -297,6 +296,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("isAckPayloadAvailable", &RF24::isAckPayloadAvailable)
         .def("isPVariant", &RF24::isPVariant)
         .def("isValid", &RF24::isValid)
+        .def("isChipConnected", &RF24::isChipConnected)
         .def("maskIRQ", &RF24::maskIRQ, (bp::arg("tx_ok"), bp::arg("tx_fail"), bp::arg("rx_ready")))
         .def("openReadingPipe", &openReadingPipe_wrap, (bp::arg("number"), bp::arg("address")))
         .def("openReadingPipe", (void (::RF24::*)(::uint8_t,::uint64_t))(&::RF24::openReadingPipe), (bp::arg("number"), bp::arg("address")))
