@@ -475,7 +475,7 @@ void RF24::print_status(uint8_t _status)
 
 void RF24::print_observe_tx(uint8_t value)
 {
-    printf_P(PSTR("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\r\n"), value, (value >> PLOS_CNT) & 0x0F, (value >> ARC_CNT) & 0x0F);
+    printf_P(PSTR("OBSERVE_TX=%02x: PLOS_CNT=%x ARC_CNT=%x\r\n"), value, (value >> PLOS_CNT) & 0x0F, (value >> ARC_CNT) & 0x0F);
 }
 
 /****************************************************************************/
