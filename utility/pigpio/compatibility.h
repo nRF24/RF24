@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#include <stdint.h>  // for uintXX_t types
+#include <stdint.h> // for uintXX_t types
 #include <stddef.h>
 #include <time.h>
 #include <sys/time.h>
@@ -30,5 +30,4 @@ uint32_t __millis();
 }
 #endif
 
-#endif    /* COMPATIBLITY_H */
-
+#endif /* COMPATIBLITY_H */

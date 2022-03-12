@@ -12,11 +12,10 @@ see <http://www.gnu.org/licenses/>
 #include "RF24_arch_config.h"
 #include <pigpio.h>
 
-#define INT_EDGE_SETUP          0
-#define INT_EDGE_FALLING        FALLING_EDGE
-#define INT_EDGE_RISING         RISING_EDGE
-#define INT_EDGE_BOTH           EITHER_EDGE
-
+#define INT_EDGE_SETUP   0
+#define INT_EDGE_FALLING FALLING_EDGE
+#define INT_EDGE_RISING  RISING_EDGE
+#define INT_EDGE_BOTH    EITHER_EDGE
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +28,7 @@ extern "C" {
  *      back to the user supplied function.
  *********************************************************************************
  */
-extern int attachInterrupt(int pin, int mode, void (* function)(void));
+extern int attachInterrupt(int pin, int mode, void (*function)(void));
 
 /*
  * detachInterrupt:

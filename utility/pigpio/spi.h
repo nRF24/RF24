@@ -3,7 +3,7 @@
  */
 
 #ifndef SPI_H
-#define    SPI_H
+#define SPI_H
 
 /**
  * @file spi.h
@@ -26,18 +26,19 @@
 #include "../../RF24_config.h"
 
 /** Specific excpetion for SPI errors */
-class SPIException : public std::runtime_error {
+class SPIException : public std::runtime_error
+{
 public:
     explicit SPIException(const std::string& msg)
-            :std::runtime_error(msg)
+        : std::runtime_error(msg)
     {
     }
 };
 
-class SPI {
+class SPI
+{
 
 public:
-
     /**
     * SPI constructor
     */
@@ -76,16 +77,13 @@ public:
     ~SPI();
 
 private:
-
     unsigned spiHandle;
     bool spiIsInitialized = false;
     void init(uint32_t spi_speed);
-
-
 };
 
 /**
  * \endcond
  */
 /*@}*/
-#endif    /* SPI_H */
+#endif /* SPI_H */
