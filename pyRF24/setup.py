@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# pylint: disable=invalid-name
 import os
 from sys import version_info
 from setuptools import setup, Extension
@@ -18,7 +18,7 @@ symlink_directory = []
 git_dir = os.path.split(os.path.abspath(os.getcwd()))[0]
 
 try:  # get compiler options from the generated Makefile.inc
-    with open(os.path.join(git_dir, "Makefile.inc"), "r") as f:
+    with open(os.path.join(git_dir, "Makefile.inc"), "r", encoding="utf-8") as f:
         for line in f.read().splitlines():
             identifier, value = line.split("=", 1)
             if identifier == "CPUFLAGS":
@@ -37,7 +37,7 @@ try:  # get compiler options from the generated Makefile.inc
 except FileNotFoundError:  # assuming lib was built & installed with CMake
 
     # get LIB_VERSION from library.properties file for Arduino IDE
-    with open(os.path.join(git_dir, "library.properties"), "r") as f:
+    with open(os.path.join(git_dir, "library.properties"), "r", encoding="utf-8") as f:
         for line in f.read().splitlines():
             if line.startswith("version"):
                 version = line.split("=")[1]
@@ -45,7 +45,7 @@ except FileNotFoundError:  # assuming lib was built & installed with CMake
 # check C++ RF24 lib is installed
 finally:
 
-    # check for possible linker flags set via CFLAGS environment varible
+    # check for possible linker flags set via CFLAGS environment variable
     for flag in cflags.split("-"):
         if flag.startswith("L"):
             symlink_directory.append(
@@ -70,6 +70,14 @@ finally:
                 " or ".join(symlink_directory)
             )
         )
+
+    # avoid IRQ support if pigpio is not available; link to pigpio if it is found
+    found_pigpio = False
+    for symlink_loc in symlink_directory:
+        if os.path.exists(symlink_loc + "/libpigpio.so"):
+            found_pigpio = True
+    # IRQ pin features will be implemented in python via pigpio's python API or RPi.GPIO
+    cflags += " -DRF24_NO_INTERRUPT"
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags
@@ -103,6 +111,10 @@ setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
     ext_modules=[
-        Extension("RF24", sources=["pyRF24.cpp"], libraries=["rf24", BOOST_LIB])
+        Extension(
+            "RF24",
+            sources=["pyRF24.cpp"],
+            libraries=["rf24", BOOST_LIB] + (["pigpio"] if found_pigpio else [])
+        )
     ],
 )

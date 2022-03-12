@@ -10,7 +10,7 @@ set(EXAMPLES_LIST
     scanner
 )
 
-project(RF24LogExamples)
+project(RF24Examples CXX)
 add_compile_options(-Ofast -Wall) # passing the compiler a `-pthread` flag doesn't work here
 
 # detect the CPU make and type
@@ -24,15 +24,20 @@ find_library(RF24 rf24 REQUIRED)
 message(STATUS "using RF24 library: ${RF24}")
 
 # conditionally append "interruptConfigure" to the EXAMPLES_LIST
-if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi")
+if("${RF24_DRIVER}" STREQUAL "MRAA" OR "${RF24_DRIVER}" STREQUAL "wiringPi" OR "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
     message(STATUS "Skipping interruptConfigure.cpp example as it is incompatible with selected driver library")
-else() # not using MRAA or wiringPi drivers
+else() # not using MRAA or wiringPi drivers (or pigpio lib was found)
     list(APPEND EXAMPLES_LIST interruptConfigure)
 endif()
 
 foreach(example ${EXAMPLES_LIST})
     #make a target
     add_executable(${example} ${example}.cpp)
+    
+    # avoid including interrupt.h when pigpio is not available
+    if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        target_compile_definitions(${example} PUBLIC RF24_NO_INTERRUPT)
+    endif()
 
     # link the RF24 lib to the target. Notice we specify pthread as a linked lib here
     if("${RF24_DRIVER}" STREQUAL "MRAA")
@@ -40,6 +45,9 @@ foreach(example ${EXAMPLES_LIST})
     elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
         # wiringPi additionally needs to link to crypt and shm_open libraries
         target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibWiringPi} crypt rt)
+    elseif("${RF24_DRIVER}" STREQUAL "pigpio" OR NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        # linking to pigpio requires pthread to be listed as last linked lib
+        target_link_libraries(${example} PUBLIC ${RF24} ${LibPIGPIO} pthread)
     else() # not using MRAA or wiringPi drivers
         target_link_libraries(${example} PUBLIC ${RF24} pthread)
     endif()

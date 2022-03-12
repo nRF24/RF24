@@ -17,6 +17,7 @@ on:
       - "utility/wiringPi/*"
       - "utility/MRAAA/*"
       - "utility/SPIDEV/*"
+      - "utility/pigpio"
       - "examples_linux/*"
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
@@ -37,6 +38,7 @@ on:
       - "utility/wiringPi/*"
       - "utility/MRAAA/*"
       - "utility/SPIDEV/*"
+      - "utility/pigpio"
       - "examples_linux/*"
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
@@ -64,6 +66,7 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           - "--driver=SPIDEV"
           - "--driver=MRAA"
+          - "--driver=pigpio"
           # - "--soc=BCM2835 --driver=wiringPi"
 
     env:
@@ -88,7 +91,22 @@ jobs:
           git clone https://github.com/WiringPi/WiringPi
           cd WiringPi
           ./build
-
+      
+      - name: provide pigpio
+        if: ${{ matrix.config-options != '--driver=MRAA' }}
+        run: |
+          git clone https://github.com/joan2937/pigpio.git
+          cd pigpio
+          git fetch --tags
+          latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          git checkout $latestTag
+          mkdir build
+          cd build
+          cmake .. -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/armhf.cmake
+          make
+          sudo make install
+        
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
         env:
@@ -128,6 +146,9 @@ jobs:
   using_cmake:
     runs-on: ubuntu-latest
 
+    env:
+      RF24_DRIVER: ${{ matrix.driver }}
+
     strategy:
       fail-fast: false
 
@@ -147,12 +168,17 @@ jobs:
           - "RPi"
           - "SPIDEV"
           - "MRAA"
+          - "pigpio"
         exclude:
           # MRAA is not compatible with i686 arch
           - driver: "MRAA"
             toolchain:
               compiler: "i686"
               usr_dir: "i686-linux-gnu"
+          - driver: "pigpio"
+            toolchain:
+              compiler: "default"
+              usr_dir: "local"
         include:
           # need to cross-compile wiringPi dependencies (libcrypt)
           # only test default compiler with wiringPi
@@ -218,6 +244,21 @@ jobs:
       #     cd WiringPi
       #     ./build
 
+      - name: provide pigpio
+        if: matrix.driver == 'pigpio'
+        run: |
+          git clone https://github.com/joan2937/pigpio.git
+          cd pigpio
+          git fetch --tags
+          latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          git checkout $latestTag
+          mkdir build
+          cd build
+          cmake .. -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
+          make
+          sudo make install
+        
       - name: create CMake build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
 
@@ -225,7 +266,6 @@ jobs:
         working-directory: ${{ github.workspace }}/build
         run: |
           cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-          -D RF24_DRIVER=${{ matrix.driver }} \
           -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
           -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
 
@@ -266,7 +306,7 @@ jobs:
         # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
         # executables linked to wiringPi additionally need to be linked to crypt and shm_open
         run: |
-          cmake ../examples_linux -D RF24_DRIVER=${{ matrix.driver }} \
+          cmake ../examples_linux \
           -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
 
       - name: build examples

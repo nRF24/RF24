@@ -3,6 +3,8 @@
 CROSS_CC=arm-linux-gnueabihf-gcc
 CROSS_CXX=arm-linux-gnueabihf-g++
 
+pigpio_detected=0
+
 function help {
 cat <<EOF
 configure script for RF24 library.
@@ -55,6 +57,10 @@ function execute_check {
         eval $1
     fi
 }
+
+if [[ $(execute_check "file /usr/lib/libpigpio.so") ]]; then
+    pigpio_detected=1
+fi
 
 function die {
     echo "[ERROR] $1"
@@ -185,6 +191,8 @@ function detect_driver {
         result=MRAA
     elif [[ $(execute_check "${REMOTE_LDCONFIG} -p | grep liblittlewire-spi") ]]; then
         result=LittleWire
+    elif [ $pigpio_detected -eq 1 ]; then
+        result=pigpio
     else
         result=""
     fi
@@ -398,20 +406,29 @@ fi
 
 case ${DRIVER} in
 wiringPi)
-    SHARED_LINKER_LIBS+=" -pthread -lwiringPi"
+    SHARED_LINKER_LIBS+=" -lpigpio -lwiringPi"
     CFLAGS+=" -lwiringPi"
     ;;
 SPIDEV)
-    SHARED_LINKER_LIBS+=" -pthread"
+    if [ $pigpio_detected -eq 1 ]; then
+        echo "[INFO] linking to pigpio for interrupt compatibility"
+        SHARED_LINKER_LIBS+=" -lpigpio"
+    fi
     ;;
 RPi)
-    SHARED_LINKER_LIBS+=" -pthread"
+    if [ $pigpio_detected -eq 1 ]; then
+        echo "[INFO] linking to pigpio for interrupt compatibility"
+        SHARED_LINKER_LIBS+=" -lpigpio"
+    fi
     ;;
 MRAA)
     SHARED_LINKER_LIBS+=" -lmraa"
     ;;
 LittleWire)
     SHARED_LINKER_LIBS+=" -llittlewire-spi"
+    ;;
+pigpio)
+    SHARED_LINKER_LIBS+=" -lpigpio"
     ;;
 *)
     die "Unsupported DRIVER: ${DRIVER}." 2

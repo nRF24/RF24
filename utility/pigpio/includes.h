@@ -1,11 +1,11 @@
 #ifndef __RF24_INCLUDES_H__
 #define __RF24_INCLUDES_H__
 
-#define RF24_SPIDEV
+#define RF24_PIGPIO
 
-#include "SPIDEV/RF24_arch_config.h"
+#include "pigpio/RF24_arch_config.h"
 #ifndef RF24_NO_INTERRUPT
-    #include "SPIDEV/interrupt.h"
+    #include "pigpio/interrupt.h"
 #endif
 
 #endif

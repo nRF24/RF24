@@ -1,12 +1,9 @@
 /*
- * File:   spi.h
- * Author: Purinda Gunasekara <purinda@gmail.com>
  *
- * Created on 24 June 2012, 11:00 AM
  */
 
 #ifndef SPI_H
-#define SPI_H
+#define    SPI_H
 
 /**
  * @file spi.h
@@ -49,14 +46,14 @@ public:
     /**
     * Start SPI
     */
-    void begin(int busNo, uint32_t spi_speed = RF24_SPI_SPEED);
+    void begin(int busNo, uint32_t spi_speed);
 
     /**
     * Transfer a single byte
     * @param tx Byte to send
     * @return Data returned via spi
     */
-    uint8_t transfer(uint8_t tx);
+    uint8_t transfer(char tx);
 
     /**
     * Transfer a buffer of data
@@ -80,10 +77,11 @@ public:
 
 private:
 
-    int fd;
-    uint32_t _spi_speed;
+    unsigned spiHandle;
     bool spiIsInitialized = false;
-    void init(uint32_t spi_speed = RF24_SPI_SPEED);
+    void init(uint32_t spi_speed);
+
+
 };
 
 /**

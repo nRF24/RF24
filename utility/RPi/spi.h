@@ -12,7 +12,6 @@
 
 #include <stdio.h>
 #include "bcm2835.h"
-#include "interrupt.h"
 #include "../../RF24_config.h"
 
 #define SPI_HAS_TRANSACTION
