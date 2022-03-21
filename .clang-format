@@ -150,7 +150,7 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
-Standard: Latest
+Standard: c++11
 StatementAttributeLikeMacros: [emit]
 StatementMacros: [Q_UNUSED, QT_REQUIRE_VERSION]
 TabWidth: 4
