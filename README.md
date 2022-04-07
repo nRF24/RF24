@@ -1,10 +1,15 @@
 <!-- markdownlint-disable MD041 MD034 -->
 
-[![Badge Arduino]][Arduino]
-[![Badge Linux]][Linux]
-[![Badge PlatformIO]][PlatformIO]
-[![Badge RP2]][RP2]
+<h1>
+
+RF24 
+[![Badge Arduino]][Arduino] 
+[![Badge Linux]][Linux] 
+[![Badge PlatformIO]][PlatformIO] 
+[![Badge RP2]][RP2] 
 [![Badge Docs]][Docs]
+
+</h1>
 
 # See our [Website] for all documentation
 
