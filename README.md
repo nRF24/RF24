@@ -21,10 +21,17 @@ Please read our **[solutions to common problems][Solutions]**. If that doesn't h
 
 <br>
 
-<h1 align = 'center'>Want To Contribute?</h1>
+<div align = 'center'>
+  
+## Want To Contribute?
 
-Awesome! However, please check our [contributing guidelines][Contribute] before opening a pull request.
+**Awesome!**
 
+*However, please check our contribution* <br>
+*[Guidelines] before opening a pull request.*
+
+</div>
+  
 <br>
 
 <!----------------------------------------------------------------------------->
@@ -41,7 +48,7 @@ Awesome! However, please check our [contributing guidelines][Contribute] before 
 [Docs]: https://rf24.readthedocs.io/en/latest/?badge=latest
 [RP2]: https://github.com/nRF24/RF24/actions/workflows/build_rp2xxx.yml
 
-[Contribute]: CONTRIBUTING.md
+[Guidelines]: CONTRIBUTING.md
 [Solutions]: COMMON_ISSUES.md
 
 [Website]: http://nRF24.github.io/RF24
