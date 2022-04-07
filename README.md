@@ -15,9 +15,16 @@ RF24 
 
 <br>
 
-<h1 align = 'center'>Having Problems?</h1>
+<div align = 'center'>
 
-Please read our **[solutions to common problems][Solutions]**. If that doesn't help, then open an issue describing your problem with as much detail as possible.
+## Having Problems?
+
+Please read the **[Solutions To Common Problems][Solutions]**.
+
+*If you can't find a suitable answer, please open an issue* <br>
+*describing your problem in as much detail as possible.*
+  
+</div>
 
 <br>
 
