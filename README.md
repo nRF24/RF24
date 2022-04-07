@@ -22,8 +22,12 @@ RF24 
 
 ## Having Problems?
 
+<br>
+  
 Please read the **[Solutions To Common Problems][Solutions]**.
 
+<br>
+  
 *If you can't find a suitable answer, please open an issue* <br>
 *describing your problem in as much detail as possible.*
   
@@ -37,10 +41,14 @@ Please read the **[Solutions To Common Problems][Solutions]**.
   
 ## Want To Contribute?
 
+<br>
+  
 **Awesome!**
+  
+<br>
 
 *However, please check our contribution* <br>
-*[Guidelines] before opening a pull request.*
+***[Guidelines]*** *before opening a pull request.*
 
 </div>
   
