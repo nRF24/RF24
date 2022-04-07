@@ -11,8 +11,9 @@ RF24 
 
 </h1>
 
-# See our [Website] for all documentation
+*Please check our **[Website]** for all documentation.*
 
+<br>
 <br>
 <br>
 
