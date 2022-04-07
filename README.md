@@ -14,6 +14,7 @@ RF24 
 # See our [Website] for all documentation
 
 <br>
+<br>
 
 <div align = 'center'>
 
@@ -26,6 +27,8 @@ Please read the **[Solutions To Common Problems][Solutions]**.
   
 </div>
 
+<br>
+<br>
 <br>
 
 <div align = 'center'>
