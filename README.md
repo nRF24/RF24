@@ -13,11 +13,11 @@ RF24 
 
 # See our [Website] for all documentation
 
-## Having problems?
+<h1 align = 'center'>Having Problems?</h1>
 
 Please read our **[solutions to common problems][Solutions]**. If that doesn't help, then open an issue describing your problem with as much detail as possible.
 
-### Want to contribute?
+<h1 align = 'center'>Want To Contribute?</h1>
 
 Awesome! However, please check our [contributing guidelines][Contribute] before opening a pull request.
 
