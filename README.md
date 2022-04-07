@@ -4,10 +4,11 @@
 
 RF24 
 [![Badge Arduino]][Arduino] 
-[![Badge PlatformIO]][PlatformIO] 
 [![Badge RP2]][RP2] 
-[![Badge Linux]][Linux] 
 [![Badge Docs]][Docs]
+<br>    
+[![Badge PlatformIO]][PlatformIO] 
+[![Badge Linux]][Linux] 
 
 </h1>
 
