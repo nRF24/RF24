@@ -413,12 +413,16 @@ SPIDEV)
     if [ $pigpio_detected -eq 1 ]; then
         echo "[INFO] linking to pigpio for interrupt compatibility"
         SHARED_LINKER_LIBS+=" -lpigpio"
+    else
+        CFLAGS+=" -DRF24_NO_INTERRUPT"
     fi
     ;;
 RPi)
     if [ $pigpio_detected -eq 1 ]; then
         echo "[INFO] linking to pigpio for interrupt compatibility"
         SHARED_LINKER_LIBS+=" -lpigpio"
+    else
+        CFLAGS+=" -DRF24_NO_INTERRUPT"
     fi
     ;;
 MRAA)
