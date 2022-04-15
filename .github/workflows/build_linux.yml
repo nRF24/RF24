@@ -93,7 +93,7 @@ jobs:
           ./build
       
       - name: provide pigpio
-        if: ${{ matrix.config-options != '--driver=MRAA' }}
+        if: ${{ matrix.config-options != '--driver=pigpio' }}
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
