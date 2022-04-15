@@ -428,7 +428,11 @@ LittleWire)
     SHARED_LINKER_LIBS+=" -llittlewire-spi"
     ;;
 pigpio)
-    SHARED_LINKER_LIBS+=" -lpigpio"
+    if [ $pigpio_detected -eq 0 ]; then
+        die "[ERROR] pigpio was not detected. Make sure pigpio is installed." 2
+    else
+        SHARED_LINKER_LIBS+=" -lpigpio"
+    fi
     ;;
 *)
     die "Unsupported DRIVER: ${DRIVER}." 2
