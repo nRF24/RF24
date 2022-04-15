@@ -58,7 +58,8 @@ function execute_check {
     fi
 }
 
-if [[ $(execute_check "file /usr/lib/libpigpio.so") ]]; then
+if [[ -f "/usr/lib/libpigpio.so" || -f "/usr/local/lib/libpigpio.so" || -f "/usr/arm-linux-gnueabihf/lib/libpigpio.so" ]]; then
+    echo "[INFO] pigpio lib found."
     pigpio_detected=1
 fi
 
