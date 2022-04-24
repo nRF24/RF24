@@ -19,6 +19,7 @@
 
 .md-typeset .admonition.seealso>.admonition-title {
   background-color: hsla(287, 100%, 63%, 0.25);
+  border-left-color: hsl(301, 100%, 63%);
 }
 
 .md-typeset .admonition.important>.admonition-title::before {
@@ -44,6 +45,7 @@
 
 .md-typeset .admonition.warning>.admonition-title {
   background-color: hsla(0, 100%, 63%, 0.25);
+  border-left-color: hsl(0, 100%, 63%);
 }
 
 html .md-nav--primary .md-nav__title--site .md-nav__button {
@@ -53,17 +55,9 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
   height: auto;
 }
 
-.md-typeset table:not([class]) th {
-  background-color: rgba(23, 35, 83, 0.8);
-}
-
-.md-typeset table:not([class]) tr:hover {
-  background-color: rgba(56, 2, 81, 0.8);
-  box-shadow: inset 0 .05rem 0 #9515ff;
-}
-
-[data-md-color-scheme="default"] {
-  --md-code-bg-color: #e8e7e7;
+thead {
+	background-color: var(--md-default-fg-color--light);
+	color: var(--md-primary-bg-color);
 }
 
 .md-nav__title .md-nav__button.md-logo img, .md-nav__title .md-nav__button.md-logo svg {
@@ -73,52 +67,6 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
 
 .md-header__button.md-logo img, .md-header__button.md-logo svg {
   width: auto;
-}
-
-.linenos {
-	background-color: var(--md-default-bg-color--light);
-	margin-right: 0.5rem;
-}
-
-/* ************* temp workaround styling multi-line API signatures ******************* */
-/* In the future, we plan to do this without CSS in a more programatic way, but for now...  */
-
-.md-typeset dl.objdesc>dt.sig-wrap .m + .sig-paren::before,
-.md-typeset dl.api-field>dt.sig-wrap .m + .sig-paren::before,
-.md-typeset dl.objdesc>dt.sig-wrap .k + .sig-paren::before,
-.md-typeset dl.api-field>dt.sig-wrap .k + .sig-paren::before,
-.md-typeset dl.objdesc>dt.sig-wrap .n + .sig-paren::before,
-.md-typeset dl.api-field>dt.sig-wrap .n + .sig-paren::before {
-  content: "\a ";
-  white-space: pre;
-}
-
-.md-typeset dl.objdesc>dt.sig-wrap .sig-paren + .n:not(.sig-param)::before,
-.md-typeset dl.api-field>dt.sig-wrap .sig-paren + .reference::before,
-.md-typeset dl.objdesc>dt.sig-wrap .sig-paren + .reference::before,
-.md-typeset dl.api-field>dt.sig-wrap .sig-paren + .n:not(.sig-param)::before,
-.md-typeset dl.api-field>dt.sig-wrap .sig-paren + .k::before,
-.md-typeset dl.objdesc>dt.sig-wrap .sig-paren + .k::before,
-.md-typeset dl.objdesc>dt.sig-wrap .sig-param + .sig-param::before,
-.md-typeset dl.api-field>dt.sig-wrap .n:not(.sig-param) + a::before,
-.md-typeset dl.objdesc>dt.sig-wrap .n:not(.sig-param) + a::before,
-.md-typeset dl.api-field>dt.sig-wrap a + .n:not(.sig-param)::before,
-.md-typeset dl.objdesc>dt.sig-wrap a + .n:not(.sig-param)::before,
-.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .k::before,
-.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .k::before,
-.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .kt::before,
-.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .kt::before,
-.md-typeset dl.api-field>dt.sig-wrap .n.sig-param + .n:not(.sig-param)::before,
-.md-typeset dl.objdesc>dt.sig-wrap .n:not(.sig-param) + .n:not(.sig-param)::before,
-.md-typeset dl.objdesc>dt.sig-wrap .n.sig-param + .n:not(.sig-param)::before {
-  content: "\a     ";
-  white-space: break-spaces;
-}
-
-.md-typeset dl.api-field>dt.sig-wrap .sig-param:before,
-.md-typeset dl.objdesc>dt.sig-wrap .sig-param:before {
-  content: unset;
-  white-space: pre;
 }
 
 /* CSS for Remark admonitions (translated by breathe from doxygen's @remark(s) cmd */
