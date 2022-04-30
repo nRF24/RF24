@@ -48,6 +48,7 @@ extensions = [
     "sphinx_immaterial",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
+    "sphinx_immaterial.cppreference",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -72,6 +73,11 @@ breathe_default_project = "RF24"
 breathe_show_define_initializer = True
 breathe_show_enumvalue_initializer = True
 breathe_domain_by_extension = { "h" : "cpp" }
+
+# debug options
+# breathe_debug_trace_directives = True
+# breathe_debug_trace_doxygen_ids = True
+# breathe_debug_trace_qualification = True
 
 READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -123,13 +129,15 @@ html_theme_options = {
     "repo_url": "https://github.com/nRF24/RF24/",
     "repo_name": "RF24",
     "repo_type": "github",
-    # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": -1,
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
-    # If True, show hidden TOC entries
-    "globaltoc_includehidden": True,
 }
+
+object_description_options = [
+    ("cpp:functionParam", dict(include_in_toc=False, generate_synopses=None)),
+    ("cpp:function", dict(include_fields_in_toc=False)),
+]
+
 # Set link name generated in the top bar.
 html_title = "RF24 C++ library"
 

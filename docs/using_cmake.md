@@ -7,6 +7,11 @@ have already installed the library using [these older instructions](md_docs_linu
 
 ## Installing the library
 
+You can install the library in a few different ways.
+
+- Building and installing the library from source code is preferable since it will include all the latest changes.
+- Installing the library (via a package manager) from a pre-built package is mostly for cross-compiling purposes, but it can be useful for environments that don't have all the build-time dependencies (namely CMake).
+
 @warning If you have previously installed the library from source code using the
 [the older instructions](md_docs_linux_install.html), then you will need to
 uninstall it manually to avoid runtime conflicts.
@@ -17,14 +22,9 @@ sudo rm -r /usr/local/include/RF24
 ```
 The _librf24-bcm.so_ file may not exist if you used CMake to install the library.
 
-You can install the library in a few different ways.
-
-- Building and installing the library from source code is preferable since it will include all the latest changes.
-- Installing the library (via a package manager) from a pre-built package is mostly for cross-compiling purposes, but it can be useful for environments that don't have all the build-time dependencies (namely CMake).
-
 ### Building from source code
 
-1. Install prerequisites if there are any (wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
+1. Install prerequisites if there are any (pigpio, wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
 
    CMake may need to be installed
    ```shell
