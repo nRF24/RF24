@@ -18,7 +18,7 @@ pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDE
 **Designed & Tested on RPi** - Defaults to SPIDEV on devices supporting it
 
 1. Install prerequisites if there are any (pigpio, MRAA, LittleWire libraries, setup SPI device etc)
-2. Download the install.sh file from [http://tmrh20.github.io/RF24Installer/RPi/install.sh](wget http://tmrh20.github.io/RF24Installer/RPi/install.sh)
+2. Download the install.sh file from [http://tmrh20.github.io/RF24Installer/RPi/install.sh](http://tmrh20.github.io/RF24Installer/RPi/install.sh)
    ```shell
    wget http://tmrh20.github.io/RF24Installer/RPi/install.sh
    ```
