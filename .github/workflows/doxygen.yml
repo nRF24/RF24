@@ -48,8 +48,8 @@ jobs:
           touch doxygenAction
           echo "PROJECT_NUMBER = ${{ steps.latest_ver.outputs.release }}" >> doxygenAction
           echo "@INCLUDE = doxygenAction" >> Doxyfile
-      - name: install graphviz and libclang deps
-        run: sudo apt-get install graphviz libclang1-9 libclang-cpp9
+      - name: install Doxygen static libclang deps
+        run: sudo apt-get install libclang1-9 libclang-cpp9
       - name: install doxygen from SF binary archives
         env:
           DOXYGEN_VERSION: '1.9.4'
