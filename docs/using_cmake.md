@@ -20,7 +20,11 @@ sudo rm /usr/local/lib/librf24.*
 sudo rm /usr/local/lib/librf24-bcm.so
 sudo rm -r /usr/local/include/RF24
 ```
+
 The _librf24-bcm.so_ file may not exist if you used CMake to install the library.
+
+@note Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye),
+pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.
 
 ### Building from source code
 
