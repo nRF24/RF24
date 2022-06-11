@@ -59,7 +59,7 @@ jobs:
           gunzip doxygen.tar.gz
           tar xf doxygen.tar
           cd doxygen-$DOXYGEN_VERSION
-          sudo make install- name: build doxygen
+          sudo make install
       - run: doxygen
       - name: Save doxygen docs as artifact
         uses: actions/upload-artifact@v2
