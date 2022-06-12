@@ -48,11 +48,19 @@ jobs:
           touch doxygenAction
           echo "PROJECT_NUMBER = ${{ steps.latest_ver.outputs.release }}" >> doxygenAction
           echo "@INCLUDE = doxygenAction" >> Doxyfile
-      - name: build doxygen
-        uses: mattnotmitt/doxygen-action@v1
-        with:
-            working-directory: '.'
-            doxyfile-path: './Doxyfile'
+      - name: install Doxygen static libclang deps
+        run: sudo apt-get install libclang1-9 libclang-cpp9
+      - name: install doxygen from SF binary archives
+        env:
+          DOXYGEN_VERSION: '1.9.4'
+        run: |
+          mkdir doxygen && cd doxygen
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-$DOXYGEN_VERSION
+          sudo make install
+      - run: doxygen
       - name: Save doxygen docs as artifact
         uses: actions/upload-artifact@v2
         with:

@@ -1,8 +1,14 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""Configuration file for the Sphinx documentation builder.
+
+This file only contains a selection of the most common options. For a full
+list see the documentation:
+https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
+import subprocess
+import os
+import json
+
+# pylint: disable=invalid-name
 
 # -- Path setup --------------------------------------------------------------
 
@@ -10,12 +16,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import subprocess
-import os
-import json
 
 # -- Project information -----------------------------------------------------
 
@@ -44,8 +46,8 @@ language = "en"
 extensions = [
     "breathe",
     "sphinx_immaterial",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
+    "sphinx_immaterial.cppreference",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -71,6 +73,11 @@ breathe_show_define_initializer = True
 breathe_show_enumvalue_initializer = True
 breathe_domain_by_extension = { "h" : "cpp" }
 
+# debug options
+# breathe_debug_trace_directives = True
+# breathe_debug_trace_doxygen_ids = True
+# breathe_debug_trace_qualification = True
+
 READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
 
 if READTHEDOCS:
@@ -81,6 +88,7 @@ if READTHEDOCS:
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+# html_theme = "sphinx_rtd_theme"
 html_theme = "sphinx_immaterial"
 html_theme_options = {
     "features": [
@@ -120,13 +128,15 @@ html_theme_options = {
     "repo_url": "https://github.com/nRF24/RF24/",
     "repo_name": "RF24",
     "repo_type": "github",
-    # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": 3,
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
-    # If True, show hidden TOC entries
-    "globaltoc_includehidden": True,
 }
+
+object_description_options = [
+    ("cpp:functionParam", dict(include_in_toc=False, generate_synopses=None)),
+    ("cpp:function", dict(include_fields_in_toc=False)),
+]
+
 # Set link name generated in the top bar.
 html_title = "RF24 C++ library"
 
@@ -134,6 +144,10 @@ html_title = "RF24 C++ library"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# These paths are either relative to html_static_path
+# or fully qualified paths (eg. https://...)
+html_css_files = ["custom_material.css"]
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -144,8 +158,6 @@ html_favicon = "_static/new_favicon.ico"
 # project logo
 html_logo = "_static/Logo large.png"
 
-# These paths are either relative to html_static_path
-# or fully qualified paths (eg. https://...)
-html_css_files = [
-    "custom_material.css",
-]
+# split site index page into 2 pages:
+# 1 with only alphabet-like links to partial lists, 1 with full listing
+html_split_index = True
