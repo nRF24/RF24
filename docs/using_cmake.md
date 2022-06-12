@@ -26,6 +26,53 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
 @note Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye),
 pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.
 
+### Automatic Installation
+
+There is a newer automatic install script that makes use of the CMake approach.
+
+1. Download the install.sh file from [https://github.com/nRF24/.github/blob/main/installer/install.sh](https://github.com/nRF24/.github/blob/main/installer/install.sh)
+   ```shell
+   wget https://raw.githubusercontent.com/nRF24/.github/main/installer/install.sh
+   ```
+2. Make it executable
+   ```shell
+   chmod +x install.sh
+   ```
+3. Run it and choose your options
+   ```shell
+   ./install.sh
+   ```
+   The script will detect needed dependencies and install what it needs according to the user input.
+
+   It will also ask to install a python package named [pyRF24](https://github.com/nRF24/pyRF24).
+   This is not the same as the traditionally provided python wrappers as the pyRF24 package can be
+   used independent of the C++ installed libraries. For more information on this newer python
+   package, please check out [the pyRF24 documentation](https://nrf24.github.io/pyRF24/).
+   Note, the pyRF24 API is more pythonic instead of a direct port of the C++ API (eg. snake casing
+   instead of camel casing).
+4. Try an example from one of the libraries
+   ```shell
+   cd ~/rf24libs/RF24/examples_linux
+   ```
+
+   Edit the gettingstarted example, to set your pin configuration
+   ```shell
+   nano gettingstarted.cpp
+   ```
+
+   Build the examples. Remember to set the `RF24_DRIVER` option according to the one that was
+   selected during the scripted install.
+   ```shell
+   mkdir build && cd build
+   cmake .. -D RF24_DRIVER=SPIDEV
+   make
+   ```
+
+   Run the example
+   ```shell
+   sudo ./gettingstarted
+   ```
+
 ### Building from source code
 
 1. Install prerequisites if there are any (pigpio, wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
