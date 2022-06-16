@@ -23,10 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
-      - name: Install clang-tools
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: 12
+      # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
+      # - name: Install clang-tools
+      #   uses: KyleMayes/install-llvm-action@v1
+      #   with:
+      #     version: 12
       - name: Install linter python package
         run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
       - name: run linter as a python package
