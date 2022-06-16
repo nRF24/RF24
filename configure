@@ -58,7 +58,8 @@ function execute_check {
     fi
 }
 
-if [[ $(execute_check "file /usr/lib/libpigpio.so") ]]; then
+if [[ -f "/usr/lib/libpigpio.so" || -f "/usr/local/lib/libpigpio.so" || -f "/usr/arm-linux-gnueabihf/lib/libpigpio.so" ]]; then
+    echo "[INFO] pigpio lib found."
     pigpio_detected=1
 fi
 
@@ -413,12 +414,16 @@ SPIDEV)
     if [ $pigpio_detected -eq 1 ]; then
         echo "[INFO] linking to pigpio for interrupt compatibility"
         SHARED_LINKER_LIBS+=" -lpigpio"
+    else
+        CFLAGS+=" -DRF24_NO_INTERRUPT"
     fi
     ;;
 RPi)
     if [ $pigpio_detected -eq 1 ]; then
         echo "[INFO] linking to pigpio for interrupt compatibility"
         SHARED_LINKER_LIBS+=" -lpigpio"
+    else
+        CFLAGS+=" -DRF24_NO_INTERRUPT"
     fi
     ;;
 MRAA)
@@ -428,7 +433,11 @@ LittleWire)
     SHARED_LINKER_LIBS+=" -llittlewire-spi"
     ;;
 pigpio)
-    SHARED_LINKER_LIBS+=" -lpigpio"
+    if [ $pigpio_detected -eq 0 ]; then
+        die "[ERROR] pigpio was not detected. Make sure pigpio is installed." 2
+    else
+        SHARED_LINKER_LIBS+=" -lpigpio"
+    fi
     ;;
 *)
     die "Unsupported DRIVER: ${DRIVER}." 2

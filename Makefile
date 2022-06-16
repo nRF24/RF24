@@ -21,9 +21,15 @@ OBJECTS=RF24.o
 ifeq ($(DRIVER), MRAA)
 OBJECTS+=spi.o gpio.o compatibility.o
 else ifeq ($(DRIVER), RPi)
-OBJECTS+=spi.o bcm2835.o interrupt.o compatibility.o
+OBJECTS+=spi.o bcm2835.o compatibility.o
+ifneq (,$(findstring -lpigpio,$(SHARED_LINKER_LIBS)))
+OBJECTS+=interrupt.o
+endif
 else ifeq ($(DRIVER), SPIDEV)
-OBJECTS+=spi.o gpio.o compatibility.o interrupt.o
+OBJECTS+=spi.o gpio.o compatibility.o
+ifneq (,$(findstring -lpigpio,$(SHARED_LINKER_LIBS)))
+OBJECTS+=interrupt.o
+endif
 else ifeq ($(DRIVER), wiringPi)
 OBJECTS+=spi.o
 else ifeq ($(DRIVER), pigpio)

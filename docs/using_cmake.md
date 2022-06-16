@@ -7,13 +7,14 @@ have already installed the library using [these older instructions](md_docs_linu
 
 ## Installing the library
 
-### Using a package manager
+You can install the library in a few different ways.
 
-The RF24 library now (as of v1.4.1) has pre-built packages (.deb or .rpm files) that can be installed on a
-Raspberry Pi. These packages can be found on the library's
-[GitHub release page](https://GitHub.com/nRF24/RF24/releases)
+- Building and installing the library from source code is preferable since it will include all the latest changes.
+- Installing the library (via a package manager) from a pre-built package is mostly for cross-compiling purposes, but it can be useful for environments that don't have all the build-time dependencies (namely CMake).
 
-@warning If you have previously installed the library from source code, then you will need to uninstall it manually to avoid runtime conflicts.
+@warning If you have previously installed the library from source code using the
+[the older instructions](md_docs_linux_install.html), then you will need to
+uninstall it manually to avoid runtime conflicts.
 ```shell
 sudo rm /usr/local/lib/librf24.*
 sudo rm /usr/local/lib/librf24-bcm.so
@@ -22,45 +23,59 @@ sudo rm -r /usr/local/include/RF24
 
 The _librf24-bcm.so_ file may not exist if you used CMake to install the library.
 
-1. Download the appropriate package for your machine
+@note Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye),
+pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.
 
-   Go to the library's [GitHub release page](https://GitHub.com/nRF24/RF24/releases), and look for
-   the latest release's assets.
+### Automatic Installation
 
-   For all Raspberry Pi variants using the Raspberry Pi OS (aka Raspbian), you need the file marked
-   for _armhf_ architecture.
+There is a newer automatic install script that makes use of the CMake approach.
 
-   For Raspberry Pi variants using a 64-bit OS (like Ubuntu), you need the file marked for
-   _arm64_ architecture.
-
-   Notice that the filenames will include the name of the utility driver that the package was built with.
-   This does not mean that the LittleWire, MRAA, or wiringPi libraries are included in the package (you will still
-   need to install those yourself beforehand).
-2. Install the downloaded pkg
-
-   If you downloaded the file directly from your target machine using the desktop environment, then
-   you only need to double-click the package (deb or rpm) file, and the OS should do the rest.
-
-   If you downloaded the file remotely and want to copy it over ssh, then use the `scp` command in a terminal.
+1. Download the install.sh file from [https://github.com/nRF24/.github/blob/main/installer/install.sh](https://github.com/nRF24/.github/blob/main/installer/install.sh)
    ```shell
-   scp pkg_filename.deb pi@host_name:~/Downloads
+   wget https://raw.githubusercontent.com/nRF24/.github/main/installer/install.sh
    ```
-   @note You do not need to do this from within an ssh session. Also, you can use the target machine's IP
-   address instead of its host name.
-
-   The `scp` command will ask you for a password belonging to the user's name on the remote machine (we used
-   `pi` in the above example).
-
-   Now you can open up a ssh session and install the copied package from the terminal.
+2. Make it executable
    ```shell
-   ssh pi@host_name
-   cd Downloads
-   dpkg -i pkg_filename.deb
+   chmod +x install.sh
+   ```
+3. Run it and choose your options
+   ```shell
+   ./install.sh
+   ```
+   The script will detect needed dependencies and install what it needs according to the user input.
+
+   It will also ask to install a python package named [pyRF24](https://github.com/nRF24/pyRF24).
+   This is not the same as the traditionally provided python wrappers as the pyRF24 package can be
+   used independent of the C++ installed libraries. For more information on this newer python
+   package, please check out [the pyRF24 documentation](https://nrf24.github.io/pyRF24/).
+   Note, the pyRF24 API is more pythonic instead of a direct port of the C++ API (eg. snake casing
+   instead of camel casing).
+4. Try an example from one of the libraries
+   ```shell
+   cd ~/rf24libs/RF24/examples_linux
+   ```
+
+   Edit the gettingstarted example, to set your pin configuration
+   ```shell
+   nano gettingstarted.cpp
+   ```
+
+   Build the examples. Remember to set the `RF24_DRIVER` option according to the one that was
+   selected during the scripted install.
+   ```shell
+   mkdir build && cd build
+   cmake .. -D RF24_DRIVER=SPIDEV
+   make
+   ```
+
+   Run the example
+   ```shell
+   sudo ./gettingstarted
    ```
 
 ### Building from source code
 
-1. Install prerequisites if there are any (wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
+1. Install prerequisites if there are any (pigpio, wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
 
    CMake may need to be installed
    ```shell
@@ -148,19 +163,63 @@ The _librf24-bcm.so_ file may not exist if you used CMake to install the library
    sudo ./gettingstarted
    ```
 
+### Using a package manager
+
+The RF24 library now (as of v1.4.1) has pre-built packages (.deb or .rpm files) that
+can be installed on a Raspberry Pi. These packages can be found on the library's
+[GitHub release page](https://GitHub.com/nRF24/RF24/releases)
+
+1. Download the appropriate package for your machine
+
+   Go to the library's [GitHub release page](https://GitHub.com/nRF24/RF24/releases), and look for
+   the latest release's assets.
+
+   For all Raspberry Pi variants using the Raspberry Pi OS (aka Raspbian), you need the file marked
+   for _armhf_ architecture.
+
+   For Raspberry Pi variants using a 64-bit OS (like Ubuntu), you need the file marked for
+   _arm64_ architecture.
+
+   Notice that the filenames will include the name of the utility driver that the package was built with.
+   This does not mean that the LittleWire, MRAA, or wiringPi libraries are included in the package (you will still
+   need to install those yourself beforehand).
+2. Install the downloaded pkg
+
+   If you downloaded the file directly from your target machine using the desktop environment, then
+   you only need to double-click the package (deb or rpm) file, and the OS should do the rest.
+
+   If you downloaded the file remotely and want to copy it over ssh, then use the `scp` command in a terminal.
+   ```shell
+   scp pkg_filename.deb pi@host_name:~/Downloads
+   ```
+   @note You do not need to do this from within an ssh session. Also, you can use the target machine's IP
+   address instead of its host name.
+
+   The `scp` command will ask you for a password belonging to the user's name on the remote machine (we used
+   `pi` in the above example).
+
+   Now you can open up a ssh session and install the copied package from the terminal.
+   ```shell
+   ssh pi@host_name
+   cd Downloads
+   dpkg -i pkg_filename.deb
+   ```
+
 ## Cross-compiling the library
 
-The RF24 library comes with some pre-made toolchain files (located in the _RF24/cmake/toolchains_
-directory) to use in CMake. To use these toolchain files, additional command line options are needed
-when configuring CMake to build the library (step 5 in the above instructions to build from source).
+The RF24 library comes with some pre-made toolchain files (located in the
+_RF24/cmake/toolchains_ directory) to use in CMake. To use these toolchain files,
+additional command line options are needed when configuring CMake to build the library
+(step 5 in the above instructions to build from source).
 
 ```shell
 cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake
 make
 ```
 
-If you plan on using the cross-compiled library with your personal cross-compiled project, then
-it is advised to specify the path that your project will look in when linking to the RF24 library:
+If you plan on using the cross-compiled library with your personal cross-compiled
+project, then it is advised to specify the path that your project will look in when
+linking to the RF24 library:
 
 ```shell
 cmake .. -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake
@@ -168,12 +227,14 @@ make
 sudo make install
 ```
 
-Remember to also specify the `RF24_DRIVER` option (via CLI or environment variable) if not using the
-auto-configuration feature (see step 5 in the above instructions to build from source).
+Remember to also specify the `RF24_DRIVER` option (via CLI or environment variable) if
+not using the auto-configuration feature (see step 5 in the above instructions to build
+from source).
 
 ### Installing the library remotely
 
-To install remotely, you can create an installable package file using CMake's built-in program called CPack.
+To install remotely, you can create an installable package file using CMake's built-in
+program called CPack.
 
 ```shell
 cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake
@@ -181,6 +242,6 @@ make
 cpack
 ```
 
-This will create a deb file and a rpm file in a new sub-directory called "pkgs" within the build directory.
-You can use either of these packages to install the library to your target machine (see the above
-instructions about using a package manager).
+This will create a deb file and a rpm file in a new sub-directory called "pkgs" within
+the build directory. You can use either of these packages to install the library to
+your target machine (see the above instructions about using a package manager).

@@ -17,7 +17,7 @@
 #ifndef __PRINTF_H__
 #define __PRINTF_H__
 
-#if defined(ARDUINO_ARCH_AVR) || defined(__ARDUINO_X86__)
+#if defined (ARDUINO_ARCH_AVR) || defined (__ARDUINO_X86__) || defined (ARDUINO_ARCH_MEGAAVR)
 
 int serial_putc(char c, FILE*)
 {
@@ -28,11 +28,11 @@ int serial_putc(char c, FILE*)
 #elif defined(ARDUINO_ARCH_MBED)
 REDIRECT_STDOUT_TO(Serial);
 
-#endif // defined (ARDUINO_ARCH_AVR) || defined (__ARDUINO_X86__) || defined (ARDUINO_ARCH_MBED)
+#endif // defined (ARDUINO_ARCH_AVR) || defined (__ARDUINO_X86__) || defined (ARDUINO_ARCH_MBED) || defined (ARDUINO_ARCH_MEGAAVR)
 
 void printf_begin(void)
 {
-#if defined(ARDUINO_ARCH_AVR)
+#if defined (ARDUINO_ARCH_AVR) || defined (ARDUINO_ARCH_MEGAAVR)
     fdevopen(&serial_putc, 0);
 
 #elif defined(__ARDUINO_X86__)
