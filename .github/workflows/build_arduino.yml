@@ -31,8 +31,14 @@ jobs:
         run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
       - name: run linter as a python package
         id: linter
-        run: cpp-linter --version=12 --style=file --tidy-checks='-*' --files-changed-only='False' --extensions=ino --ignore='examples/old_backups'
-          ignore: examples/old_backups
+        run: |
+          cpp-linter \
+          --version=12 \
+          --style=file \
+          --tidy-checks='-*' \
+          --files-changed-only='False' \
+          --extensions=ino \
+          --ignore='examples/old_backups'
       - name: Linter checks failed?
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1
