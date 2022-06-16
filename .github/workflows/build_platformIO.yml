@@ -66,19 +66,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - uses: shenxianpeng/cpp-linter-action@master
-        id: linter
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - name: Install clang-tools
+        uses: KyleMayes/install-llvm-action@v1
         with:
           version: 12
-          extensions: ino
-          style: file
-          tidy-checks: '-*'
-          files-changed-only: false
-          thread-comments: false
-          ignore: examples/old_backups
-
+      - name: Install linter python package
+        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+      - name: run linter as a python package
+        id: linter
+        run: |
+          cpp-linter \
+          --version=12 \
+          --style=file \
+          --tidy-checks='-*' \
+          --files-changed-only='False' \
+          --extensions=ino \
+          --ignore='examples/old_backups'
       - name: Linter checks failed?
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1
