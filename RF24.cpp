@@ -944,9 +944,7 @@ bool RF24::begin(void)
         case 0: break;
         case 1: break;
         // Allow BCM2835 enums for RPi
-        case 8:
-            csn_pin = 0;
-            break;
+        case 8: csn_pin = 0; break;
         case 7: csn_pin = 1; break;
         case 18: csn_pin = 10; break; // to make it work on SPI1
         case 17: csn_pin = 11; break;
