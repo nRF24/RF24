@@ -91,9 +91,8 @@ def master(count=1):
                 buf_iter += 1
     end_timer = time.monotonic_ns()  # end timer
     print(
-        "Time to transmit data = {} us. Detected {} failures.".format(
-            (end_timer - start_timer) / 1000, failures
-        )
+        f"Time to transmit data = {(end_timer - start_timer) / 1000} us.",
+        f"Detected {failures} failures."
     )
 
 
@@ -110,16 +109,15 @@ def slave(timeout=6):
     while (time.monotonic() - start_timer) < timeout:
         if radio.available():
             count += 1
-            # retreive the received packet's payload
+            # retrieve the received packet's payload
             receive_payload = radio.read(radio.payloadSize)
-            print("Received: {} - {}".format(receive_payload, count))
+            print("Received:", receive_payload, "-", count)
             start_timer = time.monotonic()  # reset timer on every RX payload
 
     print("Nothing received in", timeout, "seconds. Leaving RX role")
     # recommended behavior is to keep in TX mode while idle
     radio.stopListening()  # put the radio in TX mode
 
-    print("Nothing received in ", timeout, " seconds. Leaving RX role")
 
 
 def set_role():
