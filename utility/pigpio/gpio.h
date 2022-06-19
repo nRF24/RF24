@@ -10,10 +10,11 @@
 #include <stdexcept>
 
 /** Specific excpetion for SPI errors */
-class GPIOException : public std::runtime_error {
+class GPIOException : public std::runtime_error
+{
 public:
     explicit GPIOException(const std::string& msg)
-            :std::runtime_error(msg)
+        : std::runtime_error(msg)
     {
     }
 };
@@ -24,7 +25,6 @@ public:
  * Class declaration for GPIO helper files
  */
 
-
 /**
  * Example GPIO.h file
  *
@@ -34,10 +34,9 @@ public:
  * @{
  */
 
-
-class GPIO {
+class GPIO
+{
 public:
-
     /* Constants */
     static const int DIRECTION_OUT = 1;
     static const int DIRECTION_IN = 0;
@@ -76,10 +75,9 @@ public:
     virtual ~GPIO();
 
 private:
-
 };
 /**
  * @endcond
  */
 /**@}*/
-#endif    /* H */
+#endif /* H */

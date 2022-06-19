@@ -49,8 +49,8 @@ void printHelp(string);    // prototype to function that explain CLI arg usage
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
-
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
     // perform hardware check
     if (!radio.begin()) {
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
                 return 0;
             }
         } // else
-    } // if
+    }     // if
 
     // print example's name
     cout << argv[0] << endl;
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 
     // save on transmission time by setting the radio to only transmit the
     // number of bytes we need to transmit a float
-    radio.setPayloadSize(SIZE);    // default value is the maximum 32 bytes
+    radio.setPayloadSize(SIZE); // default value is the maximum 32 bytes
 
     // Set the PA Level low to try preventing power supply related problems
     // because these examples are likely run with nodes in close proximity to
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
     radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
     // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
@@ -153,8 +153,8 @@ int main(int argc, char** argv) {
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
     // ready to execute program now
-    if (!foundArgRole) {           // if CLI arg "-r"/"--role" was not specified
-        setRole();                 // calls master() or slave() based on user input
+    if (!foundArgRole) { // if CLI arg "-r"/"--role" was not specified
+        setRole();       // calls master() or slave() based on user input
     }
     else {                         // if CLI arg "-r"/"--role" was specified
         role ? master() : slave(); // based on CLI arg option
@@ -162,12 +162,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-
 /**
  * set this node's role from stdin stream.
  * this only considers the first char as input.
  */
-void setRole() {
+void setRole()
+{
     string input = "";
     while (!input.length()) {
         cout << "*** PRESS 'T' to begin transmitting to the other node\n";
@@ -185,17 +185,17 @@ void setRole() {
                 cout << input[0] << " is an invalid input. Please try again." << endl;
         }
         input = ""; // stay in the while loop
-    } // while
+    }               // while
 } // setRole()
-
 
 /**
  * make this node act as the transmitter
  */
-void master() {
-    radio.stopListening();                           // put radio in TX mode
+void master()
+{
+    radio.stopListening(); // put radio in TX mode
 
-    unsigned int failures = 0;                       // keep track of failures
+    unsigned int failures = 0; // keep track of failures
     uint8_t i = 0;
     clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer); // start the timer
     while (i < SIZE) {
@@ -203,7 +203,8 @@ void master() {
         if (!radio.writeFast(&buffer, SIZE)) {
             failures++;
             radio.reUseTX();
-        } else {
+        }
+        else {
             i++;
         }
 
@@ -213,19 +214,19 @@ void master() {
             cout << "Aborting at payload " << buffer[0];
             break;
         }
-    } // while
-    uint32_t ellapsedTime = getMicros();             // end the timer
+    }                                    // while
+    uint32_t ellapsedTime = getMicros(); // end the timer
     cout << "Time to transmit data = ";
-    cout << ellapsedTime;                            // print the timer result
-    cout << " us. " << failures;                     // print number of retries
+    cout << ellapsedTime;        // print the timer result
+    cout << " us. " << failures; // print number of retries
     cout << " failures detected. Leaving TX role." << endl;
 } // master
-
 
 /**
  * make this node act as the receiver
  */
-void slave() {
+void slave()
+{
 
     counter = 0;
     radio.startListening();                   // put radio in RX mode
@@ -239,17 +240,17 @@ void slave() {
             startTimer = time(nullptr);       // reset timer
         }
     }
-    radio.stopListening();                    // use TX mode for idle behavior
+    radio.stopListening(); // use TX mode for idle behavior
 
     cout << "Nothing received in 6 seconds. Leaving RX role." << endl;
 }
-
 
 /**
  * Make a single payload based on position in stream.
  * This example employs this function to save on memory allocated.
  */
-void makePayload(uint8_t i) {
+void makePayload(uint8_t i)
+{
 
     // let the first character be an identifying alphanumeric prefix
     // this lets us see which payload didn't get received
@@ -261,11 +262,11 @@ void makePayload(uint8_t i) {
     }
 }
 
-
 /**
  * Calculate the ellapsed time in microseconds
  */
-uint32_t getMicros() {
+uint32_t getMicros()
+{
     // this function assumes that the timer was started using
     // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
 
@@ -273,14 +274,14 @@ uint32_t getMicros() {
     uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
-    return ((seconds) * 1000 + useconds) + 0.5;
+    return ((seconds)*1000 + useconds) + 0.5;
 }
-
 
 /**
  * print a manual page of instructions on how to use this example's CLI args
  */
-void printHelp(string progName) {
+void printHelp(string progName)
+{
     cout << "usage: " << progName << " [-h] [-n {0,1}] [-r {0,1}]\n\n"
          << "A simple example of streaming data from 1 nRF24L01 transceiver to another.\n"
          << "\nThis example was written to be used on 2 devices acting as 'nodes'.\n"

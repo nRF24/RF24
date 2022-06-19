@@ -66,19 +66,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Check code formatting
-        uses: per1234/artistic-style-action@main
-        with:
-          options-file-path: ./examples/examples_formatter.conf
-          name-patterns: |
-            - '*.ino'
-            - '*.cpp'
-            - '*.hpp'
-            - '*.h'
-          target-paths: |
-            - examples
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
+      # - name: Install clang-tools
+      #   uses: KyleMayes/install-llvm-action@v1
+      #   with:
+      #     version: 12
+      - name: Install linter python package
+        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+      - name: run linter as a python package
+        id: linter
+        run: |
+          cpp-linter \
+          --version=12 \
+          --style=file \
+          --tidy-checks='-*' \
+          --files-changed-only='False' \
+          --extensions=ino \
+          --ignore='examples/old_backups'
+      - name: Linter checks failed?
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
 
   build:
     needs: [check_formatting, validate_lib_json]

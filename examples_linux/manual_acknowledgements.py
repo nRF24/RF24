@@ -12,27 +12,25 @@ This example was written to be used on 2 devices acting as 'nodes'.
 import sys
 import argparse
 import time
-import struct
 from RF24 import RF24, RF24_PA_LOW
 
 
 parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument(
     "-n",
     "--node",
     type=int,
     choices=range(2),
-    help="the identifying radio number (or node ID number)"
+    help="the identifying radio number (or node ID number)",
 )
 parser.add_argument(
     "-r",
     "--role",
     type=int,
     choices=range(2),
-    help="'1' specifies the TX role. '0' specifies the RX role."
+    help="'1' specifies the TX role. '0' specifies the RX role.",
 )
 
 ########### USER CONFIGURATION ###########
@@ -81,10 +79,9 @@ def master():
             end_timer = time.monotonic_ns()  # end timer
             print(
                 "Transmission successful. Sent: {}{}.".format(
-                    buffer[:6].decode("utf-8"),
-                    counter[0]
+                    buffer[:6].decode("utf-8"), counter[0]
                 ),
-                end=" "
+                end=" ",
             )
             has_payload, pipe_number = radio.available_pipe()
             if has_payload:
@@ -99,7 +96,7 @@ def master():
                         pipe_number,
                         bytes(received[:6]).decode("utf-8"),
                         counter[0],
-                        (end_timer - start_timer) / 1000
+                        (end_timer - start_timer) / 1000,
                     )
                 )
             else:
@@ -140,18 +137,13 @@ def slave(timeout=6):
                     radio.payloadSize,
                     pipe_number,
                     bytes(received[:6]).decode("utf-8"),
-                    received[7:8][0]
+                    received[7:8][0],
                 ),
-                end=" "
+                end=" ",
             )
             if result:  # did response succeed?
                 # print response's payload
-                print(
-                    "Sent: {}{}".format(
-                        buffer[:6].decode("utf-8"),
-                        counter[0]
-                    )
-                )
+                print("Sent: {}{}".format(buffer[:6].decode("utf-8"), counter[0]))
             else:
                 print("Response failed or timed out")
             start_timer = time.monotonic()  # reset the timeout timer
@@ -169,11 +161,14 @@ def set_role():
         - True when role is complete & app should continue running.
         - False when app should exit
     """
-    user_input = input(
-        "*** Enter 'R' for receiver role.\n"
-        "*** Enter 'T' for transmitter role.\n"
-        "*** Enter 'Q' to quit example.\n"
-    ) or "?"
+    user_input = (
+        input(
+            "*** Enter 'R' for receiver role.\n"
+            "*** Enter 'T' for transmitter role.\n"
+            "*** Enter 'Q' to quit example.\n"
+        )
+        or "?"
+    )
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
         if len(user_input) > 1:
@@ -213,11 +208,7 @@ if __name__ == "__main__":
     radio_number = args.node  # uses default value from `parser`
     if args.node is None:  # if '--node' arg wasn't specified
         radio_number = bool(
-            int(
-                input(
-                    "Which radio is this? Enter '0' or '1'. Defaults to '0' "
-                ) or 0
-            )
+            int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
         )
 
     # set the Power Amplifier level to -12 dBm since this test example is

@@ -57,9 +57,10 @@ void GPIO::open(int port, int DDR)
     }
     /*
     if (DDR == 0)
-          fprintf(f, "in\n");
-    else  printf(f, "out\n");
-  */
+        fprintf(f, "in\n");
+    else
+        printf(f, "out\n");
+    */
     fclose(f);
 
     // Caches the GPIO descriptor;
@@ -68,11 +69,11 @@ void GPIO::open(int port, int DDR)
     int fd = ::open(file, flags);
     if (fd < 0) {
         throw GPIOException("Can't open the GPIO");
-    } else {
-        cache[port] = fd;  // cache the fd;
+    }
+    else {
+        cache[port] = fd; // cache the fd;
         lseek(fd, SEEK_SET, 0);
     }
-
 }
 
 void GPIO::close(int port)
@@ -81,7 +82,7 @@ void GPIO::close(int port)
     i = cache.find(port);
     if (i != cache.end()) {
         close(i->second); // close the cached fd
-        cache.erase(i); // Delete cache entry
+        cache.erase(i);   // Delete cache entry
     }
     // Do unexport
     FILE* f;
@@ -102,21 +103,25 @@ int GPIO::read(int port)
         i = cache.find(port);
         if (i == cache.end()) {
             throw GPIOException("can't access to GPIO");
-        } else {
+        }
+        else {
             fd = i->second;
         }
-    } else {
+    }
+    else {
         fd = i->second;
     }
 
     char c;
     if (lseek(fd, 0, SEEK_SET) == 0 && ::read(fd, &c, 1) == 1) {
         return (c == '0') ? 0 : 1;
-    } else {
+    }
+    else {
         throw GPIOException("can't access to GPIO");
     }
 
-    /*FILE *f;
+    /*
+    FILE *f;
 
     char file[128];
     sprintf(file, "/sys/class/gpio/gpio%d/value", port);
@@ -126,7 +131,7 @@ int GPIO::read(int port)
     fscanf(f, "%d", &i);
     fclose(f);
     return i;
-*/
+    */
 }
 
 void GPIO::write(int port, int value)
@@ -139,10 +144,12 @@ void GPIO::write(int port, int value)
         i = cache.find(port);
         if (i == cache.end()) {
             throw GPIOException("can't access to GPIO");
-        } else {
+        }
+        else {
             fd = i->second;
         }
-    } else {
+    }
+    else {
         fd = i->second;
     }
 
@@ -154,14 +161,18 @@ void GPIO::write(int port, int value)
         throw GPIOException("can't access to GPIO");
     }
 
-    /*FILE *f;
+    /*
+    FILE *f;
 
     char file[128];
     sprintf(file, "/sys/class/gpio/gpio%d/value", port);
     f = fopen(file, "w");
 
-    if (value == 0)	fprintf(f, "0\n");
-    else		fprintf(f, "1\n");
+    if (value == 0)
+        fprintf(f, "0\n");
+    else
+        fprintf(f, "1\n");
 
-    fclose(f);*/
+    fclose(f);
+    */
 }

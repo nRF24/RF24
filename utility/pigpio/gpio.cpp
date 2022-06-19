@@ -9,7 +9,6 @@ bool initialized = 0;
 
 GPIO::GPIO()
 {
-    
 }
 
 GPIO::~GPIO()
@@ -19,7 +18,7 @@ GPIO::~GPIO()
 
 void GPIO::open(int port, int DDR)
 {
-    if(!initialized){
+    if (!initialized) {
         gpioInitialise();
     }
     initialized = true;
@@ -28,12 +27,11 @@ void GPIO::open(int port, int DDR)
 
 void GPIO::close(int port)
 {
-    
 }
 
 int GPIO::read(int port)
 {
-    return gpioRead( port );
+    return gpioRead(port);
 }
 
 void GPIO::write(int port, int value)

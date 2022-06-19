@@ -7,22 +7,22 @@
 */
 
 /**
-   Example LED Remote
+  Example LED Remote
 
-   This is an example of how to use the RF24 class to control a remote
-   bank of LED's using buttons on a remote control.
+  This is an example of how to use the RF24 class to control a remote
+  bank of LED's using buttons on a remote control.
 
-   On the 'remote', connect any number of buttons or switches from
-   an arduino pin to ground.  Update 'button_pins' to reflect the
-   pins used.
+  On the 'remote', connect any number of buttons or switches from
+  an arduino pin to ground.  Update 'button_pins' to reflect the
+  pins used.
 
-   On the 'led' board, connect the same number of LED's from an
-   arduino pin to a resistor to ground.  Update 'led_pins' to reflect
-   the pins used.  Also connect a separate pin to ground and change
-   the 'role_pin'.  This tells the sketch it's running on the LED board.
+  On the 'led' board, connect the same number of LED's from an
+  arduino pin to a resistor to ground.  Update 'led_pins' to reflect
+  the pins used.  Also connect a separate pin to ground and change
+  the 'role_pin'.  This tells the sketch it's running on the LED board.
 
-   Every time the buttons change on the remote, the entire state of
-   buttons is send to the led board, which displays the state.
+  Every time the buttons change on the remote, the entire state of
+  buttons is send to the led board, which displays the state.
 */
 
 #include <SPI.h>
@@ -68,10 +68,11 @@ const uint64_t pipe = 0xE8E8F0F0E1LL;
 //
 
 // The various roles supported by this sketch
-typedef enum { role_remote = 1, role_led } role_e;
+typedef enum { role_remote = 1,
+               role_led } role_e;
 
 // The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Remote", "LED Board"};
+const char* role_friendly_name[] = { "invalid", "Remote", "LED Board" };
 
 // The role of the current running sketch
 role_e role;
@@ -87,8 +88,7 @@ uint8_t led_states[num_led_pins];
 // Setup
 //
 
-void setup(void)
-{
+void setup(void) {
   //
   // Role
   //
@@ -96,10 +96,10 @@ void setup(void)
   // set up the role pin
   pinMode(role_pin, INPUT);
   digitalWrite(role_pin, HIGH);
-  delay(20); // Just to get a solid reading on the role pin
+  delay(20);  // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
-  if ( digitalRead(role_pin) )
+  if (digitalRead(role_pin))
     role = role_remote;
   else
     role = role_led;
@@ -126,12 +126,9 @@ void setup(void)
   // This simple sketch opens a single pipes for these two nodes to communicate
   // back and forth.  One listens on it, the other talks to it.
 
-  if ( role == role_remote )
-  {
+  if (role == role_remote) {
     radio.openWritingPipe(pipe);
-  }
-  else
-  {
+  } else {
     radio.openReadingPipe(1, pipe);
   }
 
@@ -139,7 +136,7 @@ void setup(void)
   // Start listening
   //
 
-  if ( role == role_led )
+  if (role == role_led)
     radio.startListening();
 
   //
@@ -153,62 +150,52 @@ void setup(void)
   //
 
   // Set pull-up resistors for all buttons
-  if ( role == role_remote )
-  {
+  if (role == role_remote) {
     int i = num_button_pins;
-    while (i--)
-    {
+    while (i--) {
       pinMode(button_pins[i], INPUT);
       digitalWrite(button_pins[i], HIGH);
     }
   }
 
   // Turn LED's ON until we start getting keys
-  if ( role == role_led )
-  {
+  if (role == role_led) {
     int i = num_led_pins;
-    while (i--)
-    {
+    while (i--) {
       pinMode(led_pins[i], OUTPUT);
       led_states[i] = HIGH;
       digitalWrite(led_pins[i], led_states[i]);
     }
   }
-
 }
 
 //
 // Loop
 //
 
-void loop(void)
-{
+void loop(void) {
   //
   // Remote role.  If the state of any button has changed, send the whole state of
   // all buttons.
   //
 
-  if ( role == role_remote )
-  {
+  if (role == role_remote) {
     // Get the current state of buttons, and
     // Test if the current state is different from the last state we sent
     int i = num_button_pins;
     bool different = false;
-    while (i--)
-    {
-      uint8_t state = ! digitalRead(button_pins[i]);
-      if ( state != button_states[i] )
-      {
+    while (i--) {
+      uint8_t state = !digitalRead(button_pins[i]);
+      if (state != button_states[i]) {
         different = true;
         button_states[i] = state;
       }
     }
 
     // Send the state of the buttons to the LED board
-    if ( different )
-    {
+    if (different) {
       printf("Now sending...");
-      bool ok = radio.write( button_states, num_button_pins );
+      bool ok = radio.write(button_states, num_button_pins);
       if (ok)
         printf("ok\n\r");
       else
@@ -223,26 +210,21 @@ void loop(void)
   // LED role.  Receive the state of all buttons, and reflect that in the LEDs
   //
 
-  if ( role == role_led )
-  {
+  if (role == role_led) {
     // if there is data ready
-    if ( radio.available() )
-    {
+    if (radio.available()) {
       // Dump the payloads until we've gotten everything
-      while (radio.available())
-      {
+      while (radio.available()) {
         // Fetch the payload, and see if this was the last one.
-        radio.read( button_states, num_button_pins );
+        radio.read(button_states, num_button_pins);
 
         // Spew it
         printf("Got buttons\n\r");
 
         // For each button, if the button now on, then toggle the LED
         int i = num_led_pins;
-        while (i--)
-        {
-          if ( button_states[i] )
-          {
+        while (i--) {
+          if (button_states[i]) {
             led_states[i] ^= HIGH;
             digitalWrite(led_pins[i], led_states[i]);
           }

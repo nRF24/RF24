@@ -1,5 +1,5 @@
-#ifndef __ARCH_CONFIG_H__
-#define __ARCH_CONFIG_H__
+#ifndef RF24_UTILITY_RPI_RF24_ARCH_CONFIG_H_
+#define RF24_UTILITY_RPI_RF24_ARCH_CONFIG_H_
 
 #define RF24_LINUX
 
@@ -16,32 +16,33 @@
 
 #define _SPI spi
 
-#if defined (SPI_HAS_TRANSACTION)
+#if defined(SPI_HAS_TRANSACTION)
     // this gets triggered as /utility/RPi/spi.h defines SPI_HAS_TRANSACTION (unless modified by end-user)
     #define RF24_SPI_TRANSACTIONS
 #endif
 
 // GCC a Arduino Missing
-#define _BV(x) (1<<(x))
+#define _BV(x)           (1 << (x))
 #define pgm_read_word(p) (*(p))
 #define pgm_read_byte(p) (*(p))
-#define pgm_read_ptr(p) (*(p))
+#define pgm_read_ptr(p)  (*(p))
 
 //typedef uint16_t prog_uint16_t;
-#define PSTR(x) (x)
+#define PSTR(x)  (x)
 #define printf_P printf
 #define strlen_P strlen
 #define PROGMEM
 #define PRIPSTR "%s"
 
 #ifdef SERIAL_DEBUG
-    #define IF_SERIAL_DEBUG(x) ({x;})
+    #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
     #define IF_SERIAL_DEBUG(x)
 #endif
 
 #define digitalWrite(pin, value) bcm2835_gpio_write(pin, value)
-#define pinMode(pin, value) bcm2835_gpio_fsel(pin, value)
-#define OUTPUT BCM2835_GPIO_FSEL_OUTP
-#define INPUT BCM2835_GPIO_FSEL_INPT
-#endif
+#define pinMode(pin, value)      bcm2835_gpio_fsel(pin, value)
+#define OUTPUT                   BCM2835_GPIO_FSEL_OUTP
+#define INPUT                    BCM2835_GPIO_FSEL_INPT
+
+#endif // RF24_UTILITY_RPI_RF24_ARCH_CONFIG_H_

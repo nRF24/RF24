@@ -44,7 +44,8 @@ void slave();   // prototype of the RX node's behavior
 struct timespec startTimer, endTimer;
 uint32_t getMicros(); // prototype to get ellapsed time in microseconds
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
     // perform hardware check
     if (!radio.begin()) {
@@ -80,7 +81,7 @@ int main(int argc, char** argv) {
     radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
 
     // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]);     // always uses pipe 0
+    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
@@ -94,12 +95,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-
 /**
  * set this node's role from stdin stream.
  * this only considers the first char as input.
  */
-void setRole() {
+void setRole()
+{
     string input = "";
     while (!input.length()) {
         cout << "*** PRESS 'T' to begin transmitting to the other node\n";
@@ -117,37 +118,37 @@ void setRole() {
                 cout << input[0] << " is an invalid input. Please try again." << endl;
         }
         input = ""; // stay in the while loop
-    } // while
+    }               // while
 } // setRole()
-
 
 /**
  * make this node act as the transmitter
  */
-void master() {
-    radio.stopListening();                                          // put radio in TX mode
+void master()
+{
+    radio.stopListening(); // put radio in TX mode
 
-    unsigned int failure = 0;                                       // keep track of failures
+    unsigned int failure = 0; // keep track of failures
     while (failure < 6) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);            // start the timer
-        bool report = radio.write(&payload, sizeof(float));         // transmit & save the report
-        uint32_t timerEllapsed = getMicros();                       // end the timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);    // start the timer
+        bool report = radio.write(&payload, sizeof(float)); // transmit & save the report
+        uint32_t timerEllapsed = getMicros();               // end the timer
 
         if (report) {
             // payload was delivered
             cout << "Transmission successful! Time to transmit = ";
-            cout << timerEllapsed;                                  // print the timer result
-            cout << " us. Sent: " << payload << endl;               // print payload sent
-            payload += 0.01;                                        // increment float payload
-
-        } else {
+            cout << timerEllapsed;                    // print the timer result
+            cout << " us. Sent: " << payload << endl; // print payload sent
+            payload += 0.01;                          // increment float payload
+        }
+        else {
             // payload was not delivered
             cout << "Transmission failed or timed out" << endl;
             failure++;
         }
 
         // to make this example readable in the terminal
-        delay(1000);  // slow transmissions down by 1 second
+        delay(1000); // slow transmissions down by 1 second
     }
     cout << failure << " failures detected. Leaving TX role." << endl;
 }
@@ -155,12 +156,13 @@ void master() {
 /**
  * make this node act as the receiver
  */
-void slave() {
+void slave()
+{
 
-    radio.startListening();                                  // put radio in RX mode
+    radio.startListening(); // put radio in RX mode
 
-    time_t startTimer = time(nullptr);                       // start a timer
-    while (time(nullptr) - startTimer < 6) {                 // use 6 second timeout
+    time_t startTimer = time(nullptr);       // start a timer
+    while (time(nullptr) - startTimer < 6) { // use 6 second timeout
         uint8_t pipe;
         if (radio.available(&pipe)) {                        // is there a payload? get the pipe number that recieved it
             uint8_t bytes = radio.getPayloadSize();          // get the size of the payload
@@ -175,11 +177,11 @@ void slave() {
     radio.stopListening();
 }
 
-
 /**
  * Calculate the ellapsed time in microseconds
  */
-uint32_t getMicros() {
+uint32_t getMicros()
+{
     // this function assumes that the timer was started using
     // `clock_gettime(CLOCK_MONOTONIC_RAW, &startTimer);`
 
@@ -187,5 +189,5 @@ uint32_t getMicros() {
     uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;
     uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;
 
-    return ((seconds) * 1000 + useconds) + 0.5;
+    return ((seconds)*1000 + useconds) + 0.5;
 }

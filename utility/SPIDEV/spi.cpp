@@ -1,6 +1,6 @@
-/*
- * File:   spi.cpp
- * Author: Purinda Gunasekara <purinda@gmail.com>
+/**
+ * @file spi.cpp
+ * @author Purinda Gunasekara <purinda@gmail.com>
  *
  * Created on 24 June 2012, 11:00 AM
  *
@@ -23,10 +23,9 @@
 #define RF24_SPIDEV_BITS 8
 
 SPI::SPI()
-        :fd(-1), _spi_speed(RF24_SPI_SPEED)
+    : fd(-1), _spi_speed(RF24_SPI_SPEED)
 {
 }
-
 
 void SPI::begin(int busNo, uint32_t spi_speed)
 {
@@ -138,9 +137,9 @@ uint8_t SPI::transfer(uint8_t tx)
 {
     struct spi_ioc_transfer tr;
     memset(&tr, 0, sizeof(tr));
-    tr.tx_buf = (unsigned long) &tx;
+    tr.tx_buf = (unsigned long)&tx;
     uint8_t rx;
-    tr.rx_buf = (unsigned long) &rx;
+    tr.rx_buf = (unsigned long)&rx;
     tr.len = sizeof(tx);
     tr.speed_hz = _spi_speed; //RF24_SPI_SPEED;
     tr.delay_usecs = 0;
@@ -164,8 +163,8 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
     struct spi_ioc_transfer tr;
     memset(&tr, 0, sizeof(tr));
-    tr.tx_buf = (unsigned long) tbuf;
-    tr.rx_buf = (unsigned long) rbuf;
+    tr.tx_buf = (unsigned long)tbuf;
+    tr.rx_buf = (unsigned long)rbuf;
     tr.len = len;
     tr.speed_hz = _spi_speed; //RF24_SPI_SPEED;
     tr.delay_usecs = 0;
@@ -181,6 +180,11 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
         perror("can't send spi message");
         abort();
     }*/
+}
+
+void SPI::transfern(char* buf, uint32_t len)
+{
+    transfernb(buf, buf, len);
 }
 
 SPI::~SPI()

@@ -3,23 +3,22 @@
  * SPI layer for RF24
  */
 
-#ifndef _SPI_H_INCLUDED
-#define _SPI_H_INCLUDED
+#ifndef RF24_UTILITY_MRAA_SPI_H_
+#define RF24_UTILITY_MRAA_SPI_H_
 /**
-* @file spi.h
-* \cond HIDDEN_SYMBOLS
-* Class declaration for SPI helper files
-*/
+ * @file spi.h
+ * Class declaration for SPI helper files
+ */
 
 #include <stdio.h>
 #include "mraa.h"
 #include "mraa.hpp"
 
-#include "../../RF24_config.h"
+#include "../../RF24_config.h" // This is cyclical and should be fixed
 
-class SPI {
+class SPI
+{
 public:
-
     SPI();
 
     virtual ~SPI();
@@ -52,7 +51,7 @@ uint8_t SPI::transfer(uint8_t _data)
 
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
-    mspi->transfer((uint8_t*) tbuf, (uint8_t*) rbuf, len);
+    mspi->transfer((uint8_t*)tbuf, (uint8_t*)rbuf, len);
 }
 
 void SPI::transfern(char* buf, uint32_t len)
@@ -60,7 +59,4 @@ void SPI::transfern(char* buf, uint32_t len)
     transfernb(buf, buf, len);
 }
 
-/**
- * \endcond
- */
-#endif
+#endif // RF24_UTILITY_MRAA_SPI_H_

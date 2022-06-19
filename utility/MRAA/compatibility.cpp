@@ -13,7 +13,7 @@ void __msleep(int milisec)
     struct timespec req = {0};
     req.tv_sec = 0;
     req.tv_nsec = milisec * 1000000L;
-    nanosleep(&req, (struct timespec*) NULL);
+    nanosleep(&req, (struct timespec*)NULL);
     //usleep(milisec*1000);
 }
 
@@ -22,7 +22,7 @@ void __usleep(int milisec)
     struct timespec req = {0};
     req.tv_sec = 0;
     req.tv_nsec = milisec * 1000L;
-    nanosleep(&req, (struct timespec*) NULL);
+    nanosleep(&req, (struct timespec*)NULL);
     //usleep(milisec);
 }
 
@@ -39,6 +39,6 @@ void __start_timer()
 long __millis()
 {
     auto end = std::chrono::steady_clock::now();
-	
-	return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }

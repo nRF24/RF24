@@ -21,7 +21,7 @@
 RF24 radio(7, 8);  // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t addresses[2] = {0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL};
+const uint64_t addresses[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 /************************* Role management ****************************/
 // Set up role.  This sketch uses the same software for all the nodes in this
@@ -30,10 +30,11 @@ const uint64_t addresses[2] = {0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL};
 // The role_pin is a digital input pin used to set the role of this radio.
 // Connect the role_pin to GND to be the 'pong' receiver
 // Leave the role_pin open to be the 'ping' transmitter
-const short role_pin = 5;                                                 // use pin 5
-typedef enum { role_ping_out = 1, role_pong_back } role_e;                // The various roles supported by this sketch
-const char* role_friendly_name[] = {"invalid", "Ping out", "Pong back"};  // The debug-friendly names of those roles
-role_e role;                                                              // The role of the current running sketch
+const short role_pin = 5;  // use pin 5
+typedef enum { role_ping_out = 1,
+               role_pong_back } role_e;                                     // The various roles supported by this sketch
+const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back" };  // The debug-friendly names of those roles
+role_e role;                                                                // The role of the current running sketch
 
 
 // variables used for changing the payload size dynamically (used when role == role_ping_out)
@@ -44,11 +45,10 @@ int send_payload_size = min_payload_size;
 
 char receive_payload[max_payload_size + 1];  // +1 to allow room for a terminating NULL char
 
-void setup(void)
-{
-  pinMode(role_pin, INPUT);       // set up the role pin
+void setup(void) {
+  pinMode(role_pin, INPUT);  // set up the role pin
   digitalWrite(role_pin, HIGH);
-  delay(20);                      // Just to get a solid reading on the role pin
+  delay(20);  // Just to get a solid reading on the role pin
 
   // read the role_pin, establish our role
   if (digitalRead(role_pin)) {
@@ -58,7 +58,7 @@ void setup(void)
   }
 
   Serial.begin(115200);
-  printf_begin();                 // needed for printDetails()
+  printf_begin();  // needed for printDetails()
 
   // Print preamble
   Serial.println(F("RF24/examples/pingpair_dyn/"));
@@ -79,8 +79,8 @@ void setup(void)
     radio.openReadingPipe(1, addresses[0]);
   }
 
-  radio.startListening();         // Start listening
-  radio.printDetails();           // Dump the configuration of the rf unit for debugging
+  radio.startListening();  // Start listening
+  radio.printDetails();    // Dump the configuration of the rf unit for debugging
 }
 
 void loop() {
@@ -92,20 +92,20 @@ void loop() {
     // The payload will always be the same, what will change is how much of it we send.
     static char send_payload[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ789012";
 
-    radio.stopListening();                          // First, stop listening so we can talk.
+    radio.stopListening();  // First, stop listening so we can talk.
 
     // Send the payload
     Serial.print(F("Now sending length "));
     Serial.println(send_payload_size);
-    radio.write(send_payload, send_payload_size);   // This will block until complete
+    radio.write(send_payload, send_payload_size);  // This will block until complete
 
-    radio.startListening();                         // Now, continue listening
+    radio.startListening();  // Now, continue listening
 
-    unsigned long started_waiting_at = millis();    // Start a timer for measuring timout
+    unsigned long started_waiting_at = millis();  // Start a timer for measuring timout
     bool timeout = false;
-    while (!radio.available() && !timeout)          // Wait until we get a response or timeout is reached
+    while (!radio.available() && !timeout)  // Wait until we get a response or timeout is reached
     {
-      if (millis() - started_waiting_at > 500)      // Only wait for 500 milliseconds
+      if (millis() - started_waiting_at > 500)  // Only wait for 500 milliseconds
         timeout = true;
     }
 
@@ -124,7 +124,7 @@ void loop() {
       radio.read(receive_payload, len);
 
       // Use payload as a C-string (for easy printing)
-      receive_payload[len] = 0;                     // put a NULL terminating zero at the end
+      receive_payload[len] = 0;  // put a NULL terminating zero at the end
 
       // Spew it
       Serial.print(F("Got response size="));
@@ -133,11 +133,11 @@ void loop() {
       Serial.println(receive_payload);
     }
 
-    send_payload_size += payload_size_increment;    // Update size for next time.
-    if (send_payload_size > max_payload_size)       // if payload length is larger than the radio can handle
-      send_payload_size = min_payload_size;         // reset the payload length
+    send_payload_size += payload_size_increment;  // Update size for next time.
+    if (send_payload_size > max_payload_size)     // if payload length is larger than the radio can handle
+      send_payload_size = min_payload_size;       // reset the payload length
 
-    delay(1000);                                    // Try again 1s later
+    delay(1000);  // Try again 1s later
   }
 
 
@@ -145,7 +145,7 @@ void loop() {
   // Receive each packet, send it back, and dump it out
 
   if (role == role_pong_back) {
-    while (radio.available())                       // if there is data ready
+    while (radio.available())  // if there is data ready
     {
 
       uint8_t len = radio.getDynamicPayloadSize();  // Fetch the the payload size
@@ -157,7 +157,7 @@ void loop() {
       radio.read(receive_payload, len);
 
       // Use payload as a C-string (for easy printing)
-      receive_payload[len] = 0;                     // put a NULL terminating zero at the end
+      receive_payload[len] = 0;  // put a NULL terminating zero at the end
 
       // Spew it
       Serial.print(F("Got response size="));
@@ -165,7 +165,7 @@ void loop() {
       Serial.print(F(" value="));
       Serial.println(receive_payload);
 
-      radio.stopListening();                        // First, stop listening so we can talk
+      radio.stopListening();  // First, stop listening so we can talk
 
       // Send a reply that the packet was received
       //
@@ -175,8 +175,8 @@ void loop() {
       radio.write(receive_payload, len);
       Serial.println(F("Sent response."));
 
-      radio.startListening();                       // Now, resume listening so we catch the next packets.
+      radio.startListening();  // Now, resume listening so we catch the next packets.
     }
   }
-} // loop
+}  // loop
 // vim:cin:ai:sts=2 sw=2 ft=cpp

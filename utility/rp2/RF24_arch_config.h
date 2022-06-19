@@ -13,8 +13,8 @@
  * General defines and includes for RF24 using The Pico SDK
  */
 
-#ifndef __ARCH_CONFIG_H__
-#define __ARCH_CONFIG_H__
+#ifndef RF24_UTILITY_RP2_RF24_ARCH_CONFIG_H_
+#define RF24_UTILITY_RP2_RF24_ARCH_CONFIG_H_
 
 #include "spi.h"
 #include "gpio.h"
@@ -24,39 +24,37 @@
 #define RF24_RP2
 
 #define _BV(x) (1 << (x))
-#define _SPI SPI
+#define _SPI   SPI
 #define RF24_SPI_PTR
 
 static SPI spi;
 
 #ifdef SERIAL_DEBUG
-    #define IF_SERIAL_DEBUG(x) ({x;})
+    #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
     #define IF_SERIAL_DEBUG(x)
 #endif
 
 typedef uint16_t prog_uint16_t;
-#define PSTR(x) (x)
+#define PSTR(x)  (x)
 #define printf_P printf
 #define strlen_P strlen
 #define PROGMEM
 #define pgm_read_word(p) (*(p))
-#define PRIPSTR "%s"
+#define PRIPSTR          "%s"
 #define pgm_read_byte(p) (*(p))
 
 #define pgm_read_ptr(p) (*(p))
 
 // Function, constant map as a result of migrating from Arduino
-#define LOW GPIO::OUTPUT_LOW
-#define HIGH GPIO::OUTPUT_HIGH
-#define INPUT GPIO::DIRECTION_IN
-#define OUTPUT GPIO::DIRECTION_OUT
+#define LOW                      GPIO::OUTPUT_LOW
+#define HIGH                     GPIO::OUTPUT_HIGH
+#define INPUT                    GPIO::DIRECTION_IN
+#define OUTPUT                   GPIO::DIRECTION_OUT
 #define digitalWrite(pin, value) GPIO::write(pin, value)
-#define pinMode(pin, direction) GPIO::open(pin, direction)
-#define delay(milisec) sleep_ms(milisec)
-#define delayMicroseconds(usec) sleep_us(usec)
-#define millis() to_ms_since_boot(get_absolute_time())
+#define pinMode(pin, direction)  GPIO::open(pin, direction)
+#define delay(milisec)           sleep_ms(milisec)
+#define delayMicroseconds(usec)  sleep_us(usec)
+#define millis()                 to_ms_since_boot(get_absolute_time())
 
-#endif // __ARCH_CONFIG_H__
-
-/**@}*/
+#endif // RF24_UTILITY_RP2_RF24_ARCH_CONFIG_H_

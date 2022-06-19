@@ -8,7 +8,6 @@ bool bcmIsInitialized = false;
 
 SPI::SPI()
 {
-
 }
 
 void SPI::begin(int busNo, uint32_t spi_speed)
@@ -62,5 +61,4 @@ void SPI::chipSelect(int csn_pin)
 
 SPI::~SPI()
 {
-
 }

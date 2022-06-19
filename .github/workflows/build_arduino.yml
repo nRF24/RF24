@@ -12,25 +12,37 @@ on:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/old_backups/**"
+env:
+  # convenient variable used multiple times
+  SKETCHES_REPORTS: sketches-reports
 
 jobs:
   check_formatting:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Check code formatting
-        uses: per1234/artistic-style-action@main
-        with:
-          options-file-path: ./examples/examples_formatter.conf
-          name-patterns: |
-            - '*.ino'
-            - '*.cpp'
-            - '*.hpp'
-            - '*.h'
-          target-paths: |
-            - examples
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
+      # - name: Install clang-tools
+      #   uses: KyleMayes/install-llvm-action@v1
+      #   with:
+      #     version: 12
+      - name: Install linter python package
+        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+      - name: run linter as a python package
+        id: linter
+        run: |
+          cpp-linter \
+          --version=12 \
+          --style=file \
+          --tidy-checks='-*' \
+          --files-changed-only='False' \
+          --extensions=ino \
+          --ignore='examples/old_backups'
+      - name: Linter checks failed?
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
   build:
     needs: check_formatting
     runs-on: ubuntu-latest
@@ -83,7 +95,16 @@ jobs:
           - "arduino:megaavr:uno2018"
           # - "arduino:megaavr:nano4809"  # board not found
           - "arduino:sam:arduino_due_x_dbg"
-
+        # By default, don't generate size deltas data.
+        enable-deltas-report: 
+          - false
+        # Generate size deltas data for this board
+        include:
+          - fqbn: arduino:avr:nano
+            enable-deltas-report: true
+          - fqbn: arduino:samd:mkrzero
+            enable-deltas-report: true
+ 
 
     steps:
       - name: Checkout
@@ -112,6 +133,17 @@ jobs:
           #   - examples/old_backups/recipes/nordic_fob
           #   - examples/old_backups/recipes/pingpair_maple
           fqbn: ${{ matrix.fqbn }}
+          enable-deltas-report: ${{ matrix.enable-deltas-report }}
+          sketches-report-path: ${{ env.SKETCHES_REPORTS }}
+      
+      # This step is needed to pass the size data to the report job 
+      - name: Upload sketches report to workflow artifact
+        if: ${{ matrix.enable-deltas-report }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS }}
+          path: ${{ env.SKETCHES_REPORTS }}
+
   attiny:
     needs: check_formatting
     runs-on: ubuntu-latest
@@ -143,6 +175,13 @@ jobs:
           - ATTinyCore:avr:attiny1634
           - ATTinyCore:avr:attiny1634opti
           - ATTinyCore:avr:attinyx313
+        # By default, don't generate size deltas data.
+        enable-deltas-report:
+          - false
+        # Generate size deltas data for this board
+        include:
+          - fqbn: ATTinyCore:avr:attinyx5
+            enable-deltas-report: true
 
     steps:
       - name: Checkout
@@ -159,3 +198,29 @@ jobs:
             - examples/rf24_ATTiny/rf24ping85
             - examples/rf24_ATTiny/timingSearch3pin
           fqbn: ${{ matrix.fqbn }}
+          enable-deltas-report: ${{ matrix.enable-deltas-report }}
+          sketches-report-path: ${{ env.SKETCHES_REPORTS }}
+      
+      # This step is needed to pass the size data to the report job 
+      - name: Upload sketches report to workflow artifact
+        if: ${{ matrix.enable-deltas-report }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS }}
+          path: ${{ env.SKETCHES_REPORTS }}
+
+  # When using a matrix to compile for multiple boards, it's necessary to use a separate job for the deltas report
+  report:
+    needs: [build, attiny]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download sketches reports artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS }}
+          path: ${{ env.SKETCHES_REPORTS }}
+
+      - uses: arduino/report-size-deltas@v1
+        with:
+          sketches-reports-source: ${{ env.SKETCHES_REPORTS }}

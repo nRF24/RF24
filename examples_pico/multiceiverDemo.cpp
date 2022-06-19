@@ -33,8 +33,7 @@ uint64_t address[6] = {0x7878787878LL,
                        0xB3B4B5B6CDLL,
                        0xB3B4B5B6A3LL,
                        0xB3B4B5B60FLL,
-                       0xB3B4B5B605LL
-                      };
+                       0xB3B4B5B605LL};
 
 // Because this example allow up to 6 nodes (specified by numbers 0-5) to
 // transmit and only 1 node to receive, we will use a negative value in our
@@ -48,8 +47,8 @@ char role = 'R'; // integers 0-5 = TX node; character 'R' or integer 82 = RX nod
 // Make a data structure to use as a payload.
 struct PayloadStruct
 {
-  unsigned long nodeID;
-  unsigned long payloadID;
+    unsigned long nodeID;
+    unsigned long payloadID;
 };
 PayloadStruct payload;
 
@@ -57,7 +56,6 @@ PayloadStruct payload;
 // To make this easier we'll use a function to manage the addresses, and the
 // payload's nodeID
 void setRole(); // declare a prototype; definition is found after the loop()
-
 
 bool setup()
 {
@@ -100,7 +98,6 @@ bool setup()
     return true;
 } // setup()
 
-
 void loop()
 {
     if (role <= 53) {
@@ -130,7 +127,7 @@ void loop()
         // This device is the RX node
 
         uint8_t pipe;
-        while (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
+        while (radio.available(&pipe)) {            // is there a payload? get the pipe number that recieved it
             uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
             radio.read(&payload, bytes);            // fetch payload from FIFO
 
@@ -155,7 +152,6 @@ void loop()
             printf("--- Enter a number between 0 and 5 (inclusive) to act as\n");
             printf("    a unique node number that transmits to the RX node.\n");
             setRole(); // change address on all pipes to TX nodes
-
         }
         else if (input >= 48 && input <= 53 && input != role) {
             // Become a TX node with identifier 'input'
@@ -186,7 +182,6 @@ void setRole()
             radio.openReadingPipe(i, address[i]);
 
         radio.startListening(); // put radio in RX mode
-
     }
     else {
         // For the TX node
