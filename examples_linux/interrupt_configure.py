@@ -64,13 +64,13 @@ def interrupt_handler(channel):
     tx_ds, tx_df, rx_dr = radio.whatHappened()  # get IRQ status flags
     if tx_df:
         radio.flush_tx()
-    print("\ttx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
+    print(f"\ttx_ds: {tx_ds}, tx_df: {tx_df}, rx_dr: {rx_dr}")
     if pl_iterator[0] == 0:
-        print("    'data ready' event test {}".format("passed" if rx_dr else "failed"))
+        print("    'data ready' event test", ("passed" if rx_dr else "failed"))
     elif pl_iterator[0] == 1:
-        print("    'data sent' event test {}".format("passed" if tx_ds else "failed"))
+        print("    'data sent' event test", ("passed" if tx_ds else "failed"))
     elif pl_iterator[0] == 3:
-        print("    'data fail' event test {}".format("passed" if tx_df else "failed"))
+        print("    'data fail' event test", ("passed" if tx_df else "failed"))
 
 
 # setup IRQ GPIO pin
@@ -98,8 +98,8 @@ def _ping_n_wait(pl_iter):
     time.sleep(0.1)  # wait 100 ms for interrupt_handler() to complete
 
 
-def print_rx_fifo(pl_size):
-    """fush RX FIFO by printing all available payloads with 1 buffer
+def print_rx_fifo(pl_size: int):
+    """Flush RX FIFO by printing all available payloads with 1 buffer
 
     :param int pl_size: the expected size of each payload
     """
@@ -147,7 +147,7 @@ def master():
             print("RX node's FIFO is full; it is not listening any more")
         else:
             print(
-                "Transmission successful, but the RX node might still be " "listening."
+                "Transmission successful, but the RX node might still be listening."
             )
     else:
         radio.flush_tx()
@@ -166,14 +166,14 @@ def master():
     print_rx_fifo(len(ack_payloads[0]))  # empty RX FIFO
 
 
-def slave(timeout=6):  # will listen for 6 seconds before timing out
+def slave(timeout: int = 6):
     """Only listen for 3 payload from the master node
 
     :param int timeout: The number of seconds to wait (with no transmission)
         until exiting function.
     """
     pl_iterator[0] = 0  # reset this to indicate event is a 'data_ready' event
-    # setup radio to recieve pings, fill TX FIFO with ACK payloads
+    # setup radio to receive pings, fill TX FIFO with ACK payloads
     radio.writeAckPayload(1, ack_payloads[0])
     radio.writeAckPayload(1, ack_payloads[1])
     radio.writeAckPayload(1, ack_payloads[2])
@@ -187,7 +187,7 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
     print_rx_fifo(len(tx_payloads[0]))
 
 
-def set_role():
+def set_role() -> bool:
     """Set the role using stdin stream. Timeout arg for slave() can be
     specified using a space delimiter (e.g. 'R 10' calls `slave(10)`)
 
@@ -210,15 +210,14 @@ def set_role():
         else:
             slave()
         return True
-    elif user_input[0].upper().startswith("T"):
+    if user_input[0].upper().startswith("T"):
         master()
         return True
-    elif user_input[0].upper().startswith("Q"):
+    if user_input[0].upper().startswith("Q"):
         radio.powerDown()
         return False
-    else:
-        print(user_input[0], "is an unrecognized input. Please try again.")
-        return set_role()
+    print(user_input[0], "is an unrecognized input. Please try again.")
+    return set_role()
 
 
 if __name__ == "__main__":
@@ -275,8 +274,10 @@ if __name__ == "__main__":
                 pass  # continue example until 'Q' is entered
         else:  # if role was set using CLI args
             # run role once and exit
-            master() if bool(args.role) else slave()
+            if bool(args.role):
+                master()
+            else:
+                slave()
     except KeyboardInterrupt:
-        print(" Keyboard Interrupt detected. Exiting...")
+        print(" Keyboard Interrupt detected. Powering down radio.")
         radio.powerDown()
-        sys.exit()

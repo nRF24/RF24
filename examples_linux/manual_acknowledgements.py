@@ -77,10 +77,9 @@ def master():
                 pass  # wait for incoming payload or timeout
             radio.stopListening()  # put radio in TX mode
             end_timer = time.monotonic_ns()  # end timer
+            decoded = buffer[:6].decode("utf-8")
             print(
-                "Transmission successful. Sent: {}{}.".format(
-                    buffer[:6].decode("utf-8"), counter[0]
-                ),
+                f"Transmission successful. Sent: {decoded}{counter[0]}.",
                 end=" ",
             )
             has_payload, pipe_number = radio.available_pipe()
@@ -89,15 +88,11 @@ def master():
                 received = radio.read(radio.payloadSize)
                 # NOTE received[7:8] discards NULL terminating 0
                 counter[0] = received[7:8][0]  # save the counter
+                decoded = bytes(received[:6]).decode("utf-8")
                 print(
-                    "Received {} bytes on pipe {}: {}{}. "
-                    "Round-trip delay: {} us.".format(
-                        radio.payloadSize,
-                        pipe_number,
-                        bytes(received[:6]).decode("utf-8"),
-                        counter[0],
-                        (end_timer - start_timer) / 1000,
-                    )
+                    f"Received {radio.payloadSize} bytes",
+                    f"on pipe {pipe_number}: {decoded}{counter[0]}.",
+                    f"Round-trip delay: {(end_timer - start_timer) / 1000} us.",
                 )
             else:
                 print("No response received.")
@@ -105,7 +100,7 @@ def master():
     print(failures, "failures detected. Leaving TX role.")
 
 
-def slave(timeout=6):
+def slave(timeout: int = 6):
     """Listen for any payloads and print the transaction
 
     :param int timeout: The number of seconds to wait (with no transmission)
@@ -132,18 +127,16 @@ def slave(timeout=6):
             # NOTE txStandBy() flushes TX FIFO on transmission failure
             radio.startListening()  # put radio back in RX mode
             # print the payload received payload
+            decoded = bytes(received[:6]).decode("utf-8")
             print(
-                "Received {} bytes on pipe {}: {}{}.".format(
-                    radio.payloadSize,
-                    pipe_number,
-                    bytes(received[:6]).decode("utf-8"),
-                    received[7:8][0],
-                ),
+                f"Received {radio.payloadSize} bytes"
+                f"on pipe {pipe_number}: {decoded}{received[7:8][0]}.",
                 end=" ",
             )
             if result:  # did response succeed?
                 # print response's payload
-                print("Sent: {}{}".format(buffer[:6].decode("utf-8"), counter[0]))
+                decoded = buffer[:6].decode("utf-8")
+                print(f"Sent: {decoded}{counter[0]}")
             else:
                 print("Response failed or timed out")
             start_timer = time.monotonic()  # reset the timeout timer
@@ -153,7 +146,7 @@ def slave(timeout=6):
     radio.stopListening()  # put the radio in TX mode
 
 
-def set_role():
+def set_role() -> bool:
     """Set the role using stdin stream. Timeout arg for slave() can be
     specified using a space delimiter (e.g. 'R 10' calls `slave(10)`)
 
@@ -176,10 +169,10 @@ def set_role():
         else:
             slave()
         return True
-    elif user_input[0].upper().startswith("T"):
+    if user_input[0].upper().startswith("T"):
         master()
         return True
-    elif user_input[0].upper().startswith("Q"):
+    if user_input[0].upper().startswith("Q"):
         radio.powerDown()
         return False
     print(user_input[0], "is an unrecognized input. Please try again.")
@@ -238,8 +231,10 @@ if __name__ == "__main__":
                 pass  # continue example until 'Q' is entered
         else:  # if role was set using CLI args
             # run role once and exit
-            master() if bool(args.role) else slave()
+            if bool(args.role):
+                master()
+            else:
+                slave()
     except KeyboardInterrupt:
-        print(" Keyboard Interrupt detected. Exiting...")
+        print(" Keyboard Interrupt detected. Powering down radio.")
         radio.powerDown()
-        sys.exit()
