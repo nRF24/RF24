@@ -45,13 +45,6 @@ totals = [0] * 126  # for the total signal count on each channel
 
 # create table of progress bars (labeled by frequency channel in MHz)
 table = Table.grid(padding=(0, 1))
-progress_header = Progress(
-    TextColumn("Scanning all channels using {task.description} for"),
-    TextColumn("{task.fields[duration]} seconds."),
-    TextColumn("Channel labels are in MHz."),
-)
-progress_header.add_task(SELECTED_RATE, duration=DURATION)
-table.add_row(progress_header)
 progress_bars: List[Progress] = [None] * 126
 for i in range(21):  # 21 rows
     row = []
@@ -77,16 +70,16 @@ def scan_channel(channel: int) -> bool:
     return result
 
 
-def scan():
+def scan(duration: int = DURATION):
     """Perform scan."""
-    timeout = time.monotonic() + DURATION
+    timeout = time.monotonic() + duration
+    console.print(
+        f"Scanning all channels using {SELECTED_RATE} for",
+        f"{duration} seconds. Channel labels are in MHz.",
+    )
     with Live(table, refresh_per_second=1000):
         try:
             while time.monotonic() < timeout:
-                progress_header.update(
-                    progress_header.task_ids[0],
-                    duration=DURATION - int(time.monotonic())
-                )
                 for chl, p_bar in enumerate(progress_bars):
                     # save the latest in history
                     history[chl] = history[1 : CACHE_MAX - 1] + [signals[chl]]
