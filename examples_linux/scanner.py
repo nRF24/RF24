@@ -41,11 +41,11 @@ progress_bars = [None] * 126
 for i in range(21):  # 21 rows
     row = []
     for j in range(i, i + (21 * 6), 21):  # 6 columns
-        BG_COLOR = "white" if int(j / 21) % 2 else "yellow"
+        COLOR = "white" if int(j / 21) % 2 else "yellow"
         progress_bars[j] = Progress(
-            TextColumn("{task.description}", style=Style(bgcolor=BG_COLOR)),
-            BarColumn(style=Style(bgcolor=BG_COLOR)),
-            TextColumn("{task.fields[signals]}", style=Style(bgcolor=BG_COLOR)),
+            TextColumn("{task.description}", style=Style(color=COLOR)),
+            BarColumn(style=Style(color=COLOR)),
+            TextColumn("{task.fields[signals]}", style=Style(color=COLOR)),
         )
         progress_bars[j].add_task(f"{2400 + (j)}", signals="-")  # only 1 task for each
         row.append(progress_bars[j])
