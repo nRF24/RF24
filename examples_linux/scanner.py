@@ -1,7 +1,7 @@
 """A scanner example that uses the python `rich` module to provide
 a user-friendly output."""
 import time
-import math
+from typing import List
 
 try:
     from rich.table import Table
@@ -30,14 +30,29 @@ available_rates = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
 console = Console()
 for i, rate in enumerate(offered_rates):
     console.print(f"{i + 1}. {rate}")
+DATA_RATE = (
+    int(Prompt.ask("Choose the data rate", choices=["1", "2", "3"], default="1")) - 1
+)
+radio.setDataRate(available_rates[DATA_RATE])
+
+DURATION = IntPrompt.ask("Enter the scan duration (in whole seconds)")
+SELECTED_RATE = offered_rates[DATA_RATE]
+
+CACHE_MAX = 5  # the depth of history to calculate peaks
+history = [[False] * CACHE_MAX] * 126  # for tracking peak decay on each channel
+signals = [False] * 126  # for tracking the signal count on each channel
+totals = [0] * 126  # for the total signal count on each channel
 
 # create table of progress bars (labeled by frequency channel in MHz)
 table = Table.grid(padding=(0, 1))
-totals = [0] * 126  # for the total signal count on each channel
-signals = [0] * 126  # for tracking the signal count on each channel
-CACHE_MAX = 5  # the depth of history to calculate averages with
-history = [[0] * CACHE_MAX] * 126  # for tracking peak decay on each channel
-progress_bars = [None] * 126
+progress_header = Progress(
+    TextColumn("Scanning all channels using {task.description} for"),
+    TextColumn("{task.fields[duration]} seconds."),
+    TextColumn("Channel labels are in MHz."),
+)
+progress_header.add_task(SELECTED_RATE, duration=DURATION)
+table.add_row(progress_header)
+progress_bars: List[Progress] = [None] * 126
 for i in range(21):  # 21 rows
     row = []
     for j in range(i, i + (21 * 6), 21):  # 6 columns
@@ -51,65 +66,43 @@ for i in range(21):  # 21 rows
         row.append(progress_bars[j])
     table.add_row(*row)
 
-DATA_RATE = (
-    int(Prompt.ask("Choose the data rate", choices=["1", "2", "3"], default="1")) - 1
-)
-radio.setDataRate(available_rates[DATA_RATE])
 
-DURATION = IntPrompt.ask("Enter the scan duration (in whole seconds)")
-SELECTED_RATE = offered_rates[DATA_RATE]
-
-
-def scan_channel(channel: int) -> int:
+def scan_channel(channel: int) -> bool:
     """Scan a specified channel and report if a signal was detected."""
     radio.channel = channel
     radio.startListening()
     time.sleep(0.00013)
     result = radio.testRPD()
     radio.stopListening()
-    return int(result)
-
-
-def calc_peak(channel: int) -> int:
-    """Get the average of the last 6 scans on a channel"""
-    total = int(signals[channel])
-    for val in history[channel]:
-        total += val
-    return math.ceil(total / (CACHE_MAX + 1))
+    return result
 
 
 def scan():
     """Perform scan."""
     timeout = time.monotonic() + DURATION
-    console.print(
-        f"Beginning scan using {SELECTED_RATE} for {DURATION} seconds.",
-        "Channel labels are in MHz.",
-    )
     with Live(table, refresh_per_second=1000):
         try:
-            history_index: int = 0
             while time.monotonic() < timeout:
+                progress_header.update(
+                    progress_header.task_ids[0],
+                    duration=DURATION - int(time.monotonic())
+                )
                 for chl, p_bar in enumerate(progress_bars):
                     # save the latest in history
-                    history[chl][history_index] = signals[chl]
+                    history[chl] = history[1 : CACHE_MAX - 1] + [signals[chl]]
 
                     # refresh the latest
                     signals[chl] = scan_channel(chl)
 
                     # update total signal count for the channel
-                    totals[chl] += signals[chl]
+                    totals[chl] += int(signals[chl])
 
-                    peak = calc_peak(chl)  # average latest with history
                     p_bar.update(
                         p_bar.task_ids[0],
-                        completed=peak,
-                        total=CACHE_MAX + 1,
+                        completed=int(signals[chl]) + history[chl].count(True),
+                        total=CACHE_MAX,
                         signals="-" if not totals[chl] else totals[chl],
                     )
-                # history is a list of cyclical arrays. Wrap iterator to 0 at CACHE_MAX
-                history_index = (
-                    0 if history_index == (CACHE_MAX - 1) else history_index + 1
-                )
         except KeyboardInterrupt:
             console.print(" Keyboard interrupt detected. Powering down radio.")
             radio.powerDown()
@@ -119,3 +112,4 @@ if __name__ == "__main__":
     scan()
 else:
     console.print("Enter `scan()` to run a scan.")
+    console.print("Change data rate using `radio.setDataRate()`")
