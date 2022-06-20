@@ -1,6 +1,7 @@
 """A scanner example that uses the python `rich` module to provide
 a user-friendly output."""
 import time
+import math
 
 try:
     from rich.table import Table
@@ -31,6 +32,7 @@ for i, rate in enumerate(offered_rates):
 
 # create table of progress bars (labeled by frequency channel in MHz)
 table = Table.grid(padding=(0, 1))
+totals = [0] * 126  # for the total signal count on each channel
 signals = [0] * 126  # for tracking the signal count on each channel
 CACHED_MAX = 5  # the depth of history to calculate averages with
 history = [[0] * CACHED_MAX] * 126  # for tracking peak decay on each channel
@@ -38,8 +40,10 @@ progress_bars = [Progress()] * 126
 for i in range(21):  # 21 rows
     row = []
     for j in range(i, i + (21 * 6), 21):  # 6 columns
-        progress_bars[j] = Progress(TextColumn("{task.description}"), BarColumn())
-        progress_bars[j].add_task(f"{2400 + (j)}")  # only 1 task for each
+        progress_bars[j] = Progress(
+            TextColumn("{task.description}"), BarColumn(), TextColumn("{task.signals}")
+        )
+        progress_bars[j].add_task(f"{2400 + (j)}", signals=0)  # only 1 task for each
         row.append(progress_bars[j])
     table.add_row(*row)
 
@@ -68,24 +72,39 @@ def scan_channel(channel: int) -> int:
 
 def calc_peak(channel: int) -> int:
     """Get the average of the last 6 scans on a channel"""
-    total = signals[channel]
+    total = int(signals[channel])
     for val in history[channel]:
         total += val
-    return int(total / (CACHED_MAX + 1))
+    return math.ceil(total / (CACHED_MAX + 1))
 
 
 # perform scan
 TIMEOUT = time.monotonic() + DURATION
-with Live(table, refresh_per_second=3000) as live:
+with Live(table, refresh_per_second=1000) as live:
     try:
         history_index: int = 0
         while time.monotonic() < TIMEOUT:
-            for i, bar in enumerate(progress_bars):
-                history[i][history_index] = signals[i]  # save the latest in history
-                signals[i] = scan_channel(i)  # refresh the latest
-                peak = calc_peak(i)  # average latest with history
-                bar.update(bar.task_ids[0], completed=signals[i], total=CACHED_MAX + 1)
-            history_index = 0 if history_index == (CACHED_MAX - 1) else history_index + 1
+            for chl, bar in enumerate(progress_bars):
+                # save the latest in history
+                history[chl][history_index] = signals[chl]
+
+                # refresh the latest
+                signals[chl] = scan_channel(chl)
+
+                # update total signal count for the channel
+                totals[chl] += signals[chl]
+
+                peak = calc_peak(chl)  # average latest with history
+                bar.update(
+                    bar.task_ids[0],
+                    completed=signals[chl],
+                    total=CACHED_MAX + 1,
+                    signals=totals[chl],
+                )
+            # history is a list of cyclical arrays. Wrap iterator to 0 at CAHCED_MAX
+            history_index = (
+                0 if history_index == (CACHED_MAX - 1) else history_index + 1
+            )
     except KeyboardInterrupt:
         console.print(" Keyboard interrupt detected. Powering down radio.")
         radio.powerDown()
