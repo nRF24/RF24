@@ -41,13 +41,13 @@ progress_bars = [None] * 126
 for i in range(21):  # 21 rows
     row = []
     for j in range(i, i + (21 * 6), 21):  # 6 columns
-        BG_COLOR = "#8787d7" if (j % 21) % 2 else "#5f5f5f"
+        BG_COLOR = "white" if int(j / 21) % 2 else "yellow"
         progress_bars[j] = Progress(
             TextColumn("{task.description}", style=Style(bgcolor=BG_COLOR)),
             BarColumn(style=Style(bgcolor=BG_COLOR)),
             TextColumn("{task.fields[signals]}", style=Style(bgcolor=BG_COLOR)),
         )
-        progress_bars[j].add_task(f"{2400 + (j)}", signals=0)  # only 1 task for each
+        progress_bars[j].add_task(f"{2400 + (j)}", signals="-")  # only 1 task for each
         row.append(progress_bars[j])
     table.add_row(*row)
 
@@ -104,7 +104,7 @@ def scan():
                         p_bar.task_ids[0],
                         completed=peak,
                         total=CACHE_MAX + 1,
-                        signals=totals[chl],
+                        signals="-" if not totals[chl] else totals[chl],
                     )
                 # history is a list of cyclical arrays. Wrap iterator to 0 at CACHE_MAX
                 history_index = (
