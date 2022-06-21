@@ -55,7 +55,6 @@ jobs:
           - "arduino:avr:yun"
           - "arduino:avr:uno"
           - "arduino:avr:diecimila"
-          - "arduino:avr:nano"
           - "arduino:avr:mega"
           - "arduino:avr:megaADK"
           - "arduino:avr:leonardo"
@@ -79,7 +78,6 @@ jobs:
           - "arduino:avr:unowifi"
           - "arduino:mbed:nano33ble"
           - "arduino:samd:mkr1000"  # InterruptConfigure.ino uses pin 2
-          - "arduino:samd:mkrzero"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:mkrwifi1010"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:nano_33_iot"
           - "arduino:samd:mkrfox1200"  # InterruptConfigure.ino uses pin 2
@@ -102,7 +100,7 @@ jobs:
         include:
           - fqbn: arduino:avr:nano
             enable-deltas-report: true
-          - fqbn: arduino:samd:mkrzero
+          - fqbn: arduino:samd:mkrzero  # InterruptConfigure.ino uses pin 2
             enable-deltas-report: true
  
 

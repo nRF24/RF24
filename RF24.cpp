@@ -153,9 +153,7 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 
     *ptx++ = (R_REGISTER | reg);
 
-    while (len--) {
-        *ptx++ = RF24_NOP;
-    } // Dummy operation, just for reading
+    while (len--) *ptx++ = RF24_NOP; // Dummy operation, just for reading
 
     #if defined(RF24_RP2)
     _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
@@ -166,9 +164,7 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
     status = *prx++; // status is 1st byte of receive buffer
 
     // decrement before to skip status byte
-    while (--size) {
-        *buf++ = *prx++;
-    }
+    while (--size) *buf++ = *prx++;
 
     endTransaction(); // unlocks mutex and setting csn high
 
@@ -177,15 +173,11 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
     beginTransaction();
     #if defined(RF24_SPI_PTR)
     status = _spi->transfer(R_REGISTER | reg);
-    while (len--) {
-        *buf++ = _spi->transfer(0xFF);
-    }
+    while (len--) *buf++ = _spi->transfer(0xFF);
 
     #else // !defined(RF24_SPI_PTR)
     status = _SPI.transfer(R_REGISTER | reg);
-    while (len--) {
-        *buf++ = _SPI.transfer(0xFF);
-    }
+    while (len--) *buf++ = _SPI.transfer(0xFF);
 
     #endif // !defined(RF24_SPI_PTR)
     endTransaction();
@@ -245,9 +237,7 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
     *ptx++ = (W_REGISTER | (REGISTER_MASK & reg));
-    while (len--) {
-        *ptx++ = *buf++;
-    }
+    while (len--) *ptx++ = *buf++;
 
     #if defined(RF24_RP2)
     _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
@@ -262,15 +252,11 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
     beginTransaction();
     #if defined(RF24_SPI_PTR)
     status = _spi->transfer(W_REGISTER | reg);
-    while (len--) {
-        _spi->transfer(*buf++);
-    }
+    while (len--) _spi->transfer(*buf++);
 
     #else // !defined(RF24_SPI_PTR)
     status = _SPI.transfer(W_REGISTER | reg);
-    while (len--) {
-        _SPI.transfer(*buf++);
-    }
+    while (len--) _SPI.transfer(*buf++);
 
     #endif // !defined(RF24_SPI_PTR)
     endTransaction();
@@ -355,12 +341,8 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     size = static_cast<uint8_t>(data_len + blank_len + 1); // Add register value to transmit buffer
 
     *ptx++ = writeType;
-    while (data_len--) {
-        *ptx++ = *current++;
-    }
-    while (blank_len--) {
-        *ptx++ = 0;
-    }
+    while (data_len--) *ptx++ = *current++;
+    while (blank_len--) *ptx++ = 0;
 
     #if defined(RF24_RP2)
     _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
@@ -376,22 +358,14 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     beginTransaction();
     #if defined(RF24_SPI_PTR)
     status = _spi->transfer(writeType);
-    while (data_len--) {
-        _spi->transfer(*current++);
-    }
-    while (blank_len--) {
-        _spi->transfer(0);
-    }
+    while (data_len--) _spi->transfer(*current++);
+    while (blank_len--) _spi->transfer(0);
 
     #else // !defined(RF24_SPI_PTR)
     status = _SPI.transfer(writeType);
-    while (data_len--) {
-        _SPI.transfer(*current++);
-    }
+    while (data_len--) _SPI.transfer(*current++);
 
-    while (blank_len--) {
-        _SPI.transfer(0);
-    }
+    while (blank_len--) _SPI.transfer(0);
 
     #endif // !defined(RF24_SPI_PTR)
     endTransaction();
@@ -425,9 +399,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
     size = static_cast<uint8_t>(data_len + blank_len + 1); // Add register value to transmit buffer
 
     *ptx++ = R_RX_PAYLOAD;
-    while (--size) {
-        *ptx++ = RF24_NOP;
-    }
+    while (--size) *ptx++ = RF24_NOP;
 
     size = static_cast<uint8_t>(data_len + blank_len + 1); // Size has been lost during while, re affect
 
@@ -441,9 +413,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     if (data_len > 0) {
         // Decrement before to skip 1st status byte
-        while (--data_len) {
-            *current++ = *prx++;
-        }
+        while (--data_len) *current++ = *prx++;
 
         *current = *prx;
     }
@@ -463,12 +433,8 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     #else // !defined(RF24_SPI_PTR)
     status = _SPI.transfer(R_RX_PAYLOAD);
-    while (data_len--) {
-        *current++ = _SPI.transfer(0xFF);
-    }
-    while (blank_len--) {
-        _SPI.transfer(0xff);
-    }
+    while (data_len--) *current++ = _SPI.transfer(0xFF);
+    while (blank_len--) _SPI.transfer(0xff);
 
     #endif // !defined(RF24_SPI_PTR)
     endTransaction();
@@ -975,29 +941,15 @@ bool RF24::begin(void)
 #if defined(RF24_LINUX)
     #if defined(RF24_RPi)
     switch (csn_pin) { // Ensure valid hardware CS pin
-        case 0:
-            break;
-        case 1:
-            break;
+        case 0: break;
+        case 1: break;
         // Allow BCM2835 enums for RPi
-        case 8:
-            csn_pin = 0;
-            break;
-        case 7:
-            csn_pin = 1;
-            break;
-        case 18:
-            csn_pin = 10;
-            break; // to make it work on SPI1
-        case 17:
-            csn_pin = 11;
-            break;
-        case 16:
-            csn_pin = 12;
-            break;
-        default:
-            csn_pin = 0;
-            break;
+        case 8: csn_pin = 0; break;
+        case 7: csn_pin = 1; break;
+        case 18: csn_pin = 10; break; // to make it work on SPI1
+        case 17: csn_pin = 11; break;
+        case 16: csn_pin = 12; break;
+        default: csn_pin = 0; break;
     }
     #endif // RF24_RPi
 
