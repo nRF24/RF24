@@ -60,9 +60,9 @@ bool write_wrap2(RF24& ref, bp::object buf, const bool multicast)
     return ref.write(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast);
 }
 
-void writeAckPayload_wrap(RF24& ref, uint8_t pipe, bp::object buf)
+bool writeAckPayload_wrap(RF24& ref, uint8_t pipe, bp::object buf)
 {
-    ref.writeAckPayload(pipe, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
+    return ref.writeAckPayload(pipe, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
 }
 
 bool writeFast_wrap1(RF24& ref, bp::object buf)
