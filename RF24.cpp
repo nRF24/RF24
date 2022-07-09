@@ -723,6 +723,9 @@ void RF24::printPrettyDetails(void)
     uint8_t channel = getChannel();
     uint16_t frequency = static_cast<uint16_t>(channel + 2400);
     printf_P(PSTR("Channel\t\t\t= %u (~ %u MHz)\r\n"), channel, frequency);
+    printf_P(PSTR("Model\t\t\t= " PRIPSTR
+                  "\r\n"),
+             (char*)(pgm_read_ptr(&rf24_model_e_str_P[isPVariant()])));
 
     printf_P(PSTR("RF Data Rate\t\t" PRIPSTR
                   "\r\n"),
