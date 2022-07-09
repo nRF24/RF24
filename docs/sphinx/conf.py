@@ -47,7 +47,7 @@ extensions = [
     "breathe",
     "sphinx_immaterial",
     "sphinx.ext.autosectionlabel",
-    "sphinx_immaterial.cppreference",
+    "sphinx_immaterial.apidoc.cpp.cppreference",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
