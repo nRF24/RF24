@@ -60,9 +60,9 @@ bool write_wrap2(RF24& ref, bp::object buf, const bool multicast)
     return ref.write(get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf), multicast);
 }
 
-void writeAckPayload_wrap(RF24& ref, uint8_t pipe, bp::object buf)
+bool writeAckPayload_wrap(RF24& ref, uint8_t pipe, bp::object buf)
 {
-    ref.writeAckPayload(pipe, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
+    return ref.writeAckPayload(pipe, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
 }
 
 bool writeFast_wrap1(RF24& ref, bp::object buf)
@@ -309,6 +309,8 @@ BOOST_PYTHON_MODULE(RF24)
         .def("reUseTX", &RF24::reUseTX)
         .def("read", &read_wrap, (bp::arg("maxlen")))
         .def("rxFifoFull", &RF24::rxFifoFull)
+        .def("isFifo", (uint8_t(::RF24::*)(bool))(&::RF24::isFifo), (bp::arg("about_tx")))
+        .def("isFifo", (bool (::RF24::*)(bool, bool))(&::RF24::isFifo), (bp::arg("about_tx"), bp::arg("check_empty")))
         .def("setAddressWidth", &RF24::setAddressWidth)
         .def("setAutoAck", (void (::RF24::*)(bool))(&::RF24::setAutoAck), (bp::arg("enable")))
         .def("setAutoAck", (void (::RF24::*)(::uint8_t, bool))(&::RF24::setAutoAck), (bp::arg("pipe"), bp::arg("enable")))

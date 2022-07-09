@@ -71,6 +71,8 @@ FIFO Management
 .. doxygenfunction:: RF24::rxFifoFull
 .. doxygenfunction:: RF24::flush_tx
 .. doxygenfunction:: RF24::flush_rx
+.. doxygenfunction:: RF24::isFifo (bool about_tx)
+.. doxygenfunction:: RF24::isFifo (bool about_tx, bool check_empty)
 
 Ambiguous Signal Detection
 **************************
