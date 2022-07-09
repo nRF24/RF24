@@ -102,7 +102,7 @@
     left: 0; top: 0;
     border: 1px solid #90A5CE;
     background-color: #F9FAFC;
-    z-index: 1;
+    z-index: 10001;
     padding-top: 4px;
     padding-bottom: 4px;
     -moz-border-radius: 4px;
@@ -155,7 +155,7 @@ a.SelectItem:hover {
 /*---------------- Search results window */
 
 iframe#MSearchResults {
-    width: 60ex;
+    /*width: 60ex;*/
     height: 15em;
 }
 
@@ -165,6 +165,7 @@ iframe#MSearchResults {
     left: 0; top: 0;
     border: 1px solid #000;
     background-color: #EEF1F7;
+    z-index:10000;
 }
 
 /* ----------------------------------- */
@@ -220,19 +221,21 @@ a.SRScope:focus, a.SRScope:active {
 
 span.SRScope {
     padding-left: 4px;
+    font-family: Arial, Verdana, sans-serif;
 }
 
 .SRPage .SRStatus {
     padding: 2px 5px;
     font-size: 8pt;
     font-style: italic;
+    font-family: Arial, Verdana, sans-serif;
 }
 
 .SRResult {
     display: none;
 }
 
-DIV.searchresults {
+div.searchresults {
     margin-left: 10px;
     margin-right: 10px;
 }
