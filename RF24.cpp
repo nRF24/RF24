@@ -1372,6 +1372,20 @@ bool RF24::rxFifoFull()
 
 /****************************************************************************/
 
+bool RF24::isFifo(const bool about_tx, const bool check_empty)
+{
+    return static_cast<bool>(is_fifo(about_tx) & _BV(!check_empty));
+}
+
+/****************************************************************************/
+
+bool RF24::isFifo(const bool about_tx, const bool check_empty)
+{
+    return static_cast<bool>(is_fifo(about_tx) & _BV(!check_empty));
+}
+
+/****************************************************************************/
+
 bool RF24::txStandBy()
 {
 
