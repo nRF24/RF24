@@ -791,7 +791,7 @@ public:
      * - `1` if the specified FIFO is empty.
      * - `2` if the specified FIFO is full.
      */
-    uint8_t isFifo(const bool about_tx);
+    uint8_t isFifo(bool about_tx);
 
     /** 
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
@@ -800,7 +800,7 @@ public:
      * - `false` checks is the specified FIFO is full.
      * @return A boolean answer to the question "is the [TX/RX] FIFO [empty/full]?"
      */
-    bool isFifo(const bool about_tx, const bool check_empty);
+    bool isFifo(bool about_tx, bool check_empty);
 
     /**
      * Enter low-power mode
