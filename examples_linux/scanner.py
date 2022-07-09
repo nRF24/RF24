@@ -55,7 +55,8 @@ for i in range(21):  # 21 rows
             BarColumn(style=Style(color=COLOR)),
             TextColumn("{task.fields[signals]}", style=Style(color=COLOR)),
         )
-        progress_bars[j].add_task(f"{2400 + (j)}", signals="-")  # only 1 task for each
+        # add only 1 task for each progress bar
+        progress_bars[j].add_task(f"{2400 + (j)}", total=CACHE_MAX, signals="-")
         row.append(progress_bars[j])
     table.add_row(*row)
 
@@ -81,8 +82,8 @@ def scan(duration: int = DURATION):
         try:
             while time.monotonic() < timeout:
                 for chl, p_bar in enumerate(progress_bars):
-                    # save the latest in history
-                    history[chl] = history[1 : CACHE_MAX - 1] + [signals[chl]]
+                    # save the latest in history (FIFO ordering)
+                    history[chl] = history[chl][1:] + [signals[chl]]
 
                     # refresh the latest
                     signals[chl] = scan_channel(chl)
@@ -92,8 +93,7 @@ def scan(duration: int = DURATION):
 
                     p_bar.update(
                         p_bar.task_ids[0],
-                        completed=int(signals[chl]) + history[chl].count(True),
-                        total=CACHE_MAX,
+                        completed=history[chl].count(True),
                         signals="-" if not totals[chl] else totals[chl],
                     )
         except KeyboardInterrupt:
@@ -103,6 +103,7 @@ def scan(duration: int = DURATION):
 
 if __name__ == "__main__":
     scan()
+    radio.powerDown()
 else:
     console.print("Enter `scan()` to run a scan.")
-    console.print("Change data rate using `radio.setDataRate()`")
+    console.print("Change data rate using `radio.setDataRate(RF24_**BPS)`")
