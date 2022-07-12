@@ -50,7 +50,7 @@ RF24 radio(CE_PIN, CSN_PIN);
 // Channel info
 const uint8_t num_channels = 126;
 uint8_t values[num_channels];
-const uint8_t noiseAddress[][2] = { {0x55, 0x55}, {0xAA, 0xAA} };
+const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 
 const int num_reps = 100;
 int reset_array = 0;
