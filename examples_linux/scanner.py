@@ -24,6 +24,13 @@ radio = RF24(CE_PIN, CSN_PIN)
 if not radio.begin():
     raise RuntimeError("Radio hardware not responding!")
 radio.setAutoAck(False)
+radio.disableCRC()
+radio.setAddressWidth(2)
+radio.openReadingPipe(0, b"\x55\x55")
+radio.openReadingPipe(1, b"\xAA\xAA")
+radio.startListening()
+radio.stopListening()
+radio.flush_rx()
 
 offered_rates = ["1 Mbps", "2 Mbps", "250 kbps"]
 available_rates = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
@@ -68,6 +75,8 @@ def scan_channel(channel: int) -> bool:
     time.sleep(0.00013)
     result = radio.testRPD()
     radio.stopListening()
+    if result:
+        radio.flush_rx()
     return result
 
 
