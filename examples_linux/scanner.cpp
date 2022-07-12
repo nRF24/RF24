@@ -28,18 +28,18 @@
  * - The header is a list of supported channels in decimal written vertically.
  * - Each column corresponding to the vertical header is a hexadecimal count of
  *   detected signals (max is 15 or 'f').
- * 
+ *
  * The following example
  *    000
  *    111
  *    789
  *    ~~~   <- just a divider between the channel's vertical labels and signal counts
  *    1-2
- * can be interpreted as 
+ * can be interpreted as
  * - 1 signal detected on channel 17
  * - 0 signals (denoted as '-') detected on channel 18
  * - 2 signals detected on channel 19
- * 
+ *
  * Each line of signal counts represent 100 passes of the supported spectrum.
  */
 #include <string>   // string, getline()
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
     // set the data rate
     cout << "Select your Data Rate. ";
     cout << "Enter '1' for 1Mbps, '2' for 2Mbps, '3' for 250kbps. Defaults to 1Mbps." << endl;
-    string dataRate = 0;
+    string dataRate = "";
     getline(cin, dataRate);
     if (dataRate.length() >= 1 && static_cast<char>(dataRate[0]) == '2') {
         cout << "Using 2 Mbps." << endl;
