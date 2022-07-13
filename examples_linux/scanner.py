@@ -1,7 +1,7 @@
 """A scanner example written in python using the std lib's ncurses wrapper"""
 import curses
 import time
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Any
 
 from pyrf24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
 
@@ -26,9 +26,9 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         x: int,
         y: int,
         cols: int,
-        std_scr: curses.window,
+        std_scr: Any, # type: curses.window,
         label: str,
-        color: curses.color_pair,
+        color: Any, # type: curses.color_pair,
     ):
         self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
         string = label  # always labeled in MHz (4 digits)
@@ -94,7 +94,7 @@ def init_curses():
     return std_scr
 
 
-def deinit_curses(output: Optional[curses.window]):
+def deinit_curses(output: Any):
     """de-init the curses interface"""
     curses.nocbreak()
     curses.echo()
