@@ -1,7 +1,7 @@
 """A scanner example written in python using the std lib's ncurses wrapper"""
 import curses
 import time
-from typing import List, Tuple, Any, Optional
+from typing import List, Tuple, Optional
 
 from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
 
@@ -43,11 +43,12 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
         string = label  # always labeled in MHz (4 digits)
         # -9 for padding, label, & signal count
-        string += "─" * (self.width - 8)
+        string += "─" * (self.width - 8)  # the empty bar
         string += " - "  # the initial signal count
         self.win.addstr(self.y, self.x, string, self.color)
 
     def update(self, completed: int, signal_count: int):
+        """Update the progress bar."""
         filled = min(CACHE_MAX, completed) / CACHE_MAX
         bar = "═" * int((self.width - 8) * filled)
         empty = "─" * (self.width - 8 - len(bar))
@@ -79,7 +80,6 @@ def init_interface(window) -> List[ProgressBar]:
 def init_curses():
     """init the curses interface"""
     std_scr = curses.initscr()
-    # stdscr.keypad(True)
     curses.noecho()
     curses.cbreak()
     curses.start_color()
@@ -90,9 +90,8 @@ def init_curses():
     return std_scr
 
 
-def deinit_curses(std_scr: curses.window, output: Optional[curses.window]):
+def deinit_curses(output: Optional[curses.window]):
     """de-init the curses interface"""
-    # std_scr.keypad(False)
     curses.nocbreak()
     curses.echo()
     cache_out = []
@@ -107,7 +106,7 @@ def get_user_input() -> Tuple[int, int]:
     """Get input parameters for the scan from the user."""
     for i, d_rate in enumerate(OFFERED_DATA_RATES):
         print(f"{i + 1}. {d_rate}")
-    d_rate = int(input("Select your data rate [1, 2, 3] (defaults to 1 Mbps) ") or "1")
+    d_rate = input("Select your data rate [1, 2, 3] (defaults to 1 Mbps) ")
     duration = input("how long (in seconds) to perform scan? ")
     while duration is None or not duration.isdigit():
         print("Please enter a number.")
@@ -116,7 +115,11 @@ def get_user_input() -> Tuple[int, int]:
         "Channels are labeled in MHz. Signal counts are",
         "clamped to a single hexadecimal digit.",
     )
-    return (min(1, max(3, d_rate)) - 1, abs(int(duration)))
+
+    return (
+        min(1, max(3, int(1 if d_rate is None else d_rate))) - 1,
+        abs(int(duration)),
+    )
 
 
 def scan_channel(channel: int) -> bool:
@@ -155,7 +158,7 @@ def main():
             channel = 0 if channel + 1 == TOTAL_CHANNELS else channel + 1
     finally:
         radio.powerDown()
-        deinit_curses(std_scr, scanner_output_window)
+        deinit_curses(scanner_output_window)
 
 
 if __name__ == "__main__":
