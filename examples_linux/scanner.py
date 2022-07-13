@@ -3,22 +3,12 @@ import curses
 import time
 from typing import List, Tuple, Optional
 
-from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
+from pyrf24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
 
 CSN_PIN = 0  # connected to GPIO8
 CE_PIN = 22  # connected to GPIO22
 radio = RF24(CE_PIN, CSN_PIN)
 
-if not radio.begin():
-    raise RuntimeError("Radio hardware not responding!")
-radio.setAutoAck(False)
-radio.disableCRC()
-radio.setAddressWidth(2)
-radio.openReadingPipe(0, b"\x55\x55")
-radio.openReadingPipe(1, b"\xAA\xAA")
-radio.startListening()
-radio.stopListening()
-radio.flush_rx()
 
 OFFERED_DATA_RATES = ["1 Mbps", "2 Mbps", "250 kbps"]
 AVAILABLE_RATES = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
@@ -77,6 +67,20 @@ def init_interface(window) -> List[ProgressBar]:
     return progress_bars
 
 
+def init_radio():
+    """init the radio"""
+    if not radio.begin():
+        raise RuntimeError("Radio hardware not responding!")
+    radio.setAutoAck(False)
+    radio.disableCRC()
+    radio.setAddressWidth(2)
+    radio.openReadingPipe(0, b"\x55\x55")
+    radio.openReadingPipe(1, b"\xAA\xAA")
+    radio.startListening()
+    radio.stopListening()
+    radio.flush_rx()
+
+
 def init_curses():
     """init the curses interface"""
     std_scr = curses.initscr()
@@ -107,17 +111,17 @@ def get_user_input() -> Tuple[int, int]:
     for i, d_rate in enumerate(OFFERED_DATA_RATES):
         print(f"{i + 1}. {d_rate}")
     d_rate = input("Select your data rate [1, 2, 3] (defaults to 1 Mbps) ")
-    duration = input("how long (in seconds) to perform scan? ")
-    while duration is None or not duration.isdigit():
-        print("Please enter a number.")
-        duration = input("how long (in seconds) to perform scan? ")
+    duration = input("How long (in seconds) to perform scan? ")
+    while not duration.isdigit():
+        print("Please enter a positive number.")
+        duration = input("How long (in seconds) to perform scan? ")
     print(
         "Channels are labeled in MHz. Signal counts are",
         "clamped to a single hexadecimal digit.",
     )
 
     return (
-        min(1, max(3, int(1 if d_rate is None else d_rate))) - 1,
+        max(1, min(3, 1 if not d_rate.isdigit() else int(d_rate))) - 1,
         abs(int(duration)),
     )
 
@@ -137,6 +141,7 @@ def scan_channel(channel: int) -> bool:
 
 def main():
     data_rate, duration = get_user_input()
+    init_radio()
     radio.setDataRate(AVAILABLE_RATES[data_rate])
     scanner_output_window = None
     try:
