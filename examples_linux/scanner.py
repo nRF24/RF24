@@ -1,7 +1,6 @@
 """A scanner example written in python using the std lib's ncurses wrapper"""
 import curses
 import time
-import json
 from typing import List, Tuple, Any
 
 from pyrf24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
@@ -101,16 +100,10 @@ def deinit_curses():
     curses.echo()
     cache_out = []
     curses.endwin()
-    noisy_channels = {}
     for channel, count in enumerate(totals):
         if count:
-            noisy_channels[channel] = count
-    if noisy_channels:
-        print(
-            "Channels with detected signals:",
-            json.dumps(noisy_channels, indent=2),
-            sep="\n",
-        )
+            print(f"  {channel}: {count}")
+    print(f"{TOTAL_CHANNELS - totals.count(0)} channels detected signals.")
 
 
 def get_user_input() -> Tuple[int, int]:
