@@ -115,6 +115,11 @@ def get_user_input() -> Tuple[int, int]:
     while not duration.isdigit():
         print("Please enter a positive number.")
         duration = input("How long (in seconds) to perform scan? ")
+    print(
+        "Channels are labeled in MHz. Signal counts are",
+        "clamped to a single hexadecimal digit.",
+    )
+
     return (
         max(1, min(3, 1 if not d_rate.isdigit() else int(d_rate))) - 1,
         abs(int(duration)),
@@ -136,6 +141,7 @@ def scan_channel(channel: int) -> bool:
 
 def main():
     data_rate, duration = get_user_input()
+    print(f"Scanning for {duration} seconds at {OFFERED_DATA_RATES[data_rate]}")
     init_radio()
     radio.setDataRate(AVAILABLE_RATES[data_rate])
     scanner_output_window = None
