@@ -67,7 +67,7 @@ def init_interface(window) -> List[ProgressBar]:
             color = curses.color_pair(7) if int(j / 21) % 2 else curses.color_pair(3)
             progress_bars[j] = ProgressBar(
                 x=bar_w * int(j / 21),
-                y=i + 1,
+                y=i + 3,
                 cols=bar_w,
                 std_scr=window,
                 label=f"{2400 + (j)} ",
@@ -97,7 +97,7 @@ def deinit_curses(std_scr: curses.window, output: Optional[curses.window]):
     curses.echo()
     cache_out = []
     if output is not None:
-        for line in range(1, 21):
+        for line in range(3, 24):
             cache_out.append(output.instr(line, 0).decode())
     curses.endwin()
     print("\n".join(cache_out))
@@ -112,6 +112,10 @@ def get_user_input() -> Tuple[int, int]:
     while duration is None or not duration.isdigit():
         print("Please enter a number.")
         duration = input("how long (in seconds) to perform scan? ")
+    print(
+        "Channels are labeled in MHz. Signal counts are",
+        "clamped to a single hexadecimal digit.",
+    )
     return (min(1, max(3, d_rate)) - 1, abs(int(duration)))
 
 
@@ -135,12 +139,14 @@ def main():
     try:
         std_scr = init_curses()
         timer_prompt = "Scanning for {} seconds at " + OFFERED_DATA_RATES[data_rate]
+        std_scr.addstr(0, 0, "Channels are labeled in MHz.")
+        std_scr.addstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.")
         scanner_output_window = std_scr.subpad(26, curses.COLS, 0, 0)
         table = init_interface(scanner_output_window)
         channel, val = (0, False)
         end = time.monotonic() + duration
         while time.monotonic() < end:
-            std_scr.addstr(0, 0, timer_prompt.format(int(end - time.monotonic())))
+            std_scr.addstr(2, 0, timer_prompt.format(int(end - time.monotonic())))
             val = scan_channel(channel)
             totals[channel] += val
             history[channel] = history[channel][1:] + [val]
