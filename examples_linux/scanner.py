@@ -115,11 +115,6 @@ def get_user_input() -> Tuple[int, int]:
     while not duration.isdigit():
         print("Please enter a positive number.")
         duration = input("How long (in seconds) to perform scan? ")
-    print(
-        "Channels are labeled in MHz. Signal counts are",
-        "clamped to a single hexadecimal digit.",
-    )
-
     return (
         max(1, min(3, 1 if not d_rate.isdigit() else int(d_rate))) - 1,
         abs(int(duration)),
