@@ -1,6 +1,7 @@
 """A scanner example written in python using the std lib's ncurses wrapper"""
 import curses
 import time
+import json
 from typing import List, Tuple, Any
 
 from pyrf24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
@@ -26,9 +27,9 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         x: int,
         y: int,
         cols: int,
-        std_scr: Any, # type: curses.window,
+        std_scr: Any,  # type: curses.window,
         label: str,
-        color: Any, # type: curses.color_pair,
+        color: Any,  # type: curses.color_pair,
     ):
         self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
         string = label  # always labeled in MHz (4 digits)
@@ -94,16 +95,22 @@ def init_curses():
     return std_scr
 
 
-def deinit_curses(output: Any):
+def deinit_curses():
     """de-init the curses interface"""
     curses.nocbreak()
     curses.echo()
     cache_out = []
-    if output is not None:
-        for line in range(3, 24):
-            cache_out.append(output.instr(line, 0).decode())
     curses.endwin()
-    print("\n".join(cache_out))
+    noisy_channels = {}
+    for channel, count in enumerate(totals):
+        if count:
+            noisy_channels[channel] = count
+    if noisy_channels:
+        print(
+            "Channels with detected signals:",
+            json.dumps(noisy_channels, indent=2),
+            sep="\n",
+        )
 
 
 def get_user_input() -> Tuple[int, int]:
@@ -163,7 +170,7 @@ def main():
             channel = 0 if channel + 1 == TOTAL_CHANNELS else channel + 1
     finally:
         radio.powerDown()
-        deinit_curses(scanner_output_window)
+        deinit_curses()
 
 
 if __name__ == "__main__":
