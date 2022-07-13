@@ -1,20 +1,8 @@
-"""A scanner example that uses the python `rich` module to provide
-a user-friendly output."""
+"""A scanner example written in python using the std lib's ncurses wrapper"""
+import curses
 import time
-from typing import List
+from typing import List, Tuple, Any, Optional
 
-try:
-    from rich.table import Table
-    from rich.console import Console
-    from rich.progress import BarColumn, Progress, TextColumn
-    from rich.live import Live
-    from rich.prompt import Prompt, IntPrompt
-    from rich.style import Style
-except ImportError as exc:
-    raise ImportError(
-        "This example requires the python `rich` module installed."
-        "\nInstall it using 'python3 -m pip install rich'"
-    ) from exc
 from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
 
 CSN_PIN = 0  # connected to GPIO8
@@ -32,40 +20,99 @@ radio.startListening()
 radio.stopListening()
 radio.flush_rx()
 
-offered_rates = ["1 Mbps", "2 Mbps", "250 kbps"]
-available_rates = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
-console = Console()
-for i, rate in enumerate(offered_rates):
-    console.print(f"{i + 1}. {rate}")
-DATA_RATE = (
-    int(Prompt.ask("Choose the data rate", choices=["1", "2", "3"], default="1")) - 1
-)
-radio.setDataRate(available_rates[DATA_RATE])
-
-DURATION = IntPrompt.ask("Enter the scan duration (in whole seconds)")
-SELECTED_RATE = offered_rates[DATA_RATE]
-
+OFFERED_DATA_RATES = ["1 Mbps", "2 Mbps", "250 kbps"]
+AVAILABLE_RATES = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
+TOTAL_CHANNELS = 126
 CACHE_MAX = 5  # the depth of history to calculate peaks
-history = [[False] * CACHE_MAX] * 126  # for tracking peak decay on each channel
-signals = [False] * 126  # for tracking the signal count on each channel
-totals = [0] * 126  # for the total signal count on each channel
+history = [[False] * CACHE_MAX] * TOTAL_CHANNELS  # FIFO for tracking peak decays
+totals = [0] * TOTAL_CHANNELS  # for the total signal counts
 
-# create table of progress bars (labeled by frequency channel in MHz)
-table = Table.grid(padding=(0, 1))
-progress_bars: List[Progress] = [None] * 126
-for i in range(21):  # 21 rows
-    row = []
-    for j in range(i, i + (21 * 6), 21):  # 6 columns
-        COLOR = "white" if int(j / 21) % 2 else "yellow"
-        progress_bars[j] = Progress(
-            TextColumn("{task.description}", style=Style(color=COLOR)),
-            BarColumn(style=Style(color=COLOR)),
-            TextColumn("{task.fields[signals]}", style=Style(color=COLOR)),
-        )
-        # add only 1 task for each progress bar
-        progress_bars[j].add_task(f"{2400 + (j)}", total=CACHE_MAX, signals="-")
-        row.append(progress_bars[j])
-    table.add_row(*row)
+
+class ProgressBar:  # pylint: disable=too-few-public-methods
+    """This represents a progress bar using a curses window object."""
+
+    def __init__(  # pylint: disable=too-many-arguments,invalid-name
+        self,
+        x: int,
+        y: int,
+        cols: int,
+        std_scr: curses.window,
+        label: str,
+        color: curses.color_pair,
+    ):
+        self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
+        string = label  # always labeled in MHz (4 digits)
+        # -9 for padding, label, & signal count
+        string += "─" * (self.width - 8)
+        string += " - "  # the initial signal count
+        self.win.addstr(self.y, self.x, string, self.color)
+
+    def update(self, completed: int, signal_count: int):
+        filled = min(CACHE_MAX, completed) / CACHE_MAX
+        bar = "═" * int((self.width - 8) * filled)
+        empty = "─" * (self.width - 8 - len(bar))
+        count = "-"
+        if signal_count:
+            count = "%X" % min(0xF, signal_count)
+        self.win.addstr(self.y, self.x + 5, bar, curses.color_pair(5))
+        self.win.addstr(self.y, self.x + 5 + len(bar), f"{empty} {count} ", self.color)
+
+
+def init_interface(window) -> List[ProgressBar]:
+    """Creates a table of progress bars (1 for each channel)."""
+    progress_bars: List[ProgressBar] = [None] * TOTAL_CHANNELS
+    bar_w = int(curses.COLS / 6)
+    for i in range(21):  # 21 rows
+        for j in range(i, i + (21 * 6), 21):  # 6 columns
+            color = curses.color_pair(7) if int(j / 21) % 2 else curses.color_pair(3)
+            progress_bars[j] = ProgressBar(
+                x=bar_w * int(j / 21),
+                y=i + 1,
+                cols=bar_w,
+                std_scr=window,
+                label=f"{2400 + (j)} ",
+                color=color,
+            )
+    return progress_bars
+
+
+def init_curses():
+    """init the curses interface"""
+    std_scr = curses.initscr()
+    # stdscr.keypad(True)
+    curses.noecho()
+    curses.cbreak()
+    curses.start_color()
+    curses.use_default_colors()
+    curses.init_pair(3, curses.COLOR_YELLOW, -1)
+    curses.init_pair(5, curses.COLOR_MAGENTA, -1)
+    curses.init_pair(7, curses.COLOR_WHITE, -1)
+    return std_scr
+
+
+def deinit_curses(std_scr: curses.window, output: Optional[curses.window]):
+    """de-init the curses interface"""
+    # std_scr.keypad(False)
+    curses.nocbreak()
+    curses.echo()
+    cache_out = []
+    if output is not None:
+        for line in range(1, 21):
+            cache_out.append(output.instr(line, 0).decode())
+    curses.endwin()
+    print("\n".join(cache_out))
+
+
+def get_user_input() -> Tuple[int, int]:
+    """Get input parameters for the scan from the user."""
+    for i, d_rate in enumerate(OFFERED_DATA_RATES):
+        print(f"{i + 1}. {d_rate}")
+    d_rate = int(input("Select your data rate [1, 2, 3] (defaults to 1 Mbps) ") or "1")
+    duration = input("how long (in seconds) to perform scan? ")
+    while duration is None or not duration.isdigit():
+        print("Please enter a number.")
+        duration = input("how long (in seconds) to perform scan? ")
+    return (min(1, max(3, d_rate)) - 1, abs(int(duration)))
 
 
 def scan_channel(channel: int) -> bool:
@@ -75,44 +122,37 @@ def scan_channel(channel: int) -> bool:
     time.sleep(0.00013)
     result = radio.testRPD()
     radio.stopListening()
+    result = result or radio.testRPD()
     if result:
         radio.flush_rx()
     return result
 
 
-def scan(duration: int = DURATION):
-    """Perform scan."""
-    timeout = time.monotonic() + duration
-    console.print(
-        f"Scanning all channels using {SELECTED_RATE} for",
-        f"{duration} seconds. Channel labels are in MHz.",
-    )
-    with Live(table, refresh_per_second=1000):
-        try:
-            while time.monotonic() < timeout:
-                for chl, p_bar in enumerate(progress_bars):
-                    # save the latest in history (FIFO ordering)
-                    history[chl] = history[chl][1:] + [signals[chl]]
-
-                    # refresh the latest
-                    signals[chl] = scan_channel(chl)
-
-                    # update total signal count for the channel
-                    totals[chl] += int(signals[chl])
-
-                    p_bar.update(
-                        p_bar.task_ids[0],
-                        completed=history[chl].count(True),
-                        signals="-" if not totals[chl] else totals[chl],
-                    )
-        except KeyboardInterrupt:
-            console.print(" Keyboard interrupt detected. Powering down radio.")
-            radio.powerDown()
+def main():
+    data_rate, duration = get_user_input()
+    radio.setDataRate(AVAILABLE_RATES[data_rate])
+    scanner_output_window = None
+    try:
+        std_scr = init_curses()
+        timer_prompt = "Scanning for {} seconds at " + OFFERED_DATA_RATES[data_rate]
+        scanner_output_window = std_scr.subpad(26, curses.COLS, 0, 0)
+        table = init_interface(scanner_output_window)
+        channel, val = (0, False)
+        end = time.monotonic() + duration
+        while time.monotonic() < end:
+            std_scr.addstr(0, 0, timer_prompt.format(int(end - time.monotonic())))
+            val = scan_channel(channel)
+            totals[channel] += val
+            history[channel] = history[channel][1:] + [val]
+            table[channel].update(history[channel].count(True), totals[channel])
+            scanner_output_window.refresh()
+            channel = 0 if channel + 1 == TOTAL_CHANNELS else channel + 1
+    finally:
+        radio.powerDown()
+        deinit_curses(std_scr, scanner_output_window)
 
 
 if __name__ == "__main__":
-    scan()
-    radio.powerDown()
+    main()
 else:
-    console.print("Enter `scan()` to run a scan.")
-    console.print("Change data rate using `radio.setDataRate(RF24_**BPS)`")
+    print("Enter 'main()' to run the program.")
