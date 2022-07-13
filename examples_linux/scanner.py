@@ -152,10 +152,11 @@ def main():
         while time.monotonic() < end:
             std_scr.addstr(2, 0, timer_prompt.format(int(end - time.monotonic())))
             val = scan_channel(channel)
-            totals[channel] += val
             history[channel] = history[channel][1:] + [val]
-            table[channel].update(history[channel].count(True), totals[channel])
-            scanner_output_window.refresh()
+            totals[channel] += val
+            if totals[channel]:
+                table[channel].update(history[channel].count(True), totals[channel])
+                scanner_output_window.refresh()
             channel = 0 if channel + 1 == TOTAL_CHANNELS else channel + 1
     finally:
         radio.powerDown()
