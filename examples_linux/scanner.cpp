@@ -73,32 +73,11 @@ uint8_t values[num_channels];     // the array to store summary of signal counts
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
 // that the RF signal's preamble is part of the packet/payload.
-const uint8_t noiseAddress[][2] = {{0, 0x55}, {0, 0xAA}};
+const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 
 const int num_reps = 100; // number of passes for each scan of the entire spectrum
 
-void printHeader()
-{
-    // print the hundreds digits
-    for (int i = 0; i < num_channels; ++i)
-        cout << (i / 100);
-    cout << endl;
-
-    // print the tens digits
-    for (int i = 0; i < num_channels; ++i)
-        cout << ((i % 100) / 10);
-    cout << endl;
-
-    // print the singles digits
-    for (int i = 0; i < num_channels; ++i)
-        cout << (i % 10);
-    cout << endl;
-
-    // print the header's divider
-    for (int i = 0; i < num_channels; ++i)
-        cout << '~';
-    cout << endl;
-}
+void printHeader(); // prototype function for printing the channels' header
 
 int main(int argc, char** argv)
 {
@@ -112,8 +91,10 @@ int main(int argc, char** argv)
     }
 
     // set the data rate
-    cout << "Select your Data Rate. ";
-    cout << "Enter '1' for 1Mbps, '2' for 2Mbps, '3' for 250kbps. Defaults to 1Mbps." << endl;
+    cout << "Select your Data Rate. "
+         << "Enter '1' for 1 Mbps, '2' for 2 Mbps, '3' for 250 kbps. "
+         << "Defaults to 1Mbps."
+         << endl;
     string dataRate = "";
     getline(cin, dataRate);
     if (dataRate.length() >= 1 && static_cast<char>(dataRate[0]) == '2') {
@@ -140,9 +121,12 @@ int main(int argc, char** argv)
     radio.startListening();
     radio.stopListening();
     radio.flush_rx();
+    // radio.printPrettyDetails();
 
-    radio.printPrettyDetails();
-
+    // print a line that should not be wrapped
+    cout << "\n!!! This example requires a width of at least 126 characters. "
+         << "If this text uses multiple lines, then the output will look bad.\n"
+         << endl;
     // print the vertical header
     printHeader();
 
@@ -188,6 +172,29 @@ int main(int argc, char** argv)
     }
 
     return 0;
+}
+
+void printHeader()
+{
+    // print the hundreds digits
+    for (int i = 0; i < num_channels; ++i)
+        cout << (i / 100);
+    cout << endl;
+
+    // print the tens digits
+    for (int i = 0; i < num_channels; ++i)
+        cout << ((i % 100) / 10);
+    cout << endl;
+
+    // print the singles digits
+    for (int i = 0; i < num_channels; ++i)
+        cout << (i % 10);
+    cout << endl;
+
+    // print the header's divider
+    for (int i = 0; i < num_channels; ++i)
+        cout << '~';
+    cout << endl;
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp

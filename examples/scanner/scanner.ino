@@ -97,7 +97,8 @@ void setup(void) {
 
   // set the data rate
   Serial.print(F("Select your Data Rate. "));
-  Serial.println(F("Enter '1' for 1Mbps, 2 for 2Mbps, 3 for 250kbps. Defaults to 1Mbps."));
+  Serial.print(F("Enter '1' for 1 Mbps, '2' for 2 Mbps, '3' for 250 kbps. "));
+  Serial.println(F("Defaults to 1Mbps."));
   while (!Serial.available()) {
     // wait for user input
   }
