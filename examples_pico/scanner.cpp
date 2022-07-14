@@ -22,6 +22,26 @@
  * See http://arduino.cc/forum/index.php/topic,54795.0.html
  */
 
+/*
+ * How to read the output:
+ * - The header is a list of supported channels in decimal written vertically.
+ * - Each column corresponding to the vertical header is a hexadecimal count of
+ *   detected signals (max is 15 or 'f').
+ *
+ * The following example
+ *    000
+ *    111
+ *    789
+ *    ~~~   <- just a divider between the channel's vertical labels and signal counts
+ *    1-2
+ * can be interpreted as
+ * - 1 signal detected on channel 17
+ * - 0 signals (denoted as '-') detected on channel 18
+ * - 2 signals detected on channel 19
+ *
+ * Each line of signal counts represent 100 passes of the supported spectrum.
+ */
+
 #include "pico/stdlib.h"  // printf(), sleep_ms(), getchar_timeout_us(), to_us_since_boot(), get_absolute_time()
 #include "pico/bootrom.h" // reset_usb_boot()
 #include <tusb.h>         // tud_cdc_connected()
@@ -32,11 +52,19 @@
 RF24 radio(CE_PIN, CSN_PIN);
 
 // Channel info
-const uint8_t num_channels = 126;
-uint8_t values[num_channels];
+const uint8_t num_channels = 126; // 0-125 are supported
+uint8_t values[num_channels];     // the array to store summary of signal counts per channel
 
-const int num_reps = 100;
-int reset_array = 0;
+// To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
+// These addresses are designed to confuse the radio into thinking
+// that the RF signal's preamble is part of the packet/payload.
+const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
+
+const int num_reps = 100; // number of passes for each scan of the entire spectrum
+
+void printHeader();
+void scanChannel(uint8_t);
+void initRadio();
 
 int main()
 {
@@ -47,37 +75,17 @@ int main()
         sleep_ms(10);
     }
 
+    // print example's name
+    printf("RF24/examples_pico/scanner\n");
+
     // initialize the transceiver on the SPI bus
     while (!radio.begin()) {
         printf("radio hardware is not responding!!\n");
     }
+    initRadio();
 
-    // print example's name
-    printf("RF24/examples_pico/scanner\n");
-
-    radio.setAutoAck(false);
-
-    // Get into standby mode
-    radio.startListening();
-    radio.stopListening();
-
-    // radio.printDetails();
-
-    // Print out header, high then low digit
-    int i = 0;
-
-    while (i < num_channels) {
-        printf("%x", i >> 4);
-        ++i;
-    }
-    printf("\n");
-
-    i = 0;
-    while (i < num_channels) {
-        printf("%x", i & 0xf);
-        ++i;
-    }
-    printf("\n");
+    // Print out header
+    printHeader();
 
     // forever loop
     while (1) {
@@ -88,36 +96,95 @@ int main()
         int rep_counter = num_reps;
         while (rep_counter--) {
 
-            int i = num_channels;
-            while (i--) {
+            for (uint8_t i = 0; i < num_channels; ++i) {
 
                 // Select this channel
-                radio.setChannel(i);
+                scanChannel(i); // updates values[i] accordingly
 
-                // Listen for a little
-                radio.startListening();
-                sleep_us(128);
-                radio.stopListening();
-
-                // Did we get a carrier?
-                if (radio.testCarrier()) {
-                    ++values[i];
-                }
+                // Print out channel measurements, clamped to a single hex digit
+                if (values[i])
+                    printf("%x", rf24_min(0xf, values[i]));
+                else
+                    printf("-");
             }
-        }
-
-        // Print out channel measurements, clamped to a single hex digit
-        i = 0;
-        while (i < num_channels) {
-            if (values[i])
-                printf("%x", rf24_min(0xf, (values[i] & 0xf)));
-            else
-                printf("-");
-
-            ++i;
+            printf("\r");
         }
         printf("\n");
     }
 
     return 0;
+}
+
+void initRadio()
+{
+    // configure the radio
+    radio.setAutoAck(false);  // Don't acknowledge arbitrary signals
+    radio.disableCRC();       // Accept any signal we find
+    radio.setAddressWidth(2); // A reverse engineering tactic (not typically recommended)
+    radio.openReadingPipe(0, noiseAddress[0]);
+    radio.openReadingPipe(1, noiseAddress[1]);
+
+    // To set the radioNumber via the Serial terminal on startup
+    printf("Select your data rate. ");
+    printf("Enter '1' for 1 Mbps, '2' for 2 Mbps, or '3' for 250 kbps. ");
+    printf("Defaults to 1 Mbps.\n");
+    char input = getchar();
+    if (input == 50) {
+        printf("\nUsing 2 Mbps.\n");
+        radio.setDataRate(RF24_2MBPS);
+    }
+    else if (input == 51) {
+        printf("\nUsing 250 kbps.\n");
+        radio.setDataRate(RF24_250KBPS);
+    }
+    else {
+        printf("\nUsing 1 Mbps.\n");
+        radio.setDataRate(RF24_1MBPS);
+    }
+
+    // Get into standby mode
+    radio.startListening();
+    radio.stopListening();
+    radio.flush_rx();
+    // radio.printPrettyDetails();
+}
+
+void scanChannel(uint8_t channel)
+{
+    radio.setChannel(channel);
+
+    // Listen for a little
+    radio.startListening();
+    sleep_us(130);
+    bool foundSignal = radio.testRPD();
+    radio.stopListening();
+
+    // Did we get a carrier?
+    if (foundSignal || radio.testRPD()) {
+        ++values[channel];
+        radio.flush_rx();
+    }
+}
+
+void printHeader()
+{
+    // print the hundreds digits
+    for (int i = 0; i < num_channels; ++i)
+        printf("%d", (i / 100));
+    printf("\n");
+
+    // print the tens digits
+    for (int i = 0; i < num_channels; ++i)
+        printf("%d", ((i % 100) / 10));
+    printf("\n");
+
+    // print the singles digits
+    for (int i = 0; i < num_channels; ++i)
+        printf("%d", (i % 10));
+    printf("\n");
+
+    // print the header's divider
+    for (int i = 0; i < num_channels; ++i)
+        printf('~');
+    printf("\n");
 }
