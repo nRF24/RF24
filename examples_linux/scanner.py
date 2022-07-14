@@ -16,7 +16,7 @@ TOTAL_CHANNELS = 126
 CACHE_MAX = 5  # the depth of history to calculate peaks
 history = [[False] * CACHE_MAX] * TOTAL_CHANNELS  # FIFO for tracking peak decays
 totals = [0] * TOTAL_CHANNELS  # for the total signal counts
-
+spectrum_pass = [0]
 
 class ProgressBar:  # pylint: disable=too-few-public-methods
     """This represents a progress bar using a curses window object."""
@@ -103,7 +103,10 @@ def deinit_curses():
     for channel, count in enumerate(totals):
         if count:
             print(f"  {channel}: {count}")
-    print(f"{TOTAL_CHANNELS - totals.count(0)} channels detected signals.")
+    print(
+        f"{TOTAL_CHANNELS - totals.count(0)} channels detected signals",
+        f"out of {spectrum_pass[0]} passes on the entire spectrum."
+    )
 
 
 def get_user_input() -> Tuple[int, int]:
@@ -157,7 +160,11 @@ def main():
             if totals[channel]:
                 table[channel].update(history[channel].count(True), totals[channel])
                 scanner_output_window.refresh()
-            channel = 0 if channel + 1 == TOTAL_CHANNELS else channel + 1
+            if channel + 1 == TOTAL_CHANNELS:
+                channel = 0
+                spectrum_pass[0] += 1
+            else:
+                channel += 1
     finally:
         radio.powerDown()
         deinit_curses()
