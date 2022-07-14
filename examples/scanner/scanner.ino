@@ -142,10 +142,13 @@ void loop(void) {
       delay(2);
       Serial.print("\nStarting Carrier Wave Output on channel ");
       Serial.println(c);
+      // for non-plus models, startConstCarrier() changes address on pipe 0 and sets address width to 5
       radio.startConstCarrier(RF24_PA_LOW, c);
     } else {
       constCarrierMode = 0;
       radio.stopConstCarrier();
+      radio.setAddressWidth(2);                   // reset address width
+      radio.openReadingPipe(0, noiseAddress[0]);  // ensure address is looking for noise
       Serial.println("\nStopping Carrier Out");
       printHeader();
     }

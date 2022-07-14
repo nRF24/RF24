@@ -78,6 +78,10 @@ int main()
     // print example's name
     printf("RF24/examples_pico/scanner\n");
 
+    // print a line that should not be wrapped
+    printf("!!! This example requires a width of at least 126 characters. ");
+    printf("If this text uses multiple lines, then the output will look bad.\n");
+
     // initialize the transceiver on the SPI bus
     while (!radio.begin()) {
         printf("radio hardware is not responding!!\n");
@@ -110,6 +114,15 @@ int main()
             printf("\r");
         }
         printf("\n");
+
+        char input = getchar_timeout_us(0); // get char from buffer for user input
+        if (input != PICO_ERROR_TIMEOUT) {
+            if (input == 'b' || input == 'B') {
+                // reset to bootloader
+                radio.powerDown();
+                reset_usb_boot(0, 0);
+            }
+        }
     }
 
     return 0;
