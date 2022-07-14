@@ -102,7 +102,8 @@ def deinit_curses():
     curses.endwin()
     for channel, count in enumerate(totals):
         if count:
-            print(f"  {channel}: {count}")
+            percentage = round(count / spectrum_pass[0], 3)
+            print(f"  {channel}: {count} / {spectrum_pass[0]} ({percentage} %)")
     print(
         f"{TOTAL_CHANNELS - totals.count(0)} channels detected signals",
         f"out of {spectrum_pass[0]} passes on the entire spectrum."
