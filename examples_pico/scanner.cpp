@@ -185,6 +185,6 @@ void printHeader()
 
     // print the header's divider
     for (int i = 0; i < num_channels; ++i)
-        printf('~');
+        printf("~");
     printf("\n");
 }
