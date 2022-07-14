@@ -1,9 +1,10 @@
 """A scanner example written in python using the std lib's ncurses wrapper"""
+# pylint: disable=no-member
 import curses
 import time
 from typing import List, Tuple, Any
 
-from pyrf24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
+from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
 
 CSN_PIN = 0  # connected to GPIO8
 CE_PIN = 22  # connected to GPIO22
@@ -98,7 +99,6 @@ def deinit_curses():
     """de-init the curses interface"""
     curses.nocbreak()
     curses.echo()
-    cache_out = []
     curses.endwin()
     for channel, count in enumerate(totals):
         if count:
