@@ -44,7 +44,7 @@ const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 
 unsigned int num_reps = 0; // count of passes for each scan of the entire spectrum
 
-WINDOW* win;          // curses base window object
+WINDOW* win; // curses base window object
 char sig_cnt_buf[] = " - ";
 
 // function prototypes
@@ -92,7 +92,6 @@ public:
 
 // our table of progress bars used to represent channels in the curses window
 ProgressBar* table[num_channels];
-
 
 int main(int argc, char** argv)
 {
@@ -241,10 +240,10 @@ void init_containers()
             int inMHz = 2400 + j;
 
             table[j] = new ProgressBar(bar_w * j / 21,   // x
-                                   i + 3,            // y
-                                   bar_w,            // width
-                                   to_string(inMHz), // label
-                                   color);           // color
+                                       i + 3,            // y
+                                       bar_w,            // width
+                                       to_string(inMHz), // label
+                                       color);           // color
         }
     }
 }
