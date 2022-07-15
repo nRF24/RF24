@@ -29,10 +29,10 @@ RF24 radio(22, 0);
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
 // Channel info
-const uint8_t num_channels = 126;        // 0-125 are supported
-unsigned int values[num_channels] = {0}; // the array to store summary of signal counts per channel
+const uint8_t MAX_CHANNELS = 126;        // 0-125 are supported
+unsigned int values[MAX_CHANNELS] = {0}; // the array to store summary of signal counts per channel
 const int CACHE_MAX = 5;                 // maximum depth of history for calculating peaks per channel
-queue<bool> history[num_channels];       // a cache of history for each channel
+queue<bool> history[MAX_CHANNELS];       // a cache of history for each channel
 
 // we'll need a container to act as a buffer during history init and counting historic signals
 queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
@@ -42,17 +42,17 @@ queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
 // that the RF signal's preamble is part of the packet/payload.
 const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 
-unsigned int passeCount = 0; // count of passes for each scan of the entire spectrum
+unsigned int passesCount = 0; // count of passes for each scan of the entire spectrum
 
 WINDOW* win; // curses base window object
 
 // function prototypes
-int init_radio();
-void init_curses();
-void init_containers();
-void deinit_curses();
-bool scan_channel(uint8_t);
-int count_history(uint8_t index);
+uint8_t initRadio();
+void initCurses();
+void initContainers();
+void deinitCurses();
+bool scanChannel(uint8_t);
+int countHistory(uint8_t index);
 
 class ProgressBar
 {
@@ -79,7 +79,7 @@ public:
         int offset_x = 5;
         move(y, x + offset_x);
         for (int i = offset_x; i < w - 3; ++i) {
-            int bar_color = i < (filled + offset_x) ? 3 : color;
+            int bar_color = i < (filled + offset_x) ? 5 : color;
             attron(COLOR_PAIR(bar_color));
             addch(ACS_HLINE);
             attroff(COLOR_PAIR(bar_color));
@@ -91,7 +91,7 @@ public:
 };
 
 // our table of progress bars used to represent channels in the curses window
-ProgressBar* table[num_channels];
+ProgressBar* table[MAX_CHANNELS];
 
 int main(int argc, char** argv)
 {
@@ -103,14 +103,13 @@ int main(int argc, char** argv)
         cout << "Radio hardware not responding!" << endl;
         return 1;
     }
-    int d_rate = init_radio();
+    uint8_t d_rate = initRadio();
     char bpsUnit = d_rate > 2 ? 'k' : 'M';
 
     string input = "";
     int duration = 0;
     while (!input.length()) {
-        cout << endl
-             << "Enter the duration (in seconds) of the scan: ";
+        cout << "Enter the duration (in seconds) of the scan: ";
         getline(cin, input);
         if (input.length()) {
             duration = stoi(input);
@@ -119,55 +118,54 @@ int main(int argc, char** argv)
     }
 
     // create out interface
-    init_curses();
-    init_containers();
+    initCurses();
+    initContainers();
+    mvaddstr(0, 0, "Channels are labeled in MHz.");
+    mvaddstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.");
+
     uint8_t i = 0;
     time_t start = time(nullptr);
     while (static_cast<int>(difftime(time(nullptr), start)) < duration) {
-        // Clear measurement values
-        memset(values, 0, sizeof(values));
-
-        mvprintw(0,
+        mvprintw(2,
                  0,
-                 "Scanning for %d seconds at %d %cbps",
+                 "Scanning for %3d seconds at %d %cbps",
                  static_cast<int>(difftime(start + duration, time(nullptr))),
-                 d_rate,
+                 static_cast<int>(d_rate),
                  bpsUnit);
 
-        bool foundSignal = scan_channel(i);
-        values[i] += static_cast<unsigned int>(foundSignal);
+        bool foundSignal = scanChannel(i);
         history[i].pop();
         history[i].push(foundSignal);
 
         // output the summary/snapshot for this channel
         if (values[i]) {
-            int cached_count = count_history(i);
+            int cachedCount = countHistory(i);
 
             // Print changes to screen
-            table[i]->update(cached_count, rf24_min(values[i], 0xF));
+            table[i]->update(cachedCount, rf24_min(values[i], 0xF));
         }
+
         refresh();
-        if (i + 1 == num_channels) {
+        if (i + 1 == MAX_CHANNELS) {
             i = 0;
-            passeCount++;
+            ++passesCount;
         }
         else {
             ++i;
         }
     }
 
-    deinit_curses();
+    deinitCurses();
     return 0;
 }
 
-int init_radio()
+uint8_t initRadio()
 {
-    int returnVal = 0;
+    uint8_t returnVal = 0;
     // set the data rate
     cout << "Select your Data Rate. "
          << "Enter '1' for 1 Mbps, '2' for 2 Mbps, '3' for 250 kbps. "
-         << "Defaults to 1Mbps."
-         << endl;
+         << "Defaults to 1Mbps: ";
     string dataRate = "";
     getline(cin, dataRate);
     if (dataRate.length() >= 1 && static_cast<char>(dataRate[0]) == '2') {
@@ -202,7 +200,7 @@ int init_radio()
     return returnVal;
 }
 
-bool scan_channel(uint8_t channel)
+bool scanChannel(uint8_t channel)
 {
     // Select this channel
     radio.setChannel(channel);
@@ -216,13 +214,14 @@ bool scan_channel(uint8_t channel)
 
     // Did we get a signal?
     if (foundSignal || radio.testRPD()) {
+        ++values[channel];
         radio.flush_rx(); // discard packets of noise
         return true;
     }
     return false;
 }
 
-void init_curses()
+void initCurses()
 {
     win = initscr(); // Start curses mode
     noecho();
@@ -234,7 +233,7 @@ void init_curses()
     init_pair(7, COLOR_WHITE, -1);
 }
 
-void deinit_curses()
+void deinitCurses()
 {
     nocbreak();
     echo();
@@ -242,41 +241,47 @@ void deinit_curses()
 
     // print out the total signal counts (if any)
     uint8_t active_channels = 0; // the sum of channels with detected noise
-    for (uint8_t i = 0; i < num_channels; ++i) {
+    for (uint8_t i = 0; i < MAX_CHANNELS; ++i) {
         if (values[i]) {
             active_channels++;
-            cout << "  " << i << ": " << static_cast<unsigned int>(values[i]) << endl;
+            cout << "  "
+                 << static_cast<unsigned int>(i)
+                 << ": "
+                 << static_cast<unsigned int>(values[i])
+                 << endl;
         }
     }
-    cout << static_cast<unsigned int>(active_channels) << " channels deteted signals." << endl;
+    cout << static_cast<unsigned int>(active_channels)
+         << " channels deteted signals after "
+         << passesCount
+         << " passes."
+         << endl;
 }
 
-void init_containers()
+void initContainers()
 {
     // fill our history with blanks
-    for (uint8_t i = 0; i < num_channels; ++i) {
+    for (uint8_t i = 0; i < MAX_CHANNELS; ++i) {
         history[i] = queue<bool>(temp);
     }
 
     // init our progress bars
     int bar_w = COLS / 6; // total progress bar width (including all contents)
-    int inMHz = 2400;
     for (uint8_t i = 0; i < 21; ++i) {    // 21 rows
         for (uint8_t j = 0; j < 6; ++j) { // 6 columns
 
             int color = j % 2 ? 7 : 3; // 3 is yellow, 7 is white
-
-            table[j + (i * 6)] = new ProgressBar(bar_w * j,        // x
-                                                 i + 3,            // y
-                                                 bar_w,            // width
-                                                 to_string(inMHz), // label
-                                                 color);           // color
-            inMHz++;
+            uint8_t channel = j * 21 + i;
+            table[channel] = new ProgressBar(bar_w * j,                  // x
+                                             i + 3,                      // y
+                                             bar_w,                      // width
+                                             to_string(2400 + channel), // label
+                                             color);                     // color
         }
     }
 }
 
-int count_history(uint8_t index)
+int countHistory(uint8_t index)
 {
     int sum = 0;
     // clear the temp buffer
