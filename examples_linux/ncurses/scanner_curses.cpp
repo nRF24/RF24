@@ -47,10 +47,11 @@ unsigned int passesCount = 0; // count of passes for each scan of the entire spe
 WINDOW* win; // curses base window object
 
 // function prototypes
+
 uint8_t initRadio();
 void initCurses();
-void initContainers();
 void deinitCurses();
+void initContainers();
 bool scanChannel(uint8_t);
 int countHistory(uint8_t index);
 
@@ -159,6 +160,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
+/** init radio according to user-specified data rate */
 uint8_t initRadio()
 {
     uint8_t returnVal = 0;
@@ -200,6 +202,7 @@ uint8_t initRadio()
     return returnVal;
 }
 
+/** scan the specified channel and increment signal count accordingly */
 bool scanChannel(uint8_t channel)
 {
     // Select this channel
@@ -221,6 +224,7 @@ bool scanChannel(uint8_t channel)
     return false;
 }
 
+/** init the curses interface */
 void initCurses()
 {
     win = initscr(); // Start curses mode
@@ -233,6 +237,7 @@ void initCurses()
     init_pair(7, COLOR_WHITE, -1);
 }
 
+/** de-init the curses interface & show total signal counts */
 void deinitCurses()
 {
     nocbreak();
@@ -258,6 +263,7 @@ void deinitCurses()
          << endl;
 }
 
+/** init the history and progress bars */
 void initContainers()
 {
     // fill our history with blanks
@@ -267,22 +273,28 @@ void initContainers()
 
     // init our progress bars
     int bar_w = COLS / 6; // total progress bar width (including all contents)
+
     for (uint8_t i = 0; i < 21; ++i) {    // 21 rows
         for (uint8_t j = 0; j < 6; ++j) { // 6 columns
 
-            int color = j % 2 ? 7 : 3; // 3 is yellow, 7 is white
             uint8_t channel = j * 21 + i;
-            table[channel] = new ProgressBar(bar_w * j,                  // x
-                                             i + 3,                      // y
-                                             bar_w,                      // width
-                                             to_string(2400 + channel), // label
-                                             color);                     // color
+            table[channel] = new ProgressBar(
+                bar_w * j,                 // x
+                i + 3,                     // y
+                bar_w,                     // width
+                to_string(2400 + channel), // label
+                j % 2 ? 7 : 3              // 3 is yellow, 7 is white
+            );
         }
     }
 }
 
+/** count the number of historic signals (limited to CACHE_MAX) */
 int countHistory(uint8_t index)
 {
+    // TODO: there must be a better way to implement a FIFO and
+    // count the exact same values contained within.
+
     int sum = 0;
     // clear the temp buffer
     while (!temp.empty()) temp.pop();
