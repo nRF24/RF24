@@ -30,25 +30,53 @@ else() # not using MRAA or wiringPi drivers (or pigpio lib was found)
     list(APPEND EXAMPLES_LIST interruptConfigure)
 endif()
 
+
+set(linked_libs 
+    ${RF24}
+    pthread # Notice we specify pthread as a linked lib here
+)
+
+# append additional libs for linking to the executable
+if("${RF24_DRIVER}" STREQUAL "MRAA")
+    if(NOT "${LibMRAA}" STREQUAL "LibMRAA-NOTFOUND")
+        message(STATUS "linking to ${LibMRAA}")
+        list(APPEND linked_libs ${LibMRAA})
+    else()
+        message(FATAL "Lib ${RF24_DRIVER} not found.")
+    endif()
+elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
+    if(NOT "${LibWiringPi}" STREQUAL "LibWiringPi-NOTFOUND")
+        message(STATUS "linking to ${LibWiringPi}")
+        # wiringPi additionally needs to link to crypt and shm_open libraries
+        list(APPEND linked_libs ${LibWiringPi} crypt rt)
+    else()
+        message(FATAL "Lib ${RF24_DRIVER} not found.")
+    endif()
+elseif(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND" AND NOT DEFINED RF24_NO_INTERUPT)
+    if(NOT "${RF24_DRIVER}" STREQUAL "pigpio")
+        message(STATUS "linking to ${LibPIGPIO} for interrupt support")
+    else()
+        message(STATUS "linking to ${LibPIGPIO}")
+    endif()
+    # linking to pigpio requires pthread to be listed as last linked lib
+    list(APPEND linked_libs ${LibPIGPIO} pthread)
+else()
+    message(STATUS "Disabling IRQ pin support")
+endif()
+
 foreach(example ${EXAMPLES_LIST})
     #make a target
     add_executable(${example} ${example}.cpp)
     
     # avoid including interrupt.h when pigpio is not available
-    if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+    if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND" OR DEFINED RF24_NO_INTERRUPT)
         target_compile_definitions(${example} PUBLIC RF24_NO_INTERRUPT)
     endif()
 
-    # link the RF24 lib to the target. Notice we specify pthread as a linked lib here
-    if("${RF24_DRIVER}" STREQUAL "MRAA")
-        target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibMRAA})
-    elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
-        # wiringPi additionally needs to link to crypt and shm_open libraries
-        target_link_libraries(${example} PUBLIC ${RF24} pthread ${LibWiringPi} crypt rt)
-    elseif("${RF24_DRIVER}" STREQUAL "pigpio" OR NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
-        # linking to pigpio requires pthread to be listed as last linked lib
-        target_link_libraries(${example} PUBLIC ${RF24} ${LibPIGPIO} pthread)
-    else() # not using MRAA or wiringPi drivers
-        target_link_libraries(${example} PUBLIC ${RF24} pthread)
-    endif()
+    target_link_libraries(${example} PUBLIC ${linked_libs})
 endforeach()
+
+include(../cmake/enableNcursesExample.cmake)
+if(BUILD_NCURSES_EXAMPLE)
+    add_subdirectory(ncurses)
+endif()
