@@ -49,10 +49,10 @@ char sig_cnt_buf[] = " - ";
 
 // function prototypes
 void init_radio();
-bool scan_channel(uint8_t);
 void init_curses();
-void deinit_curses();
 void init_containers();
+void deinit_curses();
+bool scan_channel(uint8_t);
 int count_history(uint8_t index);
 
 class ProgressBar
@@ -67,6 +67,7 @@ public:
     {
         attron(COLOR_PAIR(color));
         mvaddstr(y, x, label.c_str());
+        addch(' ');
         for (uint8_t i = 0; i < w - 8; ++i)
             addch(ACS_HLINE);
         addstr(sig_cnt_buf);
@@ -117,6 +118,10 @@ int main(int argc, char** argv)
         }
     }
 
+    // create out interface
+    init_curses();
+    init_containers();
+
     time_t start = time(nullptr);
     while (static_cast<int>(difftime(time(nullptr), start)) < duration) {
         // Clear measurement values
@@ -145,6 +150,7 @@ int main(int argc, char** argv)
         }
     }
 
+    deinit_curses();
     return 0;
 }
 
