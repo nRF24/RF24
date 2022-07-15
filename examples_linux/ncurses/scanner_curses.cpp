@@ -45,10 +45,9 @@ const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 unsigned int num_reps = 100; // count of passes for each scan of the entire spectrum
 
 WINDOW* win; // curses base window object
-char sig_cnt_buf[] = " - ";
 
 // function prototypes
-void init_radio();
+int init_radio();
 void init_curses();
 void init_containers();
 void deinit_curses();
@@ -70,11 +69,11 @@ public:
         addch(' ');
         for (uint8_t i = 0; i < w - 8; ++i)
             addch(ACS_HLINE);
-        addstr(sig_cnt_buf);
+        addstr(" - ");
         attroff(COLOR_PAIR(color));
     };
 
-    void update(int completed)
+    void update(int completed, int sig_count)
     {
         int filled = (w - 8) * completed / CACHE_MAX;
         int offset_x = 5;
@@ -86,7 +85,7 @@ public:
             attroff(COLOR_PAIR(bar_color));
         }
         attron(COLOR_PAIR(color));
-        addstr(sig_cnt_buf);
+        printw(" %x ", sig_count);
         attroff(COLOR_PAIR(color));
     };
 };
@@ -104,7 +103,8 @@ int main(int argc, char** argv)
         cout << "Radio hardware not responding!" << endl;
         return 1;
     }
-    init_radio();
+    int d_rate = init_radio();
+    char bpsUnit = d_rate > 2 ? 'k' : 'M';
 
     string input = "";
     int duration = 0;
@@ -121,12 +121,18 @@ int main(int argc, char** argv)
     // create out interface
     init_curses();
     init_containers();
-
     time_t start = time(nullptr);
     while (static_cast<int>(difftime(time(nullptr), start)) < duration) {
         // Clear measurement values
         memset(values, 0, sizeof(values));
 
+        mvprintw(0,
+                 0,
+                 "Scanning for %d seconds at %d %cbps",
+                 static_cast<int>(difftime(time(nullptr), start)),
+                 d_rate,
+                 bpsUnit);
+        refresh();
         // Scan all channels num_reps times
         int rep_counter = num_reps;
         while (rep_counter--) {
@@ -140,10 +146,9 @@ int main(int argc, char** argv)
                 // output the summary/snapshot for this channel
                 if (values[i]) {
                     int cached_count = count_history(i);
-                    sprintf(sig_cnt_buf, " %X ", rf24_min(values[i], 0xF));
 
                     // Print changes to screen
-                    table[i]->update(cached_count);
+                    table[i]->update(cached_count, rf24_min(values[i], 0xF));
                     refresh();
                 }
             }
@@ -154,8 +159,9 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void init_radio()
+int init_radio()
 {
+    int returnVal = 0;
     // set the data rate
     cout << "Select your Data Rate. "
          << "Enter '1' for 1 Mbps, '2' for 2 Mbps, '3' for 250 kbps. "
@@ -166,14 +172,17 @@ void init_radio()
     if (dataRate.length() >= 1 && static_cast<char>(dataRate[0]) == '2') {
         cout << "Using 2 Mbps." << endl;
         radio.setDataRate(RF24_2MBPS);
+        returnVal = 2;
     }
     else if (dataRate.length() >= 1 && static_cast<char>(dataRate[0]) == '3') {
         cout << "Using 250 kbps." << endl;
         radio.setDataRate(RF24_250KBPS);
+        returnVal = 250;
     }
     else {
         cout << "Using 1 Mbps." << endl;
         radio.setDataRate(RF24_1MBPS);
+        returnVal = 1;
     }
 
     // configure the radio
@@ -188,6 +197,8 @@ void init_radio()
     radio.stopListening();
     radio.flush_rx();
     // radio.printPrettyDetails();
+
+    return returnVal;
 }
 
 bool scan_channel(uint8_t channel)
@@ -228,6 +239,16 @@ void deinit_curses()
     nocbreak();
     echo();
     endwin();
+
+    // print out the total signal counts (if any)
+    uint8_t active_channels = 0; // the sum of channels with detected noise
+    for (uint8_t i = 0; i < num_channels; ++i) {
+        if (values[i]) {
+            active_channels++;
+            cout << "  " << i << ": " << static_cast<unsigned int>(values[i]) << endl;
+        }
+    }
+    cout << static_cast<unsigned int>(active_channels) << " channels deteted signals." << endl;
 }
 
 void init_containers()
@@ -238,22 +259,21 @@ void init_containers()
     }
 
     // init our progress bars
-    int bar_w = COLS / 6;                 // total progress bar width (including all contents)
+    int bar_w = COLS / 6; // total progress bar width (including all contents)
     int inMHz = 2400;
     for (uint8_t i = 0; i < 21; ++i) {    // 21 rows
         for (uint8_t j = 0; j < 6; ++j) { // 6 columns
 
             int color = j % 2 ? 7 : 3; // 3 is yellow, 7 is white
-    
-            table[j] = new ProgressBar(bar_w * j,        // x
-                                       i + 3,            // y
-                                       bar_w,            // width
-                                       to_string(inMHz), // label
-                                       color);           // color
+
+            table[j + (i * 6)] = new ProgressBar(bar_w * j,        // x
+                                                 i + 3,            // y
+                                                 bar_w,            // width
+                                                 to_string(inMHz), // label
+                                                 color);           // color
             inMHz++;
         }
     }
-    refresh();
 }
 
 int count_history(uint8_t index)
