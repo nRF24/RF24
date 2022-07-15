@@ -29,10 +29,10 @@ RF24 radio(22, 0);
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
 // Channel info
-const uint8_t num_channels = 126;   // 0-125 are supported
-uint8_t values[num_channels] = {0}; // the array to store summary of signal counts per channel
-const int CACHE_MAX = 5;            // maximum depth of history for calculating peaks per channel
-queue<bool> history[num_channels];  // a cache of history for each channel
+const uint8_t num_channels = 126;        // 0-125 are supported
+unsigned int values[num_channels] = {0}; // the array to store summary of signal counts per channel
+const int CACHE_MAX = 5;                 // maximum depth of history for calculating peaks per channel
+queue<bool> history[num_channels];       // a cache of history for each channel
 
 // we'll need a container to act as a buffer during history init and counting historic signals
 queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
@@ -42,7 +42,7 @@ queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
 // that the RF signal's preamble is part of the packet/payload.
 const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 
-unsigned int num_reps = 100; // count of passes for each scan of the entire spectrum
+unsigned int passeCount = 0; // count of passes for each scan of the entire spectrum
 
 WINDOW* win; // curses base window object
 
@@ -121,6 +121,7 @@ int main(int argc, char** argv)
     // create out interface
     init_curses();
     init_containers();
+    uint8_t i = 0;
     time_t start = time(nullptr);
     while (static_cast<int>(difftime(time(nullptr), start)) < duration) {
         // Clear measurement values
@@ -129,29 +130,29 @@ int main(int argc, char** argv)
         mvprintw(0,
                  0,
                  "Scanning for %d seconds at %d %cbps",
-                 static_cast<int>(difftime(time(nullptr), start)),
+                 static_cast<int>(difftime(start + duration, time(nullptr))),
                  d_rate,
                  bpsUnit);
+
+        bool foundSignal = scan_channel(i);
+        values[i] += static_cast<unsigned int>(foundSignal);
+        history[i].pop();
+        history[i].push(foundSignal);
+
+        // output the summary/snapshot for this channel
+        if (values[i]) {
+            int cached_count = count_history(i);
+
+            // Print changes to screen
+            table[i]->update(cached_count, rf24_min(values[i], 0xF));
+        }
         refresh();
-        // Scan all channels num_reps times
-        int rep_counter = num_reps;
-        while (rep_counter--) {
-
-            for (uint8_t i = 0; i < num_channels; ++i) {
-
-                bool foundSignal = scan_channel(i);
-                history[i].pop();
-                history[i].push(foundSignal);
-
-                // output the summary/snapshot for this channel
-                if (values[i]) {
-                    int cached_count = count_history(i);
-
-                    // Print changes to screen
-                    table[i]->update(cached_count, rf24_min(values[i], 0xF));
-                    refresh();
-                }
-            }
+        if (i + 1 == num_channels) {
+            i = 0;
+            passeCount++;
+        }
+        else {
+            ++i;
         }
     }
 
@@ -215,7 +216,6 @@ bool scan_channel(uint8_t channel)
 
     // Did we get a signal?
     if (foundSignal || radio.testRPD()) {
-        ++values[channel];
         radio.flush_rx(); // discard packets of noise
         return true;
     }
