@@ -42,7 +42,7 @@ queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
 // that the RF signal's preamble is part of the packet/payload.
 const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
 
-unsigned int num_reps = 0; // count of passes for each scan of the entire spectrum
+unsigned int num_reps = 100; // count of passes for each scan of the entire spectrum
 
 WINDOW* win; // curses base window object
 char sig_cnt_buf[] = " - ";
@@ -238,20 +238,22 @@ void init_containers()
     }
 
     // init our progress bars
-    int bar_w = COLS / 6;
-    for (uint8_t i = 0; i < 21; ++i) {                   // 21 rows
-        for (uint8_t j = i; j < i + (21 * 6); j += 21) { // 6 columns
+    int bar_w = COLS / 6;                 // total progress bar width (including all contents)
+    int inMHz = 2400;
+    for (uint8_t i = 0; i < 21; ++i) {    // 21 rows
+        for (uint8_t j = 0; j < 6; ++j) { // 6 columns
 
-            int color = (j / 21) % 2 ? 7 : 3; // 3 is yellow, 7 is white
-            int inMHz = 2400 + j;
-
-            table[j] = new ProgressBar(bar_w * j / 21,   // x
+            int color = j % 2 ? 7 : 3; // 3 is yellow, 7 is white
+    
+            table[j] = new ProgressBar(bar_w * j,        // x
                                        i + 3,            // y
                                        bar_w,            // width
                                        to_string(inMHz), // label
                                        color);           // color
+            inMHz++;
         }
     }
+    refresh();
 }
 
 int count_history(uint8_t index)
