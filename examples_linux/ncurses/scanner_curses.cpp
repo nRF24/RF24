@@ -40,7 +40,7 @@ queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
 // that the RF signal's preamble is part of the packet/payload.
-const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
+const uint8_t noiseAddress[][6] = {{0x55, 0x55}, {0xAA, 0xAA}, {0x0A, 0xAA}, {0xA0, 0xAA}, {0x00, 0xAA}, {0xAB, 0xAA}};
 
 unsigned int passesCount = 0; // count of passes for each scan of the entire spectrum
 
@@ -192,6 +192,10 @@ uint8_t initRadio()
     radio.setAddressWidth(2); // A reverse engineering tactic (not typically recommended)
     radio.openReadingPipe(0, noiseAddress[0]);
     radio.openReadingPipe(1, noiseAddress[1]);
+    radio.openReadingPipe(2, noiseAddress[2]);
+    radio.openReadingPipe(3, noiseAddress[3]);
+    radio.openReadingPipe(4, noiseAddress[4]);
+    radio.openReadingPipe(5, noiseAddress[5]);
 
     // Get into standby mode
     radio.startListening();
@@ -216,7 +220,7 @@ bool scanChannel(uint8_t channel)
     radio.stopListening();
 
     // Did we get a signal?
-    if (foundSignal || radio.testRPD()) {
+    if (foundSignal || radio.testRPD() || radio.available()) {
         ++values[channel];
         radio.flush_rx(); // discard packets of noise
         return true;

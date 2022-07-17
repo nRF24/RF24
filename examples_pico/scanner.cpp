@@ -58,7 +58,7 @@ uint8_t values[num_channels];     // the array to store summary of signal counts
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
 // that the RF signal's preamble is part of the packet/payload.
-const uint8_t noiseAddress[][2] = {{0x55, 0x55}, {0xAA, 0xAA}};
+const uint8_t noiseAddress[][6] = {{0x55, 0x55}, {0xAA, 0xAA}, {0x0A, 0xAA}, {0xA0, 0xAA}, {0x00,0xAA}, {0xAB,0xAA}};
 
 const int num_reps = 100; // number of passes for each scan of the entire spectrum
 
@@ -136,6 +136,10 @@ void initRadio()
     radio.setAddressWidth(2); // A reverse engineering tactic (not typically recommended)
     radio.openReadingPipe(0, noiseAddress[0]);
     radio.openReadingPipe(1, noiseAddress[1]);
+    radio.openReadingPipe(2, noiseAddress[2]);
+    radio.openReadingPipe(3, noiseAddress[3]);
+    radio.openReadingPipe(4, noiseAddress[4]);
+    radio.openReadingPipe(5, noiseAddress[5]);
 
     // To set the radioNumber via the Serial terminal on startup
     printf("Select your data rate. ");
@@ -173,7 +177,7 @@ void scanChannel(uint8_t channel)
     radio.stopListening();
 
     // Did we get a carrier?
-    if (foundSignal || radio.testRPD()) {
+    if (foundSignal || radio.testRPD() || radio.available()) {
         ++values[channel];
         radio.flush_rx();
     }

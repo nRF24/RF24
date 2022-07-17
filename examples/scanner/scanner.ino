@@ -173,7 +173,7 @@ void loop(void) {
         radio.stopListening();
 
         // Did we get a signal?
-        if (radio.testRPD()) {
+        if (radio.testRPD() || radio.available()) {
           ++values[i];
           radio.flush_rx();  // discard packets of noise
         }
