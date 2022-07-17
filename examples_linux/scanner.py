@@ -132,7 +132,7 @@ def scan_channel(channel: int) -> bool:
     time.sleep(0.00013)
     result = radio.testRPD()
     radio.stopListening()
-    result = result or radio.testRPD()
+    result = result or radio.testRPD() or radio.available()
     if result:
         radio.flush_rx()
     return result
