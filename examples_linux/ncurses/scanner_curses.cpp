@@ -8,8 +8,7 @@
 #include <cstdio>   // sprintf()
 #include <string>   // string, getline()
 #include <ctime>    // time_t, time(), difftime()
-#include <iostream> // cout, endl, flush, cin
-#include <queue>
+#include <iostream> // cout, endl, flush, cin, setprecision()
 #include <ncurses.h>
 #include <RF24/RF24.h>
 
@@ -31,11 +30,8 @@ RF24 radio(22, 0);
 // Channel info
 const uint8_t MAX_CHANNELS = 126;        // 0-125 are supported
 unsigned int values[MAX_CHANNELS] = {0}; // the array to store summary of signal counts per channel
-const int CACHE_MAX = 5;                 // maximum depth of history for calculating peaks per channel
-queue<bool> history[MAX_CHANNELS];       // a cache of history for each channel
-
-// we'll need a container to act as a buffer during history init and counting historic signals
-queue<bool> temp = queue<bool>({0, 0, 0, 0, 0});
+const uint8_t CACHE_MAX = 5;             // maximum depth of history for calculating peaks per channel
+bool history[MAX_CHANNELS][CACHE_MAX];   // a cache of history for each channel
 
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
@@ -51,9 +47,9 @@ WINDOW* win; // curses base window object
 uint8_t initRadio();
 void initCurses();
 void deinitCurses();
-void initContainers();
+void initArrays();
 bool scanChannel(uint8_t);
-int countHistory(uint8_t index);
+int historyPush(uint8_t index, bool value);
 
 class ProgressBar
 {
@@ -120,7 +116,7 @@ int main(int argc, char** argv)
 
     // create out interface
     initCurses();
-    initContainers();
+    initArrays();
     mvaddstr(0, 0, "Channels are labeled in MHz.");
     mvaddstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.");
 
@@ -135,14 +131,11 @@ int main(int argc, char** argv)
                  bpsUnit);
 
         bool foundSignal = scanChannel(i);
-        history[i].pop();
-        history[i].push(foundSignal);
+        int cachedCount = historyPush(i, foundSignal);
 
         // output the summary/snapshot for this channel
         if (values[i]) {
-            int cachedCount = countHistory(i);
-
-            // Print changes to screen
+            // make changes to the screen
             table[i]->update(cachedCount, rf24_min(values[i], 0xF));
         }
 
@@ -253,26 +246,35 @@ void deinitCurses()
     for (uint8_t i = 0; i < MAX_CHANNELS; ++i) {
         if (values[i]) {
             active_channels++;
+            float noiseRatio = static_cast<float>(values[i]) / passesCount;
             cout << "  "
                  << static_cast<unsigned int>(i)
                  << ": "
                  << static_cast<unsigned int>(values[i])
+                 << " / "
+                 << passesCount
+                 << " ("
+                 << setprecision(3)
+                 << noiseRatio
+                 << " %)"
                  << endl;
         }
     }
     cout << static_cast<unsigned int>(active_channels)
-         << " channels deteted signals after "
+         << " channels detected signals after "
          << passesCount
          << " passes."
          << endl;
 }
 
-/** init the history and progress bars */
-void initContainers()
+/** init arrays for the history and progress bars */
+void initArrays()
 {
     // fill our history with blanks
     for (uint8_t i = 0; i < MAX_CHANNELS; ++i) {
-        history[i] = queue<bool>(temp);
+        for (uint8_t j = 0; j < CACHE_MAX; ++j) {
+            history[i][j] = false;
+        }
     }
 
     // init our progress bars
@@ -293,30 +295,19 @@ void initContainers()
     }
 }
 
-/** count the number of historic signals (limited to CACHE_MAX) */
-int countHistory(uint8_t index)
+/**
+ * Push new scan result for a channel into the history.
+ * @returns The count of historic signals found (including pushed result)
+ */
+uint8_t historyPush(uint8_t index, bool value)
 {
-    // TODO: there must be a better way to implement a FIFO and
-    // count the exact same values contained within.
-
-    int sum = 0;
-    // clear the temp buffer
-    while (!temp.empty()) temp.pop();
-
-    // move values of history into temp buffer, and count the historic signals
-    while (!history[index].empty()) {
-        temp.push(history[index].front());
-        sum += static_cast<int>(history[index].front());
-        history[index].pop();
+    uint8_t sum = 0;
+    for (uint8_t i = 0; i < CACHE_MAX - 1; ++i) {
+        history[index][i] = history[index][i + 1];
+        sum += history[index][i];
     }
-
-    // move values from buffer back into history
-    while (!temp.empty()) {
-        history[index].push(temp.front());
-        temp.pop();
-    }
-
-    return sum;
+    history[index][CACHE_MAX - 1] = value;
+    return sum + value;
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp
