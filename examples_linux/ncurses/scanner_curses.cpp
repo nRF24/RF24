@@ -49,7 +49,7 @@ void initCurses();
 void deinitCurses();
 void initArrays();
 bool scanChannel(uint8_t);
-int historyPush(uint8_t index, bool value);
+uint8_t historyPush(uint8_t index, bool value);
 
 class ProgressBar
 {
@@ -131,12 +131,12 @@ int main(int argc, char** argv)
                  bpsUnit);
 
         bool foundSignal = scanChannel(i);
-        int cachedCount = historyPush(i, foundSignal);
+        uint8_t cachedCount = historyPush(i, foundSignal);
 
         // output the summary/snapshot for this channel
         if (values[i]) {
             // make changes to the screen
-            table[i]->update(cachedCount, rf24_min(values[i], 0xF));
+            table[i]->update(static_cast<int>(cachedCount), rf24_min(values[i], 0xF));
         }
 
         refresh();
