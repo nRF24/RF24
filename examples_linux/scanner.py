@@ -147,14 +147,12 @@ def main():
     print(f"Scanning for {duration} seconds at {OFFERED_DATA_RATES[data_rate]}")
     init_radio()
     radio.setDataRate(AVAILABLE_RATES[data_rate])
-    scanner_output_window = None
     try:
         std_scr = init_curses()
         timer_prompt = "Scanning for {} seconds at " + OFFERED_DATA_RATES[data_rate]
         std_scr.addstr(0, 0, "Channels are labeled in MHz.")
         std_scr.addstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.")
-        scanner_output_window = std_scr.subpad(26, curses.COLS, 0, 0)
-        table = init_interface(scanner_output_window)
+        table = init_interface(std_scr)
         channel, val = (0, False)
         end = time.monotonic() + duration
         while time.monotonic() < end:
@@ -164,7 +162,7 @@ def main():
             totals[channel] += val
             if totals[channel]:
                 table[channel].update(history[channel].count(True), totals[channel])
-                scanner_output_window.refresh()
+                std_scr.refresh()
             if channel + 1 == TOTAL_CHANNELS:
                 channel = 0
                 spectrum_pass[0] += 1
