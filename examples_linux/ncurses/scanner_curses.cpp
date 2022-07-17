@@ -8,7 +8,8 @@
 #include <cstdio>   // sprintf()
 #include <string>   // string, getline()
 #include <ctime>    // time_t, time(), difftime()
-#include <iostream> // cout, endl, flush, cin, setprecision()
+#include <iostream> // cout, endl, flush, cin
+#include <iomanip>  // setprecision()
 #include <ncurses.h>
 #include <RF24/RF24.h>
 
