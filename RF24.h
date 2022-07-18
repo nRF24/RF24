@@ -1064,7 +1064,7 @@ public:
      *
      * @note ACK payloads are dynamic payloads. Calling enableAckPayload()
      * will automatically enable dynamic payloads on pipe 0 (required for TX
-     * mode when expecting ACK payloads)& pipe 1. To use ACK payloads on any other
+     * mode when expecting ACK payloads) & pipe 1. To use ACK payloads on any other
      * pipe in RX mode, call enableDynamicPayloads().
      *
      * @param pipe Which pipe# (typically 1-5) will get this response.
