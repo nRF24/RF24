@@ -54,6 +54,7 @@
 // RaspberryPi rp2xxx-based devices (e.g. RPi Pico board)
 #elif defined(PICO_BUILD) && !defined(ARDUINO)
     #include "utility/rp2/RF24_arch_config.h"
+    #define sprintf_P sprintf
 
 #elif (!defined(ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
