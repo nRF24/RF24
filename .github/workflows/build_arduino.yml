@@ -7,6 +7,7 @@ on:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/old_backups/**"
+      - "RF24.*"
   push:
     paths:
       - ".github/workflows/build_arduino.yml"

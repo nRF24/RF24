@@ -19,6 +19,7 @@
 #include "spi.h"
 #include "gpio.h"
 #include <string.h>
+#include <stdio.h>
 
 /** Define a specific platform name for this configuration */
 #define RF24_RP2
