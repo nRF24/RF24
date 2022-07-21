@@ -25,7 +25,7 @@ elseif("${RF24_DRIVER}" STREQUAL "RPi") # use RPi
             ${RF24_DRIVER}/RF24_arch_config.h
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
-    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND" AND NOT DEFINED RF24_NO_INTERRUPT)
         set(RF24_LINKED_DRIVER ${LibPIGPIO} PARENT_SCOPE)
         message(STATUS "linking to pigpio lib for interrupt functionality")
         install(FILES
@@ -63,7 +63,7 @@ elseif("${RF24_DRIVER}" STREQUAL "SPIDEV") # use SPIDEV
             ${RF24_DRIVER}/RF24_arch_config.h
         DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
-    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND" AND NOT DEFINED RF24_NO_INTERRUPT)
         set(RF24_LINKED_DRIVER ${LibPIGPIO} PARENT_SCOPE)
         message(STATUS "linking to pigpio lib for interrupt functionality")
         install(FILES
