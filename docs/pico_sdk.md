@@ -1,15 +1,14 @@
-# RaspberryPi Pico SDK (for the RP2040)
+# Raspberry Pi Pico SDK (for the RP2040)
 
 <!-- markdownlint-disable MD031 MD046 -->
 Just to be very clear and concise: The following instructions are
 **not required to use the Arduino IDE** with any RP2040-based boards.
-These instructions pertain to using only the
-[Raspberry Pi foundation's Pico SDK](https://github.com/raspberrypi/pico-sdk)
+These instructions pertain to using only [Raspberry Pi's Pico SDK](https://github.com/raspberrypi/pico-sdk)
 for RP2040 based boards.
 
 ## Prerequisite
 
-Follow the Raspberry Pi Foundation's
+Follow Raspberry Pi's
 ["Getting Started with Pico" document](https://rptl.io/pico-get-started) to
 setup a proper development environment on your host PC (the machine that
 will build your project). Notice that the setup instructions are a little
