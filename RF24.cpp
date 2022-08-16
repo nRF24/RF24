@@ -91,7 +91,11 @@ void RF24::csn(bool mode)
 #endif // defined(RF24_RPi)
 
 #if !defined(RF24_LINUX)
+#if defined(STM32)
+    HAL_GPIO_WritePin(csn_port, csn_pin, mode ? GPIO_PIN_SET : GPIO_PIN_RESET);
+#else
     digitalWrite(csn_pin, mode);
+#endif
     delayMicroseconds(csDelay);
 #else
     static_cast<void>(mode); // ignore -Wunused-parameter
@@ -104,7 +108,11 @@ void RF24::ce(bool level)
 {
     //Allow for 3-pin use on ATTiny
     if (ce_pin != csn_pin) {
+        #if defined(STM32)
+        HAL_GPIO_WritePin(ce_port, ce_pin, level ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        #else
         digitalWrite(ce_pin, level);
+        #endif
     }
 }
 
@@ -593,7 +601,7 @@ void RF24::_init_obj()
 {
     // Use a pointer on the Arduino platform
 
-#if defined(RF24_SPI_PTR) && !defined(RF24_RP2)
+#if defined(RF24_SPI_PTR) && !defined(RF24_RP2) && !defined(STM32)
     _spi = &SPI;
 #endif // defined (RF24_SPI_PTR)
 
@@ -945,7 +953,7 @@ void RF24::encodeRadioDetails(uint8_t* encoded_details)
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
-#if defined(RF24_SPI_PTR) || defined(DOXYGEN_FORCED)
+#if (defined(RF24_SPI_PTR) || defined(DOXYGEN_FORCED)) && !defined(STM32)
 // does not apply to RF24_LINUX
 
 bool RF24::begin(_SPI* spiBus)
@@ -964,6 +972,20 @@ bool RF24::begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin)
 }
 
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+
+/****************************************************************************/
+
+#if defined(STM32)
+bool RF24::begin(SPI_HandleTypeDef * spiBus, uint16_t _cepin, GPIO_TypeDef* _ceport, uint16_t _cspin, GPIO_TypeDef* _csport)
+{
+    ce_pin = _cepin;
+    ce_port = _ceport;
+    csn_pin = _cspin;
+    csn_port = _csport;
+    _spi = new DummySpi(spiBus);
+    return begin();
+}
+#endif
 
 /****************************************************************************/
 
@@ -1000,6 +1022,11 @@ bool RF24::begin(void)
 
 #elif defined(RF24_RP2)
     _spi->begin(PICO_DEFAULT_SPI ? spi1 : spi0);
+
+#elif defined(STM32)
+    // you should configure the spi handler outside because your microcontroller may have more than one spi bus
+    _spi->begin();
+    spi_speed = _spi->get_baud();
 
 #else // using an Arduino platform || defined (LITTLEWIRE)
 
@@ -1045,6 +1072,21 @@ bool RF24::_init_pins()
     ce(LOW);
     csn(HIGH);
     delay(200);
+
+#elif defined(STM32)
+    if (ce_pin != csn_pin) {
+        GPIO_InitTypeDef gpio;
+        gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+        gpio.Mode = GPIO_MODE_OUTPUT_PP;
+        gpio.Pull = GPIO_NOPULL;
+        gpio.Pin = ce_pin;
+        HAL_GPIO_Init(ce_port, &gpio);
+        gpio.Pin = csn_pin;
+        HAL_GPIO_Init(csn_port, &gpio);
+    }
+
+    ce(LOW);
+    csn(HIGH);
 
 #else // using an Arduino platform
 

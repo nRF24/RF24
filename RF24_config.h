@@ -56,6 +56,15 @@
     #include "utility/rp2/RF24_arch_config.h"
     #define sprintf_P sprintf
 
+#elif (defined(STM32))
+#include "utility/stm32/RF24_arch_config.h"
+
+#ifdef SERIAL_DEBUG
+#define IF_SERIAL_DEBUG(x) ({ x; })
+#else
+#define IF_SERIAL_DEBUG(x)
+#endif // SERIAL_DEBUG
+
 #elif (!defined(ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
     // This behavior can be overridden by calling configure with respective parameters

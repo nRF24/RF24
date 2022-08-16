@@ -133,6 +133,12 @@ private:
 
     uint16_t ce_pin;    /* "Chip Enable" pin, activates the RX or TX role */
     uint16_t csn_pin;   /* SPI Chip select */
+
+#if defined(STM32)
+    GPIO_TypeDef* ce_port;
+    GPIO_TypeDef* csn_port;
+#endif
+
     uint32_t spi_speed; /* SPI Bus Speed */
 #if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2)
     uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
@@ -242,7 +248,7 @@ public:
      */
     bool begin(void);
 
-#if defined(RF24_SPI_PTR) || defined(DOXYGEN_FORCED)
+#if (defined(RF24_SPI_PTR) || defined(DOXYGEN_FORCED)) && !defined(STM32)
     /**
      * Same as begin(), but allows specifying a non-default SPI bus to use.
      *
@@ -283,6 +289,33 @@ public:
      */
     bool begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin);
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
+
+#if defined(STM32)
+    /**
+     * Same as begin(), but allows dynamically specifying a SPI bus, CE pin,
+     * and CSN pin to use.
+     *
+     * @note This function assumes the `SPI::begin()` method was called before to
+     * calling this function.
+     *
+     * @warning This function is for the Arduino platforms only
+     *
+     * @param spiBus A pointer or reference to an instantiated SPI bus object.
+     * The `_SPI` datatype is a "wrapped" definition that will represent
+     * various SPI implementations based on the specified platform.
+     * @param _cepin The pin attached to Chip Enable on the RF module.
+     * @param _ceport The handle object associated with the pin attached to Chip Enable on the RF module.
+     * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
+     * @param _csport The handle object associated with the pin attached to Chip Select (often labeled CSN) on the radio module.
+     * - For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
+     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     *
+     * @see Review the [Arduino support page](md_docs_arduino.html).
+     *
+     * @return same result as begin()
+     */
+    bool begin(SPI_HandleTypeDef * spiBus, uint16_t _cepin, GPIO_TypeDef* _ceport, uint16_t _cspin, GPIO_TypeDef* _csport);
+#endif
 
     /**
      * Same as begin(), but allows dynamically specifying a CE pin
