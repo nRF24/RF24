@@ -1,0 +1,8 @@
+########
+# RF24 #
+########
+add_library(rf24 RF24.cpp utility/STM32/rf24_stm32.cpp)
+target_compile_definitions(rf24 PUBLIC -DSTM32 -DSTM32F1)
+target_include_directories(rf24 PRIVATE . ${STM32CubeHalIncludes} ../Core/Inc)
+target_compile_options(rf24 PRIVATE -Ofast)
+target_link_libraries(rf24 PRIVATE STM32CubeHal)
