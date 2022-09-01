@@ -1349,7 +1349,7 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
     while ((get_status() & (_BV(TX_FULL)))) {
         if (status & _BV(MAX_RT)) {
             return 0; //Return 0. The previous payload has not been retransmitted
-            // From the user perspective, if you get a 0, just keep trying to send the same payload
+            // From the user perspective, if you get a 0, call txStandBy()
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > 95) {
