@@ -661,10 +661,10 @@ public:
      *
      * This function is not available in the python wrapper because it is intended for
      * use on processors with very limited available resources.
-     * 
+     *
      * @remark
      * This function uses much less ram than other `*print*Details()` methods.
-     * 
+     *
      * @code
      * uint8_t encoded_details[43] = {0};
      * radio.encodeRadioDetails(encoded_details);
@@ -673,7 +673,7 @@ public:
      * @param encoded_status The uint8_t array that RF24 radio details are
      * encoded into. This array must be at least 43 bytes in length; any less would surely
      * cause undefined behavior.
-     * 
+     *
      * Registers names and/or data corresponding to the index of the `encoded_details` array:
      * | index | register/data |
      * |------:|:--------------|
@@ -786,14 +786,14 @@ public:
 
     /**
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
-     * @return 
+     * @return
      * - `0` if the specified FIFO is neither full nor empty.
      * - `1` if the specified FIFO is empty.
      * - `2` if the specified FIFO is full.
      */
     uint8_t isFifo(bool about_tx);
 
-    /** 
+    /**
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
      * @param check_empty
      * - `true` checks if the specified FIFO is empty
@@ -866,14 +866,18 @@ public:
 
     /**
      * This will not block until the 3 FIFO buffers are filled with data.
-     * Once the FIFOs are full, writeFast will simply wait for success or
-     * timeout, and return 1 or 0 respectively. From a user perspective, just
-     * keep trying to send the same data. The library will keep auto retrying
-     * the current payload using the built in functionality.
-     * @warning It is important to never keep the nRF24L01 in TX mode and FIFO full for more than 4ms at a time. If the auto
+     * Once the FIFOs are full, writeFast() will simply wait for a buffer to
+     * become available or a transmission failure (returning `true` or `false`
+     * respectively).
+     *
+     * @warning
+     * @parblock
+     * It is important to never keep the nRF24L01 in TX mode and FIFO full for more than 4ms at a time. If the auto
      * retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
+     * Use txStandBy() when this function returns `false`.
+     * 
      * Example (Partial blocking):
      * @code
      * radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
@@ -882,8 +886,10 @@ public:
      * radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
      * txStandBy(1000);		   // Using extended timeouts, returns 1 if success. Retries failed payloads for 1 seconds before returning 0.
      * @endcode
+     * @endparblock
      *
      * @see
+     * - setAutoAck()
      * - txStandBy()
      * - write()
      * - writeBlocking()
@@ -891,12 +897,10 @@ public:
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
      * @return
-     * - `true` if the payload was delivered successfully and an acknowledgement
-     *   (ACK packet) was received. If auto-ack is disabled, then any attempt
-     *   to transmit will also return true (even if the payload was not
-     *   received).
-     * - `false` if the payload was sent but was not acknowledged with an ACK
-     *   packet. This condition can only be reported if the auto-ack feature
+     * - `true` if the payload passed to `buf` was loaded in the TX FIFO.
+     * - `false` if the payload passed to `buf` was not loaded in the TX FIFO
+     *   because a previous payload already in the TX FIFO failed to
+     *   transmit. This condition can only be reported if the auto-ack feature
      *   is on.
      *
      * @note The `len` parameter must be omitted when using the python
@@ -911,11 +915,18 @@ public:
     bool writeFast(const void* buf, uint8_t len);
 
     /**
-     * WriteFast for single NOACK writes. Optionally disable
-     * acknowledgements/auto-retries for a single payload using the
-     * multicast parameter set to true.
+     * Similar to writeFast(const void*, uint8_t) but allows for single NOACK writes.
+     * Optionally disable acknowledgements/auto-retries for a single payload using the
+     * multicast parameter set to `true`.
      *
-     * @see setAutoAck()
+     * @warning If the auto-ack feature is enabled, then it is strongly encouraged to call
+     * txStandBy() when this function returns `false`.
+     *
+     * @see
+     * - setAutoAck()
+     * - txStandBy()
+     * - write()
+     * - writeBlocking()
      *
      * @param buf Pointer to the data to be sent
      * @param len Number of bytes to be sent
@@ -927,7 +938,7 @@ public:
      * - `false` if the payload passed to `buf` was not loaded in the TX FIFO
      *   because a previous payload already in the TX FIFO failed to
      *   transmit. This condition can only be reported if the auto-ack feature
-     *   is on.
+     *   is on (and the multicast parameter is set to false).
      *
      * @note The `len` parameter must be omitted when using the python
      * wrapper because the length of the payload is determined automatically.
