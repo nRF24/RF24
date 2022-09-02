@@ -3,7 +3,7 @@ var searchData=
   ['r_5fregister_0',['R_REGISTER',['../nRF24L01_8h.html#afb0b251378d3b14c508e51fd2c3157d6',1,'nRF24L01.h']]],
   ['r_5frx_5fpayload_1',['R_RX_PAYLOAD',['../nRF24L01_8h.html#a462d8c2314b823b724574c1ca73225a6',1,'nRF24L01.h']]],
   ['r_5frx_5fpl_5fwid_2',['R_RX_PL_WID',['../nRF24L01_8h.html#a14ea186f093047db160cee642e5bd901',1,'nRF24L01.h']]],
-  ['raspberrypi_20pico_20sdk_20_28for_20the_20rp2040_29_3',['RaspberryPi Pico SDK (for the RP2040)',['../md_docs_pico_sdk.html',1,'']]],
+  ['raspberry_20pi_20pico_20sdk_20_28for_20the_20rp2040_29_3',['Raspberry Pi Pico SDK (for the RP2040)',['../md_docs_pico_sdk.html',1,'']]],
   ['read_4',['read',['../group__Porting__GPIO.html#ga783c8d81b91f178759766e7e62ea4b17',1,'read():&#160;gpio.h'],['../classRF24.html#a8e2eacacfba96426c192066f04054c5b',1,'RF24::read(void *buf, uint8_t len)']]],
   ['read_5fregister_5',['read_register',['../classRF24.html#a99958992f6b92af61c8132557cd847c0',1,'RF24::read_register(uint8_t reg, uint8_t *buf, uint8_t len)'],['../classRF24.html#a9a77a59447ca017aa178eb831e52a9e8',1,'RF24::read_register(uint8_t reg)']]],
   ['register_5fmask_6',['REGISTER_MASK',['../nRF24L01_8h.html#a866fc0cef05f3c63ba55a555f63648a2',1,'nRF24L01.h']]],

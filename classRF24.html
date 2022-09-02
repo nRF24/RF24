@@ -1496,14 +1496,18 @@ This function no longer returns a boolean. Use available to determine if packets
         </tr>
       </table>
 </div><div class="memdoc">
-<p >This will not block until the 3 FIFO buffers are filled with data. Once the FIFOs are full, writeFast will simply wait for success or timeout, and return 1 or 0 respectively. From a user perspective, just keep trying to send the same data. The library will keep auto retrying the current payload using the built in functionality. </p><dl class="section warning"><dt>Warning</dt><dd>It is important to never keep the nRF24L01 in TX mode and FIFO full for more than 4ms at a time. If the auto retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO to clear by issuing <a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a> or ensure appropriate time between transmissions.</dd></dl>
-<p>Example (Partial blocking): </p><div class="fragment"><div class="line">radio.writeFast(&amp;buf,32);  <span class="comment">// Writes 1 payload to the buffers</span></div>
+<p >This will not block until the 3 FIFO buffers are filled with data. Once the FIFOs are full, <a class="el" href="classRF24.html#a47b2516993481b58e724d1274a7fd9cb">writeFast()</a> will simply wait for a buffer to become available or a transmission failure (returning <code>true</code> or <code>false</code> respectively).</p>
+<dl class="section warning"><dt>Warning</dt><dd><p class="startdd">It is important to never keep the nRF24L01 in TX mode and FIFO full for more than 4ms at a time. If the auto retransmit is enabled, the nRF24L01 is never in TX mode long enough to disobey this rule. Allow the FIFO to clear by issuing <a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a> or ensure appropriate time between transmissions.</p>
+<p class="interdd">Use <a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a> when this function returns <code>false</code>.</p>
+<p class="enddd">Example (Partial blocking): </p><div class="fragment"><div class="line">radio.writeFast(&amp;buf,32);  <span class="comment">// Writes 1 payload to the buffers</span></div>
 <div class="line"><a class="code hl_function" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy</a>();               <span class="comment">// Returns 0 if failed. 1 if success. Blocks only until MAX_RT timeout or success. Data flushed on fail.</span></div>
 <div class="line"> </div>
 <div class="line">radio.writeFast(&amp;buf,32);  <span class="comment">// Writes 1 payload to the buffers</span></div>
 <div class="line"><a class="code hl_function" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy</a>(1000);           <span class="comment">// Using extended timeouts, returns 1 if success. Retries failed payloads for 1 seconds before returning 0.</span></div>
 <div class="ttc" id="aclassRF24_html_a12cc453453c94969d4d3f0edb3778c83"><div class="ttname"><a href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">RF24::txStandBy</a></div><div class="ttdeci">bool txStandBy()</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8cpp_source.html#l01429">RF24.cpp:1429</a></div></div>
-</div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><ul>
+</div><!-- fragment --> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><ul>
+<li><a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">setAutoAck()</a></li>
 <li><a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a></li>
 <li><a class="el" href="classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58">write()</a></li>
 <li><a class="el" href="classRF24.html#ae6fd8d5ee490d54ae1cb2e8fefee535f">writeBlocking()</a></li>
@@ -1517,8 +1521,8 @@ This function no longer returns a boolean. Use available to determine if packets
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><ul>
-<li><code>true</code> if the payload was delivered successfully and an acknowledgement (ACK packet) was received. If auto-ack is disabled, then any attempt to transmit will also return true (even if the payload was not received).</li>
-<li><code>false</code> if the payload was sent but was not acknowledged with an ACK packet. This condition can only be reported if the auto-ack feature is on.</li>
+<li><code>true</code> if the payload passed to <code>buf</code> was loaded in the TX FIFO.</li>
+<li><code>false</code> if the payload passed to <code>buf</code> was not loaded in the TX FIFO because a previous payload already in the TX FIFO failed to transmit. This condition can only be reported if the auto-ack feature is on.</li>
 </ul>
 </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The <code>len</code> parameter must be omitted when using the python wrapper because the length of the payload is determined automatically. To use this function in the python wrapper: <div class="fragment"><div class="line"><span class="comment"># let `radio` be the instantiated RF24 object</span></div>
@@ -1561,8 +1565,15 @@ This function no longer returns a boolean. Use available to determine if packets
         </tr>
       </table>
 </div><div class="memdoc">
-<p >WriteFast for single NOACK writes. Optionally disable acknowledgements/auto-retries for a single payload using the multicast parameter set to true.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">setAutoAck()</a></dd></dl>
+<p >Similar to <a class="el" href="classRF24.html#a47b2516993481b58e724d1274a7fd9cb">writeFast(const void*, uint8_t)</a> but allows for single NOACK writes. Optionally disable acknowledgements/auto-retries for a single payload using the multicast parameter set to <code>true</code>.</p>
+<dl class="section warning"><dt>Warning</dt><dd>If the auto-ack feature is enabled, then it is strongly encouraged to call <a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a> when this function returns <code>false</code>.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><ul>
+<li><a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">setAutoAck()</a></li>
+<li><a class="el" href="classRF24.html#a12cc453453c94969d4d3f0edb3778c83">txStandBy()</a></li>
+<li><a class="el" href="classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58">write()</a></li>
+<li><a class="el" href="classRF24.html#ae6fd8d5ee490d54ae1cb2e8fefee535f">writeBlocking()</a></li>
+</ul>
+</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">buf</td><td>Pointer to the data to be sent </td></tr>
@@ -1573,7 +1584,7 @@ This function no longer returns a boolean. Use available to determine if packets
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><ul>
 <li><code>true</code> if the payload passed to <code>buf</code> was loaded in the TX FIFO.</li>
-<li><code>false</code> if the payload passed to <code>buf</code> was not loaded in the TX FIFO because a previous payload already in the TX FIFO failed to transmit. This condition can only be reported if the auto-ack feature is on.</li>
+<li><code>false</code> if the payload passed to <code>buf</code> was not loaded in the TX FIFO because a previous payload already in the TX FIFO failed to transmit. This condition can only be reported if the auto-ack feature is on (and the multicast parameter is set to false).</li>
 </ul>
 </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The <code>len</code> parameter must be omitted when using the python wrapper because the length of the payload is determined automatically. To use this function in the python wrapper: <div class="fragment"><div class="line"><span class="comment"># let `radio` be the instantiated RF24 object</span></div>
@@ -3238,7 +3249,7 @@ description when<br  />
 <div class="line">  report_failure();                       <span class="comment">// Blink LEDs, send a message, etc. to indicate failure</span></div>
 <div class="line">}</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01325">1325</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01336">1336</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
 
 </div>
 </div>
@@ -3261,7 +3272,7 @@ description when<br  />
 </ol>
 <dl class="section warning"><dt>Warning</dt><dd>If set to 0, ensure 130uS delay after <a class="el" href="classRF24.html#a6f144d73fc447c8ac2d1a4166210fd88">stopListening()</a> and before any sends </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01734">1734</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01745">1745</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
 
 </div>
 </div>
@@ -3280,7 +3291,7 @@ description when<br  />
 <p >This is intended to minimise the speed of SPI polling due to radio commands</p>
 <p >If using interrupts or timed requests, this can be set to 0 Default:5 </p>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01744">1744</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01755">1755</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
 
 </div>
 </div>
@@ -3291,7 +3302,7 @@ description when<br  />
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 19 2022 12:13:05 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4
+Generated on Fri Sep 2 2022 11:08:33 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4
 </small></address>
 </body>
 </html>
