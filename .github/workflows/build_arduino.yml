@@ -78,6 +78,10 @@ jobs:
           - "arduino:avr:one"
           - "arduino:avr:unowifi"
           - "arduino:mbed:nano33ble"
+          - "arduino:mbed:nanorp2040connect"
+          - "rp2040:rp2040:rpipico"
+          - "rp2040:rp2040:rpipicow"
+          - "rp2040:rp2040:adafruit_feather"
           - "arduino:samd:mkr1000"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:mkrwifi1010"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:nano_33_iot"

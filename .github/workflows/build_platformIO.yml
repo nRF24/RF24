@@ -112,6 +112,8 @@ jobs:
           - "teensy40"
           - "teensy41"
           - "teensylc"
+          - "genericSTM32F411CE"
+          - "blackpill_f103c8"
 
     steps:
     - uses: actions/checkout@v2
