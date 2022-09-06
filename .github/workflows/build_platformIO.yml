@@ -74,7 +74,7 @@ jobs:
       #   with:
       #     version: 12
       - name: Install linter python package
-        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+        run: python3 -m pip install cpp-linter
       - name: run linter as a python package
         id: linter
         run: |
