@@ -163,7 +163,7 @@ extern HardwareSPI SPI;
         #include <pgmspace.h>
         #define PRIPSTR "%s"
         #ifndef pgm_read_ptr
-            #define pgm_read_ptr(p) (*(p))
+            #define pgm_read_ptr(p) (*(void* const*)(p))
         #endif
     #elif defined(ARDUINO) && !defined(ESP_PLATFORM) && !defined(__arm__) && !defined(__ARDUINO_X86__) || defined(XMEGA)
         #include <avr/pgmspace.h>
@@ -208,7 +208,7 @@ typedef uint16_t prog_uint16_t;
             #define pgm_read_word(p) (*(p))
         #endif
         #if !defined pgm_read_ptr || defined ARDUINO_ARCH_MBED
-            #define pgm_read_ptr(p) (*(p))
+            #define pgm_read_ptr(p) (*(void* const*)(p))
         #endif
         #ifndef PRIPSTR
             #define PRIPSTR "%s"
