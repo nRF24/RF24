@@ -205,7 +205,7 @@ typedef uint16_t prog_uint16_t;
             #define PROGMEM
         #endif
         #ifndef pgm_read_word
-            #define pgm_read_word(p) (*(p))
+            #define pgm_read_word(p) (*(const unsigned short *)(addr))
         #endif
         #if !defined pgm_read_ptr || defined ARDUINO_ARCH_MBED
             #define pgm_read_ptr(p) (*(void* const*)(p))

@@ -22,8 +22,8 @@
 #define HIGH             1
 #define LOW              0
 #define _BV(x)           (1 << (x))
-#define pgm_read_word(p) (*(p))
-#define pgm_read_byte(p) (*(p))
+#define pgm_read_word(p) (*(const unsigned short *)(addr))
+#define pgm_read_byte(p) (*(const unsigned char *)(addr))
 #define pgm_read_ptr(p)  (*(void* const*)(p))
 #define _SPI             spi
 
