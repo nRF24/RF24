@@ -18,10 +18,13 @@ To integrate the RF24 library code into your STM32Cube project, follow these ste
 2. Exclude all sub-directories except "STM32" in the RF24/utility/ directory.
 3. Open your project's settings and add 2 symbols.
     1. right-click the project's root folder and select properties.
+
         ![select project properties](../images/STM32Cube-project-properties.png)
     2. In the "C/C++ General" -> "Paths and Symbols" from the side menu.
+
         ![select path and symbols](../images/STM32Cube-project-path-symbols.png)
     3. Select the "Symbols" tab in the main portion of the properties dialogue.
+
         ![select symbols](../images/STM32Cube-project-symbols.png)
     4. Add the following variables (case-sensitive) to both "GNU C" and "GNU C++" categories:
         - `STM32` (used by RF24_arch_config.h and RF24.cpp)
