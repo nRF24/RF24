@@ -1,23 +1,18 @@
-/**
- * @file includes.h
- * Configuration defines for RF24/Linux
- */
-
-/**
- * Example of includes.h for RF24 Linux portability
- *
- * @defgroup Porting_Includes Porting: Includes
- * @{
- */
-
 #ifndef RF24_UTILITY_STM32_INCLUDES_H_
 #define RF24_UTILITY_STM32_INCLUDES_H_
 
-/**
- * Load the correct configuration for this platform
- */
-#include "RF24_arch_config.h"
-
-/**@}*/
+#if defined(STM32F1)
+    #include "stm32f1xx_hal.h"
+    #include "stm32f1xx_hal_gpio.h"
+    #include "stm32f1xx_hal_spi.h"
+#elif defined(STM32F3)
+    #include "stm32f3xx_hal.h"
+    #include "stm32f3xx_hal_gpio.h"
+    #include "stm32f3xx_hal_spi.h"
+#elif defined(STM32F4)
+    #include "stm32f4xx_hal.h"
+    #include "stm32f4xx_hal_gpio.h"
+    #include "stm32f4xx_hal_spi.h"
+#endif
 
 #endif // RF24_UTILITY_STM32_INCLUDES_H_

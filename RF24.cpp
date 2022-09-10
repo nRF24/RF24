@@ -599,7 +599,7 @@ void RF24::_init_obj()
 {
     // Use a pointer on the Arduino platform
 
-#if defined(RF24_SPI_PTR) && !defined(RF24_RP2)
+#if defined(RF24_SPI_PTR) && !defined(RF24_RP2) && !defined(STM32)
     _spi = &SPI;
 #endif // defined (RF24_SPI_PTR)
 

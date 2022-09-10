@@ -1,7 +1,7 @@
-#include "RF24_arch_config.h"
+#include "gpio.h"
 
-
-static GPIO_TypeDef* decode_pin(uint8_t pin, uint16_t* decoded_pin) {
+GPIO_TypeDef* decode_pin(uint8_t pin, uint16_t* decoded_pin)
+{
     GPIO_TypeDef* port;
     *decoded_pin = 1 << (pin % 16);
 
@@ -32,12 +32,12 @@ static GPIO_TypeDef* decode_pin(uint8_t pin, uint16_t* decoded_pin) {
             break;
 #endif
 #if defined(GPIOF)
-            case 5:
+        case 5:
             port = GPIOF;
             break;
 #endif
 #if defined(GPIOG)
-            case 6:
+        case 6:
             port = GPIOG;
             break;
 #endif
@@ -48,12 +48,8 @@ static GPIO_TypeDef* decode_pin(uint8_t pin, uint16_t* decoded_pin) {
     return port;
 }
 
-static uint32_t rf24_get_time_us()
+void pinMode(uint8_t pin, uint8_t direction)
 {
-    return 1000 * HAL_GetTick() + 1000 - (SysTick->VAL / (SystemCoreClock / 1000000));
-}
-
-void pinMode(uint8_t pin, uint8_t direction) {
     uint16_t decoded_pin;
     GPIO_TypeDef* port = decode_pin(pin, &decoded_pin);
 
@@ -65,35 +61,9 @@ void pinMode(uint8_t pin, uint8_t direction) {
     HAL_GPIO_Init(port, &config);
 }
 
-void digitalWrite(uint8_t pin, uint8_t value) {
+void digitalWrite(uint8_t pin, uint8_t value)
+{
     uint16_t decoded_pin;
     GPIO_TypeDef* port = decode_pin(pin, &decoded_pin);
     HAL_GPIO_WritePin(port, decoded_pin, value ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
-
-void delayMicroseconds(uint32_t usecs)
-{
-    uint32_t now = rf24_get_time_us();
-    uint32_t blocked_until = now + usecs;
-    while (blocked_until > rf24_get_time_us()) {}
-}
-
-RF24_SPI::RF24_SPI() {
-    _hspi = nullptr;
-}
-
-void RF24_SPI::begin() {
-    HAL_SPI_Init(_hspi);
-}
-
-void RF24_SPI::begin(SPI_HandleTypeDef* hspi) {
-    _hspi = hspi;
-}
-
-uint8_t RF24_SPI::transfer(uint8_t data_to_send) {
-    uint8_t rx_data;
-    HAL_SPI_TransmitReceive(_hspi, &data_to_send, &rx_data, 1, HAL_MAX_DELAY);
-    return rx_data;
-}
-
-RF24_SPI _SPI;
