@@ -4,6 +4,10 @@ if (PICO_SDK_PATH)
     # If so, load the relevant CMakeLists-file but don't do anything else
     include(${CMAKE_CURRENT_LIST_DIR}/utility/rp2/CMakeLists.txt)
     return()
+elseif(DEFINED STM32)
+    option(STM32_ARCH "The STM32 architecture family (eg STM32F1 or STM32F4)" "STM32F1")
+    include(${CMAKE_CURRENT_LIST_DIR}/utility/STM32/CMakeLists.txt)
+    return()
 endif()
 
 cmake_minimum_required(VERSION 3.15)
