@@ -56,6 +56,10 @@
     #include "utility/rp2/RF24_arch_config.h"
     #define sprintf_P sprintf
 
+// STM32Cube IDE.
+#elif !defined(ARDUINO) && defined(STM32)
+    #include "utility/STM32/RF24_arch_config.h"
+
 #elif (!defined(ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
     // This behavior can be overridden by calling configure with respective parameters
