@@ -1082,10 +1082,8 @@ bool RF24::_init_radio()
     // sizes must never be used. See datasheet for a more complete explanation.
     setRetries(5, 15);
 
-    // Then set the data rate to the slowest (and most reliable) speed supported by all
-    // hardware. Since this value occupies the same register as the PA level value, set
-    // the PA level to MAX
-    setRadiation(RF24_PA_MAX, RF24_1MBPS); // LNA enabled by default
+    // Then set the data rate to the slowest (and most reliable) speed supported by all hardware.
+    setDataRate(RF24_1MBPS);
 
     // detect if is a plus variant & use old toggle features command accordingly
     uint8_t before_toggle = read_register(FEATURE);
