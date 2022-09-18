@@ -30,7 +30,7 @@ jobs:
       #   with:
       #     version: 12
       - name: Install linter python package
-        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+        run: python3 -m pip install cpp-linter
       - name: run linter as a python package
         id: linter
         run: |
@@ -78,6 +78,10 @@ jobs:
           - "arduino:avr:one"
           - "arduino:avr:unowifi"
           - "arduino:mbed:nano33ble"
+          - "arduino:mbed:nanorp2040connect"
+          - "rp2040:rp2040:rpipico"
+          - "rp2040:rp2040:rpipicow"
+          - "rp2040:rp2040:adafruit_feather"
           - "arduino:samd:mkr1000"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:mkrwifi1010"  # InterruptConfigure.ino uses pin 2
           - "arduino:samd:nano_33_iot"
@@ -134,6 +138,15 @@ jobs:
           fqbn: ${{ matrix.fqbn }}
           enable-deltas-report: ${{ matrix.enable-deltas-report }}
           sketches-report-path: ${{ env.SKETCHES_REPORTS }}
+          # install earlphilhower's arduino-pico platform index
+          platforms: |
+            - name: rp2040:rp2040
+              source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+            - name: arduino:avr
+            - name: arduino:megaavr
+            - name: arduino:sam
+            - name: arduino:samd
+            - name: arduino:mbed
       
       # This step is needed to pass the size data to the report job 
       - name: Upload sketches report to workflow artifact

@@ -43,9 +43,9 @@ typedef uint16_t prog_uint16_t;
 #define printf_P printf
 #define strlen_P strlen
 #define PROGMEM
-#define pgm_read_word(p) (*(p))
+#define pgm_read_word(p) (*(const unsigned short*)(p))
 #define PRIPSTR          "%s"
-#define pgm_read_byte(p) (*(p))
+#define pgm_read_byte(p) (*(const unsigned char*)(p))
 #define pgm_read_ptr(p)  (*(void* const*)(p))
 
 #endif // RF24_UTILITY_WIRINGPI_RF24_ARCH_CONFIG_H_
