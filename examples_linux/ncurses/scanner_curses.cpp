@@ -111,7 +111,8 @@ int main(int argc, char** argv)
         getline(cin, input);
         if (input.length()) {
             duration = stoi(input);
-            if (!duration) input.clear();
+            if (!duration)
+                input.clear();
         }
     }
 
