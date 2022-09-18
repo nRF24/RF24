@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/nRF24/RF24.git"
     },
-    "version": "1.4.5",
+    "version": "1.4.6",
     "export": {
         "exclude": [
             "datasheets",
