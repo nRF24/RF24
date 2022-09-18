@@ -114,6 +114,8 @@ jobs:
           - "teensylc"
           - "genericSTM32F411CE"
           - "blackpill_f103c8"
+          - "nodemcuv2"
+          - "adafruit_qtpy_esp32s2"
 
     steps:
     - uses: actions/checkout@v2

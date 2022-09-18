@@ -159,12 +159,18 @@ extern HardwareSPI SPI;
     #endif // defined (__ARDUINO_X86__)
 
     // Progmem is Arduino-specific
-    #if defined(ARDUINO_ARCH_ESP8266) || defined(ESP32)
+    #if defined(ARDUINO_ARCH_ESP8266) || defined(ESP32) || (defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED))
         #include <pgmspace.h>
         #define PRIPSTR "%s"
         #ifndef pgm_read_ptr
             #define pgm_read_ptr(p) (*(void* const*)(p))
         #endif
+        // Serial.printf() is no longer defined in the unifying Arduino/ArduinoCore-API repo
+        // Serial.printf() is defined if using the arduino-pico/esp32/8266 repo
+        #if defined(ARDUINO_ARCH_ESP32) // do not `undef` when using the espressif SDK only
+            #undef printf_P             // needed for ESP32 core
+        #endif
+        #define printf_P Serial.printf
     #elif defined(ARDUINO) && !defined(ESP_PLATFORM) && !defined(__arm__) && !defined(__ARDUINO_X86__) || defined(XMEGA)
         #include <avr/pgmspace.h>
         #define PRIPSTR "%S"
