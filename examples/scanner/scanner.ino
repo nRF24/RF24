@@ -12,10 +12,10 @@
  * 
  * There are 126 channels available, 1MHz wide, starting at 2400MHz. This example will scan through all 126 channels, 
  * listening for 128 microseconds on each channel for a carrier wave. The more carrier waves detected during the channel sweep, the 
- * higher the hexadecimal value displayed under that channel on the serial monitor. The channel numbers are displayed in hexiecimal in
+ * higher the hexadecimal value displayed under that channel on the serial monitor. The channel numbers are displayed in hexadecimal in
  * a header two lines tall, where 0x00 is on the left and 0x7D is on the right.
  *
- * While any 2.4GHz device can trigger this carrier wave detection, a second NRF24L01+ device can be configured to outptu a constant 
+ * While any 2.4GHz device can trigger this carrier wave detection, a second NRF24L01+ device can be configured to output a constant 
  * carrier wave by sending the character "g" over the serial monitor. Output power and channel can be adjusted in the #defines below.
  *
  * Originally inspired by cpixip,
@@ -45,15 +45,12 @@ void setup(void) {
     ;
   Serial.println(F("rRF24/examples/scanner/"));
 
-  // Setup and configure rf radi
-  /*
+  // Setup and configure rf radio
   if(!radio.begin())
   {
     Serial.println("Can't connect to radio");
     while(1);
   }
-
-  */
 
   radio.setAutoAck(false);
   radio.stopListening();
