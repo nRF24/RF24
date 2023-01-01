@@ -1,5 +1,7 @@
 # RF24 Portability
 
+@tableofcontents
+
 The RF24 radio driver mainly utilizes the [Arduino API](http://arduino.cc/en/reference/homePage)
 for GPIO, SPI, and timing functions, which are easily replicated on various platforms.
 

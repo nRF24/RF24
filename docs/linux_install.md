@@ -1,5 +1,7 @@
 # Linux Installation
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or using LittleWire.
 

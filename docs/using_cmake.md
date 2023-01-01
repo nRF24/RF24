@@ -1,5 +1,7 @@
 # Using CMake
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 A more modern approach instead of using hand-crafted _Makefiles_ & _configure_ scripts
 to build & install software. Please note that these instructions are not needed if you
@@ -48,8 +50,6 @@ There is a newer automatic install script that makes use of the CMake approach.
    This is not the same as the traditionally provided python wrappers as the pyRF24 package can be
    used independent of the C++ installed libraries. For more information on this newer python
    package, please check out [the pyRF24 documentation](https://nrf24.github.io/pyRF24/).
-   Note, the pyRF24 API is more pythonic instead of a direct port of the C++ API (eg. snake casing
-   instead of camel casing).
 4. Try an example from one of the libraries
    ```shell
    cd ~/rf24libs/RF24/examples_linux

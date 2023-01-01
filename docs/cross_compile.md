@@ -1,5 +1,7 @@
 # Linux cross-compilation
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 @warning These instructions are no longer recommended because they involve disabling security measures
 for the target system. Please try the [instructions using CMake](md_docs_using_cmake.html).
