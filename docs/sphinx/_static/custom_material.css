@@ -6,8 +6,8 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
 }
 
 thead {
-	background-color: var(--md-default-fg-color--light);
-	color: var(--md-primary-bg-color);
+  background-color: var(--md-default-fg-color--light);
+  color: var(--md-primary-bg-color);
 }
 
 .md-nav__title .md-nav__button.md-logo img, .md-nav__title .md-nav__button.md-logo svg {

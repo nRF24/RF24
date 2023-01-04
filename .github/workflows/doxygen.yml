@@ -45,6 +45,7 @@ jobs:
         id: latest_ver
         run: echo "release=$(awk -F "=" '/version/ {print $2}' library.properties)" >> $GITHUB_OUTPUT
       - name: overwrite doxygen tags
+        working-directory: docs
         run: |
           touch doxygenAction
           echo "PROJECT_NUMBER = ${{ steps.latest_ver.outputs.release }}" >> doxygenAction
@@ -61,7 +62,7 @@ jobs:
           tar xf doxygen.tar
           cd doxygen-$DOXYGEN_VERSION
           sudo make install
-      - run: doxygen
+      - run: cd docs && doxygen
       - name: Save doxygen docs as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -81,8 +82,7 @@ jobs:
       - name: Install sphinx deps
         run: python -m pip install -r docs/sphinx/requirements.txt
       - name: build docs with Sphinx
-        working-directory: docs
-        run: sphinx-build sphinx _build
+        run: sphinx-build docs/sphinx docs/_build
       - name: Save sphinx docs as artifact
         uses: actions/upload-artifact@v3
         with:

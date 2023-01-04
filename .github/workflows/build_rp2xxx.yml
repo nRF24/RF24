@@ -34,14 +34,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
       # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
       # - name: Install clang-tools
       #   uses: KyleMayes/install-llvm-action@v1
       #   with:
       #     version: 12
       - name: Install linter python package
-        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
+        run: python3 -m pip install cpp-linter
       - name: run linter as a python package
         id: linter
         run: |
@@ -80,13 +82,13 @@ jobs:
           
     steps:
     - name: checkout RF24 lib
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install toolchain
       run: sudo apt update && sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
 
     - name: Clone pico-sdk
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: raspberrypi/pico-sdk
         # master branch is latest stable release
@@ -115,7 +117,7 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Save artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: examples_pico_${{ matrix.board }}
         path: |

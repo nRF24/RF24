@@ -81,7 +81,7 @@ breathe_domain_by_extension = { "h" : "cpp" }
 READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
 
 if READTHEDOCS:
-    subprocess.call("cd ../..; doxygen", shell=True)
+    subprocess.call("cd ..; doxygen", shell=True)
 
 # -- Options for HTML output -------------------------------------------------
 

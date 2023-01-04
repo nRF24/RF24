@@ -58,7 +58,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
       # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
       # - name: Install clang-tools
       #   uses: KyleMayes/install-llvm-action@v1
@@ -100,7 +102,7 @@ jobs:
       CFLAGS: "-I /usr/local/include"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: provide toolchain
         run: |
@@ -217,7 +219,7 @@ jobs:
 
     steps:
       - name: Checkout RF24 repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # - name: provide toolchain (for x86_64)
       #   if: ${{ matrix.toolchain.compiler == 'x86_64' }}
@@ -310,7 +312,7 @@ jobs:
         run: sudo cpack
 
       - name: Save artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "pkg_RF24"
           path: |
@@ -319,10 +321,10 @@ jobs:
 
       - name: Upload Release assets
         if: github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')
-        uses: csexton/release-asset-action@master
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
-          pattern: "${{ github.workspace }}/build/pkgs/librf24*"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "${{ github.workspace }}/build/pkgs/librf24*"
 
       - name: clean build environment
         working-directory: ${{ github.workspace }}/build
@@ -346,7 +348,7 @@ jobs:
       # cross-compiling a python C extension is better done with pypa/cibuildwheel action
       - name: Set up Python 3.7
         if: ${{ matrix.toolchain.compiler == 'default' }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
 

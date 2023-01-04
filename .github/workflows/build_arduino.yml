@@ -23,7 +23,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
       # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
       # - name: Install clang-tools
       #   uses: KyleMayes/install-llvm-action@v1
@@ -111,7 +113,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Compile examples
         uses: arduino/compile-sketches@main
@@ -197,7 +199,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Compile examples
         uses: arduino/compile-sketches@main
@@ -216,7 +218,7 @@ jobs:
       # This step is needed to pass the size data to the report job 
       - name: Upload sketches report to workflow artifact
         if: ${{ matrix.enable-deltas-report }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.SKETCHES_REPORTS }}
           path: ${{ env.SKETCHES_REPORTS }}
