@@ -81,7 +81,7 @@ breathe_domain_by_extension = { "h" : "cpp" }
 READTHEDOCS = os.environ.get('READTHEDOCS', None) == 'True'
 
 if READTHEDOCS:
-    subprocess.call("cd ../..; doxygen", shell=True)
+    subprocess.call("cd ..; doxygen", shell=True)
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -135,6 +135,32 @@ html_theme_options = {
 object_description_options = [
     ("cpp:functionParam", dict(include_in_toc=False, generate_synopses=None)),
     ("cpp:function", dict(include_fields_in_toc=False)),
+]
+
+sphinx_immaterial_custom_admonitions = [
+    {
+        "name": "warning",
+        "color": (255, 66, 66),
+        "icon": "octicons/alert-24",
+        "override": True,
+    },
+    {
+        "name": "note",
+        "icon": "octicons/pencil-24",
+        "override": True,
+    },
+    {
+        "name": "seealso",
+        "color": (255, 66, 252),
+        "icon": "octicons/eye-24",
+        "title": "See Also",
+        "override": True,
+    },
+    {
+        "name": "remark",
+        "color": (116, 66, 255),
+        "icon": "octicons/checklist-16",
+    },
 ]
 
 # Set link name generated in the top bar.

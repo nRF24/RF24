@@ -54,30 +54,9 @@ env:
 
 jobs:
   check_formatting:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
-      # - name: Install clang-tools
-      #   uses: KyleMayes/install-llvm-action@v1
-      #   with:
-      #     version: 12
-      - name: Install linter python package
-        run: python3 -m pip install cpp-linter
-      - name: run linter as a python package
-        id: linter
-        run: |
-          cpp-linter \
-          --version=12 \
-          --style=file \
-          --tidy-checks='-*' \
-          --files-changed-only='False' \
-          --ignore='examples|examples_pico|utility/RPi/bcm2835.h|utility/RPi/bcm2835.c'
-      - name: Linter checks failed?
-        if: steps.linter.outputs.checks-failed > 0
-        run: exit 1
+    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
+    with:
+      ignore: 'examples|examples_pico|utility/RPi/bcm2835.h|utility/RPi/bcm2835.c'
 
   ####################### using Makefile #############################
   build:
@@ -100,7 +79,7 @@ jobs:
       CFLAGS: "-I /usr/local/include"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: provide toolchain
         run: |
@@ -172,14 +151,17 @@ jobs:
   ####################### using CMake ################################
   using_cmake:
     needs: check_formatting
-    runs-on: ubuntu-latest
-
-    env:
-      RF24_DRIVER: ${{ matrix.driver }}
-
+    uses: nRF24/.github/.github/workflows/build_linux_cmake.yaml@main
+    with:
+      rf24-ref: ${{ github.sha }}
+      driver: ${{ matrix.driver }}
+      compiler: ${{ matrix.toolchain.compiler }}
+      usr-dir: ${{ matrix.toolchain.usr_dir }}
+      examples-path: examples_linux
+      deploy-release: ${{ github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV') }}
+      py-wrapper-path: pyRF24
     strategy:
       fail-fast: false
-
       matrix:
         toolchain:
           - compiler: "armhf"
@@ -214,159 +196,3 @@ jobs:
             toolchain:
               compiler: "default" # github runner is hosted on a "amd64"
               usr_dir: "local"
-
-    steps:
-      - name: Checkout RF24 repo
-        uses: actions/checkout@v2
-
-      # - name: provide toolchain (for x86_64)
-      #   if: ${{ matrix.toolchain.compiler == 'x86_64' }}
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install gcc-x86-64-linux-gnux32 g++-x86-64-linux-gnux32
-
-      # - name: provide toolchain (for i686)
-      #   if: ${{ matrix.toolchain.compiler == 'i686' }}
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install gcc-i686-linux-gnu g++-i686-linux-gnu
-
-      - name: provide toolchain (for arm64)
-        if: ${{ matrix.toolchain.compiler == 'arm64' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-      - name: provide toolchain (for armhf)
-        if: ${{ matrix.toolchain.compiler == 'armhf' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-
-      - name: provide MRAA
-        if: ${{ matrix.driver == 'MRAA' }}
-        run: |
-          git clone https://github.com/intel-iot-devkit/mraa.git
-          cd mraa
-          mkdir build
-          cd build
-          cmake .. -D BUILDSWIGNODE=OFF \
-          -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
-          sudo make install
-
-      - name: provide WiringPi
-        if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler == 'default' }}
-        run: |
-          git clone https://github.com/WiringPi/WiringPi
-          cd WiringPi
-          ./build
-
-      # - name: provide WiringPi (with toolchain compilers)
-      #   if: ${{ matrix.driver == 'wiringPi' && matrix.toolchain.compiler != 'default' }}
-      #   env:
-      #     CC: /usr/bin/${{ matrix.toolchain.usr_dir }}-gcc
-      #     CFLAGS: "-I/usr/${{ matrix.toolchain.usr_dir }}"
-      #   run: |
-      #     git clone https://github.com/WiringPi/WiringPi
-      #     cd WiringPi
-      #     ./build
-
-      - name: provide pigpio
-        if: matrix.driver == 'pigpio'
-        run: |
-          git clone https://github.com/joan2937/pigpio.git
-          cd pigpio
-          git fetch --tags
-          latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          git checkout $latestTag
-          mkdir build
-          cd build
-          cmake .. -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
-          make
-          sudo make install
-        
-      - name: create CMake build environment
-        run: cmake -E make_directory ${{ github.workspace }}/build
-
-      - name: configure lib
-        working-directory: ${{ github.workspace }}/build
-        run: |
-          cmake .. -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-          -D CMAKE_INSTALL_PREFIX=/usr/${{ matrix.toolchain.usr_dir }} \
-          -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
-
-      - name: build lib
-        working-directory: ${{ github.workspace }}/build
-        run: cmake --build .
-
-      - name: install lib
-        working-directory: ${{ github.workspace }}/build
-        run: sudo cmake --install .
-
-      - name: package lib
-        working-directory: ${{ github.workspace }}/build
-        run: sudo cpack
-
-      - name: Save artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: "pkg_RF24"
-          path: |
-            ${{ github.workspace }}/build/pkgs/*.deb
-            ${{ github.workspace }}/build/pkgs/*.rpm
-
-      - name: Upload Release assets
-        if: github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV')
-        uses: csexton/release-asset-action@master
-        with:
-          pattern: "${{ github.workspace }}/build/pkgs/librf24*"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: clean build environment
-        working-directory: ${{ github.workspace }}/build
-        run: sudo rm -r ./*
-
-      - name: configure examples
-        working-directory: ${{ github.workspace }}/build
-        # interruptConfigure isn't compatible with RF24 lib's support of MRAA as a driver
-        # interruptConfigure uses `attachInterrupt()` instead of wiringPi's `waitFor/interrupt()`
-        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
-        run: |
-          cmake ../examples_linux \
-          -D CMAKE_TOOLCHAIN_FILE=../cmake/toolchains/${{ matrix.toolchain.compiler }}.cmake
-
-      - name: build examples
-        working-directory: ${{ github.workspace }}/build
-        run: |
-          cmake --build .
-          file ./gettingstarted
-
-      # cross-compiling a python C extension is better done with pypa/cibuildwheel action
-      - name: Set up Python 3.7
-        if: ${{ matrix.toolchain.compiler == 'default' }}
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
-
-      - name: provide python wrapper prerequisites
-        if: ${{ matrix.toolchain.compiler == 'default' }}
-        # python3-rpi.gpio is only required for physical hardware (namely the IRQ example)
-        run: |
-          sudo apt-get install python3-dev libboost-python-dev python3-pip
-          python3 -m pip install --upgrade pip setuptools
-
-      - name: create alias symlink to libboost_python3*.so
-        if: ${{ matrix.toolchain.compiler == 'default' }}
-        run: sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
-
-      - name: build python wrapper
-        if: ${{ matrix.toolchain.compiler == 'default' }}
-        working-directory: ${{ github.workspace }}/pyRF24
-        run: python3 setup.py build
-
-      - name: install python wrapper
-        if: ${{ matrix.toolchain.compiler == 'default' }}
-        working-directory: ${{ github.workspace }}/pyRF24
-        run: sudo python3 setup.py install

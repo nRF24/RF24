@@ -1,5 +1,7 @@
 # Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
 
+@tableofcontents
+
 ## Design Goals
 
 This library fork is designed to be...

@@ -1,5 +1,7 @@
 # Arduino
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 RF24 is fully compatible with Arduino boards.
 

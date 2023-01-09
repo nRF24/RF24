@@ -1,5 +1,7 @@
 # Python Wrapper
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 By [mz-fuzzy](https://github.com/mz-fuzzy)
 

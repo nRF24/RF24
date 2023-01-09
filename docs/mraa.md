@@ -1,5 +1,7 @@
 # MRAA
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 MRAA is a Low Level Skeleton Library for Communication on GNU/Linux platforms.
 Review the [MRAA documentation](http://iotdk.intel.com/docs/master/mraa/index.html) for more information

@@ -1,5 +1,7 @@
 # ATTiny
 
+@tableofcontents
+
 ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with [this install guide](http://highlowtech.org/?p=1695)
 
 See the included rf24ping85 example for pin info and usage

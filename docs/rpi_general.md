@@ -1,5 +1,7 @@
 # Linux General/Raspberry Pi
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 RF24 supports a variety of Linux based devices via various drivers. Some boards like RPi can utilize multiple methods
 to drive the GPIO and SPI functionality.

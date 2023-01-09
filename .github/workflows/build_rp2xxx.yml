@@ -24,44 +24,20 @@ on:
       - "utility/rp2/*"
       - "examples_pico/*"
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   check_formatting:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
-      # - name: Install clang-tools
-      #   uses: KyleMayes/install-llvm-action@v1
-      #   with:
-      #     version: 12
-      - name: Install linter python package
-        run: python3 -m pip install git+https://github.com/cpp-linter/cpp-linter-action@v1
-      - name: run linter as a python package
-        id: linter
-        run: |
-          cpp-linter \
-          --version=12 \
-          --style=file \
-          --tidy-checks='-*' \
-          --files-changed-only='False' \
-          --ignore='!examples_pico|'
-      - name: Linter checks failed?
-        if: steps.linter.outputs.checks-failed > 0
-        run: exit 1
+    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
+    with:
+      ignore: '!examples_pico|'
 
   build:
     needs: check_formatting
-    runs-on: ubuntu-latest
-
+    uses: nRF24/.github/.github/workflows/build_pico_sdk.yaml@main
+    with:
+      board-id: ${{ matrix.board }}
+      rf24-ref: ${{ github.sha }}
     strategy:
       fail-fast: false
-
       matrix:
         board:
           - "pico"
@@ -77,49 +53,3 @@ jobs:
           - "pimoroni_picolipo_4mb" # requires PicoSDK v1.2.0
           - "pimoroni_picolipo_16mb" # requires PicoSDK v1.2.0
           - "pimoroni_pga2040" # requires PicoSDK v1.2.0
-          
-    steps:
-    - name: checkout RF24 lib
-      uses: actions/checkout@v2
-
-    - name: Install toolchain
-      run: sudo apt update && sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
-
-    - name: Clone pico-sdk
-      uses: actions/checkout@v2
-      with:
-        repository: raspberrypi/pico-sdk
-        # master branch is latest stable release
-        path: pico-sdk
-        clean: false
-        submodules: true
-
-    - name: Checkout pico-sdk submodules
-      working-directory: ${{ github.workspace }}/pico-sdk
-      run: git submodule update --init
-
-    - name: Create Build Environment
-      env:
-        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
-      run: cmake -E make_directory ${{ github.workspace }}/build
-
-    - name: Configure CMake
-      working-directory: ${{ github.workspace }}/build
-      env:
-        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
-      run: cmake ../examples_pico -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPICO_BOARD=${{ matrix.board }}
-
-    - name: Build
-      working-directory: ${{ github.workspace }}/build
-      # Execute the build. You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE
-
-    - name: Save artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: examples_pico_${{ matrix.board }}
-        path: |
-          ${{ github.workspace }}/build/*.uf2
-          ${{ github.workspace }}/build/*.elf
-        # ${{ github.workspace }}/build/*.hex
-        # ${{ github.workspace }}/build/*.bin

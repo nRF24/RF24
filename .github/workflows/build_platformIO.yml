@@ -21,81 +21,23 @@ on:
 
 jobs:
   validate_lib_json:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: get latest release version number
-        id: latest_ver
-        run: echo "::set-output name=release::$(awk -F "=" '/version/ {print $2}' library.properties)"
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-
-      - name: Install PlatformIO
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
-
-      - name: package lib
-        run: pio package pack -o PlatformIO-RF24-${{ steps.latest_ver.outputs.release }}.tar.gz
-
-      - name: Save artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: "PIO_pkg_RF24"
-          path: PlatformIO*.tar.gz
-
-      - name: Upload Release assets
-        if: github.event_name == 'release'
-        uses: csexton/release-asset-action@master
-        with:
-          pattern: "PlatformIO*.tar.gz"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: upload package to PlatformIO Registry
-        if: github.event_name == 'release' && github.event_type != 'created'
-        # PIO lib packages cannot be re-published under the same tag
-        env:
-          PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
-        run: pio package publish --owner nrf24 --non-interactive
-
+    uses: nRF24/.github/.github/workflows/validate_deploy_platformio.yaml@main
+    secrets: inherit
 
   check_formatting:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      # Ubuntu 20.04.4 LTS reunners ship with clang-tools v12
-      # - name: Install clang-tools
-      #   uses: KyleMayes/install-llvm-action@v1
-      #   with:
-      #     version: 12
-      - name: Install linter python package
-        run: python3 -m pip install cpp-linter
-      - name: run linter as a python package
-        id: linter
-        run: |
-          cpp-linter \
-          --version=12 \
-          --style=file \
-          --tidy-checks='-*' \
-          --files-changed-only='False' \
-          --extensions=ino \
-          --ignore='examples/old_backups'
-      - name: Linter checks failed?
-        if: steps.linter.outputs.checks-failed > 0
-        run: exit 1
+    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
+    with:
+      ignore: examples/old_backups
+      extensions: ino
 
   build:
     needs: [check_formatting, validate_lib_json]
-    runs-on: ubuntu-latest
-
+    uses: nRF24/.github/.github/workflows/build_platformio.yaml@main
+    with:
+     example-path: ${{ matrix.example }}
+     board-id: ${{ matrix.board }}
     strategy:
       fail-fast: false
-
       matrix:
         example:
           - "examples/GettingStarted/GettingStarted.ino"
@@ -116,28 +58,3 @@ jobs:
           - "blackpill_f103c8"
           - "nodemcuv2"
           - "adafruit_qtpy_esp32s2"
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Cache PlatformIO
-      uses: actions/cache@v2
-      with:
-        path: ~/.platformio
-        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-    - name: Set up Python
-      uses: actions/setup-python@v2
-    - name: Install PlatformIO
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade platformio
-    - name: Run PlatformIO
-      run: pio ci --lib="." --board=${{ matrix.board }}
-      env:
-        PLATFORMIO_CI_SRC: ${{ matrix.example }}

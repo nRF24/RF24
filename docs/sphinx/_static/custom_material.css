@@ -1,53 +1,3 @@
-.md-typeset .admonition,
-.md-typeset details {
-  font-size: 0.75rem;
-}
-
-.md-typeset .admonition.tip>.admonition-title::before,
-.md-typeset .admonition.hint>.admonition-title::before {
-  mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" /></svg>');
-}
-
-.md-typeset .admonition.seealso>.admonition-title::before {
-  mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z"/></svg>');
-  background-color: hsl(301, 100%, 63%);
-}
-
-.md-typeset .admonition.seealso {
-  border-left: .2rem solid hsl(301, 100%, 63%);
-}
-
-.md-typeset .admonition.seealso>.admonition-title {
-  background-color: hsla(287, 100%, 63%, 0.25);
-  border-left-color: hsl(301, 100%, 63%);
-}
-
-.md-typeset .admonition.important>.admonition-title::before {
-  mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></svg>');
-  background-color: hsl(123, 100%, 63%);
-}
-
-.md-typeset .admonition.important {
-  border-left: .2rem solid hsl(123, 100%, 63%);
-}
-
-.md-typeset .admonition.important>.admonition-title {
-  background-color: hsla(123, 100%, 63%, 0.25);
-}
-
-.md-typeset .admonition.warning>.admonition-title::before {
-  background-color: hsl(0, 100%, 63%);
-}
-
-.md-typeset .admonition.warning {
-  border-left: .2rem solid hsl(0, 100%, 63%);
-}
-
-.md-typeset .admonition.warning>.admonition-title {
-  background-color: hsla(0, 100%, 63%, 0.25);
-  border-left-color: hsl(0, 100%, 63%);
-}
-
 html .md-nav--primary .md-nav__title--site .md-nav__button {
   top: 0;
   left: 0;
@@ -56,8 +6,8 @@ html .md-nav--primary .md-nav__title--site .md-nav__button {
 }
 
 thead {
-	background-color: var(--md-default-fg-color--light);
-	color: var(--md-primary-bg-color);
+  background-color: var(--md-default-fg-color--light);
+  color: var(--md-primary-bg-color);
 }
 
 .md-nav__title .md-nav__button.md-logo img, .md-nav__title .md-nav__button.md-logo svg {
@@ -67,21 +17,4 @@ thead {
 
 .md-header__button.md-logo img, .md-header__button.md-logo svg {
   width: auto;
-}
-
-/* CSS for Remark admonitions (translated by breathe from doxygen's @remark(s) cmd */
-:root {
-  --md-admonition-icon--remark: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>')
-}
-.md-typeset .admonition.remark {
-  border-color: rgb(116, 66, 255);
-}
-.md-typeset .remark > .admonition-title {
-  background-color: rgba(116, 66, 255, 0.1);
-  border-color: rgb(116, 66, 255);
-}
-.md-typeset .remark > .admonition-title::before {
-  background-color: rgb(116, 66, 255);
-  -webkit-mask-image: var(--md-admonition-icon--remark);
-        mask-image: var(--md-admonition-icon--remark);
 }

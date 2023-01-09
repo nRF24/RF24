@@ -1,5 +1,7 @@
 # Common Issues
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 -->
 
 ## Settings that must match

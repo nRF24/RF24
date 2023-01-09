@@ -1,5 +1,7 @@
 # Raspberry Pi Pico SDK (for the RP2040)
 
+@tableofcontents
+
 <!-- markdownlint-disable MD031 MD046 -->
 Just to be very clear and concise: The following instructions are
 **not required to use the Arduino IDE** with any RP2040-based boards.
