@@ -1,7 +1,5 @@
 #include "spi.h"
 
-spi_inst_t* SPI::_hw_id;
-
 SPI::SPI()
 {
 }

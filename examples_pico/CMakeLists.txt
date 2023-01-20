@@ -22,6 +22,7 @@ set(EXAMPLES_LIST
     multiceiverDemo
     interruptConfigure
     scanner
+    multipleRadios
 )
 
 foreach(example ${EXAMPLES_LIST})
