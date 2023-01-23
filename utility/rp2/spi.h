@@ -33,7 +33,7 @@ public:
      * @see begin(spi_inst_t, uint8_t, uint8_t, uint8_t) for using other pins as
      * your SPI bus.
      */
-    static void begin(spi_inst_t* hw_id);
+    void begin(spi_inst_t* hw_id);
 
     /**
      * Start SPI
@@ -47,24 +47,24 @@ public:
      * @see The [Pico SDK has a chart of applicable pins](https://datasheets.raspberrypi.org/pico/raspberry-pi-pico-c-sdk.pdf#%5B%7B%22num%22%3A106%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C377.118%2Cnull%5D)
      * that can be used for hardware driven SPI transactions.
      */
-    static void begin(spi_inst_t* hw_id, uint8_t _sck, uint8_t _tx, uint8_t _rx);
+    void begin(spi_inst_t* hw_id, uint8_t _sck, uint8_t _tx, uint8_t _rx);
 
-    static uint8_t transfer(uint8_t tx_);
+    uint8_t transfer(uint8_t tx_);
 
-    static void transfernb(const uint8_t* tbuf, uint8_t* rbuf, uint32_t len);
+    void transfernb(const uint8_t* tbuf, uint8_t* rbuf, uint32_t len);
 
-    static void transfern(const uint8_t* buf, uint32_t len);
+    void transfern(const uint8_t* buf, uint32_t len);
 
-    static void beginTransaction(uint32_t _spi_speed);
+    void beginTransaction(uint32_t _spi_speed);
 
     /** deinit the SPI bus (using hw_id passed to begin()) */
-    static void endTransaction();
+    void endTransaction();
 
     virtual ~SPI();
 
 private:
     /** the ID of the hardware driven SPI bus */
-    static spi_inst_t* _hw_id;
+    spi_inst_t* _hw_id;
 };
 
 #endif // RF24_UTILITY_RP2_SPI_H_
