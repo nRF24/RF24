@@ -16,7 +16,7 @@ void SPI::begin(int busNo, uint32_t spi_speed)
     }
     spiIsInitialized = true;
     gpioInitialise();
-    spiHandle = spiOpen(busNo, spi_speed, 0);
+    spiHandle = spiOpen((unsigned int)(busNo & 2), spi_speed, (unsigned int)((busNo / 10) << 7));
 }
 
 void SPI::init(uint32_t speed)
