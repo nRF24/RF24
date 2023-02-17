@@ -80,6 +80,16 @@
 #else //Everything else
     #include <Arduino.h>
 
+    #ifdef NUM_DIGITAL_PINS
+        #if NUM_DIGITAL_PINS < 256
+typedef uint8_t rf24_gpio_pin_t;
+        #else
+typedef uint16_t rf24_gpio_pin_t;
+        #endif
+    #else
+typedef uint16_t rf24_gpio_pin_t;
+    #endif
+
     #if defined(ARDUINO) && !defined(__arm__) && !defined(__ARDUINO_X86__)
         #if defined SPI_UART
             #include <SPI_UART.h>

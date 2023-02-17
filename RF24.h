@@ -131,8 +131,8 @@ private:
     GPIO gpio;
 #endif
 
-    uint16_t ce_pin;    /* "Chip Enable" pin, activates the RX or TX role */
-    uint16_t csn_pin;   /* SPI Chip select */
+    rf24_gpio_pin_t ce_pin;    /* "Chip Enable" pin, activates the RX or TX role */
+    rf24_gpio_pin_t csn_pin;   /* SPI Chip select */
     uint32_t spi_speed; /* SPI Bus Speed */
 #if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2)
     uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
@@ -208,7 +208,7 @@ public:
      *     - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
      *     - For Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed as of v1.3.7
      */
-    RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed = RF24_SPI_SPEED);
+    RF24(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, uint32_t _spi_speed = RF24_SPI_SPEED);
 
     /**
      * A constructor for initializing the radio's hardware dynamically
@@ -281,7 +281,7 @@ public:
      *
      * @return same result as begin()
      */
-    bool begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin);
+    bool begin(_SPI* spiBus, rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin);
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
 
     /**
@@ -293,7 +293,7 @@ public:
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
      * @return same result as begin()
      */
-    bool begin(uint16_t _cepin, uint16_t _cspin);
+    bool begin(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin);
 
     /**
      * Checks if the chip is connected to the SPI bus
