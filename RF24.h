@@ -201,7 +201,8 @@ public:
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
      * - For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
-     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for
+     * the radio's CSN pin.
      * @param _spi_speed The SPI speed in Hz ie: 1000000 == 1Mhz
      * - Users can specify default SPI speed by modifying @ref RF24_SPI_SPEED in @ref RF24_config.h
      *     - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
@@ -212,8 +213,8 @@ public:
 
     /**
      * A constructor for initializing the radio's hardware dynamically
-     * @warning You MUST use begin(uint16_t, uint16_t) or begin(_SPI*, uint16_t, uint16_t) to pass both the digital output pin
-     * numbers connected to the radio's CE and CSN pins.
+     * @warning You MUST use begin(rf24_gpio_pin_t, rf24_gpio_pin_t) or begin(_SPI*, rf24_gpio_pin_t, rf24_gpio_pin_t) to pass both the
+     * digital output pin numbers connected to the radio's CE and CSN pins.
      * @param _spi_speed The SPI speed in Hz ie: 1000000 == 1Mhz
      * - Users can specify default SPI speed by modifying @ref RF24_SPI_SPEED in @ref RF24_config.h
      *     - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
