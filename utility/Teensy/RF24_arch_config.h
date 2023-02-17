@@ -18,7 +18,7 @@
 
 #define _SPI SPIClass
 #define RF24_SPI_PTR
-typedef uint8_t rf24_gpio_pin_t
+typedef uint8_t rf24_gpio_pin_t;
 
 #define printf Serial.printf
 

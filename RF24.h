@@ -121,7 +121,7 @@ private:
     SPIUARTClass uspi;
 #endif
 
-#if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2) /* XMEGA can use SPI class */
+#if defined(RF24_LINUX) || defined(XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
 #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
 #if defined(RF24_SPI_PTR)
@@ -131,9 +131,9 @@ private:
     GPIO gpio;
 #endif
 
-    rf24_gpio_pin_t ce_pin;    /* "Chip Enable" pin, activates the RX or TX role */
-    rf24_gpio_pin_t csn_pin;   /* SPI Chip select */
-    uint32_t spi_speed; /* SPI Bus Speed */
+    rf24_gpio_pin_t ce_pin;  /* "Chip Enable" pin, activates the RX or TX role */
+    rf24_gpio_pin_t csn_pin; /* SPI Chip select */
+    uint32_t spi_speed;      /* SPI Bus Speed */
 #if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2)
     uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32 + 1]; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
