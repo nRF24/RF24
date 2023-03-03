@@ -22,6 +22,8 @@ extern LittleWireSPI _SPI;
 
 //typedef uint16_t prog_uint16_t;
 typedef uint8_t rf24_gpio_pin_t;
+#define RF24_PIN_INVALID 0xFF
+
 #define PSTR(x)  (x)
 #define printf_P printf
 #define strlen_P strlen

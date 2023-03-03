@@ -83,11 +83,14 @@
     #ifdef NUM_DIGITAL_PINS
         #if NUM_DIGITAL_PINS < 256
 typedef uint8_t rf24_gpio_pin_t;
+            #define RF24_PIN_INVALID 0xFF
         #else
 typedef uint16_t rf24_gpio_pin_t;
+            #define RF24_PIN_INVALID 0xFFFF
         #endif
     #else
 typedef uint16_t rf24_gpio_pin_t;
+        #define RF24_PIN_INVALID 0xFFFF
     #endif
 
     #if defined(ARDUINO) && !defined(__arm__) && !defined(__ARDUINO_X86__)
