@@ -999,6 +999,7 @@ bool RF24::begin(void)
     _spi->begin(csn_pin);
 
 #elif defined(RF24_RP2)
+    _spi = new SPI();
     _spi->begin(PICO_DEFAULT_SPI ? spi1 : spi0);
 
 #else // using an Arduino platform || defined (LITTLEWIRE)

@@ -28,8 +28,6 @@
 #define _SPI   SPI
 #define RF24_SPI_PTR
 
-static SPI spi;
-
 #ifdef SERIAL_DEBUG
     #define IF_SERIAL_DEBUG(x) ({ x; })
 #else
