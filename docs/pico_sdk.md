@@ -144,6 +144,7 @@ This option is the most reliable and flexible. It involves calling `SPI.begin()`
 #include <RF24.h>
 
 RF24 radio(7, 8); // pin numbers connected to the radio's CE and CSN pins (respectively)
+SPI spi;
 
 int main()
 {
