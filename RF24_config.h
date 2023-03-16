@@ -81,7 +81,7 @@
     #include <Arduino.h>
 
     #ifdef NUM_DIGITAL_PINS
-        #if NUM_DIGITAL_PINS < 256
+        #if NUM_DIGITAL_PINS < 255
 typedef uint8_t rf24_gpio_pin_t;
             #define RF24_PIN_INVALID 0xFF
         #else
