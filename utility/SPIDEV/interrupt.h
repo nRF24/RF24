@@ -5,18 +5,12 @@ Interrupt functions
 #define __RF24_INTERRUPT_H__
 
 #include "RF24_arch_config.h"
-#ifdef ORANGEPI
-#include <wiringPi.h>
-#else
 #include <pigpio.h>
-#endif
 
-#ifndef ORANGEPI
 #define INT_EDGE_SETUP   0
 #define INT_EDGE_FALLING FALLING_EDGE
 #define INT_EDGE_RISING  RISING_EDGE
 #define INT_EDGE_BOTH    EITHER_EDGE
-#endif
 
 #ifdef __cplusplus
 extern "C" {

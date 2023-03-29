@@ -4,7 +4,6 @@ CROSS_CC=arm-linux-gnueabihf-gcc
 CROSS_CXX=arm-linux-gnueabihf-g++
 
 pigpio_detected=0
-wiringPi_detected=0
 
 function help {
 cat <<EOF
@@ -62,11 +61,6 @@ function execute_check {
 if [[ -f "/usr/lib/libpigpio.so" || -f "/usr/local/lib/libpigpio.so" || -f "/usr/arm-linux-gnueabihf/lib/libpigpio.so" ]]; then
     echo "[INFO] pigpio lib found."
     pigpio_detected=1
-fi
-
-if [[ -f "/usr/lib/libwiringPi.so" || -f "/usr/local/lib/libwiringPi.so" || -f "/usr/arm-linux-gnueabihf/lib/libwiringPi.so" ]]; then
-    echo "[INFO] wiringPi lib found."
-    wiringPi_detected=1
 fi
 
 function die {
@@ -420,9 +414,6 @@ SPIDEV)
     if [ $pigpio_detected -eq 1 ]; then
         echo "[INFO] linking to pigpio for interrupt compatibility"
         SHARED_LINKER_LIBS+=" -lpigpio"
-    elif [ $wiringPi_detected -eq 1 ]; then
-        echo "[INFO] linking to wiringPi for interrupt compatibility"
-        SHARED_LINKER_LIBS+=" -lwiringPi"
     else
         CFLAGS+=" -DRF24_NO_INTERRUPT"
     fi

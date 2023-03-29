@@ -18,7 +18,7 @@ LIBS=-l$(LIB)
 ifeq ($(DRIVER), LittleWire)
 	LIBS+= -llittlewire-spi
 endif
-LIBS+=-lwiringPi
+
 all: $(PROGRAMS)
 
 $(PROGRAMS): $(SOURCES)
