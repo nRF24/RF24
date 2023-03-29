@@ -18,7 +18,8 @@ endif
 include ../Makefile.inc
 
 # define all programs
-PROGRAMS = gettingstarted acknowledgementPayloads manualAcknowledgements streamingData multiceiverDemo scanner
+PROGRAMS = gettingstarted
+#PROGRAMS = gettingstarted acknowledgementPayloads manualAcknowledgements streamingData multiceiverDemo scanner
 ifneq (,$(findstring -lpigpio,$(SHARED_LINKER_LIBS)))
 PROGRAMS+=interruptConfigure
 endif

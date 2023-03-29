@@ -9,7 +9,9 @@
 #include "nRF24L01.h"
 #include "RF24_config.h"
 #include "RF24.h"
-
+#ifdef ORANGEPI
+#include <wiringPi.h>
+#endif
 /****************************************************************************/
 
 void RF24::csn(bool mode)
@@ -1034,6 +1036,10 @@ bool RF24::_init_pins()
     GPIO();
     gpio.begin(ce_pin, csn_pin);
     #endif
+
+#ifdef ORANGEPI
+    wiringPiSetup();
+#endif
 
     pinMode(ce_pin, OUTPUT);
     ce(LOW);

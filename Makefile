@@ -26,8 +26,12 @@ ifneq (,$(findstring -lpigpio,$(SHARED_LINKER_LIBS)))
 OBJECTS+=interrupt.o
 endif
 else ifeq ($(DRIVER), SPIDEV)
-OBJECTS+=spi.o gpio.o compatibility.o
+#OBJECTS+=spi.o gpio.o compatibility.o
+OBJECTS+=spi.o compatibility.o
 ifneq (,$(findstring -lpigpio,$(SHARED_LINKER_LIBS)))
+OBJECTS+=interrupt.o
+endif
+ifneq (,$(findstring -lwiringPi,$(SHARED_LINKER_LIBS)))
 OBJECTS+=interrupt.o
 endif
 else ifeq ($(DRIVER), wiringPi)

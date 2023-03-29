@@ -10,10 +10,15 @@
 #define RF24_UTILITY_SPIDEV_RF24_ARCH_CONFIG_H_
 
 #define RF24_LINUX
+#define ORANGEPI
 
 #include <stddef.h>
 #include "spi.h"
+#ifdef ORANGEPI
+#include <wiringPi.h>
+#else
 #include "gpio.h"
+#endif
 #include "compatibility.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -54,14 +59,16 @@ typedef uint16_t prog_uint16_t;
 #define pgm_read_ptr(p)  (*(void* const*)(p))
 
 // Function, constant map as a result of migrating from Arduino
+#ifndef ORANGEPI
 #define LOW                      GPIO::OUTPUT_LOW
 #define HIGH                     GPIO::OUTPUT_HIGH
 #define INPUT                    GPIO::DIRECTION_IN
 #define OUTPUT                   GPIO::DIRECTION_OUT
 #define digitalWrite(pin, value) GPIO::write(pin, value)
 #define pinMode(pin, direction)  GPIO::open(pin, direction)
-#define delay(milisec)           __msleep(milisec)
 #define delayMicroseconds(usec)  __usleep(usec)
-#define millis()                 __millis()
+#define delay(milisec)           __msleep(milisec)
+#define millis(void)             __millis()
+#endif
 
 #endif // RF24_UTILITY_SPIDEV_RF24_ARCH_CONFIG_H_
