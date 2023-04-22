@@ -121,7 +121,7 @@ private:
     SPIUARTClass uspi;
 #endif
 
-#if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2) /* XMEGA can use SPI class */
+#if defined(RF24_LINUX) || defined(XMEGA_D3) /* XMEGA can use SPI class */
     SPI spi;
 #endif // defined (RF24_LINUX) || defined (XMEGA_D3)
 #if defined(RF24_SPI_PTR)
@@ -131,9 +131,9 @@ private:
     GPIO gpio;
 #endif
 
-    uint16_t ce_pin;    /* "Chip Enable" pin, activates the RX or TX role */
-    uint16_t csn_pin;   /* SPI Chip select */
-    uint32_t spi_speed; /* SPI Bus Speed */
+    rf24_gpio_pin_t ce_pin;  /* "Chip Enable" pin, activates the RX or TX role */
+    rf24_gpio_pin_t csn_pin; /* SPI Chip select */
+    uint32_t spi_speed;      /* SPI Bus Speed */
 #if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2)
     uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32 + 1]; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
@@ -201,19 +201,20 @@ public:
      * @param _cepin The pin attached to Chip Enable on the RF module
      * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
      * - For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
-     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
+     * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for
+     * the radio's CSN pin.
      * @param _spi_speed The SPI speed in Hz ie: 1000000 == 1Mhz
      * - Users can specify default SPI speed by modifying @ref RF24_SPI_SPEED in @ref RF24_config.h
      *     - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
      *     - Older/Unsupported Arduino devices will use a default clock divider & settings configuration
      *     - For Linux: The old way of setting SPI speeds using BCM2835 driver enums has been removed as of v1.3.7
      */
-    RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed = RF24_SPI_SPEED);
+    RF24(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, uint32_t _spi_speed = RF24_SPI_SPEED);
 
     /**
      * A constructor for initializing the radio's hardware dynamically
-     * @warning You MUST use begin(uint16_t, uint16_t) or begin(_SPI*, uint16_t, uint16_t) to pass both the digital output pin
-     * numbers connected to the radio's CE and CSN pins.
+     * @warning You MUST use begin(rf24_gpio_pin_t, rf24_gpio_pin_t) or begin(_SPI*, rf24_gpio_pin_t, rf24_gpio_pin_t) to pass both the
+     * digital output pin numbers connected to the radio's CE and CSN pins.
      * @param _spi_speed The SPI speed in Hz ie: 1000000 == 1Mhz
      * - Users can specify default SPI speed by modifying @ref RF24_SPI_SPEED in @ref RF24_config.h
      *     - For Arduino, the default SPI speed will only be properly configured this way on devices supporting SPI TRANSACTIONS
@@ -281,7 +282,7 @@ public:
      *
      * @return same result as begin()
      */
-    bool begin(_SPI* spiBus, uint16_t _cepin, uint16_t _cspin);
+    bool begin(_SPI* spiBus, rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin);
 #endif // defined (RF24_SPI_PTR) || defined (DOXYGEN_FORCED)
 
     /**
@@ -293,7 +294,7 @@ public:
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
      * @return same result as begin()
      */
-    bool begin(uint16_t _cepin, uint16_t _cspin);
+    bool begin(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin);
 
     /**
      * Checks if the chip is connected to the SPI bus

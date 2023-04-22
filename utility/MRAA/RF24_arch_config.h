@@ -29,6 +29,9 @@
 
 #define RF24_LINUX
 //typedef uint16_t prog_uint16_t;
+typedef uint16_t rf24_gpio_pin_t;
+#define RF24_PIN_INVALID 0xFFFF
+
 #define PSTR(x)   (x)
 #define printf_P  printf
 #define sprintf_P sprintf

@@ -17,8 +17,10 @@
 #include <SPI.h>
 #include "RF24.h"
 
+#define CE_PIN 7
+#define CSN_PIN 8
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(7, 8);  // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(CE_PIN, CSN_PIN);
 
 /*
   For this example, we'll be using a data buffer containing

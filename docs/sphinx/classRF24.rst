@@ -3,7 +3,7 @@ RF24 class
 
 .. cpp:class:: RF24
 
-    .. doxygenfunction:: RF24 (uint16_t,uint16_t,uint32_t)
+    .. doxygenfunction:: RF24 (rf24_gpio_pin_t, rf24_gpio_pin_t, uint32_t)
     .. doxygenfunction:: begin (void)
     .. doxygenfunction:: begin (_SPI *spiBus)
 
@@ -11,8 +11,8 @@ Dynamically Instantiated Pins
 =============================
 
 .. doxygenfunction:: RF24::RF24 (uint32_t _spi_speed=RF24_SPI_SPEED)
-.. doxygenfunction:: RF24::begin (uint16_t _cepin, uint16_t _cspin)
-.. doxygenfunction:: RF24::begin (_SPI *spiBus, uint16_t _cepin, uint16_t _cspin)
+.. doxygenfunction:: RF24::begin (rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin)
+.. doxygenfunction:: RF24::begin (_SPI *spiBus, rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin)
 
 Basic API
 ============

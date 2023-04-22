@@ -25,6 +25,8 @@
 #include <SPI.h>
 
 #define _SPI SPI
+typedef uint8_t rf24_gpio_pin_t;
+#define RF24_PIN_INVALID 0xFF
 
 #if !defined(RF24_CSN_SETTLE_LOW_DELAY)
     #define RF24_CSN_SETTLE_LOW_DELAY 11

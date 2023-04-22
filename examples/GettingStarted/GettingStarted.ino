@@ -14,8 +14,10 @@
 #include "printf.h"
 #include "RF24.h"
 
+#define CE_PIN 7
+#define CSN_PIN 8
 // instantiate an object for the nRF24L01 transceiver
-RF24 radio(7, 8);  // using pin 7 for the CE pin, and pin 8 for the CSN pin
+RF24 radio(CE_PIN, CSN_PIN);
 
 // Let these addresses be used for the pair
 uint8_t address[][6] = { "1Node", "2Node" };
