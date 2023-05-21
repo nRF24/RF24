@@ -1521,7 +1521,8 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
 bool RF24::available(void)
 {
-    return available(NULL);
+    uint8_t pipe = 0;
+    return available(&pipe);
 }
 
 /****************************************************************************/
