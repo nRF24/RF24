@@ -23,6 +23,8 @@ jobs:
   validate_lib_json:
     uses: nRF24/.github/.github/workflows/validate_deploy_platformio.yaml@main
     secrets: inherit
+    with:
+      deploy-release: ${{ github.event_name == 'release' }}
 
   check_formatting:
     uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
