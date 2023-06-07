@@ -28,7 +28,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.6</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.7</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -144,34 +144,36 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga05ca2f20b55933ad782917161d54287d">   54</a></span><span class="keyword">typedef</span> uint16_t <a class="code hl_typedef" href="group__Porting__General.html#ga05ca2f20b55933ad782917161d54287d">prog_uint16_t</a>;</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga9c00057fd19e916cc1aa0a5949336beb">   55</a></span><span class="preprocessor">#define PSTR(x)  (x)</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga758ad569cbda7c5ddfaa902e8eed3360">   56</a></span><span class="preprocessor">#define printf_P printf</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga05dde754db9944c90362c1f861d358ba">   57</a></span><span class="preprocessor">#define strlen_P strlen</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga75acaba9e781937468d0911423bc0c35">   58</a></span><span class="preprocessor">#define PROGMEM</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gaa59a94d7ea755db0d7811b543253ebc4">   59</a></span><span class="preprocessor">#define pgm_read_word(p) (*(const unsigned short*)(p))</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga7642e6d60f41fc769b32962c8c513668">   60</a></span><span class="preprocessor">#define PRIPSTR          &quot;%s&quot;</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gae6778ca2c38951f24bd39f9c38cab9b2">   61</a></span><span class="preprocessor">#define pgm_read_byte(p) (*(const unsigned char*)(p))</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment">// Function, constant map as a result of migrating from Arduino</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gab811d8c6ff3a505312d3276590444289">   64</a></span><span class="preprocessor">#define LOW                      GPIO::OUTPUT_LOW</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga5bb885982ff66a2e0a0a45a8ee9c35e2">   65</a></span><span class="preprocessor">#define HIGH                     GPIO::OUTPUT_HIGH</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga1bb283bd7893b9855e2f23013891fc82">   66</a></span><span class="preprocessor">#define INPUT                    GPIO::DIRECTION_IN</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557">   67</a></span><span class="preprocessor">#define OUTPUT                   GPIO::DIRECTION_OUT</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gabda89b115581947337690b2f85bfab6e">   68</a></span><span class="preprocessor">#define digitalWrite(pin, value) GPIO::write(pin, value)</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga361649efb4f1e2fa3c870ca203497d5e">   69</a></span><span class="preprocessor">#define pinMode(pin, direction)  GPIO::open(pin, direction)</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">   70</a></span><span class="preprocessor">#define delay(milisec)           __msleep(milisec)</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga9384257bf5d5c1aae675b22cc3ecb91a">   71</a></span><span class="preprocessor">#define delayMicroseconds(usec)  __usleep(usec)</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">   72</a></span><span class="preprocessor">#define millis()                 __millis()</span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#endif </span><span class="comment">// RF24_UTILITY_TEMPLATE_RF24_ARCH_CONFIG_H_</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga14d9f7d6fba6240418c98f6067966329">   55</a></span><span class="keyword">typedef</span> uint16_t <a class="code hl_typedef" href="group__Porting__General.html#ga14d9f7d6fba6240418c98f6067966329">rf24_gpio_pin_t</a>;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga9c00057fd19e916cc1aa0a5949336beb">   56</a></span><span class="preprocessor">#define PSTR(x)  (x)</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga758ad569cbda7c5ddfaa902e8eed3360">   57</a></span><span class="preprocessor">#define printf_P printf</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga05dde754db9944c90362c1f861d358ba">   58</a></span><span class="preprocessor">#define strlen_P strlen</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga75acaba9e781937468d0911423bc0c35">   59</a></span><span class="preprocessor">#define PROGMEM</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gaa59a94d7ea755db0d7811b543253ebc4">   60</a></span><span class="preprocessor">#define pgm_read_word(p) (*(const unsigned short*)(p))</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga7642e6d60f41fc769b32962c8c513668">   61</a></span><span class="preprocessor">#define PRIPSTR          &quot;%s&quot;</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gae6778ca2c38951f24bd39f9c38cab9b2">   62</a></span><span class="preprocessor">#define pgm_read_byte(p) (*(const unsigned char*)(p))</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment">// Function, constant map as a result of migrating from Arduino</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gab811d8c6ff3a505312d3276590444289">   65</a></span><span class="preprocessor">#define LOW                      GPIO::OUTPUT_LOW</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga5bb885982ff66a2e0a0a45a8ee9c35e2">   66</a></span><span class="preprocessor">#define HIGH                     GPIO::OUTPUT_HIGH</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga1bb283bd7893b9855e2f23013891fc82">   67</a></span><span class="preprocessor">#define INPUT                    GPIO::DIRECTION_IN</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557">   68</a></span><span class="preprocessor">#define OUTPUT                   GPIO::DIRECTION_OUT</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gabda89b115581947337690b2f85bfab6e">   69</a></span><span class="preprocessor">#define digitalWrite(pin, value) GPIO::write(pin, value)</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga361649efb4f1e2fa3c870ca203497d5e">   70</a></span><span class="preprocessor">#define pinMode(pin, direction)  GPIO::open(pin, direction)</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">   71</a></span><span class="preprocessor">#define delay(milisec)           __msleep(milisec)</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="group__Porting__General.html#ga9384257bf5d5c1aae675b22cc3ecb91a">   72</a></span><span class="preprocessor">#define delayMicroseconds(usec)  __usleep(usec)</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">   73</a></span><span class="preprocessor">#define millis()                 __millis()</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#endif </span><span class="comment">// RF24_UTILITY_TEMPLATE_RF24_ARCH_CONFIG_H_</span></div>
 <div class="ttc" id="acompatibility_8h_html"><div class="ttname"><a href="compatibility_8h.html">compatibility.h</a></div></div>
 <div class="ttc" id="agpio_8h_html"><div class="ttname"><a href="gpio_8h.html">gpio.h</a></div></div>
 <div class="ttc" id="agroup__Porting__General_html_ga05ca2f20b55933ad782917161d54287d"><div class="ttname"><a href="group__Porting__General.html#ga05ca2f20b55933ad782917161d54287d">prog_uint16_t</a></div><div class="ttdeci">uint16_t prog_uint16_t</div><div class="ttdef"><b>Definition:</b> <a href="RF24__arch__config_8h_source.html#l00054">RF24_arch_config.h:54</a></div></div>
+<div class="ttc" id="agroup__Porting__General_html_ga14d9f7d6fba6240418c98f6067966329"><div class="ttname"><a href="group__Porting__General.html#ga14d9f7d6fba6240418c98f6067966329">rf24_gpio_pin_t</a></div><div class="ttdeci">uint16_t rf24_gpio_pin_t</div><div class="ttdef"><b>Definition:</b> <a href="RF24__arch__config_8h_source.html#l00055">RF24_arch_config.h:55</a></div></div>
 <div class="ttc" id="aspi_8h_html"><div class="ttname"><a href="spi_8h.html">spi.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 9 2023 11:05:51 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Tue Jun 6 2023 23:42:16 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>

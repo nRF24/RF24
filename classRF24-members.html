@@ -28,7 +28,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.6</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.7</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -108,8 +108,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
   <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#ace7dd139fabc16b77cb8325faa07620f">available</a>(uint8_t *pipe_num)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#a048a20c73c7d9b2e02dcbae6fb9c4ba8">begin</a>(void)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">begin</a>(_SPI *spiBus)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classRF24.html#ae9277681d834410ee6b38f1dda7de36e">begin</a>(_SPI *spiBus, uint16_t _cepin, uint16_t _cspin)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#a59573f754a51dfe32f195435d27622a8">begin</a>(uint16_t _cepin, uint16_t _cspin)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classRF24.html#a2dc258bc522fdb8473d38e3ba7584bef">begin</a>(_SPI *spiBus, rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#af3aa4ab081c2ca2046d320d513f42660">begin</a>(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#a5a669f1c68203d5317f8f452a2bff1b5">beginTransaction</a>()</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">protected</span></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#a9944d93994a80037e3586f340f5e0107">closeReadingPipe</a>(uint8_t pipe)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#ad08121bf844f08dbe53f51576b7c4066">csDelay</a></td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
@@ -151,7 +151,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#a99958992f6b92af61c8132557cd847c0">read_register</a>(uint8_t reg, uint8_t *buf, uint8_t len)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#a9a77a59447ca017aa178eb831e52a9e8">read_register</a>(uint8_t reg)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#aeaf7fa54d3ab2a85ce215b4bf6ae933b">reUseTX</a>()</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#a123231bd955698373d221a84ad40055a">RF24</a>(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed=RF24_SPI_SPEED)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#a025fcbad6f062d18252485c1d6ba574f">RF24</a>(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, uint32_t _spi_speed=RF24_SPI_SPEED)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#aa08204a6c77e9d03bd1075cf0759fccd">RF24</a>(uint32_t _spi_speed=RF24_SPI_SPEED)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="classRF24.html#ad22e44fe1a68747872fcb304a407fd30">rxFifoFull</a>()</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classRF24.html#ad5aea7f9a3bd9c7d357fb296ce751f21">setAddressWidth</a>(uint8_t a_width)</td><td class="entry"><a class="el" href="classRF24.html">RF24</a></td><td class="entry"></td></tr>
@@ -187,7 +187,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 9 2023 11:05:51 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Tue Jun 6 2023 23:42:16 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>

@@ -28,7 +28,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.6</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.7</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -100,6 +100,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level2"><a href="#autotoc_md54">Build-time configuration option</a></li>
 </ul>
 </li>
+<li class="level1"><a href="#autotoc_md55">Using Multiple Radios</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Just to be very clear and concise: The following instructions are <b>not required to use the Arduino IDE</b> with any RP2040-based boards. These instructions pertain to using only <a href="https://github.com/raspberrypi/pico-sdk">Raspberry Pi's Pico SDK</a> for RP2040 based boards.</p>
@@ -171,6 +172,7 @@ Project Source code option</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="RF24_8h.html">RF24.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(7, 8); <span class="comment">// pin numbers connected to the radio&#39;s CE and CSN pins (respectively)</span></div>
+<div class="line">SPI spi;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> main()</div>
 <div class="line">{</div>
@@ -195,13 +197,61 @@ Build-time configuration option</h2>
 <div class="line">)</div>
 </div><!-- fragment --></li>
 <li>additional command line arguments <div class="fragment"><div class="line">cmake --build . --config Release -DPICO_DEFAULT_SPI=0 -DPICO_DEFAULT_SPI_SCK_PIN=2 -DPICO_DEFAULT_SPI_TX_PIN=3 -DPICO_DEFAULT_SPI_RX_PIN=4</div>
-</div><!-- fragment --> </li>
+</div><!-- fragment --></li>
 </ol>
-</div></div><!-- contents -->
+<h1><a class="anchor" id="autotoc_md55"></a>
+Using Multiple Radios</h1>
+<p>It is possible to drive multiple nRF24L01 transceivers on a single board. To do this each radio needs dedicated digital output pins for the CE and CSN pins.</p>
+<p>If you want to drive each radio with a separate SPI bus, then the following example will demonstrate how to do that.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="RF24_8h.html">RF24.h</a>&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Declare the pin numbers connected to the radios&#39; CE and CSN pins (respectively)</span></div>
+<div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio0(8, 5);   <span class="comment">// first radio object</span></div>
+<div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio1(14, 13); <span class="comment">// second radio object</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// By default, one SPI bus instance is created by the RF24 lib. We&#39;ll use this</span></div>
+<div class="line"><span class="comment">// default instance of the `spi0` interface for our first radio, but we want a</span></div>
+<div class="line"><span class="comment">// different SPI bus for the second radio.</span></div>
+<div class="line"><span class="comment">// </span></div>
+<div class="line"><span class="comment">// So, here we declare a second SPI bus instance:</span></div>
+<div class="line">SPI my_spi; <span class="comment">// we specify the `spi1` bus interface below</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">bool</span> setupRadios()</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">// Initialize the first radio using the default SPI instance</span></div>
+<div class="line">    <span class="keywordflow">if</span> (!radio0.begin()) {</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Radio0 hardware is not responding!\n&quot;</span>);</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">// first radio object initialized successfully</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// specify the the second SPI bus interface and corresponding GPIO pins</span></div>
+<div class="line">    my_spi.begin(spi1, 10, 11, 12); <span class="comment">// spi1 bus, SCK, TX, RX</span></div>
+<div class="line">    <span class="keywordflow">if</span> (!radio1.begin(&amp;my_spi)) {</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Radio1 hardware is not responding!\n&quot;</span>);</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="comment">// second radio object initialized successfully</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span> main()</div>
+<div class="line">{</div>
+<div class="line">    stdio_init_all(); <span class="comment">// init necessary IO for the RP2040</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">while</span> (!setupRadios()) { <span class="comment">// if either radioX.begin() failed</span></div>
+<div class="line">        sleep_ms(1000); <span class="comment">// add 1 second delay for console readability</span></div>
+<div class="line">        <span class="comment">// hold program in infinite attempts to initialize the radios</span></div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// continue with program as normal ...</span></div>
+<div class="line">}</div>
+</div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 9 2023 11:05:51 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Tue Jun 6 2023 23:42:16 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>
