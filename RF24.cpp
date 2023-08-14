@@ -1529,15 +1529,15 @@ bool RF24::available(void)
 
 bool RF24::available(uint8_t* pipe_num)
 {
-    if (!isFifo(false, true)) { // if RX FIFO is not empty
-        // If the caller wants the pipe number, include that
-        if (*pipe_num != RF24_NO_FETCH_PIPE)
-            *pipe_num = (get_status() >> RX_P_NO) & 0x07;
-
-        return 1;
+    if (read_register(FIFO_STATUS) & 1) { // if RX FIFO is empty
+        return 0;
     }
 
-    return 0;
+    // If the caller wants the pipe number, include that
+    if (*pipe_num != RF24_NO_FETCH_PIPE)
+        *pipe_num = (get_status() >> RX_P_NO) & 0x07;
+
+    return 1;
 }
 
 /****************************************************************************/
