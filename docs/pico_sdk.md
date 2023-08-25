@@ -180,6 +180,10 @@ To specify the default SPI pins used at build time, you can use either:
 
 It is possible to drive multiple nRF24L01 transceivers on a single board. To do this each radio needs dedicated digital output pins for the CE and CSN pins.
 
+@warning The RPi Pico board's 3v regulator is typically insufficient to power more than 1 radio.
+It is also worth mentioning that the RPi Pico board uses a switching regulator which inherently
+produces electrical noise (a not steady 3v signal otherwise referred to as "power instability").
+
 If you want to drive each radio with a separate SPI bus, then the following example will demonstrate how to do that.
 
 ```cpp
