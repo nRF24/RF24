@@ -1521,7 +1521,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
 bool RF24::available(void)
 {
-    uint8_t pipe = 0;
+    uint8_t pipe = RF24_NO_FETCH_PIPE;
     return available(&pipe);
 }
 
@@ -1529,14 +1529,13 @@ bool RF24::available(void)
 
 bool RF24::available(uint8_t* pipe_num)
 {
-    // get implied RX FIFO empty flag from status byte
-    uint8_t pipe = (get_status() >> RX_P_NO) & 0x07;
-    if (pipe > 5)
+    if (read_register(FIFO_STATUS) & 1) { // if RX FIFO is empty
         return 0;
+    }
 
     // If the caller wants the pipe number, include that
-    if (pipe_num)
-        *pipe_num = pipe;
+    if (*pipe_num != RF24_NO_FETCH_PIPE)
+        *pipe_num = (get_status() >> RX_P_NO) & 0x07;
 
     return 1;
 }
