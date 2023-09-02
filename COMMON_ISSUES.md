@@ -4,6 +4,43 @@
 
 <!-- markdownlint-disable MD031 -->
 
+## Simple Troubleshooting
+
+When troubleshooting, users can start with the included gettingStarted
+sketch as it contains all the info needed to troubleshoot an RF24 radio.
+
+1. If `radio.begin()` returns false, the MCU and radio are not "talking"
+successfully with each other. Verify pin connections and wiring.
+2. If `radio.begin()` returns true, but the devices are not communicating,
+users can  uncomment the lines `printf_begin()` & `radio.printDetails()` and
+   view the settings. They should appear as the following:
+   
+   ```
+   SPI Speedz	    = 10 Mhz
+   STATUS		    = 0x0e RX_DR=0 TX_DS=0 MAX_RT=0 RX_P_NO=7 TX_FULL=0
+   RX_ADDR_P0-1	    = 0x65646f4e31 0x65646f4e32
+   RX_ADDR_P2-5	    = 0x33 0xce 0x3e 0xe3
+   TX_ADDR		    = 0x65646f4e31
+   RX_PW_P0-6	    = 0x04 0x04 0x04 0x04 0x04 0x04
+   EN_AA		    = 0x3f
+   EN_RXADDR	    = 0x02
+   RF_CH		    = 0x4c
+   RF_SETUP	        = 0x03
+   CONFIG		    = 0x0f
+   DYNPD/FEATURE	= 0x00 0x00
+   Data Rate	    = 1 MBPS
+   Model		    = nRF24L01+
+   CRC Length	    = 16 bits
+   PA Power	        = PA_LOW
+   ARC		        = 0
+   ```
+   If the settings do not appear as above, troubleshoot wiring, pin
+   connections, etc.
+   
+3. If both of the above check out, the problem is likely in software or 
+even hardware issues (bad radios etc.) See the following.
+   
+
 ## Settings that must match
 
 Before you report undesirable behavior, please make sure that the
