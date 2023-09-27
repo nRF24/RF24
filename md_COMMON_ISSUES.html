@@ -28,7 +28,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.7</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.8</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -93,18 +93,46 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md1">Settings that must match</a></li>
-<li class="level1"><a href="#autotoc_md2">Prohibited usage of write*() in Interrupt Service Routine callbacks</a></li>
-<li class="level1"><a href="#autotoc_md3">Here are the most common issues and their solutions</a><ul><li class="level2"><a href="#autotoc_md4">write() always returns true after setAutoAck(false)</a></li>
-<li class="level2"><a href="#autotoc_md5">write() returns false when the payload was received</a></li>
-<li class="level2"><a href="#autotoc_md6">Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)</a></li>
-<li class="level2"><a href="#autotoc_md7">My PA/LNA module fails to transmit</a></li>
-<li class="level2"><a href="#autotoc_md8">My PA/LNA module doesn&#39;t perform as well as I&#39;d hoped or the NRF radio works better on touching it</a></li>
+<ul><li class="level1"><a href="#autotoc_md1">Simple Troubleshooting</a></li>
+<li class="level1"><a href="#autotoc_md2">Settings that must match</a></li>
+<li class="level1"><a href="#autotoc_md3">Prohibited usage of write*() in Interrupt Service Routine callbacks</a></li>
+<li class="level1"><a href="#autotoc_md4">Here are the most common issues and their solutions</a><ul><li class="level2"><a href="#autotoc_md5">write() always returns true after setAutoAck(false)</a></li>
+<li class="level2"><a href="#autotoc_md6">write() returns false when the payload was received</a></li>
+<li class="level2"><a href="#autotoc_md7">Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)</a></li>
+<li class="level2"><a href="#autotoc_md8">My PA/LNA module fails to transmit</a></li>
+<li class="level2"><a href="#autotoc_md9">My PA/LNA module doesn&#39;t perform as well as I&#39;d hoped or the NRF radio works better on touching it</a></li>
 </ul>
 </li>
 </ul>
 </div>
 <div class="textblock"><h1><a class="anchor" id="autotoc_md1"></a>
+Simple Troubleshooting</h1>
+<p>When troubleshooting, users can start with the included gettingStarted sketch as it contains all the info needed to troubleshoot an <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> radio.</p>
+<ol type="1">
+<li>If <code>radio.begin()</code> returns false, the MCU and radio are not "talking" successfully with each other. Verify pin connections and wiring.</li>
+<li><p class="startli">If <code>radio.begin()</code> returns true, but the devices are not communicating, users can uncomment the lines <code><a class="el" href="printf_8h.html#afc0d9ca32710dff550ebe56ab6b39d23">printf_begin()</a></code> &amp; <code>radio.printDetails()</code> and view the settings. They should appear as the following:</p>
+<div class="fragment"><div class="line">SPI Speedz       = 10 Mhz</div>
+<div class="line">STATUS           = 0x0e RX_DR=0 TX_DS=0 MAX_RT=0 RX_P_NO=7 TX_FULL=0</div>
+<div class="line">RX_ADDR_P0-1     = 0x65646f4e31 0x65646f4e32</div>
+<div class="line">RX_ADDR_P2-5     = 0x33 0xce 0x3e 0xe3</div>
+<div class="line">TX_ADDR          = 0x65646f4e31</div>
+<div class="line">RX_PW_P0-6       = 0x04 0x04 0x04 0x04 0x04 0x04</div>
+<div class="line">EN_AA            = 0x3f</div>
+<div class="line">EN_RXADDR        = 0x02</div>
+<div class="line">RF_CH            = 0x4c</div>
+<div class="line">RF_SETUP         = 0x03</div>
+<div class="line">CONFIG           = 0x0f</div>
+<div class="line">DYNPD/FEATURE    = 0x00 0x00</div>
+<div class="line">Data Rate        = 1 MBPS</div>
+<div class="line">Model            = nRF24L01+</div>
+<div class="line">CRC Length       = 16 bits</div>
+<div class="line">PA Power         = PA_LOW</div>
+<div class="line">ARC              = 0</div>
+</div><!-- fragment --><p> If the settings do not appear as above, troubleshoot wiring, pin connections, etc.</p>
+</li>
+<li>If both of the above check out, the problem is likely in software or even hardware issues (bad radios etc.) See the following.</li>
+</ol>
+<h1><a class="anchor" id="autotoc_md2"></a>
 Settings that must match</h1>
 <p>Before you report undesirable behavior, please make sure that the following <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> configurations match on both receiving and transmitting nRF24L01 transceivers:</p>
 <ol type="1">
@@ -118,7 +146,7 @@ Settings that must match</h1>
 <li><code><a class="el" href="classRF24.html#a89f626fc4a58dd997153bcc0f8198b9e">RF24::setCRCLength()</a></code> or <code><a class="el" href="classRF24.html#a5eacd9ecfbc19864801d714c292cf8be">RF24::disableCRC()</a></code> (the auto-ack feature automatically enables CRC because it is required)</li>
 </ol>
 <p>Also, it helps to think of an address as a path (a commonly shared route) instead of an identifying device destination. This means that addresses have to match for a payload to travel from one transceiver to another. However, the pipe numbers assigned with the matching address do not have to match. You can think of pipes as parking spots for the packets, while all packets' payloads live in a TX or RX FIFO buffer. Remember that the TX FIFO buffers and the RX FIFO buffers both have a maximum occupancy of 3 payloads (regardless of the maximum 32-byte payload size).</p>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<h1><a class="anchor" id="autotoc_md3"></a>
 Prohibited usage of write*() in Interrupt Service Routine callbacks</h1>
 <p>Because the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library uses <code><a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a></code> to implement a timeout and <code><a class="el" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay()</a></code> for mandatory wait times, the following functions cannot be used within an ISR callback method:</p>
 <ul>
@@ -133,17 +161,17 @@ Prohibited usage of write*() in Interrupt Service Routine callbacks</h1>
 </ul>
 <dl class="section see"><dt>See also</dt><dd>The note in the documentation for <code><a class="el" href="classRF24.html#a127105eb7a3b351cfe777c1cec50627a">RF24::available()</a></code>.</dd></dl>
 <p>More info about why you can't call <code><a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a></code> (or <code><a class="el" href="group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f">delay()</a></code>) from an ISR callback function is available at <a href="https://www.google.com/url?sa=t&amp;source=web&amp;rct=j&amp;url=https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/&amp;ved=2ahUKEwjMhtSRl5jzAhVUsp4KHWIPCrIQFnoECAoQAQ&amp;usg=AOvVaw1X9H0058Nz7Hck91VIC3bD">the Arduino docs</a>.</p>
-<h1><a class="anchor" id="autotoc_md3"></a>
+<h1><a class="anchor" id="autotoc_md4"></a>
 Here are the most common issues and their solutions</h1>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 write() always returns true after setAutoAck(false)</h2>
 <p>Don't disabled the auto-ack feature. <a class="el" href="classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58">RF24::write()</a> has no reason to doubt that the payload was delivered if the auto-ack feature is disabled. We recommend you read the docs about <a class="el" href="classRF24.html#aec71746d59da978bcbb975167886a2cc">RF24::setAutoAck()</a> before disabling the auto-ack feature.</p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 write() returns false when the payload was received</h2>
 <p>If the settings match on both endpoint transceivers, then this can only mean that the receiving nRF24L01 failed to send an acknowledgement (ACK) packet back to the transmitting nRF24L01. Usually this is due to instability (electric noise) in the power lines (VCC and GND) going to the receiving nRF24L01.</p>
 <p>If you're not receiving ACK packets correctly/reliably on data rates lower than 2MBPS, try adding a big capacitor close to the module/chip. Example issues: <a href="https://github.com/nRF24/RF24/issues/264">#264</a> <a href="https://github.com/nRF24/RF24/issues/211">#211</a>.</p>
 <p>For reliability, please use Electrolytic or Tantalum capacitors. Ceramic capacitors may not be good enough (depending on the manufacturing source).</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)</h2>
 <p>This is likely due to the SPI speed being set up to 10MHz by default. We recommend:</p>
 <ol type="1">
@@ -153,7 +181,7 @@ Payloads received/sent are inaccurate or printDetails() outputs the unexpected v
 </div><!-- fragment --></li>
 </ol>
 <p>In the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library's beginnings, the default value was (prior to 2014) set to 4MHz.</p>
-<h2><a class="anchor" id="autotoc_md7"></a>
+<h2><a class="anchor" id="autotoc_md8"></a>
 My PA/LNA module fails to transmit</h2>
 <p>You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ separate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:</p>
 <ol type="1">
@@ -174,7 +202,7 @@ My PA/LNA module fails to transmit</h2>
 </ul>
 </li>
 </ol>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md9"></a>
 My PA/LNA module doesn't perform as well as I'd hoped or the NRF radio works better on touching it</h2>
 <p>As described above, the radio modules (notably the PA+LNA versions) are reliant on a stable power source. While these modules may work with a poor power supply, they often lose packets or fail to receive as many as a module with a better power source. Moreover, this can sometimes be seen in odd ways such as the radio module working better when touched. This again is likely a power stability issue because the radio module is missing a capacitor (a commonly neglected expense on behalf of the module's manufacturer).</p>
 <p>Add capacitor(s) close to the VCC and GND pins of the radio. Typically, 10uF is enough. Depending upon your circuit's layout, differences in capacitors' electrolytic properties can be seen, such that a low ESR (Equivalent Series Resistance) rated capacitor is desirable. </p>
@@ -182,7 +210,7 @@ My PA/LNA module doesn't perform as well as I'd hoped or the NRF radio works bet
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 6 2023 23:42:16 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Wed Sep 27 2023 06:03:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>
