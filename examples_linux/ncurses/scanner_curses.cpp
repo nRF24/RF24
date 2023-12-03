@@ -77,9 +77,10 @@ public:
         int offset_x = 5;
         move(y, x + offset_x);
         for (int i = offset_x; i < w - 3; ++i) {
-            int bar_color = i < (filled + offset_x) ? 5 : color;
+            bool bar_filled = i < (filled + offset_x);
+            int bar_color = bar_filled ? 5 : color;
             attron(COLOR_PAIR(bar_color));
-            addch(ACS_HLINE);
+            addch(bar_filled ? '=' : ACS_HLINE);
             attroff(COLOR_PAIR(bar_color));
         }
         attron(COLOR_PAIR(color));
