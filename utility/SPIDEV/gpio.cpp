@@ -9,15 +9,27 @@
  *
  *  Patched for filedescriptor catching and error control by L Diaz 2018
  */
-
+#include <linux/gpio.h>
 #include "gpio.h"
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <getopt.h>
 
-std::map<int, GPIOfdCache_t> GPIO::cache;
+const char* dev_name = "/dev/gpiochip0";
+
+#define NEWGPIO
+
+
+//std::map<int, GPIOfdCache_t> GPIO::cache;
+
+
 
 GPIO::GPIO()
 {
@@ -27,8 +39,20 @@ GPIO::~GPIO()
 {
 }
 
-void GPIO::open(int port, int DDR)
+int fd;
+
+void GPIO::Gopen(int port, int DDR)
 {
+ 
+   
+  fd = open(dev_name, O_RDONLY);
+  if (fd >= 0){
+    
+  }
+  close(fd);
+    #if !defined NEWGPIO
+
+
     FILE* f;
     f = fopen("/sys/class/gpio/export", "w");
     if (f == NULL) {
@@ -74,10 +98,14 @@ void GPIO::open(int port, int DDR)
         cache[port] = fd; // cache the fd;
         lseek(fd, SEEK_SET, 0);
     }
+  #endif
+  
 }
 
-void GPIO::close(int port)
+void GPIO::Gclose(int port)
 {
+    close(fd);
+    #if !defined NEWGPIO
     std::map<int, GPIOfdCache_t>::iterator i;
     i = cache.find(port);
     if (i != cache.end()) {
@@ -91,10 +119,29 @@ void GPIO::close(int port)
         fprintf(f, "%d\n", port);
         fclose(f);
     }
+    #endif
 }
 
-int GPIO::read(int port)
+int GPIO::Gread(int port)
 {
+    
+    struct gpiohandle_request rq;
+    struct gpiohandle_data data;
+    int fd, ret;
+    fd = open(dev_name, O_RDONLY);
+    if (fd >= 0){
+      rq.lineoffsets[0] = port;
+      rq.flags = GPIOHANDLE_REQUEST_INPUT;
+      rq.lines = 1;
+      ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+      close(fd);
+      ret = ioctl(rq.fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
+      close(rq.fd);
+      return ret;      
+    }
+    return -1;
+    
+    #if !defined NEWGPIO
     std::map<int, GPIOfdCache_t>::iterator i;
     int fd;
     i = cache.find(port);
@@ -132,10 +179,26 @@ int GPIO::read(int port)
     fclose(f);
     return i;
     */
+    #endif
 }
 
-void GPIO::write(int port, int value)
+void GPIO::Gwrite(int port, int value)
 {
+    
+    struct gpiohandle_request rq;
+    struct gpiohandle_data data;
+    int fd, ret;
+    fd = open(dev_name, O_RDONLY);
+    rq.lineoffsets[0] = port;
+    rq.flags = GPIOHANDLE_REQUEST_OUTPUT;
+    rq.lines = 1;
+    ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+    close(fd);
+    data.values[0] = value;
+    ret = ioctl(rq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
+    close(rq.fd);
+    
+    #if !defined NEWGPIO
     std::map<int, GPIOfdCache_t>::iterator i;
     int fd;
     i = cache.find(port);
@@ -175,4 +238,5 @@ void GPIO::write(int port, int value)
 
     fclose(f);
     */
+    #endif
 }
