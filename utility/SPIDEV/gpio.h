@@ -41,19 +41,19 @@ public:
 
     GPIO();
 
-    static void open(int port, int DDR);
+    static void Gopen(int port, int DDR);
 
-    static void close(int port);
+    static void Gclose(int port);
 
-    static int read(int port);
+    static int Gread(int port);
 
-    static void write(int port, int value);
+    static void Gwrite(int port, int value);
 
     virtual ~GPIO();
-
+    
 private:
     /* fd cache */
-    static std::map<int, GPIOfdCache_t> cache;
+    //static std::map<int, GPIOfdCache_t> cache;
 };
 
 #endif // RF24_UTILITY_SPIDEV_GPIO_H_
