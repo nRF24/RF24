@@ -50,9 +50,8 @@ public:
     static void Gwrite(int port, int value);
 
     virtual ~GPIO();
-    
-private:
 
+private:
 };
 
 #endif // RF24_UTILITY_SPIDEV_GPIO_H_
