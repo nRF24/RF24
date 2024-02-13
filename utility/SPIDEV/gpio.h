@@ -53,8 +53,7 @@ public:
     virtual ~GPIO();
     
 private:
-    /* fd cache */
-    //static std::map<int, GPIOfdCache_t> cache;
+
 };
 
 #endif // RF24_UTILITY_SPIDEV_GPIO_H_
