@@ -17,7 +17,6 @@
 #include <map>
 #include <stdexcept>
 
-
 /** Specific excpetion for SPI errors */
 class GPIOException : public std::runtime_error
 {
@@ -51,9 +50,8 @@ public:
     static void Gwrite(int port, int value);
 
     virtual ~GPIO();
-    
-private:
 
+private:
 };
 
 #endif // RF24_UTILITY_SPIDEV_GPIO_H_
