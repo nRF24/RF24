@@ -28,14 +28,8 @@ jobs:
     with:
       deploy-release: ${{ github.event_name == 'release' }}
 
-  check_formatting:
-    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
-    with:
-      ignore: examples/old_backups
-      extensions: ino
-
   build:
-    needs: [check_formatting, validate_lib_json]
+    needs: [validate_lib_json]
     uses: nRF24/.github/.github/workflows/build_platformio.yaml@main
     with:
      example-path: ${{ matrix.example }}

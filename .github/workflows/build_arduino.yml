@@ -17,14 +17,7 @@ on:
       - "!examples/old_backups/**"
 
 jobs:
-  check_formatting:
-    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
-    with:
-      ignore: examples/old_backups
-      extensions: ino
-
   build:
-    needs: check_formatting
     uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
     with:
       sketch-paths: |
@@ -117,7 +110,6 @@ jobs:
             enable-deltas-report: true
 
   attiny:
-    needs: check_formatting
     uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
     with:
       platforms: |

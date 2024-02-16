@@ -28,13 +28,7 @@ on:
       - "examples_pico/*"
 
 jobs:
-  check_formatting:
-    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
-    with:
-      ignore: '!examples_pico|'
-
   build:
-    needs: check_formatting
     uses: nRF24/.github/.github/workflows/build_pico_sdk.yaml@main
     with:
       board-id: ${{ matrix.board }}
