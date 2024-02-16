@@ -34,35 +34,35 @@ class SPI
 
 public:
     /**
-	 * SPI constructor
-	 */
+     * SPI constructor
+     */
     SPI();
 
     /**
-	 * Start SPI
-	 */
+     * Start SPI
+     */
     void begin(int busNo);
 
     /**
-	 * Transfer a single byte
-	 * @param tx_ Byte to send
-	 * @return Data returned via spi
-	 */
+     * Transfer a single byte
+     * @param tx_ Byte to send
+     * @return Data returned via spi
+     */
     uint8_t transfer(uint8_t tx_);
 
     /**
-	 * Transfer a buffer of data
-	 * @param tbuf Transmit buffer
-	 * @param rbuf Receive buffer
-	 * @param len Length of the data
-	 */
+     * Transfer a buffer of data
+     * @param tbuf Transmit buffer
+     * @param rbuf Receive buffer
+     * @param len Length of the data
+     */
     void transfernb(char* tbuf, char* rbuf, uint32_t len);
 
     /**
-	 * Transfer a buffer of data without an rx buffer
-	 * @param buf Pointer to a buffer of data
-	 * @param len Length of the data
-	 */
+     * Transfer a buffer of data without an rx buffer
+     * @param buf Pointer to a buffer of data
+     * @param len Length of the data
+     */
     void transfern(char* buf, uint32_t len);
 
 #ifndef DOXYGEN_FORCED

@@ -219,10 +219,11 @@ void master()
             cout << "Aborting at payload " << buffer[0];
             break;
         }
-    }                                    // while
+    } // while
+
     uint32_t elapsedTime = getMicros(); // end the timer
     cout << "Time to transmit data = ";
-    cout << elapsedTime;        // print the timer result
+    cout << elapsedTime;         // print the timer result
     cout << " us. " << failures; // print number of retries
     cout << " failures detected. Leaving TX role." << endl;
 } // master

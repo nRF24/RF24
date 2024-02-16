@@ -878,7 +878,7 @@ public:
      * to clear by issuing txStandBy() or ensure appropriate time between transmissions.
      *
      * Use txStandBy() when this function returns `false`.
-     * 
+     *
      * Example (Partial blocking):
      * @code
      * radio.writeFast(&buf,32);  // Writes 1 payload to the buffers
