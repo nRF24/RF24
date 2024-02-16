@@ -2,6 +2,7 @@ name: Arduino CLI build
 
 on:
   pull_request:
+    branches: [master]
     types: [opened, reopened]
     paths:
       - ".github/workflows/build_arduino.yml"
@@ -9,6 +10,7 @@ on:
       - "!examples/old_backups/**"
       - "RF24.*"
   push:
+    branches: [master]
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"

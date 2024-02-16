@@ -2,6 +2,7 @@ name: PlatformIO build
 
 on:
   pull_request:
+    branches: [master]
     types: [opened, reopened]
     paths:
       - ".github/workflows/build_platformIO.yml"
@@ -10,6 +11,7 @@ on:
       - "!examples/old_backups/**"
       - "!examples/rf24_ATTiny/**"
   push:
+    branches: [master]
     paths:
       - ".github/workflows/build_platformIO.yml"
       - "library.json"
