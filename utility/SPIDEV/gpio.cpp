@@ -1,13 +1,9 @@
 /*
- * https://github.com/mrshu/GPIOlib
- * Copyright (c) 2011, Copyright (c) 2011 mr.Shu
+ * 
+ * Copyright (c) 2024, Copyright (c) 2024 TMRh20 & 2bndy5
  * All rights reserved.
  *
- * Modified on 24 June 2012, 11:06 AM
- * File:   gpio.cpp
- * Author: purinda (purinda@gmail.com)
- *
- *  Patched for filedescriptor catching and error control by L Diaz 2018
+ * 
  */
 #include <linux/gpio.h>
 #include "gpio.h"
@@ -72,7 +68,7 @@ int GPIO::Gread(int port)
             return ret;
         }
         close(rq.fd);
-        return ret;
+        return data.values[0];
     }
     return -1;
 }
