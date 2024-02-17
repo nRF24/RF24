@@ -41,13 +41,13 @@ public:
 
     GPIO();
 
-    static void Gopen(int port, int DDR);
+    static void open(int port, int DDR);
 
-    static void Gclose(int port);
+    static void close(int port);
 
-    static int Gread(int port);
+    static int read(int port);
 
-    static void Gwrite(int port, int value);
+    static void write(int port, int value);
 
     virtual ~GPIO();
 

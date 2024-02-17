@@ -61,8 +61,8 @@ typedef uint16_t rf24_gpio_pin_t;
 #define HIGH                     GPIO::OUTPUT_HIGH
 #define INPUT                    GPIO::DIRECTION_IN
 #define OUTPUT                   GPIO::DIRECTION_OUT
-#define digitalWrite(pin, value) GPIO::Gwrite(pin, value)
-#define pinMode(pin, direction)  GPIO::Gopen(pin, direction)
+#define digitalWrite(pin, value) GPIO::write(pin, value)
+#define pinMode(pin, direction)  GPIO::open(pin, direction)
 #define delay(milisec)           __msleep(milisec)
 #define delayMicroseconds(usec)  __usleep(usec)
 #define millis()                 __millis()

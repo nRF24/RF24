@@ -23,15 +23,15 @@ GPIO::~GPIO()
 
 int fd;
 
-void GPIO::Gopen(int port, int DDR)
+void GPIO::open(int port, int DDR)
 {
-    fd = open(dev_name, O_RDONLY);
+    fd = ::open(dev_name, O_RDONLY);
     if (fd >= 0) {
         close(fd);
     }
     else {
         dev_name = "/dev/gpiochip0";
-        fd = open(dev_name, O_RDONLY);
+        fd = ::open(dev_name, O_RDONLY);
         if (fd >= 0) {
             close(fd);
         }
@@ -41,17 +41,17 @@ void GPIO::Gopen(int port, int DDR)
     }
 }
 
-void GPIO::Gclose(int port)
+void GPIO::close(int port)
 {
 }
 
-int GPIO::Gread(int port)
+int GPIO::read(int port)
 {
 
     struct gpiohandle_request rq;
     struct gpiohandle_data data;
     int fd, ret;
-    fd = open(dev_name, O_RDONLY);
+    fd = ::open(dev_name, O_RDONLY);
     if (fd >= 0) {
         rq.lineoffsets[0] = port;
         rq.flags = GPIOHANDLE_REQUEST_INPUT;
@@ -73,13 +73,13 @@ int GPIO::Gread(int port)
     return -1;
 }
 
-void GPIO::Gwrite(int port, int value)
+void GPIO::write(int port, int value)
 {
 
     struct gpiohandle_request rq;
     struct gpiohandle_data data;
     int fd, ret;
-    fd = open(dev_name, O_RDONLY);
+    fd = ::open(dev_name, O_RDONLY);
     if (fd < 0) {
         throw GPIOException("Can't open dev");
         return;
