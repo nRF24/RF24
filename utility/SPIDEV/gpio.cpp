@@ -15,7 +15,7 @@
 #include <fcntl.h>     // open()
 #include <sys/ioctl.h> // ioctl()
 
-char* dev_name = "/dev/gpiochip4";
+const char* dev_name = "/dev/gpiochip4";
 
 GPIO::GPIO()
 {
