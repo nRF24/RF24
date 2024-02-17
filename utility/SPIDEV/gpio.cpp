@@ -1,9 +1,9 @@
 /*
- * 
+ *
  * Copyright (c) 2024, Copyright (c) 2024 TMRh20 & 2bndy5
  * All rights reserved.
  *
- * 
+ *
  */
 #include <linux/gpio.h>
 #include "gpio.h"
