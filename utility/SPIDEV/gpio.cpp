@@ -11,16 +11,9 @@
  */
 #include <linux/gpio.h>
 #include "gpio.h"
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <getopt.h>
+#include <unistd.h>    // close()
+#include <fcntl.h>     // open()
+#include <sys/ioctl.h> // ioctl()
 
 char* dev_name = "/dev/gpiochip4";
 
