@@ -1,0 +1,14 @@
+name: check code formatting
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+
+jobs:
+    check_formatting:
+        uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
+        with:
+          ignore: examples/old_backups|utility/RPi/bcm2835.h|utility/RPi/bcm2835.c
+          extensions: ino,c,cpp,h

@@ -8,7 +8,7 @@
 
  03/17/2013 : Charles-Henri Hallard (http://hallard.me)
               Modified to use with Arduipi board http://hallard.me/arduipi
-						  Changed to use modified bcm2835 and RF24 library
+                          Changed to use modified bcm2835 and RF24 library
 
  */
 

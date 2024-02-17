@@ -9,7 +9,7 @@
 #include <map>
 #include <stdexcept>
 
-/** Specific excpetion for SPI errors */
+/** Specific exception for SPI errors */
 class GPIOException : public std::runtime_error
 {
 public:
@@ -66,10 +66,10 @@ public:
     static int read(int port);
 
     /**
-    * Similar to Arduino digitalWrite(pin,state);
-    * @param port
-    * @param value
-    */
+     * Similar to Arduino digitalWrite(pin,state);
+     * @param port
+     * @param value
+     */
     static void write(int port, int value);
 
     virtual ~GPIO();

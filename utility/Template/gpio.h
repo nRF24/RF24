@@ -50,10 +50,10 @@ public:
     static int read(int port);
 
     /**
-    * Similar to Arduino digitalWrite(pin,state);
-    * @param port
-    * @param value
-    */
+     * Similar to Arduino digitalWrite(pin,state);
+     * @param port
+     * @param value
+     */
     static void write(int port, int value);
 
 #ifndef DOXYGEN_FORCED

@@ -1,5 +1,5 @@
 /*
-* GPIO Functions
+ * GPIO Functions
  */
 
 #include "gpio.h"

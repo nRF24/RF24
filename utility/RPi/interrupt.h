@@ -35,11 +35,11 @@ extern int attachInterrupt(int pin, int mode, void (*function)(void));
 extern int detachInterrupt(int pin);
 
 /* Deprecated, no longer functional
-*/
+ */
 extern void rfNoInterrupts();
 
 /* Deprecated, no longer functional
-*/
+ */
 extern void rfInterrupts();
 
 #ifdef __cplusplus
