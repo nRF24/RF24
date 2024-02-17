@@ -156,8 +156,8 @@ jobs:
   #         - fqbn: ATTinyCore:avr:attinyx5
   #           enable-deltas-report: true
 
-  # # When using a matrix to compile for multiple boards, it's necessary to use a separate job for the deltas report
-  # report:
-  #   needs: [build, attiny]
-  #   if: github.event_name == 'pull_request'
-  #   uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@main
+  # When using a matrix to compile for multiple boards, it's necessary to use a separate job for the deltas report
+  report:
+    needs: [build] # , attiny]
+    if: github.event_name == 'pull_request'
+    uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@main
