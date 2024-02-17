@@ -1,9 +1,8 @@
 name: Linux build
 
 on:
-  pull_request_target:
   pull_request:
-    types: [opened, reopened]
+    branches: [master]
     paths:
       - "*.h"
       - "*.cpp"
@@ -25,6 +24,7 @@ on:
       - "pyRF24/pyRF24.cpp"
       - ".github/workflows/build_linux.yml"
   push:
+    branches: [master]
     paths:
       - "*.h"
       - "*.cpp"
@@ -53,14 +53,9 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  check_formatting:
-    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
-    with:
-      ignore: 'examples|examples_pico|utility/RPi/bcm2835.h|utility/RPi/bcm2835.c'
 
   ####################### using Makefile #############################
   build:
-    needs: check_formatting
     runs-on: ubuntu-latest
 
     strategy:
@@ -79,7 +74,7 @@ jobs:
       CFLAGS: "-I /usr/local/include"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: provide toolchain
         run: |
@@ -150,7 +145,6 @@ jobs:
 
   ####################### using CMake ################################
   using_cmake:
-    needs: check_formatting
     uses: nRF24/.github/.github/workflows/build_linux_cmake.yaml@main
     with:
       rf24-ref: ${{ github.sha }}

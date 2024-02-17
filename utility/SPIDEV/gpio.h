@@ -17,7 +17,7 @@
 #include <map>
 #include <stdexcept>
 
-/** Specific excpetion for SPI errors */
+/** Specific exception for SPI errors */
 class GPIOException : public std::runtime_error
 {
 public:

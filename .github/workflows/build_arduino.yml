@@ -2,27 +2,21 @@ name: Arduino CLI build
 
 on:
   pull_request:
-    types: [opened, reopened]
+    branches: [master]
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/old_backups/**"
       - "RF24.*"
   push:
+    branches: [master]
     paths:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/old_backups/**"
 
 jobs:
-  check_formatting:
-    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
-    with:
-      ignore: examples/old_backups
-      extensions: ino
-
   build:
-    needs: check_formatting
     uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
     with:
       sketch-paths: |
@@ -114,55 +108,56 @@ jobs:
           - fqbn: arduino:samd:mkrzero  # InterruptConfigure.ino uses pin 2
             enable-deltas-report: true
 
-  attiny:
-    needs: check_formatting
-    uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
-    with:
-      platforms: |
-        - source-url: "http://drazzy.com/package_drazzy.com_index.json"
-          name: "ATTinyCore:avr"
-        - name: "arduino:avr"
-      sketch-paths: |
-        - examples/rf24_ATTiny/rf24ping85
-        - examples/rf24_ATTiny/timingSearch3pin
-      fqbn: ${{ matrix.fqbn }}
-      enable-deltas-report: ${{ matrix.enable-deltas-report }}
-    strategy:
-      fail-fast: false
-      matrix:
-        fqbn:
-          - ATTinyCore:avr:attinyx4
-          - ATTinyCore:avr:attinyx4opti
-          - ATTinyCore:avr:attinyx4micr
-          - ATTinyCore:avr:attinyx5
-          - ATTinyCore:avr:attinyx5micr
-          - ATTinyCore:avr:attinyx8
-          - ATTinyCore:avr:attinyx8opti
-          - ATTinyCore:avr:attinyx8micr
-          - ATTinyCore:avr:attinyx7
-          - ATTinyCore:avr:attinyx7opti
-          - ATTinyCore:avr:attinyx7micr
-          - ATTinyCore:avr:attinyx61
-          - ATTinyCore:avr:attinyx61opti
-          - ATTinyCore:avr:attinyx41
-          - ATTinyCore:avr:attinyx41opti
-          - ATTinyCore:avr:attinyx41micr
-          # - ATTinyCore:avr:attiny43  # doesn't seem to support USI implementation of SPI
-          - ATTinyCore:avr:attiny828
-          - ATTinyCore:avr:attiny828opti
-          - ATTinyCore:avr:attiny1634
-          - ATTinyCore:avr:attiny1634opti
-          - ATTinyCore:avr:attinyx313
-        # By default, don't generate size deltas data.
-        enable-deltas-report:
-          - false
-        # Generate size deltas data for this board
-        include:
-          - fqbn: ATTinyCore:avr:attinyx5
-            enable-deltas-report: true
+  #### NOTE installing ATTinyCore has become too problematic for various reasons
+  #### I'll have to revisit this later when the Arduino CLI tool gets their act together
+  # attiny:
+  #   uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
+  #   with:
+  #     platforms: |
+  #       - source-url: "http://drazzy.com/package_drazzy.com_index.json"
+  #         name: "ATTinyCore:avr"
+  #       - name: "arduino:avr"
+  #     sketch-paths: |
+  #       - examples/rf24_ATTiny/rf24ping85
+  #       - examples/rf24_ATTiny/timingSearch3pin
+  #     fqbn: ${{ matrix.fqbn }}
+  #     enable-deltas-report: ${{ matrix.enable-deltas-report }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       fqbn:
+  #         - ATTinyCore:avr:attinyx4
+  #         - ATTinyCore:avr:attinyx4opti
+  #         - ATTinyCore:avr:attinyx4micr
+  #         - ATTinyCore:avr:attinyx5
+  #         - ATTinyCore:avr:attinyx5micr
+  #         - ATTinyCore:avr:attinyx8
+  #         - ATTinyCore:avr:attinyx8opti
+  #         - ATTinyCore:avr:attinyx8micr
+  #         - ATTinyCore:avr:attinyx7
+  #         - ATTinyCore:avr:attinyx7opti
+  #         - ATTinyCore:avr:attinyx7micr
+  #         - ATTinyCore:avr:attinyx61
+  #         - ATTinyCore:avr:attinyx61opti
+  #         - ATTinyCore:avr:attinyx41
+  #         - ATTinyCore:avr:attinyx41opti
+  #         - ATTinyCore:avr:attinyx41micr
+  #         # - ATTinyCore:avr:attiny43  # doesn't seem to support USI implementation of SPI
+  #         - ATTinyCore:avr:attiny828
+  #         - ATTinyCore:avr:attiny828opti
+  #         - ATTinyCore:avr:attiny1634
+  #         - ATTinyCore:avr:attiny1634opti
+  #         - ATTinyCore:avr:attinyx313
+  #       # By default, don't generate size deltas data.
+  #       enable-deltas-report:
+  #         - false
+  #       # Generate size deltas data for this board
+  #       include:
+  #         - fqbn: ATTinyCore:avr:attinyx5
+  #           enable-deltas-report: true
 
   # When using a matrix to compile for multiple boards, it's necessary to use a separate job for the deltas report
   report:
-    needs: [build, attiny]
+    needs: [build] # , attiny]
     if: github.event_name == 'pull_request'
     uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@main

@@ -1,7 +1,7 @@
 /**
-* @file includes.h
-* Configuration defines for RF24/Linux
-*/
+ * @file includes.h
+ * Configuration defines for RF24/Linux
+ */
 
 #ifndef RF24_UTILITY_INCLUDES_H_
 #define RF24_UTILITY_INCLUDES_H_

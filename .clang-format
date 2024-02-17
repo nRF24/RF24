@@ -67,10 +67,7 @@ DeriveLineEnding: false
 DerivePointerAlignment: false
 DisableFormat: false
 EmptyLineBeforeAccessModifier: Always
-# ---
-# only in v13+
-# EmptyLineAfterAccessModifier: Leave
-# ---
+EmptyLineAfterAccessModifier: Leave
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeBlocks: Preserve
@@ -89,10 +86,7 @@ IncludeCategories:
     CaseSensitive: false
 IncludeIsMainRegex: "(Test)?$"
 IncludeIsMainSourceRegex: ""
-# ---
-# only in v13+
-# IndentAccessModifiers: false
-# ---
+IndentAccessModifiers: false
 IndentCaseLabels: true
 IndentCaseBlocks: false
 IndentGotoLabels: false
@@ -117,15 +111,12 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PenaltyIndentedWhitespace: 0
 PointerAlignment: Left
-# ---
-# only in v13+
-# ReferenceAlignment: Right
-# ---
+ReferenceAlignment: Pointer
 ReflowComments: true
-# ---
-# only in v13+
-# ShortNamespaceLines: 0
-# ---
+SpacesInLineCommentPrefix:
+  Maximum: -1
+  Minimum: 0
+ShortNamespaceLines: 0
 # Sort**** is about sorting include/using statements alphabetically
 SortIncludes: false
 SortUsingDeclarations: false
