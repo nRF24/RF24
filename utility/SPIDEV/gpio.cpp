@@ -21,10 +21,9 @@ GPIO::~GPIO()
 {
 }
 
-int fd;
-
 void GPIO::open(int port, int DDR)
 {
+    int fd;
     fd = ::open(dev_name, O_RDONLY);
     if (fd >= 0) {
         close(fd);
