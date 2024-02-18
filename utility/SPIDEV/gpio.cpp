@@ -26,13 +26,13 @@ void GPIO::open(int port, int DDR)
     int fd;
     fd = ::open(dev_name, O_RDONLY);
     if (fd >= 0) {
-        close(fd);
+        ::close(fd);
     }
     else {
         dev_name = "/dev/gpiochip0";
         fd = ::open(dev_name, O_RDONLY);
         if (fd >= 0) {
-            close(fd);
+            ::close(fd);
         }
         else {
             throw GPIOException("can't open /dev/gpiochip");
@@ -60,13 +60,13 @@ int GPIO::read(int port)
             throw GPIOException("Can't get line handle from IOCTL");
             return ret;
         }
-        close(fd);
+        ::close(fd);
         ret = ioctl(rq.fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
         if (ret == -1) {
             throw GPIOException("Can't get line value from IOCTL");
             return ret;
         }
-        close(rq.fd);
+        ::close(rq.fd);
         return data.values[0];
     }
     return -1;
@@ -91,12 +91,12 @@ void GPIO::write(int port, int value)
         throw GPIOException("Can't get line handle from IOCTL");
         return;
     }
-    close(fd);
+    ::close(fd);
     data.values[0] = value;
     ret = ioctl(rq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
     if (ret == -1) {
         throw GPIOException("Can't set line value from IOCTL");
         return;
     }
-    close(rq.fd);
+    ::close(rq.fd);
 }
