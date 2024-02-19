@@ -121,6 +121,12 @@ This is likely due to the SPI speed being set up to 10MHz by default. We recomme
 
 In the RF24 library's beginnings, the default value was (prior to 2014) set to 4MHz.
 
+Inaccurate payloads can also be because of the difference in how 8-bit, 32-bit and 64-bit systems handle data in memory. The easiest way to ensure your data aligns between devices is to specify the size of variables in code. ie: Instead of unsigned long, use uint32_t and use __attribute__((__packed__)) for data structures if you don't align your data manually per the below blog post.
+
+Newer users can use the `sizeof();` function to verify the size of different variables or data structures as well.
+
+See [https://www.gnu.org/software/libc/manual/html_node/Integers.html](https://www.gnu.org/software/libc/manual/html_node/Integers.html) and [TMRh20s Blog Post](https://tmrh20.blogspot.com/2020/09/transferring-data-between-systems-using.html) for more info
+
 ### My PA/LNA module fails to transmit
 
 You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L01+PA+LNA”. These modules are distinct in the fact that they come with a detachable (SMA-type) antenna. They employ separate RFX24C01 IC with the antenna for enhanced Power Amplification (PA) and Low Noise Amplification (LNA) features. While they boast greater range with the same functionality, they are subject to a couple lesser known (and lesser advertised) drawbacks:
