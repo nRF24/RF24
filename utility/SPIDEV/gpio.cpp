@@ -47,27 +47,28 @@ void GPIO::close(int port)
 int GPIO::read(int port)
 {
 
-    struct gpiohandle_request rq;
-    struct gpiohandle_data data;
+    struct gpio_v2_line_request rq;
+    memset(&rq, 0, sizeof(rq));
+    struct gpio_v2_line_values data;
     int fd, ret;
     fd = ::open(dev_name, O_RDONLY);
     if (fd >= 0) {
-        rq.lineoffsets[0] = port;
-        rq.flags = GPIOHANDLE_REQUEST_INPUT;
-        rq.lines = 1;
-        ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+        rq.offsets[0] = port;
+        rq.config.flags = GPIO_V2_LINE_FLAG_INPUT;
+        rq.num_lines = 1;
+        ret = ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &rq);
         if (ret == -1) {
             throw GPIOException("Can't get line handle from IOCTL");
             return ret;
         }
         ::close(fd);
-        ret = ioctl(rq.fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
+        ret = ioctl(rq.fd, GPIO_V2_LINE_GET_VALUES_IOCTL, &data);
         if (ret == -1) {
             throw GPIOException("Can't get line value from IOCTL");
             return ret;
         }
         ::close(rq.fd);
-        return data.values[0];
+        return data.bits;
     }
     return -1;
 }
@@ -75,25 +76,31 @@ int GPIO::read(int port)
 void GPIO::write(int port, int value)
 {
 
-    struct gpiohandle_request rq;
-    struct gpiohandle_data data;
+    struct gpio_v2_line_request rq;
+    memset(&rq, 0, sizeof(rq));       // This is needed to set to default values apparently
+    struct gpio_v2_line_values data;
+    
     int fd, ret;
     fd = ::open(dev_name, O_RDONLY);
     if (fd < 0) {
         throw GPIOException("Can't open dev");
         return;
     }
-    rq.lineoffsets[0] = port;
-    rq.flags = GPIOHANDLE_REQUEST_OUTPUT;
-    rq.lines = 1;
-    ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+    rq.offsets[0] = port;
+    rq.config.flags = GPIO_V2_LINE_FLAG_OUTPUT;
+    rq.num_lines = 1;
+    
+    ret = ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &rq);
     if (ret == -1) {
-        throw GPIOException("Can't get line handle from IOCTL");
+        throw GPIOException("Can't get line handle from IOCTL ");
         return;
     }
     ::close(fd);
-    data.values[0] = value;
-    ret = ioctl(rq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
+    
+    data.bits = value;
+    data.mask = 1;
+    
+    ret = ioctl(rq.fd, GPIO_V2_LINE_SET_VALUES_IOCTL, &data);
     if (ret == -1) {
         throw GPIOException("Can't set line value from IOCTL");
         return;
