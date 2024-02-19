@@ -10,7 +10,7 @@
 #include <unistd.h>    // close()
 #include <fcntl.h>     // open()
 #include <sys/ioctl.h> // ioctl()
-#include <string>      // memset()
+#include <string.h>    // memset()
 
 const char* dev_name = "/dev/gpiochip4";
 
