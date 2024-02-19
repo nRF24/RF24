@@ -10,6 +10,8 @@
 #include <unistd.h>    // close()
 #include <fcntl.h>     // open()
 #include <sys/ioctl.h> // ioctl()
+#include <errno.h>     // errno
+#include <string.h>    // memset()
 
 const char* dev_name = "/dev/gpiochip4";
 
@@ -46,57 +48,73 @@ void GPIO::close(int port)
 
 int GPIO::read(int port)
 {
-
-    struct gpiohandle_request rq;
-    struct gpiohandle_data data;
-    int fd, ret;
-    fd = ::open(dev_name, O_RDONLY);
-    if (fd >= 0) {
-        rq.lineoffsets[0] = port;
-        rq.flags = GPIOHANDLE_REQUEST_INPUT;
-        rq.lines = 1;
-        ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
-        if (ret == -1) {
-            throw GPIOException("Can't get line handle from IOCTL");
-            return ret;
-        }
-        ::close(fd);
-        ret = ioctl(rq.fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
-        if (ret == -1) {
-            throw GPIOException("Can't get line value from IOCTL");
-            return ret;
-        }
-        ::close(rq.fd);
-        return data.values[0];
+    int fd = ::open(dev_name, O_RDWR);
+    if (fd < 0) {
+        throw GPIOException("Can't open character device");
+        return -1;
     }
-    return -1;
+
+    struct gpio_v2_line_request rq;
+    memset(&rq, 0, sizeof(rq));
+    rq.offsets[0] = port;
+    rq.num_lines = 1;
+    rq.config.flags = GPIO_V2_LINE_FLAG_INPUT;
+
+    int ret = ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &rq);
+    if (ret == -1) {
+        std::string msg = "[GPIO::read] Can't get line handle from IOCTL; ";
+        msg += strerror(errno);
+        throw GPIOException(msg);
+        return ret;
+    }
+
+    struct gpio_v2_line_values data;
+    data.bits = 0;
+    data.mask = 1;
+    ret = ioctl(rq.fd, GPIO_V2_LINE_GET_VALUES_IOCTL, &data);
+    if (ret == -1 || rq.fd <= 0) {
+        std::string msg = "[GPIO::read] Can't get line value from IOCTL; ";
+        msg += strerror(errno);
+        throw GPIOException(msg);
+        return ret;
+    }
+    ::close(rq.fd);
+    ::close(fd);
+    return data.bits & data.mask;
 }
 
 void GPIO::write(int port, int value)
 {
-
-    struct gpiohandle_request rq;
-    struct gpiohandle_data data;
-    int fd, ret;
-    fd = ::open(dev_name, O_RDONLY);
+    int fd = ::open(dev_name, O_RDWR);
     if (fd < 0) {
-        throw GPIOException("Can't open dev");
+        throw GPIOException("Can't open character device");
         return;
     }
-    rq.lineoffsets[0] = port;
-    rq.flags = GPIOHANDLE_REQUEST_OUTPUT;
-    rq.lines = 1;
-    ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &rq);
+
+    gpio_v2_line_request rq;
+    memset(&rq, 0, sizeof(rq));
+    rq.offsets[0] = port;
+    rq.num_lines = 1;
+    rq.config.flags = GPIO_V2_LINE_FLAG_OUTPUT;
+
+    int ret = ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &rq);
     if (ret == -1) {
-        throw GPIOException("Can't get line handle from IOCTL");
+        std::string msg = "[GPIO::write] Can't get line handle from IOCTL; ";
+        msg += strerror(errno);
+        throw GPIOException(msg);
         return;
     }
-    ::close(fd);
-    data.values[0] = value;
-    ret = ioctl(rq.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
-    if (ret == -1) {
-        throw GPIOException("Can't set line value from IOCTL");
+
+    struct gpio_v2_line_values data;
+    data.bits |= value;
+    data.mask = 1;
+    ret = ioctl(rq.fd, GPIO_V2_LINE_SET_VALUES_IOCTL, &data);
+    if (ret == -1 || rq.fd <= 0) {
+        std::string msg = "[GPIO::write] Can't set line value from IOCTL; ";
+        msg += strerror(errno);
+        throw GPIOException(msg);
         return;
     }
     ::close(rq.fd);
+    ::close(fd);
 }
