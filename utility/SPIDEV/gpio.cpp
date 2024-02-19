@@ -10,6 +10,7 @@
 #include <unistd.h>    // close()
 #include <fcntl.h>     // open()
 #include <sys/ioctl.h> // ioctl()
+#include <string>      // memset()
 
 const char* dev_name = "/dev/gpiochip4";
 
@@ -99,6 +100,7 @@ void GPIO::write(int port, int value)
 
     data.bits = value;
     data.mask = 1;
+
     ret = ioctl(rq.fd, GPIO_V2_LINE_SET_VALUES_IOCTL, &data);
     if (ret == -1) {
         throw GPIOException("Can't set line value from IOCTL");
