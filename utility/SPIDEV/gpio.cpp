@@ -77,9 +77,9 @@ void GPIO::write(int port, int value)
 {
 
     struct gpio_v2_line_request rq;
-    memset(&rq, 0, sizeof(rq));       // This is needed to set to default values apparently
+    memset(&rq, 0, sizeof(rq)); // This is needed to set to default values apparently
     struct gpio_v2_line_values data;
-    
+
     int fd, ret;
     fd = ::open(dev_name, O_RDONLY);
     if (fd < 0) {
@@ -89,17 +89,17 @@ void GPIO::write(int port, int value)
     rq.offsets[0] = port;
     rq.config.flags = GPIO_V2_LINE_FLAG_OUTPUT;
     rq.num_lines = 1;
-    
+
     ret = ioctl(fd, GPIO_V2_GET_LINE_IOCTL, &rq);
     if (ret == -1) {
         throw GPIOException("Can't get line handle from IOCTL ");
         return;
     }
     ::close(fd);
-    
+
     data.bits = value;
     data.mask = 1;
-    
+
     ret = ioctl(rq.fd, GPIO_V2_LINE_SET_VALUES_IOCTL, &data);
     if (ret == -1) {
         throw GPIOException("Can't set line value from IOCTL");
