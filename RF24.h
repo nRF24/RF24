@@ -1277,7 +1277,7 @@ public:
      * @code
      * bool goodSignal = radio.testRPD();
      * if(radio.available()){
-     *    Serial.println(goodSignal ? "Strong signal > -64dBm" : "Weak or no signal < -64dBm" );
+     *    Serial.println(goodSignal ? "Strong signal > -64dBm" : "Weak or no signal (< -64dBm)" );
      *    radio.read(0,0);
      * }
      * @endcode
