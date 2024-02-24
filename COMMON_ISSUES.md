@@ -37,7 +37,7 @@ users can  uncomment the lines `printf_begin()` & `radio.printDetails()` and
    If the settings do not appear as above, troubleshoot wiring, pin
    connections, etc.
    
-3. If both of the above check out, the problem is likely in software or 
+3. If both of the above check out, the problem is likely the CE pin is wired wrong, or 
 even hardware issues (bad radios etc.) See the following.
    
 
@@ -83,6 +83,26 @@ Because the RF24 library uses `millis()` to implement a timeout and `delay()` fo
 @see The note in the documentation for `RF24::available()`.
 
 More info about why you can't call `millis()` (or `delay()`) from an ISR callback function is available at [the Arduino docs](https://www.google.com/url?sa=t&source=web&rct=j&url=https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/&ved=2ahUKEwjMhtSRl5jzAhVUsp4KHWIPCrIQFnoECAoQAQ&usg=AOvVaw1X9H0058Nz7Hck91VIC3bD).
+
+## Which write*() function do I use?
+
+**Standard:**
+
+`radio.write()`: The standard write function, this is the most commonly used way to send data over radio link. This function will block until data is sent successfully. This means that if Auto-Ack is enabled, the radio will write the packet and wait for a response from the receiving radio. If Auto-Ack is disabled, the function will return sooner, as it will not wait for a response from the receiving radio.
+
+`radio.startWrite()`: Can be used similar to the standard `write()` function, but it will not block. Useful for writing data outside of an interrupt routine, triggering that interrupt. Contains a `delayMicroseconds()` call for faster MCUs/devices to ensure the CE pin is toggled for a full 10us.
+
+**Advanced: (requires calling txStandBy())**
+
+`radio.writeFast()`: Used for high-speed streaming of data. This function can be used to transmit data by simply placing data in the 3-layer FIFO buffers if room is available, or blocking until available. The function will return after a packet is placed in the buffer, or when a packet fails to transmit, in which case the buffers are cleared.
+
+`radio.writeBlocking()`: Not commonly used, this function will first check the 3-layer FIFO for available space, then block until a timeout period is met if packets are failing, or return once there is room in the FIFO buffer and a packet is placed there.
+
+Interrupt Safe Functions:
+
+`radio.startFastWrite()`: Can be used to write data and return immediately, without going into standBy mode. Can be used to transmit data at high speeds using interrupts, but will easily overflow the FIFO buffer if attempting to send data faster than the radio will process it.
+
+Again, some of the other functions can technically be placed inside interrupt routines, but rely on millis() for timeouts etc. and this functionality will not typically work within an interrupt routine.
 
 ## Here are the most common issues and their solutions
 
