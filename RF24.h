@@ -1277,11 +1277,11 @@ public:
      * @code
      * bool goodSignal = radio.testRPD();
      * if(radio.available()){
-     *    Serial.println(goodSignal ? "Strong signal > 64dBm" : "Weak signal < 64dBm" );
+     *    Serial.println(goodSignal ? "Strong signal > -64dBm" : "Weak or no signal < -64dBm" );
      *    radio.read(0,0);
      * }
      * @endcode
-     * @return true if a signal less than or equal to -64dBm was detected,
+     * @return true if a signal greater than or equal to -64dBm was detected,
      * false if not.
      */
     bool testRPD(void);
