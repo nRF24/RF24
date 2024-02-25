@@ -93,9 +93,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md31">Cross compilation steps</a></li>
-<li class="level1"><a href="#autotoc_md32">Cross comilation steps for python wrapper</a><ul><li class="level2"><a href="#autotoc_md33">Prerequisites</a></li>
-<li class="level2"><a href="#autotoc_md34">Installation steps</a></li>
+<ul><li class="level1"><a href="#autotoc_md32">Cross compilation steps</a></li>
+<li class="level1"><a href="#autotoc_md33">Cross comilation steps for python wrapper</a><ul><li class="level2"><a href="#autotoc_md34">Prerequisites</a></li>
+<li class="level2"><a href="#autotoc_md35">Installation steps</a></li>
 </ul>
 </li>
 </ul>
@@ -115,7 +115,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!-- fragment --> and cross-compilation tools must be in PATH, for example <div class="fragment"><div class="line">export PATH=$PATH:/your/dir/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin</div>
 </div><!-- fragment --></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Cross compilation steps</h1>
 <ol type="1">
 <li>clone <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> to a machine for cross-compilation <div class="fragment"><div class="line">git clone https://github.com/nRF24/RF24</div>
@@ -136,16 +136,16 @@ Cross compilation steps</h1>
 <li>(optional) upload examples to target machine <div class="fragment"><div class="line">make upload</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md33"></a>
 Cross comilation steps for python wrapper</h1>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md34"></a>
 Prerequisites</h2>
 <ul>
 <li>Python setuptools must be installed on both target and cross-compilation machines <div class="fragment"><div class="line">sudo pip install setuptools</div>
 </div><!-- fragment --> or <div class="fragment"><div class="line">sudo apt-get install python-setuptools</div>
 </div><!-- fragment --></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<h2><a class="anchor" id="autotoc_md35"></a>
 Installation steps</h2>
 <ol type="1">
 <li>Assure having libboost-python-dev library in your cross-compilation environment. Alternatively, you can install it into your target machine and copy /usr and /lib directories to the cross-compilation machine. For example <div class="fragment"><div class="line">mkdir -p rpi_root &amp;&amp; rsync -a pi@target_linux_host:/usr :/lib rpi_root</div>
@@ -164,7 +164,7 @@ Installation steps</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 27 2023 06:03:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Sun Feb 25 2024 07:03:25 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>

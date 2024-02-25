@@ -303,76 +303,77 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>            cout &lt;&lt; <span class="stringliteral">&quot;Aborting at payload &quot;</span> &lt;&lt; buffer[0];</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>            <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        }</div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    }                                    <span class="comment">// while</span></div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>    uint32_t elapsedTime = getMicros(); <span class="comment">// end the timer</span></div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    cout &lt;&lt; <span class="stringliteral">&quot;Time to transmit data = &quot;</span>;</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    cout &lt;&lt; elapsedTime;        <span class="comment">// print the timer result</span></div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    cout &lt;&lt; <span class="stringliteral">&quot; us. &quot;</span> &lt;&lt; failures; <span class="comment">// print number of retries</span></div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    cout &lt;&lt; <span class="stringliteral">&quot; failures detected. Leaving TX role.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>} <span class="comment">// master</span></div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="keywordtype">void</span> slave()</div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>{</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    counter = 0;</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>    radio.startListening();                   <span class="comment">// put radio in RX mode</span></div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    time_t startTimer = time(<span class="keyword">nullptr</span>);        <span class="comment">// start a timer</span></div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <span class="keywordflow">while</span> (time(<span class="keyword">nullptr</span>) - startTimer &lt; 6) {  <span class="comment">// use 6 second timeout</span></div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        <span class="keywordflow">if</span> (radio.available()) {              <span class="comment">// is there a payload</span></div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>            radio.read(&amp;buffer, SIZE);        <span class="comment">// fetch payload from FIFO</span></div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>            cout &lt;&lt; <span class="stringliteral">&quot;Received: &quot;</span> &lt;&lt; buffer;   <span class="comment">// print the payload&#39;s value</span></div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>            cout &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; counter &lt;&lt; endl; <span class="comment">// print the counter</span></div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>            counter++;                        <span class="comment">// increment counter</span></div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>            startTimer = time(<span class="keyword">nullptr</span>);       <span class="comment">// reset timer</span></div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>        }</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    }</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    radio.stopListening(); <span class="comment">// use TX mode for idle behavior</span></div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    cout &lt;&lt; <span class="stringliteral">&quot;Nothing received in 6 seconds. Leaving RX role.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>}</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span> </div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="keywordtype">void</span> makePayload(uint8_t i)</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>{</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span> </div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>    <span class="comment">// let the first character be an identifying alphanumeric prefix</span></div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    <span class="comment">// this lets us see which payload didn&#39;t get received</span></div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    buffer[0] = i + (i &lt; 26 ? 65 : 71);</div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="keywordflow">for</span> (uint8_t j = 0; j &lt; SIZE - 1; ++j) {</div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordtype">char</span> chr = j &gt;= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>        chr |= j &lt; (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        buffer[j + 1] = chr + 48;</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    }</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>}</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>uint32_t getMicros()</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>{</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    <span class="comment">// this function assumes that the timer was started using</span></div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="comment">// `clock_gettime(CLOCK_MONOTONIC_RAW, &amp;startTimer);`</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    clock_gettime(CLOCK_MONOTONIC_RAW, &amp;endTimer);</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;</div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span> </div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    <span class="keywordflow">return</span> ((seconds)*1000 + useconds) + 0.5;</div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>}</div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="keywordtype">void</span> printHelp(<span class="keywordtype">string</span> progName)</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>{</div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    cout &lt;&lt; <span class="stringliteral">&quot;usage: &quot;</span> &lt;&lt; progName &lt;&lt; <span class="stringliteral">&quot; [-h] [-n {0,1}] [-r {0,1}]\n\n&quot;</span></div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>         &lt;&lt; <span class="stringliteral">&quot;A simple example of streaming data from 1 nRF24L01 transceiver to another.\n&quot;</span></div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>         &lt;&lt; <span class="stringliteral">&quot;\nThis example was written to be used on 2 devices acting as &#39;nodes&#39;.\n&quot;</span></div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>         &lt;&lt; <span class="stringliteral">&quot;\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n&quot;</span></div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>         &lt;&lt; <span class="stringliteral">&quot;  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n&quot;</span></div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>         &lt;&lt; <span class="stringliteral">&quot;  -r {0,1}, --role {0,1}\n\t\t\t&#39;1&#39; specifies the TX role.&quot;</span></div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>         &lt;&lt; <span class="stringliteral">&quot; &#39;0&#39; specifies the RX role.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>}</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    } <span class="comment">// while</span></div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    uint32_t elapsedTime = getMicros(); <span class="comment">// end the timer</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    cout &lt;&lt; <span class="stringliteral">&quot;Time to transmit data = &quot;</span>;</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    cout &lt;&lt; elapsedTime;         <span class="comment">// print the timer result</span></div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    cout &lt;&lt; <span class="stringliteral">&quot; us. &quot;</span> &lt;&lt; failures; <span class="comment">// print number of retries</span></div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    cout &lt;&lt; <span class="stringliteral">&quot; failures detected. Leaving TX role.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>} <span class="comment">// master</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="keywordtype">void</span> slave()</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>{</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span> </div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>    counter = 0;</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    radio.startListening();                   <span class="comment">// put radio in RX mode</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    time_t startTimer = time(<span class="keyword">nullptr</span>);        <span class="comment">// start a timer</span></div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    <span class="keywordflow">while</span> (time(<span class="keyword">nullptr</span>) - startTimer &lt; 6) {  <span class="comment">// use 6 second timeout</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        <span class="keywordflow">if</span> (radio.available()) {              <span class="comment">// is there a payload</span></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>            radio.read(&amp;buffer, SIZE);        <span class="comment">// fetch payload from FIFO</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>            cout &lt;&lt; <span class="stringliteral">&quot;Received: &quot;</span> &lt;&lt; buffer;   <span class="comment">// print the payload&#39;s value</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>            cout &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; counter &lt;&lt; endl; <span class="comment">// print the counter</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>            counter++;                        <span class="comment">// increment counter</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>            startTimer = time(<span class="keyword">nullptr</span>);       <span class="comment">// reset timer</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>        }</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    }</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    radio.stopListening(); <span class="comment">// use TX mode for idle behavior</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    cout &lt;&lt; <span class="stringliteral">&quot;Nothing received in 6 seconds. Leaving RX role.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>}</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="keywordtype">void</span> makePayload(uint8_t i)</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>{</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    <span class="comment">// let the first character be an identifying alphanumeric prefix</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    <span class="comment">// this lets us see which payload didn&#39;t get received</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    buffer[0] = i + (i &lt; 26 ? 65 : 71);</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    <span class="keywordflow">for</span> (uint8_t j = 0; j &lt; SIZE - 1; ++j) {</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>        <span class="keywordtype">char</span> chr = j &gt;= (SIZE - 1) / 2 + abs((SIZE - 1) / 2 - i);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        chr |= j &lt; (SIZE - 1) / 2 - abs((SIZE - 1) / 2 - i);</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>        buffer[j + 1] = chr + 48;</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    }</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>}</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>uint32_t getMicros()</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>{</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="comment">// this function assumes that the timer was started using</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <span class="comment">// `clock_gettime(CLOCK_MONOTONIC_RAW, &amp;startTimer);`</span></div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span> </div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    clock_gettime(CLOCK_MONOTONIC_RAW, &amp;endTimer);</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    uint32_t seconds = endTimer.tv_sec - startTimer.tv_sec;</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    uint32_t useconds = (endTimer.tv_nsec - startTimer.tv_nsec) / 1000;</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span> </div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <span class="keywordflow">return</span> ((seconds)*1000 + useconds) + 0.5;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>}</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="keywordtype">void</span> printHelp(<span class="keywordtype">string</span> progName)</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>{</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    cout &lt;&lt; <span class="stringliteral">&quot;usage: &quot;</span> &lt;&lt; progName &lt;&lt; <span class="stringliteral">&quot; [-h] [-n {0,1}] [-r {0,1}]\n\n&quot;</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>         &lt;&lt; <span class="stringliteral">&quot;A simple example of streaming data from 1 nRF24L01 transceiver to another.\n&quot;</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>         &lt;&lt; <span class="stringliteral">&quot;\nThis example was written to be used on 2 devices acting as &#39;nodes&#39;.\n&quot;</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>         &lt;&lt; <span class="stringliteral">&quot;\noptional arguments:\n  -h, --help\t\tshow this help message and exit\n&quot;</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>         &lt;&lt; <span class="stringliteral">&quot;  -n {0,1}, --node {0,1}\n\t\t\tthe identifying radio number\n&quot;</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>         &lt;&lt; <span class="stringliteral">&quot;  -r {0,1}, --role {0,1}\n\t\t\t&#39;1&#39; specifies the TX role.&quot;</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>         &lt;&lt; <span class="stringliteral">&quot; &#39;0&#39; specifies the RX role.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>}</div>
 <div class="ttc" id="aRF24_8h_html"><div class="ttname"><a href="RF24_8h.html">RF24.h</a></div></div>
 <div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00115">RF24.h:116</a></div></div>
 <div class="ttc" id="agroup__PALevel_html_gga1e4cd0bea93e6b43422855fb0120aacea7d8d09f4a047b7c22655e56c98ca010c"><div class="ttname"><a href="group__PALevel.html#gga1e4cd0bea93e6b43422855fb0120aacea7d8d09f4a047b7c22655e56c98ca010c">RF24_PA_LOW</a></div><div class="ttdeci">@ RF24_PA_LOW</div><div class="ttdef"><b>Definition:</b> <a href="RF24_8h_source.html#l00050">RF24.h:50</a></div></div>
 </div><!-- fragment --> </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 27 2023 06:03:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Sun Feb 25 2024 07:03:25 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>

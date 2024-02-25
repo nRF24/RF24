@@ -2101,10 +2101,10 @@ This function no longer returns a boolean. Use available to determine if packets
 <p>Useful to check for interference on the current channel and channel hopping strategies.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> goodSignal = radio.testRPD();</div>
 <div class="line"><span class="keywordflow">if</span>(radio.available()){</div>
-<div class="line">   Serial.println(goodSignal ? <span class="stringliteral">&quot;Strong signal &gt; 64dBm&quot;</span> : <span class="stringliteral">&quot;Weak signal &lt; 64dBm&quot;</span> );</div>
-<div class="line">   radio.read(0,0);</div>
+<div class="line">   Serial.println(goodSignal ? <span class="stringliteral">&quot;Strong signal &gt; -64dBm&quot;</span> : <span class="stringliteral">&quot;Weak signal &lt; -64dBm&quot;</span> );</div>
+<div class="line">   radio.read(&amp;payload,<span class="keyword">sizeof</span>(payload));</div>
 <div class="line">}</div>
-</div><!-- fragment --> <dl class="section return"><dt>Returns</dt><dd>true if a signal less than or equal to -64dBm was detected, false if not. </dd></dl>
+</div><!-- fragment --> <dl class="section return"><dt>Returns</dt><dd>true if a signal greater than or equal to -64dBm was detected, false if not. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="RF24_8cpp_source.html#l01846">1846</a> of file <a class="el" href="RF24_8cpp_source.html">RF24.cpp</a>.</p>
 
@@ -3307,7 +3307,7 @@ description when<br  />
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 27 2023 06:03:10 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Sun Feb 25 2024 07:03:25 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>
