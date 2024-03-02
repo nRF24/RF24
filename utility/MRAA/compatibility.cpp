@@ -1,7 +1,6 @@
 #include "compatibility.h"
+#include <time.h>
 #include <chrono>
-//static struct timeval start, end;
-//static long mtime, seconds, useconds;
 
 /**********************************************************************/
 /**
@@ -10,33 +9,30 @@
  */
 void __msleep(int milisec)
 {
-    struct timespec req = {0};
-    req.tv_sec = 0;
-    req.tv_nsec = milisec * 1000000L;
-    nanosleep(&req, (struct timespec*)NULL);
-    //usleep(milisec*1000);
+    struct timespec req; // = {0};
+    req.tv_sec = (time_t)milisec / 1000;
+    req.tv_nsec = (milisec % 1000) * 1000000L;
+    clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
 
-void __usleep(int milisec)
+void __usleep(int microsec)
 {
-    struct timespec req = {0};
-    req.tv_sec = 0;
-    req.tv_nsec = milisec * 1000L;
-    nanosleep(&req, (struct timespec*)NULL);
-    //usleep(milisec);
+    struct timespec req; // = {0};
+    req.tv_sec = (time_t)microsec / 1000000;
+    req.tv_nsec = (microsec / 1000000) * 1000;
+    clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
-
-auto start = std::chrono::steady_clock::now();
 
 /**
  * This function is added in order to simulate arduino millis() function
  */
 void __start_timer()
 {
-    //gettimeofday(&start, NULL);
 }
 
-long __millis()
+auto start = std::chrono::steady_clock::now();
+
+uint32_t __millis()
 {
     auto end = std::chrono::steady_clock::now();
 
