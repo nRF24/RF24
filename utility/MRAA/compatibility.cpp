@@ -23,7 +23,6 @@ void __usleep(int microsec)
     clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
 
-
 /**
  * This function is added in order to simulate arduino millis() function
  */
