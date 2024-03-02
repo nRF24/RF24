@@ -24,8 +24,7 @@ changes.
 - [RF24 Class Documentation](classRF24.html)
 - [Support & Configuration](pages.html)
 - [Source Code](https://github.com/nRF24/RF24/)
-- [nRF24L01 v2.0 Datasheet](http://github.com/nRF24/RF24/raw/master/datasheets/nRF24L01_datasheet_v2.pdf)
-- [nRF24L01+ v1.0 Datasheet](http://github.com/nRF24/RF24/raw/master/datasheets/nRF24L01P_datasheet_v1.pdf)
+- [Datasheets](https://github.com/nRF24/RF24/tree/master/datasheets)
 
 ### Additional Information and Add-ons
 
@@ -33,6 +32,7 @@ changes.
 - [RF24Mesh](http://nRF24.github.io/RF24Mesh): Dynamic Mesh Layer for RF24Network
 - [RF24Ethernet](http://nRF24.github.io/RF24Ethernet): TCP/IP Radio Mesh Networking (shares Arduino Ethernet API)
 - [RF24Audio](http://nRF24.github.io/RF24Audio): Realtime Wireless Audio streaming
+- [nrf_to_nrf](https://github.com/TMRh20/nrf_to_nrf): OSI Layer 2 radio driver for NRF52x radios. Replaces RF24 layer for new radio devices.
 - [TMRh20 Blog: RF24 Optimization Overview](http://tmrh20.blogspot.com/2014/03/high-speed-data-transfers-and-wireless.html)
 - [TMRh20: RPi/Linux with RF24Gateway](http://tmrh20.blogspot.com/2016/08/raspberry-pilinux-with-nrf24l01.html)
 - [All TMRh20 Documentation Main Page](http://tmrh20.github.io/)
