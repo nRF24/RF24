@@ -19,7 +19,7 @@ void __usleep(int microsec)
 {
     struct timespec req; // = {0};
     req.tv_sec = (time_t)microsec / 1000000;
-    req.tv_nsec = (microsec / 1000000) * 1000;
+    req.tv_nsec = (microsec % 1000000) * 1000;
     clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
 
