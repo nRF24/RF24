@@ -129,6 +129,7 @@ void loop() {
       while (!radio.available()) {             // wait for response
         if (millis() - start_timeout > 200)    // only wait 200 ms
           break;
+        delayMicroseconds(200);  // relax probing of available()
       }
       unsigned long end_timer = micros();  // end the timer
       radio.stopListening();               // put back in TX mode
