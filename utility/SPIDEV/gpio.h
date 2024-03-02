@@ -16,6 +16,11 @@
 #include <cstdio>
 #include <map>
 #include <stdexcept>
+#include <cstdint>
+
+
+typedef uint16_t rf24_gpio_pin_t;
+#define RF24_PIN_INVALID 0xFFFF
 
 /** Specific exception for SPI errors */
 class GPIOException : public std::runtime_error
@@ -41,13 +46,13 @@ public:
 
     GPIO();
 
-    static void open(int port, int DDR);
+    static void open(rf24_gpio_pin_t port, int DDR);
 
-    static void close(int port);
+    static void close(rf24_gpio_pin_t port);
 
-    static int read(int port);
+    static int read(rf24_gpio_pin_t port);
 
-    static void write(int port, int value);
+    static void write(rf24_gpio_pin_t port, int value);
 
     virtual ~GPIO();
 
