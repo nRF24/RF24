@@ -9,7 +9,7 @@
  03/17/2013 : Charles-Henri Hallard (http://hallard.me)
               Modified to use with Arduipi board http://hallard.me/arduipi
                           Changed to use modified bcm2835 and RF24 library
-
+ 07/12/2022: Modified to be more promiscuous using reverse engineering tactics.
  */
 
 /**
@@ -20,7 +20,7 @@
  * good channel for your application.
  *
  * Inspired by cpixip.
- * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ * See https://forum.arduino.cc/t/poor-mans-2-4-ghz-scanner/54846
  */
 
 /*
@@ -90,6 +90,11 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // print a line that should not be wrapped
+    cout << "\n!!! This example requires a width of at least 126 characters. "
+         << "If this text uses multiple lines, then the output will look bad.\n"
+         << endl;
+
     // set the data rate
     cout << "Select your Data Rate. "
          << "Enter '1' for 1 Mbps, '2' for 2 Mbps, '3' for 250 kbps. "
@@ -114,23 +119,15 @@ int main(int argc, char** argv)
     radio.setAutoAck(false);  // Don't acknowledge arbitrary signals
     radio.disableCRC();       // Accept any signal we find
     radio.setAddressWidth(2); // A reverse engineering tactic (not typically recommended)
-    radio.openReadingPipe(0, noiseAddress[0]);
-    radio.openReadingPipe(1, noiseAddress[1]);
-    radio.openReadingPipe(2, noiseAddress[2]);
-    radio.openReadingPipe(3, noiseAddress[3]);
-    radio.openReadingPipe(4, noiseAddress[4]);
-    radio.openReadingPipe(5, noiseAddress[5]);
+    for (uint8_t i = 0; i < 6; ++i) {
+        radio.openReadingPipe(i, noiseAddress[i]);
+    }
 
     // Get into standby mode
     radio.startListening();
     radio.stopListening();
     radio.flush_rx();
     // radio.printPrettyDetails();
-
-    // print a line that should not be wrapped
-    cout << "\n!!! This example requires a width of at least 126 characters. "
-         << "If this text uses multiple lines, then the output will look bad.\n"
-         << endl;
     // print the vertical header
     printHeader();
 

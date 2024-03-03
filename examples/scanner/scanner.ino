@@ -14,12 +14,14 @@
  * This is a good diagnostic tool to check whether you're picking a
  * good channel for your application.
  *
- * Run this sketch on two devices. On one device, start CCW output by sending a 'g'
- * character over Serial. The other device scanning should detect the output of the sending
- * device on the given channel. Adjust channel and output power of CCW below.
+ * Run this sketch on two devices. On one device, start emitting a constant carrier wave
+ * by sending a channel number in the Serial Monitor. The other device scanning should
+ * detect the constant carrier wave from the sending device on the given channel.
+ * Send a negative number in the Serial Monitor to stop emitting a constant carrier wave
+ * and resume scanning.
  *
  * Inspired by cpixip.
- * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ * See https://forum.arduino.cc/t/poor-mans-2-4-ghz-scanner/54846
  */
 
 /*
@@ -64,7 +66,7 @@ uint8_t values[num_channels];      // the array to store summary of signal count
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
 // that the RF signal's preamble is part of the packet/payload.
-const uint8_t noiseAddress[][2] = { { 0x55, 0x55 }, { 0xAA, 0xAA } };
+const uint8_t noiseAddress[][2] = { { 0x55, 0x55 }, { 0xAA, 0xAA }, { 0xA0, 0xAA }, { 0xAB, 0xAA }, { 0xAC, 0xAA }, { 0xAD, 0xAA } };
 
 const int num_reps = 100;   // number of passes for each scan of the entire spectrum
 bool constCarrierMode = 0;  // this flag controls example behavior (scan mode is default)
@@ -92,8 +94,9 @@ void setup(void) {
   radio.setAutoAck(false);   // Don't acknowledge arbitrary signals
   radio.disableCRC();        // Accept any signal we find
   radio.setAddressWidth(2);  // A reverse engineering tactic (not typically recommended)
-  radio.openReadingPipe(0, noiseAddress[0]);
-  radio.openReadingPipe(1, noiseAddress[1]);
+  for (uint8_t i = 0; i < 6; ++i) {
+    radio.openReadingPipe(i, noiseAddress[i]);
+  }
 
   // set the data rate
   Serial.print(F("Select your Data Rate. "));
@@ -102,7 +105,7 @@ void setup(void) {
   while (!Serial.available()) {
     // wait for user input
   }
-  uint8_t dataRate = Serial.read();
+  uint8_t dataRate = Serial.parseInt();
   if (dataRate == 50) {
     Serial.println(F("Using 2 Mbps."));
     radio.setDataRate(RF24_2MBPS);
@@ -134,7 +137,7 @@ void loop(void) {
   // Send a number over Serial to begin Constant Carrier Wave output
   // Configure the power amplitude level below
   if (Serial.available()) {
-    int c = Serial.read();
+    uint8_t c = Serial.parseInt();
     if (c >= 0) {
       c = min(125, max(0, c));  // clamp channel to supported range
       constCarrierMode = 1;

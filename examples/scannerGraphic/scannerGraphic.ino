@@ -5,13 +5,39 @@
  * modify it under the terms of the GNU General Public License
  * version 2 as published by the Free Software Foundation.
  */
+
+/*
+ * This example uses 1 of 2 different popular displays. To control which display to use,
+ * comment/uncomment the lines below that define
+ * - `SPI_DISPLAY`: This requires the "Adafruit ST7735 and ST7789 Library" installed
+ * - `I2C_DISPLAY`: This requires the "Adafruit SSD1306" library installed
+ * 
+ * Use the Arduino Library manager to ensure the required libraries are installed.
+ * By default, this sketch uses the SPI_DISPLAY (ST7789). Using both displays at the same
+ * time is not supported by this sketch.
+ * 
+ * NOTES:
+ *     The `SCREEN_HEIGHT` and `SCREEN_WIDTH` defines may need to be adjusted according
+ *     to your display module's capability.
+ *
+ *     The SPI_DISPLAY ues its own pins defined by `TFT_CS`, `TFT_DC`, and the
+ *     optional `TFT_RST` (see below). The SPI bus is shared between radio and display,
+ *     so the display's CS pin must be connected as specified by `TFT_CS`.
+ *     If your ST7789 display does not have a CS pin, then further modification must
+ *     be made so it does not use the same SPI bus that the radio uses.
+ * 
+ *     `DEBUGGING` can be enabled (uncommented) to show Serial output. This is just a
+ *     convenience for troubleshooting and advanced development. See our other
+ *     RF24/scanner example that only uses the Serial Monitor instead of a graphic
+ *     display.
+ */
+#include <Adafruit_GFX.h>  // dependency of Adafruit display libraries
 #include "RF24.h"
-#include <Adafruit_GFX.h>
 
 
-/* *******************************************************************
+/********************************************************************
  * Instantiate the radio and app-specific attributes
- * *******************************************************************/
+ ********************************************************************/
 
 // Set up nRF24L01 radio on SPI bus using pins 7 (for CE) & 8 (for CSN)
 RF24 radio(0, 1);
@@ -30,7 +56,7 @@ bool history[num_channels][CACHE_MAX];
  * Instantiate the appropriate display
  ********************************************************************/
 
-// uncomment either or none of the following:
+// uncomment either or none of the following to use the desired display:
 
 // #define I2C_DISPLAY  // using the SSD1306
 #define SPI_DISPLAY  // using ST7789
@@ -50,7 +76,7 @@ bool history[num_channels][CACHE_MAX];
 // On an arduino MEGA 2560: 20(SDA), 21(SCL)
 // On an arduino LEONARDO:   2(SDA),  3(SCL), ...
 #define OLED_RESET -1        // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3D  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define SCREEN_ADDRESS 0x3D  // See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define BLACK SSD1306_BLACK
@@ -109,7 +135,7 @@ void setup(void) {
   while (!Serial) {
     // some boards need this to wait for Serial connection
   }
-  Serial.println(F("RF24/examples/recipes/scanner/"));
+  Serial.println(F("RF24/examples/scannerGraphic/"));
 #endif
 
 #ifdef I2C_DISPLAY
@@ -140,12 +166,9 @@ void setup(void) {
   radio.setAutoAck(false);   // Don't acknowledge arbitrary signals
   radio.disableCRC();        // accept any signal we find
   radio.setAddressWidth(2);  // a reverse engineering tactic (not typically recommended)
-  radio.openReadingPipe(0, noiseAddress[0]);
-  radio.openReadingPipe(1, noiseAddress[1]);
-  radio.openReadingPipe(2, noiseAddress[2]);
-  radio.openReadingPipe(3, noiseAddress[3]);
-  radio.openReadingPipe(4, noiseAddress[4]);
-  radio.openReadingPipe(5, noiseAddress[5]);
+  for (uint8_t i = 0; i < 6; ++i) {
+    radio.openReadingPipe(i, noiseAddress[i]);
+  }
 
   // set the data rate
 #ifdef DEBUGGING
@@ -155,9 +178,9 @@ void setup(void) {
   while (!Serial.available() && millis() < inputTimeout) {
     // Wait for user input. Timeout after 7 seconds.
   }
-  uint8_t dataRate = !Serial.available() ? '1' : Serial.read();
+  char dataRate = !Serial.available() ? '1' : Serial.parseInt();
 #else
-  uint8_t dataRate = '1';
+  char dataRate = '1';
 #endif
   if (dataRate == '2') {
     SERIAL_DEBUG(Serial.println(F("Using 2 Mbps.")););
@@ -234,13 +257,13 @@ bool scanChannel(uint8_t channel) {
  * Push new scan result for a channel into the history.
  * @returns The count of historic signals found (including pushed result)
  ********************************************************************/
-uint8_t historyPush(uint8_t index, bool value) {
+uint8_t historyPush(uint8_t channel, bool value) {
   uint8_t sum = 0;
   for (uint8_t i = 0; i < CACHE_MAX - 1; ++i) {
-    history[index][i] = history[index][i + 1];
-    sum += history[index][i];
+    history[channel][i] = history[channel][i + 1];
+    sum += history[channel][i];
   }
-  history[index][CACHE_MAX - 1] = value;
+  history[channel][CACHE_MAX - 1] = value;
   return sum + value;
 }
 

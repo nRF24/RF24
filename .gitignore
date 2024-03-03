@@ -18,8 +18,9 @@ Session.vim
 .DS_Store
 Makefile.inc
 utility/includes.h
+!examples_linux/
 examples_linux/*
-examples_linux/**/*
+!examples_linux/**/
 !examples_linux/*.cpp
 !examples_linux/*.py
 !examples_linux/**/*.cpp

@@ -76,7 +76,4 @@ foreach(example ${EXAMPLES_LIST})
     target_link_libraries(${example} PUBLIC ${linked_libs})
 endforeach()
 
-include(../cmake/enableNcursesExample.cmake)
-if(BUILD_NCURSES_EXAMPLE)
-    add_subdirectory(ncurses)
-endif()
+add_subdirectory(ncurses)

@@ -29,10 +29,15 @@ RF24 radio(22, 0);
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
 // Channel info
-const uint8_t MAX_CHANNELS = 126;        // 0-125 are supported
-unsigned int values[MAX_CHANNELS] = {0}; // the array to store summary of signal counts per channel
-const uint8_t CACHE_MAX = 5;             // maximum depth of history for calculating peaks per channel
-bool history[MAX_CHANNELS][CACHE_MAX];   // a cache of history for each channel
+const uint8_t MAX_CHANNELS = 126; // 0-125 are supported
+const uint8_t CACHE_MAX = 5;      // maximum depth of history for calculating peaks per channel
+
+struct ChannelHistory
+{
+    unsigned int total = 0; // the summary of signal counts for the channel
+    bool history[CACHE_MAX]; // a cache of history for the channel
+};
+ChannelHistory stored[MAX_CHANNELS];
 
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
@@ -48,7 +53,7 @@ WINDOW* win; // curses base window object
 uint8_t initRadio();
 void initCurses();
 void deinitCurses();
-void initArrays();
+void initBars();
 bool scanChannel(uint8_t);
 uint8_t historyPush(uint8_t index, bool value);
 
@@ -119,11 +124,11 @@ int main(int argc, char** argv)
 
     // create out interface
     initCurses();
-    initArrays();
+    initBars();
     mvaddstr(0, 0, "Channels are labeled in MHz.");
     mvaddstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.");
 
-    uint8_t i = 0;
+    uint8_t channel = 0;
     time_t start = time(nullptr);
     while (static_cast<int>(difftime(time(nullptr), start)) < duration) {
         mvprintw(2,
@@ -133,22 +138,22 @@ int main(int argc, char** argv)
                  static_cast<int>(d_rate),
                  bpsUnit);
 
-        bool foundSignal = scanChannel(i);
-        uint8_t cachedCount = historyPush(i, foundSignal);
+        bool foundSignal = scanChannel(channel);
+        uint8_t cachedCount = historyPush(channel, foundSignal);
 
         // output the summary/snapshot for this channel
-        if (values[i]) {
+        if (stored[channel].total) {
             // make changes to the screen
-            table[i]->update(static_cast<int>(cachedCount), rf24_min(values[i], 0xF));
+            table[channel]->update(static_cast<int>(cachedCount), rf24_min(stored[channel].total, 0xF));
         }
 
         refresh();
-        if (i + 1 == MAX_CHANNELS) {
-            i = 0;
+        if (channel + 1 == MAX_CHANNELS) {
+            channel = 0;
             ++passesCount;
         }
         else {
-            ++i;
+            ++channel;
         }
     }
 
@@ -186,12 +191,9 @@ uint8_t initRadio()
     radio.setAutoAck(false);  // Don't acknowledge arbitrary signals
     radio.disableCRC();       // Accept any signal we find
     radio.setAddressWidth(2); // A reverse engineering tactic (not typically recommended)
-    radio.openReadingPipe(0, noiseAddress[0]);
-    radio.openReadingPipe(1, noiseAddress[1]);
-    radio.openReadingPipe(2, noiseAddress[2]);
-    radio.openReadingPipe(3, noiseAddress[3]);
-    radio.openReadingPipe(4, noiseAddress[4]);
-    radio.openReadingPipe(5, noiseAddress[5]);
+    for (uint8_t i = 0; i < 6; ++i) {
+        radio.openReadingPipe(i, noiseAddress[i]);
+    }
 
     // Get into standby mode
     radio.startListening();
@@ -217,7 +219,7 @@ bool scanChannel(uint8_t channel)
 
     // Did we get a signal?
     if (foundSignal || radio.testRPD() || radio.available()) {
-        ++values[channel];
+        ++stored[channel].total;
         radio.flush_rx(); // discard packets of noise
         return true;
     }
@@ -246,14 +248,24 @@ void deinitCurses()
 
     // print out the total signal counts (if any)
     uint8_t active_channels = 0; // the sum of channels with detected noise
-    for (uint8_t i = 0; i < MAX_CHANNELS; ++i) {
-        if (values[i]) {
+    uint8_t digitW = 0;
+    unsigned int tmp = passesCount;
+    while (tmp) {
+        digitW += 1;
+        tmp /= 10;
+    }
+
+    for (uint8_t channel = 0; channel < MAX_CHANNELS; ++channel) {
+        if (stored[channel].total) {
             active_channels++;
-            float noiseRatio = static_cast<float>(values[i]) / passesCount;
+            float noiseRatio = static_cast<float>(stored[channel].total) / passesCount * 100;
             cout << "  "
-                 << static_cast<unsigned int>(i)
+                 << setfill(' ')
+                 << setw(3)
+                 << static_cast<unsigned int>(channel)
                  << ": "
-                 << static_cast<unsigned int>(values[i])
+                 << setw(digitW)
+                 << static_cast<unsigned int>(stored[channel].total)
                  << " / "
                  << passesCount
                  << " ("
@@ -271,15 +283,8 @@ void deinitCurses()
 }
 
 /** init arrays for the history and progress bars */
-void initArrays()
+void initBars()
 {
-    // fill our history with blanks
-    for (uint8_t i = 0; i < MAX_CHANNELS; ++i) {
-        for (uint8_t j = 0; j < CACHE_MAX; ++j) {
-            history[i][j] = false;
-        }
-    }
-
     // init our progress bars
     int bar_w = COLS / 6; // total progress bar width (including all contents)
 
@@ -302,14 +307,14 @@ void initArrays()
  * Push new scan result for a channel into the history.
  * @returns The count of historic signals found (including pushed result)
  */
-uint8_t historyPush(uint8_t index, bool value)
+uint8_t historyPush(uint8_t channel, bool value)
 {
     uint8_t sum = 0;
     for (uint8_t i = 0; i < CACHE_MAX - 1; ++i) {
-        history[index][i] = history[index][i + 1];
-        sum += history[index][i];
+        stored[channel].history[i] = stored[channel].history[i + 1];
+        sum += stored[channel].history[i];
     }
-    history[index][CACHE_MAX - 1] = value;
+    stored[channel].history[CACHE_MAX - 1] = value;
     return sum + value;
 }
 

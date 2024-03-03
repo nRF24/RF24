@@ -1,6 +1,12 @@
 # this example needs the ncurses package installed
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIR})
+find_package(Curses)
+if(Curses_FOUND)
+    message(STATUS "Including ncurses example")
+    include_directories(${CURSES_INCLUDE_DIR})
+else()
+    message(STATUS "libncurses5-dev not found. Skipping ncurses example")
+    return()
+endif()
 
 set(example scanner_curses)
 

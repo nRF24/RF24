@@ -1,4 +1,5 @@
-"""A scanner example written in python using the std lib's ncurses wrapper"""
+"""A scanner example written in python using the std lib's ncurses wrapper."""
+
 # pylint: disable=no-member
 import curses
 import time
@@ -15,9 +16,19 @@ OFFERED_DATA_RATES = ["1 Mbps", "2 Mbps", "250 kbps"]
 AVAILABLE_RATES = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
 TOTAL_CHANNELS = 126
 CACHE_MAX = 5  # the depth of history to calculate peaks
-history = [[False] * CACHE_MAX] * TOTAL_CHANNELS  # FIFO for tracking peak decays
-totals = [0] * TOTAL_CHANNELS  # for the total signal counts
-spectrum_pass = [0]
+
+
+class ChannelHistory:
+    def __init__(self) -> None:
+        #: FIFO for tracking peak decays
+        self.history: List[bool] = [False] * CACHE_MAX
+        #: for the total signal counts
+        self.total: int = 0
+
+
+#: An array of histories for each channel
+stored = [ChannelHistory() for _ in range(TOTAL_CHANNELS)]
+
 
 class ProgressBar:  # pylint: disable=too-few-public-methods
     """This represents a progress bar using a curses window object."""
@@ -50,7 +61,7 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         self.win.addstr(self.y, self.x + 5 + len(bar), f"{empty} {count} ", self.color)
 
 
-def init_interface(window) -> List[ProgressBar]:
+def init_display(window) -> List[ProgressBar]:
     """Creates a table of progress bars (1 for each channel)."""
     progress_bars: List[ProgressBar] = [None] * TOTAL_CHANNELS
     bar_w = int(curses.COLS / 6)
@@ -76,11 +87,11 @@ def init_radio():
     radio.disableCRC()
     radio.setAddressWidth(2)
     radio.openReadingPipe(0, b"\x55\x55")
-    radio.openReadingPipe(1, b"\xAA\xAA")
-    radio.openReadingPipe(1, b"\x0A\xAA")
-    radio.openReadingPipe(1, b"\xA0\xAA")
-    radio.openReadingPipe(1, b"\x00\xAA")
-    radio.openReadingPipe(1, b"\xAB\xAA")
+    radio.openReadingPipe(1, b"\xaa\xaa")
+    radio.openReadingPipe(1, b"\x0a\xaa")
+    radio.openReadingPipe(1, b"\xa0\xaa")
+    radio.openReadingPipe(1, b"\x00\xaa")
+    radio.openReadingPipe(1, b"\xab\xaa")
     radio.startListening()
     radio.stopListening()
     radio.flush_rx()
@@ -99,18 +110,24 @@ def init_curses():
     return std_scr
 
 
-def deinit_curses():
+def deinit_curses(spectrum_passes: int):
     """de-init the curses interface"""
     curses.nocbreak()
     curses.echo()
     curses.endwin()
-    for channel, count in enumerate(totals):
-        if count:
-            percentage = round(count / spectrum_pass[0], 3)
-            print(f"  {channel}: {count} / {spectrum_pass[0]} ({percentage} %)")
+    noisy_channels: int = 0
+    digit_w = len(str(spectrum_passes))
+    for channel, data in enumerate(stored):
+        if data.total:
+            count_padding = " " * (digit_w - len(str(data.total)))
+            percentage = round(data.total / spectrum_passes * 100, 3)
+            print(
+                f"  {channel:>3}: {count_padding}{data.total} / {spectrum_passes} ({percentage} %)"
+            )
+            noisy_channels += 1
     print(
-        f"{TOTAL_CHANNELS - totals.count(0)} channels detected signals",
-        f"out of {spectrum_pass[0]} passes on the entire spectrum."
+        f"{noisy_channels} channels detected signals out of {spectrum_passes}",
+        "passes on the entire spectrum.",
     )
 
 
@@ -143,6 +160,7 @@ def scan_channel(channel: int) -> bool:
 
 
 def main():
+    spectrum_passes = 0
     data_rate, duration = get_user_input()
     print(f"Scanning for {duration} seconds at {OFFERED_DATA_RATES[data_rate]}")
     init_radio()
@@ -152,25 +170,27 @@ def main():
         timer_prompt = "Scanning for {} seconds at " + OFFERED_DATA_RATES[data_rate]
         std_scr.addstr(0, 0, "Channels are labeled in MHz.")
         std_scr.addstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.")
-        table = init_interface(std_scr)
+        bars = init_display(std_scr)
         channel, val = (0, False)
         end = time.monotonic() + duration
         while time.monotonic() < end:
             std_scr.addstr(2, 0, timer_prompt.format(int(end - time.monotonic())))
             val = scan_channel(channel)
-            history[channel] = history[channel][1:] + [val]
-            totals[channel] += val
-            if totals[channel]:
-                table[channel].update(history[channel].count(True), totals[channel])
+            stored[channel].history = stored[channel].history[1:] + [val]
+            stored[channel].total += val
+            if stored[channel].total:
+                bars[channel].update(
+                    stored[channel].history.count(True), stored[channel].total
+                )
                 std_scr.refresh()
             if channel + 1 == TOTAL_CHANNELS:
                 channel = 0
-                spectrum_pass[0] += 1
+                spectrum_passes += 1
             else:
                 channel += 1
     finally:
         radio.powerDown()
-        deinit_curses()
+        deinit_curses(spectrum_passes)
 
 
 if __name__ == "__main__":
