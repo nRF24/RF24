@@ -19,7 +19,7 @@
  * good channel for your application.
  *
  * Inspired by cpixip.
- * See http://arduino.cc/forum/index.php/topic,54795.0.html
+ * See https://forum.arduino.cc/t/poor-mans-2-4-ghz-scanner/54846
  */
 
 /*
@@ -134,12 +134,9 @@ void initRadio()
     radio.setAutoAck(false);  // Don't acknowledge arbitrary signals
     radio.disableCRC();       // Accept any signal we find
     radio.setAddressWidth(2); // A reverse engineering tactic (not typically recommended)
-    radio.openReadingPipe(0, noiseAddress[0]);
-    radio.openReadingPipe(1, noiseAddress[1]);
-    radio.openReadingPipe(2, noiseAddress[2]);
-    radio.openReadingPipe(3, noiseAddress[3]);
-    radio.openReadingPipe(4, noiseAddress[4]);
-    radio.openReadingPipe(5, noiseAddress[5]);
+    for (uint8_t i = 0; i < 6; ++i) {
+        radio.openReadingPipe(i, noiseAddress[i]);
+    }
 
     // To set the radioNumber via the Serial terminal on startup
     printf("Select your data rate. ");
