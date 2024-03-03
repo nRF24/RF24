@@ -79,7 +79,7 @@ int main()
     printf("RF24/examples_pico/scanner\n");
 
     // print a line that should not be wrapped
-    printf("!!! This example requires a width of at least 126 characters. ");
+    printf("\n!!! This example requires a width of at least 126 characters. ");
     printf("If this text uses multiple lines, then the output will look bad.\n");
 
     // initialize the transceiver on the SPI bus
@@ -139,7 +139,7 @@ void initRadio()
     }
 
     // To set the radioNumber via the Serial terminal on startup
-    printf("Select your data rate. ");
+    printf("\nSelect your data rate. ");
     printf("Enter '1' for 1 Mbps, '2' for 2 Mbps, or '3' for 250 kbps. ");
     printf("Defaults to 1 Mbps.\n");
     char input = getchar();

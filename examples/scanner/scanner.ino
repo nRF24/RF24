@@ -137,7 +137,7 @@ void loop(void) {
   // Send a number over Serial to begin Constant Carrier Wave output
   // Configure the power amplitude level below
   if (Serial.available()) {
-    uint8_t c = Serial.parseInt();
+    int8_t c = Serial.parseInt();
     if (c >= 0) {
       c = min(125, max(0, c));  // clamp channel to supported range
       constCarrierMode = 1;
@@ -152,7 +152,7 @@ void loop(void) {
       radio.stopConstCarrier();
       radio.setAddressWidth(2);                   // reset address width
       radio.openReadingPipe(0, noiseAddress[0]);  // ensure address is looking for noise
-      Serial.println("\nStopping Carrier Out");
+      Serial.println("\nStopping Carrier Wave Output");
       printHeader();
     }
   }
