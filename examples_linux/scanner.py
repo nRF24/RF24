@@ -45,15 +45,15 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
         string = label  # always labeled in MHz (4 digits)
         # -9 for padding, label, & signal count
-        string += "─" * (self.width - 8)  # the empty bar
+        string += "-" * (self.width - 8)  # the empty bar
         string += " - "  # the initial signal count
         self.win.addstr(self.y, self.x, string, self.color)
 
     def update(self, completed: int, signal_count: int):
         """Update the progress bar."""
         filled = min(CACHE_MAX, completed) / CACHE_MAX
-        bar = "═" * int((self.width - 8) * filled)
-        empty = "─" * (self.width - 8 - len(bar))
+        bar = "=" * int((self.width - 8) * filled)
+        empty = "-" * (self.width - 8 - len(bar))
         count = "-"
         if signal_count:
             count = "%X" % min(0xF, signal_count)
