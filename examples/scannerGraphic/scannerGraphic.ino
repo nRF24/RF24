@@ -27,7 +27,7 @@
  *     be made so it does not use the same SPI bus that the radio uses.
  * 
  *     `DEBUGGING` can be enabled (uncommented) to show Serial output. This is just a
- *     convenience for troubleshooting and advanced development. See our other
+ *     convenience set radio data rate or further development. See our other
  *     RF24/scanner example that only uses the Serial Monitor instead of a graphic
  *     display.
  */
@@ -49,10 +49,43 @@ RF24 radio(CE_PIN, CSN_PIN);
 // that the RF signal's preamble is part of the packet/payload.
 const uint8_t noiseAddress[][2] = { { 0x55, 0x55 }, { 0xAA, 0xAA }, { 0xA0, 0xAA }, { 0xAB, 0xAA }, { 0xAC, 0xAA }, { 0xAD, 0xAA } };
 
-// keep a cache of history for peak decay
-const uint8_t CACHE_MAX = 4;
-const uint8_t num_channels = 126;  // 0-125 are supported
-bool history[num_channels][CACHE_MAX];
+const uint8_t numChannels = 126;  // 0-125 are supported
+
+/***********************************************************************
+ * Declare caching mechanism to track history of signals for peak decay
+ **********************************************************************/
+
+const uint8_t cacheMax = 4;
+
+// uncomment to disable decay of maxPeak pixels
+// #define HOLD_PEAKS
+
+/// A data structure to organize the cache of signals for a certain channel.
+struct ChannelHistory {
+  /// max peak value is (at most) 2 * CACHE_MAX to allow for half-step decays
+  uint8_t maxPeak = 0;
+
+  /// Push a signal's value into cached history while popping
+  /// oldest cached value. This also sets the maxPeak value.
+  /// @returns The sum of signals found in the cached history
+  uint8_t push(bool value) {
+    uint8_t sum = 0;
+    for (uint8_t i = 0; i < cacheMax - 1; ++i) {
+      history[i] = history[i + 1];
+      sum += history[i];
+    }
+    history[cacheMax - 1] = value;
+    sum += value;
+    maxPeak = max(sum * 2, maxPeak);  // sum * 2 to allow half-step decay
+    return sum;
+  }
+
+private:
+  bool history[cacheMax] = { 0 };
+};
+
+/// An array of caches to use as channels' history
+ChannelHistory stored[numChannels];
 
 /********************************************************************
  * Instantiate the appropriate display
@@ -107,7 +140,10 @@ Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 #endif  // if defined(I2C_DISPLAY) || defined(SPI_DISPLAY)
 
-#define X_OFFSET (SCREEN_WIDTH - (num_channels + 2)) / 2
+// constant chart size attributes
+const uint8_t margin = 1;  // use 1 pixel margin for markers on each side of chart
+const uint8_t barWidth = (SCREEN_WIDTH - (margin * 2)) / numChannels;
+const uint8_t chartHeight = SCREEN_HEIGHT - 10;
 
 /********************************************************************
  * Configure debugging on Serial output
@@ -200,13 +236,6 @@ void setup(void) {
   radio.startListening();
   radio.stopListening();
   radio.flush_rx();
-
-  // initialize our history for showing cumulative peaks
-  for (uint8_t i = 0; i < num_channels; ++i) {
-    for (uint8_t j = 0; j < CACHE_MAX; ++j) {
-      history[i][j] = false;
-    }
-  }
 }
 
 /********************************************************************
@@ -214,16 +243,23 @@ void setup(void) {
  ********************************************************************/
 void loop(void) {
   // Print out channel measurements, clamped to a single hex digit
-  for (int i = 0; i < num_channels; ++i) {
-    bool foundSignal = scanChannel(i);
-    // uint8_t chart
-    uint8_t historicCount = historyPush(i, foundSignal);
-    uint8_t x = i + 1 + X_OFFSET;
-    uint8_t chartHeight = SCREEN_HEIGHT - 10;
-    display.drawLine(x, 0, x, chartHeight, BLACK);
-    if (historicCount) {
-      uint8_t barHeight = chartHeight * historicCount / CACHE_MAX;
-      display.drawLine(x, SCREEN_HEIGHT - 10, x, SCREEN_HEIGHT - 10 - barHeight, WHITE);
+  for (uint8_t channel = 0; channel < numChannels; ++channel) {
+    bool foundSignal = scanChannel(channel);
+    uint8_t cacheSum = stored[channel].push(foundSignal);
+    uint8_t x = (barWidth * channel) + 1 + margin - (barWidth * (bool)channel);
+    // reset bar for current channel to 0
+    display.fillRect(x, 0, barWidth, chartHeight, BLACK);
+    if (stored[channel].maxPeak > cacheSum * 2) {
+      // draw a peak line only if it is greater than current sum of cached signal counts
+      uint16_t y = chartHeight - (chartHeight * stored[channel].maxPeak / (cacheMax * 2));
+      display.drawLine(x, y, x + barWidth, y, WHITE);
+#ifndef HOLD_PEAKS
+      stored[channel].maxPeak -= 1;  // decrement max peak
+#endif
+    }
+    if (cacheSum) {  // draw the cached signal count
+      uint8_t barHeight = chartHeight * cacheSum / cacheMax;
+      display.fillRect(x, chartHeight - barHeight, barWidth, barHeight, WHITE);
     }
   }
   REFRESH;
@@ -250,42 +286,34 @@ bool scanChannel(uint8_t channel) {
 }
 
 /********************************************************************
- * Push new scan result for a channel into the history.
- * @returns The count of historic signals found (including pushed result)
- ********************************************************************/
-uint8_t historyPush(uint8_t channel, bool value) {
-  uint8_t sum = 0;
-  for (uint8_t i = 0; i < CACHE_MAX - 1; ++i) {
-    history[channel][i] = history[channel][i + 1];
-    sum += history[channel][i];
-  }
-  history[channel][CACHE_MAX - 1] = value;
-  return sum + value;
-}
-
-/********************************************************************
  * Draw the chart axis and labels
  ********************************************************************/
 void displayChartAxis() {
   // draw base line
-  display.drawLine(X_OFFSET, SCREEN_HEIGHT - 8, X_OFFSET + 127, SCREEN_HEIGHT - 8, WHITE);
+  display.drawLine(0, chartHeight + 1, SCREEN_WIDTH, chartHeight + 1, WHITE);
 
   // draw base line border
-  display.drawLine(X_OFFSET, SCREEN_HEIGHT - 1, X_OFFSET, SCREEN_HEIGHT - 12, WHITE);
-  display.drawLine(X_OFFSET + 127, SCREEN_HEIGHT - 1, X_OFFSET + 127, SCREEN_HEIGHT - 12, WHITE);
+  display.drawLine(margin, SCREEN_HEIGHT, margin, chartHeight - 2, WHITE);
+  display.drawLine(SCREEN_WIDTH - margin, SCREEN_HEIGHT, SCREEN_WIDTH - margin, chartHeight - 2, WHITE);
 
   // draw scalar marks
-  for (uint8_t i = 0; i < CACHE_MAX; ++i) {
-    uint8_t scalarHeight = (SCREEN_HEIGHT - 10) * i / CACHE_MAX;
-    display.drawLine(X_OFFSET, scalarHeight, SCREEN_WIDTH - X_OFFSET, scalarHeight, WHITE);
+  for (uint8_t i = 0; i < cacheMax; ++i) {
+    uint8_t scalarHeight = chartHeight * i / cacheMax;
+    display.drawLine(0, scalarHeight, SCREEN_WIDTH, scalarHeight, WHITE);
   }
 
   // draw channel range labels
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(SCREEN_WIDTH - X_OFFSET - 21, SCREEN_HEIGHT - 7);
-  display.print(125);
-  display.setCursor(X_OFFSET + 2, SCREEN_HEIGHT - 7);
+  uint8_t maxChannelDigits = 0;
+  uint8_t tmp = numChannels;
+  while (tmp) {
+    maxChannelDigits += 1;
+    tmp /= 10;
+  }
+  display.setCursor(SCREEN_WIDTH - margin - (7 * maxChannelDigits), chartHeight + 3);
+  display.print(numChannels - 1);
+  display.setCursor(margin + 2, chartHeight + 3);
   display.print(0);
 
   // refresh display
