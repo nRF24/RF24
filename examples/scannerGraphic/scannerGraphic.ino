@@ -39,8 +39,10 @@
  * Instantiate the radio and app-specific attributes
  ********************************************************************/
 
-// Set up nRF24L01 radio on SPI bus using pins 7 (for CE) & 8 (for CSN)
-RF24 radio(0, 1);
+#define CE_PIN 7
+#define CSN_PIN 8
+// instantiate an object for the nRF24L01 transceiver
+RF24 radio(CE_PIN, CSN_PIN);
 
 // To detect noise, we'll use the worst addresses possible (a reverse engineering tactic).
 // These addresses are designed to confuse the radio into thinking
@@ -48,7 +50,7 @@ RF24 radio(0, 1);
 const uint8_t noiseAddress[][2] = { { 0x55, 0x55 }, { 0xAA, 0xAA }, { 0xA0, 0xAA }, { 0xAB, 0xAA }, { 0xAC, 0xAA }, { 0xAD, 0xAA } };
 
 // keep a cache of history for peak decay
-const uint8_t CACHE_MAX = 6;
+const uint8_t CACHE_MAX = 4;
 const uint8_t num_channels = 126;  // 0-125 are supported
 bool history[num_channels][CACHE_MAX];
 
@@ -116,10 +118,6 @@ Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 #ifdef DEBUGGING
 #include "printf.h"
 #define SERIAL_DEBUG(x) ({ x; })
-
-// Using "\r" is meant for console apps that connect to USB serial ports (SimplySerial on Windows)
-#define RETURN_FEED "\r"  // change this to "\n" if using the Serial Monitor in Arduino IDE
-
 #else
 #define SERIAL_DEBUG(x)
 #endif
@@ -135,7 +133,7 @@ void setup(void) {
   while (!Serial) {
     // some boards need this to wait for Serial connection
   }
-  Serial.println(F("RF24/examples/scannerGraphic/"));
+  Serial.println(F("RF24/examples/scannerGraphic"));
 #endif
 
 #ifdef I2C_DISPLAY
@@ -149,20 +147,25 @@ void setup(void) {
 #elif defined(SPI_DISPLAY)
   // use this initializer for a 1.14" 240x135 TFT:
   display.init(SCREEN_HEIGHT, SCREEN_WIDTH);  // Init ST7789 240x135
-  display.setRotation(1);
+  display.setRotation(1);                     // put in landscape mode
 #endif
 
   // Clear the buffer
   CLEAR_DISPLAY;
-  displayChartAxis();
 
   // Setup and configure rf radio
   if (!radio.begin()) {
     SERIAL_DEBUG(Serial.println(F("radio hardware not responding!")););
+    display.setCursor(1, 1);
+    display.setTextColor(WHITE);
+    display.printf("radio hardware\nnot responding!");
+    REFRESH;
     while (true) {
       // hold in an infinite loop
     }
   }
+  displayChartAxis();
+
   radio.setAutoAck(false);   // Don't acknowledge arbitrary signals
   radio.disableCRC();        // accept any signal we find
   radio.setAddressWidth(2);  // a reverse engineering tactic (not typically recommended)
@@ -204,9 +207,6 @@ void setup(void) {
       history[i][j] = false;
     }
   }
-#ifdef DEBUGGING
-  printHeader();
-#endif
 }
 
 /********************************************************************
@@ -221,16 +221,12 @@ void loop(void) {
     uint8_t x = i + 1 + X_OFFSET;
     uint8_t chartHeight = SCREEN_HEIGHT - 10;
     display.drawLine(x, 0, x, chartHeight, BLACK);
-    if (!historicCount) {
-      SERIAL_DEBUG(Serial.print("-"););
-    } else {
+    if (historicCount) {
       uint8_t barHeight = chartHeight * historicCount / CACHE_MAX;
       display.drawLine(x, SCREEN_HEIGHT - 10, x, SCREEN_HEIGHT - 10 - barHeight, WHITE);
-      SERIAL_DEBUG(Serial.print(historicCount););
     }
   }
   REFRESH;
-  SERIAL_DEBUG(Serial.print(RETURN_FEED););
 }  // end loop()
 
 /******************************************************************** 
@@ -265,31 +261,6 @@ uint8_t historyPush(uint8_t channel, bool value) {
   }
   history[channel][CACHE_MAX - 1] = value;
   return sum + value;
-}
-
-/********************************************************************
- * A debugging function for printing the channels' header
- ********************************************************************/
-void printHeader() {
-  // Print the hundreds digits
-  for (int i = 0; i < num_channels; ++i)
-    Serial.print(i / 100);
-  Serial.println();
-
-  // Print the tens digits
-  for (int i = 0; i < num_channels; ++i)
-    Serial.print((i % 100) / 10);
-  Serial.println();
-
-  // Print the singles digits
-  for (int i = 0; i < num_channels; ++i)
-    Serial.print(i % 10);
-  Serial.println();
-
-  // Print the header's divider
-  for (int i = 0; i < num_channels; ++i)
-    Serial.print(F("~"));
-  Serial.println();
 }
 
 /********************************************************************
