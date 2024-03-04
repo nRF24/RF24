@@ -85,7 +85,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define WHITE SSD1306_WHITE
 #define REFRESH ({ display.display(); })
 #define CLEAR_DISPLAY ({ display.clearDisplay(); })
-#define X_OFFSET 0
 
 #elif defined(SPI_DISPLAY)
 
@@ -105,9 +104,10 @@ Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 #define WHITE ST77XX_WHITE
 #define REFRESH
 #define CLEAR_DISPLAY ({ display.fillScreen(BLACK); })
-#define X_OFFSET (SCREEN_WIDTH - 128) / 2
 
 #endif  // if defined(I2C_DISPLAY) || defined(SPI_DISPLAY)
+
+#define X_OFFSET (SCREEN_WIDTH - (num_channels + 2)) / 2
 
 /********************************************************************
  * Configure debugging on Serial output
