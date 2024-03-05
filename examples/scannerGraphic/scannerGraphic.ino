@@ -18,7 +18,9 @@
  * 
  * NOTES:
  *     The `SCREEN_HEIGHT` and `SCREEN_WIDTH` defines may need to be adjusted according
- *     to your display module's capability.
+ *     to your display module's capability. This example expects the display to be at
+ *     least 128 pixels wide. Otherwise, you would have to reduce the `numChannels`
+ *     constant to fit within your display's width.
  *
  *     The SPI_DISPLAY ues its own pins defined by `TFT_CS`, `TFT_DC`, and the
  *     optional `TFT_RST` (see below). The SPI bus is shared between radio and display,
@@ -34,6 +36,19 @@
 #include <Adafruit_GFX.h>  // dependency of Adafruit display libraries
 #include "RF24.h"
 
+/********************************************************************
+ * CHOOSE A DISPLAY INTERFACE
+ * uncomment/comment only 1 of the following to use the desired display
+ ********************************************************************/
+// #define I2C_DISPLAY  // using the SSD1306
+#define SPI_DISPLAY  // using ST7789
+
+/********************************************************************
+ * Choose a sketch feature
+ * uncomment any of the following to enable a special feature
+ ********************************************************************/
+// #define DEBUGGING  // uncomment to enable Serial output (optional)
+// #define HOLD_PEAKS  // uncomment to disable decay of maxPeak pixels (useful for assessing total noise)
 
 /********************************************************************
  * Instantiate the radio and app-specific attributes
@@ -56,9 +71,6 @@ const uint8_t numChannels = 126;  // 0-125 are supported
  **********************************************************************/
 
 const uint8_t cacheMax = 4;
-
-// uncomment to disable decay of maxPeak pixels
-// #define HOLD_PEAKS
 
 /// A data structure to organize the cache of signals for a certain channel.
 struct ChannelHistory {
@@ -88,15 +100,11 @@ private:
 ChannelHistory stored[numChannels];
 
 /********************************************************************
- * Instantiate the appropriate display
+ * Instantiate the appropriate display objects according to the
+ * defines (above near top of file)
  ********************************************************************/
 
-// uncomment either or none of the following to use the desired display:
-
-// #define I2C_DISPLAY  // using the SSD1306
-#define SPI_DISPLAY  // using ST7789
-
-// create our `display` objects according to the above defines
+// create our `display`
 #ifdef I2C_DISPLAY
 
 #include <Wire.h>
@@ -123,12 +131,12 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
 
-#define TFT_CS 2
+#define TFT_CS 9
 #define TFT_RST -1  // Or set to -1 and connect to Arduino RESET pin
-#define TFT_DC 3
+#define TFT_DC 6
 
-#define SCREEN_WIDTH 240   // TFT display width, in pixels
-#define SCREEN_HEIGHT 135  // TFT display height, in pixels
+#define SCREEN_WIDTH 135   // TFT display width, in pixels
+#define SCREEN_HEIGHT 240  // TFT display height, in pixels
 
 // For 1.14", 1.3", 1.54", 1.69", and 2.0" TFT with ST7789:
 Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
@@ -141,15 +149,14 @@ Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 #endif  // if defined(I2C_DISPLAY) || defined(SPI_DISPLAY)
 
 // constant chart size attributes
-const uint8_t margin = 1;  // use 1 pixel margin for markers on each side of chart
-const uint8_t barWidth = (SCREEN_WIDTH - (margin * 2)) / numChannels;
-const uint8_t chartHeight = SCREEN_HEIGHT - 10;
+const uint16_t margin = 1;  // use 1 pixel margin for markers on each side of chart
+const uint16_t barWidth = (SCREEN_WIDTH - (margin * 2)) / numChannels;
+const uint16_t chartHeight = SCREEN_HEIGHT - 10;
+const uint16_t chartWidth = margin * 2 + (numChannels * barWidth);
 
 /********************************************************************
  * Configure debugging on Serial output
  ********************************************************************/
-
-// #define DEBUGGING  // uncomment to enable Serial output
 
 #ifdef DEBUGGING
 #include "printf.h"
@@ -182,8 +189,7 @@ void setup(void) {
   }
 #elif defined(SPI_DISPLAY)
   // use this initializer for a 1.14" 240x135 TFT:
-  display.init(SCREEN_HEIGHT, SCREEN_WIDTH);  // Init ST7789 240x135
-  display.setRotation(1);                     // put in landscape mode
+  display.init(SCREEN_WIDTH, SCREEN_HEIGHT);  // Init ST7789 240x135
 #endif
 
   // Clear the buffer
@@ -265,9 +271,7 @@ void loop(void) {
   REFRESH;
 }  // end loop()
 
-/******************************************************************** 
- * Scan a specified channel and return the resulting flag
- ********************************************************************/
+/// Scan a specified channel and return the resulting flag
 bool scanChannel(uint8_t channel) {
   radio.setChannel(channel);
 
@@ -285,21 +289,19 @@ bool scanChannel(uint8_t channel) {
   return false;
 }
 
-/********************************************************************
- * Draw the chart axis and labels
- ********************************************************************/
+/// Draw the chart axis and labels
 void displayChartAxis() {
   // draw base line
-  display.drawLine(0, chartHeight + 1, SCREEN_WIDTH, chartHeight + 1, WHITE);
+  display.drawLine(0, chartHeight + 1, chartWidth - margin, chartHeight + 1, WHITE);
 
   // draw base line border
   display.drawLine(margin, SCREEN_HEIGHT, margin, chartHeight - 2, WHITE);
-  display.drawLine(SCREEN_WIDTH - margin, SCREEN_HEIGHT, SCREEN_WIDTH - margin, chartHeight - 2, WHITE);
+  display.drawLine(chartWidth - margin, SCREEN_HEIGHT, chartWidth - margin, chartHeight - 2, WHITE);
 
   // draw scalar marks
   for (uint8_t i = 0; i < cacheMax; ++i) {
     uint8_t scalarHeight = chartHeight * i / cacheMax;
-    display.drawLine(0, scalarHeight, SCREEN_WIDTH, scalarHeight, WHITE);
+    display.drawLine(0, scalarHeight, chartWidth, scalarHeight, WHITE);
   }
 
   // draw channel range labels
@@ -311,7 +313,7 @@ void displayChartAxis() {
     maxChannelDigits += 1;
     tmp /= 10;
   }
-  display.setCursor(SCREEN_WIDTH - margin - (7 * maxChannelDigits), chartHeight + 3);
+  display.setCursor(chartWidth - (7 * maxChannelDigits), chartHeight + 3);
   display.print(numChannels - 1);
   display.setCursor(margin + 2, chartHeight + 3);
   display.print(0);
