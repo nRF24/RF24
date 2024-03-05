@@ -91,6 +91,7 @@ void setup(void) {
       // hold in an infinite loop
     }
   }
+  radio.stopConstCarrier();  // in case MCU was reset while radio was emitting carrier wave
   radio.setAutoAck(false);   // Don't acknowledge arbitrary signals
   radio.disableCRC();        // Accept any signal we find
   radio.setAddressWidth(2);  // A reverse engineering tactic (not typically recommended)
