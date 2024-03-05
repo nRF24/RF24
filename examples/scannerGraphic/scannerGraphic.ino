@@ -32,6 +32,8 @@
  *     convenience set radio data rate or further development. See our other
  *     RF24/scanner example that only uses the Serial Monitor instead of a graphic
  *     display.
+ *
+ * See documentation at https://nRF24.github.io/RF24
  */
 #include <Adafruit_GFX.h>  // dependency of Adafruit display libraries
 #include "RF24.h"

@@ -22,6 +22,8 @@
  *
  * Inspired by cpixip.
  * See https://forum.arduino.cc/t/poor-mans-2-4-ghz-scanner/54846
+ *
+ * See documentation at https://nRF24.github.io/RF24
  */
 
 /*

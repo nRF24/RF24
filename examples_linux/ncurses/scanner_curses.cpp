@@ -5,6 +5,16 @@
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
  */
+
+/**
+ * Channel scanner
+ *
+ * Example to detect interference on the various channels available.
+ * This is a good diagnostic tool to check whether you're picking a
+ * good channel for your application.
+ *
+ * See documentation at https://nRF24.github.io/RF24
+ */
 #include <cstdio>   // sprintf()
 #include <string>   // string, getline()
 #include <ctime>    // time_t, time(), difftime()
