@@ -93,18 +93,41 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md37">Automated Install</a></li>
-<li class="level1"><a href="#autotoc_md38">Manual Install</a><ul><li class="level2"><a href="#autotoc_md39">Build using SPIDEV</a></li>
+<ul><ul><li class="level2"><a href="#autotoc_md37">Automatic Installation (New)</a></li>
+</ul>
+<li class="level1"><a href="#autotoc_md38">Automated Install (Deprecated)</a></li>
+<li class="level1"><a href="#autotoc_md39">Manual Install (Deprecated)</a><ul><li class="level2"><a href="#autotoc_md40">Build using SPIDEV (Deprecated)</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<div class="textblock"><p>Generic Linux devices are supported via SPIDEV, MRAA, RPi native via BCM2835, or using LittleWire.</p>
-<dl class="section note"><dt>Note</dt><dd>The SPIDEV option should work with most Linux systems supporting spi userspace device.</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>These install instructions are beginning to age because they were designed with the assumption that the arm-linux-gnueabihf-g** compilers were available and default for the system. If you have problems using the manual install instructions (especially on a 64-bit OS), please try the <a href="md_docs_using_cmake.html">instructions using CMake</a>.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye), pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.</dd></dl>
-<h1><a class="anchor" id="autotoc_md37"></a>
-Automated Install</h1>
+<div class="textblock"><p>Generic Linux devices are supported via SPIDEV, PiGPIO, MRAA, RPi native via BCM2835, or using LittleWire.</p>
+<dl class="section note"><dt>Note</dt><dd>The SPIDEV option should work with most Linux systems supporting spi userspace device.</dd>
+<dd>
+Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye), pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.</dd></dl>
+<h2><a class="anchor" id="autotoc_md37"></a>
+Automatic Installation (New)</h2>
+<p>Using CMake: (See the <a href="md_docs_using_cmake.html">instructions using CMake</a> for more information and options)</p>
+<ol type="1">
+<li>Download the install.sh file from <a href="https://github.com/nRF24/.github/blob/main/installer/install.sh">https://github.com/nRF24/.github/blob/main/installer/install.sh</a> <div class="fragment"><div class="line">wget https://raw.githubusercontent.com/nRF24/.github/main/installer/install.sh</div>
+</div><!-- fragment --></li>
+<li>Make it executable <div class="fragment"><div class="line">chmod +x install.sh</div>
+</div><!-- fragment --></li>
+<li><p class="startli">Run it and choose your options </p><div class="fragment"><div class="line">./install.sh</div>
+</div><!-- fragment --><p> The script will detect needed dependencies and install what it needs according to the user input.</p>
+<p class="startli">It will also ask to install a python package named <a href="https://github.com/nRF24/pyRF24">pyRF24</a>. This is not the same as the traditionally provided python wrappers as the pyRF24 package can be used independent of the C++ installed libraries. For more information on this newer python package, please check out <a href="https://nrf24.github.io/pyRF24/">the pyRF24 documentation</a>.</p>
+</li>
+<li><p class="startli">Try an example from one of the libraries </p><div class="fragment"><div class="line">cd ~/rf24libs/RF24/examples_linux</div>
+</div><!-- fragment --><p class="startli">Edit the gettingstarted example, to set your pin configuration </p><div class="fragment"><div class="line">nano gettingstarted.cpp</div>
+</div><!-- fragment --><p class="startli">Build the examples. Remember to set the <code>RF24_DRIVER</code> option according to the one that was selected during the scripted install. </p><div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -D RF24_DRIVER=SPIDEV</div>
+<div class="line">make</div>
+</div><!-- fragment --><p class="startli">Run the example </p><div class="fragment"><div class="line">sudo ./gettingstarted</div>
+</div><!-- fragment --></li>
+</ol>
+<p>See the <a href="md_docs_using_cmake.html">instructions using CMake</a> for more information and options</p>
+<h1><a class="anchor" id="autotoc_md38"></a>
+Automated Install (Deprecated)</h1>
 <p><b>Designed &amp; Tested on RPi</b> - Defaults to SPIDEV on devices supporting it</p>
 <ol type="1">
 <li>Install prerequisites if there are any (pigpio, MRAA, LittleWire libraries, setup SPI device etc)</li>
@@ -120,8 +143,8 @@ Automated Install</h1>
 <div class="line">sudo ./gettingstarted</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md38"></a>
-Manual Install</h1>
+<h1><a class="anchor" id="autotoc_md39"></a>
+Manual Install (Deprecated)</h1>
 <ol type="1">
 <li>Install prerequisites if there are any (pigpio, MRAA, LittleWire libraries, setup SPI device etc) <dl class="section note"><dt>Note</dt><dd>See the <a href="http://iotdk.intel.com/docs/master/mraa/index.html">MRAA</a> documentation for more info on installing MRAA</dd></dl>
 </li>
@@ -145,8 +168,8 @@ Manual Install</h1>
 <div class="line">sudo ./gettingstarted</div>
 </div><!-- fragment --></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md39"></a>
-Build using SPIDEV</h2>
+<h2><a class="anchor" id="autotoc_md40"></a>
+Build using SPIDEV (Deprecated)</h2>
 <ol type="1">
 <li>Make sure that spi device support is enabled and /dev/spidev&lt;a&gt;.&lt;b&gt; is present</li>
 <li>Manual Install using SPIDEV: <div class="fragment"><div class="line">./configure --driver=SPIDEV</div>
@@ -159,7 +182,7 @@ Build using SPIDEV</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Feb 25 2024 07:03:25 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Wed Mar 6 2024 17:20:05 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>

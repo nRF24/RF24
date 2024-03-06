@@ -93,18 +93,18 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md59">Basic Hardware Template</a><ul><li class="level2"><a href="#autotoc_md60">RF24/utility</a></li>
+<ul><li class="level1"><a href="#autotoc_md60">Basic Hardware Template</a><ul><li class="level2"><a href="#autotoc_md61">RF24/utility</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md61">Device Detection</a></li>
-<li class="level1"><a href="#autotoc_md62">Code</a></li>
+<li class="level1"><a href="#autotoc_md62">Device Detection</a></li>
+<li class="level1"><a href="#autotoc_md63">Code</a></li>
 </ul>
 </div>
 <div class="textblock"><p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> radio driver mainly utilizes the <a href="http://arduino.cc/en/reference/homePage">Arduino API</a> for GPIO, SPI, and timing functions, which are easily replicated on various platforms.</p>
 <p>Support files for these platforms are stored under RF24/utility, and can be modified to provide the required functionality.</p>
-<h1><a class="anchor" id="autotoc_md59"></a>
+<h1><a class="anchor" id="autotoc_md60"></a>
 Basic Hardware Template</h1>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md61"></a>
 RF24/utility</h2>
 <p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library now includes a basic hardware template to assist in porting to various platforms.</p>
 <p>The following files can be included to replicate standard Arduino functions as needed, allowing devices from ATTiny to Raspberry Pi to utilize the same core <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> driver.</p>
@@ -126,21 +126,21 @@ RF24/utility</h2>
 </table>
 <p>Examples are provided via the included hardware support templates in <b>RF24/utility</b></p>
 <p>See the <a href="modules.html">modules</a> page for examples of class declarations.</p>
-<h1><a class="anchor" id="autotoc_md61"></a>
+<h1><a class="anchor" id="autotoc_md62"></a>
 Device Detection</h1>
 <ol type="1">
 <li>The main detection for Linux devices is done in the configure script, with the <a class="el" href="includes_8h.html">includes.h</a> from the proper hardware directory copied to RF24/utility/includes.h</li>
 <li>Secondary detection is completed in <a class="el" href="RF24__config_8h.html">RF24_config.h</a>, causing the include.h file to be included for all supported Linux devices</li>
 <li><a class="el" href="RF24_8h.html">RF24.h</a> contains the declaration for SPI and GPIO objects 'spi' and 'gpio' to be used for porting-in related functions.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md62"></a>
+<h1><a class="anchor" id="autotoc_md63"></a>
 Code</h1>
 <p>To have your ported code included in this library, or for assistance in porting, create a pull request or open an issue at <a href="https://github.com/nRF24/RF24">RF24 Library issues</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Feb 25 2024 07:03:25 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
+Generated on Wed Mar 6 2024 17:20:05 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6
 </small></address>
 </body>
 </html>
