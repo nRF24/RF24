@@ -23,6 +23,18 @@ AVAILABLE_RATES = [RF24_1MBPS, RF24_2MBPS, RF24_250KBPS]
 TOTAL_CHANNELS = 126
 CACHE_MAX = 5  # the depth of history to calculate peaks
 
+# To detect noise, we'll use the worst addresses possible (a reverse engineering
+# tactic). These addresses are designed to confuse the radio into thinking that the
+# RF signal's preamble is part of the packet/payload.
+noise_address = [
+    b"\x55\x55",
+    b"\xaa\xaa",
+    b"\x0a\xaa",
+    b"\xa0\xaa",
+    b"\x00\xaa",
+    b"\xab\xaa",
+]
+
 
 class ChannelHistory:
     def __init__(self) -> None:
@@ -92,12 +104,8 @@ def init_radio():
     radio.setAutoAck(False)
     radio.disableCRC()
     radio.setAddressWidth(2)
-    radio.openReadingPipe(0, b"\x55\x55")
-    radio.openReadingPipe(1, b"\xaa\xaa")
-    radio.openReadingPipe(1, b"\x0a\xaa")
-    radio.openReadingPipe(1, b"\xa0\xaa")
-    radio.openReadingPipe(1, b"\x00\xaa")
-    radio.openReadingPipe(1, b"\xab\xaa")
+    for pipe, address in enumerate(noise_address):
+        radio.openReadingPipe(pipe, address)
     radio.startListening()
     radio.stopListening()
     radio.flush_rx()
