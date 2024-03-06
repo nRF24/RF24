@@ -163,7 +163,7 @@ void loop(void) {
       if (Serial.peek() == '\r' || Serial.peek() == '\n') {
         Serial.read();
       } else {  // got a charater that isn't a line feed
-        break;  // handle it on nect loop() iteration
+        break;  // handle it on next loop() iteration
       }
     }
   }
@@ -185,10 +185,11 @@ void loop(void) {
         // Listen for a little
         radio.startListening();
         delayMicroseconds(128);
+        bool foundSignal = radio.testRPD();
         radio.stopListening();
 
         // Did we get a signal?
-        if (radio.testRPD() || radio.available()) {
+        if (foundSignal || radio.testRPD() || radio.available()) {
           ++values[i];
           radio.flush_rx();  // discard packets of noise
         }

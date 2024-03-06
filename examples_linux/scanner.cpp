@@ -150,7 +150,6 @@ int main(int argc, char** argv)
                 // Listen for a little
                 radio.startListening();
                 delayMicroseconds(130);
-                // for some reason, this flag is more accurate on Linux when still in RX mode.
                 bool foundSignal = radio.testRPD();
                 radio.stopListening();
 

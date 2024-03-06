@@ -39,7 +39,7 @@ noise_address = [
 class ChannelHistory:
     def __init__(self) -> None:
         #: FIFO for tracking peak decays
-        self.history: List[bool] = [False] * CACHE_MAX
+        self._history: List[bool] = [False] * CACHE_MAX
         #: for the total signal counts
         self.total: int = 0
 
@@ -47,9 +47,9 @@ class ChannelHistory:
         """Push a scan result's value into history while returning the sum of cached
         signals found. This function also increments the total signal count accordingly.
         """
-        self.history = self.history[1:] + [value]
+        self._history = self._history[1:] + [value]
         self.total += value
-        return self.history.count(True)
+        return self._history.count(True)
 
 
 #: An array of histories for each channel
@@ -173,12 +173,12 @@ def scan_channel(channel: int) -> bool:
     radio.channel = channel
     radio.startListening()
     time.sleep(0.00013)
-    result = radio.testRPD()
+    found_signal = radio.testRPD()
     radio.stopListening()
-    result = result or radio.testRPD() or radio.available()
-    if result:
+    if found_signal or radio.testRPD() or radio.available():
         radio.flush_rx()
-    return result
+        return True
+    return False
 
 
 def main():

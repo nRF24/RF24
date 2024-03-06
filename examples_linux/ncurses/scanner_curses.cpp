@@ -45,7 +45,6 @@ const uint8_t CACHE_MAX = 5;      // maximum depth of history for calculating pe
 struct ChannelHistory
 {
     unsigned int total = 0;  // the summary of signal counts for the channel
-    bool history[CACHE_MAX]; // a cache of history for the channel
 
     /**
      * Push new scan result for a channel into the history.
@@ -63,6 +62,9 @@ struct ChannelHistory
         history[CACHE_MAX - 1] = value;
         return sum;
     }
+
+private:
+    bool history[CACHE_MAX]; // a cache of history for the channel
 };
 ChannelHistory stored[MAX_CHANNELS];
 
