@@ -46,6 +46,23 @@ struct ChannelHistory
 {
     unsigned int total = 0;  // the summary of signal counts for the channel
     bool history[CACHE_MAX]; // a cache of history for the channel
+
+    /**
+     * Push new scan result for a channel into the history.
+     * This function also increments the total signal count accordingly.
+     * @returns The count of cached signals found (including pushed result)
+     */
+    uint8_t push(bool value)
+    {
+        uint8_t sum = value;
+        total += value;
+        for (uint8_t i = 0; i < CACHE_MAX - 1; ++i) {
+            history[i] = history[i + 1];
+            sum += history[i];
+        }
+        history[CACHE_MAX - 1] = value;
+        return sum;
+    }
 };
 ChannelHistory stored[MAX_CHANNELS];
 
@@ -149,7 +166,7 @@ int main(int argc, char** argv)
                  bpsUnit);
 
         bool foundSignal = scanChannel(channel);
-        uint8_t cachedCount = historyPush(channel, foundSignal);
+        uint8_t cachedCount = stored[channel].push(foundSignal);
 
         // output the summary/snapshot for this channel
         if (stored[channel].total) {
@@ -311,21 +328,6 @@ void initBars()
             );
         }
     }
-}
-
-/**
- * Push new scan result for a channel into the history.
- * @returns The count of historic signals found (including pushed result)
- */
-uint8_t historyPush(uint8_t channel, bool value)
-{
-    uint8_t sum = 0;
-    for (uint8_t i = 0; i < CACHE_MAX - 1; ++i) {
-        stored[channel].history[i] = stored[channel].history[i + 1];
-        sum += stored[channel].history[i];
-    }
-    stored[channel].history[CACHE_MAX - 1] = value;
-    return sum + value;
 }
 
 // vim:ai:cin:sts=2 sw=2 ft=cpp

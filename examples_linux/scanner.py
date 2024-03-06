@@ -43,6 +43,14 @@ class ChannelHistory:
         #: for the total signal counts
         self.total: int = 0
 
+    def push(self, value: bool) -> int:
+        """Push a scan result's value into history while returning the sum of cached
+        signals found. This function also increments the total signal count accordingly.
+        """
+        self.history = self.history[1:] + [value]
+        self.total += value
+        return self.history.count(True)
+
 
 #: An array of histories for each channel
 stored = [ChannelHistory() for _ in range(TOTAL_CHANNELS)]
@@ -190,12 +198,9 @@ def main():
         while time.monotonic() < end:
             std_scr.addstr(2, 0, timer_prompt.format(int(end - time.monotonic())))
             val = scan_channel(channel)
-            stored[channel].history = stored[channel].history[1:] + [val]
-            stored[channel].total += val
+            cache_sum = stored[channel].push(val)
             if stored[channel].total:
-                bars[channel].update(
-                    stored[channel].history.count(True), stored[channel].total
-                )
+                bars[channel].update(cache_sum, stored[channel].total)
                 std_scr.refresh()
             if channel + 1 == TOTAL_CHANNELS:
                 channel = 0
