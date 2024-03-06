@@ -84,7 +84,6 @@ void setup(void) {
     // some boards need this to wait for Serial connection
   }
   Serial.println(F("RF24/examples/scanner/"));
-  Serial.println(F("!!! Please do not send line endings in the serial monitor !!!"));
 
   // Setup and configure rf radio
   if (!radio.begin()) {
@@ -158,7 +157,17 @@ void loop(void) {
       Serial.println("\nStopping Carrier Wave Output");
       printHeader();
     }
+
+    // discard any CR and LF sent
+    while (Serial.peek() != -1) {
+      if (Serial.peek() == '\r' || Serial.peek() == '\n') {
+        Serial.read();
+      } else {  // got a charater that isn't a line feed
+        break;  // handle it on nect loop() iteration
+      }
+    }
   }
+
   /****************************************/
 
   if (constCarrierMode == 0) {
