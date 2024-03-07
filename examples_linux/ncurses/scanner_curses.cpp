@@ -248,7 +248,6 @@ bool scanChannel(uint8_t channel)
 
     // Did we get a signal?
     if (foundSignal || radio.testRPD() || radio.available()) {
-        ++stored[channel].total;
         radio.flush_rx(); // discard packets of noise
         return true;
     }
