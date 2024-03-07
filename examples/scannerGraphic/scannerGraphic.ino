@@ -22,14 +22,14 @@
  *     least 128 pixels wide. Otherwise, you would have to reduce the `numChannels`
  *     constant to fit within your display's width.
  *
- *     The SPI_DISPLAY ues its own pins defined by `TFT_CS`, `TFT_DC`, and the
+ *     The SPI_DISPLAY uses its own pins defined by `TFT_CS`, `TFT_DC`, and the
  *     optional `TFT_RST` (see below). The SPI bus is shared between radio and display,
  *     so the display's CS pin must be connected as specified by `TFT_CS`.
  *     If your ST7789 display does not have a CS pin, then further modification must
  *     be made so it does not use the same SPI bus that the radio uses.
  * 
  *     `DEBUGGING` can be enabled (uncommented) to show Serial output. This is just a
- *     convenience set radio data rate or further development. See our other
+ *     convenience to set radio data rate or further development. See our other
  *     RF24/scanner example that only uses the Serial Monitor instead of a graphic
  *     display.
  *
@@ -83,13 +83,12 @@ struct ChannelHistory {
   /// oldest cached value. This also sets the maxPeak value.
   /// @returns The sum of signals found in the cached history
   uint8_t push(bool value) {
-    uint8_t sum = 0;
+    uint8_t sum = value;
     for (uint8_t i = 0; i < cacheMax - 1; ++i) {
       history[i] = history[i + 1];
       sum += history[i];
     }
     history[cacheMax - 1] = value;
-    sum += value;
     maxPeak = max(sum * 2, maxPeak);  // sum * 2 to allow half-step decay
     return sum;
   }
@@ -106,7 +105,6 @@ ChannelHistory stored[numChannels];
  * defines (above near top of file)
  ********************************************************************/
 
-// create our `display`
 #ifdef I2C_DISPLAY
 
 #include <Wire.h>
@@ -120,7 +118,7 @@ ChannelHistory stored[numChannels];
 // On an arduino UNO:       A4(SDA), A5(SCL)
 // On an arduino MEGA 2560: 20(SDA), 21(SCL)
 // On an arduino LEONARDO:   2(SDA),  3(SCL), ...
-#define OLED_RESET -1        // Reset pin # (or -1 if sharing Arduino reset pin)
+#define OLED_RESET -1        // Or set to -1 and connect to Arduino RESET pin
 #define SCREEN_ADDRESS 0x3D  // See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
@@ -202,7 +200,7 @@ void setup(void) {
     SERIAL_DEBUG(Serial.println(F("radio hardware not responding!")););
     display.setCursor(1, 1);
     display.setTextColor(WHITE);
-    display.printf("radio hardware\nnot responding!");
+    display.print(F("radio hardware\nnot responding!"));
     REFRESH;
     while (true) {
       // hold in an infinite loop
