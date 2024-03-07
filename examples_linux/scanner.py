@@ -66,25 +66,34 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         cols: int,
         std_scr: Any,  # type: curses.window,
         label: str,
-        color: Any,  # type: curses.color_pair,
+        color: int,
     ):
         self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
-        string = label  # always labeled in MHz (4 digits)
-        # -9 for padding, label, & signal count
-        string += "-" * (self.width - 8)  # the empty bar
-        string += " - "  # the initial signal count
-        self.win.addstr(self.y, self.x, string, self.color)
+        self.win.move(self.y, self.x)
+        self.win.attron(curses.color_pair(self.color))
+        self.win.addstr(label)  # always labeled in MHz (4 digits)
+        for _ in range(self.width - 8):  # draw the empty bar
+            self.win.addch(curses.ACS_HLINE)
+        self.win.addstr(" - ")  # draw the initial signal count
+        self.win.attroff(curses.color_pair(self.color))
 
     def update(self, completed: int, signal_count: int):
         """Update the progress bar."""
-        filled = min(CACHE_MAX, completed) / CACHE_MAX
-        bar = "=" * int((self.width - 8) * filled)
-        empty = "-" * (self.width - 8 - len(bar))
         count = "-"
         if signal_count:
             count = "%X" % min(0xF, signal_count)
-        self.win.addstr(self.y, self.x + 5, bar, curses.color_pair(5))
-        self.win.addstr(self.y, self.x + 5 + len(bar), f"{empty} {count} ", self.color)
+        filled = (self.width - 8) * completed / CACHE_MAX
+        offset_x = 5
+        self.win.move(self.y, self.x + offset_x)
+        for i in range(offset_x, self.width - 3):
+            bar_filled = i < (filled + offset_x)
+            bar_color = 5 if bar_filled else self.color
+            self.win.attron(curses.color_pair(bar_color))
+            self.win.addch("=" if bar_filled else curses.ACS_HLINE)
+            self.win.attroff(curses.color_pair(bar_color))
+        self.win.attron(curses.color_pair(self.color))
+        self.win.addstr(f" {count} ")
+        self.win.attroff(curses.color_pair(self.color))
 
 
 def init_display(window) -> List[ProgressBar]:
@@ -93,7 +102,7 @@ def init_display(window) -> List[ProgressBar]:
     bar_w = int(curses.COLS / 6)
     for i in range(21):  # 21 rows
         for j in range(i, i + (21 * 6), 21):  # 6 columns
-            color = curses.color_pair(7) if int(j / 21) % 2 else curses.color_pair(3)
+            color = 7 if int(j / 21) % 2 else 3
             progress_bars[j] = ProgressBar(
                 x=bar_w * int(j / 21),
                 y=i + 3,
