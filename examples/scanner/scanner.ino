@@ -215,22 +215,22 @@ void loop(void) {
 
 void printHeader() {
   // Print the hundreds digits
-  for (int i = 0; i < num_channels; ++i)
+  for (uint8_t i = 0; i < num_channels; ++i)
     Serial.print(i / 100);
   Serial.println();
 
   // Print the tens digits
-  for (int i = 0; i < num_channels; ++i)
+  for (uint8_t i = 0; i < num_channels; ++i)
     Serial.print((i % 100) / 10);
   Serial.println();
 
   // Print the singles digits
-  for (int i = 0; i < num_channels; ++i)
+  for (uint8_t i = 0; i < num_channels; ++i)
     Serial.print(i % 10);
   Serial.println();
 
   // Print the header's divider
-  for (int i = 0; i < num_channels; ++i)
+  for (uint8_t i = 0; i < num_channels; ++i)
     Serial.print(F("~"));
   Serial.println();
 }

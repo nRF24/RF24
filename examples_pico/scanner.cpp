@@ -183,22 +183,22 @@ void scanChannel(uint8_t channel)
 void printHeader()
 {
     // print the hundreds digits
-    for (int i = 0; i < num_channels; ++i)
+    for (uint8_t i = 0; i < num_channels; ++i)
         printf("%d", (i / 100));
     printf("\n");
 
     // print the tens digits
-    for (int i = 0; i < num_channels; ++i)
+    for (uint8_t i = 0; i < num_channels; ++i)
         printf("%d", ((i % 100) / 10));
     printf("\n");
 
     // print the singles digits
-    for (int i = 0; i < num_channels; ++i)
+    for (uint8_t i = 0; i < num_channels; ++i)
         printf("%d", (i % 10));
     printf("\n");
 
     // print the header's divider
-    for (int i = 0; i < num_channels; ++i)
+    for (uint8_t i = 0; i < num_channels; ++i)
         printf("~");
     printf("\n");
 }

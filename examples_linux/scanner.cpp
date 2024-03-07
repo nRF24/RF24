@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 
     // print a line that should not be wrapped
     cout << "\n!!! This example requires a width of at least 126 characters. "
-         << "If this text uses multiple lines, then the output will look bad.\n"
+         << "If this text uses multiple lines, then the output will look bad."
          << endl;
 
     // set the data rate
@@ -179,22 +179,22 @@ int main(int argc, char** argv)
 void printHeader()
 {
     // print the hundreds digits
-    for (int i = 0; i < num_channels; ++i)
-        cout << (i / 100);
+    for (uint8_t i = 0; i < num_channels; ++i)
+        cout << static_cast<int>(i / 100);
     cout << endl;
 
     // print the tens digits
-    for (int i = 0; i < num_channels; ++i)
-        cout << ((i % 100) / 10);
+    for (uint8_t i = 0; i < num_channels; ++i)
+        cout << static_cast<int>((i % 100) / 10);
     cout << endl;
 
     // print the singles digits
-    for (int i = 0; i < num_channels; ++i)
-        cout << (i % 10);
+    for (uint8_t i = 0; i < num_channels; ++i)
+        cout << static_cast<int>(i % 10);
     cout << endl;
 
     // print the header's divider
-    for (int i = 0; i < num_channels; ++i)
+    for (uint8_t i = 0; i < num_channels; ++i)
         cout << '~';
     cout << endl;
 }
