@@ -189,7 +189,7 @@ def main():
     radio.setDataRate(AVAILABLE_RATES[data_rate])
     try:
         std_scr = init_curses()
-        timer_prompt = "Scanning for {} seconds at " + OFFERED_DATA_RATES[data_rate]
+        timer_prompt = "Scanning for {:>3} seconds at " + OFFERED_DATA_RATES[data_rate]
         std_scr.addstr(0, 0, "Channels are labeled in MHz.")
         std_scr.addstr(1, 0, "Signal counts are clamped to a single hexadecimal digit.")
         bars = init_display(std_scr)
