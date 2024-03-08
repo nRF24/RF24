@@ -289,7 +289,8 @@ void ping_n_wait()
 }
 
 /**
- * when the IRQ pin goes active LOW, call this fuction print out why
+ * when the IRQ pin goes active LOW.
+ * Here we just set a flag to unblock ping_n_wait()
  */
 void interruptHandler()
 {
