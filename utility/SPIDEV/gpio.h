@@ -18,7 +18,6 @@
 #include <stdexcept>
 #include <cstdint>
 
-
 typedef uint16_t rf24_gpio_pin_t;
 #define RF24_PIN_INVALID 0xFFFF
 
