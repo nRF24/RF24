@@ -21,6 +21,7 @@
 
 // We will be using the nRF24L01's IRQ pin for this example
 volatile bool wait_for_event = false; // used to wait for an IRQ event to trigger
+volatile bool got_interrupt = false;  // used to signal when an IRQ event has been triggered
 
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);
@@ -40,6 +41,7 @@ char ack_payloads[][ack_pl_size + 1] = {"Yak ", "Back", " ACK"};
 
 void interruptHandler(uint gpio, uint32_t events); // prototype to handle IRQ events
 void printRxFifo();                                // prototype to print RX FIFO with 1 buffer
+void assessInterruptEvent();                       // prototype to assess IRQ flags triggered
 
 bool setup()
 {
@@ -121,7 +123,6 @@ bool setup()
     }
 
     // For debugging info
-    // printf_begin();             // needed only once for printing details
     // radio.printDetails();       // (smaller) function that prints raw register values
     // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
@@ -231,6 +232,10 @@ void loop()
 
     } // role
 
+    if (got_interrupt) {
+        assessInterruptEvent();
+    }
+
     char input = getchar_timeout_us(0); // get char from buffer for user input
     if (input != PICO_ERROR_TIMEOUT) {
         // change the role via the serial terminal
@@ -239,7 +244,7 @@ void loop()
             // Become the TX node
             if (!role)
                 printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n");
-            else if (role && wait_for_event) // don't interrupt on ongoing test
+            else if (role && wait_for_event) // don't interrupt an ongoing test
                 return;                      // exit now; start next loop()
             else
                 printf("*** RESTARTING IRQ PIN TEST ***\n");
@@ -277,16 +282,24 @@ void loop()
 } // loop
 
 /**
- * when the IRQ pin goes active LOW, call this fuction print out why
+ * when the IRQ pin goes active LOW.
+ * Here we just tell the main loop() to call `assessInterruptEve4nt()`.
  */
 void interruptHandler(uint gpio, uint32_t events)
 {
-
     if (gpio != IRQ_PIN && !(events | GPIO_IRQ_EDGE_FALL)) {
         // the gpio pin and event does not match the configuration we specified
         return;
     }
+    got_interrupt = true; // forward event handling back to main loop()
+}
 
+/**
+ * Called when an event has been triggered.
+ * Here, we want to verify the expected IRQ flag has been asserted.
+ */
+void assessInterruptEvent()
+{
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n");   // show that this function was called
     bool tx_ds, tx_df, rx_dr;                // declare variables for IRQ masks
@@ -315,8 +328,9 @@ void interruptHandler(uint gpio, uint32_t events)
     else if (pl_iterator == 4) {
         printf("   'Data Fail' event test %s\n", tx_df ? "passed" : "failed");
     }
+    got_interrupt = false;  // reset this flag to prevent calling this function from loop()
     wait_for_event = false; // ready to continue with loop() operations
-} // interruptHandler
+}
 
 /**
  * Print the entire RX FIFO with one buffer. This will also flush the RX FIFO.

@@ -19,6 +19,7 @@
 
 // We will be using the nRF24L01's IRQ pin for this example
 #define IRQ_PIN 2                      // this needs to be a digital input capable pin
+volatile bool got_interrupt = false;   // used to signal processing of interrupt
 volatile bool wait_for_event = false;  // used to wait for an IRQ event to trigger
 
 #define CE_PIN 7
@@ -136,9 +137,11 @@ void setup() {
 }
 
 void loop() {
-  if (role && !wait_for_event) {
+  if (got_interrupt) {
+    assessInterruptEvent();
+  }
 
-    // delay(1); // wait for IRQ pin to fully RISE
+  if (role && !wait_for_event) {
 
     // This device is a TX node. This if block is only triggered when
     // NOT waiting for an IRQ event to happen
@@ -218,25 +221,22 @@ void loop() {
       pl_iterator++;  // proceed from step 3 to last step (stop at step 4 for readability)
     }
 
-  } else if (!role) {
-    // This device is a RX node
+  } else if (!role && radio.rxFifoFull()) {
+    // This device is a RX node:
+    // wait until RX FIFO is full then stop listening
 
-    if (radio.rxFifoFull()) {
-      // wait until RX FIFO is full then stop listening
+    delay(100);             // let ACK payload finish transmitting
+    radio.stopListening();  // also discards unused ACK payloads
+    printRxFifo();          // flush the RX FIFO
 
-      delay(100);             // let ACK payload finish transmitting
-      radio.stopListening();  // also discards unused ACK payloads
-      printRxFifo();          // flush the RX FIFO
+    // Fill the TX FIFO with 3 ACK payloads for the first 3 received
+    // transmissions on pipe 1.
+    radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
+    radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
 
-      // Fill the TX FIFO with 3 ACK payloads for the first 3 received
-      // transmissions on pipe 1.
-      radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
-      radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
-      radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
-
-      delay(100);              // let TX node finish its role
-      radio.startListening();  // We're ready to start over. Begin listening.
-    }
+    delay(100);              // let TX node finish its role
+    radio.startListening();  // We're ready to start over. Begin listening.
 
   }  // role
 
@@ -271,6 +271,7 @@ void loop() {
       // Fill the TX FIFO with 3 ACK payloads for the first 3 received
       // transmissions on pipe 1
       radio.flush_tx();  // make sure there is room for 3 new ACK payloads
+      radio.flush_rx();  // make sure there is room for 3 incoming payloads
       radio.writeAckPayload(1, &ack_payloads[0], ack_pl_size);
       radio.writeAckPayload(1, &ack_payloads[1], ack_pl_size);
       radio.writeAckPayload(1, &ack_payloads[2], ack_pl_size);
@@ -281,9 +282,18 @@ void loop() {
 
 
 /**
- * when the IRQ pin goes active LOW, call this fuction print out why
+ * when the IRQ pin goes active LOW.
+ * Here we just tell the main loop() to call `assessInterruptEve4nt()`.
  */
 void interruptHandler() {
+  got_interrupt = true;  // forward event handling back to main loop()
+}
+
+/**
+ * Called when an event has been triggered.
+ * Here, we want to verify the expected IRQ flag has been asserted.
+ */
+void assessInterruptEvent() {
   // print IRQ status and all masking flags' states
 
   Serial.println(F("\tIRQ pin is actively LOW"));  // show that this function was called
@@ -316,9 +326,9 @@ void interruptHandler() {
     Serial.print(F("   'Data Fail' event test "));
     Serial.println(tx_df ? F("passed") : F("failed"));
   }
+  got_interrupt = false;   // reset this flag to prevent calling this function from loop()
   wait_for_event = false;  // ready to continue with loop() operations
-}  // interruptHandler
-
+}
 
 /**
  * Print the entire RX FIFO with one buffer. This will also flush the RX FIFO.

@@ -25,7 +25,7 @@ using namespace std;
 #define IRQ_PIN 12 // this needs to be a digital input capable pin
 
 // this example is a sequential program. so we need to wait for the event to be handled
-volatile bool wait_for_event = false; // used to signify that the event is handled
+volatile bool got_interrupt = false; // used to signify that the event started
 
 /****************** Linux ***********************/
 // Radio CE Pin, CSN Pin, SPI Speed
@@ -245,12 +245,12 @@ void slave()
  */
 void ping_n_wait()
 {
+    got_interrupt = false;
+
     // use the non-blocking call to write a payload and begin transmission
     // the "false" argument means we are expecting an ACK packet response
     radio.startFastWrite(tx_payloads[pl_iterator], tx_pl_size, false);
-
-    wait_for_event = true;
-    while (wait_for_event) {
+    while (!got_interrupt) {
         /*
          * IRQ pin is LOW when activated. Otherwise it is always HIGH
          * Wait in this empty loop until IRQ pin is activated.
@@ -260,13 +260,6 @@ void ping_n_wait()
          * default, we don't need a timeout check to prevent an infinite loop.
          */
     }
-}
-
-/**
- * when the IRQ pin goes active LOW, call this fuction print out why
- */
-void interruptHandler()
-{
     // print IRQ status and all masking flags' states
 
     cout << "\tIRQ pin is actively LOW" << endl; // show that this function was called
@@ -292,8 +285,17 @@ void interruptHandler()
     else if (pl_iterator == 3)
         cout << "   'Data Fail' event test " << (tx_df ? "passed" : "failed") << endl;
 
-    wait_for_event = false; // ready to continue
-} // interruptHandler
+    got_interrupt = false;
+}
+
+/**
+ * when the IRQ pin goes active LOW.
+ * Here we just set a flag to unblock ping_n_wait()
+ */
+void interruptHandler()
+{
+    got_interrupt = true; // ready to continue
+}
 
 /**
  * Print the entire RX FIFO with one buffer. This will also flush the RX FIFO.
