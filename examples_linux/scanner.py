@@ -71,7 +71,7 @@ class ProgressBar:  # pylint: disable=too-few-public-methods
         self.x, self.y, self.width, self.win, self.color = (x, y, cols, std_scr, color)
         self.win.move(self.y, self.x)
         self.win.attron(curses.color_pair(self.color))
-        self.win.addstr(label + " ")  # always labeled in MHz (4 digits)
+        self.win.addstr(label)  # always labeled in MHz (4 digits)
         for _ in range(self.width - 8):  # draw the empty bar
             self.win.addch(curses.ACS_HLINE)
         self.win.addstr(" - ")  # draw the initial signal count
