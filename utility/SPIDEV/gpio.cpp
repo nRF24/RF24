@@ -36,6 +36,8 @@ struct GlobalCache
             if (fd < 0) {
                 std::string msg = "Can't open device ";
                 msg += chip;
+                msg += "; ";
+                msg += strerror(errno);
                 throw GPIOException(msg);
             }
         }
