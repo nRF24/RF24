@@ -21,6 +21,14 @@
 typedef uint16_t rf24_gpio_pin_t;
 #define RF24_PIN_INVALID 0xFFFF
 
+#ifndef RF24_SPIDEV_GPIO_CHIP
+    /**
+     * The default GPIO chip to use.  Defaults to `/dev/gpiochip4` (for RPi5).
+     * Falls back to `/dev/gpiochip0` if this value is somehow incorrect.
+     */
+    #define RF24_SPIDEV_GPIO_CHIP "/dev/gpiochip4"
+#endif
+
 /** Specific exception for SPI errors */
 class GPIOException : public std::runtime_error
 {
