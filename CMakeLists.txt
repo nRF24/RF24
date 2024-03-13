@@ -136,6 +136,13 @@ if(DEFINED RF24_SPI_SPEED)
         RF24_SPI_SPEED=${RF24_SPI_SPEED}
     )
 endif()
+# allow user customization of default GPIO chip used with the SPIDEV driver
+if(DEFINED RF24_SPIDEV_GPIO_CHIP)
+    message(STATUS "RF24_SPIDEV_GPIO_CHIP set to ${RF24_SPIDEV_GPIO_CHIP}")
+    target_compile_definitions(${LibTargetName} PUBLIC
+        RF24_SPIDEV_GPIO_CHIP="${RF24_SPIDEV_GPIO_CHIP}"
+    )
+endif()
 # conditionally disable interruot support (a pigpio specific feature)
 if("${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND" OR DEFINED RF24_NO_INTERRUPT)
     message(STATUS "Disabling IRQ pin support")
