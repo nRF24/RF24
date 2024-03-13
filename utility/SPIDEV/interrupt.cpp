@@ -12,9 +12,13 @@ Interrupt functions
 #include <sys/poll.h>
 #include <map>
 #include "interrupt.h"
-#include "gpio.h" // gpioCache
+#include "gpio.h" // GPIOChipCache
 
-pthread_mutex_t irq_mutex;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static pthread_mutex_t irq_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<rf24_gpio_pin_t, IrqPinCache> irqCache;
 
 IrqPinCache::~IrqPinCache()
@@ -25,6 +29,29 @@ IrqPinCache::~IrqPinCache()
     }
 }
 
+struct IrqChipCache : public GPIOChipCache
+{
+    IrqChipCache() : GPIOChipCache() {};
+    ~IrqChipCache()
+    {
+        for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
+            pthread_join(i->second.id, NULL);
+            close(i->second.fd);
+        }
+        irqCache.clear();
+    }
+};
+
+IrqChipCache irqChipCache;
+
+int waitForInterrupt(pollfd* pollObj, int mS = -1)
+{
+    // pollObj.events = POLLPRI | POLLERR ;
+
+    int x = poll(pollObj, 1, mS) ;
+    return x ;
+}
+
 void* poll_irq(void* arg)
 {
     IrqPinCache* pin_cache = (IrqPinCache*)(arg);
@@ -32,10 +59,10 @@ void* poll_irq(void* arg)
     poll_obj.fd = pin_cache->fd;
     poll_obj.events = POLLIN;
 
-    int x = poll(&poll_obj, 1, -1);
-    if (x > 0)
-        pin_cache->function();
-
+    for (;;) {
+        if (waitForInterrupt(&poll_obj) > 0)
+            pin_cache->function();
+    }
     return NULL;
 }
 
@@ -43,9 +70,10 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
 {
     // ensure pin is not already being used in a separate thread
     detachInterrupt(pin);
+    GPIO::close(pin);
 
-    if (pin > gpioCache.info.lines) {
-        std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + gpioCache.chip;
+    if (pin > irqChipCache.info.lines) {
+        std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + irqChipCache.chip;
         throw GPIOException(msg);
         return 0;
     }
@@ -64,7 +92,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     request.config.num_attrs = 1U;
 
     // set pin as input and configure edge detection
-    request.config.flags = GPIO_V2_LINE_FLAG_INPUT;
+    request.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_ACTIVE_LOW;
     switch (mode) {
         case INT_EDGE_BOTH:
         case INT_EDGE_FALLING:
@@ -77,15 +105,15 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     }
 
     // write pin request's config
-    gpioCache.openDevice();
-    int ret = ioctl(gpioCache.fd, GPIO_V2_GET_LINE_IOCTL, &request);
+    irqChipCache.openDevice();
+    int ret = ioctl(irqChipCache.fd, GPIO_V2_GET_LINE_IOCTL, &request);
     if (ret < 0 || request.fd <= 0) {
         std::string msg = "[attachInterrupt] Could not get line handle from ioctl; ";
         msg += strerror(errno);
         throw GPIOException(msg);
         return 0;
     }
-    gpioCache.closeDevice();
+    irqChipCache.closeDevice();
 
     ret = ioctl(request.fd, GPIO_V2_LINE_SET_CONFIG_IOCTL, &request.config);
     if (ret < 0) {
@@ -99,10 +127,11 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     IrqPinCache cachedIrq;
     cachedIrq.fd = request.fd;
     cachedIrq.function = function;
+    irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, cachedIrq));
+
     pthread_mutex_lock(&irq_mutex);
     pthread_create(&cachedIrq.id, NULL, poll_irq, &cachedIrq);
     pthread_mutex_unlock(&irq_mutex);
-    irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, cachedIrq));
 
     return 1;
 }
@@ -126,3 +155,7 @@ void rfNoInterrupts()
 void rfInterrupts()
 {
 }
+
+#ifdef __cplusplus
+}
+#endif

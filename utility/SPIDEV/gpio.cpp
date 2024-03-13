@@ -78,6 +78,9 @@ GPIOChipCache::~GPIOChipCache()
     }
 }
 
+// GPIO chip cache manager
+GPIOChipCache gpioCache;
+
 GPIO::GPIO()
 {
 }
@@ -132,8 +135,14 @@ void GPIO::open(rf24_gpio_pin_t port, int DDR)
 
 void GPIO::close(rf24_gpio_pin_t port)
 {
-    // This is not really used in RF24 convention (designed for embedded apps).
-    // Instead rely on gpioCache destructor (see above)
+    std::map<rf24_gpio_pin_t, gpio_fd>::iterator pin = cachedPins.find(port);
+    if (pin == cachedPins.end()) {
+        return;
+    }
+    if (pin->second > 0) {
+        ::close(pin->second);
+    }
+    cachedPins.erase(pin);
 }
 
 int GPIO::read(rf24_gpio_pin_t port)

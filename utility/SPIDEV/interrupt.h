@@ -35,12 +35,12 @@ struct IrqPinCache
  * Take the details and create an interrupt handler that will
  * callback to the user-supplied function.
  */
-extern int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void));
+int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void));
 
 /**
  * Will cancel the interrupt thread, close the filehandle and release the pin.
  */
-extern int detachInterrupt(rf24_gpio_pin_t pin);
+int detachInterrupt(rf24_gpio_pin_t pin);
 
 /** Deprecated, no longer functional */
 extern void rfNoInterrupts();
