@@ -14,9 +14,9 @@
 #define RF24_UTILITY_SPIDEV_GPIO_H_
 
 #include <cstdio>
-#include <map>
 #include <stdexcept>
 #include <cstdint>
+#include <linux/gpio.h> // gpiochip_info
 
 typedef uint16_t rf24_gpio_pin_t;
 #define RF24_PIN_INVALID 0xFFFF
@@ -45,6 +45,7 @@ struct GPIOChipCache
 {
     const char* chip = RF24_SPIDEV_GPIO_CHIP;
     int fd = -1;
+    gpiochip_info info;
 
     /// Open the File Descriptor for the GPIO chip
     void openDevice();

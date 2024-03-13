@@ -20,7 +20,6 @@ typedef int gpio_fd; // for readability
 std::map<rf24_gpio_pin_t, gpio_fd> cachedPins;
 struct gpio_v2_line_request request;
 struct gpio_v2_line_values data;
-struct gpiochip_info chipMeta;
 
 void GPIOChipCache::openDevice()
 {
@@ -58,7 +57,8 @@ GPIOChipCache::GPIOChipCache()
     data.mask = 1ULL; // only change value for specified pin
 
     // cache chip info
-    int ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &chipMeta);
+    memset(&info, 0, sizeof(info));
+    int ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &info);
     if (ret < 0) {
         std::string msg = "Could not gather info about ";
         msg += chip;
@@ -91,7 +91,7 @@ GPIO::~GPIO()
 
 void GPIO::open(rf24_gpio_pin_t port, int DDR)
 {
-    if (port > chipMeta.lines) {
+    if (port > gpioCache.info.lines) {
         std::string msg = "pin number " + std::to_string(port) + " not available for " + gpioCache.chip;
         throw GPIOException(msg);
         return;
