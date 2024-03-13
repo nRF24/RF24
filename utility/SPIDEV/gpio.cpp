@@ -78,9 +78,6 @@ GPIOChipCache::~GPIOChipCache()
     }
 }
 
-// GPIO chip cache manager
-GPIOChipCache gpioCache;
-
 GPIO::GPIO()
 {
 }

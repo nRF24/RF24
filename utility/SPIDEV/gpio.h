@@ -63,6 +63,10 @@ struct GPIOChipCache
     ~GPIOChipCache();
 };
 
+
+// GPIO chip cache manager
+static GPIOChipCache gpioCache;
+
 class GPIO
 {
 
