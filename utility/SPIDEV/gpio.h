@@ -39,7 +39,28 @@ public:
     }
 };
 
-typedef int GPIOfdCache_t;
+/// A struct to manage the GPIO chip file descriptor.
+/// This struct's destructor should close any cached GPIO pin requests' file descriptors.
+struct GPIOChipCache
+{
+    const char* chip = RF24_SPIDEV_GPIO_CHIP;
+    int fd = -1;
+
+    /// Open the File Descriptor for the GPIO chip
+    void openDevice();
+
+    /// Close the File Descriptor for the GPIO chip
+    void closeDevice();
+
+    /// should be called automatically on program start.
+    /// Here, we do some one-off configuration.
+    GPIOChipCache();
+
+    /// Should be called automatically on program exit.
+    /// What we need here is to make sure that the File Descriptors used to
+    /// control GPIO pins are properly closed.
+    ~GPIOChipCache();
+};
 
 class GPIO
 {

@@ -22,75 +22,64 @@ struct gpio_v2_line_request request;
 struct gpio_v2_line_values data;
 struct gpiochip_info chipMeta;
 
-// A struct to keep a track of the open/closed file descriptor for specified GPIO chip
-struct GlobalCache
+void GPIOChipCache::openDevice()
 {
-    const char* chip = RF24_SPIDEV_GPIO_CHIP;
-    int fd = -1;
-
-    // Open the File Descriptor for the GPIO chip
-    void openDevice()
-    {
+    if (fd < 0) {
+        fd = open(chip, O_RDONLY);
         if (fd < 0) {
-            fd = open(chip, O_RDONLY);
-            if (fd < 0) {
-                std::string msg = "Can't open device ";
-                msg += chip;
-                msg += "; ";
-                msg += strerror(errno);
-                throw GPIOException(msg);
-            }
-        }
-    }
-
-    /// Close the File Descriptor for the GPIO chip
-    void closeDevice()
-    {
-        if (fd >= 0) {
-            close(fd);
-            fd = -1;
-        }
-    }
-
-    // should be called automatically on program start.
-    // Here, we do some one-off configuration.
-    GlobalCache()
-    {
-        try {
-            openDevice();
-        }
-        catch (GPIOException& exc) {
-            chip = "/dev/gpiochip0";
-            openDevice();
-        }
-        request.num_lines = 1;
-        strcpy(request.consumer, "RF24 lib");
-        data.mask = 1ULL; // only change value for specified pin
-
-        // cache chip info
-        int ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &chipMeta);
-        if (ret < 0) {
-            std::string msg = "Could not gather info about ";
+            std::string msg = "Can't open device ";
             msg += chip;
+            msg += "; ";
+            msg += strerror(errno);
             throw GPIOException(msg);
-            return;
         }
-        closeDevice(); // in case other apps want to access it
     }
+}
 
-    // Should be called automatically on program exit.
-    // What we need here is to make sure that the File Descriptors used to
-    // control GPIO pins are properly closed.
-    ~GlobalCache()
-    {
-        closeDevice();
-        for (std::map<rf24_gpio_pin_t, gpio_fd>::iterator i = cachedPins.begin(); i != cachedPins.end(); ++i) {
-            if (i->second > 0) {
-                close(i->second);
-            }
+void GPIOChipCache::closeDevice()
+{
+    if (fd >= 0) {
+        close(fd);
+        fd = -1;
+    }
+}
+
+GPIOChipCache::GPIOChipCache()
+{
+    try {
+        openDevice();
+    }
+    catch (GPIOException& exc) {
+        chip = "/dev/gpiochip0";
+        openDevice();
+    }
+    request.num_lines = 1;
+    strcpy(request.consumer, "RF24 lib");
+    data.mask = 1ULL; // only change value for specified pin
+
+    // cache chip info
+    int ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &chipMeta);
+    if (ret < 0) {
+        std::string msg = "Could not gather info about ";
+        msg += chip;
+        throw GPIOException(msg);
+        return;
+    }
+    closeDevice(); // in case other apps want to access it
+}
+
+GPIOChipCache::~GPIOChipCache()
+{
+    closeDevice();
+    for (std::map<rf24_gpio_pin_t, gpio_fd>::iterator i = cachedPins.begin(); i != cachedPins.end(); ++i) {
+        if (i->second > 0) {
+            close(i->second);
         }
     }
-} gpioCache;
+}
+
+// GPIO chip cache manager
+GPIOChipCache gpioCache;
 
 GPIO::GPIO()
 {
