@@ -12,14 +12,15 @@
 #define RF24_LINUX
 
 #include <stddef.h>
-#include "spi.h"
-#include "gpio.h"
-#include "compatibility.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <sys/time.h>
+#include "spi.h"
+#include "gpio.h"
+#include "compatibility.h"
+#include "interrupt.h"
 
 //#define RF24_SPI_SPEED RF24_SPIDEV_SPEED
 
