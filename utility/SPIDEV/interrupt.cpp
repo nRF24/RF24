@@ -20,6 +20,7 @@ extern "C" {
 
 static pthread_mutex_t irq_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<rf24_gpio_pin_t, IrqPinCache> irqCache;
+// gpio_v2_line_event irqEventInfo;
 
 IrqPinCache::~IrqPinCache()
 {
@@ -35,7 +36,7 @@ struct IrqChipCache : public GPIOChipCache
     ~IrqChipCache()
     {
         for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
-            pthread_join(i->second.id, NULL);
+            pthread_cancel(i->second.id);
             close(i->second.fd);
         }
         irqCache.clear();
@@ -44,24 +45,38 @@ struct IrqChipCache : public GPIOChipCache
 
 IrqChipCache irqChipCache;
 
-int waitForInterrupt(pollfd* pollObj, int mS = -1)
-{
-    // pollObj.events = POLLPRI | POLLERR ;
-
-    int x = poll(pollObj, 1, mS) ;
-    return x ;
-}
-
 void* poll_irq(void* arg)
 {
-    IrqPinCache* pin_cache = (IrqPinCache*)(arg);
-    struct pollfd poll_obj;
-    poll_obj.fd = pin_cache->fd;
-    poll_obj.events = POLLIN;
+    IrqPinCache* pinCache = (IrqPinCache*)(arg);
+    pollfd pollObj;
+    pollObj.fd = pinCache->fd;
+    pollObj.events = POLLIN;
 
     for (;;) {
-        if (waitForInterrupt(&poll_obj) > 0)
-            pin_cache->function();
+        int x = poll(&pollObj, 1, -1);
+        if (x > 0) {
+            if (pollObj.revents & POLLIN) {
+                pinCache->function();
+            }
+            // memset(&irqEventInfo, 0, sizeof(irqEventInfo));
+            // int ret = read(pinCache->fd, &irqEventInfo, sizeof(irqEventInfo));
+            // if (ret < 0) {
+            //     std::string msg = "[attachInterrupt] Could not read event info; ";
+            //     msg += strerror(errno);
+            //     throw GPIOException(msg);
+            //     return NULL;
+            // }
+            // if (irqEventInfo.timestamp_ns != 0) {
+            //     pinCache->function();
+            // }
+        }
+        else if (x < 0) {
+            std::string msg = "Encountered problem polling interrupt; ";
+            msg += strerror(errno);
+            throw GPIOException(msg);
+            return NULL;
+        }
+        pthread_testcancel();
     }
     return NULL;
 }
@@ -84,6 +99,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     strcpy(request.consumer, "RF24 IRQ");
     request.num_lines = 1U;
     request.offsets[0] = pin;
+    request.event_buffer_size = 16U;
 
     // set debounce for the pin
     request.config.attrs[0].mask = 1LL;
@@ -92,12 +108,14 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     request.config.num_attrs = 1U;
 
     // set pin as input and configure edge detection
-    request.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_ACTIVE_LOW;
+    request.config.flags = GPIO_V2_LINE_FLAG_INPUT;
     switch (mode) {
         case INT_EDGE_BOTH:
-        case INT_EDGE_FALLING:
         case INT_EDGE_RISING:
             request.config.flags |= mode;
+            break;
+        case INT_EDGE_FALLING:
+            request.config.flags |= mode | GPIO_V2_LINE_FLAG_ACTIVE_LOW;
             break;
         default:
             // bad user input!
@@ -124,13 +142,19 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     }
 
     // create thread and cache details
-    IrqPinCache cachedIrq;
-    cachedIrq.fd = request.fd;
-    cachedIrq.function = function;
-    irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, cachedIrq));
+    IrqPinCache irqPinCache;
+    irqPinCache.fd = request.fd;
+    irqPinCache.function = function;
+    std::pair<std::map<rf24_gpio_pin_t, IrqPinCache>::iterator, bool> indexPair = irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, irqPinCache));
+
+    if (!indexPair.second) {
+        // this should be reached, but indexPair.first needs to be the inserted map element
+        throw GPIOException("Could not cache the IRQ pin with function pointer");
+        return 0;
+    }
 
     pthread_mutex_lock(&irq_mutex);
-    pthread_create(&cachedIrq.id, NULL, poll_irq, &cachedIrq);
+    pthread_create(&indexPair.first->second.id, nullptr, poll_irq, &indexPair.first->second);
     pthread_mutex_unlock(&irq_mutex);
 
     return 1;
