@@ -109,10 +109,8 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     switch (mode) {
         case INT_EDGE_BOTH:
         case INT_EDGE_RISING:
-            request.config.flags |= mode;
-            break;
         case INT_EDGE_FALLING:
-            request.config.flags |= mode | GPIO_V2_LINE_FLAG_ACTIVE_LOW | GPIO_V2_LINE_FLAG_BIAS_PULL_DOWN;
+            request.config.flags |= mode;
             break;
         default:
             // bad user input!
