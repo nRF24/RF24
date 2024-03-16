@@ -20,7 +20,7 @@ extern "C" {
 
 static pthread_mutex_t irq_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<rf24_gpio_pin_t, IrqPinCache> irqCache;
-// gpio_v2_line_event irqEventInfo;
+gpio_v2_line_event irqEventInfo;
 
 struct IrqChipCache : public GPIOChipCache
 {
@@ -48,24 +48,24 @@ void* poll_irq(void* arg)
         int x = poll(&pollObj, 1, -1);
         if (x > 0) {
             if (pollObj.revents & POLLIN) {
-                pinCache->function();
+                // clear the interrupt event in the kernel buffer
+                memset(&irqEventInfo, 0, sizeof(irqEventInfo));
+                int ret = read(pinCache->fd, &irqEventInfo, sizeof(irqEventInfo));
+                if (ret < 0) {
+                    std::string msg = "[attachInterrupt] Could not read event info; ";
+                    msg += strerror(errno);
+                    throw GPIOException(msg);
+                    return NULL;
+                }
+                if (irqEventInfo.timestamp_ns != 0) {
+                    pinCache->function();
+                }
             }
             else if (pollObj.revents & POLLNVAL) {
                 std::string msg = "Could not poll kernel fd about the pin";
                 throw GPIOException(msg);
                 return NULL;
             }
-            // memset(&irqEventInfo, 0, sizeof(irqEventInfo));
-            // int ret = read(pinCache->fd, &irqEventInfo, sizeof(irqEventInfo));
-            // if (ret < 0) {
-            //     std::string msg = "[attachInterrupt] Could not read event info; ";
-            //     msg += strerror(errno);
-            //     throw GPIOException(msg);
-            //     return NULL;
-            // }
-            // if (irqEventInfo.timestamp_ns != 0) {
-            //     pinCache->function();
-            // }
         }
         else if (x < 0) {
             std::string msg = "Encountered problem polling interrupt; ";
@@ -105,7 +105,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     request.config.num_attrs = 1U;
 
     // set pin as input and configure edge detection
-    request.config.flags = GPIO_V2_LINE_FLAG_INPUT;
+    request.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_EVENT_CLOCK_REALTIME;
     switch (mode) {
         case INT_EDGE_BOTH:
         case INT_EDGE_RISING:
