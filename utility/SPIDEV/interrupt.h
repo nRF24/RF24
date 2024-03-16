@@ -27,8 +27,6 @@ struct IrqPinCache
 
     /// The user-designated ISR function (used as a callback)
     void (*function)(void) = nullptr;
-
-    ~IrqPinCache();
 };
 
 /**

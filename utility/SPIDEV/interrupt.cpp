@@ -22,14 +22,6 @@ static pthread_mutex_t irq_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<rf24_gpio_pin_t, IrqPinCache> irqCache;
 // gpio_v2_line_event irqEventInfo;
 
-IrqPinCache::~IrqPinCache()
-{
-    pthread_join(id, NULL);
-    if (fd > 0) {
-        close(fd);
-    }
-}
-
 struct IrqChipCache : public GPIOChipCache
 {
     IrqChipCache() : GPIOChipCache() {};
@@ -57,6 +49,11 @@ void* poll_irq(void* arg)
         if (x > 0) {
             if (pollObj.revents & POLLIN) {
                 pinCache->function();
+            }
+            else if (pollObj.revents & POLLNVAL) {
+                std::string msg = "Could not poll kernel fd about the pin";
+                throw GPIOException(msg);
+                return NULL;
             }
             // memset(&irqEventInfo, 0, sizeof(irqEventInfo));
             // int ret = read(pinCache->fd, &irqEventInfo, sizeof(irqEventInfo));
@@ -115,7 +112,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
             request.config.flags |= mode;
             break;
         case INT_EDGE_FALLING:
-            request.config.flags |= mode | GPIO_V2_LINE_FLAG_ACTIVE_LOW;
+            request.config.flags |= mode | GPIO_V2_LINE_FLAG_ACTIVE_LOW | GPIO_V2_LINE_FLAG_BIAS_PULL_DOWN;
             break;
         default:
             // bad user input!
@@ -166,7 +163,7 @@ int detachInterrupt(rf24_gpio_pin_t pin)
     if (cachedPin == irqCache.end()) {
         return 0; // pin not in cache; just exit
     }
-    pthread_join(cachedPin->second.id, NULL);
+    pthread_cancel(cachedPin->second.id);
     close(cachedPin->second.fd);
     irqCache.erase(cachedPin);
     return 1;
