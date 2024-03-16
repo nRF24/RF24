@@ -250,7 +250,14 @@ void ping_n_wait()
     // use the non-blocking call to write a payload and begin transmission
     // the "false" argument means we are expecting an ACK packet response
     radio.startFastWrite(tx_payloads[pl_iterator], tx_pl_size, false);
+    
+    uint32_t timer = millis();
     while (!got_interrupt) {
+        if(millis() - timer > 500){
+            cout << "\tIRQ NOT received" << endl;
+            break;
+        }
+        
         /*
          * IRQ pin is LOW when activated. Otherwise it is always HIGH
          * Wait in this empty loop until IRQ pin is activated.
