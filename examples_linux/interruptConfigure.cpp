@@ -167,14 +167,14 @@ void master()
     // Test the "data ready" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to ignore the 'data sent' event\n";
     radio.maskIRQ(true, false, false); // args = "data_sent", "data_fail", "data_ready"
-    cout << "   Pinging RX node for 'data ready' event..." << flush;
+    cout << "   Pinging RX node for 'data ready' event..." << endl;
     ping_n_wait(); // transmit a payload and detect the IRQ pin
     pl_iterator++; // increment iterator for next test
 
     // Test the "data sent" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to ignore the 'data ready' event\n";
     radio.maskIRQ(false, false, true); // args = "data_sent", "data_fail", "data_ready"
-    cout << "   Pinging RX node for 'data sent' event..." << flush;
+    cout << "   Pinging RX node for 'data sent' event..." << endl;
     radio.flush_tx(); // flush payloads from any failed prior test
     ping_n_wait();    // transmit a payload and detect the IRQ pin
     pl_iterator++;    // increment iterator for next test
@@ -196,7 +196,7 @@ void master()
     // test the "data fail" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to reflect all events\n";
     radio.maskIRQ(0, 0, 0); // args = "data_sent", "data_fail", "data_ready"
-    cout << "   Pinging inactive RX node for 'data fail' event..." << flush;
+    cout << "   Pinging inactive RX node for 'data fail' event..." << endl;
     ping_n_wait(); // transmit a payload and detect the IRQ pin
 
     // CE pin is still HIGH which consumes more power. Example is now idling so...
