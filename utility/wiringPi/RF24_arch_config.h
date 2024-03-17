@@ -12,13 +12,13 @@
 #define RF24_LINUX
 
 #include <stddef.h>
-#include "spi.h"
-#include "wiringPi.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <sys/time.h>
+#include "spi.h"
+#include "wiringPi.h"
 
 #define _BV(x) (1 << (x))
 #define _SPI   spi

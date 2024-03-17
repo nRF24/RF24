@@ -12,19 +12,7 @@
 #ifndef RF24_UTILITY_TEMPLATE_SPI_H_
 #define RF24_UTILITY_TEMPLATE_SPI_H_
 
-#include <string>
 #include <stdint.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <getopt.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <inttypes.h>
-#include <linux/types.h>
-#include <linux/spi/spidev.h>
-
-using namespace std;
 
 #ifndef DOXYGEN_FORCED
 // exclude this line from the docs to prevent displaying in the list of classes
@@ -71,17 +59,14 @@ public:
 #endif
 
 private:
-    /** Default SPI device */
-    string device;
+    /** SPI bus */
+    int bus;
     /** SPI Mode set */
     uint8_t mode;
-    /** word size*/
+    /** SPI word size */
     uint8_t bits;
-    /** Set SPI speed*/
+    /** SPI speed */
     uint32_t speed;
-    int fd;
-
-    void init();
 };
 
 /**@}*/

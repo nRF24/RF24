@@ -11,12 +11,8 @@
 
 #define RF24_LINUX
 
-#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <sys/time.h>
 #include "spi.h"
 #include "gpio.h"
 #include "compatibility.h"

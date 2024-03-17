@@ -8,16 +8,15 @@
  * wiringPi/examples/spiSpeed.c
  */
 
-#include "spi.h"
-
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
+
+#include <wiringPi.h>
+#include <wiringPiSPI.h>
+#include "spi.h"
 
 #define RF24_SPI_CHANNEL 0
 

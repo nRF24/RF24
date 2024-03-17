@@ -1,15 +1,9 @@
-/*
-Interrupts functions extruded from wiringPi library by Oitzu.
+/**
+ * Interrupt functions wrapped from pigpio library
+ */
+#ifndef RF24_UTILITY_PIGPIO_INTERRUPT_H_
+#define RF24_UTILITY_PIGPIO_INTERRUPT_H_
 
-wiringPi Copyright (c) 2012 Gordon Henderson
-https://projects.drogon.net/raspberry-pi/wiringpi
-wiringPi is free software: GNU Lesser General Public License
-see <http://www.gnu.org/licenses/>
-*/
-#ifndef __RF24_INTERRUPT_H__
-#define __RF24_INTERRUPT_H__
-
-#include "RF24_arch_config.h"
 #include <pigpio.h>
 
 #define INT_EDGE_SETUP   0
@@ -50,4 +44,4 @@ extern void rfInterrupts();
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // RF24_UTILITY_PIGPIO_INTERRUPT_H_

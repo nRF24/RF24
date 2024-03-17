@@ -1,9 +1,8 @@
-/*
-
-*/
-
-#include "interrupt.h"
+/**
+ * Interrupt implementation wrapped from pigpio library
+ */
 #include <pigpio.h>
+#include "interrupt.h"
 
 int attachInterrupt(int pin, int mode, void (*function)(void))
 {

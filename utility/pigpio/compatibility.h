@@ -1,22 +1,15 @@
 /*
- * File:   compatiblity.h
- * Author: purinda
- *
- * Created on 24 June 2012, 3:08 PM
- * patch for safer monotonic clock & millis() correction for 64bit LDV 2018
+ * Time keeping functions
  */
 
-#ifndef COMPATIBLITY_H
-#define COMPATIBLITY_H
+#include <stdint.h> // for uintXX_t types
+
+#ifndef RF24_UTILITY_PIGPIO_COMPATIBLITY_H_
+#define RF24_UTILITY_PIGPIO_COMPATIBLITY_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdint.h> // for uintXX_t types
-#include <stddef.h>
-#include <time.h>
-#include <sys/time.h>
 
 void __msleep(int milisec);
 
@@ -30,4 +23,4 @@ uint32_t __millis();
 }
 #endif
 
-#endif /* COMPATIBLITY_H */
+#endif /* RF24_UTILITY_PIGPIO_COMPATIBLITY_H_ */

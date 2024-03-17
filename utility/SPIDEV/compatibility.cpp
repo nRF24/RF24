@@ -1,15 +1,11 @@
+#include <time.h>
+#include <chrono>
 #include "compatibility.h"
 
 long long mtime, seconds, useconds;
 //static struct timeval start, end;
 //struct timespec start, end;
-#include <time.h>
-#include <chrono>
-/**********************************************************************/
-/**
- * This function is added in order to simulate arduino delay() function
- * @param milisec
- */
+
 void __msleep(int milisec)
 {
     struct timespec req; // = {0};

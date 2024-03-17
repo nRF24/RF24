@@ -2,8 +2,8 @@
  *
  */
 
-#include "spi.h"
 #include <pigpio.h>
+#include "spi.h"
 
 SPI::SPI()
 {

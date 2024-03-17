@@ -6,12 +6,9 @@
 #ifndef RF24_UTILITY_WIRINGPI_SPI_H_
 #define RF24_UTILITY_WIRINGPI_SPI_H_
 
-#include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #include "../../RF24_config.h" // This is cyclical and should be fixed
-
-using namespace std;
 
 class SPI
 {

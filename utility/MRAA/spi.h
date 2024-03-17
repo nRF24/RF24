@@ -10,7 +10,6 @@
  * Class declaration for SPI helper files
  */
 
-#include <stdio.h>
 #include "mraa.h"
 #include "mraa.hpp"
 

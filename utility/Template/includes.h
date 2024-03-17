@@ -16,12 +16,12 @@
 /**
  * Define a specific platform for this configuration
  */
-#define RF24_BBB
+#define RF24_TEMPLATE
 
 /**
  * Load the correct configuration for this platform
  */
-#include "BBB/RF24_arch_config.h"
+#include "Template/RF24_arch_config.h"
 
 /**@}*/
 
