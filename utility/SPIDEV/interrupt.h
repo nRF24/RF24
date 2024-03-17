@@ -1,10 +1,11 @@
 /**
  * Interrupt functions
  */
-#ifndef __RF24_INTERRUPT_H__
-#define __RF24_INTERRUPT_H__
+#ifndef RF24_UTILITY_SPIDEV_INTERRUPT_H_
+#define RF24_UTILITY_SPIDEV_INTERRUPT_H_
 
 #include <pthread.h> // pthread_t
+#include <stdexcept>
 #include "gpio.h"    // rf24_gpio_pin_t
 
 #define INT_EDGE_SETUP   0
@@ -15,6 +16,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** Specific exception for IRQ errors */
+class IRQException : public std::runtime_error
+{
+public:
+    explicit IRQException(const std::string& msg)
+        : std::runtime_error(msg)
+    {
+    }
+};
 
 /** Details related to a certain pin's ISR. */
 struct IrqPinCache
@@ -49,4 +60,4 @@ extern void rfInterrupts();
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // RF24_UTILITY_SPIDEV_INTERRUPT_H_

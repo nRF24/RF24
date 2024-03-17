@@ -17,6 +17,8 @@ SOURCES = $(PROGRAMS:=.cpp)
 LIBS=-l$(LIB)
 ifeq ($(DRIVER), LittleWire)
 	LIBS+= -llittlewire-spi
+else ifeq ($(DRIVER), wiringPi)
+	LIBS+= -lwiringPi -lcrypt -lrt
 endif
 
 all: $(PROGRAMS)

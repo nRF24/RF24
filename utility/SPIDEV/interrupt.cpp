@@ -1,7 +1,6 @@
-/*
-Interrupt functions
-*/
-
+/**
+ * Interrupt implementations
+ */
 #include <linux/gpio.h>
 #include <unistd.h>    // close()
 #include <fcntl.h>     // open()
@@ -47,7 +46,7 @@ void* poll_irq(void* arg)
         if (ret < 0) {
             std::string msg = "[poll_irq] Could not read event info; ";
             msg += strerror(errno);
-            throw GPIOException(msg);
+            throw IRQException(msg);
             return NULL;
         }
         if (ret > 0 && irqEventInfo.line_seqno != lastEventSeqNo) {
@@ -67,7 +66,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
 
     if (pin > irqChipCache.info.lines) {
         std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + irqChipCache.chip;
-        throw GPIOException(msg);
+        throw IRQException(msg);
         return 0;
     }
 
@@ -104,7 +103,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     if (ret < 0 || request.fd <= 0) {
         std::string msg = "[attachInterrupt] Could not get line handle from ioctl; ";
         msg += strerror(errno);
-        throw GPIOException(msg);
+        throw IRQException(msg);
         return 0;
     }
     irqChipCache.closeDevice();
@@ -113,7 +112,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     if (ret < 0) {
         std::string msg = "[attachInterrupt] Could not set line config; ";
         msg += strerror(errno);
-        throw GPIOException(msg);
+        throw IRQException(msg);
         return 0;
     }
 
@@ -125,7 +124,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
 
     if (!indexPair.second) {
         // this should be reached, but indexPair.first needs to be the inserted map element
-        throw GPIOException("Could not cache the IRQ pin with function pointer");
+        throw IRQException("Could not cache the IRQ pin with function pointer");
         return 0;
     }
 

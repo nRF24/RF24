@@ -137,10 +137,10 @@ if(DEFINED RF24_SPI_SPEED)
     )
 endif()
 # allow user customization of default GPIO chip used with the SPIDEV driver
-if(DEFINED RF24_SPIDEV_GPIO_CHIP)
-    message(STATUS "RF24_SPIDEV_GPIO_CHIP set to ${RF24_SPIDEV_GPIO_CHIP}")
+if(DEFINED RF24_LINUX_GPIO_CHIP)
+    message(STATUS "RF24_LINUX_GPIO_CHIP set to ${RF24_LINUX_GPIO_CHIP}")
     target_compile_definitions(${LibTargetName} PUBLIC
-        RF24_SPIDEV_GPIO_CHIP="${RF24_SPIDEV_GPIO_CHIP}"
+        RF24_LINUX_GPIO_CHIP="${RF24_LINUX_GPIO_CHIP}"
     )
 endif()
 
