@@ -39,9 +39,9 @@ void* poll_irq(void* arg)
     IrqPinCache* pinCache = (IrqPinCache*)(arg);
     unsigned int lastEventSeqNo = 0;
     gpio_v2_line_event irqEventInfo;
+    memset(&irqEventInfo, 0, sizeof(irqEventInfo));
 
     for (;;) {
-        memset(&irqEventInfo, 0, sizeof(irqEventInfo));
         int ret = read(pinCache->fd, &irqEventInfo, sizeof(gpio_v2_line_event));
         if (ret < 0) {
             std::string msg = "[poll_irq] Could not read event info; ";
@@ -76,7 +76,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     strcpy(request.consumer, "RF24 IRQ");
     request.num_lines = 1U;
     request.offsets[0] = pin;
-    request.event_buffer_size = 16U;
+    request.event_buffer_size = sizeof(gpio_v2_line_event);
 
     // set debounce for the pin
     // request.config.attrs[0].mask = 1LL;
