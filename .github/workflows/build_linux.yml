@@ -68,7 +68,7 @@ jobs:
           - "--driver=SPIDEV"
           - "--driver=MRAA"
           - "--driver=pigpio"
-          # - "--soc=BCM2835 --driver=wiringPi"
+          - "--soc=BCM2835 --driver=wiringPi"
 
     env:
       CFLAGS: "-I /usr/local/include"
@@ -133,9 +133,6 @@ jobs:
         run: sudo make install
 
       - name: make linux examples
-        # compiling examples for wiringPi is broken see issue #669
-        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
-        # interruptConfigure.cpp example is incompatible with MRAA & wiringPi drivers
         if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi' && matrix.config-options != '--driver=MRAA' }}
         run: |
           cd examples_linux
