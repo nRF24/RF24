@@ -125,7 +125,7 @@ jobs:
           -D BUILDSWIGNODE=OFF \
           -D BUILDARCH=arm \
           -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/RF24/cmake/toolchains/armhf.cmake
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/armhf.cmake
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
