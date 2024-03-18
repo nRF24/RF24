@@ -1,4 +1,3 @@
-#include <sys/time.h>
 #include <time.h>
 #include <chrono>
 #include "compatibility.h"

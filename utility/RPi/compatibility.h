@@ -1,7 +1,6 @@
 #ifndef RF24_UTILITY_RPI_COMPATIBLITY_H_
 #define RF24_UTILITY_RPI_COMPATIBLITY_H_
 
-#include <sys/time.h>
 #include <stdint.h>
 #include <stddef.h>
 
