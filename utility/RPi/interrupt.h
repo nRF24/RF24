@@ -4,8 +4,8 @@
 #ifndef RF24_UTILITY_RPI_INTERRUPT_H_
 #define RF24_UTILITY_RPI_INTERRUPT_H_
 
-#include <pthread.h>          // pthread_t
-#include <linux/gpio.h>       // gpiochip_info
+#include <pthread.h>    // pthread_t
+#include <linux/gpio.h> // gpiochip_info
 #include <stdexcept>
 #include "RF24_arch_config.h" // rf24_gpio_pin_t
 

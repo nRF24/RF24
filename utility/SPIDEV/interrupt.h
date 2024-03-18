@@ -6,7 +6,7 @@
 
 #include <pthread.h> // pthread_t
 #include <stdexcept>
-#include "gpio.h"    // rf24_gpio_pin_t
+#include "gpio.h" // rf24_gpio_pin_t
 
 #define INT_EDGE_SETUP   0
 #define INT_EDGE_FALLING GPIO_V2_LINE_FLAG_EDGE_FALLING
