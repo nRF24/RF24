@@ -17,9 +17,7 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
-#include <time.h>
-#include <sys/time.h>
+#include <stdint.h>
 
 void __msleep(int milisec);
 
@@ -27,7 +25,7 @@ void __usleep(int milisec);
 
 void __start_timer();
 
-long __millis();
+uint32_t __millis();
 
 #ifdef __cplusplus
 }

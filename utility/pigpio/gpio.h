@@ -5,8 +5,6 @@
 #ifndef RF24_UTILITY_PIGPIO_GPIO_H_
 #define RF24_UTILITY_PIGPIO_GPIO_H_
 
-#include <cstdio>
-#include <map>
 #include <stdexcept>
 
 /** Specific exception for GPIO errors */
@@ -18,21 +16,6 @@ public:
     {
     }
 };
-
-/**
- * @file gpio.h
- * @cond HIDDEN_SYMBOLS
- * Class declaration for GPIO helper files
- */
-
-/**
- * Example GPIO.h file
- *
- * @defgroup GPIO GPIO Example
- *
- * See RF24_arch_config.h for additional information
- * @{
- */
 
 class GPIO
 {

@@ -3,6 +3,7 @@
 
 #define RF24_WIRINGPI
 
+#include <cstring> // memcpy() used in RF24.cpp
 #include "wiringPi/RF24_arch_config.h"
 #include "wiringPi/interrupt.h"
 
