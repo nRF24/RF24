@@ -45,27 +45,9 @@ void GPIOChipCache::closeDevice()
 
 GPIOChipCache::GPIOChipCache()
 {
-    try {
-        openDevice();
-    }
-    catch (GPIOException& exc) {
-        chip = "/dev/gpiochip0";
-        openDevice();
-    }
     request.num_lines = 1;
     strcpy(request.consumer, "RF24 lib");
     data.mask = 1ULL; // only change value for specified pin
-
-    // cache chip info
-    memset(&info, 0, sizeof(info));
-    int ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &info);
-    if (ret < 0) {
-        std::string msg = "Could not gather info about ";
-        msg += chip;
-        throw GPIOException(msg);
-        return;
-    }
-    closeDevice(); // in case other apps want to access it
 }
 
 GPIOChipCache::~GPIOChipCache()
@@ -91,7 +73,26 @@ GPIO::~GPIO()
 
 void GPIO::open(rf24_gpio_pin_t port, int DDR)
 {
-    if (port > gpioCache.info.lines) {
+    try {
+        gpioCache.openDevice();
+    }
+    catch (GPIOException& exc) {
+        gpioCache.chip = "/dev/gpiochip0";
+        gpioCache.openDevice();
+    }
+
+    // get chip info
+    gpiochip_info info;
+    memset(&info, 0, sizeof(info));
+    int ret = ioctl(gpioCache.fd, GPIO_GET_CHIPINFO_IOCTL, &info);
+    if (ret < 0) {
+        std::string msg = "Could not gather info about ";
+        msg += gpioCache.chip;
+        throw GPIOException(msg);
+        return;
+    }
+
+    if (port > info.lines) {
         std::string msg = "pin number " + std::to_string(port) + " not available for " + gpioCache.chip;
         throw GPIOException(msg);
         return;
@@ -107,8 +108,6 @@ void GPIO::open(rf24_gpio_pin_t port, int DDR)
         request.fd = pin->second;
     }
 
-    gpioCache.openDevice();
-    int ret;
     if (request.fd <= 0) {
         ret = ioctl(gpioCache.fd, GPIO_V2_GET_LINE_IOCTL, &request);
         if (ret == -1 || request.fd <= 0) {

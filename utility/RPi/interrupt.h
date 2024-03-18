@@ -4,9 +4,9 @@
 #ifndef RF24_UTILITY_RPI_INTERRUPT_H_
 #define RF24_UTILITY_RPI_INTERRUPT_H_
 
-#include <pthread.h>    // pthread_t
-#include <linux/gpio.h> // gpiochip_info
+#include <pthread.h> // pthread_t
 #include <stdexcept>
+#include <linux/gpio.h>       // GPIO_V2_LINE_FLAG_EDGE_***
 #include "RF24_arch_config.h" // rf24_gpio_pin_t
 
 #define INT_EDGE_FALLING GPIO_V2_LINE_FLAG_EDGE_FALLING
@@ -33,7 +33,6 @@ struct IrqChipCache
 {
     const char* chip = RF24_LINUX_GPIO_CHIP;
     int fd = -1;
-    gpiochip_info info;
 
     /// Open the File Descriptor for the GPIO chip
     void openDevice();

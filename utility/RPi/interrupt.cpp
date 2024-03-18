@@ -42,24 +42,6 @@ void IrqChipCache::closeDevice()
 
 IrqChipCache::IrqChipCache()
 {
-    try {
-        openDevice();
-    }
-    catch (IRQException& exc) {
-        chip = "/dev/gpiochip0";
-        openDevice();
-    }
-
-    // cache chip info
-    memset(&info, 0, sizeof(info));
-    int ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &info);
-    if (ret < 0) {
-        std::string msg = "Could not gather info about ";
-        msg += chip;
-        throw IRQException(msg);
-        return;
-    }
-    closeDevice(); // in case other apps want to access it
 }
 
 IrqChipCache::~IrqChipCache()
@@ -102,7 +84,26 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     // ensure pin is not already being used in a separate thread
     detachInterrupt(pin);
 
-    if (pin > irqChipCache.info.lines) {
+    try {
+        irqChipCache.openDevice();
+    }
+    catch (IRQException& exc) {
+        irqChipCache.chip = "/dev/gpiochip0";
+        irqChipCache.openDevice();
+    }
+
+    // get chip info
+    gpiochip_info info;
+    memset(&info, 0, sizeof(info));
+    int ret = ioctl(irqChipCache.fd, GPIO_GET_CHIPINFO_IOCTL, &info);
+    if (ret < 0) {
+        std::string msg = "[attachInterrupt] Could not gather info about ";
+        msg += irqChipCache.chip;
+        throw IRQException(msg);
+        return 0;
+    }
+
+    if (pin > info.lines) {
         std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + irqChipCache.chip;
         throw IRQException(msg);
         return 0;
@@ -136,8 +137,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     }
 
     // write pin request's config
-    irqChipCache.openDevice();
-    int ret = ioctl(irqChipCache.fd, GPIO_V2_GET_LINE_IOCTL, &request);
+    ret = ioctl(irqChipCache.fd, GPIO_V2_GET_LINE_IOCTL, &request);
     if (ret < 0 || request.fd <= 0) {
         std::string msg = "[attachInterrupt] Could not get line handle from ioctl; ";
         msg += strerror(errno);
