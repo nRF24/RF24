@@ -52,10 +52,10 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void));
 int detachInterrupt(rf24_gpio_pin_t pin);
 
 /** Deprecated, no longer functional */
-extern void rfNoInterrupts();
+void rfNoInterrupts();
 
 /** Deprecated, no longer functional */
-extern void rfInterrupts();
+void rfInterrupts();
 
 #ifdef __cplusplus
 }

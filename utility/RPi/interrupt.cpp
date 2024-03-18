@@ -154,18 +154,19 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
         return 0;
     }
 
-    // create thread and cache details
+    // cache details
     IrqPinCache irqPinCache;
     irqPinCache.fd = request.fd;
     irqPinCache.function = function;
     std::pair<std::map<rf24_gpio_pin_t, IrqPinCache>::iterator, bool> indexPair = irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, irqPinCache));
 
     if (!indexPair.second) {
-        // this should be reached, but indexPair.first needs to be the inserted map element
-        throw IRQException("Could not cache the IRQ pin with function pointer");
+        // this should not be reached, but indexPair.first needs to be the inserted map element
+        throw IRQException("[attachInterrupt] Could not cache the IRQ pin with function pointer");
         return 0;
     }
 
+    // create and start thread
     pthread_mutex_lock(&irq_mutex);
     pthread_create(&indexPair.first->second.id, nullptr, poll_irq, &indexPair.first->second);
     pthread_mutex_unlock(&irq_mutex);
