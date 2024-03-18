@@ -9,7 +9,6 @@
 #include <stdexcept>
 #include "RF24_arch_config.h" // rf24_gpio_pin_t
 
-#define INT_EDGE_SETUP   0
 #define INT_EDGE_FALLING GPIO_V2_LINE_FLAG_EDGE_FALLING
 #define INT_EDGE_RISING  GPIO_V2_LINE_FLAG_EDGE_RISING
 #define INT_EDGE_BOTH    GPIO_V2_LINE_FLAG_EDGE_FALLING | GPIO_V2_LINE_FLAG_EDGE_RISING

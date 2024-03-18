@@ -6,7 +6,6 @@
 
 #include <pigpio.h>
 
-#define INT_EDGE_SETUP   0
 #define INT_EDGE_FALLING FALLING_EDGE
 #define INT_EDGE_RISING  RISING_EDGE
 #define INT_EDGE_BOTH    EITHER_EDGE
