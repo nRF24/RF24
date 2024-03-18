@@ -32,6 +32,8 @@ using namespace std;
 #define CSN_PIN 0
 #ifdef MRAA
     #define CE_PIN 15 // GPIO22
+#elif defined(RF24_WIRINGPI)
+    #define CE_PIN 3 // GPIO22
 #else
     #define CE_PIN 22
 #endif
