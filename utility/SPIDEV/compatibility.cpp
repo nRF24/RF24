@@ -2,6 +2,10 @@
 #include <chrono>
 #include "compatibility.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 long long mtime, seconds, useconds;
 //static struct timeval start, end;
 //struct timespec start, end;
@@ -42,3 +46,7 @@ uint32_t __millis()
 
     return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -4,6 +4,10 @@
 #include <pigpio.h>
 #include "interrupt.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int attachInterrupt(int pin, int mode, void (*function)(void))
 {
     gpioInitialise();
@@ -22,3 +26,7 @@ void rfNoInterrupts()
 void rfInterrupts()
 {
 }
+
+#ifdef __cplusplus
+}
+#endif

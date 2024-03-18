@@ -14,31 +14,15 @@
 extern "C" {
 #endif
 
-/*
- * attachInterrupt (Original: wiringPiISR):
- *      Pi Specific.
- *      Take the details and create an interrupt handler that will do a call-
- *      back to the user supplied function.
- *********************************************************************************
- */
-extern int attachInterrupt(int pin, int mode, void (*function)(void));
+int attachInterrupt(int pin, int mode, void (*function)(void));
 
-/*
- * detachInterrupt:
- *      Pi Specific detachInterrupt.
- *      Will cancel the interrupt thread, close the filehandle and
- *		setting wiringPi back to 'none' mode.
- *********************************************************************************
- */
-extern int detachInterrupt(int pin);
+int detachInterrupt(int pin);
 
-/* Deprecated, no longer functional
- */
-extern void rfNoInterrupts();
+/* Deprecated, no longer functional */
+void rfNoInterrupts();
 
-/* Deprecated, no longer functional
- */
-extern void rfInterrupts();
+/* Deprecated, no longer functional */
+void rfInterrupts();
 
 #ifdef __cplusplus
 }
