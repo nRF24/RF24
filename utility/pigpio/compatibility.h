@@ -1,11 +1,10 @@
 /*
  * Time keeping functions
  */
-
-#include <stdint.h> // for uintXX_t types
-
 #ifndef RF24_UTILITY_PIGPIO_COMPATIBLITY_H_
 #define RF24_UTILITY_PIGPIO_COMPATIBLITY_H_
+
+#include <stdint.h> // for uintXX_t types
 
 #ifdef __cplusplus
 extern "C" {
