@@ -3,8 +3,9 @@
 
 #define RF24_LINUX
 
-#include <stdint.h>
-#include <stdio.h>
+#include <stdint.h> // uint8_t
+#include <stdio.h>  // printf
+#include <string.h> // strlen
 #include "bcm2835.h"
 #include "spi.h"
 #include "compatibility.h"

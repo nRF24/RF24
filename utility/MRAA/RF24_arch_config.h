@@ -1,7 +1,9 @@
 #ifndef RF24_UTILITY_MRAA_RF24_ARCH_CONFIG_H_
 #define RF24_UTILITY_MRAA_RF24_ARCH_CONFIG_H_
 
-#include <stdint.h>
+#include <stdint.h> // uint16_t
+#include <stdio.h>  // printf
+#include <string.h> // strlen
 #include "mraa.h"
 #include "spi.h"
 #include "gpio.h"
