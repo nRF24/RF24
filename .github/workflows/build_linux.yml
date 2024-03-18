@@ -97,7 +97,7 @@ jobs:
       #     ./build
       
       - name: provide pigpio
-        if: ${{ matrix.config-options == '--driver=pigpio' || endsWith(matrix.config-options, '--driver=RPi') }}
+        if: ${{ matrix.config-options == '--driver=pigpio' }}
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
@@ -121,7 +121,11 @@ jobs:
           cd mraa
           mkdir build
           cd build
-          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm
+          cmake .. \
+          -D BUILDSWIGNODE=OFF \
+          -D BUILDARCH=arm \
+          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/RF24/cmake/toolchains/armhf.cmake
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
@@ -136,7 +140,6 @@ jobs:
         run: sudo make install
 
       - name: make linux examples
-        if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi' && matrix.config-options != '--driver=MRAA' }}
         run: |
           cd examples_linux
           make
