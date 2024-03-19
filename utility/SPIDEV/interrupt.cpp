@@ -25,7 +25,8 @@ struct IrqChipCache : public GPIOChipCache
     ~IrqChipCache()
     {
         for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
-            pthread_cancel(i->second.id);
+            pthread_cancel(i->second.id);     // send cancel request
+            pthread_join(i->second.id, NULL); // wait till thread terminates
             close(i->second.fd);
         }
         irqCache.clear();
@@ -160,7 +161,8 @@ int detachInterrupt(rf24_gpio_pin_t pin)
     if (cachedPin == irqCache.end()) {
         return 0; // pin not in cache; just exit
     }
-    pthread_cancel(cachedPin->second.id);
+    pthread_cancel(cachedPin->second.id);     // send cancel request
+    pthread_join(cachedPin->second.id, NULL); // wait till thread terminates
     close(cachedPin->second.fd);
     irqCache.erase(cachedPin);
     return 1;
