@@ -1,9 +1,8 @@
 /*
  * GPIO Functions
  */
-
-#include "gpio.h"
 #include <pigpio.h>
+#include "gpio.h"
 
 bool initialized = 0;
 

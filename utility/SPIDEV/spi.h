@@ -10,10 +10,12 @@
 #ifndef RF24_UTILITY_SPIDEV_SPI_H_
 #define RF24_UTILITY_SPIDEV_SPI_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdexcept>
 
-#include "../../RF24_config.h" // This is cyclical and should be fixed
+#ifndef RF24_SPI_SPEED
+    #define RF24_SPI_SPEED 10000000
+#endif
 
 /** Specific exception for SPI errors */
 class SPIException : public std::runtime_error

@@ -8,76 +8,69 @@
  * wiringPi/examples/spiSpeed.c
  */
 
-#include "spi.h"
-
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
-
-#include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
 
-#define RF24_SPI_CHANNEL 0
+#include <wiringPi.h>
+#include <wiringPiSPI.h>
+#include "spi.h"
 
-SPI::SPI() : fd(-1)
+SPI::SPI() : fd(-1), channel(0)
 {
-    printf("wiringPi RF24 DRIVER\n");
 }
 
 void SPI::begin(int csn_pin, uint32_t spi_speed)
 {
+    channel = csn_pin % 10;
+
     // initialize the wiringPiSPI
     wiringPiSetup();
-    if ((this->fd = wiringPiSPISetup(RF24_SPI_CHANNEL, spi_speed)) < 0) {
-        printf("Cannot configure the SPI device!\n");
-        fflush(stdout);
-        abort();
-    }
-    else {
-        printf("Configured SPI fd: %d - pin: %d\n", fd, csn_pin);
+    if ((this->fd = wiringPiSPISetup(channel, spi_speed)) < 0) {
+        std::string msg = "[SPI::begin] Cannot configure the SPI device!; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
 }
 
 uint8_t SPI::transfer(uint8_t tx)
 {
-    memset(&msgByte, 0, sizeof(msgByte));
-    memcpy(&msgByte, &tx, sizeof(tx));
+    memset(&xferByte, 0, sizeof(xferByte));
+    memcpy(&xferByte, &tx, sizeof(tx));
 
-    if (wiringPiSPIDataRW(RF24_SPI_CHANNEL, &msgByte, sizeof(tx)) < 0) {
-        printf("transfer(): Cannot send data: %s\n", strerror(errno));
-        fflush(stdout);
-        abort();
+    if (wiringPiSPIDataRW(channel, &xferByte, sizeof(tx)) < 0) {
+        std::string msg = "[SPI::transfer] Cannot send spi message; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
+        return 0;
     }
 
-    return msgByte;
+    return xferByte;
 }
 
 void SPI::transfern(char* buf, uint32_t len)
 {
-    printf("transfern(tx: %s)\n", buf);
-
-    if (wiringPiSPIDataRW(RF24_SPI_CHANNEL, (uint8_t*)buf, len) < 0) {
-        printf("transfern(): Cannot send data %s\n", strerror(errno));
-        fflush(stdout);
-        abort();
+    if (wiringPiSPIDataRW(channel, (uint8_t*)buf, len) < 0) {
+        std::string msg = "[SPI::transfern] Cannot send spi message; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
 }
 
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
     // using an auxiliary buffer to keep tx and rx different
-    memset(msg, 0, sizeof(msg));
-    memcpy(msg, tbuf, len);
+    memset(xferBuf, 0, sizeof(xferBuf));
+    memcpy(xferBuf, tbuf, len);
 
-    if (wiringPiSPIDataRW(RF24_SPI_CHANNEL, msg, len) < 0) {
-        printf("transfernb() Cannot send data %s\n", strerror(errno));
-        fflush(stdout);
-        abort();
+    if (wiringPiSPIDataRW(channel, xferBuf, len) < 0) {
+        std::string msg = "[SPI::transfernb] Cannot send spi message; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
 
-    memcpy(rbuf, msg, len);
+    memcpy(rbuf, xferBuf, len);
 }
 
 SPI::~SPI()

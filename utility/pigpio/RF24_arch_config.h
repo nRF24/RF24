@@ -6,20 +6,17 @@
  version 2 as published by the Free Software Foundation.
 
  */
-#ifndef __ARCH_CONFIG_H__
-#define __ARCH_CONFIG_H__
+#ifndef RF24_UTILITY_PIGPIO_RF24_ARCH_CONFIG_H_
+#define RF24_UTILITY_PIGPIO_RF24_ARCH_CONFIG_H_
 
 #define RF24_LINUX
 
-#include <stddef.h>
+#include <stdint.h> // uint16_t
+#include <stdio.h>  // printf
+#include <string.h> // strlen
 #include "spi.h"
 #include "gpio.h"
 #include "compatibility.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <sys/time.h>
 
 //#define RF24_SPI_SPEED RF24_SPIDEV_SPEED
 
@@ -72,4 +69,4 @@ typedef uint8_t rf24_gpio_pin_t;
 #define delayMicroseconds(usec)  __usleep(usec)
 #define millis()                 __millis()
 
-#endif // __ARCH_CONFIG_H__
+#endif // RF24_UTILITY_PIGPIO_RF24_ARCH_CONFIG_H_

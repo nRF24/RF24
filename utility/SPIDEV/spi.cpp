@@ -10,15 +10,15 @@
  * www.kernel.org/doc/Documentation/spi/spidev_test.c
  */
 
-#include "spi.h"
-
 #include <fcntl.h>
 #include <linux/spi/spidev.h>
-#include <memory.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+
+#include "spi.h"
 
 #define RF24_SPIDEV_BITS 8
 
@@ -51,14 +51,13 @@ void SPI::begin(int busNo, uint32_t spi_speed)
 
     this->fd = open(device, O_RDWR);
     if (this->fd < 0) {
-        throw SPIException("can't open device");
+        std::string msg = "[SPI::begin] Can't open device ";
+        msg += device;
+        msg += "; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*
-  {
-        perror("can't open device");
-        abort();
 
-  }*/
     this->spiIsInitialized = true;
     init(spi_speed);
 }
@@ -74,62 +73,52 @@ void SPI::init(uint32_t speed)
      */
     ret = ioctl(this->fd, SPI_IOC_WR_MODE, &mode);
     if (ret == -1) {
-        throw SPIException("cant set WR spi mode");
+        std::string msg = "[SPI::init] Can't set WR spi mode; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't set spi mode");
-        abort();
-    }*/
 
     ret = ioctl(this->fd, SPI_IOC_RD_MODE, &mode);
     if (ret == -1) {
-        throw SPIException("can't set RD spi mode");
+        std::string msg = "[SPI::init] Can't set RD spi mode; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't set spi mode");
-        abort();
-    }*/
 
     /*
      * bits per word
      */
     ret = ioctl(this->fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
     if (ret == -1) {
-        throw SPIException("can't set WR bits per word");
+        std::string msg = "[SPI::init] Can't set WR bits per word; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't set bits per word");
-        abort();
-    }*/
 
     ret = ioctl(this->fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
     if (ret == -1) {
-        throw SPIException("can't set RD bits per word");
+        std::string msg = "[SPI::init] Can't set RD bits per word; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't set bits per word");
-        abort();
-    }*/
+
     /*
      * max speed hz
      */
     ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
     if (ret == -1) {
-        throw SPIException("can't WR set max speed hz");
+        std::string msg = "[SPI::init] Can't set max WR speed hz; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't set max speed hz");
-        abort();
-    }*/
 
     ret = ioctl(this->fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
     if (ret == -1) {
-        throw SPIException("can't RD set max speed hz");
+        std::string msg = "[SPI::init] Can't set max RD speed hz; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't set max speed hz");
-        abort();
-    }*/
+
     _spi_speed = speed;
 }
 
@@ -149,12 +138,10 @@ uint8_t SPI::transfer(uint8_t tx)
     int ret;
     ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
     if (ret < 1) {
-        throw SPIException("can't send spi message");
+        std::string msg = "[SPI::transfer] Can't send spi message; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't send spi message");
-        abort();
-    }*/
 
     return rx;
 }
@@ -174,12 +161,10 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
     int ret;
     ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
     if (ret < 1) {
-        throw SPIException("can't send spi message");
+        std::string msg = "[SPI::transfernb] Can't send spi message; ";
+        msg += strerror(errno);
+        throw SPIException(msg);
     }
-    /*{
-        perror("can't send spi message");
-        abort();
-    }*/
 }
 
 void SPI::transfern(char* buf, uint32_t len)

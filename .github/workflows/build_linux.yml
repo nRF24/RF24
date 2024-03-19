@@ -68,6 +68,7 @@ jobs:
           - "--driver=SPIDEV"
           - "--driver=MRAA"
           - "--driver=pigpio"
+          # disable wiringPi due to needing cross-compiled deps (see comment below)
           # - "--soc=BCM2835 --driver=wiringPi"
 
     env:
@@ -83,18 +84,20 @@ jobs:
           arm-linux-gnueabihf-gcc -v
           arm-linux-gnueabihf-g++ -v
 
-      - name: provide WiringPi
-        if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi' }}
-        env:
-          CC: /usr/bin/arm-linux-gnueabihf-gcc
-          CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -lcrypt -lrt"
-        run: |
-          git clone https://github.com/WiringPi/WiringPi
-          cd WiringPi
-          ./build
+      # NOTE: To cross-compile wiringPi, there needs to be cross-compiled `crypt` and `rt` libs
+      # Skip cross-compiling wiringPi to avoid this headache.
+      # - name: provide WiringPi
+      #   if: ${{ matrix.config-options == '--soc=BCM2835 --driver=wiringPi' }}
+      #   env:
+      #     CC: /usr/bin/arm-linux-gnueabihf-gcc
+      #     CFLAGS: "-I /usr/local/include -L /usr/local/lib -marm -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -lcrypt -lrt"
+      #   run: |
+      #     git clone https://github.com/WiringPi/WiringPi
+      #     cd WiringPi
+      #     ./build
       
       - name: provide pigpio
-        if: ${{ matrix.config-options == '--driver=pigpio' || endsWith(matrix.config-options, '--driver=RPi') }}
+        if: ${{ matrix.config-options == '--driver=pigpio' }}
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
@@ -118,7 +121,11 @@ jobs:
           cd mraa
           mkdir build
           cd build
-          cmake .. -D BUILDSWIGNODE=OFF -D BUILDARCH=arm
+          cmake .. \
+          -D BUILDSWIGNODE=OFF \
+          -D BUILDARCH=arm \
+          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
+          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/armhf.cmake
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
@@ -133,10 +140,6 @@ jobs:
         run: sudo make install
 
       - name: make linux examples
-        # compiling examples for wiringPi is broken see issue #669
-        # executables linked to wiringPi additionally need to be linked to crypt and shm_open
-        # interruptConfigure.cpp example is incompatible with MRAA & wiringPi drivers
-        if: ${{ matrix.config-options != '--soc=BCM2835 --driver=wiringPi' && matrix.config-options != '--driver=MRAA' }}
         run: |
           cd examples_linux
           make

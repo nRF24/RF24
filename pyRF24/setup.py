@@ -35,7 +35,6 @@ try:  # get compiler options from the generated Makefile.inc
                 os.environ[identifier] = value
 
 except FileNotFoundError:  # assuming lib was built & installed with CMake
-
     # get LIB_VERSION from library.properties file for Arduino IDE
     with open(os.path.join(git_dir, "library.properties"), "r", encoding="utf-8") as f:
         for line in f.read().splitlines():
@@ -44,7 +43,6 @@ except FileNotFoundError:  # assuming lib was built & installed with CMake
 
 # check C++ RF24 lib is installed
 finally:
-
     # check for possible linker flags set via CFLAGS environment variable
     for flag in cflags.split("-"):
         if flag.startswith("L"):
@@ -71,13 +69,6 @@ finally:
             )
         )
 
-    # avoid IRQ support if pigpio is not available; link to pigpio if it is found
-    found_pigpio = False
-    for symlink_loc in symlink_directory:
-        if os.path.exists(symlink_loc + "/libpigpio.so"):
-            found_pigpio = True
-    # IRQ pin features will be implemented in python via pigpio's python API or RPi.GPIO
-    cflags += " -DRF24_NO_INTERRUPT"
 
 # append any additionally found compiler flags
 os.environ["CFLAGS"] = cflags
@@ -114,7 +105,7 @@ setup(
         Extension(
             "RF24",
             sources=["pyRF24.cpp"],
-            libraries=["rf24", BOOST_LIB] + (["pigpio"] if found_pigpio else [])
+            libraries=["rf24", BOOST_LIB],
         )
     ],
 )

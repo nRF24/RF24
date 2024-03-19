@@ -1,20 +1,13 @@
 #ifndef RF24_UTILITY_MRAA_RF24_ARCH_CONFIG_H_
 #define RF24_UTILITY_MRAA_RF24_ARCH_CONFIG_H_
 
+#include <stdint.h> // uint16_t
+#include <stdio.h>  // printf
+#include <string.h> // strlen
 #include "mraa.h"
 #include "spi.h"
 #include "gpio.h"
 #include "compatibility.h"
-
-#include <stdint.h>
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <sys/time.h>
-#include <stddef.h>
-#include <iostream>
-#include <unistd.h>
-#include <stdlib.h>
 
 //#include <UtilTime.h> // Precompiled arduino x86 based utiltime for timing functions
 

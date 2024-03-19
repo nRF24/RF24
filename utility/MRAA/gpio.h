@@ -1,13 +1,11 @@
 /**
- * @file spi.h
+ * @file gpio.h
  * @author TMRh20 2015
  * Class declaration for GPIO helper files
  */
 #ifndef RF24_UTILITY_MRAA_GPIO_H_
 #define RF24_UTILITY_MRAA_GPIO_H_
 
-#include <cstdio>
-#include <stdio.h>
 #include "mraa.hpp"
 
 class GPIO

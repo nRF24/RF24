@@ -3,13 +3,9 @@
 
 #define RF24_LINUX
 
-#include <stdint.h>
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <sys/time.h>
-#include <stddef.h>
-
+#include <stdint.h> // uint8_t
+#include <stdio.h>  // printf
+#include <string.h> // strlen
 #include "bcm2835.h"
 #include "spi.h"
 #include "compatibility.h"
@@ -30,6 +26,14 @@
 //typedef uint16_t prog_uint16_t;
 typedef uint8_t rf24_gpio_pin_t;
 #define RF24_PIN_INVALID 0xFF
+
+#ifndef RF24_LINUX_GPIO_CHIP
+    /**
+     * The default GPIO chip to use.  Defaults to `/dev/gpiochip4` (for RPi5).
+     * Falls back to `/dev/gpiochip0` if this value is somehow incorrect.
+     */
+    #define RF24_LINUX_GPIO_CHIP "/dev/gpiochip4"
+#endif
 
 #define PSTR(x)  (x)
 #define printf_P printf

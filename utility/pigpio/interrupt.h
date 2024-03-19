@@ -1,18 +1,11 @@
-/*
-Interrupts functions extruded from wiringPi library by Oitzu.
+/**
+ * Interrupt functions wrapped from pigpio library
+ */
+#ifndef RF24_UTILITY_PIGPIO_INTERRUPT_H_
+#define RF24_UTILITY_PIGPIO_INTERRUPT_H_
 
-wiringPi Copyright (c) 2012 Gordon Henderson
-https://projects.drogon.net/raspberry-pi/wiringpi
-wiringPi is free software: GNU Lesser General Public License
-see <http://www.gnu.org/licenses/>
-*/
-#ifndef __RF24_INTERRUPT_H__
-#define __RF24_INTERRUPT_H__
-
-#include "RF24_arch_config.h"
 #include <pigpio.h>
 
-#define INT_EDGE_SETUP   0
 #define INT_EDGE_FALLING FALLING_EDGE
 #define INT_EDGE_RISING  RISING_EDGE
 #define INT_EDGE_BOTH    EITHER_EDGE
@@ -21,33 +14,17 @@ see <http://www.gnu.org/licenses/>
 extern "C" {
 #endif
 
-/*
- * attachInterrupt (Original: wiringPiISR):
- *      Pi Specific.
- *      Take the details and create an interrupt handler that will do a call-
- *      back to the user supplied function.
- *********************************************************************************
- */
-extern int attachInterrupt(int pin, int mode, void (*function)(void));
+int attachInterrupt(int pin, int mode, void (*function)(void));
 
-/*
- * detachInterrupt:
- *      Pi Specific detachInterrupt.
- *      Will cancel the interrupt thread, close the filehandle and
- *		setting wiringPi back to 'none' mode.
- *********************************************************************************
- */
-extern int detachInterrupt(int pin);
+int detachInterrupt(int pin);
 
-/* Deprecated, no longer functional
- */
-extern void rfNoInterrupts();
+/* Deprecated, no longer functional */
+void rfNoInterrupts();
 
-/* Deprecated, no longer functional
- */
-extern void rfInterrupts();
+/* Deprecated, no longer functional */
+void rfInterrupts();
 
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // RF24_UTILITY_PIGPIO_INTERRUPT_H_

@@ -2,28 +2,11 @@
  *
  */
 
-#ifndef SPI_H
-#define SPI_H
+#ifndef RF24_UTILITY_PIGPIO_SPI_H_
+#define RF24_UTILITY_PIGPIO_SPI_H_
 
-/**
- * @file spi.h
- * \cond HIDDEN_SYMBOLS
- * Class declaration for SPI helper files
- */
-
-/**
- * Example GPIO.h file
- *
- * @defgroup SPI SPI Example
- *
- * See RF24_arch_config.h for additional information
- * @{
- */
-
-#include <inttypes.h>
+#include <cstdint>
 #include <stdexcept>
-
-#include "../../RF24_config.h"
 
 /** Specific exception for SPI errors */
 class SPIException : public std::runtime_error
@@ -82,8 +65,4 @@ private:
     void init(uint32_t spi_speed);
 };
 
-/**
- * \endcond
- */
-/*@}*/
-#endif /* SPI_H */
+#endif /* RF24_UTILITY_PIGPIO_SPI_H_ */

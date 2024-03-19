@@ -6,12 +6,23 @@
 #ifndef RF24_UTILITY_WIRINGPI_SPI_H_
 #define RF24_UTILITY_WIRINGPI_SPI_H_
 
-#include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
+#include <stdexcept>
+#include <string>
 
-#include "../../RF24_config.h" // This is cyclical and should be fixed
+#ifndef RF24_SPI_SPEED
+    #define RF24_SPI_SPEED 10000000
+#endif
 
-using namespace std;
+/** Specific exception for SPI errors */
+class SPIException : public std::runtime_error
+{
+public:
+    explicit SPIException(const std::string& msg)
+        : std::runtime_error(msg)
+    {
+    }
+};
 
 class SPI
 {
@@ -31,8 +42,9 @@ public:
 
 private:
     int fd;
-    uint8_t msg[32 + 1];
-    uint8_t msgByte;
+    int channel;
+    uint8_t xferBuf[32 + 1];
+    uint8_t xferByte;
 };
 
 #endif // RF24_UTILITY_WIRINGPI_SPI_H_

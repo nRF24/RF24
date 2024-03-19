@@ -1,11 +1,10 @@
-#ifndef __RF24_INCLUDES_H__
-#define __RF24_INCLUDES_H__
+#ifndef RF24_UTILITY_INCLUDES_H_
+#define RF24_UTILITY_INCLUDES_H_
 
 #define RF24_PIGPIO
 
+#include <cstring> // memcpy() used in RF24.cpp
 #include "pigpio/RF24_arch_config.h"
-#ifndef RF24_NO_INTERRUPT
-    #include "pigpio/interrupt.h"
-#endif
+#include "pigpio/interrupt.h"
 
 #endif

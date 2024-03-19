@@ -1,12 +1,7 @@
-#include "compatibility.h"
 #include <time.h>
 #include <chrono>
+#include "compatibility.h"
 
-/**********************************************************************/
-/**
- * This function is added in order to simulate arduino delay() function
- * @param milisec
- */
 void __msleep(int milisec)
 {
     struct timespec req; // = {0};
@@ -23,9 +18,6 @@ void __usleep(int microsec)
     clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }
 
-/**
- * This function is added in order to simulate arduino millis() function
- */
 void __start_timer()
 {
 }
