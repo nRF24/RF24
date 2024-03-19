@@ -28,8 +28,10 @@ void IrqChipCache::openDevice()
             msg += "; ";
             msg += strerror(errno);
             throw IRQException(msg);
+            return;
         }
     }
+    chipInitialized = true;
 }
 
 void IrqChipCache::closeDevice()
@@ -89,6 +91,10 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
         irqChipCache.openDevice();
     }
     catch (IRQException& exc) {
+        if (irqChipCache.chipInitialized) {
+            throw exc;
+            return 0;
+        }
         irqChipCache.chip = "/dev/gpiochip0";
         irqChipCache.openDevice();
     }

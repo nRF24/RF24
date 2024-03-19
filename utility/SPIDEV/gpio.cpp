@@ -31,8 +31,10 @@ void GPIOChipCache::openDevice()
             msg += "; ";
             msg += strerror(errno);
             throw GPIOException(msg);
+            return;
         }
     }
+    chipInitialized = true;
 }
 
 void GPIOChipCache::closeDevice()
@@ -77,6 +79,10 @@ void GPIO::open(rf24_gpio_pin_t port, int DDR)
         gpioCache.openDevice();
     }
     catch (GPIOException& exc) {
+        if (gpioCache.chipInitialized) {
+            throw exc;
+            return;
+        }
         gpioCache.chip = "/dev/gpiochip0";
         gpioCache.openDevice();
     }
