@@ -15,7 +15,7 @@
 
 #include <stdexcept>
 #include <cstdint>
-#include <linux/gpio.h> // gpiochip_info
+#include "linux/gpio.h" // gpiochip_info
 
 typedef uint16_t rf24_gpio_pin_t;
 #define RF24_PIN_INVALID 0xFFFF
