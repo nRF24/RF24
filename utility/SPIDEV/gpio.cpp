@@ -5,7 +5,7 @@
  *
  *
  */
-#include <linux/gpio.h>
+#include "linux/gpio.h"
 #include <unistd.h>    // close()
 #include <fcntl.h>     // open()
 #include <sys/ioctl.h> // ioctl()

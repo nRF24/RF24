@@ -6,7 +6,7 @@
 
 #include <pthread.h> // pthread_t
 #include <stdexcept>
-#include <linux/gpio.h>       // GPIO_V2_LINE_FLAG_EDGE_***
+#include "linux/gpio.h"       // GPIO_V2_LINE_FLAG_EDGE_***
 #include "RF24_arch_config.h" // rf24_gpio_pin_t
 
 #define INT_EDGE_FALLING GPIO_V2_LINE_FLAG_EDGE_FALLING
