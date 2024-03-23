@@ -1030,11 +1030,6 @@ bool RF24::_init_pins()
 
 #if defined(RF24_LINUX)
 
-    #if defined(MRAA)
-    GPIO();
-    gpio.begin(ce_pin, csn_pin);
-    #endif
-
     pinMode(ce_pin, OUTPUT);
     ce(LOW);
     delay(100);

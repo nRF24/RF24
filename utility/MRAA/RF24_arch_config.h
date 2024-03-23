@@ -22,8 +22,6 @@
 
 #define RF24_LINUX
 //typedef uint16_t prog_uint16_t;
-typedef uint16_t rf24_gpio_pin_t;
-#define RF24_PIN_INVALID 0xFFFF
 
 #define PSTR(x)   (x)
 #define printf_P  printf
@@ -38,9 +36,9 @@ typedef uint16_t rf24_gpio_pin_t;
     #define IF_SERIAL_DEBUG(x)
 #endif
 
-#define digitalWrite(pin, value) gpio.write(pin, value)
+#define digitalWrite(pin, value) GPIO::write(pin, value)
 #define digitalRead(pin)         GPIO::read(pin)
-#define pinMode(pin, direction)  gpio.open(pin, direction)
+#define pinMode(pin, direction)  GPIO::open(pin, direction)
 
 #ifndef __TIME_H__
     // Prophet: Redefine time functions only if precompiled arduino time is not included

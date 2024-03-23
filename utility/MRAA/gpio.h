@@ -6,7 +6,21 @@
 #ifndef RF24_UTILITY_MRAA_GPIO_H_
 #define RF24_UTILITY_MRAA_GPIO_H_
 
+#include <stdexcept> // std::runtime_error, std::string
 #include "mraa.hpp"
+
+typedef uint16_t rf24_gpio_pin_t;
+#define RF24_PIN_INVALID 0xFFFF
+
+/** Specific exception for GPIO errors */
+class GPIOException : public std::runtime_error
+{
+public:
+    explicit GPIOException(const std::string& msg)
+        : std::runtime_error(msg)
+    {
+    }
+};
 
 class GPIO
 {
@@ -16,21 +30,13 @@ public:
 
     virtual ~GPIO();
 
-    void begin(uint8_t ce_pin, uint8_t cs_pin);
+    static void open(rf24_gpio_pin_t port, mraa::Dir DDR);
 
-    void open(int port, int DDR);
+    static void close(rf24_gpio_pin_t port);
 
-    void close(int port);
+    static int read(rf24_gpio_pin_t port);
 
-    int read(int port);
-
-    void write(int port, int value);
-
-private:
-    int gpio_ce_pin; /** ce_pin value of the RF24 device **/
-    // int gpio_cs_pin;    /** cs_pin value of the RF24 device **/
-    mraa::Gpio* gpio_0; /** gpio object for ce_pin **/
-    // mraa::Gpio* gpio_1; /** gpio object for cs_pin **/
+    static void write(rf24_gpio_pin_t port, int value);
 };
 
 #endif // RF24_UTILITY_MRAA_GPIO_H_
