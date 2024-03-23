@@ -127,9 +127,6 @@ private:
 #if defined(RF24_SPI_PTR)
     _SPI* _spi;
 #endif // defined (RF24_SPI_PTR)
-#if defined(MRAA)
-    GPIO gpio;
-#endif
 
     rf24_gpio_pin_t ce_pin;  /* "Chip Enable" pin, activates the RX or TX role */
     rf24_gpio_pin_t csn_pin; /* SPI Chip select */
