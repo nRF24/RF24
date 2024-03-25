@@ -1,3 +1,107 @@
 table.markdownTable th {
   color: unset;
 }
+
+/* overrides from default CSSS for some admonitions */
+dl.note, dl.remark,
+dl.warning, dl.attention {
+  color: unset;
+}
+dl.remark {
+	background: var(--remark-color-bg);
+	border-left: 8px solid var(--remark-color-hl);
+}
+dl.remark dt {
+	color: var(--remark-color-hl);
+}
+
+/* special rules to accent `/see` or `/sa` command output */
+dl.see {
+	background: var(--seealso-color-bg);
+	border-left: 8px solid var(--seealso-color-hl);
+}
+dl.see dt {
+	color: var(--seealso-color-hl);
+}
+dl.see {
+  padding: 10px;
+	margin: 10px 0px;
+	overflow: hidden;
+	margin-left: 0;
+	border-radius: 4px;
+}
+
+/* admonition icons */
+dl.note dt::before {
+  background-color: var(--note-color-hl);
+  mask-image: var(--note-icon);
+}
+dl.see dt::before {
+  background-color: var(--seealso-color-hl);
+  mask-image: var(--seealso-icon);
+}
+dl.remark dt::before {
+  background-color: var(--remark-color-hl);
+  mask-image: var(--remark-icon);
+}
+dl.warning dt::before {
+  background-color: var(--warning-color-hl);
+  mask-image: var(--warning-icon);
+}
+dl.deprecated dt::before {
+  background-color: var(--deprecated-color-hl);
+  mask-image: var(--deprecated-icon);
+}
+dl.note dt::before,
+dl.see dt::before,
+dl.warning dt::before,
+dl.remark dt::before,
+dl.deprecated dt::before {
+	vertical-align: middle;
+	background-repeat: no-repeat;
+	content: "";
+	display: inline-block;
+	height: 2em;
+	width: 2em;
+  margin-right: 0.25rem;
+}
+dl.note dt,
+dl.see dt,
+dl.warning dt,
+dl.remark dt,
+dl.deprecated dt {
+  margin-top: -0.35em;
+  margin-bottom: 0.5em;
+}
+
+/* icon SVG data */
+*:root {
+  --note-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>');
+  --seealso-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>');
+  --warning-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>');
+  --remark-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>');
+  --deprecated-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>');
+}
+
+/* color overrides */
+html {
+  /* light theme CSS variables */
+  --note-color-bg: hsla(47.6, 77.3%, 91.4%, 65%);
+  --warning-color-bg: hsla(6.8, 75.9%, 88.6%, 65%);
+  --deprecated-color-bg: hsla(205.7, 22.6%, 93.9%, 65%);
+  --seealso-color-bg: hsla(215, 76%, 89%, 65%);
+  --seealso-color-hl: hsl(215, 98%, 48%);
+  --remark-color-bg: hsla(133, 75%, 89%, 65%);
+  --remark-color-hl: hsl(133, 98.9%, 35.3%);
+}
+
+html.dark-mode {
+  /* dark theme CSS variables */
+  --note-color-bg: hsla(45.8, 87.3%, 12.4%, 65%);
+  --warning-color-bg: hsla(5.2, 33.3%, 13.5%, 65%);
+  --deprecated-color-bg: hsla(221.5, 12.4%, 20.6%, 65%);
+  --seealso-color-bg: hsla(215, 33%, 14%, 0.65);
+  --seealso-color-hl: hsl(215, 98%, 48%);
+  --remark-color-bg: hsla(133, 32%, 14%, 65%);
+  --remark-color-hl: hsl(133, 98%, 48%);
+}

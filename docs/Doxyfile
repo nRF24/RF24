@@ -332,14 +332,15 @@ HTML_EXTRA_STYLESHEET  = doxygen-custom.css
 
 HTML_COLORSTYLE = TOGGLE
 
-# If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML
-# page will contain the date and time when the page was generated. Setting this
-# to YES can help to show when doxygen was last run and thus if the
-# documentation is up to date.
+# If the TIMESTAMP tag is set different from NO then each generated page will contain
+# the date or date and time when the page was generated. Setting this to NO can help
+# when comparing the output of multiple runs.
+#
+# Possible values are: YES, NO, DATETIME and DATE.
+#
 # The default value is: NO.
-# This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_TIMESTAMP         = YES
+TIMESTAMP         = DATE
 
 # If the HTML_DYNAMIC_MENUS tag is set to YES then the generated HTML
 # documentation will contain a main index with vertical navigation menus that
