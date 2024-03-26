@@ -1,35 +1,34 @@
 """
-This example uses Acknowledgement (ACK) payloads attached to ACK packets to
-demonstrate how the nRF24L01's IRQ (Interrupt Request) pin can be
-configured to detect when data is received, or when data has transmitted
-successfully, or when data has failed to transmit.
+Simple example of detecting (and verifying) the IRQ (interrupt) pin on the
+nRF24L01
 
-This example was written to be used on 2 devices acting as "nodes".
+See documentation at https://nRF24.github.io/RF24
 """
-import sys
-import argparse
+
 import time
-import RPi.GPIO as GPIO
-from RF24 import RF24, RF24_PA_LOW
+from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER
 
+try:
+    import gpiod
+    from gpiod.line import Edge
+except ImportError as exc:
+    raise ImportError(
+        "This script requires gpiod installed for observing the IRQ pin. Please run\n"
+        "\n    pip install gpiod\n\nMore details at https://pypi.org/project/gpiod/"
+    ) from exc
 
-parser = argparse.ArgumentParser(
-    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-)
-parser.add_argument(
-    "-n",
-    "--node",
-    type=int,
-    choices=range(2),
-    help="the identifying radio number (or node ID number)",
-)
-parser.add_argument(
-    "-r",
-    "--role",
-    type=int,
-    choices=range(2),
-    help="'1' specifies the TX role. '0' specifies the RX role.",
-)
+try:  # try RPi5 gpio chip first
+    chip_path = "/dev/gpiochip4"
+    chip = gpiod.Chip(chip_path)
+except FileNotFoundError:  # fall back to gpio chip for RPi4 or older
+    chip_path = "/dev/gpiochip0"
+    chip = gpiod.Chip(chip_path)
+finally:
+    print(__file__)  # print example name
+    # print gpio chip info
+    info = chip.get_info()
+    print(f"Using {info.name} [{info.label}] ({info.num_lines} lines)")
+
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -38,17 +37,55 @@ parser.add_argument(
 # their own pin numbering
 # CS Pin addresses the SPI bus number at /dev/spidev<a>.<b>
 # ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
-CSN_PIN = 0  # connected to GPIO8
-CE_PIN = 22  # connected to GPIO22
+CSN_PIN = 0  # GPIO8 aka CE0 on SPI bus 0: /dev/spidev0.0
+if RF24_DRIVER == "MRAA":
+    CE_PIN = 15  # for GPIO22
+elif RF24_DRIVER == "wiringPi":
+    CE_PIN = 3  # for GPIO22
+else:
+    CE_PIN = 22
 radio = RF24(CE_PIN, CSN_PIN)
-################## Linux (BBB,x86,etc) #########################
-# See http://nRF24.github.io/RF24/pages.html for more information on usage
-# See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
-# See https://www.kernel.org/doc/Documentation/spi/spidev for more
-# information on SPIDEV
 
 # select your digital input pin that's connected to the IRQ pin on the nRF24L01
-IRQ_PIN = 12
+IRQ_PIN = 24
+
+# For this example, we will use different addresses
+# An address need to be a buffer protocol object (bytearray)
+address = [b"1Node", b"2Node"]
+# It is very helpful to think of an address as a path instead of as
+# an identifying device destination
+
+# to use different addresses on a pair of radios, we need a variable to
+# uniquely identify which address this radio will use to transmit
+# 0 uses address[0] to transmit, 1 uses address[1] to transmit
+radio_number = bool(
+    int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
+)
+
+# initialize the nRF24L01 on the spi bus
+if not radio.begin():
+    raise OSError("nRF24L01 hardware isn't responding")
+
+# this example uses the ACK payload to trigger the IRQ pin active for
+# the "on data received" event
+radio.enableDynamicPayloads()  # ACK payloads are dynamically sized
+radio.enableAckPayload()  # enable ACK payloads
+
+# set the Power Amplifier level to -12 dBm since this test example is
+# usually run with nRF24L01 transceivers in close proximity of each other
+radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+# set the TX address of the RX node into the TX pipe
+radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+
+# set the RX address of the TX node into a RX pipe
+radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
+
+# for debugging, we have 2 options that print a large block of details
+# (smaller) function that prints raw register values
+# radio.printDetails()
+# (larger) function that prints human readable data
+# radio.printPrettyDetails()
 
 # For this example, we'll be using a payload containing
 # a string that changes on every transmission. (successful or not)
@@ -58,61 +95,40 @@ tx_payloads = (b"Ping ", b"Pong ", b"Radio", b"1FAIL")
 ack_payloads = (b"Yak ", b"Back", b" ACK")
 
 
-def interrupt_handler(channel):
+def interrupt_handler():
     """This function is called when IRQ pin is detected active LOW"""
-    print("IRQ pin", channel, "went active LOW.")
-    tx_ds, tx_df, rx_dr = radio.whatHappened()  # get IRQ status flags
-    if tx_df:
-        radio.flush_tx()
+    print("\tIRQ pin went active LOW.")
+    tx_ds, tx_df, rx_dr = radio.whatHappened()  # update IRQ status flags
     print(f"\ttx_ds: {tx_ds}, tx_df: {tx_df}, rx_dr: {rx_dr}")
     if pl_iterator[0] == 0:
         print("    'data ready' event test", ("passed" if rx_dr else "failed"))
     elif pl_iterator[0] == 1:
         print("    'data sent' event test", ("passed" if tx_ds else "failed"))
-    elif pl_iterator[0] == 3:
+    elif pl_iterator[0] == 2:
         print("    'data fail' event test", ("passed" if tx_df else "failed"))
 
 
 # setup IRQ GPIO pin
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(IRQ_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.add_event_detect(IRQ_PIN, GPIO.FALLING, callback=interrupt_handler)
-# IMPORTANT: do not call radio.available() before calling
-# radio.whatHappened() when the interruptHandler() is triggered by the
-# IRQ pin FALLING event. According to the datasheet, the pipe information
-# is unreliable during the IRQ pin FALLING transition.
+irq_line = gpiod.request_lines(
+    path=chip_path,
+    consumer="RF24_interrupt_py-example",  # optional
+    config={IRQ_PIN: gpiod.LineSettings(edge_detection=Edge.FALLING)},
+)
 
 
-def _ping_n_wait(pl_iter):
-    """private function to ping RX node and wait for IRQ pin to be handled
-
-    :param int pl_iter: The index of the buffer in `tx_payloads` tuple to
-        send. This number is also used to determine if event test was
-        successful or not.
+def _wait_for_irq(timeout: float = 5):
+    """Wait till IRQ_PIN goes active (LOW).
+    IRQ pin is LOW when activated. Otherwise it is always HIGH
     """
-    # set pl_iterator[0] so interrupt_handler() can determine if test was
-    # successful or not
-    pl_iterator[0] = pl_iter
-    # the following False parameter means we're expecting an ACK packet
-    radio.startFastWrite(tx_payloads[pl_iter], False)
-    time.sleep(0.1)  # wait 100 ms for interrupt_handler() to complete
-
-
-def print_rx_fifo(pl_size: int):
-    """Flush RX FIFO by printing all available payloads with 1 buffer
-
-    :param int pl_size: the expected size of each payload
-    """
-    if radio.rxFifoFull():
-        # all 3 payloads received were 5 bytes each, and RX FIFO is full
-        # so, fetching 15 bytes from the RX FIFO also flushes RX FIFO
-        print("Complete RX FIFO:", radio.read(pl_size * 3).decode("utf-8"))
-    else:
-        buffer = bytearray()
-        while radio.available():
-            buffer += radio.read(pl_size)
-        if buffer:  # if any payloads were read from the RX FIFO
-            print("Complete RX FIFO:", buffer.decode("utf-8"))
+    # wait up to ``timeout`` seconds for event to be detected.
+    if not irq_line.wait_edge_events(timeout):
+        print(f"\tInterrupt event not detected for {timeout} seconds!")
+        return False
+    # read event from kernel buffer
+    for event in irq_line.read_edge_events():
+        if event.line_offset == IRQ_PIN and event.event_type is event.Type.FALLING_EDGE:
+            return True
+    return False
 
 
 def master():
@@ -129,65 +145,70 @@ def master():
     # on data ready test
     print("\nConfiguring IRQ pin to only ignore 'on data sent' event")
     radio.maskIRQ(True, False, False)  # args = tx_ds, tx_df, rx_dr
-    print("    Pinging slave node for an ACK payload...", end=" ")
-    _ping_n_wait(0)
+    print("    Pinging slave node for an ACK payload...")
+    pl_iterator[0] = 0
+    radio.startFastWrite(tx_payloads[0], False)  # False means expecting an ACK
+    if _wait_for_irq():
+        interrupt_handler()
 
     # on "data sent" test
     print("\nConfiguring IRQ pin to only ignore 'on data ready' event")
     radio.maskIRQ(False, False, True)  # args = tx_ds, tx_df, rx_dr
-    print("    Pinging slave node again...             ", end=" ")
-    _ping_n_wait(1)
+    print("    Pinging slave node again...")
+    pl_iterator[0] = 1
+    radio.startFastWrite(tx_payloads[1], False)  # False means expecting an ACK
+    if _wait_for_irq():
+        interrupt_handler()
 
-    # trigger slave node to stopListening() by filling slave node's RX FIFO
+    # trigger slave node to exit by filling the slave node's RX FIFO
     print("\nSending one extra payload to fill RX FIFO on slave node.")
-    radio.maskIRQ(1, 1, 1)  # disable IRQ pin for this step
+    print("Disabling IRQ pin for all events.")
+    radio.maskIRQ(True, True, True)  # args = tx_ds, tx_df, rx_dr
     if radio.write(tx_payloads[2]):
-        # when send_only parameter is True, send() ignores RX FIFO usage
-        if radio.rxFifoFull():
-            print("RX node's FIFO is full; it is not listening any more")
-        else:
-            print(
-                "Transmission successful, but the RX node might still be listening."
-            )
+        print("Slave node should not be listening anymore.")
     else:
-        radio.flush_tx()
-        print("Transmission failed or timed out. Continuing anyway.")
+        print("Slave node was unresponsive.")
 
     # on "data fail" test
     print("\nConfiguring IRQ pin to go active for all events.")
     radio.maskIRQ(False, False, False)  # args = tx_ds, tx_df, rx_dr
-    print("    Sending a ping to inactive slave node...", end=" ")
-    _ping_n_wait(3)
+    print("    Sending a ping to inactive slave node...")
+    radio.flush_tx()  # just in case any previous tests failed
+    pl_iterator[0] = 2
+    radio.startFastWrite(tx_payloads[3], False)  # False means expecting an ACK
+    if _wait_for_irq():
+        interrupt_handler()
+    radio.flush_tx()  # flush artifact payload in TX FIFO from last test
+    # all 3 ACK payloads received were 4 bytes each, and RX FIFO is full
+    # so, fetching 12 bytes from the RX FIFO also flushes RX FIFO
+    print("\nComplete RX FIFO:", radio.read(12))
 
-    # CE pin is still HIGH which consumes more power. Example is now idling so...
-    radio.stopListening()  # ensure CE pin is LOW
-    # stopListening() also calls flush_tx() when ACK payloads are enabled
 
-    print_rx_fifo(len(ack_payloads[0]))  # empty RX FIFO
-
-
-def slave(timeout: int = 6):
-    """Only listen for 3 payload from the master node
-
-    :param int timeout: The number of seconds to wait (with no transmission)
-        until exiting function.
-    """
-    pl_iterator[0] = 0  # reset this to indicate event is a 'data_ready' event
+def slave(timeout=6):  # will listen for 6 seconds before timing out
+    """Only listen for 3 payload from the master node"""
+    # the "data ready" event will trigger in RX mode
+    # the "data sent" or "data fail" events will trigger when we
+    # receive with ACK payloads enabled (& loaded in TX FIFO)
+    print("\nDisabling IRQ pin for all events.")
+    radio.maskIRQ(True, True, True)  # args = tx_ds, tx_df, rx_dr
     # setup radio to receive pings, fill TX FIFO with ACK payloads
     radio.writeAckPayload(1, ack_payloads[0])
     radio.writeAckPayload(1, ack_payloads[1])
     radio.writeAckPayload(1, ack_payloads[2])
-    radio.startListening()  # start listening & clear status flags
+    radio.startListening()  # start listening & clear irq_dr flag
     start_timer = time.monotonic()  # start timer now
     while not radio.rxFifoFull() and time.monotonic() - start_timer < timeout:
         # if RX FIFO is not full and timeout is not reached, then keep waiting
         pass
-    time.sleep(0.1)  # wait for last ACK payload to transmit
+    time.sleep(0.5)  # wait for last ACK payload to transmit
     radio.stopListening()  # put radio in TX mode & discard any ACK payloads
-    print_rx_fifo(len(tx_payloads[0]))
+    if radio.available():  # if RX FIFO is not empty (timeout did not occur)
+        # all 3 payloads received were 5 bytes each, and RX FIFO is full
+        # so, fetching 15 bytes from the RX FIFO also flushes RX FIFO
+        print("Complete RX FIFO:", radio.read(15))
 
 
-def set_role() -> bool:
+def set_role():
     """Set the role using stdin stream. Timeout arg for slave() can be
     specified using a space delimiter (e.g. 'R 10' calls `slave(10)`)
 
@@ -197,6 +218,7 @@ def set_role() -> bool:
     """
     user_input = (
         input(
+            f"Make sure the IRQ pin is connected to the GPIO{IRQ_PIN}\n"
             "*** Enter 'R' for receiver role.\n"
             "*** Enter 'T' for transmitter role.\n"
             "*** Enter 'Q' to quit example.\n"
@@ -205,10 +227,7 @@ def set_role() -> bool:
     )
     user_input = user_input.split()
     if user_input[0].upper().startswith("R"):
-        if len(user_input) > 1:
-            slave(int(user_input[1]))
-        else:
-            slave()
+        slave(*[int(x) for x in user_input[1:2]])
         return True
     if user_input[0].upper().startswith("T"):
         master()
@@ -221,63 +240,16 @@ def set_role() -> bool:
 
 
 if __name__ == "__main__":
-
-    args = parser.parse_args()  # parse any CLI args
-
-    # initialize the nRF24L01 on the spi bus
-    if not radio.begin():
-        raise RuntimeError("radio hardware is not responding")
-
-    # For this example, we will use different addresses
-    # An address need to be a buffer protocol object (bytearray)
-    address = [b"1Node", b"2Node"]
-    # It is very helpful to think of an address as a path instead of as
-    # an identifying device destination
-
-    print(sys.argv[0])  # print example name
-
-    # to use different addresses on a pair of radios, we need a variable to
-    # uniquely identify which address this radio will use to transmit
-    # 0 uses address[0] to transmit, 1 uses address[1] to transmit
-    radio_number = args.node  # uses default value from `parser`
-    if args.node is None:  # if '--node' arg wasn't specified
-        radio_number = bool(
-            int(input("Which radio is this? Enter '0' or '1'. Defaults to '0' ") or 0)
-        )
-
-    # set the Power Amplifier level to -12 dBm since this test example is
-    # usually run with nRF24L01 transceivers in close proximity of each other
-    radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
-    # ACK payloads are dynamically sized.
-    radio.enableDynamicPayloads()  # to use ACK payloads
-
-    # this example uses the ACK payload to trigger the IRQ pin active for
-    # the "on data received" event
-    radio.enableAckPayload()  # enable ACK payloads
-
-    # set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radio_number])  # always uses pipe 0
-
-    # set the RX address of the TX node into a RX pipe
-    radio.openReadingPipe(1, address[not radio_number])  # using pipe 1
-
-    # for debugging, we have 2 options that print a large block of details
-    # (smaller) function that prints raw register values
-    # radio.printDetails()
-    # (larger) function that prints human readable data
-    # radio.printPrettyDetails()
-
     try:
-        if args.role is None:  # if not specified with CLI arg '-r'
-            while set_role():
-                pass  # continue example until 'Q' is entered
-        else:  # if role was set using CLI args
-            # run role once and exit
-            if bool(args.role):
-                master()
-            else:
-                slave()
+        while set_role():
+            pass  # continue example until 'Q' is entered
     except KeyboardInterrupt:
-        print(" Keyboard Interrupt detected. Powering down radio.")
+        print(" Keyboard Interrupt detected. Exiting...")
         radio.powerDown()
+else:
+    print(
+        f"Make sure the IRQ pin is connected to the GPIO{IRQ_PIN}",
+        "Run slave() on receiver",
+        "Run master() on transmitter",
+        sep="\n",
+    )

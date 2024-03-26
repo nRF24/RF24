@@ -6,15 +6,19 @@ good channel for your application.
 See documentation at https://nRF24.github.io/RF24
 """
 
-# pylint: disable=no-member
 import curses
 import time
 from typing import List, Tuple, Any
 
-from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS
+from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS, RF24_DRIVER
 
-CSN_PIN = 0  # connected to GPIO8
-CE_PIN = 22  # connected to GPIO22
+CSN_PIN = 0  # GPIO8 aka CE0 on SPI bus 0: /dev/spidev0.0
+if RF24_DRIVER == "MRAA":
+    CE_PIN = 15  # for GPIO22
+elif RF24_DRIVER == "wiringPi":
+    CE_PIN = 3  # for GPIO22
+else:
+    CE_PIN = 22
 radio = RF24(CE_PIN, CSN_PIN)
 
 
@@ -224,4 +228,4 @@ def main():
 if __name__ == "__main__":
     main()
 else:
-    print("Enter 'main()' to run the program.")
+    print("Run 'main()' to run the program.")

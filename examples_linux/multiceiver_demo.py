@@ -5,24 +5,15 @@ Nordic Semiconductors as "MultiCeiver".
 
 This example was written to be used on up to 6 devices acting as TX nodes &
 only 1 device acting as the RX node (that's a maximum of 7 devices).
+
+See documentation at https://nRF24.github.io/RF24
 """
-import sys
-import argparse
+
 import time
 import struct
-from RF24 import RF24, RF24_PA_LOW
+from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER
 
-
-parser = argparse.ArgumentParser(
-    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-)
-parser.add_argument(
-    "-n",
-    "--node",
-    choices=("0", "1", "2", "3", "4", "5", "R", "r"),
-    help="the identifying node ID number for the TX role. "
-    "Use 'R' or 'r' to specify the RX role",
-)
+print(__file__)
 
 ########### USER CONFIGURATION ###########
 # See https://github.com/TMRh20/RF24/blob/master/pyRF24/readme.md
@@ -31,23 +22,41 @@ parser.add_argument(
 # their own pin numbering
 # CS Pin addresses the SPI bus number at /dev/spidev<a>.<b>
 # ie: RF24 radio(<ce_pin>, <a>*10+<b>); spidev1.0 is 10, spidev1.1 is 11 etc..
-CSN_PIN = 0  # connected to GPIO8
-CE_PIN = 22  # connected to GPIO22
+CSN_PIN = 0  # GPIO8 aka CE0 on SPI bus 0: /dev/spidev0.0
+if RF24_DRIVER == "MRAA":
+    CE_PIN = 15  # for GPIO22
+elif RF24_DRIVER == "wiringPi":
+    CE_PIN = 3  # for GPIO22
+else:
+    CE_PIN = 22
 radio = RF24(CE_PIN, CSN_PIN)
-################## Linux (BBB,x86,etc) #########################
-# See http://nRF24.github.io/RF24/pages.html for more information on usage
-# See http://iotdk.intel.com/docs/master/mraa/ for more information on MRAA
-# See https://www.kernel.org/doc/Documentation/spi/spidev for more
-# information on SPIDEV
+
+# initialize the nRF24L01 on the spi bus
+if not radio.begin():
+    raise RuntimeError("radio hardware is not responding")
+
+# set the Power Amplifier level to -12 dBm since this test example is
+# usually run with nRF24L01 transceivers in close proximity of each other
+radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
+
+# To save time during transmission, we'll set the payload size to be only what
+# we need.
+# 2 int occupy 8 bytes in memory using struct.pack()
+# "ii" means 2 unsigned integers
+radio.payloadSize = struct.calcsize("ii")
+
+# for debugging, we have 2 options that print a large block of details
+# radio.printDetails();  # (smaller) function that prints raw register values
+# radio.printPrettyDetails();  # (larger) function that prints human readable data
 
 # setup the addresses for all transmitting radio nodes
 addresses = [
     b"\x78" * 5,
-    b"\xF1\xB6\xB5\xB4\xB3",
-    b"\xCD\xB6\xB5\xB4\xB3",
-    b"\xA3\xB6\xB5\xB4\xB3",
-    b"\x0F\xB6\xB5\xB4\xB3",
-    b"\x05\xB6\xB5\xB4\xB3",
+    b"\xf1\xb6\xb5\xb4\xb3",
+    b"\xcd\xb6\xb5\xb4\xb3",
+    b"\xa3\xb6\xb5\xb4\xb3",
+    b"\x0f\xb6\xb5\xb4\xb3",
+    b"\x05\xb6\xb5\xb4\xb3",
 ]
 # It is very helpful to think of an address as a path instead of as
 # an identifying device destination
@@ -157,39 +166,13 @@ def set_role() -> bool:
 
 
 if __name__ == "__main__":
-
-    args = parser.parse_args()  # parse any CLI args
-
-    # initialize the nRF24L01 on the spi bus
-    if not radio.begin():
-        raise RuntimeError("radio hardware is not responding")
-
-    print(sys.argv[0])  # print example name
-
-    # set the Power Amplifier level to -12 dBm since this test example is
-    # usually run with nRF24L01 transceivers in close proximity of each other
-    radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
-
-    # To save time during transmission, we'll set the payload size to be only what
-    # we need.
-    # 2 int occupy 8 bytes in memory using struct.pack()
-    # "ii" means 2 unsigned integers
-    radio.payloadSize = struct.calcsize("ii")
-
-    # for debugging, we have 2 options that print a large block of details
-    # radio.printDetails();  # (smaller) function that prints raw register values
-    # radio.printPrettyDetails();  # (larger) function that prints human readable data
-
     try:
-        if args.node is None:  # if not specified with CLI arg '-n'
-            while set_role():
-                pass  # continue example until 'Q' is entered
-        else:  # if role was set using CLI args
-            # run role once and exit
-            if args.node.isdigit():
-                master(int(args.node))
-            else:
-                slave()
+        while set_role():
+            pass  # continue example until 'Q' is entered
     except KeyboardInterrupt:
         print(" Keyboard Interrupt detected. Powering down radio.")
         radio.powerDown()
+else:
+    print("    Run slave() on the receiver")
+    print("    Run master(node_number) on a transmitter")
+    print("        master()'s parameter, `node_number`, must be in range [0, 5]")

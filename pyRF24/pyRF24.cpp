@@ -151,6 +151,19 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(txStandBy_wrap1, RF24::txStandBy, 0, 2)
 
 BOOST_PYTHON_MODULE(RF24)
 {
+    bp::scope().attr("RF24_DRIVER") =
+#ifdef RF24_PIGPIO
+        "pigpio"
+#elif defined(MRAA)
+        "MRAA"
+#elif defined(RF24_RPi)
+        "RPi"
+#elif defined(RF24_WIRINGPI)
+        "wiringPi"
+#else
+        "SPIDEV"
+#endif
+        ;
 
 #ifdef BCM2835_H
     bp::enum_<RPiGPIOPin>("RPiGPIOPin")
