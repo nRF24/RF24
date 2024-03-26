@@ -67,6 +67,7 @@ elseif("${RF24_DRIVER}" STREQUAL "MRAA") # use MRAA
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/spi.cpp
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/compatibility.cpp
         ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/RF24_arch_config.h
+        ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/interrupt.cpp
         PARENT_SCOPE
     )
     install(FILES
@@ -75,7 +76,8 @@ elseif("${RF24_DRIVER}" STREQUAL "MRAA") # use MRAA
             ${RF24_DRIVER}/spi.h
             ${RF24_DRIVER}/compatibility.h
             ${RF24_DRIVER}/RF24_arch_config.h
-        DESTINATION include/RF24/utility/${RF24_DRIVER}
+            ${CMAKE_CURRENT_LIST_DIR}/${RF24_DRIVER}/interrupt.h
+            DESTINATION include/RF24/utility/${RF24_DRIVER}
     )
 elseif("${RF24_DRIVER}" STREQUAL "pigpio") # use pigpio
     set(RF24_LINKED_DRIVER ${LibPIGPIO} PARENT_SCOPE)
