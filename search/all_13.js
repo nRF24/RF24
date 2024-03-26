@@ -1,12 +1,20 @@
 var searchData=
 [
-  ['w_5fack_5fpayload_0',['W_ACK_PAYLOAD',['../nRF24L01_8h.html#a83176d6f9c44eb5e6738176b667f6430',1,'nRF24L01.h']]],
-  ['w_5fregister_1',['W_REGISTER',['../nRF24L01_8h.html#a3b68b214d5753039d2c156ad57cd7153',1,'nRF24L01.h']]],
-  ['w_5ftx_5fpayload_2',['W_TX_PAYLOAD',['../nRF24L01_8h.html#afd12673bc8ca8559b0eee395e8845982',1,'nRF24L01.h']]],
-  ['w_5ftx_5fpayload_5fno_5fack_3',['W_TX_PAYLOAD_NO_ACK',['../nRF24L01_8h.html#a661c2fa72a2694434c155ee75a4f952d',1,'nRF24L01.h']]],
-  ['whathappened_4',['whatHappened',['../classRF24.html#afb97dc4bdf4d2d84ea44060ac5b4ed89',1,'RF24']]],
-  ['write_5',['write',['../classRF24.html#a4cd4c198a47704db20b6b5cf0731cd58',1,'RF24::write(const void *buf, uint8_t len)'],['../classRF24.html#a23bfe6502d74bb5bbccb3a7f2ba2b5ea',1,'RF24::write(const void *buf, uint8_t len, const bool multicast)'],['../group__Porting__GPIO.html#ga957694ca061e30268dd8a4b28a08e59b',1,'write():&#160;gpio.h']]],
-  ['writeackpayload_6',['writeAckPayload',['../classRF24.html#a36b9fc363d3560358fe430a600a6f385',1,'RF24']]],
-  ['writeblocking_7',['writeBlocking',['../classRF24.html#ae6fd8d5ee490d54ae1cb2e8fefee535f',1,'RF24']]],
-  ['writefast_8',['writeFast',['../classRF24.html#a47b2516993481b58e724d1274a7fd9cb',1,'RF24::writeFast(const void *buf, uint8_t len)'],['../classRF24.html#ad16d53de0327c0b41d170cbda4bf41af',1,'RF24::writeFast(const void *buf, uint8_t len, const bool multicast)']]]
+  ['observe_5ftx_0',['OBSERVE_TX',['../nRF24L01_8h.html#a491468eaa7f2db84c152709b0b5fb1aa',1,'nRF24L01.h']]],
+  ['of_20rf24_20library_20lineage_1',['breif history of RF24 library lineage',['../md_docs_2rpi__general.html#autotoc_md77',1,'']]],
+  ['of_20write_20in_20interrupt_20service_20routine_20callbacks_2',['Prohibited usage of write*() in Interrupt Service Routine callbacks',['../md_COMMON__ISSUES.html#autotoc_md3',1,'']]],
+  ['on_20touching_20it_3',['My PA/LNA module doesn&apos;t perform as well as I&apos;d hoped or the NRF radio works better on touching it',['../md_COMMON__ISSUES.html#autotoc_md10',1,'']]],
+  ['ons_4',['Additional Information and Add-ons',['../index.html#autotoc_md45',1,'']]],
+  ['open_5',['open',['../group__Porting__GPIO.html#gad3451cca241dbbf42bf381129385a35c',1,'gpio.h']]],
+  ['openreadingpipe_6',['openReadingPipe',['../classRF24.html#a9edc910ccc1ffcff56814b08faca5535',1,'RF24::openReadingPipe(uint8_t number, const uint8_t *address)'],['../classRF24.html#aa7e8523f86f9f8f20c274e0c89a5fd45',1,'RF24::openReadingPipe(uint8_t number, uint64_t address)']]],
+  ['openwritingpipe_7',['openWritingPipe',['../classRF24.html#af2e409e62d49a23e372a70b904ae30e1',1,'RF24::openWritingPipe(const uint8_t *address)'],['../classRF24.html#a50c8e68ee840e1860a31dbdc83afbd77',1,'RF24::openWritingPipe(uint64_t address)']]],
+  ['optimized_20high_20speed_20driver_20for_20nrf24l01_202_204ghz_20wireless_20transceiver_8',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]],
+  ['option_9',['Option',['../md_docs_2pico__sdk.html#autotoc_md57',1,'Build-time configuration option'],['../md_docs_2pico__sdk.html#autotoc_md56',1,'Project Source code option']]],
+  ['options_10',['Build Options',['../md_docs_2rpi__general.html#autotoc_md71',1,'']]],
+  ['or_20printdetails_20outputs_20the_20unexpected_20value_20s_11',['Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)',['../md_COMMON__ISSUES.html#autotoc_md8',1,'']]],
+  ['or_20the_20nrf_20radio_20works_20better_20on_20touching_20it_12',['My PA/LNA module doesn&apos;t perform as well as I&apos;d hoped or the NRF radio works better on touching it',['../md_COMMON__ISSUES.html#autotoc_md10',1,'']]],
+  ['output_13',['OUTPUT',['../group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557',1,'RF24_arch_config.h']]],
+  ['output_5fhigh_14',['OUTPUT_HIGH',['../group__Porting__GPIO.html#ga18fd76f29528fc97aadcdb78495ff6bf',1,'gpio.h']]],
+  ['output_5flow_15',['OUTPUT_LOW',['../group__Porting__GPIO.html#gaa29a50f0f8fc0a62076c7f4bc7dc70db',1,'gpio.h']]],
+  ['outputs_20the_20unexpected_20value_20s_16',['Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)',['../md_COMMON__ISSUES.html#autotoc_md8',1,'']]]
 ];

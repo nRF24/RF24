@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['raspberry_20pi_20pico_20sdk_20_28for_20the_20rp2040_29_0',['Raspberry Pi Pico SDK (for the RP2040)',['../md_docs_pico_sdk.html',1,'']]],
-  ['rf24_20portability_1',['RF24 Portability',['../md_docs_portability.html',1,'']]]
+  ['high_20speed_20driver_20for_20nrf24l01_202_204ghz_20wireless_20transceiver_0',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]]
 ];

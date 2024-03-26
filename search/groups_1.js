@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['datarate_0',['datarate',['../group__Datarate.html',1,'']]]
+  ['crc_20length_0',['CRC length',['../group__CRCLength.html',1,'']]]
 ];

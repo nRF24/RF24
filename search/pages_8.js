@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['using_20cmake_0',['Using CMake',['../md_docs_using_cmake.html',1,'']]]
+  ['installation_0',['Linux Installation',['../md_docs_2linux__install.html',1,'']]],
+  ['issues_1',['Common Issues',['../md_COMMON__ISSUES.html',1,'']]]
 ];

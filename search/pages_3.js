@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['linux_20cross_2dcompilation_0',['Linux cross-compilation',['../md_docs_cross_compile.html',1,'']]],
-  ['linux_20general_2fraspberry_20pi_1',['Linux General/Raspberry Pi',['../md_docs_rpi_general.html',1,'']]],
-  ['linux_20installation_2',['Linux Installation',['../md_docs_linux_install.html',1,'']]]
+  ['cmake_0',['Using CMake',['../md_docs_2using__cmake.html',1,'']]],
+  ['common_20issues_1',['Common Issues',['../md_COMMON__ISSUES.html',1,'']]],
+  ['compilation_2',['Linux cross-compilation',['../md_docs_2cross__compile.html',1,'']]],
+  ['contributing_20guidelines_3',['Contributing guidelines',['../md_CONTRIBUTING.html',1,'']]],
+  ['cross_20compilation_4',['Linux cross-compilation',['../md_docs_2cross__compile.html',1,'']]]
 ];

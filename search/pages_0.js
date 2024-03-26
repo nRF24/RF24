@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['arduino_0',['Arduino',['../md_docs_arduino.html',1,'']]],
-  ['attiny_1',['ATTiny',['../md_docs_attiny.html',1,'']]],
-  ['atxmega_2',['ATXMEGA',['../md_docs_atxmega.html',1,'']]]
+  ['2_204ghz_20wireless_20transceiver_0',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]]
 ];

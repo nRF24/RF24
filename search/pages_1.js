@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['common_20issues_0',['Common Issues',['../md_COMMON_ISSUES.html',1,'']]],
-  ['contributing_20guidelines_1',['Contributing guidelines',['../md_CONTRIBUTING.html',1,'']]]
+  ['4ghz_20wireless_20transceiver_0',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]]
 ];

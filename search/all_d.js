@@ -1,11 +1,17 @@
 var searchData=
 [
-  ['observe_5ftx_0',['OBSERVE_TX',['../nRF24L01_8h.html#a491468eaa7f2db84c152709b0b5fb1aa',1,'nRF24L01.h']]],
-  ['open_1',['open',['../group__Porting__GPIO.html#gad3451cca241dbbf42bf381129385a35c',1,'gpio.h']]],
-  ['openreadingpipe_2',['openReadingPipe',['../classRF24.html#a9edc910ccc1ffcff56814b08faca5535',1,'RF24::openReadingPipe(uint8_t number, const uint8_t *address)'],['../classRF24.html#aa7e8523f86f9f8f20c274e0c89a5fd45',1,'RF24::openReadingPipe(uint8_t number, uint64_t address)']]],
-  ['openwritingpipe_3',['openWritingPipe',['../classRF24.html#af2e409e62d49a23e372a70b904ae30e1',1,'RF24::openWritingPipe(const uint8_t *address)'],['../classRF24.html#a50c8e68ee840e1860a31dbdc83afbd77',1,'RF24::openWritingPipe(uint64_t address)']]],
-  ['optimized_20high_20speed_20driver_20for_20nrf24l01_28_2b_29_202_2e4ghz_20wireless_20transceiver_4',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]],
-  ['output_5',['OUTPUT',['../group__Porting__General.html#ga61a3c9a18380aafb6e430e79bf596557',1,'RF24_arch_config.h']]],
-  ['output_5fhigh_6',['OUTPUT_HIGH',['../group__Porting__GPIO.html#ga18fd76f29528fc97aadcdb78495ff6bf',1,'gpio.h']]],
-  ['output_5flow_7',['OUTPUT_LOW',['../group__Porting__GPIO.html#gaa29a50f0f8fc0a62076c7f4bc7dc70db',1,'gpio.h']]]
+  ['general_0',['General',['../md_docs_2rpi__general.html#autotoc_md73',1,'General'],['../group__Porting__General.html',1,'Porting: General']]],
+  ['general_20µc_20pin_20layout_1',['General µC Pin layout',['../index.html#autotoc_md48',1,'']]],
+  ['general_20raspberry_20pi_2',['Linux General/Raspberry Pi',['../md_docs_2rpi__general.html',1,'']]],
+  ['getarc_3',['getARC',['../classRF24.html#a54b26abd1846e5080a0439ee372f3b8b',1,'RF24']]],
+  ['getchannel_4',['getChannel',['../classRF24.html#a6a66a94609309e17edaa1919e66cea0a',1,'RF24']]],
+  ['getcrclength_5',['getCRCLength',['../classRF24.html#aba4ca91b829afcd94a4c11e0343e3796',1,'RF24']]],
+  ['getdatarate_6',['getDataRate',['../classRF24.html#a72a7b11dafe8ffab6135f243decce0d7',1,'RF24']]],
+  ['getdynamicpayloadsize_7',['getDynamicPayloadSize',['../classRF24.html#a65963ed8d8fd45f847e2f673995b85e1',1,'RF24']]],
+  ['getpalevel_8',['getPALevel',['../classRF24.html#af7c4dcd84466168c5816382ceb366067',1,'RF24']]],
+  ['getpayloadsize_9',['getPayloadSize',['../classRF24.html#a0aa0c7cbe3d38fef4722f3f1d2d6c5f1',1,'RF24']]],
+  ['goals_10',['Design Goals',['../index.html#autotoc_md42',1,'']]],
+  ['gpio_11',['GPIO',['../group__Porting__GPIO.html#ga872483872ed4d11f46192619106a188c',1,'GPIO():&#160;gpio.h'],['../group__Porting__GPIO.html',1,'Porting: GPIO']]],
+  ['gpio_2eh_12',['gpio.h',['../gpio_8h.html',1,'']]],
+  ['guidelines_13',['Contributing guidelines',['../md_CONTRIBUTING.html',1,'']]]
 ];

@@ -1,12 +1,9 @@
 var searchData=
 [
-  ['failure_5fhandling_0',['FAILURE_HANDLING',['../RF24__config_8h.html#a80b7b445a2432fd652f91232b5558554',1,'RF24_config.h']]],
-  ['failuredetected_1',['failureDetected',['../classRF24.html#a2e40fe66d1231a333aa2534e8491f828',1,'RF24']]],
-  ['feature_2',['FEATURE',['../nRF24L01_8h.html#adf81f7b30b6c08465ce704956b446a2d',1,'nRF24L01.h']]],
-  ['fifo_5ffull_3',['FIFO_FULL',['../nRF24L01_8h.html#aff743182d3cc16bed60c67b0313cfeec',1,'nRF24L01.h']]],
-  ['fifo_5fstatus_4',['FIFO_STATUS',['../nRF24L01_8h.html#a9e5c9878194f462bf7a46ca8a7b8f9d2',1,'nRF24L01.h']]],
-  ['flush_5frx_5',['flush_rx',['../classRF24.html#a575c061519e7820e1850ad380c617d95',1,'RF24']]],
-  ['flush_5frx_6',['FLUSH_RX',['../nRF24L01_8h.html#ab2418a6171d7f1eefd458927fdfe7057',1,'nRF24L01.h']]],
-  ['flush_5ftx_7',['flush_tx',['../classRF24.html#adb7915b1d2661a82137573344f659e81',1,'RF24']]],
-  ['flush_5ftx_8',['FLUSH_TX',['../nRF24L01_8h.html#abce47e8066832b6ac4e18162a79859b4',1,'nRF24L01.h']]]
+  ['_5f_5fmillis_0',['__millis',['../group__Porting__Timing.html#gabbbe932935bad139f6e446e7bddb7efa',1,'compatibility.h']]],
+  ['_5f_5fmsleep_1',['__msleep',['../group__Porting__Timing.html#ga4c2e4dffa20576f5b3d9c2f9bb052106',1,'compatibility.h']]],
+  ['_5f_5fstart_5ftimer_2',['__start_timer',['../group__Porting__Timing.html#ga6c8e606d2db30ac66d24b35056a8f819',1,'compatibility.h']]],
+  ['_5f_5fusleep_3',['__usleep',['../group__Porting__Timing.html#gaec87320f2886551c012814de85713681',1,'compatibility.h']]],
+  ['_5fbv_4',['_BV',['../group__Porting__General.html#ga483c9de27db573099572f5485ef841c9',1,'RF24_arch_config.h']]],
+  ['_5fspi_5',['_SPI',['../group__Porting__General.html#gaa9e44ba356b97be27806db7f96ff527d',1,'RF24_arch_config.h']]]
 ];

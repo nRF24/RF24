@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['crc_20length_0',['CRC length',['../group__CRCLength.html',1,'']]]
+  ['amplifier_20level_0',['Power Amplifier level',['../group__PALevel.html',1,'']]]
 ];
