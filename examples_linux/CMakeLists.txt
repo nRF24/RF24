@@ -46,10 +46,14 @@ elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
     else()
         message(FATAL "Lib ${RF24_DRIVER} not found.")
     endif()
-elseif(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
-    message(STATUS "linking to ${LibPIGPIO}")
-    # linking to pigpio requires pthread to be listed as last linked lib
-    list(APPEND linked_libs ${LibPIGPIO} pthread)
+elseif("${RF24_DRIVER}" STREQUAL "pigpio")
+    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        message(STATUS "linking to ${LibPIGPIO}")
+        # linking to pigpio requires pthread to be listed as last linked lib
+        list(APPEND linked_libs ${LibPIGPIO} pthread)
+    else()
+        message(FATAL "Lib ${RF24_DRIVER} not found")
+    endif()
 endif()
 
 foreach(example ${EXAMPLES_LIST})
