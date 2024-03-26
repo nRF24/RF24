@@ -5,7 +5,6 @@ nRF24L01
 See documentation at https://nRF24.github.io/RF24
 """
 
-import select
 import time
 from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER
 
@@ -69,7 +68,8 @@ if not radio.begin():
 
 # this example uses the ACK payload to trigger the IRQ pin active for
 # the "on data received" event
-radio.ack_payloads = True  # enable ACK payloads
+radio.enableDynamicPayloads()  # ACK payloads are dynamically sized
+radio.enableAckPayload()  # enable ACK payloads
 
 # set the Power Amplifier level to -12 dBm since this test example is
 # usually run with nRF24L01 transceivers in close proximity of each other
@@ -114,18 +114,17 @@ irq_line = gpiod.request_lines(
     consumer="RF24_interrupt_py-example",  # optional
     config={IRQ_PIN: gpiod.LineSettings(edge_detection=Edge.FALLING)},
 )
-poll = select.poll()
-poll.register(irq_line.fd, select.POLLIN)
 
 
-def _wait_for_irq(timeout: int = 15):
+def _wait_for_irq(timeout: float = 5):
     """Wait till IRQ_PIN goes active (LOW).
     IRQ pin is LOW when activated. Otherwise it is always HIGH
     """
     # wait up to ``timeout`` seconds for event to be detected.
-    result = poll.poll(timeout * 1000)  # pass `None` to block
-    if not result:  # channel should be equal to GPIO.HIGH
-        raise RuntimeError("Interrupt event not detected. Check your wiring.")
+    if not irq_line.wait_edge_events(timeout):
+        print(f"\tInterrupt event not detected for {timeout} seconds!")
+        return False
+    # read event from kernel buffer
     for event in irq_line.read_edge_events():
         if event.line_offset == IRQ_PIN and event.event_type is event.Type.FALLING_EDGE:
             return True
@@ -148,7 +147,7 @@ def master():
     radio.maskIRQ(True, False, False)  # args = tx_ds, tx_df, rx_dr
     print("    Pinging slave node for an ACK payload...")
     pl_iterator[0] = 0
-    radio.startWrite(tx_payloads[0], False)  # False means expecting an ACK
+    radio.startFastWrite(tx_payloads[0], False)  # False means expecting an ACK
     if _wait_for_irq():
         interrupt_handler()
 
@@ -157,7 +156,7 @@ def master():
     radio.maskIRQ(False, False, True)  # args = tx_ds, tx_df, rx_dr
     print("    Pinging slave node again...")
     pl_iterator[0] = 1
-    radio.startWrite(tx_payloads[1], False)  # False means expecting an ACK
+    radio.startFastWrite(tx_payloads[1], False)  # False means expecting an ACK
     if _wait_for_irq():
         interrupt_handler()
 
@@ -176,7 +175,7 @@ def master():
     print("    Sending a ping to inactive slave node...")
     radio.flush_tx()  # just in case any previous tests failed
     pl_iterator[0] = 2
-    radio.startWrite(tx_payloads[3], False)  # False means expecting an ACK
+    radio.startFastWrite(tx_payloads[3], False)  # False means expecting an ACK
     if _wait_for_irq():
         interrupt_handler()
     radio.flush_tx()  # flush artifact payload in TX FIFO from last test
