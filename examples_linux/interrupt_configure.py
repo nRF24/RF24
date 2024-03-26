@@ -218,6 +218,7 @@ def set_role():
     """
     user_input = (
         input(
+            f"Make sure the IRQ pin is connected to the GPIO{IRQ_PIN}\n"
             "*** Enter 'R' for receiver role.\n"
             "*** Enter 'T' for transmitter role.\n"
             "*** Enter 'Q' to quit example.\n"
@@ -239,28 +240,9 @@ def set_role():
 
 
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument(
-        "-r",
-        "--role",
-        type=int,
-        choices=range(2),
-        help="'1' specifies the TX role. '0' specifies the RX role.",
-    )
-    args = parser.parse_args()  # parse any CLI args
-
     try:
-        if args.role is None:  # if not specified with CLI arg '-r'
-            while set_role():
-                pass  # continue example until 'Q' is entered
-        elif bool(args.role):  # if role was set using CLI args, run role once and exit
-            master()
-        else:
-            slave()
+        while set_role():
+            pass  # continue example until 'Q' is entered
     except KeyboardInterrupt:
         print(" Keyboard Interrupt detected. Exiting...")
         radio.powerDown()

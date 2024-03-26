@@ -69,7 +69,7 @@ to each library.
    ```
 2. Install the library.
 
-   This step and the next step need to be executed from the appropriate directory of
+   This step needs to be executed from the appropriate directory of
    the cloned RF24* repository:
    - navigate to *pyRF24* directory in the RF24 cloned repository
    - navigate to *RPi/pyRF24Network* directory in the RF24Network cloned repository
