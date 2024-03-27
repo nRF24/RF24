@@ -8,6 +8,7 @@ set(EXAMPLES_LIST
     streamingData
     multiceiverDemo
     scanner
+    interruptConfigure
 )
 
 project(RF24Examples CXX)
@@ -22,13 +23,6 @@ include(../cmake/AutoConfig_RF24_DRIVER.cmake)
 
 find_library(RF24 rf24 REQUIRED)
 message(STATUS "using RF24 library: ${RF24}")
-
-# conditionally append "interruptConfigure" to the EXAMPLES_LIST
-if("${RF24_DRIVER}" STREQUAL "MRAA")
-    message(STATUS "Skipping interruptConfigure.cpp example as it is incompatible with selected driver library")
-else() # not using MRAA or wiringPi drivers (or pigpio lib was found)
-    list(APPEND EXAMPLES_LIST interruptConfigure)
-endif()
 
 
 set(linked_libs 
@@ -52,10 +46,14 @@ elseif("${RF24_DRIVER}" STREQUAL "wiringPi")
     else()
         message(FATAL "Lib ${RF24_DRIVER} not found.")
     endif()
-elseif(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
-    message(STATUS "linking to ${LibPIGPIO}")
-    # linking to pigpio requires pthread to be listed as last linked lib
-    list(APPEND linked_libs ${LibPIGPIO} pthread)
+elseif("${RF24_DRIVER}" STREQUAL "pigpio")
+    if(NOT "${LibPIGPIO}" STREQUAL "LibPIGPIO-NOTFOUND")
+        message(STATUS "linking to ${LibPIGPIO}")
+        # linking to pigpio requires pthread to be listed as last linked lib
+        list(APPEND linked_libs ${LibPIGPIO} pthread)
+    else()
+        message(FATAL "Lib ${RF24_DRIVER} not found")
+    endif()
 endif()
 
 foreach(example ${EXAMPLES_LIST})

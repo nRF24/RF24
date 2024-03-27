@@ -6,5 +6,6 @@
 #endif
 
 #include "MRAA/RF24_arch_config.h"
+#include "MRAA/interrupt.h"
 
 #endif // RF24_UTILITY_INCLUDES_H_

@@ -4,6 +4,7 @@
  */
 
 #include <map>
+#include <mraa.h> // mraa_strresult()
 #include "gpio.h"
 
 // cache for mraa::Gpio instances
@@ -25,15 +26,22 @@ GPIO::~GPIO()
 
 void GPIO::open(rf24_gpio_pin_t port, mraa::Dir DDR)
 {
+    mraa::Result status;
+
     // check that mraa::Gpio context doesn't already exist
     std::map<rf24_gpio_pin_t, mraa::Gpio*>::iterator i = gpio_cache.find(port);
     if (i == gpio_cache.end()) {
         mraa::Gpio* gpio_inst = new mraa::Gpio(port);
         gpio_cache[port] = gpio_inst;
-        gpio_inst->dir(DDR);
+        status = gpio_inst->dir(DDR);
     }
     else {
-        i->second->dir(DDR);
+        status = i->second->dir(DDR);
+    }
+    if (status != mraa::SUCCESS) {
+        std::string msg = "[GPIO::open] Could not set the pin direction; ";
+        msg += mraa_strresult((mraa_result_t)status);
+        throw GPIOException(msg);
     }
 }
 
@@ -60,17 +68,17 @@ int GPIO::read(rf24_gpio_pin_t port)
 
 void GPIO::write(rf24_gpio_pin_t port, int value)
 {
-    mraa::Result result = mraa::Result::ERROR_UNSPECIFIED; // a default
     // get cache gpio instance
     std::map<rf24_gpio_pin_t, mraa::Gpio*>::iterator i = gpio_cache.find(port);
     if (i != gpio_cache.end()) {
-        result = i->second->write(value);
+        mraa::Result result = i->second->write(value);
+        if (result != mraa::Result::SUCCESS) {
+            std::string msg = "[GPIO::write] Could not set pin output value; ";
+            msg += mraa_strresult((mraa_result_t)result);
+            throw GPIOException(msg);
+        }
     }
     else {
         throw GPIOException("[GPIO::write] pin was not initialized with GPIO::open()");
-    }
-
-    if (result != mraa::Result::SUCCESS) {
-        throw GPIOException("GPIO::write() failed");
     }
 }
