@@ -13,6 +13,24 @@ extern "C" {
 static pthread_mutex_t irq_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<rf24_gpio_pin_t, IrqPinCache> irqCache;
 
+// A simple struct instantiated privately to:
+// 1. properly clean up open threads
+// 2. clear BCM2835 lib's Edge Detection Status settings
+struct IrqCacheDestructor
+{
+    ~IrqCacheDestructor()
+    {
+        for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
+            pthread_cancel(i->second.id);
+            pthread_join(i->second.id, NULL);
+            bcm2835_gpio_clr_ren(i->second.pin);
+            bcm2835_gpio_clr_fen(i->second.pin);
+            bcm2835_gpio_set_eds(i->second.pin);
+        }
+        irqCache.clear();
+    }
+} irqCacheMgr;
+
 void* poll_irq(void* arg)
 {
     IrqPinCache* pinCache = (IrqPinCache*)(arg);
