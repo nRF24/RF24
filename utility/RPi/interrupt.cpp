@@ -23,8 +23,8 @@ struct IrqCacheDestructor
         for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
             pthread_cancel(i->second.id);
             pthread_join(i->second.id, NULL);
-            bcm2835_gpio_clr_ren(i->second.pin);
-            bcm2835_gpio_clr_fen(i->second.pin);
+            bcm2835_gpio_clr_aren(i->second.pin);
+            bcm2835_gpio_clr_afen(i->second.pin);
             bcm2835_gpio_set_eds(i->second.pin);
         }
         irqCache.clear();
@@ -54,14 +54,14 @@ int attachInterrupt(rf24_gpio_pin_t pin, uint8_t mode, void (*function)(void))
     // configure the specified pin
     switch (mode) {
         case INT_EDGE_BOTH:
-            bcm2835_gpio_ren(pin);
-            bcm2835_gpio_fen(pin);
+            bcm2835_gpio_aren(pin);
+            bcm2835_gpio_afen(pin);
             break;
         case INT_EDGE_RISING:
-            bcm2835_gpio_ren(pin);
+            bcm2835_gpio_aren(pin);
             break;
         case INT_EDGE_FALLING:
-            bcm2835_gpio_fen(pin);
+            bcm2835_gpio_afen(pin);
             break;
         default:
             // bad user input!
@@ -96,8 +96,8 @@ int detachInterrupt(rf24_gpio_pin_t pin)
     }
     pthread_cancel(cachedPin->second.id);     // send cancel request
     pthread_join(cachedPin->second.id, NULL); // wait till thread terminates
-    bcm2835_gpio_clr_ren(cachedPin->second.pin);
-    bcm2835_gpio_clr_fen(cachedPin->second.pin);
+    bcm2835_gpio_clr_aren(cachedPin->second.pin);
+    bcm2835_gpio_clr_afen(cachedPin->second.pin);
     bcm2835_gpio_set_eds(cachedPin->second.pin);
     irqCache.erase(cachedPin);
     return 1;
