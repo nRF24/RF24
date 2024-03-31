@@ -18,9 +18,6 @@ endif
 include ../Makefile.inc
 
 # define all programs
-PROGRAMS = gettingstarted acknowledgementPayloads manualAcknowledgements streamingData multiceiverDemo scanner
-ifneq ($(DRIVER), MRAA)
-PROGRAMS+=interruptConfigure
-endif
+PROGRAMS = gettingstarted acknowledgementPayloads manualAcknowledgements streamingData multiceiverDemo scanner interruptConfigure
 
 include Makefile.examples

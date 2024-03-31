@@ -22,7 +22,13 @@
 using namespace std;
 
 // We will be using the nRF24L01's IRQ pin for this example
-#define IRQ_PIN 24 // this needs to be a digital input capable pin
+#ifdef MRAA
+    #define IRQ_PIN 18 // GPIO24
+#elif defined(RF24_WIRINGPI)
+    #define IRQ_PIN 5 // GPIO24
+#else
+    #define IRQ_PIN 24 // GPIO24
+#endif
 
 // this example is a sequential program. so we need to wait for the event to be handled
 volatile bool got_interrupt = false; // used to signify that the event started
