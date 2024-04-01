@@ -1,14 +1,9 @@
 /**
  * Interrupt implementations
  */
-#include "linux/gpio.h"
-#include <unistd.h>    // close()
-#include <fcntl.h>     // open()
-#include <sys/ioctl.h> // ioctl()
-#include <errno.h>     // errno, strerror()
-#include <string.h>    // std::string, strcpy()
 #include <pthread.h>
 #include <map>
+#include "bcm2835.h"
 #include "interrupt.h"
 
 #ifdef __cplusplus
@@ -18,63 +13,32 @@ extern "C" {
 static pthread_mutex_t irq_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<rf24_gpio_pin_t, IrqPinCache> irqCache;
 
-void IrqChipCache::openDevice()
+// A simple struct instantiated privately to:
+// 1. properly clean up open threads
+// 2. clear BCM2835 lib's Edge Detection Status settings
+struct IrqCacheDestructor
 {
-    if (fd < 0) {
-        fd = open(chip, O_RDONLY);
-        if (fd < 0) {
-            std::string msg = "Can't open device ";
-            msg += chip;
-            msg += "; ";
-            msg += strerror(errno);
-            throw IRQException(msg);
-            return;
+    ~IrqCacheDestructor()
+    {
+        for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
+            pthread_cancel(i->second.id);
+            pthread_join(i->second.id, NULL);
+            bcm2835_gpio_clr_aren(i->second.pin);
+            bcm2835_gpio_clr_afen(i->second.pin);
+            bcm2835_gpio_set_eds(i->second.pin);
         }
+        irqCache.clear();
     }
-    chipInitialized = true;
-}
-
-void IrqChipCache::closeDevice()
-{
-    if (fd >= 0) {
-        close(fd);
-        fd = -1;
-    }
-}
-
-IrqChipCache::IrqChipCache()
-{
-}
-
-IrqChipCache::~IrqChipCache()
-{
-    for (std::map<rf24_gpio_pin_t, IrqPinCache>::iterator i = irqCache.begin(); i != irqCache.end(); ++i) {
-        pthread_cancel(i->second.id);     // send cancel request
-        pthread_join(i->second.id, NULL); // wait till thread terminates
-        close(i->second.fd);
-    }
-    irqCache.clear();
-}
-
-IrqChipCache irqChipCache;
+} irqCacheMgr;
 
 void* poll_irq(void* arg)
 {
     IrqPinCache* pinCache = (IrqPinCache*)(arg);
-    unsigned int lastEventSeqNo = 0;
-    gpio_v2_line_event irqEventInfo;
-    memset(&irqEventInfo, 0, sizeof(irqEventInfo));
 
     for (;;) {
-        int ret = read(pinCache->fd, &irqEventInfo, sizeof(gpio_v2_line_event));
-        if (ret < 0) {
-            std::string msg = "[poll_irq] Could not read event info; ";
-            msg += strerror(errno);
-            throw IRQException(msg);
-            return NULL;
-        }
-        if (ret > 0 && irqEventInfo.line_seqno != lastEventSeqNo) {
-            lastEventSeqNo = irqEventInfo.line_seqno;
+        int ret = bcm2835_gpio_eds(pinCache->pin);
+        if (ret > 0) {
+            bcm2835_gpio_set_eds(pinCache->pin);
             pinCache->function();
         }
         pthread_testcancel();
@@ -82,88 +46,31 @@ void* poll_irq(void* arg)
     return NULL;
 }
 
-int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
+int attachInterrupt(rf24_gpio_pin_t pin, uint8_t mode, void (*function)(void))
 {
     // ensure pin is not already being used in a separate thread
     detachInterrupt(pin);
 
-    try {
-        irqChipCache.openDevice();
-    }
-    catch (IRQException& exc) {
-        if (irqChipCache.chipInitialized) {
-            throw exc;
-            return 0;
-        }
-        irqChipCache.chip = "/dev/gpiochip0";
-        irqChipCache.openDevice();
-    }
-
-    // get chip info
-    gpiochip_info info;
-    memset(&info, 0, sizeof(info));
-    int ret = ioctl(irqChipCache.fd, GPIO_GET_CHIPINFO_IOCTL, &info);
-    if (ret < 0) {
-        std::string msg = "[attachInterrupt] Could not gather info about ";
-        msg += irqChipCache.chip;
-        throw IRQException(msg);
-        return 0;
-    }
-
-    if (pin > info.lines) {
-        std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + irqChipCache.chip;
-        throw IRQException(msg);
-        return 0;
-    }
-
-    // create a request object to configure the specified pin
-    gpio_v2_line_request request;
-    memset(&request, 0, sizeof(request));
-    strcpy(request.consumer, "RF24 IRQ");
-    request.num_lines = 1U;
-    request.offsets[0] = pin;
-    request.event_buffer_size = sizeof(gpio_v2_line_event);
-
-    // set debounce for the pin
-    // request.config.attrs[0].mask = 1LL;
-    // request.config.attrs[0].attr.id = GPIO_V2_LINE_ATTR_ID_DEBOUNCE;
-    // request.config.attrs[0].attr.debounce_period_us = 10U;
-    // request.config.num_attrs = 1U;
-
-    // set pin as input and configure edge detection
-    request.config.flags = GPIO_V2_LINE_FLAG_INPUT | GPIO_V2_LINE_FLAG_EVENT_CLOCK_REALTIME;
+    // configure the specified pin
     switch (mode) {
         case INT_EDGE_BOTH:
+            bcm2835_gpio_aren(pin);
+            bcm2835_gpio_afen(pin);
+            break;
         case INT_EDGE_RISING:
+            bcm2835_gpio_aren(pin);
+            break;
         case INT_EDGE_FALLING:
-            request.config.flags |= mode;
+            bcm2835_gpio_afen(pin);
             break;
         default:
             // bad user input!
             return 0; // stop here
     }
 
-    // write pin request's config
-    ret = ioctl(irqChipCache.fd, GPIO_V2_GET_LINE_IOCTL, &request);
-    if (ret < 0 || request.fd <= 0) {
-        std::string msg = "[attachInterrupt] Could not get line handle from ioctl; ";
-        msg += strerror(errno);
-        throw IRQException(msg);
-        return 0;
-    }
-    irqChipCache.closeDevice();
-
-    ret = ioctl(request.fd, GPIO_V2_LINE_SET_CONFIG_IOCTL, &request.config);
-    if (ret < 0) {
-        std::string msg = "[attachInterrupt] Could not set line config; ";
-        msg += strerror(errno);
-        throw IRQException(msg);
-        return 0;
-    }
-
     // cache details
     IrqPinCache irqPinCache;
-    irqPinCache.fd = request.fd;
+    irqPinCache.pin = pin;
     irqPinCache.function = function;
     std::pair<std::map<rf24_gpio_pin_t, IrqPinCache>::iterator, bool> indexPair = irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, irqPinCache));
 
@@ -189,7 +96,9 @@ int detachInterrupt(rf24_gpio_pin_t pin)
     }
     pthread_cancel(cachedPin->second.id);     // send cancel request
     pthread_join(cachedPin->second.id, NULL); // wait till thread terminates
-    close(cachedPin->second.fd);
+    bcm2835_gpio_clr_aren(cachedPin->second.pin);
+    bcm2835_gpio_clr_afen(cachedPin->second.pin);
+    bcm2835_gpio_set_eds(cachedPin->second.pin);
     irqCache.erase(cachedPin);
     return 1;
 }
