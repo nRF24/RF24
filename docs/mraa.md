@@ -39,4 +39,4 @@ MRAA is not included.
    ```
 3. Install RF24, using MRAA
 
-   See [Linux Install instructions](md_docs_linux_install.html)
+   See [Linux Install instructions](linux_install.md)

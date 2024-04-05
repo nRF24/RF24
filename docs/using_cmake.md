@@ -5,7 +5,7 @@
 <!-- markdownlint-disable MD031 -->
 A more modern approach instead of using hand-crafted _Makefiles_ & _configure_ scripts
 to build & install software. Please note that these instructions are not needed if you
-have already installed the library using [these older instructions](md_docs_linux_install.html)
+have already installed the library using [these older instructions](linux_install.md)
 
 ## Installing the library
 
@@ -15,7 +15,7 @@ You can install the library in a few different ways.
 - Installing the library (via a package manager) from a pre-built package is mostly for cross-compiling purposes, but it can be useful for environments that don't have all the build-time dependencies (namely CMake).
 
 @warning If you have previously installed the library from source code using the
-[the older instructions](md_docs_linux_install.html), then you will need to
+[the older instructions](linux_install.md), then you will need to
 uninstall it manually to avoid runtime conflicts.
 ```shell
 sudo rm /usr/local/lib/librf24.*
@@ -24,9 +24,6 @@ sudo rm -r /usr/local/include/RF24
 ```
 
 The _librf24-bcm.so_ file may not exist if you used CMake to install the library.
-
-@note Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye),
-pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.
 
 ### Automatic Installation
 
@@ -44,7 +41,11 @@ There is a newer automatic install script that makes use of the CMake approach.
    ```shell
    ./install.sh
    ```
-   The script will detect needed dependencies and install what it needs according to the user input.
+
+   @warning 
+   `SPIDEV` is now always selected as the default driver because
+   all other Linux drivers are being removed in the future.
+   See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
 
    It will also ask to install a python package named [pyRF24](https://github.com/nRF24/pyRF24).
    This is not the same as the traditionally provided python wrappers as the pyRF24 package can be
@@ -75,13 +76,13 @@ There is a newer automatic install script that makes use of the CMake approach.
 
 ### Building from source code
 
-1. Install prerequisites if there are any (pigpio, wiringPi, MRAA, LittleWire libraries, setup SPI device etc)
+1. Install prerequisites if there are any (PiGPIO, WiringPi, MRAA, LittleWire libraries, and enable the SPI bus(es) in the OS).
 
    CMake may need to be installed
    ```shell
    sudo apt-get install cmake
    ```
-   @note See the [MRAA documentation](http://iotdk.intel.com/docs/master/mraa/index.html) for more information on installing MRAA
+   @note See the [MRAA documentation](http://iotdk.intel.com/docs/master/mraa/index.html) for more information on installing MRAA.
 2. Make a directory to contain the RF24 library and possibly other RF24\* libraries and enter it
    ```shell
    mkdir ~/rf24libs
@@ -119,9 +120,10 @@ There is a newer automatic install script that makes use of the CMake approach.
    Instead of using `SPIDEV` driver (recommended), you can also specify the `RPi`, `wiringPi`,
    `MRAA`, or `LittleWire` as alternative drivers.
 
-   If the `RF24_DRIVER` option is not specified (and it is not set as an environment variable), then
-   it will be automatically configured based on the detected CPU or installed libraries (which
-   defaults to `SPIDEV` when auto-detection fails).
+   @warning
+   `SPIDEV` is now always selected as the default driver because
+   all other Linux drivers are being removed in the future.
+   See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
 6. Build and install the library
    ```shell
    make
@@ -137,7 +139,7 @@ There is a newer automatic install script that makes use of the CMake approach.
    ```shell
    nano gettingstarted.cpp
    ```
-   and edit the pin numbers as directed in the [linux/RPi general documation](md_docs_rpi_general.html).
+   and edit the pin numbers as directed in the [linux/RPi general documation](rpi_general.md).
    Create a build directory in the examples_linux directory and navigate to it.
    ```shell
    mkdir build

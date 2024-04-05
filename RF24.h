@@ -252,7 +252,7 @@ public:
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      * The `_SPI` datatype is a "wrapped" definition that will represent
      * various SPI implementations based on the specified platform.
-     * @see Review the [Arduino support page](md_docs_arduino.html).
+     * @see Review the [Arduino support page](arduino.md).
      *
      * @return same result as begin()
      */
@@ -275,7 +275,7 @@ public:
      * - For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.
      *
-     * @see Review the [Arduino support page](md_docs_arduino.html).
+     * @see Review the [Arduino support page](arduino.md).
      *
      * @return same result as begin()
      */
@@ -2233,7 +2233,7 @@ private:
  *
  * This is a simple example of using the RF24 class on a Raspberry Pi.
  *
- * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
+ * Remember to install the [Python wrapper](python_wrapper.md), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 getting_started.py @endcode and follow the prompts.
@@ -2249,7 +2249,7 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * transmit and retrieve custom automatic acknowledgment payloads.
  *
- * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
+ * Remember to install the [Python wrapper](python_wrapper.md), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 acknowledgement_payloads.py @endcode and follow the prompts.
@@ -2268,7 +2268,7 @@ private:
  * payloads because automatic ACK payloads' data will always be outdated by 1
  * transmission. Instead, this example uses a call and response paradigm.
  *
- * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
+ * Remember to install the [Python wrapper](python_wrapper.md), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 manual_acknowledgements.py @endcode and follow the prompts.
@@ -2284,7 +2284,7 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi for
  * streaming multiple payloads.
  *
- * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
+ * Remember to install the [Python wrapper](python_wrapper.md), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 streaming_data.py @endcode and follow the prompts.
@@ -2300,7 +2300,7 @@ private:
  * This is a simple example of using the RF24 class on a Raspberry Pi to
  * detecting (and verifying) the IRQ (interrupt) pin on the nRF24L01.
  *
- * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
+ * Remember to install the [Python wrapper](python_wrapper.md), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 interrupt_configure.py @endcode and follow the prompts.
@@ -2317,7 +2317,7 @@ private:
  * using 1 nRF24L01 to receive data from up to 6 other transceivers. This
  * technique is called "multiceiver" in the datasheet.
  *
- * Remember to install the [Python wrapper](md_docs_python_wrapper.html), then
+ * Remember to install the [Python wrapper](python_wrapper.md), then
  * navigate to the "RF24/examples_linux" folder.
  * <br>To run this example, enter
  * @code{.sh}python3 multiceiver_demo.py @endcode and follow the prompts.

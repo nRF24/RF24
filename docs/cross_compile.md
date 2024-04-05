@@ -4,7 +4,7 @@
 
 <!-- markdownlint-disable MD031 -->
 @warning These instructions are no longer recommended because they involve disabling security measures
-for the target system. Please try the [instructions using CMake](md_docs_using_cmake.html).
+for the target system. Please try the [instructions using CMake](using_cmake.md).
 
 RF24 library supports cross-compilation. Advantages of cross-compilation:
 
