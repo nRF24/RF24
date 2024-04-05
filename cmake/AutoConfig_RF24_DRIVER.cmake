@@ -51,7 +51,7 @@ endif()
 if(DEFINED ENV{RF24_DRIVER})
     message(STATUS "RF24_DRIVER (set from env var) = $ENV{RF24_DRIVER}")
     set(RF24_DRIVER $ENV{RF24_DRIVER} CACHE STRING "" FORCE)
-else()
+elseif(${RF24_DRIVER} STREQUAL "UNKNOWN")
     set(RF24_DRIVER SPIDEV CACHE STRING "using folder /utility/SPIDEV" FORCE)
 endif()
 
