@@ -51,8 +51,8 @@ changes.
 - [Arduino](arduino.md) (Uno, Nano, Mega, Due, Galileo, etc)
 - [ATTiny](attiny.md)
 - [Pico SDK support](pico_sdk.md)
-- [Linux Installation](linux_install.html) (or the alternative [instructions using CMake](using_cmake.md)),
-  ([Linux/RPi General](rpi_general.html), [MRAA](mraa.md) supported boards (Galileo, Edison, etc), LittleWire)
+- [Linux Installation](linux_install.md) (or the alternative [instructions using CMake](using_cmake.md)),
+  ([Linux/RPi General](rpi_general.md), [MRAA](mraa.md) supported boards (Galileo, Edison, etc), LittleWire)
 - [Cross-compilation](cross_compile.md) for linux devices
 - [Python wrapper](python_wrapper.md) available for Linux devices
 
