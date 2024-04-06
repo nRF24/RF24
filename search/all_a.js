@@ -4,7 +4,7 @@ var searchData=
   ['datarate_1',['datarate',['../group__Datarate.html',1,'']]],
   ['delay_2',['delay',['../group__Porting__General.html#ga70a331e8ddf9acf9d33c47b71cda4c5f',1,'RF24_arch_config.h']]],
   ['delaymicroseconds_3',['delayMicroseconds',['../group__Porting__General.html#ga9384257bf5d5c1aae675b22cc3ecb91a',1,'RF24_arch_config.h']]],
-  ['deprecated_4',['Deprecated',['../md_docs_2linux__install.html#autotoc_md38',1,'Automated Install (Deprecated)'],['../md_docs_2linux__install.html#autotoc_md40',1,'Build using SPIDEV (Deprecated)'],['../md_docs_2linux__install.html#autotoc_md39',1,'Manual Install (Deprecated)']]],
+  ['deprecated_2032_20bit_20only_4',['Deprecated 32 bit only',['../md_docs_2linux__install.html#autotoc_md38',1,'Automated Install (Deprecated - 32 bit only)'],['../md_docs_2linux__install.html#autotoc_md40',1,'Build using SPIDEV (Deprecated - 32 bit only)'],['../md_docs_2linux__install.html#autotoc_md39',1,'Manual Install (Deprecated - 32 bit only)']]],
   ['deprecated_20list_5',['Deprecated List',['../deprecated.html',1,'']]],
   ['design_20goals_6',['Design Goals',['../index.html#autotoc_md42',1,'']]],
   ['detection_7',['Device Detection',['../md_docs_2portability.html#autotoc_md62',1,'']]],

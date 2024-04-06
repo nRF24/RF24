@@ -38,7 +38,7 @@ var searchData=
   ['attiny25_2045_2085_20pin_20map_20with_20ce_5fpin_203_20and_20csn_5fpin_204_35',['ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4',['../md_docs_2attiny.html#autotoc_md24',1,'']]],
   ['atxmega_36',['ATXMEGA',['../md_docs_2atxmega.html',1,'']]],
   ['atxmega_2emd_37',['atxmega.md',['../atxmega_8md.html',1,'']]],
-  ['automated_20install_20deprecated_38',['Automated Install (Deprecated)',['../md_docs_2linux__install.html#autotoc_md38',1,'']]],
+  ['automated_20install_20deprecated_2032_20bit_20only_38',['Automated Install (Deprecated - 32 bit only)',['../md_docs_2linux__install.html#autotoc_md38',1,'']]],
   ['automatic_20installation_39',['Automatic Installation',['../md_docs_2using__cmake.html#autotoc_md80',1,'']]],
   ['automatic_20installation_20new_40',['Automatic Installation (New)',['../md_docs_2linux__install.html#autotoc_md37',1,'']]],
   ['available_41',['available',['../classRF24.html#a127105eb7a3b351cfe777c1cec50627a',1,'RF24::available(void)'],['../classRF24.html#ace7dd139fabc16b77cb8325faa07620f',1,'RF24::available(uint8_t *pipe_num)']]],

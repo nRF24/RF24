@@ -11,7 +11,7 @@ var searchData=
   ['information_8',['More Information',['../index.html#autotoc_md46',1,'']]],
   ['information_20and_20add_20ons_9',['Additional Information and Add-ons',['../index.html#autotoc_md45',1,'']]],
   ['input_10',['INPUT',['../group__Porting__General.html#ga1bb283bd7893b9855e2f23013891fc82',1,'RF24_arch_config.h']]],
-  ['install_20deprecated_11',['Install Deprecated',['../md_docs_2linux__install.html#autotoc_md38',1,'Automated Install (Deprecated)'],['../md_docs_2linux__install.html#autotoc_md39',1,'Manual Install (Deprecated)']]],
+  ['install_20deprecated_2032_20bit_20only_11',['Install Deprecated 32 bit only',['../md_docs_2linux__install.html#autotoc_md38',1,'Automated Install (Deprecated - 32 bit only)'],['../md_docs_2linux__install.html#autotoc_md39',1,'Manual Install (Deprecated - 32 bit only)']]],
   ['installation_12',['Installation',['../md_docs_2using__cmake.html#autotoc_md80',1,'Automatic Installation'],['../md_docs_2python__wrapper.html#autotoc_md68',1,'Installation'],['../md_docs_2linux__install.html',1,'Linux Installation'],['../md_docs_2mraa.html#autotoc_md50',1,'Setup and installation']]],
   ['installation_20new_13',['Automatic Installation (New)',['../md_docs_2linux__install.html#autotoc_md37',1,'']]],
   ['installation_20steps_14',['Installation steps',['../md_docs_2cross__compile.html#autotoc_md35',1,'']]],

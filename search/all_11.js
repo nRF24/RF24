@@ -2,7 +2,7 @@ var searchData=
 [
   ['main_5fpage_2emd_0',['main_page.md',['../main__page_8md.html',1,'']]],
   ['manager_1',['Using a package manager',['../md_docs_2using__cmake.html#autotoc_md82',1,'']]],
-  ['manual_20install_20deprecated_2',['Manual Install (Deprecated)',['../md_docs_2linux__install.html#autotoc_md39',1,'']]],
+  ['manual_20install_20deprecated_2032_20bit_20only_2',['Manual Install (Deprecated - 32 bit only)',['../md_docs_2linux__install.html#autotoc_md39',1,'']]],
   ['map_20with_20ce_5fpin_2012_20and_20csn_5fpin_2013_3',['ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13',['../md_docs_2attiny.html#autotoc_md27',1,'']]],
   ['map_20with_20ce_5fpin_203_20and_20csn_5fpin_203_20pb3_20and_20pb4_20are_20free_20to_20use_20for_20application_4',['ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3 - PB3 and PB4 are free to use for application',['../md_docs_2attiny.html#autotoc_md25',1,'']]],
   ['map_20with_20ce_5fpin_203_20and_20csn_5fpin_204_5',['ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 4',['../md_docs_2attiny.html#autotoc_md24',1,'']]],

@@ -32,7 +32,7 @@ var searchData=
   ['spi_20support_29',['Alternate SPI Support',['../md_docs_2arduino.html#autotoc_md13',1,'']]],
   ['spi_2eh_30',['spi.h',['../spi_8h.html',1,'']]],
   ['spi_5fdev_20constructor_31',['SPI_DEV Constructor',['../md_docs_2rpi__general.html#autotoc_md75',1,'']]],
-  ['spidev_20deprecated_32',['Build using SPIDEV (Deprecated)',['../md_docs_2linux__install.html#autotoc_md40',1,'']]],
+  ['spidev_20deprecated_2032_20bit_20only_32',['Build using SPIDEV (Deprecated - 32 bit only)',['../md_docs_2linux__install.html#autotoc_md40',1,'']]],
   ['sprintf_5fp_33',['sprintf_P',['../RF24__config_8h.html#a6120d1982a91bb372fbee1502841baba',1,'RF24_config.h']]],
   ['sprintfprettydetails_34',['sprintfPrettyDetails',['../classRF24.html#a03b7e739eba98e47fc92cf74bc6d8be4',1,'RF24']]],
   ['startconstcarrier_35',['startConstCarrier',['../classRF24.html#ac43ad43c34337ec0de189105bab2213b',1,'RF24']]],

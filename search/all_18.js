@@ -12,7 +12,7 @@ var searchData=
   ['using_20cmake_9',['Using CMake',['../md_docs_2using__cmake.html',1,'']]],
   ['using_20different_20pins_20for_20the_20spi_20bus_10',['Using different pins for the SPI bus',['../md_docs_2pico__sdk.html#autotoc_md55',1,'']]],
   ['using_20multiple_20radios_11',['Using Multiple Radios',['../md_docs_2pico__sdk.html#autotoc_md58',1,'']]],
-  ['using_20spidev_20deprecated_12',['Build using SPIDEV (Deprecated)',['../md_docs_2linux__install.html#autotoc_md40',1,'']]],
+  ['using_20spidev_20deprecated_2032_20bit_20only_12',['Build using SPIDEV (Deprecated - 32 bit only)',['../md_docs_2linux__install.html#autotoc_md40',1,'']]],
   ['using_5fcmake_2emd_13',['using_cmake.md',['../using__cmake_8md.html',1,'']]],
   ['utility_14',['RF24/utility',['../md_docs_2portability.html#autotoc_md61',1,'']]]
 ];
