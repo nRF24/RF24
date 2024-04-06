@@ -26,7 +26,7 @@ sudo raspi-config
 
 The default build on Raspberry Pi utilizes the included **BCM2835** driver from [the BCM2835 Library](http://www.airspayce.com/mikem/bcm2835)
 
-1. See [the Linux section for automated installation](md_docs_linux_install.html).
+1. See [the Linux section for automated installation](linux_install.md).
 2. Manual install:
    ```shell
    make

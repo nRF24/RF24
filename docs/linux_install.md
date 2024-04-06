@@ -2,18 +2,14 @@
 
 @tableofcontents
 
-<!-- markdownlint-disable MD031 -->
 Generic Linux devices are supported via SPIDEV, PiGPIO, MRAA, RPi native via BCM2835, or using LittleWire.
 
 @note The SPIDEV option should work with most Linux systems supporting spi userspace device.
 
-@note Since wiringPi is no longer maintained or distributed (as of RPi OS 11 bullseye),
-pigpio is now required for using the radio's IRQ pin. This applies to RPi, SPIDEV, and pigpio drivers. The MRAA driver may provide its own IRQ implementation. Remember that the RPi OS lite variant does not ship with pigpio installed.
-
 
 ### Automatic Installation (New)
 
-Using CMake: (See the [instructions using CMake](md_docs_using_cmake.html) for more information and options)
+Using CMake: (See the [instructions using CMake](using_cmake.md) for more information and options)
 
 1. Download the install.sh file from [https://github.com/nRF24/.github/blob/main/installer/install.sh](https://github.com/nRF24/.github/blob/main/installer/install.sh)
    ```shell
@@ -27,7 +23,11 @@ Using CMake: (See the [instructions using CMake](md_docs_using_cmake.html) for m
    ```shell
    ./install.sh
    ```
-   The script will detect needed dependencies and install what it needs according to the user input.
+
+   @warning 
+   `SPIDEV` is now always selected as the default driver because
+   all other Linux drivers are being removed in the future.
+   See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
 
    It will also ask to install a python package named [pyRF24](https://github.com/nRF24/pyRF24).
    This is not the same as the traditionally provided python wrappers as the pyRF24 package can be
@@ -56,9 +56,9 @@ Using CMake: (See the [instructions using CMake](md_docs_using_cmake.html) for m
    sudo ./gettingstarted
    ```
 
-See the [instructions using CMake](md_docs_using_cmake.html) for more information and options
+See the [instructions using CMake](using_cmake.md) for more information and options
 
-## Automated Install (Deprecated)
+## Automated Install (Deprecated - 32 bit only)
 
 **Designed & Tested on RPi** - Defaults to SPIDEV on devices supporting it
 
@@ -75,6 +75,12 @@ See the [instructions using CMake](md_docs_using_cmake.html) for more informatio
    ```shell
    ./install.sh
    ```
+
+   @warning 
+   `SPIDEV` is now always selected as the default driver because
+   all other Linux drivers are being removed in the future.
+   See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
+
 5. Run an example from one of the libraries
    ```shell
    cd rf24libs/RF24/examples_linux
@@ -86,7 +92,7 @@ See the [instructions using CMake](md_docs_using_cmake.html) for more informatio
    sudo ./gettingstarted
    ```
 
-## Manual Install (Deprecated)
+## Manual Install (Deprecated - 32 bit only)
 
 1. Install prerequisites if there are any (pigpio, MRAA, LittleWire libraries, setup SPI device etc)
    @note See the [MRAA](http://iotdk.intel.com/docs/master/mraa/index.html) documentation for more info on installing MRAA
@@ -103,13 +109,18 @@ See the [instructions using CMake](md_docs_using_cmake.html) for more informatio
    ```shell
    cd RF24
    ```
-5. Configure build environment using
+5. Configure build environment using the command:
    ```shell
    ./configure
    ```
-   script. It auto detectes device and build environment.
+   It automatically detects device and build environment.
 
-   For overriding autodetections, use command-line switches, see
+   @warning 
+   `SPIDEV` is now always selected as the default driver because
+   all other Linux drivers are being removed in the future.
+   See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
+
+   For overriding automatic detections, use command-line arguments, see
    ```shell
    ./configure --help
    ```
@@ -129,7 +140,7 @@ See the [instructions using CMake](md_docs_using_cmake.html) for more informatio
    sudo ./gettingstarted
    ```
 
-### Build using SPIDEV (Deprecated)
+### Build using SPIDEV (Deprecated - 32 bit only)
 
 1. Make sure that spi device support is enabled and /dev/spidev\<a\>.\<b\> is present
 2. Manual Install using SPIDEV:

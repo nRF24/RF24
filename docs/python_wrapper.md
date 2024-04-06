@@ -28,7 +28,7 @@ These instructions work for the RF24, RF24Network, and RF24Mesh libraries, but
 the C++ source code needs to be built and installed for the corresponding
 python wrapper(s) to work.
 
-@see Review [installing with CMake](md_docs_using_cmake.html) and [Linux/RPi General](md_docs_rpi_general.html).
+@see Review [installing with CMake](using_cmake.md) and [Linux/RPi General](rpi_general.md).
 
 @note The interrupt_configure.py example uses the
 [gpiod library](https://pypi.org/project/gpiod) to watch the radio's IRQ pin.
@@ -101,7 +101,7 @@ to each library.
    ```shell
    cd ../examples_linux
    ```
-   Edit the getting_started.py example to configure the appropriate pins per the [Linux/RPi General](md_docs_rpi_general.html) documentation.
+   Edit the getting_started.py example to configure the appropriate pins per the [Linux/RPi General](rpi_general.md) documentation.
    ```shell
    nano getting_started.py
    ```
