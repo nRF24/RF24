@@ -5,6 +5,11 @@ if (PICO_SDK_PATH)
     include(${CMAKE_CURRENT_LIST_DIR}/utility/rp2/CMakeLists.txt)
     return()
 endif()
+# check if we are building as an ESP-IDF component
+if (ESP_PLATFORM)
+    include(${CMAKE_CURRENT_LIST_DIR}/utility/esp_idf/CmakeLists.txt)
+    return()
+endif()
 
 cmake_minimum_required(VERSION 3.15)
 
