@@ -34,6 +34,8 @@ typedef uint16_t prog_uint16_t;
 #define PRIPSTR          "%s"
 #define pgm_read_byte(p) (*(const unsigned char*)(p))
 
+#define pgm_read_ptr(p) (*(void* const*)(p))
+
 // Function, constant map as a result of migrating from Arduino
 #define LOW                      GPIO::OUTPUT_LOW
 #define HIGH                     GPIO::OUTPUT_HIGH
