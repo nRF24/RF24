@@ -8,7 +8,7 @@
 #define RF24_UTILITY_ESP_IDF_GPIO_H_
 
 #include <stdint.h> // uintXX_t
-#include "driver/gpio.h"
+#include <driver/gpio.h>
 
 typedef uint8_t rf24_gpio_pin_t;
 #define RF24_PIN_INVALID 0xFF
