@@ -56,6 +56,11 @@
     #include "utility/rp2/RF24_arch_config.h"
     #define sprintf_P sprintf
 
+// Espressif IDF-based devices (e.g. ESP32 board)
+#elif defined(ESP_PLATFORM) && !defined(ARDUINO)
+    #include "utility/esp_idf/RF24_arch_config.h"
+    #define sprintf_P sprintf
+
 #elif (!defined(ARDUINO)) // Any non-arduino device is handled via configure/Makefile
     // The configure script detects device and copies the correct includes.h file to /utility/includes.h
     // This behavior can be overridden by calling configure with respective parameters

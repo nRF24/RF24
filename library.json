@@ -30,7 +30,7 @@
             "utility/ATXMegaD3/*"
         ]
     },
-    "frameworks": "arduino",
+    "frameworks": ["arduino", "espidf"],
     "platforms": [
         "atmelavr",
         "atmelsam",
