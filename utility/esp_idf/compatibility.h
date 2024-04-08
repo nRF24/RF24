@@ -11,9 +11,7 @@ extern "C" {
 
 #include <stdint.h>
 
-void __msleep(int milisec);
-
-void __usleep(int microsec);
+void __msleep(int64_t milisec);
 
 uint32_t __millis();
 
