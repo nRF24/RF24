@@ -10,6 +10,7 @@
 #include <stdint.h> // uintXX_t
 #include <stdio.h>  // printf(), sprintf()
 #include <string.h> // memcpy() used in RF24.cpp, strlen()
+#include <unistd.h> // usleep()
 #include "spi.h"
 #include "gpio.h"
 #include "compatibility.h"
@@ -44,7 +45,7 @@ typedef uint16_t prog_uint16_t;
 #define digitalWrite(pin, value) GPIO::write(pin, value)
 #define pinMode(pin, direction)  GPIO::open(pin, direction)
 #define delay(milisec)           __msleep(milisec)
-#define delayMicroseconds(usec)  __usleep(usec)
+#define delayMicroseconds(usec)  usleep(usec)
 #define millis()                 __millis()
 
 #endif // RF24_UTILITY_ESP_IDF_RF24_ARCH_CONFIG_H_

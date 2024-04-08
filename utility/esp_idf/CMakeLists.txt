@@ -12,7 +12,7 @@ idf_component_register(
         "${CMAKE_CURRENT_LIST_DIR}/gpio.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/spi.cpp"
     INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../"
-    REQUIRES driver # esp_driver_gpio esp_driver_spi
+    REQUIRES driver esp_timer # esp_driver_gpio esp_driver_spi
 )
 
 # add_library(RF24 STATIC
