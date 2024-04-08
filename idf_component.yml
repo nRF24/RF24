@@ -15,4 +15,4 @@ dependencies:
   #   # All dependencies of `main` are public by default.
   #   public: true
 examples:
-  - path: ../examples_esp/getting_started
+  - path: examples_esp/getting_started

@@ -21,6 +21,4 @@ uint32_t __millis();
 }
 #endif
 
-/**@}*/
-
 #endif // RF24_UTILITY_ESP_IDF_COMPATIBLITY_H_
