@@ -1,3 +1,4 @@
+#include <string.h> // memset()
 #include "spi.h"
 
 SPIClass::SPIClass() : bus(nullptr)
@@ -22,7 +23,7 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
     busConfig.data5_io_num = -1;
     busConfig.data6_io_num = -1;
     busConfig.data7_io_num = -1;
-    busConfig.max_transfer_sz = 97; // enough to read the entire RX FIFO in 1 transaction; all other ops only need 33 bytes
+    busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
     busConfig.flags = 0;
     busConfig.isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO;
     busConfig.intr_flags = 0;
@@ -48,7 +49,7 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_
     device_conf.pre_cb = nullptr;
     device_conf.post_cb = nullptr;
 
-    ret = spi_bus_add_device(busNo, &device_conf, bus);
+    ret = spi_bus_add_device(busNo, &device_conf, &bus);
     ESP_ERROR_CHECK(ret);
 }
 
@@ -65,7 +66,7 @@ void SPIClass::transfernb(const uint8_t* txBuf, uint8_t* rxBuf, uint32_t len)
     memset(&transactionConfig, 0, sizeof(transactionConfig));
     transactionConfig.length = len * 8; // in bits, not bytes
     transactionConfig.tx_buffer = txBuf;
-    transactionConfig.rx_buff = rxBuf;
+    transactionConfig.rx_buffer = rxBuf;
     esp_err_t ret = spi_device_polling_transmit(bus, &transactionConfig);
     ESP_ERROR_CHECK(ret);
 }
@@ -77,14 +78,13 @@ void SPIClass::transfern(const uint8_t* buf, uint32_t len)
 
 void SPIClass::beginTransaction()
 {
-    esp_err_t ret = spi_device_acquire_bus(*bus, portMAX_DELAY);
+    esp_err_t ret = spi_device_acquire_bus(bus, portMAX_DELAY);
     ESP_ERROR_CHECK(ret);
 }
 
 void SPIClass::endTransaction()
 {
-    esp_err_t ret = spi_device_release_bus(*bus);
-    ESP_ERROR_CHECK(ret);
+    spi_device_release_bus(bus);
 }
 
 SPIClass::~SPIClass()
