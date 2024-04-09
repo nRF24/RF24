@@ -8,13 +8,26 @@ SPIClass::SPIClass() : bus(nullptr)
 void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
 {
     spi_bus_config_t busConfig;
-    // By default we want to use the default pins corresponding to the specified busNo (hardware SPI).
-    // Users can pass a customized bus config to SPIClass::begin() overload if software SPI is desired.
-    busConfig.mosi_io_num = -1;
+    // We will use the pins corresponding to the specified busNo (appropriate config option).
+    // Users can also pass a customized bus config to SPIClass::begin() overload if/when
+    // a secondary SPI bus is desired.
+#ifdef CONFIG_RF24_DEFAULT_MOSI
+    busConfig.mosi_io_num = CONFIG_RF24_DEFAULT_MOSI;
+#else
+    busConfig.mosi_io_num = -1; // GPIO13 on SPI2_HOST; GPIO23 on SPI3_HOST
+#endif
     busConfig.data0_io_num = -1;
-    busConfig.miso_io_num = -1;
+#ifdef CONFIG_RF24_DEFAULT_MISO
+    busConfig.miso_io_num = CONFIG_RF24_DEFAULT_MISO;
+#else
+    busConfig.miso_io_num = -1; // GPIO12 on SPI2_HOST; GPIO19 on SPI3_HOST
+#endif
     busConfig.data1_io_num = -1;
-    busConfig.sclk_io_num = -1;
+#ifdef CONFIG_RF24_DEFAULT_SCLK
+    busConfig.sclk_io_num = CONFIG_RF24_DEFAULT_SCLK;
+#else
+    busConfig.sclk_io_num = -1; // GPIO14 on SPI2_HOST; GPIO18 on SPI3_HOST
+#endif
     busConfig.quadwp_io_num = -1;
     busConfig.data2_io_num = -1;
     busConfig.quadhd_io_num = -1;

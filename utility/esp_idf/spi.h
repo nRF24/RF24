@@ -14,6 +14,12 @@
     #define RF24_SPI_SPEED 10000000
 #endif
 
+#ifdef CONFIG_RF24_DEFAULT_SPI_BUS
+    #define DEFAULT_SPI_BUS CONFIG_RF24_DEFAULT_SPI_BUS
+#else
+    #define DEFAULT_SPI_BUS SPI2_HOST
+#endif
+
 #define SPI_HAS_TRANSACTION
 
 enum spi_mode_t : uint8_t
@@ -30,7 +36,7 @@ class SPIClass
 public:
     SPIClass();
 
-    void begin(spi_host_device_t busNo = SPI1_HOST, uint32_t speed = RF24_SPI_SPEED);
+    void begin(spi_host_device_t busNo = DEFAULT_SPI_BUS, uint32_t speed = RF24_SPI_SPEED);
     void begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_bus_config_t* busConfig);
 
     void beginTransaction();
