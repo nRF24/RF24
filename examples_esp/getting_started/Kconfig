@@ -1,0 +1,10 @@
+config RF24_CE_PIN
+    int "The GPIO pin number used for the radio's CE pin"
+    help
+        If undefined, then the main app's code defaults to using pin 7.
+
+config RF24_CSN_PIN
+    int "The GPIO pin number used for the radio's CSN pin"
+    help
+        If undefined, then the main app's code defaults to using pin 8.
+        
