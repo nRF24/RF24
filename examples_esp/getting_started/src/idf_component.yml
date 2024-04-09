@@ -2,3 +2,8 @@
 dependencies:
   espressif/esp_tinyusb: "^1"
   idf: "^5.0"
+  nRF24/RF24:
+    # for external projects (not included in the RF24 repo), instead use
+    # nRF24/RF24: "^1.5"
+    # for this project, we use the current repo changes (for testing purposes)
+    path: ../../../

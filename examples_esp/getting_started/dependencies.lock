@@ -16,6 +16,12 @@ dependencies:
     source:
       type: idf
     version: 5.2.1
-manifest_hash: 65bdfdf3ce9ef7f7d3d9c4c075a17d649adf01fa2984a9b54e4b8b493274a309
+  nRF24/RF24:
+    component_hash: null
+    source:
+      path: C:\dev\RF24
+      type: local
+    version: '*'
+manifest_hash: 1ce988382cdd4e2de357dd7ddd71b47091cb0109a1223eca45c2e086bfadc03e
 target: esp32s2
 version: 1.0.0
