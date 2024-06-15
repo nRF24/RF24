@@ -17,7 +17,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/PreventInSourceBuilds.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/GetLibInfo.cmake)
 
 # allow CMake CLI options to configure RF24_config.h macros
-option(SERIAL_DEBUG "enable/disable debugging output" OFF)
+option(RF24_DEBUG "enable/disable debugging output" OFF)
 option(MINIMAL "exclude optional source code to keep compile size compact" OFF)
 
 # Link this 'library' to set the c++ standard / compile-time options requested
@@ -115,9 +115,9 @@ else() # utility driver is compiled with the library - not linking to a pre-comp
 endif()
 
 # assert the appropriate preprocessor macros for RF24_config.h
-if(SERIAL_DEBUG)
-    message(STATUS "SERIAL_DEBUG asserted")
-    target_compile_definitions(${LibTargetName} PUBLIC SERIAL_DEBUG)
+if(RF24_DEBUG)
+    message(STATUS "RF24_DEBUG asserted")
+    target_compile_definitions(${LibTargetName} PUBLIC RF24_DEBUG)
 endif()
 if(MINIMAL)
     message(STATUS "MINIMAL asserted")

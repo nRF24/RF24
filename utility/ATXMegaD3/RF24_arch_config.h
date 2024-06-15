@@ -30,11 +30,10 @@
 #define _SPI SPI
 #define RF24_SPI_PTR
 
-#undef SERIAL_DEBUG
-#ifdef SERIAL_DEBUG
-    #define IF_SERIAL_DEBUG(x) ({ x; })
+#ifdef RF24_DEBUG
+    #define IF_RF24_DEBUG(x) ({ x; })
 #else
-    #define IF_SERIAL_DEBUG(x)
+    #define IF_RF24_DEBUG(x)
 #endif
 
 // Use the avr pgmspace commands
