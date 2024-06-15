@@ -286,7 +286,7 @@ void RF24::write_register(uint8_t reg, uint8_t value, bool is_cmd_only)
 {
     if (is_cmd_only) {
         if (reg != RF24_NOP) { // don't print the get_status() operation
-            IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x)\r\n"), reg));
+            IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x)\r\n"), reg));
         }
         beginTransaction();
 #if defined(RF24_LINUX)
@@ -301,7 +301,7 @@ void RF24::write_register(uint8_t reg, uint8_t value, bool is_cmd_only)
         endTransaction();
     }
     else {
-        IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
+        IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
 #if defined(RF24_LINUX) || defined(RF24_RP2)
         beginTransaction();
         uint8_t* prx = spi_rxbuff;
@@ -348,7 +348,7 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     }
 
     //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
-    IF_SERIAL_DEBUG(printf("[Writing %u bytes %u blanks]\n", data_len, blank_len););
+    IF_RF24_DEBUG(printf("[Writing %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -420,7 +420,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
-    IF_SERIAL_DEBUG(printf("[Reading %u bytes %u blanks]\n", data_len, blank_len););
+    IF_RF24_DEBUG(printf("[Reading %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -1229,7 +1229,7 @@ void RF24::powerUp(void)
 
 void RF24::errNotify()
 {
-    #if defined(SERIAL_DEBUG) || defined(RF24_LINUX)
+    #if defined(RF24_DEBUG) || defined(RF24_LINUX)
     printf_P(PSTR("RF24 HARDWARE FAIL: Radio not responding, verify pin connections, wiring, etc.\r\n"));
     #endif
     #if defined(FAILURE_HANDLING)
@@ -1690,7 +1690,7 @@ void RF24::enableDynamicPayloads(void)
     //toggle_features();
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DPL));
 
-    IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
     // Enable dynamic payload on all pipes
     //
@@ -1710,7 +1710,7 @@ void RF24::disableDynamicPayloads(void)
     //toggle_features();
     write_register(FEATURE, 0);
 
-    IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
     // Disable dynamic payload on all pipes
     //
@@ -1731,7 +1731,7 @@ void RF24::enableAckPayload(void)
     if (!ack_payloads_enabled) {
         write_register(FEATURE, read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL));
 
-        IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+        IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
         // Enable dynamic payload on pipes 0 & 1
         write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
@@ -1748,7 +1748,7 @@ void RF24::disableAckPayload(void)
     if (ack_payloads_enabled) {
         write_register(FEATURE, static_cast<uint8_t>(read_register(FEATURE) & ~_BV(EN_ACK_PAY)));
 
-        IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+        IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 
         ack_payloads_enabled = false;
     }
@@ -1764,7 +1764,7 @@ void RF24::enableDynamicAck(void)
     //toggle_features();
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DYN_ACK));
 
-    IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
 }
 
 /****************************************************************************/
@@ -1989,7 +1989,7 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel)
     }
     setPALevel(level);
     setChannel(channel);
-    IF_SERIAL_DEBUG(printf_P(PSTR("RF_SETUP=%02x\r\n"), read_register(RF_SETUP)));
+    IF_RF24_DEBUG(printf_P(PSTR("RF_SETUP=%02x\r\n"), read_register(RF_SETUP)));
     ce(HIGH);
     if (isPVariant()) {
         delay(1); // datasheet says 1 ms is ok in this instance

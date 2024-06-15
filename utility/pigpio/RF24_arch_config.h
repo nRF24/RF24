@@ -23,11 +23,10 @@
 #define _BV(x) (1 << (x))
 #define _SPI   spi
 
-//#undef SERIAL_DEBUG
-#ifdef SERIAL_DEBUG
-    #define IF_SERIAL_DEBUG(x) ({ x; })
+#ifdef RF24_DEBUG
+    #define IF_RF24_DEBUG(x) ({ x; })
 #else
-    #define IF_SERIAL_DEBUG(x)
+    #define IF_RF24_DEBUG(x)
 #endif
 
 // Avoid spurious warnings

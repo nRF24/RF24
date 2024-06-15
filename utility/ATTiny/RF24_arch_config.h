@@ -36,15 +36,15 @@ typedef uint8_t rf24_gpio_pin_t;
     #define RF24_CSN_SETTLE_HIGH_DELAY 100
 #endif
 
-#ifdef SERIAL_DEBUG
-    #define IF_SERIAL_DEBUG(x) ({ x; })
+#ifdef RF24_DEBUG
+    #define IF_RF24_DEBUG(x) ({ x; })
 #else
-    #define IF_SERIAL_DEBUG(x)
+    #define IF_RF24_DEBUG(x)
 
     #if defined(RF24_TINY)
         #define printf_P(...)
     #endif
-#endif // !defined(SERIAL_DEBUG)
+#endif // !defined(RF24_DEBUG)
 
 #include <avr/pgmspace.h>
 
