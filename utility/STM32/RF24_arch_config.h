@@ -35,11 +35,10 @@
 #include "gpio.h"
 #include "includes.h"
 
-#undef SERIAL_DEBUG
-#ifdef SERIAL_DEBUG
-    #define IF_SERIAL_DEBUG(x) ({ x; })
+#ifdef RF24_DEBUG
+    #define IF_RF24_DEBUG(x) ({ x; })
 #else
-    #define IF_SERIAL_DEBUG(x)
+    #define IF_RF24_DEBUG(x)
 #endif
 
 #if !defined(printf_P)
