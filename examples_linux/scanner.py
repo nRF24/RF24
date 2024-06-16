@@ -12,6 +12,12 @@ from typing import List, Tuple, Any
 
 from RF24 import RF24, RF24_1MBPS, RF24_2MBPS, RF24_250KBPS, RF24_DRIVER
 
+########### USER CONFIGURATION ###########
+# CE Pin uses GPIO number with RPi and SPIDEV drivers, other drivers use
+# their own pin numbering
+# CS Pin corresponds the SPI bus number at /dev/spidev<a>.<b>
+# ie: radio = RF24(<ce_pin>, <a>*10+<b>)
+# where CS pin for /dev/spidev1.0 is 10, /dev/spidev1.1 is 11 etc...
 CSN_PIN = 0  # GPIO8 aka CE0 on SPI bus 0: /dev/spidev0.0
 if RF24_DRIVER == "MRAA":
     CE_PIN = 15  # for GPIO22
