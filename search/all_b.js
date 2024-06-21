@@ -25,6 +25,6 @@ var searchData=
   ['erx_5fp5_22',['ERX_P5',['../nRF24L01_8h.html#af93d9be6cb2bac887584ab7f6805f7e9',1,'nRF24L01.h']]],
   ['esp32_20example_23',['ESP32 example',['../md_docs_2arduino.html#autotoc_md18',1,'']]],
   ['esp8266_20example_24',['ESP8266 example',['../md_docs_2arduino.html#autotoc_md17',1,'']]],
-  ['example_25',['Example',['../md_docs_2arduino.html#autotoc_md18',1,'ESP32 example'],['../md_docs_2arduino.html#autotoc_md17',1,'ESP8266 example'],['../md_docs_2arduino.html#autotoc_md19',1,'Teensy example']]],
+  ['example_25',['example',['../md_docs_2arduino.html#autotoc_md18',1,'ESP32 example'],['../md_docs_2arduino.html#autotoc_md17',1,'ESP8266 example'],['../md_docs_2arduino.html#autotoc_md19',1,'Teensy example']]],
   ['examples_20for_20the_20pico_20sdk_26',['Building the RF24 examples for the Pico SDK',['../md_docs_2pico__sdk.html#autotoc_md53',1,'']]]
 ];

@@ -39,7 +39,7 @@ var searchData=
   ['startfastwrite_36',['startFastWrite',['../classRF24.html#acd19843064cb70ec23507412e519e4ef',1,'RF24']]],
   ['startlistening_37',['startListening',['../classRF24.html#a30a2733a3889bdc331fe2d2f4f0f7b39',1,'RF24']]],
   ['startwrite_38',['startWrite',['../classRF24.html#adbf25b53d28d1fcc385fd9738a531b75',1,'RF24']]],
-  ['steps_39',['Steps',['../md_docs_2cross__compile.html#autotoc_md32',1,'Cross compilation steps'],['../md_docs_2cross__compile.html#autotoc_md35',1,'Installation steps']]],
+  ['steps_39',['steps',['../md_docs_2cross__compile.html#autotoc_md32',1,'Cross compilation steps'],['../md_docs_2cross__compile.html#autotoc_md35',1,'Installation steps']]],
   ['steps_20for_20python_20wrapper_40',['Cross comilation steps for python wrapper',['../md_docs_2cross__compile.html#autotoc_md33',1,'']]],
   ['stopconstcarrier_41',['stopConstCarrier',['../classRF24.html#a38fa92d612b7b9b8a739a68ed7d88330',1,'RF24']]],
   ['stoplistening_42',['stopListening',['../classRF24.html#a6f144d73fc447c8ac2d1a4166210fd88',1,'RF24']]],

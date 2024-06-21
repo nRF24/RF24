@@ -3,7 +3,7 @@ var searchData=
   ['layout_0',['General µC Pin layout',['../index.html#autotoc_md48',1,'']]],
   ['length_1',['CRC length',['../group__CRCLength.html',1,'']]],
   ['level_2',['Power Amplifier level',['../group__PALevel.html',1,'']]],
-  ['library_3',['Library',['../md_docs_2using__cmake.html#autotoc_md83',1,'Cross-compiling the library'],['../md_docs_2using__cmake.html#autotoc_md79',1,'Installing the library']]],
+  ['library_3',['library',['../md_docs_2using__cmake.html#autotoc_md83',1,'Cross-compiling the library'],['../md_docs_2using__cmake.html#autotoc_md79',1,'Installing the library']]],
   ['library_20lineage_4',['breif history of RF24 library lineage',['../md_docs_2rpi__general.html#autotoc_md77',1,'']]],
   ['library_20remotely_5',['Installing the library remotely',['../md_docs_2using__cmake.html#autotoc_md84',1,'']]],
   ['libs_20into_20your_20project_6',['Incorporating RF24 libs into your project',['../md_docs_2pico__sdk.html#autotoc_md54',1,'']]],
