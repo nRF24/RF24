@@ -129,7 +129,7 @@ Example issues: [#264](https://github.com/nRF24/RF24/issues/264)
 For reliability, please use Electrolytic or Tantalum capacitors. Ceramic
 capacitors may not be good enough (depending on the manufacturing source).
 
-### Payloads received/sent are inaccurate or printDetails() outputs the unexpected value(s)
+### printDetails() outputs the unexpected value(s)
 
 This is likely due to the SPI speed being set up to 10MHz by default. We recommend:
 
@@ -141,7 +141,11 @@ This is likely due to the SPI speed being set up to 10MHz by default. We recomme
 
 In the RF24 library's beginnings, the default value was (prior to 2014) set to 4MHz.
 
-Inaccurate payloads can also happen because of differences in how 8-bit, 32-bit and 64-bit systems store data in memory. The easiest way to ensure your data aligns between devices is to specify the size of variables in code. For example, use `uint32_t` instead of `unsigned long`, and use `__attribute__((__packed__))` for data structures if you don't align your data manually per the linked blog posts (see below).
+### Payloads received/sent are inaccurate
+
+If lowering the SPI speed (as noted above) does not fix this problem, then it is likely data misalignment.
+
+Inaccurate payloads can also happen because of differences in how certain systems store data in memory. The easiest way to ensure your data aligns between devices is to specify the size of variables in code. For example, use `uint32_t` instead of `unsigned long`, and use `__attribute__((__packed__))` for data structures if you don't align your data manually per the linked blog posts (see below).
 
 Newer users can use the `sizeof()` function to verify the size of different variables or data structures as well.
 
