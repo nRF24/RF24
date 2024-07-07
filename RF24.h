@@ -1358,7 +1358,7 @@ public:
      * (ACK) packet during the delay between retry attempts.
      *
      * @param delay How long to wait between each retry, in multiples of
-     * 250 us. The minumum of 0 means 250 us, and the maximum of 15 means
+     * 250 us. The minimum of 0 means 250 us, and the maximum of 15 means
      * 4000 us. The default value of 5 means 1500us (5 * 250 + 250).
      * @param count How many retries before giving up. The default/maximum is 15. Use
      * 0 to disable the auto-retry feature all together.
