@@ -35,3 +35,12 @@ body:
       description: >-
         If there is anything that might be special or specific to your usage, please let us know.
       placeholder: You can use markdown syntax here
+
+  - type: markdown
+    id: how-to-md
+    attributes:
+      value: |-
+        [gfm-doc]: https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+
+        GitHub supports their own flavor of MarkDown syntax.
+        Learn more about writing Markdown syntax in [GitHub's documentation][gfm-doc].
