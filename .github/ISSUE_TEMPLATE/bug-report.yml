@@ -87,6 +87,21 @@ body:
         Codename:	bookworm
       render: text
 
+  - type: dropdown
+    id: linux-driver
+    attributes:
+      label: If using Linux, what RF24 driver did you select?
+      description: >-
+        The following are hardware drivers that the RF24 library supports on Linux.
+        Please select which one you chose (SPIDEV is highly recommended)
+      options:
+        - SPIDEV (linux kernel)
+        - RPi (BCM2835 library)
+        - MRAA
+        - wiringPi
+        - pigpio
+        - LittleWire
+
   - type: textarea
     id: user-issue
     attributes:
