@@ -91,9 +91,13 @@ body:
     id: linux-driver
     attributes:
       label: If using Linux, what RF24 driver did you select?
-      description: >-
-        The following are hardware drivers that the RF24 library supports on Linux.
-        Please select which one you chose (SPIDEV is highly recommended)
+      description: |-
+        These are hardware drivers that the RF24 library supports on Linux.
+        Please select which one you used.
+        
+        > [!note]
+        > The `SPIDEV` is highly recommended and will be the only driver supported in the future.
+        > See rationale in [nRF24/RF24#971](nRF24/RF24#971).
       options:
         - SPIDEV (linux kernel)
         - RPi (BCM2835 library)
