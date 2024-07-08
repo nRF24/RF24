@@ -97,7 +97,7 @@ body:
         
         > [!note]
         > The `SPIDEV` is highly recommended and will be the only driver supported in the future.
-        > See rationale in [nRF24/RF24#971](nRF24/RF24#971).
+        > See rationale in [nRF24/RF24#971](https://github.com/nRF24/RF24/issues/971).
       options:
         - SPIDEV (linux kernel)
         - RPi (BCM2835 library)
