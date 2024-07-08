@@ -96,7 +96,7 @@ body:
         Please select which one you used.
         
         > [!note]
-        > The `SPIDEV` is highly recommended and will be the only driver supported in the future.
+        > The `SPIDEV` driver is highly recommended and will be the only driver supported in the future.
         > See rationale in [nRF24/RF24#971](https://github.com/nRF24/RF24/issues/971).
       options:
         - SPIDEV (linux kernel)
