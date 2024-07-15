@@ -282,54 +282,36 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 
 /****************************************************************************/
 
-void RF24::write_register(uint8_t reg, uint8_t value, bool is_cmd_only)
+void RF24::write_register(uint8_t reg, uint8_t value)
 {
-    if (is_cmd_only) {
-        if (reg != RF24_NOP) { // don't print the get_status() operation
-            IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x)\r\n"), reg));
-        }
-        beginTransaction();
-#if defined(RF24_LINUX)
-        status = _SPI.transfer(W_REGISTER | reg);
-#else // !defined(RF24_LINUX) || defined (RF24_RP2)
-    #if defined(RF24_SPI_PTR)
-        status = _spi->transfer(W_REGISTER | reg);
-    #else  // !defined (RF24_SPI_PTR)
-        status = _SPI.transfer(W_REGISTER | reg);
-    #endif // !defined (RF24_SPI_PTR)
-#endif     // !defined(RF24_LINUX) || defined(RF24_RP2)
-        endTransaction();
-    }
-    else {
-        IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
+    IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
 #if defined(RF24_LINUX) || defined(RF24_RP2)
-        beginTransaction();
-        uint8_t* prx = spi_rxbuff;
-        uint8_t* ptx = spi_txbuff;
-        *ptx++ = (W_REGISTER | reg);
-        *ptx = value;
+    beginTransaction();
+    uint8_t* prx = spi_rxbuff;
+    uint8_t* ptx = spi_txbuff;
+    *ptx++ = (W_REGISTER | reg);
+    *ptx = value;
 
     #if defined(RF24_RP2)
-        _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
+    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
     #else  // !defined(RF24_RP2)
-        _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), 2);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), 2);
     #endif // !defined(RF24_RP2)
 
-        status = *prx++; // status is 1st byte of receive buffer
-        endTransaction();
+    status = *prx++; // status is 1st byte of receive buffer
+    endTransaction();
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
 
-        beginTransaction();
+    beginTransaction();
     #if defined(RF24_SPI_PTR)
-        status = _spi->transfer(W_REGISTER | reg);
-        _spi->transfer(value);
+    status = _spi->transfer(W_REGISTER | reg);
+    _spi->transfer(value);
     #else  // !defined(RF24_SPI_PTR)
-        status = _SPI.transfer(W_REGISTER | reg);
-        _SPI.transfer(value);
+    status = _SPI.transfer(W_REGISTER | reg);
+    _SPI.transfer(value);
     #endif // !defined(RF24_SPI_PTR)
-        endTransaction();
+    endTransaction();
 #endif     // !defined(RF24_LINUX) && !defined(RF24_RP2)
-    }
 }
 
 /****************************************************************************/
@@ -486,7 +468,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
 uint8_t RF24::flush_rx(void)
 {
-    write_register(FLUSH_RX, RF24_NOP, true);
+    read_register(FLUSH_RX, (uint8_t*)nullptr, 0);
     return status;
 }
 
@@ -494,7 +476,7 @@ uint8_t RF24::flush_rx(void)
 
 uint8_t RF24::flush_tx(void)
 {
-    write_register(FLUSH_TX, RF24_NOP, true);
+    read_register(FLUSH_TX, (uint8_t*)nullptr, 0);
     return status;
 }
 
@@ -502,7 +484,7 @@ uint8_t RF24::flush_tx(void)
 
 uint8_t RF24::get_status(void)
 {
-    write_register(RF24_NOP, RF24_NOP, true);
+    read_register(RF24_NOP, (uint8_t*)nullptr, 0);
     return status;
 }
 
@@ -1325,7 +1307,7 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
 void RF24::reUseTX()
 {
     write_register(NRF_STATUS, _BV(MAX_RT)); //Clear max retry flag
-    write_register(REUSE_TX_PL, RF24_NOP, true);
+    read_register(REUSE_TX_PL, (uint8_t*)nullptr, 0);
     ce(LOW); //Re-Transfer packet
     ce(HIGH);
 }
