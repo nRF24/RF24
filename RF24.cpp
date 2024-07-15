@@ -223,11 +223,11 @@ uint8_t RF24::read_register(uint8_t reg)
 
     beginTransaction();
     #if defined(RF24_SPI_PTR)
-    status = _spi->transfer(R_REGISTER | reg);
+    status = _spi->transfer(reg);
     result = _spi->transfer(0xff);
 
     #else // !defined(RF24_SPI_PTR)
-    status = _SPI.transfer(R_REGISTER | reg);
+    status = _SPI.transfer(reg);
     result = _SPI.transfer(0xff);
 
     #endif // !defined(RF24_SPI_PTR)
@@ -247,7 +247,7 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
     uint8_t* ptx = spi_txbuff;
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
-    *ptx++ = (W_REGISTER | (REGISTER_MASK & reg));
+    *ptx++ = (W_REGISTER | reg);
     while (len--) {
         *ptx++ = *buf++;
     }
@@ -527,7 +527,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
              name);
     while (qty--) {
         uint8_t* buffer = new uint8_t[addr_width];
-        read_register(reg++ & REGISTER_MASK, buffer, addr_width);
+        read_register(reg++, buffer, addr_width);
 
         printf_P(PSTR(" 0x"));
         uint8_t* bufptr = buffer + addr_width;
@@ -546,7 +546,7 @@ uint8_t RF24::sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qt
     uint8_t offset = 0;
     uint8_t* read_buffer = new uint8_t[addr_width];
     while (qty--) {
-        read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
+        read_register(reg++, read_buffer, addr_width);
         uint8_t* bufptr = read_buffer + addr_width;
         while (--bufptr >= read_buffer) {
             offset += sprintf_P(out_buffer + offset, PSTR("%02X"), *bufptr);
