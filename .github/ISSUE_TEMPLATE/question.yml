@@ -1,0 +1,59 @@
+name: Question
+description: Have a question?
+title: "[Question]: "
+labels: ["question"]
+body:
+
+  # This stuff will be rendered when the user is creating the issue.
+  # It is not included in the issue's description when the user submits the issue
+  - type: markdown
+    attributes:
+      value: |-
+        [docs]: https://nRF24.github.io/RF24
+        [api-docs]: https://nrf24.github.io/RF24/classRF24.html
+        [common-issues]: https://github.com/nRF24/RF24/blob/master/COMMON_ISSUES.md
+        [platform-pages]: https://nrf24.github.io/RF24/pages.html
+
+        Please read [about common issues][common-issues] first.
+        It addresses the most common problems that people have (whether they know it or not).
+
+        > [!caution]
+        > These issues/tickets are intended **only for problems related to the RF24 library** source code.
+        > Please use other forums/communities to ask questions that specific to _your_ source code.
+        > - [Arduino Forums](https://forum.arduino.cc/)
+        > - [PlatformIO forums](https://community.platformio.org/)
+
+        We also host exhaustive [library documentation][docs].
+        Please check the [API documentation][api-docs] or [platform support pages][platform-pages] to see if your question is addressed there.
+
+        > [!important]
+        > Python users should migrate to using our [pyRF24](https://github.com/nRF24/pyRF24) python package.
+        >
+        > <details><summary>The pyRF24 package has numerous advantages over the older/individual python wrapper(s)</summary>
+        >
+        > - [x] [drop-in compatible](https://nrf24.github.io/pyRF24/#migrating-to-pyrf24) API
+        > - [x] available via [`pip install pyrf24`](https://pypi.org/project/pyrf24/)
+        > - [x] no need to build from source and does not require the C++ libraries installed
+        > - [x] includes wrappers for RF24, RF24Network, RF24Mesh libraries and a fake BLE implementation
+        > - [x] includes typing stubs for type checking tools like mypy
+        > - [x] has [dedicated documentation](https://nrf24.github.io/pyRF24) and supports Python's builtin `help()` function
+        >
+        > </details>
+
+  - type: textarea
+    id: user-question
+    attributes:
+      # `label` is a required field here. I'm guessing that it cannot be an empty string.
+      label: What would you like to know?
+      placeholder: You can use markdown syntax here
+    validations:
+      required: true
+
+  - type: markdown
+    id: how-to-md
+    attributes:
+      value: |-
+        [gfm-doc]: https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+
+        GitHub supports their own flavor of MarkDown syntax.
+        Learn more about writing Markdown syntax in [GitHub's documentation][gfm-doc].

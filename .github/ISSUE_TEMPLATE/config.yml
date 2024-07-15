@@ -1,0 +1,25 @@
+# this setting will force users to use the provided issue templates
+blank_issues_enabled: true
+# This setting may be changed in the future if the templates are not being used!
+
+# if the templates provided don't fit the subject of the user feedback,
+# here we can give links to other forms of user feedback
+contact_links:
+  - name: Arduino Forums
+    url: https://forum.arduino.cc/
+    about: A place for questions not specific to RF24 library (for Arduino users)
+  - name: PlatformIO Forums
+    url: https://community.platformio.org/
+    about: A place for questions not specific to RF24 library (for PlatformIO users)
+  - name: Common nRF24L01 problems
+    url: https://nrf24.github.io/RF24/md_COMMON__ISSUES.html
+    about: We have documented common issues for user convenience and quick solutions
+  - name: RF24 API documentation
+    url: https://nrf24.github.io/RF24/classRF24.html
+    about: Our exhaustive documentation helps describe expected behavior
+  # This link is only useful if blank issues templates are disabled (see top of this file)
+  # Uncomment this list item and disable blank issue templates
+  # to allow only maintainers the ability to open a blank issue
+  # - name: Maintainers' note
+  #   url: https://github.com/nRF24/RF24/issues/new
+  #   about: Start a discussion for maintainers only

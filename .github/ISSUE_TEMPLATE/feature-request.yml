@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest an idea for this project
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Describe the behavior you would like
+      description: >-
+        Use this area to describe what behavior you desire.
+        Please be clear and concise as possible.
+      placeholder: You can use markdown syntax here
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propose an implementation or solution
+      description: >-
+        How do you imagine this will be implemented in code?
+      placeholder: You can use markdown syntax here
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: Describe alternatives you have considered
+      description: >-
+        Were you able to achieve the desired behavior in some other/inconvenient way?
+      placeholder: You can use markdown syntax here
+
+  - type: textarea
+    id: added-context
+    attributes:
+      label: Additional context
+      description: >-
+        If there is anything that might be special or specific to your usage, please let us know.
+      placeholder: You can use markdown syntax here
+
+  - type: markdown
+    id: how-to-md
+    attributes:
+      value: |-
+        [gfm-doc]: https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+
+        GitHub supports their own flavor of MarkDown syntax.
+        Learn more about writing Markdown syntax in [GitHub's documentation][gfm-doc].
