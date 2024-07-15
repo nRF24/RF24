@@ -154,7 +154,7 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
     uint8_t* ptx = spi_txbuff;
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
-    *ptx++ = (R_REGISTER | reg);
+    *ptx++ = reg;
 
     while (len--) {
         *ptx++ = RF24_NOP; // Dummy operation, just for reading
@@ -179,13 +179,13 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 
     beginTransaction();
     #if defined(RF24_SPI_PTR)
-    status = _spi->transfer(R_REGISTER | reg);
+    status = _spi->transfer(reg);
     while (len--) {
         *buf++ = _spi->transfer(0xFF);
     }
 
     #else // !defined(RF24_SPI_PTR)
-    status = _SPI.transfer(R_REGISTER | reg);
+    status = _SPI.transfer(reg);
     while (len--) {
         *buf++ = _SPI.transfer(0xFF);
     }
@@ -206,7 +206,7 @@ uint8_t RF24::read_register(uint8_t reg)
 
     uint8_t* prx = spi_rxbuff;
     uint8_t* ptx = spi_txbuff;
-    *ptx++ = (R_REGISTER | reg);
+    *ptx++ = reg;
     *ptx++ = RF24_NOP; // Dummy operation, just for reading
 
     #if defined(RF24_RP2)
