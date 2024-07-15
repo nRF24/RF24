@@ -1756,7 +1756,7 @@ bool RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
     if (ack_payloads_enabled) {
         const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-        write_payload(current, len, W_ACK_PAYLOAD | (pipe & 0x07));
+        write_register(W_ACK_PAYLOAD | (pipe & 0x07), current, rf24_min(len, static_cast<uint8_t>(32)));
         return !(status & _BV(TX_FULL));
     }
     return 0;
