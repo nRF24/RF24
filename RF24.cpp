@@ -330,7 +330,7 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     }
 
     //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
-    IF_RF24_DEBUG(printf("[Writing %u bytes %u blanks]\n", data_len, blank_len););
+    IF_RF24_DEBUG(printf_P("[Writing %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -402,7 +402,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
-    IF_RF24_DEBUG(printf("[Reading %u bytes %u blanks]\n", data_len, blank_len););
+    IF_RF24_DEBUG(printf_P("[Reading %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -469,6 +469,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 uint8_t RF24::flush_rx(void)
 {
     read_register(FLUSH_RX, (uint8_t*)nullptr, 0);
+    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]"););
     return status;
 }
 
@@ -477,6 +478,7 @@ uint8_t RF24::flush_rx(void)
 uint8_t RF24::flush_tx(void)
 {
     read_register(FLUSH_TX, (uint8_t*)nullptr, 0);
+    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]"););
     return status;
 }
 
@@ -1308,6 +1310,7 @@ void RF24::reUseTX()
 {
     write_register(NRF_STATUS, _BV(MAX_RT)); //Clear max retry flag
     read_register(REUSE_TX_PL, (uint8_t*)nullptr, 0);
+    IF_RF24_DEBUG(printf_P("[Reusing payload in TX FIFO]"););
     ce(LOW); //Re-Transfer packet
     ce(HIGH);
 }
@@ -1672,7 +1675,7 @@ void RF24::enableDynamicPayloads(void)
     //toggle_features();
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DPL));
 
-    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
     // Enable dynamic payload on all pipes
     //
@@ -1692,7 +1695,7 @@ void RF24::disableDynamicPayloads(void)
     //toggle_features();
     write_register(FEATURE, 0);
 
-    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
     // Disable dynamic payload on all pipes
     //
@@ -1713,7 +1716,7 @@ void RF24::enableAckPayload(void)
     if (!ack_payloads_enabled) {
         write_register(FEATURE, read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL));
 
-        IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+        IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
         // Enable dynamic payload on pipes 0 & 1
         write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
@@ -1730,7 +1733,7 @@ void RF24::disableAckPayload(void)
     if (ack_payloads_enabled) {
         write_register(FEATURE, static_cast<uint8_t>(read_register(FEATURE) & ~_BV(EN_ACK_PAY)));
 
-        IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+        IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
         ack_payloads_enabled = false;
     }
@@ -1746,7 +1749,7 @@ void RF24::enableDynamicAck(void)
     //toggle_features();
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DYN_ACK));
 
-    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 }
 
 /****************************************************************************/
