@@ -79,7 +79,7 @@ void csn(bool mode) {
 /****************************************************************************/
 uint8_t read_register(uint8_t reg) {
   csn(LOW);
-  SPI.transfer(R_REGISTER | reg);
+  SPI.transfer(reg);
   uint8_t result = SPI.transfer(0xff);
   csn(HIGH);
   return result;

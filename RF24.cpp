@@ -154,7 +154,7 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
     uint8_t* ptx = spi_txbuff;
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
-    *ptx++ = (R_REGISTER | reg);
+    *ptx++ = reg;
 
     while (len--) {
         *ptx++ = RF24_NOP; // Dummy operation, just for reading
@@ -179,13 +179,13 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 
     beginTransaction();
     #if defined(RF24_SPI_PTR)
-    status = _spi->transfer(R_REGISTER | reg);
+    status = _spi->transfer(reg);
     while (len--) {
         *buf++ = _spi->transfer(0xFF);
     }
 
     #else // !defined(RF24_SPI_PTR)
-    status = _SPI.transfer(R_REGISTER | reg);
+    status = _SPI.transfer(reg);
     while (len--) {
         *buf++ = _SPI.transfer(0xFF);
     }
@@ -206,7 +206,7 @@ uint8_t RF24::read_register(uint8_t reg)
 
     uint8_t* prx = spi_rxbuff;
     uint8_t* ptx = spi_txbuff;
-    *ptx++ = (R_REGISTER | reg);
+    *ptx++ = reg;
     *ptx++ = RF24_NOP; // Dummy operation, just for reading
 
     #if defined(RF24_RP2)
@@ -223,11 +223,11 @@ uint8_t RF24::read_register(uint8_t reg)
 
     beginTransaction();
     #if defined(RF24_SPI_PTR)
-    status = _spi->transfer(R_REGISTER | reg);
+    status = _spi->transfer(reg);
     result = _spi->transfer(0xff);
 
     #else // !defined(RF24_SPI_PTR)
-    status = _SPI.transfer(R_REGISTER | reg);
+    status = _SPI.transfer(reg);
     result = _SPI.transfer(0xff);
 
     #endif // !defined(RF24_SPI_PTR)
@@ -247,7 +247,7 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
     uint8_t* ptx = spi_txbuff;
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
-    *ptx++ = (W_REGISTER | (REGISTER_MASK & reg));
+    *ptx++ = (W_REGISTER | reg);
     while (len--) {
         *ptx++ = *buf++;
     }
@@ -282,54 +282,36 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 
 /****************************************************************************/
 
-void RF24::write_register(uint8_t reg, uint8_t value, bool is_cmd_only)
+void RF24::write_register(uint8_t reg, uint8_t value)
 {
-    if (is_cmd_only) {
-        if (reg != RF24_NOP) { // don't print the get_status() operation
-            IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x)\r\n"), reg));
-        }
-        beginTransaction();
-#if defined(RF24_LINUX)
-        status = _SPI.transfer(W_REGISTER | reg);
-#else // !defined(RF24_LINUX) || defined (RF24_RP2)
-    #if defined(RF24_SPI_PTR)
-        status = _spi->transfer(W_REGISTER | reg);
-    #else  // !defined (RF24_SPI_PTR)
-        status = _SPI.transfer(W_REGISTER | reg);
-    #endif // !defined (RF24_SPI_PTR)
-#endif     // !defined(RF24_LINUX) || defined(RF24_RP2)
-        endTransaction();
-    }
-    else {
-        IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
+    IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
 #if defined(RF24_LINUX) || defined(RF24_RP2)
-        beginTransaction();
-        uint8_t* prx = spi_rxbuff;
-        uint8_t* ptx = spi_txbuff;
-        *ptx++ = (W_REGISTER | reg);
-        *ptx = value;
+    beginTransaction();
+    uint8_t* prx = spi_rxbuff;
+    uint8_t* ptx = spi_txbuff;
+    *ptx++ = (W_REGISTER | reg);
+    *ptx = value;
 
     #if defined(RF24_RP2)
-        _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
+    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
     #else  // !defined(RF24_RP2)
-        _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), 2);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), 2);
     #endif // !defined(RF24_RP2)
 
-        status = *prx++; // status is 1st byte of receive buffer
-        endTransaction();
+    status = *prx++; // status is 1st byte of receive buffer
+    endTransaction();
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
 
-        beginTransaction();
+    beginTransaction();
     #if defined(RF24_SPI_PTR)
-        status = _spi->transfer(W_REGISTER | reg);
-        _spi->transfer(value);
+    status = _spi->transfer(W_REGISTER | reg);
+    _spi->transfer(value);
     #else  // !defined(RF24_SPI_PTR)
-        status = _SPI.transfer(W_REGISTER | reg);
-        _SPI.transfer(value);
+    status = _SPI.transfer(W_REGISTER | reg);
+    _SPI.transfer(value);
     #endif // !defined(RF24_SPI_PTR)
-        endTransaction();
+    endTransaction();
 #endif     // !defined(RF24_LINUX) && !defined(RF24_RP2)
-    }
 }
 
 /****************************************************************************/
@@ -348,7 +330,7 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
     }
 
     //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
-    IF_RF24_DEBUG(printf("[Writing %u bytes %u blanks]\n", data_len, blank_len););
+    IF_RF24_DEBUG(printf_P("[Writing %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -420,7 +402,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
-    IF_RF24_DEBUG(printf("[Reading %u bytes %u blanks]\n", data_len, blank_len););
+    IF_RF24_DEBUG(printf_P("[Reading %u bytes %u blanks]\n", data_len, blank_len););
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
@@ -486,7 +468,8 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
 uint8_t RF24::flush_rx(void)
 {
-    write_register(FLUSH_RX, RF24_NOP, true);
+    read_register(FLUSH_RX, (uint8_t*)nullptr, 0);
+    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]"););
     return status;
 }
 
@@ -494,7 +477,8 @@ uint8_t RF24::flush_rx(void)
 
 uint8_t RF24::flush_tx(void)
 {
-    write_register(FLUSH_TX, RF24_NOP, true);
+    read_register(FLUSH_TX, (uint8_t*)nullptr, 0);
+    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]"););
     return status;
 }
 
@@ -502,7 +486,7 @@ uint8_t RF24::flush_tx(void)
 
 uint8_t RF24::get_status(void)
 {
-    write_register(RF24_NOP, RF24_NOP, true);
+    read_register(RF24_NOP, (uint8_t*)nullptr, 0);
     return status;
 }
 
@@ -545,7 +529,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
              name);
     while (qty--) {
         uint8_t* buffer = new uint8_t[addr_width];
-        read_register(reg++ & REGISTER_MASK, buffer, addr_width);
+        read_register(reg++, buffer, addr_width);
 
         printf_P(PSTR(" 0x"));
         uint8_t* bufptr = buffer + addr_width;
@@ -564,7 +548,7 @@ uint8_t RF24::sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qt
     uint8_t offset = 0;
     uint8_t* read_buffer = new uint8_t[addr_width];
     while (qty--) {
-        read_register(reg++ & REGISTER_MASK, read_buffer, addr_width);
+        read_register(reg++, read_buffer, addr_width);
         uint8_t* bufptr = read_buffer + addr_width;
         while (--bufptr >= read_buffer) {
             offset += sprintf_P(out_buffer + offset, PSTR("%02X"), *bufptr);
@@ -1325,7 +1309,8 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
 void RF24::reUseTX()
 {
     write_register(NRF_STATUS, _BV(MAX_RT)); //Clear max retry flag
-    write_register(REUSE_TX_PL, RF24_NOP, true);
+    read_register(REUSE_TX_PL, (uint8_t*)nullptr, 0);
+    IF_RF24_DEBUG(printf_P("[Reusing payload in TX FIFO]"););
     ce(LOW); //Re-Transfer packet
     ce(HIGH);
 }
@@ -1690,7 +1675,7 @@ void RF24::enableDynamicPayloads(void)
     //toggle_features();
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DPL));
 
-    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
     // Enable dynamic payload on all pipes
     //
@@ -1710,7 +1695,7 @@ void RF24::disableDynamicPayloads(void)
     //toggle_features();
     write_register(FEATURE, 0);
 
-    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
     // Disable dynamic payload on all pipes
     //
@@ -1731,7 +1716,7 @@ void RF24::enableAckPayload(void)
     if (!ack_payloads_enabled) {
         write_register(FEATURE, read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL));
 
-        IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+        IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
         // Enable dynamic payload on pipes 0 & 1
         write_register(DYNPD, read_register(DYNPD) | _BV(DPL_P1) | _BV(DPL_P0));
@@ -1748,7 +1733,7 @@ void RF24::disableAckPayload(void)
     if (ack_payloads_enabled) {
         write_register(FEATURE, static_cast<uint8_t>(read_register(FEATURE) & ~_BV(EN_ACK_PAY)));
 
-        IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+        IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 
         ack_payloads_enabled = false;
     }
@@ -1764,7 +1749,7 @@ void RF24::enableDynamicAck(void)
     //toggle_features();
     write_register(FEATURE, read_register(FEATURE) | _BV(EN_DYN_ACK));
 
-    IF_RF24_DEBUG(printf("FEATURE=%i\r\n", read_register(FEATURE)));
+    IF_RF24_DEBUG(printf_P("FEATURE=%i\r\n", read_register(FEATURE)));
 }
 
 /****************************************************************************/
@@ -1774,7 +1759,7 @@ bool RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
     if (ack_payloads_enabled) {
         const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-        write_payload(current, len, W_ACK_PAYLOAD | (pipe & 0x07));
+        write_register(W_ACK_PAYLOAD | (pipe & 0x07), current, rf24_min(len, static_cast<uint8_t>(32)));
         return !(status & _BV(TX_FULL));
     }
     return 0;
