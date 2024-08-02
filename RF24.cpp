@@ -1308,11 +1308,11 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
 
 void RF24::reUseTX()
 {
+    ce(LOW);
     write_register(NRF_STATUS, _BV(MAX_RT)); //Clear max retry flag
     read_register(REUSE_TX_PL, (uint8_t*)nullptr, 0);
     IF_RF24_DEBUG(printf_P("[Reusing payload in TX FIFO]"););
-    ce(LOW); //Re-Transfer packet
-    ce(HIGH);
+    ce(HIGH); //Re-Transfer packet
 }
 
 /****************************************************************************/
@@ -1977,9 +1977,8 @@ void RF24::startConstCarrier(rf24_pa_dbm_e level, uint8_t channel)
     IF_RF24_DEBUG(printf_P(PSTR("RF_SETUP=%02x\r\n"), read_register(RF_SETUP)));
     ce(HIGH);
     if (isPVariant()) {
-        delay(1); // datasheet says 1 ms is ok in this instance
-        ce(LOW);
-        reUseTX();
+        delay(1);  // datasheet says 1 ms is ok in this instance
+        reUseTX(); // CE gets toggled here
     }
 }
 
