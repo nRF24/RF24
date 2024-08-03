@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        cout << "MCU and radio are connected" << endl;
+        cout << "Congrats!! MCU and radio are connected" << endl;
     }
 
 
