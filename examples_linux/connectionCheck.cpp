@@ -58,6 +58,7 @@ int main(int argc, char** argv)
     else
     {
         cout << "Congrats!! MCU and radio are connected" << endl;
+        cout << "Here is your NRF module details:" << endl;
     }
 
 
