@@ -38,15 +38,6 @@ RF24 radio(CE_PIN, CSN_PIN);
 // See https://github.com/eclipse/mraa/ for more information on MRAA
 // See https://www.kernel.org/doc/Documentation/spi/spidev for more information on SPIDEV
 
-// For this example, we'll be using a payload containing
-// a single float number that will be incremented
-// on every successful transmission
-float payload = 0.0;
-
-void setRole(); // prototype to set the node's role
-void master();  // prototype of the TX node's behavior
-void slave();   // prototype of the RX node's behavior
-
 int main(int argc, char** argv)
 {
 
