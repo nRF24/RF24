@@ -36,6 +36,16 @@ on:
   workflow_dispatch:
 
 jobs:
+  check-spelling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - uses: actions/checkout@v4
+      - name: Install cSpell
+        run: npm install -g cspell
+      - run: npx cspell --gitignore --config cspell.config.yaml .
   build-docs:
     uses: nRF24/.github/.github/workflows/build_docs.yaml@main
     with:
