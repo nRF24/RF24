@@ -135,7 +135,7 @@ void loop()
                 radio.read(&received, sizeof(received)); // get incoming ACK payload
 
                 // print details about incoming payload
-                printf(" Recieved %d bytes on pipe %d: %s%d\n",
+                printf(" Received %d bytes on pipe %d: %s%d\n",
                        radio.getDynamicPayloadSize(),
                        pipe,
                        received.message,
@@ -145,7 +145,7 @@ void loop()
                 payload.counter = received.counter + 1;
             }
             else {
-                printf(" Recieved: an empty ACK packet\n"); // empty ACK packet received
+                printf(" Received: an empty ACK packet\n"); // empty ACK packet received
             }
         }
         else {
@@ -159,7 +159,7 @@ void loop()
         // This device is a RX node
 
         uint8_t pipe;
-        if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that received it
             uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
             PayloadStruct received;
             radio.read(&received, sizeof(received)); // get incoming payload

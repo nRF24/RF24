@@ -139,7 +139,7 @@ There is a newer automatic install script that makes use of the CMake approach.
    ```shell
    nano gettingstarted.cpp
    ```
-   and edit the pin numbers as directed in the [linux/RPi general documation](rpi_general.md).
+   and edit the pin numbers as directed in the [linux/RPi general documentation](rpi_general.md).
    Create a build directory in the examples_linux directory and navigate to it.
    ```shell
    mkdir build

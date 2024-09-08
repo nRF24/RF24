@@ -155,7 +155,7 @@ void loop()
                 payload.counter = received.counter; // save incoming counter for next outgoing counter
             }
             else {
-                printf(" Recieved no response.\n"); // no response received
+                printf(" Received no response.\n"); // no response received
             }
         }
         else {
@@ -169,7 +169,7 @@ void loop()
         // This device is a RX node
 
         uint8_t pipe;
-        if (radio.available(&pipe)) { // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) { // is there a payload? get the pipe number that received it
             PayloadStruct received;
             radio.read(&received, sizeof(received)); // get incoming payload
             payload.counter = received.counter + 1;  // increment incoming counter for next outgoing response

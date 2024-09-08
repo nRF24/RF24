@@ -146,12 +146,12 @@ uint8_t SPI::transfer(uint8_t tx)
     return rx;
 }
 
-void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
+void SPI::transfernb(char* txBuf, char* rxBuf, uint32_t len)
 {
     struct spi_ioc_transfer tr;
     memset(&tr, 0, sizeof(tr));
-    tr.tx_buf = (unsigned long)tbuf;
-    tr.rx_buf = (unsigned long)rbuf;
+    tr.tx_buf = (unsigned long)txBuf;
+    tr.rx_buf = (unsigned long)rxBuf;
     tr.len = len;
     tr.speed_hz = _spi_speed; //RF24_SPI_SPEED;
     tr.delay_usecs = 0;

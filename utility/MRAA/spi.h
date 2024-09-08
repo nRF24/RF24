@@ -35,11 +35,11 @@ public:
 
     virtual ~SPI();
 
-    mraa::Spi* mspi;
+    mraa::Spi* mraa_spi;
 
     inline uint8_t transfer(uint8_t _data);
 
-    inline void transfernb(char* tbuf, char* rbuf, uint32_t len);
+    inline void transfernb(char* txBuf, char* rxBuf, uint32_t len);
 
     inline void transfern(char* buf, uint32_t len);
 
@@ -62,12 +62,12 @@ public:
 
 uint8_t SPI::transfer(uint8_t _data)
 {
-    return mspi->writeByte(_data);
+    return mraa_spi->writeByte(_data);
 }
 
-void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
+void SPI::transfernb(char* txBuf, char* rxBuf, uint32_t len)
 {
-    mspi->transfer((uint8_t*)tbuf, (uint8_t*)rbuf, len);
+    mraa_spi->transfer((uint8_t*)txBuf, (uint8_t*)rxBuf, len);
 }
 
 void SPI::transfern(char* buf, uint32_t len)

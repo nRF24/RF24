@@ -40,11 +40,11 @@ public:
 
     /**
      * Transfer a buffer of data
-     * @param tbuf Transmit buffer
-     * @param rbuf Receive buffer
+     * @param txBuf Transmit buffer
+     * @param rxBuf Receive buffer
      * @param len Length of the data
      */
-    void transfernb(char* tbuf, char* rbuf, uint32_t len);
+    void transfernb(char* txBuf, char* rxBuf, uint32_t len);
 
     /**
      * Transfer a buffer of data without an rx buffer

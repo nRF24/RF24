@@ -101,7 +101,7 @@ void loop() {
 
     radio.startListening();  // Now, continue listening
 
-    unsigned long started_waiting_at = millis();  // Start a timer for measuring timout
+    unsigned long started_waiting_at = millis();  // Start a timer for measuring timeout
     bool timeout = false;
     while (!radio.available() && !timeout)  // Wait until we get a response or timeout is reached
     {

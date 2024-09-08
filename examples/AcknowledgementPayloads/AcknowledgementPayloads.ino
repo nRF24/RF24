@@ -132,7 +132,7 @@ void loop() {
       if (radio.available(&pipe)) {  // is there an ACK payload? grab the pipe number that received it
         PayloadStruct received;
         radio.read(&received, sizeof(received));  // get incoming ACK payload
-        Serial.print(F(" Recieved "));
+        Serial.print(F(" Received "));
         Serial.print(radio.getDynamicPayloadSize());  // print incoming payload size
         Serial.print(F(" bytes on pipe "));
         Serial.print(pipe);  // print pipe number that received the ACK
@@ -144,7 +144,7 @@ void loop() {
         payload.counter = received.counter + 1;
 
       } else {
-        Serial.println(F(" Recieved: an empty ACK packet"));  // empty ACK packet received
+        Serial.println(F(" Received: an empty ACK packet"));  // empty ACK packet received
       }
 
 
@@ -159,7 +159,7 @@ void loop() {
     // This device is a RX node
 
     uint8_t pipe;
-    if (radio.available(&pipe)) {                     // is there a payload? get the pipe number that recieved it
+    if (radio.available(&pipe)) {                     // is there a payload? get the pipe number that received it
       uint8_t bytes = radio.getDynamicPayloadSize();  // get the size of the payload
       PayloadStruct received;
       radio.read(&received, sizeof(received));  // get incoming payload

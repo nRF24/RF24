@@ -28,8 +28,8 @@ void SPI::beginTransaction(SPISettings settings)
     }
     pthread_mutex_lock(&spiMutex);
     setBitOrder(settings.border);
-    setDataMode(settings.dmode);
-    setClockDivider(settings.clck);
+    setDataMode(settings.dataMode);
+    setClockDivider(settings.clock);
 }
 
 void SPI::endTransaction()

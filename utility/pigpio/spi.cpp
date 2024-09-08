@@ -30,9 +30,9 @@ uint8_t SPI::transfer(char tx)
     return rbuf;
 }
 
-void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
+void SPI::transfernb(char* txBuf, char* rxBuf, uint32_t len)
 {
-    spiXfer(spiHandle, tbuf, rbuf, len);
+    spiXfer(spiHandle, txBuf, rxBuf, len);
 }
 
 SPI::~SPI()

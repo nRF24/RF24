@@ -36,14 +36,14 @@ argparser.add_argument(
 
 
 def address_repr(buf, reverse: bool = True, delimit: str = "") -> str:
-    """Convert a buffer into a hexlified string."""
+    """Convert a buffer into a hexadecimal string."""
     order = range(len(buf) - 1, -1, -1) if reverse else range(len(buf))
     return delimit.join(["%02X" % buf[byte] for byte in order])
 
 
 # pylint: disable=too-many-locals,too-many-statements
 def print_details(encoded_buf: bytearray):
-    """This debuggung function outputs all details about the nRF24L01."""
+    """This debugging function outputs all details about the nRF24L01."""
     # declare sequences
     pipes = [bytearray(5)] * 2 + [0] * 4
     pl_len = [0] * 6

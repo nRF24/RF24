@@ -55,7 +55,7 @@ typedef uint8_t rf24_gpio_pin_t;
 #define OUTPUT                   GPIO::DIRECTION_OUT
 #define digitalWrite(pin, value) GPIO::write(pin, value)
 #define pinMode(pin, direction)  GPIO::open(pin, direction)
-#define delay(milisec)           sleep_ms(milisec)
+#define delay(millisec)          sleep_ms(millisec)
 #define delayMicroseconds(usec)  sleep_us(usec)
 #define millis()                 to_ms_since_boot(get_absolute_time())
 

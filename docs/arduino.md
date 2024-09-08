@@ -89,7 +89,7 @@ SPI_UART SPI Pin Connections:
 ### Using a specific SPI Bus
 
 An alternate SPI bus can be specified using the overloaded `RF24::begin(_SPI*)` method.
-This is useful for some boards that offer more than 1 hardware-driven SPI bus or cetain Arduino
+This is useful for some boards that offer more than 1 hardware-driven SPI bus or certain Arduino
 cores that implement a software-driven (AKA bit-banged) SPI bus that does not use the DigitalIO
 library.
 
@@ -122,7 +122,7 @@ void setup() {
   // MISO = SD0
   // SCLK = CLK
   // CSN = GPIO0 (labeled D3 on the board)
-  // **notice we also passed `D3` to the RF24 contructor's csn_pin parameter**
+  // **notice we also passed `D3` to the RF24 constructor's csn_pin parameter**
 
   SPI.begin();
 
@@ -155,7 +155,7 @@ located in their ArduinoCore repository (along with the SPI library for the ESP3
 RF24 radio(2, 0); // the (ce_pin, csn_pin) connected to the radio
 
 SPIClass* hspi = nullptr; // we'll instantiate this in the `setup()` function
-// by default the HSPI bus predefines the following pins
+// by default the HSPI bus pre-defines the following pins
 // HSPI_MISO = 12
 // HSPI_MOSI = 13
 // HSPI_SCLK = 14
@@ -244,7 +244,7 @@ void setup() {
 ```
 
 #### ATSAMD21 example
-@see The Suport for secondary SPI bus on ATSAMD21 chips is sparcely documented. However,
+@see The Support for secondary SPI bus on ATSAMD21 chips is scarcely documented. However,
 [Sparkfun has a tutorial about using a second SPI bus](https://learn.sparkfun.com/tutorials/adding-more-sercom-ports-for-samd-boards/adding-an-spi)
 that often refers to the
 [ArduinoCore-samd SPI library source code](https://github.com/arduino/ArduinoCore-samd/blob/master/libraries/SPI/SPI.h). This example applies Sparkfun's tutorial toward the RF24 library.

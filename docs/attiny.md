@@ -2,7 +2,7 @@
 
 @tableofcontents
 
-ATTiny support for this library relys on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with [this install guide](http://highlowtech.org/?p=1695)
+ATTiny support for this library relies on the SpenceKonde ATTinyCore. Be sure to have added this core to the Arduino Boards Manager with [this install guide](http://highlowtech.org/?p=1695)
 
 See the included rf24ping85 example for pin info and usage
 
@@ -31,7 +31,7 @@ nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7
 
 - Circuit idea from [NerdRalph's 3 pin solution](http://nerdralph.blogspot.ca/2014/01/nrf24l01-control-with-3-attiny85-pins.html)
 - Original RC combination was 1K/100nF. 22K/10nF combination worked better.
-- For best settletime delay value in RF24::csn() the timingSearch3pin.ino sketch can be used.
+- For best settle-time delay value in `RF24::csn()` the timingSearch3pin.ino sketch can be used.
 - This configuration is enabled when CE_PIN and CSN_PIN are equal, e.g. both 3
 - Because CE is always high the power consumption is higher than for 5 pins solution
 

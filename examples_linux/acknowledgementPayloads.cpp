@@ -199,7 +199,7 @@ void slave()
     time_t startTimer = time(nullptr);       // start a timer
     while (time(nullptr) - startTimer < 6) { // use 6 second timeout
         uint8_t pipe;
-        if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) {                      // is there a payload? get the pipe number that received it
             uint8_t bytes = radio.getDynamicPayloadSize(); // get the size of the payload
             PayloadStruct received;
             radio.read(&received, sizeof(received));         // fetch payload from RX FIFO

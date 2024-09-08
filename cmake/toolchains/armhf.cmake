@@ -16,8 +16,8 @@ set(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++)
 # add_compile_options(-I /usr/arm-linux-gnueabihf/include) # this may not be best practice
 
 #[[
-# CMAKE_STAGING_PREFIX is only useful for transfering a built CMake project to a target machine
-set(CMAKE_STAGING_PREFIX /home/devel/stage) # use CMAKE_INSTALL_PREFIX instead (see below comments)
+# CMAKE_STAGING_PREFIX is only useful for transferring a built CMake project to a target machine
+set(CMAKE_STAGING_PREFIX /home/dev/stage) # use CMAKE_INSTALL_PREFIX instead (see below comments)
 
 CMAKE_FIND_ROOT_PATH is an empty list by default (this list can be modified where applicable)
 if cross-compiling a dependent lib (like MRAA - which is optional), then

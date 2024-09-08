@@ -72,12 +72,12 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/detectCPU.cmake) # sets the variable SOC accordingly
 
 # auto-detect what driver to use
-# auto-detect can be overriden using `cmake .. -D RF24_DRIVER=<supported driver>`
+# auto-detect can be overridden using `cmake .. -D RF24_DRIVER=<supported driver>`
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/AutoConfig_RF24_DRIVER.cmake)
 
 #[[ adding the utility sub-directory will
     1. set variables RF24_DRIVER, RF24_LINKED_DRIVER, and RF24_DRIVER_SOURCES
-    2. copy the approriate /utility/*/includes.h file to the /utility folder
+    2. copy the appropriate /utility/*/includes.h file to the /utility folder
     3. set additional install rules according to the RF24_DRIVER specified
 ]]
 add_subdirectory(utility)

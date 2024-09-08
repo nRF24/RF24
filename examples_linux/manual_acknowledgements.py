@@ -93,9 +93,9 @@ def master():
             print("Transmission failed or timed out")
         else:
             radio.startListening()  # put radio in RX mode
-            timout = time.monotonic() * 1000 + 200  # use 200 ms timeout
+            timeout = time.monotonic() * 1000 + 200  # use 200 ms timeout
             # declare a variable to save the incoming response
-            while not radio.available() and time.monotonic() * 1000 < timout:
+            while not radio.available() and time.monotonic() * 1000 < timeout:
                 pass  # wait for incoming payload or timeout
             radio.stopListening()  # put radio in TX mode
             end_timer = time.monotonic_ns()  # end timer

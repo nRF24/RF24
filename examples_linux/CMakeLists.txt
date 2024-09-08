@@ -18,7 +18,7 @@ add_compile_options(-Ofast -Wall) # passing the compiler a `-pthread` flag doesn
 include(../cmake/detectCPU.cmake) # sets the variable SOC accordingly
 
 # auto-detect what driver to use
-# auto-detect can be overriden using `cmake .. -D RF24_DRIVER=<supported driver>`
+# auto-detect can be overridden using `cmake .. -D RF24_DRIVER=<supported driver>`
 include(../cmake/AutoConfig_RF24_DRIVER.cmake)
 
 find_library(RF24 rf24 REQUIRED)

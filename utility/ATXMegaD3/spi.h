@@ -39,7 +39,7 @@ public:
 
     uint8_t transfer(uint8_t tx_);
 
-    void transfernb(char* tbuf, char* rbuf, uint32_t len);
+    void transfernb(char* txBuf, char* rxBuf, uint32_t len);
 
     void transfern(char* buf, uint32_t len);
 

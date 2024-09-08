@@ -58,11 +58,11 @@ void SPI::transfern(char* buf, uint32_t len)
     }
 }
 
-void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
+void SPI::transfernb(char* txBuf, char* rxBuf, uint32_t len)
 {
     // using an auxiliary buffer to keep tx and rx different
     memset(xferBuf, 0, sizeof(xferBuf));
-    memcpy(xferBuf, tbuf, len);
+    memcpy(xferBuf, txBuf, len);
 
     if (wiringPiSPIDataRW(channel, xferBuf, len) < 0) {
         std::string msg = "[SPI::transfernb] Cannot send spi message; ";
@@ -70,7 +70,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
         throw SPIException(msg);
     }
 
-    memcpy(rbuf, xferBuf, len);
+    memcpy(rxBuf, xferBuf, len);
 }
 
 SPI::~SPI()
