@@ -16,8 +16,8 @@
  version 2 as published by the Free Software Foundation.
 */
 
-#ifndef __RF24_CONFIG_H__
-#define __RF24_CONFIG_H__
+#ifndef RF24_CONFIG_H_
+#define RF24_CONFIG_H_
 
 /*** USER DEFINES:    ***/
 #define FAILURE_HANDLING
@@ -36,8 +36,8 @@
 #endif
 
 /**********************/
-#define rf24_max(a, b) (a > b ? a : b)
-#define rf24_min(a, b) (a < b ? a : b)
+#define rf24_max(a, b) ((a) > (b) ? (a) : (b))
+#define rf24_min(a, b) ((a) < (b) ? (a) : (b))
 
 /** @brief The default SPI speed (in Hz) */
 #ifndef RF24_SPI_SPEED
@@ -244,4 +244,4 @@ typedef uint16_t prog_uint16_t;
     #define RF24_SPI_TRANSACTIONS
 #endif // defined (SPI_HAS_TRANSACTION) && !defined (SPI_UART) && !defined (SOFTSPI)
 
-#endif // __RF24_CONFIG_H__
+#endif // RF24_CONFIG_H_

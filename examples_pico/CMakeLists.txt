@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.12)
 # Pull in SDK (must be before project)
 include(../cmake/pico_sdk_import.cmake)
 
+# generate a compilation database for static analysis by clang-tidy
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(pico_examples C CXX ASM)
 
 # Initialize the Pico SDK

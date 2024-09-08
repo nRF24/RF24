@@ -11,6 +11,9 @@ set(EXAMPLES_LIST
     interruptConfigure
 )
 
+# generate a compilation database for static analysis by clang-tidy
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(RF24Examples CXX)
 add_compile_options(-Ofast -Wall) # passing the compiler a `-pthread` flag doesn't work here
 
