@@ -53,11 +53,6 @@ sudo apt-get install python3-dev libboost-python-dev python3-pip
 
 ## Installation
 
-> [!important]
-> Only step 2 has to be repeated if installing the python wrappers for
-> RF24Network and RF24Mesh libraries. The prerequisites stated above still apply
-> to each library.
-
 > [!note]
 > If using **older versions of RF24* libraries** with python3,
 > the setup.py script needed a manually created symlink for the boost.python library.
