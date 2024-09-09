@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RF24"
+classifiers = [
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+]
+license = {text = "GNU General Public License v2 (GPLv2)"}
+readme = {file = "README.md", content-type = "text/markdown"}
+dynamic = ["version"] # version is set in setup.py

@@ -3,7 +3,6 @@
 import os
 from sys import version_info
 from setuptools import setup, Extension
-import crossunixccompiler
 
 version = ""
 cflags = os.getenv("CFLAGS", "")
@@ -74,33 +73,13 @@ finally:
 os.environ["CFLAGS"] = cflags
 
 # get the proper boost.python lib symlink name according to version of python
-if version_info >= (3,):
-    BOOST_LIB = "boost_python3"
-else:
-    BOOST_LIB = "boost_python"
-
-crossunixccompiler.register()
-
-long_description = """
-.. warning:: This python wrapper for the RF24 C++ library was not intended
-    for distribution on pypi.org. If you're reading this, then this package
-    is likely unauthorized or unofficial.
-"""
+BOOST_LIB = "boost_python" + (
+    "" if version_info < (3,) else "%d%d" % (version_info.major, version_info.minor)
+)
 
 
 setup(
-    name="RF24",
     version=version,
-    license="GPLv2",
-    license_files=(os.path.join(git_dir, "LICENSE"),),
-    long_description=long_description,
-    long_description_content_type="text/x-rst",
-    classifiers=[
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: C++",
-        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
-    ],
     ext_modules=[
         Extension(
             "RF24",

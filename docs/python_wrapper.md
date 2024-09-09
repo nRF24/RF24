@@ -17,7 +17,7 @@ We recommend using the newer [pyRF24 package](https://github.com/nRF24/pyRF24)
 8. includes typing stub files for type checking tools like mypy
 
 The only reason that you should need to keep using these older individual python
-wrappers is if you must to use python v3.6 or older.
+wrappers is if you must use python v3.6 or older.
 
 You **cannot** use these individual wrappers in combination with the pyRF24 package.
 @endparblock
@@ -51,23 +51,22 @@ python -m pip install --upgrade pip setuptools
 sudo apt-get install python3-dev libboost-python-dev python3-pip
 ```
 
-Next, install some up-to-date python3 packages.
-
-```shell
-python3 -m pip install --upgrade pip setuptools
-```
-
 ## Installation
 
-@note Only step 2 has to be repeated if installing the python wrappers for
-RF24Network and RF24Mesh libraries. The prerequisites stated above still apply
-to each library.
+> [!important]
+> Only step 2 has to be repeated if installing the python wrappers for
+> RF24Network and RF24Mesh libraries. The prerequisites stated above still apply
+> to each library.
 
-1. For python3, setup.py needs a manually created symlink for the boost.python library:
-   ```shell
-   sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
-   ```
-2. Install the library.
+> [!note]
+> If using **older versions of RF24* libraries** with python3,
+> the setup.py script needed a manually created symlink for the boost.python library.
+> ```shell
+> sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so
+> ```
+> This is no longer needed with the latest versions of RF24 libraries.
+
+1. Install the library.
 
    This step needs to be executed from the appropriate directory of
    the cloned RF24* repository:
@@ -90,7 +89,7 @@ to each library.
    See the additional [Platform Support pages](pages.html) for information on connecting your hardware.
 
    See the included [\*.py files in the "examples_linux" folder](examples.html) for usage information.
-3. Running the Example
+2. Running the Example
 
    The python examples location differ for each RF24* repositories.
    - navigate to *examples_linux* directory in the RF24 cloned repository
