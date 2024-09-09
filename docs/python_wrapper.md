@@ -33,6 +33,19 @@ python wrapper(s) to work.
 @note The interrupt_configure.py example uses the
 [gpiod library](https://pypi.org/project/gpiod) to watch the radio's IRQ pin.
 
+> [!warning]
+> Recent updates to pip mandate that users manage a python virtual environment.
+> This is good practice because it avoids the risk that installing a package with pip will
+> mess up a system-installed package.
+>
+> For information about using up a python virtual environment, see the official
+> [instructions using the python standard library `venv`](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
+> (which is a minimized variant of
+> [the `virtualenv` library](https://virtualenv.pypa.io/en/stable/index.html)).
+>
+> There's also a note at the end of these instructions that talks about
+> using `sudo` within a python virtual environment.
+
 ### Python2
 
 ```shell
@@ -70,10 +83,6 @@ sudo apt-get install python3-dev libboost-python-dev python3-pip
    - navigate to *pyRF24Mesh* directory in the RF24Mesh cloned repository
 
    When in the correct directory, run the following command:
-   ```shell
-   python setup.py install
-   ```
-   or for python3
    ```shell
    python3 -m pip install -v .
    ```
