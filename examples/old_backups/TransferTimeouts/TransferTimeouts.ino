@@ -13,7 +13,7 @@
   the auto-retry functionality to any chosen time period, preventing data loss and ensuring
   the consistency of data.
 
-  This sketh demonstrates use of the writeBlocking() functionality, and extends the standard
+  This sketch demonstrates use of the writeBlocking() functionality, and extends the standard
   retry functionality of the radio. Payloads will be auto-retried until successful or the
   extended timeout period is reached.
 */
@@ -147,7 +147,7 @@ void loop(void) {
         rxTimer = millis();                             // Reset the timeout timer
         counter++;                                      // Keep a count of received payloads
       } else if (millis() - rxTimer > timeoutPeriod) {  // If no data available, check the timeout period
-        Serial.println("Transfer Failed");              // If per-payload timeout exceeeded, end the transfer
+        Serial.println("Transfer Failed");              // If per-payload timeout exceeded, end the transfer
         transferInProgress = 0;
       } else if (counter >= payloads) {    // If the specified number of payloads is reached, transfer is completed
         startTime = millis() - startTime;  // Calculate the total time spent during transfer

@@ -8,7 +8,7 @@ TMRh20 2014
 
 /** General Data Transfer Rate Test
  * This example demonstrates basic data transfer functionality with the
- updated library. This example will display the transfer rates acheived using
+ updated library. This example will display the transfer rates achieved using
  the slower form of high-speed transfer using blocking-writes.
  */
 

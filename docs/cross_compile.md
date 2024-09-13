@@ -14,7 +14,7 @@ RF24 library supports cross-compilation. Advantages of cross-compilation:
 
 Following prerequisites need to be assured:
 
-- ssh passwordless access to target machine [Here is a hint](https://linuxconfig.org/passwordless-ssh)
+- ssh password-less access to target machine [Here is a hint](https://linuxconfig.org/passwordless-ssh)
 - sudo of a remote user without password [Here is a hint](http://askubuntu.com/questions/334318/sudoers-file-enable-nopasswd-for-user-all-commands)
 - cross-compilation toolchain for your target machine; for RPi
   ```shell
@@ -44,7 +44,7 @@ Following prerequisites need to be assured:
    ```shell
    make
    ```
-4. (optional) install library to cross-compilation machine into cross-exvironment - important for compilation of examples
+4. (optional) install library to cross-compilation machine into cross-environment - important for compilation of examples
    ```shell
    sudo make install
    ```
@@ -62,7 +62,7 @@ Following prerequisites need to be assured:
    make upload
    ```
 
-## Cross comilation steps for python wrapper
+## Cross compilation steps for python wrapper
 
 ### Prerequisites
 

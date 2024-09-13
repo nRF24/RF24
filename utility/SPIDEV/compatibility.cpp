@@ -10,11 +10,11 @@ long long mtime, seconds, useconds;
 //static struct timeval start, end;
 //struct timespec start, end;
 
-void __msleep(int milisec)
+void __msleep(int millisec)
 {
     struct timespec req; // = {0};
-    req.tv_sec = (time_t)milisec / 1000;
-    req.tv_nsec = (milisec % 1000) * 1000000L;
+    req.tv_sec = (time_t)millisec / 1000;
+    req.tv_nsec = (millisec % 1000) * 1000000L;
     //nanosleep(&req, (struct timespec *)NULL);
     clock_nanosleep(CLOCK_REALTIME, 0, &req, NULL);
 }

@@ -92,7 +92,7 @@ to each library.
    See the included [\*.py files in the "examples_linux" folder](examples.html) for usage information.
 3. Running the Example
 
-   The python examples location differ for each RF24* resopitories.
+   The python examples location differ for each RF24* repositories.
    - navigate to *examples_linux* directory in the RF24 cloned repository
    - navigate to *RPi/pyRF24Network/examples* directory in the RF24Network cloned repository
    - navigate to *examples_RPi* directory in the RF24Mesh cloned repository

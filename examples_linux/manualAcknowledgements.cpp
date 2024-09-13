@@ -181,7 +181,7 @@ void master()
                 cout << (unsigned int)payload.counter;    // print outgoing counter
                 PayloadStruct received;
                 radio.read(&received, sizeof(received));     // get incoming payload
-                cout << " Recieved " << (unsigned int)bytes; // print incoming payload size
+                cout << " Received " << (unsigned int)bytes; // print incoming payload size
                 cout << " on pipe " << (unsigned int)pipe;   // print RX pipe number
                 cout << ": " << received.message;            // print the incoming message
                 cout << (unsigned int)received.counter;      // print the incoming counter
@@ -189,7 +189,7 @@ void master()
                 payload.counter = received.counter; // save incoming counter for next outgoing counter
             }
             else {
-                cout << "Recieved no response." << endl; // no response received
+                cout << "Received no response." << endl; // no response received
             }
         }
         else {
@@ -216,7 +216,7 @@ void slave()
     time_t startTimer = time(nullptr);       // start a timer
     while (time(nullptr) - startTimer < 6) { // use 6 second timeout
         uint8_t pipe;
-        if (radio.available(&pipe)) {               // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) {               // is there a payload? get the pipe number that received it
             uint8_t bytes = radio.getPayloadSize(); // get size of incoming payload
             PayloadStruct received;
             radio.read(&received, sizeof(received)); // get incoming payload

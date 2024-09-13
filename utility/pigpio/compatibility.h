@@ -10,9 +10,9 @@
 extern "C" {
 #endif
 
-void __msleep(int milisec);
+void __msleep(int millisec);
 
-void __usleep(int milisec);
+void __usleep(int microsec);
 
 void __start_timer();
 

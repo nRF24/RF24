@@ -1,4 +1,4 @@
-// pre-chossen pins for different boards
+// pre-chosen pins for different boards
 #ifndef DEFAULTPINS_H
 #define DEFAULTPINS_H
 

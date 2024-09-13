@@ -119,7 +119,7 @@ void loop()
         // This device is a RX node
 
         uint8_t pipe;
-        if (radio.available(&pipe)) {               // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) {               // is there a payload? get the pipe number that received it
             uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
             radio.read(&payload, bytes);            // fetch payload from FIFO
 

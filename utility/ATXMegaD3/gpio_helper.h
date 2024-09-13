@@ -72,9 +72,9 @@ extern "C" {
 #define XMEGA_SPI_PORT_C 20
 #define XMEGA_SPI_PORT_D 28
 
-//void GPIO_getPort(int pinnum, PORT_t * port, uint8_t pin);
-//void GPIO_getPort(int pinnum, PORT_t * port, uint8_t * pin_bm);
-PORT_t* GPIO_getPort(int pinnum, uint8_t* pin_bm);
+//void GPIO_getPort(int pin_num, PORT_t * port, uint8_t pin);
+//void GPIO_getPort(int pin_num, PORT_t * port, uint8_t * pin_bm);
+PORT_t* GPIO_getPort(int pin_num, uint8_t* pin_bm);
 
 #ifdef __cplusplus
 }

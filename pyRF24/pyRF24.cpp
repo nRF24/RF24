@@ -285,8 +285,8 @@ BOOST_PYTHON_MODULE(RF24)
     // ******************** RF24 class  **************************
     bp::class_<RF24>("RF24", bp::init<uint16_t, uint16_t>((bp::arg("_cepin"), bp::arg("_cspin"))))
 #if defined(RF24_LINUX) && !defined(MRAA)
-        .def(bp::init<uint16_t, uint16_t, uint32_t>((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spispeed"))))
-        .def(bp::init<uint32_t>((bp::arg("spispeed"))))
+        .def(bp::init<uint16_t, uint16_t, uint32_t>((bp::arg("_cepin"), bp::arg("_cspin"), bp::arg("spi_speed"))))
+        .def(bp::init<uint32_t>((bp::arg("spi_speed"))))
         .def(bp::init<>())
 #endif
         .def("available", (bool(::RF24::*)())(&::RF24::available))

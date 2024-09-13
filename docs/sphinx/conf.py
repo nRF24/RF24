@@ -97,7 +97,6 @@ html_theme_options = {
         # "toc.integrate",
         # "navigation.sections",
         "navigation.instant",
-        # "header.autohide",
         "navigation.top",
         # "search.highlight",
         "search.share",
@@ -128,8 +127,6 @@ html_theme_options = {
     "repo_url": "https://github.com/nRF24/RF24/",
     "repo_name": "RF24",
     "repo_type": "github",
-    # If False, expand all TOC entries
-    "globaltoc_collapse": False,
 }
 
 object_description_options = [

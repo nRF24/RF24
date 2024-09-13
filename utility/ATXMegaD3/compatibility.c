@@ -11,9 +11,9 @@
 
 volatile uint32_t _millis;
 
-void __msleep(int milisec)
+void __msleep(int millisec)
 {
-    while (milisec-- > 0) {
+    while (millisec-- > 0) {
         _delay_ms(1);
     }
 }

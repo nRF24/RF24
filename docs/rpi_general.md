@@ -79,12 +79,12 @@ See [the Raspberry Pi documentation about the GPIO pins](https://www.raspberrypi
 | 2   | VCC      | rpi-3v3    | (17)              |
 | 3   | CE       | rpi-gpio22 | (15)              |
 | 4   | CSN      | rpi-gpio8  | (24)              |
-| 5   | SCK      | rpi-sckl   | (23)              |
+| 5   | SCK      | rpi-sclk   | (23)              |
 | 6   | MOSI     | rpi-mosi   | (19)              |
 | 7   | MISO     | rpi-miso   | (21)              |
 | 8   | IRQ      | -          | -                 |
 
-## breif history of RF24 library lineage
+## brief history of RF24 library lineage
 
 Based on the arduino lib from [J. Coliz](maniacbug@ymail.com),
 the library was berryfied by [Purinda Gunasekara](purinda@gmail.com)

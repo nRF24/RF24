@@ -31,7 +31,7 @@
   CRC Length     = 16 bits
   PA Power       = PA_LOW
 
-  Users can use this sketch to troubleshoot radio module wiring etc. as it makes the radios hot-swapable
+  Users can use this sketch to troubleshoot radio module wiring etc. as it makes the radios hot-swappable
 
   Updated: 2019 by TMRh20
 */

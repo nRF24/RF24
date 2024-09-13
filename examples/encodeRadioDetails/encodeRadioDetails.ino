@@ -86,7 +86,7 @@ void setup() {
   Serial.println(F("\"\n***You may need to use 'python3' (without quotes) on Linux"));
 }  // setup
 
-/* Registers correspnding to index of encoded_details array
+/* Registers corresponding to index of encoded_details array
   0:     NRF_CONFIG
   1:     EN_AA
   2:     EN_RXADDR

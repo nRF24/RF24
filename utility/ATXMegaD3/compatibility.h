@@ -18,7 +18,7 @@ extern "C" {
 //#include <time.h>
 //#include <sys/time.h>
 
-void __msleep(int milisec);
+void __msleep(int millisec);
 
 void __usleep(int usec);
 

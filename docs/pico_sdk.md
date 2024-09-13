@@ -125,10 +125,10 @@ In order to use the RF24 libraries in your RP2040 based project:
 Initially (without modification), the SPI bus uses the default pins defined in the
 Pico SDK repository's [pico-sdk/src/boards/include/boards/\<board_name>.h files](https://github.com/raspberrypi/pico-sdk/tree/master/src/boards/include/boards).
 However, there may be some boards that do not define the necessary pins to use as defaults. This can
-be rememdied using either project source code or build-time configuration.
+be remedied using either project source code or build-time configuration.
 
 @warning There is no support for software driven SPI on RP2040 based boards at this time.
-If someone is so inclined to implement this using the Pico SDK's PIO (Programable Input
+If someone is so inclined to implement this using the Pico SDK's PIO (Programmable Input
 Output) feature, please submit an issue or pull request to the
 [RF24 repository](http://github.com/nRF24/RF24).
 

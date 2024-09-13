@@ -58,7 +58,7 @@ endif()
 
 message(STATUS "tool name being used: ${tool_name}")
 
-# add compiler flags to optomize builds with arm-linux-gnueabihf-g* compilers
+# add compiler flags to optimize builds with arm-linux-gnueabihf-g* compilers
 if("${tool_name}" STREQUAL "arm-linux-gnueabihf")
     if("${SOC}" STREQUAL "BCM2835" OR "${SOC}" STREQUAL "BCM2708")
         add_compile_options(-marm -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard)

@@ -232,7 +232,7 @@ void slave()
     time_t startTimer = time(nullptr);       // start a timer
     while (time(nullptr) - startTimer < 6) { // use 6 second timeout
         uint8_t pipe;
-        if (radio.available(&pipe)) {                             // is there a payload? get the pipe number that recieved it
+        if (radio.available(&pipe)) {                             // is there a payload? get the pipe number that received it
             uint8_t bytes = radio.getPayloadSize();               // get the size of the payload
             radio.read(&payload, bytes);                          // fetch payload from FIFO
             cout << "Received " << (unsigned int)bytes;           // print the size of the payload

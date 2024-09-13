@@ -24,9 +24,9 @@ uint8_t SPI::transfer(uint8_t tx_)
     return recv;
 }
 
-void SPI::transfernb(const uint8_t* tbuf, uint8_t* rbuf, uint32_t len)
+void SPI::transfernb(const uint8_t* txBuf, uint8_t* rxBuf, uint32_t len)
 {
-    spi_write_read_blocking(_hw_id, tbuf, rbuf, len);
+    spi_write_read_blocking(_hw_id, txBuf, rxBuf, len);
 }
 
 void SPI::transfern(const uint8_t* buf, uint32_t len)

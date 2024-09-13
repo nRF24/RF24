@@ -154,7 +154,7 @@ void loop() {
         Serial.println(received.counter);    // print the incoming payload's counter
         payload.counter = received.counter;  // save incoming counter for next outgoing counter
       } else {
-        Serial.println(F(" Recieved no response."));  // no response received
+        Serial.println(F(" Received no response."));  // no response received
       }
     } else {
       Serial.println(F("Transmission failed or timed out"));  // payload was not delivered
@@ -167,7 +167,7 @@ void loop() {
     // This device is a RX node
 
     uint8_t pipe;
-    if (radio.available(&pipe)) {  // is there a payload? get the pipe number that recieved it
+    if (radio.available(&pipe)) {  // is there a payload? get the pipe number that received it
       PayloadStruct received;
       radio.read(&received, sizeof(received));  // get incoming payload
       payload.counter = received.counter + 1;   // increment incoming counter for next outgoing response

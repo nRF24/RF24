@@ -31,16 +31,16 @@ public:
         init(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0);
     }
 
-    uint32_t clck;
+    uint32_t clock;
     uint8_t border;
-    uint8_t dmode;
+    uint8_t dataMode;
 
 private:
     void init(uint32_t clock, uint8_t bitOrder, uint8_t dataMode)
     {
-        clck = clock;
+        clock = clock;
         border = bitOrder;
-        dmode = dataMode;
+        dataMode = dataMode;
     }
 
     friend class SPIClass;
@@ -55,7 +55,7 @@ public:
 
     inline static uint8_t transfer(uint8_t _data);
 
-    inline static void transfernb(char* tbuf, char* rbuf, uint32_t len);
+    inline static void transfernb(char* txBuf, char* rxBuf, uint32_t len);
 
     inline static void transfern(char* buf, uint32_t len);
 
@@ -82,9 +82,9 @@ uint8_t SPI::transfer(uint8_t _data)
     return data;
 }
 
-void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
+void SPI::transfernb(char* txBuf, char* rxBuf, uint32_t len)
 {
-    bcm2835_spi_transfernb(tbuf, rbuf, len);
+    bcm2835_spi_transfernb(txBuf, rxBuf, len);
 }
 
 void SPI::transfern(char* buf, uint32_t len)
