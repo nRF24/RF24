@@ -8,6 +8,9 @@ endif()
 
 cmake_minimum_required(VERSION 3.15)
 
+# generate a compilation database for static analysis by clang-tidy
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set the project name to your project name
 project(RF24 C CXX)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/StandardProjectSettings.cmake)

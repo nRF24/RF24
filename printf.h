@@ -14,8 +14,8 @@
  * enables 'printf'
  */
 
-#ifndef __PRINTF_H__
-#define __PRINTF_H__
+#ifndef RF24_PRINTF_H_
+#define RF24_PRINTF_H_
 
 #if defined(ARDUINO_ARCH_AVR) || defined(__ARDUINO_X86__) || defined(ARDUINO_ARCH_MEGAAVR)
 
@@ -43,4 +43,4 @@ void printf_begin(void)
 #endif // defined(__ARDUINO_X86__)
 }
 
-#endif // __PRINTF_H__
+#endif // RF24_PRINTF_H_
