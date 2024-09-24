@@ -24,19 +24,10 @@ build:
       tar xf doxygen.tar &&
       mv doxygen-$DOXYGEN_VERSION/bin/doxygen ./
     # get lib version & overwrite Doxyfile values
-    - python3 docs/ci.py
+    - python3 .github/doxygen.py
     # run doxygen
     - cd docs && ../.doxygen/doxygen
     # copy output to RTD output path for HTML files
     - ls -R docs/html/
     - mkdir -p ${READTHEDOCS_OUTPUT}
     - mv docs/html/ "${READTHEDOCS_OUTPUT}"
-
-# # Build documentation in the docs/ directory with Sphinx
-# sphinx:
-#   configuration: docs/sphinx/conf.py
-
-# # install Python requirements required to build docs
-# python:
-#   install:
-#     - requirements: docs/sphinx/requirements.txt

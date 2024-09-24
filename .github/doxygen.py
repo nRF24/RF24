@@ -7,7 +7,7 @@ Such changes SHOULD NOT be pushed to the remote.
 from pathlib import Path
 import json
 
-DOCS_DIR = Path(__file__).parent
+DOCS_DIR = Path(__file__).parent.parent / "docs"
 PROPERTIES = DOCS_DIR.parent / "library.json"
 CONFIG = DOCS_DIR / "Doxyfile"
 TMP = DOCS_DIR / "doxygenAction"
