@@ -1,3 +1,9 @@
+"""WARNING -- FOR CI ONLY
+
+This script is meant to be execute in CI only.
+Running this locally will alter the Doxyfile.
+Such changes SHOULD NOT be pushed to the remote.
+"""
 from pathlib import Path
 import json
 
