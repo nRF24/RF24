@@ -17,3 +17,14 @@ if(DEFINED CONFIG_RF24_CSN_PIN)
     target_compile_definitions(main PUBLIC CSN_PIN=${CONFIG_RF24_CSN_PIN})
 endif()
 
+if(DEFINED CONFIG_RF24_DEFAULT_MOSI)
+    target_compile_definitions(main PUBLIC CONFIG_RF24_DEFAULT_MOSI=${CONFIG_RF24_DEFAULT_MOSI})
+endif()
+
+if(DEFINED CONFIG_RF24_DEFAULT_MISO)
+    target_compile_definitions(main PUBLIC CONFIG_RF24_DEFAULT_MISO=${CONFIG_RF24_DEFAULT_MISO})
+endif()
+
+if(DEFINED CONFIG_RF24_DEFAULT_SCLK)
+    target_compile_definitions(main PUBLIC CONFIG_RF24_DEFAULT_SCLK=${CONFIG_RF24_DEFAULT_SCLK})
+endif()

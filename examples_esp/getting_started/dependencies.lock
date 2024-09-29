@@ -6,16 +6,16 @@ dependencies:
       type: service
     version: 1.4.4
   espressif/tinyusb:
-    component_hash: 6e128177d3fe5027750a75e1ff64c655a7b53fa64eff8c1a4a8a5a4daa7924d1
+    component_hash: 214989d502fc168241a4a4f83b097d8ac44a93cd6f1787b4ac10069a8b3bebd3
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 0.15.0~7
+    version: 0.15.0~10
   idf:
     component_hash: null
     source:
       type: idf
-    version: 5.2.1
+    version: 5.3.0
   nRF24/RF24:
     component_hash: null
     source:
