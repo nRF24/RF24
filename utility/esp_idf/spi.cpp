@@ -58,7 +58,7 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_
     device_conf.flags = 0;
     // we won't be using queued or interrupt-triggered SPI transactions.
     // disable those related features' config
-    device_conf.queue_size = 0;
+    device_conf.queue_size = 1;
     device_conf.pre_cb = nullptr;
     device_conf.post_cb = nullptr;
 

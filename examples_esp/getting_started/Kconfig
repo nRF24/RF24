@@ -7,3 +7,18 @@ config RF24_CSN_PIN
     int "The GPIO pin number used for the radio's CSN pin"
     help
         If undefined, then the main app's code defaults to using pin 8.
+
+config RF24_DEFAULT_MOSI
+    int "The GPIO pin number used for the radio's MOSI pin"
+    help
+        If undefined, then the RF24 library's code defaults to using GPIO13 as the SPI2_HOST MOSI pin.
+
+config RF24_DEFAULT_MISO
+    int "The GPIO pin number used for the radio's MISO pin"
+    help
+        If undefined, then the RF24 library's code defaults to using GPIO12 as the SPI2_HOST MISO pin.
+
+config RF24_DEFAULT_SCLK
+    int "The GPIO pin number used for the radio's SCLK pin"
+    help
+        If undefined, then the RF24 library's code defaults to using GPIO14 as the SPI2_HOST SCLK pin.
