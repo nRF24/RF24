@@ -15,7 +15,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 
-PROJECT_ICON = sphinx/_static/new_favicon.ico
+PROJECT_ICON = images/favicon.ico
 
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded by
 # double-quotes, unless you are using Doxywizard) that should identify the
@@ -371,24 +371,6 @@ HTML_DYNAMIC_SECTIONS  = YES
 # The default value is: YES.
 
 GENERATE_LATEX         = NO
-
-#---------------------------------------------------------------------------
-# Configuration options related to the XML output
-#---------------------------------------------------------------------------
-
-# If the GENERATE_XML tag is set to YES, doxygen will generate an XML file that
-# captures the structure of the code including all documentation.
-# The default value is: NO.
-
-GENERATE_XML           = YES
-
-# The XML_OUTPUT tag is used to specify where the XML pages will be put. If a
-# relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
-# it.
-# The default directory is: xml.
-# This tag requires that the tag GENERATE_XML is set to YES.
-
-XML_OUTPUT             = sphinx/xml
 
 #---------------------------------------------------------------------------
 # Configuration options related to the preprocessor
