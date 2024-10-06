@@ -34,9 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor some SPI transactions by \@2bndy5 in [#988](https://github.com/nRF24/RF24/pull/988)
 - Bump version to v1.4.10 by \@2bndy5 in [`5bb22e2`](https://github.com/nRF24/RF24/commit/5bb22e2dbab31dedd677defc0007c2f0e7cd7f11)
 
-[1.4.10]: https://github.com/nRF24/RF24/compare/v1.4.9...1.4.10
+[1.4.10]: https://github.com/nRF24/RF24/compare/v1.4.9...v1.4.10
 
-Full commit diff: [`v1.4.9...1.4.10`][1.4.10]
+Full commit diff: [`v1.4.9...v1.4.10`][1.4.10]
 
 ## [1.4.9] - 2024-06-11
 
@@ -132,8 +132,8 @@ Full commit diff: [`v1.4.7...v1.4.8`][1.4.8]
 
 ### <!-- 9 --> 🗨️ Changed
 
-- Solve #894 by \@2bndy5 in [#895](https://github.com/nRF24/RF24/pull/895)
-- Resolves #899 by \@2bndy5 in [`557d165`](https://github.com/nRF24/RF24/commit/557d165c12e72329b7573b380eb1e7f132cfbfe6)
+- Solve \#894 by \@2bndy5 in [#895](https://github.com/nRF24/RF24/pull/895)
+- Resolves \#899 by \@2bndy5 in [`557d165`](https://github.com/nRF24/RF24/commit/557d165c12e72329b7573b380eb1e7f132cfbfe6)
 - Update pico_sdk.md to reflect changes to SPI by \@matt-walker0 in [#900](https://github.com/nRF24/RF24/pull/900)
 - Update version for release by \@TMRh20 in [`a028813`](https://github.com/nRF24/RF24/commit/a028813b285d6cec3090d2c96984bd67a399c52e)
 
@@ -158,7 +158,7 @@ Full commit diff: [`v1.4.6...v1.4.7`][1.4.7]
 ### <!-- 4 --> 🛠️ Fixed
 
 - Fix Raspberry Pi company name by \@lurch in [#858](https://github.com/nRF24/RF24/pull/858)
-- Fix `pgm_read_ptr()` (fixes bblanchon/ArduinoJson#1790) by \@bblanchon in [#864](https://github.com/nRF24/RF24/pull/864)
+- Fix `pgm_read_ptr()` (fixes bblanchon/ArduinoJson\#1790) by \@bblanchon in [#864](https://github.com/nRF24/RF24/pull/864)
 
 ### <!-- 8 --> 📝 Documentation
 
@@ -227,8 +227,8 @@ Full commit diff: [`v1.4.3...v1.4.4`][1.4.4]
 ### <!-- 4 --> 🛠️ Fixed
 
 - Fix logic in disableAckPayloads() by \@2bndy5 in [`f9e5075`](https://github.com/nRF24/RF24/commit/f9e507544686af23bcfe9578a1558bbb08d382c9)
-- Fix #832 typo in printDetails() by \@2bndy5 in [`d4c3c35`](https://github.com/nRF24/RF24/commit/d4c3c355af0ed5d326ec79b5bbe56ff0f2a3d146)
-- Patch for #834 by \@2bndy5 in [#839](https://github.com/nRF24/RF24/pull/839)
+- Fix \#832 typo in printDetails() by \@2bndy5 in [`d4c3c35`](https://github.com/nRF24/RF24/commit/d4c3c355af0ed5d326ec79b5bbe56ff0f2a3d146)
+- Patch for \#834 by \@2bndy5 in [#839](https://github.com/nRF24/RF24/pull/839)
 
 ### <!-- 8 --> 📝 Documentation
 
@@ -243,12 +243,12 @@ Full commit diff: [`v1.4.3...v1.4.4`][1.4.4]
 - Only run linux CI on "created release" events by \@2bndy5 in [`8d25675`](https://github.com/nRF24/RF24/commit/8d256751d6dbb2523bf3b3376071faef56d073cc)
 - Update actions/checkout to v2 by \@2bndy5 in [`f584685`](https://github.com/nRF24/RF24/commit/f584685c34b6a948384c9512140ad90fd0661770)
 - Updated common issues added issues and fixes by \@matt-walker0 in [#820](https://github.com/nRF24/RF24/pull/820)
-- Undo changes to CI triggers in #821 by \@2bndy5 in [`b2cf576`](https://github.com/nRF24/RF24/commit/b2cf5769ffbc59c84b9b99a2933d74634f08efab)
+- Undo changes to CI triggers in \#821 by \@2bndy5 in [`b2cf576`](https://github.com/nRF24/RF24/commit/b2cf5769ffbc59c84b9b99a2933d74634f08efab)
 - Ran black on print_dets.py by \@2bndy5 in [`aaf0f53`](https://github.com/nRF24/RF24/commit/aaf0f53cfa4484d9bc0d3f6c2d5be91d8cdfe931)
 - Don't create PDFs on RTD by \@2bndy5 in [`7e69d7d`](https://github.com/nRF24/RF24/commit/7e69d7d1fa10c52a3bbfba1fecec89915995f90e)
 - Update printf.h to include megaAVR by \@Cobalt6700 in [#843](https://github.com/nRF24/RF24/pull/843)
 - Update linux_install.md by \@TMRh20 in [`c327568`](https://github.com/nRF24/RF24/commit/c3275683e62fcb184cfca225f5fb972faad01ad6)
-- Follow up #824 by \@2bndy5 in [#846](https://github.com/nRF24/RF24/pull/846)
+- Follow up \#824 by \@2bndy5 in [#846](https://github.com/nRF24/RF24/pull/846)
 - Update py examples by \@2bndy5 in [#851](https://github.com/nRF24/RF24/pull/851)
 - Minor version bump by \@2bndy5 in [`54ce53a`](https://github.com/nRF24/RF24/commit/54ce53a960a00d1f64dbd601dfa852936ba4be57)
 
@@ -274,7 +274,7 @@ Full commit diff: [`v1.4.2...v1.4.3`][1.4.3]
 ### <!-- 8 --> 📝 Documentation
 
 - Sphinx docs updates by \@2bndy5 in [#803](https://github.com/nRF24/RF24/pull/803)
-- Resolve #779 and augment docs by \@2bndy5 in [`04b103e`](https://github.com/nRF24/RF24/commit/04b103e81a7d21437a3ec0958a9d39bbd87a6c98)
+- Resolve \#779 and augment docs by \@2bndy5 in [`04b103e`](https://github.com/nRF24/RF24/commit/04b103e81a7d21437a3ec0958a9d39bbd87a6c98)
 - Small docs update by \@2bndy5 in [`f9447d9`](https://github.com/nRF24/RF24/commit/f9447d9c81a11862a27eb6fdf34edbac2f6ee489)
 - [docs] fix API sig; add badge; fix dup heading by \@2bndy5 in [`3befead`](https://github.com/nRF24/RF24/commit/3befead0495ac4d92228632e7d49a0c2d4f17ddc)
 - Reverse Engineering tricks by \@2bndy5 in [#804](https://github.com/nRF24/RF24/pull/804)
@@ -310,7 +310,7 @@ Full commit diff: [`v1.4.0...v1.4.1`][1.4.1]
 
 ### <!-- 1 --> 🚀 Added
 
-- Add printf.h fix from \@TonioChingon in #739 by \@2bndy5 in [`c0279c8`](https://github.com/nRF24/RF24/commit/c0279c881f36d5be556564c5750014f89667f235)
+- Add printf.h fix from \@TonioChingon in \#739 by \@2bndy5 in [`c0279c8`](https://github.com/nRF24/RF24/commit/c0279c881f36d5be556564c5750014f89667f235)
 - Add Due to ArduinoCLI action by \@2bndy5 in [`41484dc`](https://github.com/nRF24/RF24/commit/41484dc781a002e4ec67b68fdae7799b92afca7c)
 - Add MRAA to Linux CI action by \@2bndy5 in [`8e7d470`](https://github.com/nRF24/RF24/commit/8e7d4709371608222e582930462670fc951d5011)
 - Add example code snippets to Arduino support pg by \@2bndy5 in [`4770050`](https://github.com/nRF24/RF24/commit/477005031ff0473d2f2999a82a07daf8aec56b16)
@@ -325,14 +325,14 @@ Full commit diff: [`v1.4.0...v1.4.1`][1.4.1]
 
 ### <!-- 3 --> 🗑️ Removed
 
-- Remove useless Due config file #752 by \@2bndy5 in [`25d5530`](https://github.com/nRF24/RF24/commit/25d5530a42a77e53a864c08a18d755e55bff6950)
+- Remove useless Due config file \#752 by \@2bndy5 in [`25d5530`](https://github.com/nRF24/RF24/commit/25d5530a42a77e53a864c08a18d755e55bff6950)
 
 ### <!-- 4 --> 🛠️ Fixed
 
 - Fixed platforms list in library.json by \@dagix5 in [#742](https://github.com/nRF24/RF24/pull/742)
-- Fix faulty #ifdef logic by \@2bndy5 in [`416cc35`](https://github.com/nRF24/RF24/commit/416cc35d69dd7cbe5874cee5775c70081b73b319)
+- Fix faulty \#ifdef logic by \@2bndy5 in [`416cc35`](https://github.com/nRF24/RF24/commit/416cc35d69dd7cbe5874cee5775c70081b73b319)
 - Fix teensy support; add PIO CI for teensy by \@2bndy5 in [`6935766`](https://github.com/nRF24/RF24/commit/693576613efc503c4932910bbe533e1f0ebf7f73)
-- Fix #414; note need mbed example in arduino.md by \@2bndy5 in [`5a28733`](https://github.com/nRF24/RF24/commit/5a28733542997d8295a6206cadc9f7c49ce1ae7b)
+- Fix \#414; note need mbed example in arduino.md by \@2bndy5 in [`5a28733`](https://github.com/nRF24/RF24/commit/5a28733542997d8295a6206cadc9f7c49ce1ae7b)
 - Fix printf() only for adafruit/ArduinoCore-SAMD by \@2bndy5 in [`27710e2`](https://github.com/nRF24/RF24/commit/27710e2cc41146fbaca5af600f3e38ee9f416a49)
 - Fix indent by \@2bndy5 in [`1e974ce`](https://github.com/nRF24/RF24/commit/1e974ce2f2550d756e6ca5af3da55f5077adb037)
 
@@ -372,11 +372,11 @@ Full commit diff: [`v1.4.0...v1.4.1`][1.4.1]
 - Avr/pgmspace.h was added to Due core in 2013 by \@2bndy5 in [`22995fd`](https://github.com/nRF24/RF24/commit/22995fdc34a91f064a749821a570f3a25343ace3)
 - Oops, undo my testing change by \@2bndy5 in [`54e4886`](https://github.com/nRF24/RF24/commit/54e4886aa0378ec9fceaf69b4ac8451a93cd19b9)
 - Ammend support for SPI_UART in csn() by \@2bndy5 in [`9989c20`](https://github.com/nRF24/RF24/commit/9989c205b57d53ac0425dd683f013538ad2a23ac)
-- Confirm working 2nd SPI bus on esp8266 #648 by \@2bndy5 in [`02ba92f`](https://github.com/nRF24/RF24/commit/02ba92f346f180898587b0c4beeaef94fef08ced)
+- Confirm working 2nd SPI bus on esp8266 \#648 by \@2bndy5 in [`02ba92f`](https://github.com/nRF24/RF24/commit/02ba92f346f180898587b0c4beeaef94fef08ced)
 - C-n-p artifact; more indent inconcsistencies by \@2bndy5 in [`0a6aae3`](https://github.com/nRF24/RF24/commit/0a6aae3bfc632bbe1568bca03d215f1023f5829e)
 - Comment out theroretical example snippets by \@2bndy5 in [`4b6fb8d`](https://github.com/nRF24/RF24/commit/4b6fb8d4e99b95511df334f8a5a6e06f8f44ee1f)
 - Doxygen sux at reading imgs by \@2bndy5 in [`55cc2dd`](https://github.com/nRF24/RF24/commit/55cc2ddf22acd03499103222a00b2a130bc19706)
-- Implement #539 by \@2bndy5 in [`0c433f3`](https://github.com/nRF24/RF24/commit/0c433f3bc30e682eb5d3086609132465007e1d5c)
+- Implement \#539 by \@2bndy5 in [`0c433f3`](https://github.com/nRF24/RF24/commit/0c433f3bc30e682eb5d3086609132465007e1d5c)
 - My CnP skills are lacking by \@2bndy5 in [`befe021`](https://github.com/nRF24/RF24/commit/befe02112fe989ee082b271e26745a28898725e7)
 - Need to test py wrapper by \@2bndy5 in [`1f0335b`](https://github.com/nRF24/RF24/commit/1f0335b4d56a1842dae043101d553213d94f7167)
 - [py_wrap] begin fails to compile by \@2bndy5 in [`76f6048`](https://github.com/nRF24/RF24/commit/76f6048963df6252d05ef90cb9ae7fed896a74de)
@@ -433,7 +433,7 @@ Full commit diff: [`v1.3.11...v1.3.12`][1.3.12]
 
 ### <!-- 3 --> 🗑️ Removed
 
-- Follow-up fixes from #691 by \@2bndy5 in [#697](https://github.com/nRF24/RF24/pull/697)
+- Follow-up fixes from \#691 by \@2bndy5 in [#697](https://github.com/nRF24/RF24/pull/697)
 
 ### <!-- 9 --> 🗨️ Changed
 
@@ -470,7 +470,7 @@ Full commit diff: [`v1.3.10...v1.3.11`][1.3.11]
 
 - Update python wrapper by \@TMRh20 in [`4fd92d1`](https://github.com/nRF24/RF24/commit/4fd92d113359902b8e7b8ea00dd42ed65e676155)
 - Update CONTRIBUTING.md by \@Avamander in [`d062771`](https://github.com/nRF24/RF24/commit/d0627715a2e9ff626e7bfbb4d89215f94c9bc8cd)
-- Available() could be slightly faster #631 by \@jscrane in [#650](https://github.com/nRF24/RF24/pull/650)
+- Available() could be slightly faster \#631 by \@jscrane in [#650](https://github.com/nRF24/RF24/pull/650)
 - Update library.properties by \@TMRh20 in [`7debc6f`](https://github.com/nRF24/RF24/commit/7debc6f6202e6807401a135fd8c91a9ad4c594d5)
 - Update library.json by \@TMRh20 in [`c7cfbea`](https://github.com/nRF24/RF24/commit/c7cfbea636dbb552fcf93829b3b397b62dc9814d)
 
@@ -632,9 +632,9 @@ Full commit diff: [`v1.3.4...v1.3.5`][1.3.5]
 
 - Update .gitignore by \@Avamander in [`bf25900`](https://github.com/nRF24/RF24/commit/bf259002b2eb0b44df812d7c2d332f70b50525b4)
 - Update to latest BCM 2835 driver for RPI4 support by \@TMRh20 in [`e221acd`](https://github.com/nRF24/RF24/commit/e221acdc4315a39016b31c28143639b27421d75a)
-- Merge pull request #520 from jonnykl/fix-get-dyn-pld-size-spi by \@TMRh20 in [#520](https://github.com/nRF24/RF24/pull/520)
+- Merge pull request \#520 from jonnykl/fix-get-dyn-pld-size-spi by \@TMRh20 in [#520](https://github.com/nRF24/RF24/pull/520)
 - Mod to run RF24 on Raspberry SPI1 by \@Crkk in [`569639a`](https://github.com/nRF24/RF24/commit/569639a5cfedf37239619e29c888bf25395bc0eb)
-- Merge pull request #530 from Crkk/patch-1 by \@TMRh20 in [#530](https://github.com/nRF24/RF24/pull/530)
+- Merge pull request \#530 from Crkk/patch-1 by \@TMRh20 in [#530](https://github.com/nRF24/RF24/pull/530)
 - Reformatted the entire project using a single code style by \@Avamander in [`0d36fca`](https://github.com/nRF24/RF24/commit/0d36fca8406aaf46558c171b8d85d27da2d4d97e)
 - Update CONTRIBUTING.md by \@Avamander in [`d1a5d5e`](https://github.com/nRF24/RF24/commit/d1a5d5e6c5db8f7d2c75289adaba13ec244ee8ad)
 - Improved Github templates by \@olback in [#543](https://github.com/nRF24/RF24/pull/543)
@@ -665,7 +665,7 @@ Full commit diff: [`v1.3.3...v1.3.4`][1.3.4]
 
 ### <!-- 8 --> 📝 Documentation
 
-- Update docs for write() per #500 by \@TMRh20 in [`bd88f9e`](https://github.com/nRF24/RF24/commit/bd88f9e48ba74119ebd9ebd8cdbe6a69ecc4b963)
+- Update docs for write() per \#500 by \@TMRh20 in [`bd88f9e`](https://github.com/nRF24/RF24/commit/bd88f9e48ba74119ebd9ebd8cdbe6a69ecc4b963)
 
 ### <!-- 9 --> 🗨️ Changed
 
@@ -680,12 +680,12 @@ Full commit diff: [`v1.3.3...v1.3.4`][1.3.4]
 - Edit example - forgot to add 'break;' by \@TMRh20 in [`6821e42`](https://github.com/nRF24/RF24/commit/6821e42f2781e81c4b95a52ef0b27b1dd8b634c8)
 - Edit RF24_config.h for ESP32 by \@TMRh20 in [`0b24667`](https://github.com/nRF24/RF24/commit/0b2466772ada73b9cb7843128c8aba3a62dafaf0)
 - Make attiny SPI code independent from different Arduino pins definitions by \@troffmo5 in [`41866a3`](https://github.com/nRF24/RF24/commit/41866a3354e82cedaf451453a9f1d5225b30ba88)
-- Merge pull request #326 from troffmo5/attiny by \@TMRh20 in [#326](https://github.com/nRF24/RF24/pull/326)
+- Merge pull request \#326 from troffmo5/attiny by \@TMRh20 in [#326](https://github.com/nRF24/RF24/pull/326)
 - Update RF24_config.h by \@IkpeohaGodson in [`0015498`](https://github.com/nRF24/RF24/commit/0015498c06b31d524e0471848f6b0891ea56b234)
 - Cleaned up formatting of RF24_config.h by \@Avamander in [`279c67b`](https://github.com/nRF24/RF24/commit/279c67b76ed1fcaa3fd94571f8ab46ef0dfe514d)
 - Update RF24_config.h by \@Avamander in [`df3f821`](https://github.com/nRF24/RF24/commit/df3f8211976c4c457128f7a2dab606c2bea76728)
 - Update RF24_config.h by \@Avamander in [`f3b2fb0`](https://github.com/nRF24/RF24/commit/f3b2fb002386cf9f714b6dec04f959402995ca43)
-- Merge pull request #502 from IkpeohaGodson/patch-1 and clean up RF24_config.h by \@Avamander in [#502](https://github.com/nRF24/RF24/pull/502)
+- Merge pull request \#502 from IkpeohaGodson/patch-1 and clean up RF24_config.h by \@Avamander in [#502](https://github.com/nRF24/RF24/pull/502)
 - Update library.json by \@Avamander in [`5f9814f`](https://github.com/nRF24/RF24/commit/5f9814f19731595d39464695cc7d1524b8d1cdf4)
 - Update library.properties by \@Avamander in [`fdb4366`](https://github.com/nRF24/RF24/commit/fdb43667485b155269923017668a7650238f075e)
 
@@ -700,7 +700,7 @@ Full commit diff: [`v1.3.2...v1.3.3`][1.3.3]
 
 ### <!-- 1 --> 🚀 Added
 
-- Merge pull request #413 from haseebehsan/pythonWrappers by \@TMRh20 in [#413](https://github.com/nRF24/RF24/pull/413)
+- Merge pull request \#413 from haseebehsan/pythonWrappers by \@TMRh20 in [#413](https://github.com/nRF24/RF24/pull/413)
 - Added an exception if non-superuser uses the library by \@akatran in [#428](https://github.com/nRF24/RF24/pull/428)
 - Fixed misleading indent warning in bcm2835.c in [#444](https://github.com/nRF24/RF24/pull/444)
 
@@ -712,7 +712,7 @@ Full commit diff: [`v1.3.2...v1.3.3`][1.3.3]
 
 - Update pingpair_dyn.py by \@TMRh20 in [`57d3eef`](https://github.com/nRF24/RF24/commit/57d3eef5909dbb15f00afec558514000f24951f3)
 - Merge remote-tracking branch 'upstream/master' by \@ludiazv in [`5b09d19`](https://github.com/nRF24/RF24/commit/5b09d193369313946bd28d527f17ca93638d1cb6)
-- Merge pull request #411 from ludiazv/master by \@TMRh20 in [#411](https://github.com/nRF24/RF24/pull/411)
+- Merge pull request \#411 from ludiazv/master by \@TMRh20 in [#411](https://github.com/nRF24/RF24/pull/411)
 - PyRF24 moved to its specific folder by \@haseebehsan in [`8eaa26d`](https://github.com/nRF24/RF24/commit/8eaa26de6066941a32c68fe0aa33b04ff271143f)
 - PyRF24Network python wrapper created by \@haseebehsan in [`570bd1e`](https://github.com/nRF24/RF24/commit/570bd1eafcf545c69a373df3771f223c55a96564)
 - PyRF24Mesh python Wrapper created by \@haseebehsan in [`ba335de`](https://github.com/nRF24/RF24/commit/ba335de7751084a68da8f85908b8c185424ea501)
@@ -723,12 +723,12 @@ Full commit diff: [`v1.3.2...v1.3.3`][1.3.3]
 - SPIDEV compatibility layer improvement and patch for 64bits by \@ludiazv in [#455](https://github.com/nRF24/RF24/pull/455)
 - Reorder libs in linker arguments. by \@wamonite in [`4dcf86c`](https://github.com/nRF24/RF24/commit/4dcf86ca47461ac0793bd47acbddf4e36ddcf6d4)
 - Ensure pyRF24 constructors match C++ conditionals. by \@wamonite in [`ae4c03b`](https://github.com/nRF24/RF24/commit/ae4c03bc49eef915cbd389fc5339396d7849bb90)
-- Merge pull request #402 from wamonite/dev_up2 by \@TMRh20 in [#402](https://github.com/nRF24/RF24/pull/402)
+- Merge pull request \#402 from wamonite/dev_up2 by \@TMRh20 in [#402](https://github.com/nRF24/RF24/pull/402)
 - Update Transfer.ino by \@HannHank in [`ba5c39f`](https://github.com/nRF24/RF24/commit/ba5c39faeec42795ce65d4310a3b0ce41b031259)
-- Merge pull request #457 from HannHank/patch-1 by \@TMRh20 in [#457](https://github.com/nRF24/RF24/pull/457)
+- Merge pull request \#457 from HannHank/patch-1 by \@TMRh20 in [#457](https://github.com/nRF24/RF24/pull/457)
 - Update Transfer.ino by \@Avamander in [`a2b35d6`](https://github.com/nRF24/RF24/commit/a2b35d6594160263a5a8c460a9754dd71fba6d95)
 - Automatically choose correct SPI clock divider. by \@herm in [`5b1be4e`](https://github.com/nRF24/RF24/commit/5b1be4ef63b26fea8cbbc88a2beffd7198bc47c1)
-- Merge pull request #472 from herm/spi_clock by \@TMRh20 in [#472](https://github.com/nRF24/RF24/pull/472)
+- Merge pull request \#472 from herm/spi_clock by \@TMRh20 in [#472](https://github.com/nRF24/RF24/pull/472)
 - Update delay functions for SPIDEV by \@TMRh20 in [`23d1ca9`](https://github.com/nRF24/RF24/commit/23d1ca92e27490da2b0e98f35dbb2479575cb40f)
 - Set delays by CPU speed by \@TMRh20 in [`a3ab7dd`](https://github.com/nRF24/RF24/commit/a3ab7ddb075360deac54fe2c8e2fab286793d21c)
 - Update library.properties by \@Avamander in [`bba722a`](https://github.com/nRF24/RF24/commit/bba722a01b7be4c9fbb7431c2af1a686fee753e4)
@@ -782,7 +782,7 @@ Full commit diff: [`v1.3.0...v1.3.1`][1.3.1]
 
 - Add static initialization for pthread mutexes in [`e204656`](https://github.com/nRF24/RF24/commit/e204656cbdb361a983ee76a7e343ecdb1d22bd54)
 - Add to RF24: Arduino Due supported in SPI_UART by \@TMRh20 in [`3b5fc3e`](https://github.com/nRF24/RF24/commit/3b5fc3e85bd11f075f703b1cbe0709c3cada27dd)
-- Merge pull request #247 from corcrash/master in [#247](https://github.com/nRF24/RF24/pull/247)
+- Merge pull request \#247 from corcrash/master in [#247](https://github.com/nRF24/RF24/pull/247)
 - Added disableDynamicPayloads() by \@soligen2010 in [#318](https://github.com/nRF24/RF24/pull/318)
 - Added isChipConnected(). by \@wmarkow in [#291](https://github.com/nRF24/RF24/pull/291)
 
@@ -795,13 +795,13 @@ Full commit diff: [`v1.3.0...v1.3.1`][1.3.1]
 ### <!-- 9 --> 🗨️ Changed
 
 - Update to match new RPi scanner example. by \@campenr in [`b233ea1`](https://github.com/nRF24/RF24/commit/b233ea17316a8a37dab77880e8c779e722795b73)
-- Merge pull request #301 from campenr/master by \@TMRh20 in [#301](https://github.com/nRF24/RF24/pull/301)
-- Per #242 change binary to hex by \@TMRh20 in [`aaa09e1`](https://github.com/nRF24/RF24/commit/aaa09e1833dc5bb4705f642c9b003af05a27fd25)
-- Merge pull request #273 from marceloaqno/fix-mutex-init by \@TMRh20 in [#273](https://github.com/nRF24/RF24/pull/273)
+- Merge pull request \#301 from campenr/master by \@TMRh20 in [#301](https://github.com/nRF24/RF24/pull/301)
+- Per \#242 change binary to hex by \@TMRh20 in [`aaa09e1`](https://github.com/nRF24/RF24/commit/aaa09e1833dc5bb4705f642c9b003af05a27fd25)
+- Merge pull request \#273 from marceloaqno/fix-mutex-init by \@TMRh20 in [#273](https://github.com/nRF24/RF24/pull/273)
 - :begin: reset dynamic_payloads_enabled to false by \@derf in [`17e29ea`](https://github.com/nRF24/RF24/commit/17e29ea1fc8480353305c4434a61788acc4e7c02)
-- Merge pull request #319 from derf/master by \@derf in [#319](https://github.com/nRF24/RF24/pull/319)
+- Merge pull request \#319 from derf/master by \@derf in [#319](https://github.com/nRF24/RF24/pull/319)
 - Merge branch 'master' into master in [`3c4f842`](https://github.com/nRF24/RF24/commit/3c4f8420dc8c6399837abe937df1799c3ed47506)
-- Merge pull request #304 from nickmooney/patch-1 by \@nickmooney in [#304](https://github.com/nRF24/RF24/pull/304)
+- Merge pull request \#304 from nickmooney/patch-1 by \@nickmooney in [#304](https://github.com/nRF24/RF24/pull/304)
 - Create CONTRIBUTING.md by \@Avamander in [`ea3b7a6`](https://github.com/nRF24/RF24/commit/ea3b7a66918c86d18081736927f86fdda8c5693f)
 - Create LICENSE by \@Avamander in [`706c1d6`](https://github.com/nRF24/RF24/commit/706c1d6eba9082c1221212f270feb4a365642122)
 - Simplified logic of disableDynamicPayloads() by \@mattura in [#332](https://github.com/nRF24/RF24/pull/332)
@@ -834,14 +834,14 @@ Full commit diff: [`RF24v1.2.0...v1.3.0`][1.3.0]
 ### <!-- 8 --> 📝 Documentation
 
 - Minor documentation correction - RF24_CRC_DISABLED by \@pfeerick in [`3766eeb`](https://github.com/nRF24/RF24/commit/3766eebf139ed83fb5129ce06521c6168d2749c2)
-- Merge pull request #286 from pfeerick/patch-1 by \@TMRh20 in [#286](https://github.com/nRF24/RF24/pull/286)
+- Merge pull request \#286 from pfeerick/patch-1 by \@TMRh20 in [#286](https://github.com/nRF24/RF24/pull/286)
 
 ### <!-- 9 --> 🗨️ Changed
 
 - Update PlatformIO library manifest by \@valeros in [`aa54114`](https://github.com/nRF24/RF24/commit/aa54114b6c29e8dcae221d90c73288b07042033e)
-- Merge pull request #280 from valeros/patch-1 by \@Avamander in [#280](https://github.com/nRF24/RF24/pull/280)
+- Merge pull request \#280 from valeros/patch-1 by \@Avamander in [#280](https://github.com/nRF24/RF24/pull/280)
 - Let's PlatformIO decide how to build Arduino v1.0 library by \@ivankravets in [`903fc55`](https://github.com/nRF24/RF24/commit/903fc55e364cfe9fe87c63e512bc8bb05152de85)
-- Merge pull request #284 from ivankravets/patch-2 by \@TMRh20 in [#284](https://github.com/nRF24/RF24/pull/284)
+- Merge pull request \#284 from ivankravets/patch-2 by \@TMRh20 in [#284](https://github.com/nRF24/RF24/pull/284)
 - Make internal delays configurable by \@TMRh20 in [`195f5ac`](https://github.com/nRF24/RF24/commit/195f5ac1d7451d72f320de3c050c20a1ccd3ff0f)
 - Update Library Version 1.2 by \@TMRh20 in [`8ea5127`](https://github.com/nRF24/RF24/commit/8ea5127078394591a0af5b409c38fa11cb0677d9)
 
@@ -859,8 +859,8 @@ Full commit diff: [`v1.1.7...RF24v1.2.0`][RF24v1.2.0]
 - Add interrupts to SPIDEV by \@TMRh20 in [`d705abd`](https://github.com/nRF24/RF24/commit/d705abd4073defa0a5d338f6d58a604597f2aff7)
 - Add sudo when linking for old lib name via remote by \@TMRh20 in [`87f3d11`](https://github.com/nRF24/RF24/commit/87f3d11033c70e9ca5032295ca5ffd5cdc665f7f)
 - Support for ATXMega256D3 by \@akatran in [`990f3f7`](https://github.com/nRF24/RF24/commit/990f3f739ece5b5f6c25dc25779a9e2c7d7b014b)
-- Merge pull request #238 from akatran/master by \@TMRh20 in [#238](https://github.com/nRF24/RF24/pull/238)
-- Merge pull request #267 from mz-fuzzy/doc_update by \@TMRh20 in [#267](https://github.com/nRF24/RF24/pull/267)
+- Merge pull request \#238 from akatran/master by \@TMRh20 in [#238](https://github.com/nRF24/RF24/pull/238)
+- Merge pull request \#267 from mz-fuzzy/doc_update by \@TMRh20 in [#267](https://github.com/nRF24/RF24/pull/267)
 
 ### <!-- 3 --> 🗑️ Removed
 
@@ -869,16 +869,16 @@ Full commit diff: [`v1.1.7...RF24v1.2.0`][RF24v1.2.0]
 
 ### <!-- 4 --> 🛠️ Fixed
 
-- Fix progmem inclusion #252 by \@TMRh20 in [`372562a`](https://github.com/nRF24/RF24/commit/372562a2ffb81f43504ff35fdd17ec98fbca26e8)
+- Fix progmem inclusion \#252 by \@TMRh20 in [`372562a`](https://github.com/nRF24/RF24/commit/372562a2ffb81f43504ff35fdd17ec98fbca26e8)
 - Fix path to platform specific files in library.json for platformio by \@rnovacek in [`13ce2bb`](https://github.com/nRF24/RF24/commit/13ce2bb58b1fdfa5e55d1b32d69ef8c31582e3b6)
-- Merge pull request #263 from rnovacek/master by \@TMRh20 in [#263](https://github.com/nRF24/RF24/pull/263)
+- Merge pull request \#263 from rnovacek/master by \@TMRh20 in [#263](https://github.com/nRF24/RF24/pull/263)
 
 ### <!-- 9 --> 🗨️ Changed
 
-- #234 by \@TMRh20 in [`2b558d0`](https://github.com/nRF24/RF24/commit/2b558d05c8656df26fa3d4aab87c54785e94b526)
-- Change CONFIG to NRF_CONFIG per #212 by \@TMRh20 in [`b250082`](https://github.com/nRF24/RF24/commit/b250082605a8fafbc866f61e21a50c351698a819)
-- Duplicate read NRF_CONFIG per #203 in powerUp() by \@TMRh20 in [`9708f72`](https://github.com/nRF24/RF24/commit/9708f720ebaf372f4d90104577be5ee481ab1cc0)
-- ATTiny 861 support per #180 by \@TMRh20 in [`970309d`](https://github.com/nRF24/RF24/commit/970309d18ca0ebcb7d23cedc27dc398529476e34)
+- \#234 by \@TMRh20 in [`2b558d0`](https://github.com/nRF24/RF24/commit/2b558d05c8656df26fa3d4aab87c54785e94b526)
+- Change CONFIG to NRF_CONFIG per \#212 by \@TMRh20 in [`b250082`](https://github.com/nRF24/RF24/commit/b250082605a8fafbc866f61e21a50c351698a819)
+- Duplicate read NRF_CONFIG per \#203 in powerUp() by \@TMRh20 in [`9708f72`](https://github.com/nRF24/RF24/commit/9708f720ebaf372f4d90104577be5ee481ab1cc0)
+- ATTiny 861 support per \#180 by \@TMRh20 in [`970309d`](https://github.com/nRF24/RF24/commit/970309d18ca0ebcb7d23cedc27dc398529476e34)
 - Makefile and project structure improvements by \@martin-mat in [`3b13827`](https://github.com/nRF24/RF24/commit/3b138276e919c96d7d578273f5b113e21d30e985)
 - Configure - cli parameters by \@martin-mat in [`891becd`](https://github.com/nRF24/RF24/commit/891becdf89cd660db865b9ae8f5acaddc713e891)
 - Python wrapper cross-compilation refinements by \@martin-mat in [`2c6d28a`](https://github.com/nRF24/RF24/commit/2c6d28af43654736df9ebdccb3388c648406889b)
@@ -910,10 +910,10 @@ Full commit diff: [`v1.1.7...RF24v1.2.0`][RF24v1.2.0]
 - Configure - fix of wrong soname to respect major library version by \@martin-mat in [`a296ce6`](https://github.com/nRF24/RF24/commit/a296ce68af965152d91324f79256905aba0c887a)
 - Linux config: H3 detection and gcc switches. by \@martin-mat in [`244dfb1`](https://github.com/nRF24/RF24/commit/244dfb128ba3ea5010f7d40cea03b8dfd7ccf77b)
 - Change examples_RPi to examples_linux by \@gitgrimbo in [`a69535d`](https://github.com/nRF24/RF24/commit/a69535d9b310c93fde884e4385d17406c89af7d0)
-- Merge pull request #254 from gitgrimbo/fix-examples-folder-name by \@martin-mat in [#254](https://github.com/nRF24/RF24/pull/254)
+- Merge pull request \#254 from gitgrimbo/fix-examples-folder-name by \@martin-mat in [#254](https://github.com/nRF24/RF24/pull/254)
 - Change detection for ATXMega256D3 by \@akatran in [`abf4f29`](https://github.com/nRF24/RF24/commit/abf4f29926a8f5461199148e820effad2b96bc5d)
 - Changes to include XMEGA D3 family. by \@akatran in [`bdc7446`](https://github.com/nRF24/RF24/commit/bdc74464249313958c910f66ff9ca957580fb6b4)
-- Merge pull request #251 from akatran/master by \@Avamander in [#251](https://github.com/nRF24/RF24/pull/251)
+- Merge pull request \#251 from akatran/master by \@Avamander in [#251](https://github.com/nRF24/RF24/pull/251)
 - Update library.properties by \@Avamander in [`4e9f1fb`](https://github.com/nRF24/RF24/commit/4e9f1fb992c73d720cbebdd3755cd64001ffe3e2)
 
 [1.1.7]: https://github.com/nRF24/RF24/compare/v1.1.6...v1.1.7
@@ -933,8 +933,8 @@ Full commit diff: [`v1.1.6...v1.1.7`][1.1.7]
 
 - Fix GettingStarted sample by \@SaintGimp in [`81f1c0d`](https://github.com/nRF24/RF24/commit/81f1c0d50365e612fe96f32de573d43f69983584)
 - Fix warning: C++11 requires a space between literal and identifier by \@flavio-fernandes in [`c3a0996`](https://github.com/nRF24/RF24/commit/c3a0996b20fa17aa7f4f58630c3e516b189a6aa9)
-- Fix for #217 GettingStarted enhancement. by \@wmarkow in [`d0bbfaa`](https://github.com/nRF24/RF24/commit/d0bbfaa28fe8114a46e72d76475763cc20f7e10e)
-- Fix for #213. by \@wmarkow in [`5a0ec58`](https://github.com/nRF24/RF24/commit/5a0ec58516a85d77163241a824623e96a4602d6a)
+- Fix for \#217 GettingStarted enhancement. by \@wmarkow in [`d0bbfaa`](https://github.com/nRF24/RF24/commit/d0bbfaa28fe8114a46e72d76475763cc20f7e10e)
+- Fix for \#213. by \@wmarkow in [`5a0ec58`](https://github.com/nRF24/RF24/commit/5a0ec58516a85d77163241a824623e96a4602d6a)
 
 ### <!-- 9 --> 🗨️ Changed
 
@@ -943,15 +943,15 @@ Full commit diff: [`v1.1.6...v1.1.7`][1.1.7]
 - Merge branch 'master' of https://github.com/TMRh20/RF24 by \@TMRh20 in [`c9feaf5`](https://github.com/nRF24/RF24/commit/c9feaf5161b5aa928a12a45f0314b81c880ec1cb)
 - Checking for wrong return value in detachInterrupt of pthread_cancel and close. by \@Oitzu in [`72fe373`](https://github.com/nRF24/RF24/commit/72fe373e312e5f1a44f12476fd6648494ae7418f)
 - Python wrapper now respects RPI/SPIDEV/MRAA RF24 configuration. by \@martin-mat in [`95926b2`](https://github.com/nRF24/RF24/commit/95926b2c9aeedd1cdae011a1bb0f54f40b9a7726)
-- Merge pull request #200 from SaintGimp/FixGettingStarted by \@Avamander in [`58f6d8d`](https://github.com/nRF24/RF24/commit/58f6d8dbc5d6f0e8a25a5a6dd680aa62a520fab3)
-- Merge pull request #210 from flavio-fernandes/topic/fix_warning by \@Avamander in [`47435fd`](https://github.com/nRF24/RF24/commit/47435fdd3489e5550aa31487f4556da832955bfc)
+- Merge pull request \#200 from SaintGimp/FixGettingStarted by \@Avamander in [`58f6d8d`](https://github.com/nRF24/RF24/commit/58f6d8dbc5d6f0e8a25a5a6dd680aa62a520fab3)
+- Merge pull request \#210 from flavio-fernandes/topic/fix_warning by \@Avamander in [`47435fd`](https://github.com/nRF24/RF24/commit/47435fdd3489e5550aa31487f4556da832955bfc)
 - Fixed function to clear interrupt bits first. by \@ab316 in [`0242486`](https://github.com/nRF24/RF24/commit/0242486985504f34c11a4fb945c641bc04878b96)
-- Merge pull request #206 from ab316/master by \@Avamander in [`f043cb7`](https://github.com/nRF24/RF24/commit/f043cb780db1ea519b387dbbc7339836ec314497)
+- Merge pull request \#206 from ab316/master by \@Avamander in [`f043cb7`](https://github.com/nRF24/RF24/commit/f043cb780db1ea519b387dbbc7339836ec314497)
 - Update library.properties by \@Avamander in [`50cf850`](https://github.com/nRF24/RF24/commit/50cf850a87ddbf422ce1f527e901601d4d15f5ec)
-- Merge pull request #218 from wmarkow/217_fix by \@Avamander in [`8c7adbc`](https://github.com/nRF24/RF24/commit/8c7adbcc4cb0de89060325ac854b2e75cdfee2b3)
-- Merge pull request #216 from wmarkow/213_fix by \@Avamander in [`99ada7b`](https://github.com/nRF24/RF24/commit/99ada7ba2dd8790080d3cdb319a240d80da93523)
-- Revert "Fix for #217 GettingStarted enhancement." by \@Avamander in [`df225d6`](https://github.com/nRF24/RF24/commit/df225d641b0fc563b3eae15af96dc741c42092a6)
-- Merge pull request #219 from TMRh20/revert-218-217_fix by \@Avamander in [`fd89aae`](https://github.com/nRF24/RF24/commit/fd89aae4f0c65874453478d3d65deff70f384196)
+- Merge pull request \#218 from wmarkow/217_fix by \@Avamander in [`8c7adbc`](https://github.com/nRF24/RF24/commit/8c7adbcc4cb0de89060325ac854b2e75cdfee2b3)
+- Merge pull request \#216 from wmarkow/213_fix by \@Avamander in [`99ada7b`](https://github.com/nRF24/RF24/commit/99ada7ba2dd8790080d3cdb319a240d80da93523)
+- Revert "Fix for \#217 GettingStarted enhancement." by \@Avamander in [`df225d6`](https://github.com/nRF24/RF24/commit/df225d641b0fc563b3eae15af96dc741c42092a6)
+- Merge pull request \#219 from TMRh20/revert-218-217_fix by \@Avamander in [`fd89aae`](https://github.com/nRF24/RF24/commit/fd89aae4f0c65874453478d3d65deff70f384196)
 
 [1.1.6]: https://github.com/nRF24/RF24/compare/v1.1.5...v1.1.6
 
@@ -978,25 +978,25 @@ Full commit diff: [`v1.1.5...v1.1.6`][1.1.6]
 
 - Fix Warning. ‘void* interruptHandler(void*)’ declared ‘static’ but never defined. by \@Oitzu in [`409cbf7`](https://github.com/nRF24/RF24/commit/409cbf78ee5e779f3abb2c2cc6a3f22abc809fba)
 - Fixes for last commit by \@TMRh20 in [`a57fafe`](https://github.com/nRF24/RF24/commit/a57fafe017961b8cfdef2ccac3d764721c42e62d)
-- Fix per #183 by \@TMRh20 in [`9e68f9e`](https://github.com/nRF24/RF24/commit/9e68f9e133f426322d9b512239fc952b2dd3b1b9)
+- Fix per \#183 by \@TMRh20 in [`9e68f9e`](https://github.com/nRF24/RF24/commit/9e68f9e133f426322d9b512239fc952b2dd3b1b9)
 
 ### <!-- 9 --> 🗨️ Changed
 
 - Initial commit for interrupts based on wiringPi. by \@Oitzu in [`67d0285`](https://github.com/nRF24/RF24/commit/67d0285fc5ceae2b6f50f453ee9926490e629bd4)
 - Merged TMRh20's changes. by \@Oitzu in [`f4a6073`](https://github.com/nRF24/RF24/commit/f4a6073bc9a34717d7c09d07bbb466bf6d32c6c9)
 - Moving pthread to shared linker flags. by \@Oitzu in [`e83bc9a`](https://github.com/nRF24/RF24/commit/e83bc9affb30c6a1c90bf63de72d19aabcd47162)
-- Merge pull request #173 from Oitzu/master by \@TMRh20 in [`a381194`](https://github.com/nRF24/RF24/commit/a381194bf0a5e1e1ecb06a7f0c502791e049d77c)
+- Merge pull request \#173 from Oitzu/master by \@TMRh20 in [`a381194`](https://github.com/nRF24/RF24/commit/a381194bf0a5e1e1ecb06a7f0c502791e049d77c)
 - Mutex handling for interrupts on RPi by \@TMRh20 in [`243e25f`](https://github.com/nRF24/RF24/commit/243e25f23a6d3ff4f3d57ec2f89419ac84d36c16)
 - Deadlocks due to RPi SPI mutex code by \@TMRh20 in [`9a5ea80`](https://github.com/nRF24/RF24/commit/9a5ea80cacf9f50cce0b1600da4b5a55596b1011)
 - Move interrupt examples, add new int examples by \@TMRh20 in [`2c4d199`](https://github.com/nRF24/RF24/commit/2c4d1991b1a314e7f0ad5a3d808761e36002c2b5)
 - Initial commit RPI-SPI-Transactions. by \@Oitzu in [`e1fe438`](https://github.com/nRF24/RF24/commit/e1fe43814cca7af57b7515f999f70356b51fd3b1)
-- Implement detachInterrupt method. See #173 by \@Oitzu in [`b615951`](https://github.com/nRF24/RF24/commit/b615951a3d59ed258b61daa40f3a090b02cb6a00)
+- Implement detachInterrupt method. See \#173 by \@Oitzu in [`b615951`](https://github.com/nRF24/RF24/commit/b615951a3d59ed258b61daa40f3a090b02cb6a00)
 - Minor chgs to mirror Arduino SPI transaction API by \@TMRh20 in [`f285fde`](https://github.com/nRF24/RF24/commit/f285fde257438e7fe482ff4c6dc03f0de185b7e5)
-- One more per #183 by \@TMRh20 in [`d37d030`](https://github.com/nRF24/RF24/commit/d37d030495483a2c6522b2f259b46974d3d0f623)
+- One more per \#183 by \@TMRh20 in [`d37d030`](https://github.com/nRF24/RF24/commit/d37d030495483a2c6522b2f259b46974d3d0f623)
 - Merge remote-tracking branch 'refs/remotes/origin/Interrupts' by \@TMRh20 in [`3e8147a`](https://github.com/nRF24/RF24/commit/3e8147a1a150f59908d3e2bb43719193d54a54fc)
 - RPI2 autodetection by \@yozik04 in [`d7cacdc`](https://github.com/nRF24/RF24/commit/d7cacdc20bbb89632f8b9ee1a1bba439cf80de79)
 - RPI2 autodetection in examples by \@yozik04 in [`b417d58`](https://github.com/nRF24/RF24/commit/b417d58ce10cf4f18bcffa8b6869c8b53d729e4f)
-- Merge pull request #179 from yozik04/master by \@TMRh20 in [`1c78dd0`](https://github.com/nRF24/RF24/commit/1c78dd007220687f6c262b970c7b7e65819ddece)
+- Merge pull request \#179 from yozik04/master by \@TMRh20 in [`1c78dd0`](https://github.com/nRF24/RF24/commit/1c78dd007220687f6c262b970c7b7e65819ddece)
 - Update library.properties by \@Avamander in [`8115a34`](https://github.com/nRF24/RF24/commit/8115a3436f37685e83f4ddde1eb26ba1962829ea)
 
 [1.1.5]: https://github.com/nRF24/RF24/compare/v1.1.4...v1.1.5
@@ -1018,13 +1018,13 @@ Full commit diff: [`v1.1.4...v1.1.5`][1.1.5]
 
 ### <!-- 8 --> 📝 Documentation
 
-- Merge pull request #155 from zador-blood-stained/master by \@TMRh20 in [`4554f73`](https://github.com/nRF24/RF24/commit/4554f739e7087852a7375b29172df7e5df03838c)
+- Merge pull request \#155 from zador-blood-stained/master by \@TMRh20 in [`4554f73`](https://github.com/nRF24/RF24/commit/4554f739e7087852a7375b29172df7e5df03838c)
 - Update .h file per doc changes by \@TMRh20 in [`e192580`](https://github.com/nRF24/RF24/commit/e192580383d332bb7e2398a7ae057c41b1918d87)
 
 ### <!-- 9 --> 🗨️ Changed
 
 - Python3 support added by \@martin-mat in [`cda3e18`](https://github.com/nRF24/RF24/commit/cda3e18b0d011fca4e65100918ab6bb3477655b1)
-- Merge pull request #164 from mz-fuzzy/python3 by \@TMRh20 in [`90dd53e`](https://github.com/nRF24/RF24/commit/90dd53e1abb68c72bf5035a8c9497d83189fb680)
+- Merge pull request \#164 from mz-fuzzy/python3 by \@TMRh20 in [`90dd53e`](https://github.com/nRF24/RF24/commit/90dd53e1abb68c72bf5035a8c9497d83189fb680)
 - Update library.properties by \@Avamander in [`e888f55`](https://github.com/nRF24/RF24/commit/e888f55864485f4d919f7753ddb479702264fb1f)
 
 [1.1.4]: https://github.com/nRF24/RF24/compare/v1.1.3...v1.1.4
@@ -1041,11 +1041,11 @@ Full commit diff: [`v1.1.3...v1.1.4`][1.1.4]
 ### <!-- 9 --> 🗨️ Changed
 
 - Update gettingstarted.cpp by \@cguzmanceti in [`f3cc137`](https://github.com/nRF24/RF24/commit/f3cc137cb669f5ae61ecd45c89d7e4946c87d5d8)
-- Merge pull request #153 from cguzmanceti/patch-1 by \@TMRh20 in [`0bf4998`](https://github.com/nRF24/RF24/commit/0bf499884f6c1a2cd6e251b70c211cd596a478ea)
+- Merge pull request \#153 from cguzmanceti/patch-1 by \@TMRh20 in [`0bf4998`](https://github.com/nRF24/RF24/commit/0bf499884f6c1a2cd6e251b70c211cd596a478ea)
 - Update gettingstarted_call_response.cpp by \@cguzmanceti in [`c5fdf1b`](https://github.com/nRF24/RF24/commit/c5fdf1be64606b11dd5f07ba05204d38c4768102)
-- Merge pull request #154 from cguzmanceti/patch-2 by \@TMRh20 in [`dfb2395`](https://github.com/nRF24/RF24/commit/dfb2395557ad93d659018dea5efd91e0bfeb46e4)
+- Merge pull request \#154 from cguzmanceti/patch-2 by \@TMRh20 in [`dfb2395`](https://github.com/nRF24/RF24/commit/dfb2395557ad93d659018dea5efd91e0bfeb46e4)
 - ATTiny2313/4313 support by \@zador-blood-stained in [`ac0ff44`](https://github.com/nRF24/RF24/commit/ac0ff44a90d80d632aad3fba983c5020b5773535)
-- Merge pull request #152 from zador-blood-stained/master by \@TMRh20 in [`07e8362`](https://github.com/nRF24/RF24/commit/07e83623032c5aeb78b961cad4fe5491092860ef)
+- Merge pull request \#152 from zador-blood-stained/master by \@TMRh20 in [`07e8362`](https://github.com/nRF24/RF24/commit/07e83623032c5aeb78b961cad4fe5491092860ef)
 - Change printf to cout in RPi examples by \@TMRh20 in [`3652890`](https://github.com/nRF24/RF24/commit/365289022b60a951d99442f138daebfe330924bf)
 
 [1.1.3]: https://github.com/nRF24/RF24/compare/v1.1.2...v1.1.3
@@ -1062,7 +1062,7 @@ Full commit diff: [`v1.1.2...v1.1.3`][1.1.3]
 - Update library.properties by \@Avamander in [`a045c5a`](https://github.com/nRF24/RF24/commit/a045c5ac3c3f3304b793d8baeffa066d2a88e536)
 - Made possible many examples to run in 512 bytes ram chips, fixed few typos, missing F() macro calls and other minor improvements by \@fab672000 in [`0483d36`](https://github.com/nRF24/RF24/commit/0483d3604116f0ae79cc17ba0d522f58b968333c)
 - Restored back multicast pingpair example from previous maniacbug  fork by \@fab672000 in [`aab3a52`](https://github.com/nRF24/RF24/commit/aab3a529f898ec40e3d62510cd535d5e2d8a5ac4)
-- Merge pull request #141 from fab672000/master by \@Avamander in [`46ccceb`](https://github.com/nRF24/RF24/commit/46ccceb65f98dd505b9eb34ce4d5f4fd56c84d5d)
+- Merge pull request \#141 from fab672000/master by \@Avamander in [`46ccceb`](https://github.com/nRF24/RF24/commit/46ccceb65f98dd505b9eb34ce4d5f4fd56c84d5d)
 - Update library.properties by \@Avamander in [`7a44681`](https://github.com/nRF24/RF24/commit/7a446813de8278117920aa8c0ef06da599a94280)
 
 [1.1.2]: https://github.com/nRF24/RF24/compare/v1.1.1...v1.1.2
@@ -1137,7 +1137,7 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Added new example to documentation by \@maniacbug in [`d437163`](https://github.com/nRF24/RF24/commit/d4371639e612e8c74a9dcfb3148118439a6a9dac)
 - Added example for Maple by \@maniacbug in [`a6bf911`](https://github.com/nRF24/RF24/commit/a6bf911f5a99253c7b718d4c119f5a65d4f59d59)
 - Added new jamfile to this example by \@maniacbug in [`19fa395`](https://github.com/nRF24/RF24/commit/19fa3954c0d452f43ef9b8e4b8afca47d8b98a41)
-- Added #error to printf for examples that require Arduino by \@maniacbug in [`26ea458`](https://github.com/nRF24/RF24/commit/26ea4583cdebbc219b5f4460096044d911874e9d)
+- Added \#error to printf for examples that require Arduino by \@maniacbug in [`26ea458`](https://github.com/nRF24/RF24/commit/26ea4583cdebbc219b5f4460096044d911874e9d)
 - Add isValid by \@maniacbug in [`ebcd0d1`](https://github.com/nRF24/RF24/commit/ebcd0d1d0b3061fcb57444e1dbe5829ef25705cd)
 - Added writeFast() cmd - fill FIFO or return 0 by \@TMRh20 in [`281ace4`](https://github.com/nRF24/RF24/commit/281ace4ba24fb9c0cf814572c72752eebd3b8d95)
 - Add powerUp to begin(), increase powerUp delay by \@TMRh20 in [`3455e48`](https://github.com/nRF24/RF24/commit/3455e489f4c88504bd65b6b5edf10282d5a47ab3)
@@ -1153,11 +1153,11 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Address fix for attiny example sketch by \@ax7884 in [`ba161a3`](https://github.com/nRF24/RF24/commit/ba161a3b25388988b178570cc859894df2d1d186)
 - Support RPi 2 w/bcm2835.c version 1.39 by \@mannkind in [`25d379c`](https://github.com/nRF24/RF24/commit/25d379c187d673c775a7d68702f6f811405f1bdc)
 - Add updated makefile for latest changes by \@TMRh20 in [`f420557`](https://github.com/nRF24/RF24/commit/f4205573b4c40907318e9ddbbabf094c55b3270d)
-- Add include for nanosleep #69 by \@TMRh20 in [`30ef8dc`](https://github.com/nRF24/RF24/commit/30ef8dc58aa19b0d1ba0819b7e4e18bd8b5a3071)
+- Add include for nanosleep \#69 by \@TMRh20 in [`30ef8dc`](https://github.com/nRF24/RF24/commit/30ef8dc58aa19b0d1ba0819b7e4e18bd8b5a3071)
 - Add a few links to RF24 docs for related projects by \@TMRh20 in [`c83f0f2`](https://github.com/nRF24/RF24/commit/c83f0f26ff65c66754037ce959a3485c55404e02)
 - Added ```busNo``` passing to mraa::Spi() object creation call so that SPI bus number now can be defined by user when instatiating RF24 object by \@prophet-roshak in [`dd4b86a`](https://github.com/nRF24/RF24/commit/dd4b86aaac26b3c59912ebd93e8912ce208aee88)
 - Add generic pin config for RPi, minor doc changes by \@TMRh20 in [`4cb2c5c`](https://github.com/nRF24/RF24/commit/4cb2c5c5a737221ed8855c20c495143c0da0bddb)
-- Add RPi pin config to main page per #89 by \@TMRh20 in [`7fdc708`](https://github.com/nRF24/RF24/commit/7fdc708b4ff912825b513210142c8b4bd387bd3f)
+- Add RPi pin config to main page per \#89 by \@TMRh20 in [`7fdc708`](https://github.com/nRF24/RF24/commit/7fdc708b4ff912825b513210142c8b4bd387bd3f)
 - Add SPI transaction code from Ralph Doncaster by \@TMRh20 in [`b1b8cad`](https://github.com/nRF24/RF24/commit/b1b8caddfe02b0876fc928fbadab2e6f20db4e2c)
 - Add transaction code to remaining functions by \@TMRh20 in [`64da088`](https://github.com/nRF24/RF24/commit/64da08852c1537eab7e10314870e9943fe5172fa)
 - Added getChannel Method to allow for verification of the configured channel by \@komby in [`c4d222c`](https://github.com/nRF24/RF24/commit/c4d222ce0db216b7e1c372c587e9b568c6af4f79)
@@ -1179,20 +1179,20 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - - Slight modification to reUseTX cmd by \@TMRh20 in [`77b1e2c`](https://github.com/nRF24/RF24/commit/77b1e2c1400e755d13bfd9345bd235075b056ad4)
 - Ext. timeout hang, examples, board support by \@TMRh20 in [`2f7e448`](https://github.com/nRF24/RF24/commit/2f7e4489bad411ee79f068b593c83c59c1f8c515)
 - RPi SPI functionality and RPi fix for startWrite by \@TMRh20 in [`6530f95`](https://github.com/nRF24/RF24/commit/6530f954a18731e213efeb967265b612b1087ac5)
-- Due & RPi bugfix - #9 - root cause resolved by \@TMRh20 in [`2869663`](https://github.com/nRF24/RF24/commit/2869663f7fcdb5389a2c717b704a413944de1b8a)
+- Due & RPi bugfix - \#9 - root cause resolved by \@TMRh20 in [`2869663`](https://github.com/nRF24/RF24/commit/2869663f7fcdb5389a2c717b704a413944de1b8a)
 - Modify write,startWrite, remove rx buffer flushes by \@TMRh20 in [`1d18015`](https://github.com/nRF24/RF24/commit/1d1801500dc6135eede3921008c4f3d381a80252)
 - Removed wrong flush() on RPi by \@TMRh20 in [`589b2c7`](https://github.com/nRF24/RF24/commit/589b2c76fd7c2cc81f91780c776d996c269e9896)
 - Update the pin layout table and consolidate the RPi readme files. by \@reixd in [`1e8de6e`](https://github.com/nRF24/RF24/commit/1e8de6e88f98a68868f23565ddc6cc524f5eca00)
 - Remove unnecessary delay by \@TMRh20 in [`a12cdca`](https://github.com/nRF24/RF24/commit/a12cdca388a38066eca7cc92d7d4ea7c72fc6bf6)
 - Update readme for installer by \@TMRh20 in [`91c6d21`](https://github.com/nRF24/RF24/commit/91c6d214b8030555efb326b555391a46eba30cab)
 - Fixes and Improvements from large round of testing by \@TMRh20 in [`4d5f014`](https://github.com/nRF24/RF24/commit/4d5f014c0efabe2d638b928eb95b07894531b569)
-- Fix 'features'? per https://github.com/dsbaha #56 by \@TMRh20 in [`39a6385`](https://github.com/nRF24/RF24/commit/39a63859b0f83b5128eb8377a1d6c9abfcbb20ce)
+- Fix 'features'? per https://github.com/dsbaha \#56 by \@TMRh20 in [`39a6385`](https://github.com/nRF24/RF24/commit/39a63859b0f83b5128eb8377a1d6c9abfcbb20ce)
 - - reset config register to default by \@dsbaha in [`8d5e869`](https://github.com/nRF24/RF24/commit/8d5e8695ceae08d742472c66eb04333cfb89295d)
 - Fix bugs in transfer example by \@TMRh20 in [`0066eec`](https://github.com/nRF24/RF24/commit/0066eece027f84d4478b4d7aff40af439097eb22)
 - Remove trailing slash from docs/Prevent warning by \@TMRh20 in [`e900a9c`](https://github.com/nRF24/RF24/commit/e900a9cc5b097f669e31159f6e964c4b2a9c37dd)
 - SPI/GPIO fixes/changes for MRAA and SPIDEV by \@TMRh20 in [`c1bb29c`](https://github.com/nRF24/RF24/commit/c1bb29c74b4cb2c1f13658665160fb8f247bcef9)
 - Destructor for Linux only, replace bell with null by \@TMRh20 in [`e3f4a6b`](https://github.com/nRF24/RF24/commit/e3f4a6ba1879b8bb30e9b54d57c353d0fa42a34d)
-- Fix/Changes for #111 & #112 by \@TMRh20 in [`5acbcbd`](https://github.com/nRF24/RF24/commit/5acbcbd2d1d297804aecdf4f42e82ae2fde33526)
+- Fix/Changes for \#111 & \#112 by \@TMRh20 in [`5acbcbd`](https://github.com/nRF24/RF24/commit/5acbcbd2d1d297804aecdf4f42e82ae2fde33526)
 
 ### <!-- 4 --> 🛠️ Fixed
 
@@ -1222,7 +1222,7 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Return value of write, writefast by \@TMRh20 in [`5fabf26`](https://github.com/nRF24/RF24/commit/5fabf2608a64572876e5b7b94a0e7e66b392cd8c)
 - Fix typo in readme by \@TMRh20 in [`cd8bb19`](https://github.com/nRF24/RF24/commit/cd8bb19dc3aa63d30b4e474ce95b8224f0fa71c2)
 - Fix for https://github.com/TMRh20/RF24/issues/8 by \@TMRh20 in [`57521fb`](https://github.com/nRF24/RF24/commit/57521fbcc43e0a13cd40c2eff897cf5394441348)
-- Fix for #12 by \@TMRh20 in [`ecda0fa`](https://github.com/nRF24/RF24/commit/ecda0fad53ba897089efb46c045505b2f0fa749c)
+- Fix for \#12 by \@TMRh20 in [`ecda0fa`](https://github.com/nRF24/RF24/commit/ecda0fad53ba897089efb46c045505b2f0fa749c)
 - Static payload size bug prev introduced by \@TMRh20 in [`e8a63c0`](https://github.com/nRF24/RF24/commit/e8a63c03712ae99b671718c6dfee62e7afd5c106)
 - RPi dynamic ACK issue by \@TMRh20 in [`9e12c23`](https://github.com/nRF24/RF24/commit/9e12c23683b57a5979572d9bf8e8386f14d7f928)
 - Multicast pipe0 address handling issue by \@TMRh20 in [`9da3eac`](https://github.com/nRF24/RF24/commit/9da3eac0941563d9e9828c8377c9a88a161cd855)
@@ -1244,10 +1244,10 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Fix isAckPayloadAvailable() per \@jorihardman by \@TMRh20 in [`f57b383`](https://github.com/nRF24/RF24/commit/f57b383039c7085888eb026a8944443c3a842444)
 - Fix operator precedence for isAckPayloadAvailable. by \@jorihardman in [`8bd5289`](https://github.com/nRF24/RF24/commit/8bd5289514f609c9a29353077217f2a251465576)
 - Fix IDE version detection for SPI transactions by \@TMRh20 in [`f6e1f37`](https://github.com/nRF24/RF24/commit/f6e1f37b3b46ba7ae92c617106ce6b9f0796724e)
-- Fix issue #101 found by \@mz-fuzzy by \@TMRh20 in [`f691c45`](https://github.com/nRF24/RF24/commit/f691c45a69064c132dd11c52973e6fe011bded3a)
-- Fix the rest of issue #101 per mz-fuzzy by \@TMRh20 in [`90d85be`](https://github.com/nRF24/RF24/commit/90d85bef4bf370f54404e00805431f77a49607e7)
+- Fix issue \#101 found by \@mz-fuzzy by \@TMRh20 in [`f691c45`](https://github.com/nRF24/RF24/commit/f691c45a69064c132dd11c52973e6fe011bded3a)
+- Fix the rest of issue \#101 per mz-fuzzy by \@TMRh20 in [`90d85be`](https://github.com/nRF24/RF24/commit/90d85bef4bf370f54404e00805431f77a49607e7)
 - Fix for SPI transaction code by \@TMRh20 in [`c79ccc7`](https://github.com/nRF24/RF24/commit/c79ccc70bb744f91b9d325d5b21b028fead3bd48)
-- Fix example per #114 by \@TMRh20 in [`357fcb9`](https://github.com/nRF24/RF24/commit/357fcb95a5bc89704846679fa667dbcafe68a5ea)
+- Fix example per \#114 by \@TMRh20 in [`357fcb9`](https://github.com/nRF24/RF24/commit/357fcb95a5bc89704846679fa667dbcafe68a5ea)
 - Fix the last fix by \@TMRh20 in [`869a2c2`](https://github.com/nRF24/RF24/commit/869a2c2f7329967bc600e66d0b0422e959e22e2d)
 
 ### <!-- 7 -->🚦 Tests
@@ -1258,7 +1258,7 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Tune timing and upload rate of tests by \@maniacbug in [`205d4b5`](https://github.com/nRF24/RF24/commit/205d4b5cc12d119149e75e62e62b98fce0f38ac7)
 - Lib now passes all tests by \@TMRh20 in [`4340d93`](https://github.com/nRF24/RF24/commit/4340d9339a333c28c416406ada828cd3a465018e)
 - Update examples, minimize code size by \@TMRh20 in [`e83a107`](https://github.com/nRF24/RF24/commit/e83a107bdf8e7430457975b1d9251cc5c6ba7107)
-- Performance tweaks to address #9 by \@TMRh20 in [`5ec5b06`](https://github.com/nRF24/RF24/commit/5ec5b06bdc4f3b58eac3f34b3c4355a51b659ae6)
+- Performance tweaks to address \#9 by \@TMRh20 in [`5ec5b06`](https://github.com/nRF24/RF24/commit/5ec5b06bdc4f3b58eac3f34b3c4355a51b659ae6)
 
 ### <!-- 8 --> 📝 Documentation
 
@@ -1283,7 +1283,7 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - More doc updates for coming changes by \@TMRh20 in [`8e15310`](https://github.com/nRF24/RF24/commit/8e1531014fe34b13aab168bf9b03106ef2ddfbc5)
 - Update docs in 'updates' branch by \@TMRh20 in [`b320f9e`](https://github.com/nRF24/RF24/commit/b320f9e69c130ebe5b75ef15bb6b350fe71a68ea)
 - Update *.cpp examples pin config by \@TMRh20 in [`b342d97`](https://github.com/nRF24/RF24/commit/b342d97f3693f89f06739ccf351281a95ac21805)
-- @PlatformIO Library Registry manifest file by \@ivankravets in [`ea960e0`](https://github.com/nRF24/RF24/commit/ea960e057b3360094a153ca1ab9c6fa984c3d68a)
+- \@PlatformIO Library Registry manifest file by \@ivankravets in [`ea960e0`](https://github.com/nRF24/RF24/commit/ea960e057b3360094a153ca1ab9c6fa984c3d68a)
 
 ### <!-- 9 --> 🗨️ Changed
 
@@ -1391,7 +1391,7 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - FAQ- How much RAM?? by \@maniacbug in [`c6262ed`](https://github.com/nRF24/RF24/commit/c6262edbce48bb839d5fed4412da0fad39e0250a)
 - Latest jamfiles by \@maniacbug in [`84e464d`](https://github.com/nRF24/RF24/commit/84e464def4a52a3a697ee95d26eb66997db0ea76)
 - Update examples/led_remote/led_remote.pde in [`49f22ea`](https://github.com/nRF24/RF24/commit/49f22eae21c2b7a872897a6a627bd255369ff2b2)
-- Merge pull request #16 from RWSDev/master by \@maniacbug in [`8eaad77`](https://github.com/nRF24/RF24/commit/8eaad77b2cb6d7491d5bc757d1bdfb78e6bebad1)
+- Merge pull request \#16 from RWSDev/master by \@maniacbug in [`8eaad77`](https://github.com/nRF24/RF24/commit/8eaad77b2cb6d7491d5bc757d1bdfb78e6bebad1)
 - Changed writing modes by \@TMRh20 in [`d0ec0c4`](https://github.com/nRF24/RF24/commit/d0ec0c461ce6c2e1f15b334344330cdf8f993417)
 - Inspired idea to change TX standby code by \@TMRh20 in [`1e2f41c`](https://github.com/nRF24/RF24/commit/1e2f41c3f8143c9be0ae4aaa165cf98cb3052d84)
 - Updated some examples to show the new lib usage by \@TMRh20 in [`99571d6`](https://github.com/nRF24/RF24/commit/99571d653001b143d8305425e2eab193136b38fe)
@@ -1400,7 +1400,7 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Extended timeouts, txStandBy changes by \@TMRh20 in [`6263bcc`](https://github.com/nRF24/RF24/commit/6263bccd0241aaf0c0e45106d514ea34516f39e9)
 - Full Due support, maskIRQ function by \@TMRh20 in [`e1aaa57`](https://github.com/nRF24/RF24/commit/e1aaa571721d48584c43cfb287f55efc17ed97dd)
 - Revamped write_payload() and read_payload() by \@zephyrr in [`84146a1`](https://github.com/nRF24/RF24/commit/84146a17f301d4e341f12db9613bff44cc285ae0)
-- Merge pull request #1 from zephyrr/master by \@TMRh20 in [`8077f56`](https://github.com/nRF24/RF24/commit/8077f56a7f1d9ca0e0bd078b1077215d89e52c3d)
+- Merge pull request \#1 from zephyrr/master by \@TMRh20 in [`8077f56`](https://github.com/nRF24/RF24/commit/8077f56a7f1d9ca0e0bd078b1077215d89e52c3d)
 - ATTiny support fr jscrane fork tested and working by \@TMRh20 in [`07eb9f8`](https://github.com/nRF24/RF24/commit/07eb9f874999c2d862a99d452a29d08a0798760d)
 - EnableDynamicAck(), Single NOACK, default RT, by \@TMRh20 in [`92a19af`](https://github.com/nRF24/RF24/commit/92a19af8f808967aa03cf4e18d8e4c9fd3cc27fc)
 - Revert powerUp() delay to 5ms delay by \@TMRh20 in [`1858312`](https://github.com/nRF24/RF24/commit/185831233868b07310b69daefa63b169f1bf8ed4)
@@ -1408,46 +1408,46 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Small fix before pushing last commit by \@TMRh20 in [`8ff9fb6`](https://github.com/nRF24/RF24/commit/8ff9fb6f155d263adc5671e7b1c28f6265a73f15)
 - Raspberry Pi support by \@TMRh20 in [`2406e06`](https://github.com/nRF24/RF24/commit/2406e06a777d1ff0e2feb4c0b62b42f27ee21a59)
 - Restore closeReadingPipe by \@a-lurker in [`1289f85`](https://github.com/nRF24/RF24/commit/1289f85c4c25e1dbe4d85a7c2b7e09fba1063e75)
-- Merge pull request #4 from a-lurker/master by \@TMRh20 in [`e682b7d`](https://github.com/nRF24/RF24/commit/e682b7dd0c9677b6e214353896fb68124f803575)
+- Merge pull request \#4 from a-lurker/master by \@TMRh20 in [`e682b7d`](https://github.com/nRF24/RF24/commit/e682b7dd0c9677b6e214353896fb68124f803575)
 - Install header files and separate install task by \@cornet in [`9895101`](https://github.com/nRF24/RF24/commit/9895101a43015bb1352f86977106567c1a5bacf2)
 - Bring readme.md inline with new Makefile by \@cornet in [`dc9ccbf`](https://github.com/nRF24/RF24/commit/dc9ccbff92b1229ff75fec3824595c461f03982d)
 - Cleanup readme syntax by \@cornet in [`8e8c111`](https://github.com/nRF24/RF24/commit/8e8c1115eb110a722d623e2490e9caecc0dc9ffd)
 - Cleanup table in readme by \@cornet in [`ddd6a0d`](https://github.com/nRF24/RF24/commit/ddd6a0dc1f1e3adda16f5691356e3062669d93bf)
 - Use spaces, not tabs, in readme.md by \@cornet in [`ac3962c`](https://github.com/nRF24/RF24/commit/ac3962cca58567886be310af33c6aaae564d3d27)
 - Make install should build first by \@cornet in [`c004c55`](https://github.com/nRF24/RF24/commit/c004c5545040d3df83cdce0a9aec1c5dc6278016)
-- Merge pull request #2 from cornet/fix-rpi-build-scripts by \@TMRh20 in [`ee7f603`](https://github.com/nRF24/RF24/commit/ee7f6035cf6753864c14da739fa4c60ba7716ef1)
+- Merge pull request \#2 from cornet/fix-rpi-build-scripts by \@TMRh20 in [`ee7f603`](https://github.com/nRF24/RF24/commit/ee7f6035cf6753864c14da739fa4c60ba7716ef1)
 - Update readme by \@TMRh20 in [`01cac5c`](https://github.com/nRF24/RF24/commit/01cac5c3bfa29c9b0d67efab971c16135d1cb8d8)
 - De-Activate features by default with RPi by \@TMRh20 in [`b7e4a09`](https://github.com/nRF24/RF24/commit/b7e4a09abee35c4284b3fa93abfb7617cd81eb42)
 - Updated address assignment by \@TMRh20 in [`b7c24a8`](https://github.com/nRF24/RF24/commit/b7c24a81792d1c28aa30de1854c503a747f41bb6)
-- Updated examples per issue #6 by \@TMRh20 in [`a009487`](https://github.com/nRF24/RF24/commit/a009487abdbf2d3d00cd60f1f8e0a979d749b3bb)
+- Updated examples per issue \#6 by \@TMRh20 in [`a009487`](https://github.com/nRF24/RF24/commit/a009487abdbf2d3d00cd60f1f8e0a979d749b3bb)
 - Update rpi readme by \@TMRh20 in [`db1c051`](https://github.com/nRF24/RF24/commit/db1c0510798e8226373cbb303844ca336aed344d)
 - Initial Teensy3x support by \@TMRh20 in [`5e63e3a`](https://github.com/nRF24/RF24/commit/5e63e3aeba3403290bd6b5fad5cef6e03f1e8537)
 - Updated defines, fixed missing due define by \@TMRh20 in [`b8312b5`](https://github.com/nRF24/RF24/commit/b8312b5382c047d704565e157e10be5273c4c457)
-- Further tweaks per #9 by \@TMRh20 in [`b62e179`](https://github.com/nRF24/RF24/commit/b62e179ab2866a05d14bd8e86db74fe652b5d917)
+- Further tweaks per \#9 by \@TMRh20 in [`b62e179`](https://github.com/nRF24/RF24/commit/b62e179ab2866a05d14bd8e86db74fe652b5d917)
 - - Fixes and modifications for Due & Teensy3.x by \@TMRh20 in [`aac1650`](https://github.com/nRF24/RF24/commit/aac1650646b2c440c8822deb2f99514f4e2e4ddd)
-- Final tweaks to address #9 by \@TMRh20 in [`b8d97f5`](https://github.com/nRF24/RF24/commit/b8d97f53c138a23f6a0d262d508f3f29b5b5b659)
+- Final tweaks to address \#9 by \@TMRh20 in [`b8d97f5`](https://github.com/nRF24/RF24/commit/b8d97f53c138a23f6a0d262d508f3f29b5b5b659)
 - RPi - Example updates, minor bmc driver change by \@TMRh20 in [`ea98781`](https://github.com/nRF24/RF24/commit/ea9878107267a4c7fa3cf3c2fed405c224e6b56a)
 - Adj delay to accomodate 250kbps rates better by \@TMRh20 in [`cb60afe`](https://github.com/nRF24/RF24/commit/cb60afe1dfb1d2cdc6ddf5bc73646b93207a50d4)
 - Delay for dyn_Pld_length corruption by \@TMRh20 in [`4e250cb`](https://github.com/nRF24/RF24/commit/4e250cbb07740dfa7e7358c4ab64c4eec44a4874)
 - Reduce error rate in call response scenarios by \@TMRh20 in [`9e28a60`](https://github.com/nRF24/RF24/commit/9e28a60236cca121eb3d746ea53b9d362f06b381)
-- Merge pull request #19 from reixd/master by \@TMRh20 in [`f5341bf`](https://github.com/nRF24/RF24/commit/f5341bfc5010f0c87c285510e01f2a7f53bec4b2)
+- Merge pull request \#19 from reixd/master by \@TMRh20 in [`f5341bf`](https://github.com/nRF24/RF24/commit/f5341bfc5010f0c87c285510e01f2a7f53bec4b2)
 - Select a standard pin layout for the examples. by \@reixd in [`e16c99e`](https://github.com/nRF24/RF24/commit/e16c99e1f0d1c3976a249f52221075cae97681e0)
-- Merge pull request #21 from reixd/examples by \@TMRh20 in [`8c0e9f8`](https://github.com/nRF24/RF24/commit/8c0e9f80b70fbcd192728de4c0f9e89fee89e656)
+- Merge pull request \#21 from reixd/examples by \@TMRh20 in [`8c0e9f8`](https://github.com/nRF24/RF24/commit/8c0e9f80b70fbcd192728de4c0f9e89fee89e656)
 - RPi B+ Update to BCM2835 V1.37 by \@TMRh20 in [`a2c3977`](https://github.com/nRF24/RF24/commit/a2c3977ac1d60f901887a2dfa2ee5ba28672630f)
 - RPi B+ Update to BCM2835 V1.37 by \@TMRh20 in [`1732332`](https://github.com/nRF24/RF24/commit/173233231a12e502ed655544367fee7489772680)
-- Merge code per #17 by \@TMRh20 in [`0153c71`](https://github.com/nRF24/RF24/commit/0153c713d991dc73d35684379f2fb8ef7eab56f2)
+- Merge code per \#17 by \@TMRh20 in [`0153c71`](https://github.com/nRF24/RF24/commit/0153c713d991dc73d35684379f2fb8ef7eab56f2)
 - Merge remote-tracking branch 'origin/Updates' by \@TMRh20 in [`1c89b94`](https://github.com/nRF24/RF24/commit/1c89b946cf050b1f13829a7d7f4051926dc1e296)
 - Teensy Support by \@TMRh20 in [`5ff3088`](https://github.com/nRF24/RF24/commit/5ff3088ee39376ecb42192bb6366eba1e8aaf92a)
-- #24 Enable UART as 2ndary SPI BUS by \@TMRh20 in [`3f4a1cb`](https://github.com/nRF24/RF24/commit/3f4a1cbcadf3bb2854810b1ef39e077102af94a5)
-- #24 Add softSPI supp, fix SPI_UART by \@TMRh20 in [`56b7711`](https://github.com/nRF24/RF24/commit/56b7711ed09dac3264c96b2ed8a40a16eb599151)
-- #25 Fix CRC status, revert to default SPI lib by \@TMRh20 in [`5238ca2`](https://github.com/nRF24/RF24/commit/5238ca2576562e20c8aca13302f8723b1f1364fe)
-- #24 Fix: SoftSPI or UartSPI working with std SPI by \@TMRh20 in [`2d79e75`](https://github.com/nRF24/RF24/commit/2d79e75e3a468f9c2dfec4e475912c08d7502f83)
-- #24 lol Fix: Spelling and ; on std spi define by \@TMRh20 in [`80e942c`](https://github.com/nRF24/RF24/commit/80e942ce6892e47727552241aa12f16522471690)
+- \#24 Enable UART as 2ndary SPI BUS by \@TMRh20 in [`3f4a1cb`](https://github.com/nRF24/RF24/commit/3f4a1cbcadf3bb2854810b1ef39e077102af94a5)
+- \#24 Add softSPI supp, fix SPI_UART by \@TMRh20 in [`56b7711`](https://github.com/nRF24/RF24/commit/56b7711ed09dac3264c96b2ed8a40a16eb599151)
+- \#25 Fix CRC status, revert to default SPI lib by \@TMRh20 in [`5238ca2`](https://github.com/nRF24/RF24/commit/5238ca2576562e20c8aca13302f8723b1f1364fe)
+- \#24 Fix: SoftSPI or UartSPI working with std SPI by \@TMRh20 in [`2d79e75`](https://github.com/nRF24/RF24/commit/2d79e75e3a468f9c2dfec4e475912c08d7502f83)
+- \#24 lol Fix: Spelling and ; on std spi define by \@TMRh20 in [`80e942c`](https://github.com/nRF24/RF24/commit/80e942ce6892e47727552241aa12f16522471690)
 - Merge branch 'Updates' of https://github.com/TMRh20/RF24 into Updates by \@TMRh20 in [`ecc5135`](https://github.com/nRF24/RF24/commit/ecc51358c839341328cb5102d4cabe044c00108c)
 - Merge remote-tracking branch 'origin/master' into Updates by \@TMRh20 in [`8be1be0`](https://github.com/nRF24/RF24/commit/8be1be0cfa3c88e5ec8e4eeb930946a4092a42ad)
 - Built-in support multiple radios on RPi by \@TMRh20 in [`d6a9c3d`](https://github.com/nRF24/RF24/commit/d6a9c3d3cf8309b95b441cb29b39f2541354f55f)
 - Character fix by \@lnxbil in [`422495a`](https://github.com/nRF24/RF24/commit/422495ade0b55a7bdd8d159c2735c727fb3ac0d5)
-- Merge pull request #28 from lnxbil/printDetails-fix by \@TMRh20 in [`79eb410`](https://github.com/nRF24/RF24/commit/79eb4107a34578db20e90f58ba43cf9176a40cbc)
+- Merge pull request \#28 from lnxbil/printDetails-fix by \@TMRh20 in [`79eb410`](https://github.com/nRF24/RF24/commit/79eb4107a34578db20e90f58ba43cf9176a40cbc)
 - Merge RPi and Arduino code by \@TMRh20 in [`435e4db`](https://github.com/nRF24/RF24/commit/435e4db883811700d4688b9d5c86bf93528d31fa)
 - Replace old examples with the current ones for RPi by \@TMRh20 in [`c51049d`](https://github.com/nRF24/RF24/commit/c51049de7c3c3c65967d03f1e201c0b113db0b5d)
 - Moved RPi SPI driver to RPi folder from root by \@TMRh20 in [`eabd46a`](https://github.com/nRF24/RF24/commit/eabd46aec6d1313bba1e38ddfd5f3b7db60912d2)
@@ -1458,19 +1458,19 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Reliability improvements for RPi by \@TMRh20 in [`d41d47a`](https://github.com/nRF24/RF24/commit/d41d47ab20cb794b8250560154076b1b2b06feae)
 - Revert last commit, if defined... delay by \@TMRh20 in [`deef592`](https://github.com/nRF24/RF24/commit/deef592bb04729aae5bbd61bce4b31629496b7cd)
 - Python wrapper for RPi added by \@martin-mat in [`567ca69`](https://github.com/nRF24/RF24/commit/567ca69234c5c51bbe6ae7f68b3fc6e350c3a6bb)
-- Merge pull request #35 from mz-fuzzy/master by \@TMRh20 in [`a2954f8`](https://github.com/nRF24/RF24/commit/a2954f8f42b97d84f64c5753201cc8a1b3b482fc)
+- Merge pull request \#35 from mz-fuzzy/master by \@TMRh20 in [`a2954f8`](https://github.com/nRF24/RF24/commit/a2954f8f42b97d84f64c5753201cc8a1b3b482fc)
 - Revert change to delay from last commit by \@TMRh20 in [`58293d6`](https://github.com/nRF24/RF24/commit/58293d6fe48c13f3e4ddc35bd7ac2767fd0660ea)
 - Non-conflicting names by \@jfktrey in [`1650b6b`](https://github.com/nRF24/RF24/commit/1650b6bd58baded2e53e0267bd9268e55a60b675)
-- Merge pull request #38 from jfktrey/master by \@TMRh20 in [`50450a9`](https://github.com/nRF24/RF24/commit/50450a9fe363d7f549497137b1d9587d715e73a1)
+- Merge pull request \#38 from jfktrey/master by \@TMRh20 in [`50450a9`](https://github.com/nRF24/RF24/commit/50450a9fe363d7f549497137b1d9587d715e73a1)
 - Intel Gallileo support added in [`83dccd2`](https://github.com/nRF24/RF24/commit/83dccd282d75018a7970240b366db768035a1df5)
 - Optimization for Galileo Delay by \@spaniakos in [`7574bf5`](https://github.com/nRF24/RF24/commit/7574bf51ca5330beecd83879eaeb35ee53049362)
 - Galileo Optimizations and FIFO Fix by \@spaniakos in [`0969010`](https://github.com/nRF24/RF24/commit/0969010b6d3a2f2da956a352e60eef009dfe7515)
 - Galileo Optimizations by \@spaniakos in [`e13b238`](https://github.com/nRF24/RF24/commit/e13b238be108fa0a5ed1a2bb829242ed0edd3203)
-- Merge pull request #40 from spaniakos/master by \@TMRh20 in [`aace3b4`](https://github.com/nRF24/RF24/commit/aace3b4bd7ca157303fa964bbc9ade7ac20056a9)
+- Merge pull request \#40 from spaniakos/master by \@TMRh20 in [`aace3b4`](https://github.com/nRF24/RF24/commit/aace3b4bd7ca157303fa964bbc9ade7ac20056a9)
 - Updated led_example.pde to work with newer version of library. by \@k2OS in [`65d7fc1`](https://github.com/nRF24/RF24/commit/65d7fc1606dcb4cdd1ecbf0e4eef0f5dc6f9d983)
-- Merge pull request #45 from k2OS/master by \@TMRh20 in [`a0c8087`](https://github.com/nRF24/RF24/commit/a0c808751c4239d5c692588b6730f5fbda7c6954)
+- Merge pull request \#45 from k2OS/master by \@TMRh20 in [`a0c8087`](https://github.com/nRF24/RF24/commit/a0c808751c4239d5c692588b6730f5fbda7c6954)
 - Lower default SPI clock speed by \@TMRh20 in [`3515538`](https://github.com/nRF24/RF24/commit/3515538781ea714a9f4bb5f7313cd2abe676b601)
-- Merge pull request #50 from mz-fuzzy/pyRF24fix by \@TMRh20 in [`350e00a`](https://github.com/nRF24/RF24/commit/350e00a0d4ef8e47224c241f1167b3ce1c375581)
+- Merge pull request \#50 from mz-fuzzy/pyRF24fix by \@TMRh20 in [`350e00a`](https://github.com/nRF24/RF24/commit/350e00a0d4ef8e47224c241f1167b3ce1c375581)
 - Update many of the example files by \@TMRh20 in [`d05a356`](https://github.com/nRF24/RF24/commit/d05a356270650adc9d4e98f56362cd6deb373a0e)
 - Enable hardware warnings by default on linux by \@TMRh20 in [`831a424`](https://github.com/nRF24/RF24/commit/831a424d3ba1e75dbb7bbcdc4f68b65165201601)
 - Update python readme and example by \@TMRh20 in [`714999c`](https://github.com/nRF24/RF24/commit/714999c186466a97a74a151e3713b7e19caae015)
@@ -1483,31 +1483,31 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Enable buffered writes/transmissions by \@TMRh20 in [`08480a3`](https://github.com/nRF24/RF24/commit/08480a3b3750e2c44263631c2008682122b9b029)
 - Adapted python wrapper for RF24 interface changes in txStandBy and startFastWrite by \@martin-mat in [`8d68102`](https://github.com/nRF24/RF24/commit/8d681027a8ffcf1318ec85c0df5cf920202a6965)
 - Merge remote-tracking branch 'TMRh20/master' into pyRF24fix by \@martin-mat in [`b2e40bc`](https://github.com/nRF24/RF24/commit/b2e40bcceaa4250976e9ceab31091c89d10f8ad6)
-- Merge pull request #65 from mz-fuzzy/pyRF24fix by \@TMRh20 in [`a46779f`](https://github.com/nRF24/RF24/commit/a46779fad0f52ffffd1e43a4fd1e3214aed17011)
-- Merge pull request #66 from ax7884/master by \@TMRh20 in [`4b435c9`](https://github.com/nRF24/RF24/commit/4b435c99fdc39de0f31d3798aad667cbf5a48a4e)
+- Merge pull request \#65 from mz-fuzzy/pyRF24fix by \@TMRh20 in [`a46779f`](https://github.com/nRF24/RF24/commit/a46779fad0f52ffffd1e43a4fd1e3214aed17011)
+- Merge pull request \#66 from ax7884/master by \@TMRh20 in [`4b435c9`](https://github.com/nRF24/RF24/commit/4b435c99fdc39de0f31d3798aad667cbf5a48a4e)
 - Tweak CONFIG register on radio startup. by \@dsbaha in [`a27b840`](https://github.com/nRF24/RF24/commit/a27b84063269385249f46958f85181ddf2894d69)
-- Merge pull request #67 from dsbaha/master by \@TMRh20 in [`e3f9f9a`](https://github.com/nRF24/RF24/commit/e3f9f9aa395441bd42adf74c527cc9904b590d17)
+- Merge pull request \#67 from dsbaha/master by \@TMRh20 in [`e3f9f9a`](https://github.com/nRF24/RF24/commit/e3f9f9aa395441bd42adf74c527cc9904b590d17)
 - Merge remote-tracking branch 'origin/master' into Updates by \@TMRh20 in [`3c652ed`](https://github.com/nRF24/RF24/commit/3c652ed62b2007012b39d4c4bc4190a0b721371c)
-- Rough port for BBB #69 by \@TMRh20 in [`09269a3`](https://github.com/nRF24/RF24/commit/09269a355759c49854ae844a903ac74143ac7fe8)
-- #69 - Forgot to include the main config changes by \@TMRh20 in [`2254bbf`](https://github.com/nRF24/RF24/commit/2254bbf7d5e90b4fe2b619d621f0045b421fa83a)
+- Rough port for BBB \#69 by \@TMRh20 in [`09269a3`](https://github.com/nRF24/RF24/commit/09269a355759c49854ae844a903ac74143ac7fe8)
+- \#69 - Forgot to include the main config changes by \@TMRh20 in [`2254bbf`](https://github.com/nRF24/RF24/commit/2254bbf7d5e90b4fe2b619d621f0045b421fa83a)
 - Move Due and ATTiny to new template format by \@TMRh20 in [`e7deb68`](https://github.com/nRF24/RF24/commit/e7deb6843828ea729e5fea121166bbb9f83ec4eb)
-- Merge pull request #72 from mannkind/Updates by \@TMRh20 in [`f06ca7c`](https://github.com/nRF24/RF24/commit/f06ca7cb86ce7a0ec5e22174bf8c8b551e2b9ebe)
+- Merge pull request \#72 from mannkind/Updates by \@TMRh20 in [`f06ca7c`](https://github.com/nRF24/RF24/commit/f06ca7cb86ce7a0ec5e22174bf8c8b551e2b9ebe)
 - Transitioning to new hardware support template by \@TMRh20 in [`e2abd64`](https://github.com/nRF24/RF24/commit/e2abd640a296e1be9b2abc0d27bbd5caa1affa78)
-- Restore bcm updates from #72 by \@TMRh20 in [`2ca76c6`](https://github.com/nRF24/RF24/commit/2ca76c6b24c660a81e9cdbb279ca9576b83bbf39)
+- Restore bcm updates from \#72 by \@TMRh20 in [`2ca76c6`](https://github.com/nRF24/RF24/commit/2ca76c6b24c660a81e9cdbb279ca9576b83bbf39)
 - Update for generic spidev/Linux support by \@TMRh20 in [`84f4590`](https://github.com/nRF24/RF24/commit/84f4590dff3c4e4ff0daf7af446d1f25fb21f6f9)
 - Update Makefile for LittleWire by \@TMRh20 in [`02b9b16`](https://github.com/nRF24/RF24/commit/02b9b1630366bed83e267d806f0e382c2ebce0c5)
 - MRAA support tweaks by \@TMRh20 in [`3d049ab`](https://github.com/nRF24/RF24/commit/3d049abfe890225bb8232f2a025e7415e731e6e2)
-- Merge pull request #75 from prophet-roshak/mraa by \@TMRh20 in [`350cafb`](https://github.com/nRF24/RF24/commit/350cafbce914598917397473dec93ebe728a7284)
+- Merge pull request \#75 from prophet-roshak/mraa by \@TMRh20 in [`350cafb`](https://github.com/nRF24/RF24/commit/350cafbce914598917397473dec93ebe728a7284)
 - Memory handling with MRAA device contexts by \@prophet-roshak in [`e78893b`](https://github.com/nRF24/RF24/commit/e78893bf7189d534323ecd6fd05bcdf446da9410)
 - Memory handling with MRAA device contexts, minor optimizations by \@prophet-roshak in [`2eb660f`](https://github.com/nRF24/RF24/commit/2eb660f64a31b82ffc77f63733092900896e8b6a)
-- Merge pull request #76 from prophet-roshak/mraa by \@TMRh20 in [`225052a`](https://github.com/nRF24/RF24/commit/225052a3c06af786e0085c22680bb4b610bd3a10)
+- Merge pull request \#76 from prophet-roshak/mraa by \@TMRh20 in [`225052a`](https://github.com/nRF24/RF24/commit/225052a3c06af786e0085c22680bb4b610bd3a10)
 - Update note in gettingstarted example by \@TMRh20 in [`18e6775`](https://github.com/nRF24/RF24/commit/18e67756e4b014d7828592eef5cb15c88cf48903)
 - BBB/SPIDEV changes by \@TMRh20 in [`40b907c`](https://github.com/nRF24/RF24/commit/40b907c318b2046edcae761084242838bdfb0d96)
 - Cleanup RF24_config.h, add Teensy to arch/ support by \@TMRh20 in [`30a01d7`](https://github.com/nRF24/RF24/commit/30a01d74190d726e3a1bed9da8dbb961e107f4a5)
-- Merge pull request #78 from prophet-roshak/mraa by \@TMRh20 in [`71337bd`](https://github.com/nRF24/RF24/commit/71337bd48e69e77d75a6aeac7c54f4021a25071c)
+- Merge pull request \#78 from prophet-roshak/mraa by \@TMRh20 in [`71337bd`](https://github.com/nRF24/RF24/commit/71337bd48e69e77d75a6aeac7c54f4021a25071c)
 - Unify RF24 constructor API for all Linux platforms by \@TMRh20 in [`bd5ad6b`](https://github.com/nRF24/RF24/commit/bd5ad6b90c325a1bde6b1be015611ea8e673aeb1)
 - Update Makefile with better RPi detection by \@TMRh20 in [`4120b18`](https://github.com/nRF24/RF24/commit/4120b18361723607590be7b967df48ddaa76f38e)
-- Merge pull request #83 from jorihardman/master by \@TMRh20 in [`d28cfcb`](https://github.com/nRF24/RF24/commit/d28cfcbf19b9d132d4135c0f311bff58184a8830)
+- Merge pull request \#83 from jorihardman/master by \@TMRh20 in [`d28cfcb`](https://github.com/nRF24/RF24/commit/d28cfcbf19b9d132d4135c0f311bff58184a8830)
 - Merge branch 'master' of https://github.com/TMRh20/RF24 by \@TMRh20 in [`d577379`](https://github.com/nRF24/RF24/commit/d57737978da8456e28e765a9676bee91934cb510)
 - Transactions beta by \@nerdralph in [`c02a51c`](https://github.com/nRF24/RF24/commit/c02a51c25b1a85f025f8174355412cdabf6e7c8c)
 - Merge branch 'Updates' of https://github.com/nerdralph/RF24 into Updates by \@TMRh20 in [`3cc10bb`](https://github.com/nRF24/RF24/commit/3cc10bb6093d7c234d23cf0d80bb70a4a6247a4c)
@@ -1516,31 +1516,31 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Use SPI_HAS_TRANSACTION to detect transaction API by \@TMRh20 in [`28c363f`](https://github.com/nRF24/RF24/commit/28c363f4965ad4059e108a0a4921a64e4e737cac)
 - Adjust spi transaction detection again by \@TMRh20 in [`dceeabb`](https://github.com/nRF24/RF24/commit/dceeabb3423044e008906ba4a95940271da983bc)
 - Update GettingStarted.ino by \@Interneedus in [`6f5e954`](https://github.com/nRF24/RF24/commit/6f5e95494c34b827c803b29c5c342ee96c71c45a)
-- Merge pull request #103 from Interneedus/patch-1 by \@TMRh20 in [`638b199`](https://github.com/nRF24/RF24/commit/638b199b173f771902020445f42bedfed3fdc6a8)
+- Merge pull request \#103 from Interneedus/patch-1 by \@TMRh20 in [`638b199`](https://github.com/nRF24/RF24/commit/638b199b173f771902020445f42bedfed3fdc6a8)
 - Update Transfer.ino by \@Interneedus in [`51600d6`](https://github.com/nRF24/RF24/commit/51600d69034b5f74944adedcbb4fdce6d122e4b4)
-- Merge pull request #104 from Interneedus/patch-2 by \@TMRh20 in [`5896d62`](https://github.com/nRF24/RF24/commit/5896d62c2859811fb42d38debf4ba7d7b3359258)
+- Merge pull request \#104 from Interneedus/patch-2 by \@TMRh20 in [`5896d62`](https://github.com/nRF24/RF24/commit/5896d62c2859811fb42d38debf4ba7d7b3359258)
 - Update scanner.ino by \@Interneedus in [`7ad1c2f`](https://github.com/nRF24/RF24/commit/7ad1c2f0c621c0cf1c87112459673dbbfdd7e883)
-- Merge pull request #105 from Interneedus/patch-3 by \@TMRh20 in [`a75fd1f`](https://github.com/nRF24/RF24/commit/a75fd1f4cac3eb2b9c82288f8575735840deb649)
-- Merge pull request #122 from ivankravets/patch-1 by \@TMRh20 in [`417e6e5`](https://github.com/nRF24/RF24/commit/417e6e523bd34b64b2e39d13d9d883488cd51f57)
-- Modify printDetails() per #121 by \@TMRh20 in [`594a949`](https://github.com/nRF24/RF24/commit/594a949b4be911430ccdc91d0d2d8a60d288afbf)
+- Merge pull request \#105 from Interneedus/patch-3 by \@TMRh20 in [`a75fd1f`](https://github.com/nRF24/RF24/commit/a75fd1f4cac3eb2b9c82288f8575735840deb649)
+- Merge pull request \#122 from ivankravets/patch-1 by \@TMRh20 in [`417e6e5`](https://github.com/nRF24/RF24/commit/417e6e523bd34b64b2e39d13d9d883488cd51f57)
+- Modify printDetails() per \#121 by \@TMRh20 in [`594a949`](https://github.com/nRF24/RF24/commit/594a949b4be911430ccdc91d0d2d8a60d288afbf)
 - ESP8266 Support per \@crcastle by \@TMRh20 in [`cd52d61`](https://github.com/nRF24/RF24/commit/cd52d61bc08c3c3e46b5164a056b29e61fdf2689)
 - Merge branch 'master' of https://github.com/TMRh20/RF24 by \@komby in [`0a8b1d3`](https://github.com/nRF24/RF24/commit/0a8b1d3df28a50bb189b3939da78c20a9b8ed0da)
-- Merge pull request #129 from komby/master by \@TMRh20 in [`16c49cb`](https://github.com/nRF24/RF24/commit/16c49cbbf33cc4ad31ffeb09e835768385880665)
+- Merge pull request \#129 from komby/master by \@TMRh20 in [`16c49cb`](https://github.com/nRF24/RF24/commit/16c49cbbf33cc4ad31ffeb09e835768385880665)
 - Change %S to %s for ESP8266 by \@TMRh20 in [`ded7e1b`](https://github.com/nRF24/RF24/commit/ded7e1bc7dbe83490452106bd2677ca4eafd37c1)
 - Merge branch 'master' into Updates by \@TMRh20 in [`2db0f2e`](https://github.com/nRF24/RF24/commit/2db0f2e659894ba82f32fa7400639170d6c6b79d)
 - Redefine PROGMEM variables for ESP8266 by \@TMRh20 in [`14ed863`](https://github.com/nRF24/RF24/commit/14ed8638de5815fb38e88fe5d4a8daeaacbf6f20)
 - Fix for SPIDEV on 4.1.7+ by \@TMRh20 in [`ded2157`](https://github.com/nRF24/RF24/commit/ded2157c0ba68e74e304e2e968e72c406f008875)
 - Merge branch 'Updates' by \@TMRh20 in [`5296c16`](https://github.com/nRF24/RF24/commit/5296c16664f1ac22218fdec741a8d67ee3e8b58c)
 - Create library.properties by \@Avamander in [`f824302`](https://github.com/nRF24/RF24/commit/f8243024523a14b8216b3a3df97359302028ee94)
-- Merge pull request #140 from Avamander/patch-1 by \@TMRh20 in [`45d085b`](https://github.com/nRF24/RF24/commit/45d085bdc2b9fc3794e59fc297fcf95ccf4936b5)
+- Merge pull request \#140 from Avamander/patch-1 by \@TMRh20 in [`45d085b`](https://github.com/nRF24/RF24/commit/45d085bdc2b9fc3794e59fc297fcf95ccf4936b5)
 - Update library.properties by \@Avamander in [`b4e1fa7`](https://github.com/nRF24/RF24/commit/b4e1fa7b13c1c5cd92fc806bc070f2298f34b8ea)
-- Merge pull request #142 from Avamander/patch-1 by \@TMRh20 in [`2e5b360`](https://github.com/nRF24/RF24/commit/2e5b36006a44df481dac64c8b6fb3ab540434734)
+- Merge pull request \#142 from Avamander/patch-1 by \@TMRh20 in [`2e5b360`](https://github.com/nRF24/RF24/commit/2e5b36006a44df481dac64c8b6fb3ab540434734)
 - Rename arch folder to utility by \@TMRh20 in [`55b034e`](https://github.com/nRF24/RF24/commit/55b034eeb20c5bc838b7dc5d433162b8180860b8)
 - Reverting library properties and releases by \@TMRh20 in [`517326e`](https://github.com/nRF24/RF24/commit/517326e164feeb35e7e54440a8c4b71c042d3f14)
 
-[1.0]: https://github.com/nRF24/RF24/compare/de083c964d9aeeb9fda7485c39fed27443cd617c...v1.0
+[1.0]: https://github.com/nRF24/RF24/compare/...v1.0
 
-Full commit diff: [`de083c9...v1.0`][1.0]
+Full commit diff: [`...v1.0`][1.0]
 
 ## New Contributors
 * \@komby made their first contribution

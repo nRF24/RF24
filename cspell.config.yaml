@@ -313,3 +313,4 @@ ignorePaths:
   - make.bat
   - Doxyfile
   - configure
+  - CHANGELOG.md
