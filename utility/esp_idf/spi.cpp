@@ -48,7 +48,7 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
 
 void SPIClass::begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_bus_config_t* busConfig)
 {
-    esp_err_t ret = spi_bus_initialize(busNo, busConfig, SPI_DMA_CH_AUTO);
+    esp_err_t ret = spi_bus_initialize(busNo, busConfig, SPI_DMA_DISABLED);
     ESP_ERROR_CHECK(ret);
 
     spi_device_interface_config_t device_conf;
