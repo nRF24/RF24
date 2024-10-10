@@ -63,10 +63,6 @@ void app_main(void)
     printf("SPI bus configured\n");
     printf("using CE_PIN pin %d!\n", CE_PIN);
     printf("using CSN_pin pin %d!\n", CSN_PIN);
-    spi.beginTransaction();
-    uint8_t config_reg = spi.transfer(0);
-    spi.endTransaction();
-    printf("CONFIG register (before): %02x\n", config_reg);
 
     bool ok = radio.begin(&spi);
     printf("finished attempt to init radio\n");
@@ -75,11 +71,6 @@ void app_main(void)
     } else {
         printf("Success!! radio is ready to configure.\n");
     }
-
-    spi.beginTransaction();
-    config_reg = spi.transfer(0);
-    spi.endTransaction();
-    printf("CONFIG register (after): %02x\n", config_reg);
 
     while (true) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
