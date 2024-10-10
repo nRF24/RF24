@@ -35,14 +35,12 @@ void app_main(void)
 #else
     busConfig.mosi_io_num = -1; // GPIO13 on SPI2_HOST; GPIO23 on SPI3_HOST
 #endif
-    busConfig.data0_io_num = -1;
 #ifdef RF24_DEFAULT_MISO
     printf("using MISO pin %d!\n", RF24_DEFAULT_MISO);
     busConfig.miso_io_num = RF24_DEFAULT_MISO;
 #else
     busConfig.miso_io_num = -1; // GPIO12 on SPI2_HOST; GPIO19 on SPI3_HOST
 #endif
-    busConfig.data1_io_num = -1;
 #ifdef RF24_DEFAULT_SCLK
     printf("using SCLK pin %d!\n", RF24_DEFAULT_SCLK);
     busConfig.sclk_io_num = RF24_DEFAULT_SCLK;
@@ -50,13 +48,11 @@ void app_main(void)
     busConfig.sclk_io_num = -1; // GPIO14 on SPI2_HOST; GPIO18 on SPI3_HOST
 #endif
     busConfig.quadwp_io_num = -1;
-    // busConfig.data2_io_num = -1;
     busConfig.quadhd_io_num = -1;
-    // busConfig.data3_io_num = -1;
-    // busConfig.data4_io_num = -1;
-    // busConfig.data5_io_num = -1;
-    // busConfig.data6_io_num = -1;
-    // busConfig.data7_io_num = -1;
+    busConfig.data4_io_num = -1;
+    busConfig.data5_io_num = -1;
+    busConfig.data6_io_num = -1;
+    busConfig.data7_io_num = -1;
     // busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
     // busConfig.flags = 0;
     // busConfig.isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO;

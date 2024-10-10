@@ -18,7 +18,6 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
 #else
     busConfig.mosi_io_num = -1; // GPIO13 on SPI2_HOST; GPIO23 on SPI3_HOST
 #endif
-    busConfig.data0_io_num = -1;
 #ifdef RF24_DEFAULT_MISO
     busConfig.miso_io_num = RF24_DEFAULT_MISO;
 #elif defined(CONFIG_RF24_DEFAULT_MISO)
@@ -26,7 +25,6 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
 #else
     busConfig.miso_io_num = -1; // GPIO12 on SPI2_HOST; GPIO19 on SPI3_HOST
 #endif
-    busConfig.data1_io_num = -1;
 #ifdef RF24_DEFAULT_SCLK
     busConfig.sclk_io_num = RF24_DEFAULT_SCLK;
 #elif defined(CONFIG_RF24_DEFAULT_SCLK)
@@ -35,9 +33,7 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
     busConfig.sclk_io_num = -1; // GPIO14 on SPI2_HOST; GPIO18 on SPI3_HOST
 #endif
     busConfig.quadwp_io_num = -1;
-    busConfig.data2_io_num = -1;
     busConfig.quadhd_io_num = -1;
-    busConfig.data3_io_num = -1;
     busConfig.data4_io_num = -1;
     busConfig.data5_io_num = -1;
     busConfig.data6_io_num = -1;
