@@ -14,3 +14,4 @@ dependencies.lock
 # generated ESP-IDF config files
 sdkconfig.*
 !sdkconfig.defaults
+!sdkconfig.defaults.*
