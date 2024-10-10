@@ -7,6 +7,10 @@
 # ESP component registry cache
 managed_components/
 
-# generated sdkconfig files
+# exclude lock file because we're building RF24 lib from source.
+# This results in an absolute path gettign checked into git remote :(
+dependencies.lock
+
+# generated ESP-IDF config files
 sdkconfig.*
 !sdkconfig.defaults

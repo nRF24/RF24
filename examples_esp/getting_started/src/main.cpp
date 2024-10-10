@@ -12,14 +12,14 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_RF24_CE_PIN
-    #define CE_PIN CONFIG_RF24_CE_PIN
+#ifdef RF24_CE_PIN
+    #define CE_PIN RF24_CE_PIN
 #else
     #define CE_PIN 7
 #endif
 
-#ifdef CONFIG_RF24_CSN_PIN
-    #define CSN_PIN CONFIG_RF24_CSN_PIN
+#ifdef RF24_CSN_PIN
+    #define CSN_PIN RF24_CSN_PIN
 #else
     #define CSN_PIN 8
 #endif
@@ -36,50 +36,61 @@ void app_main(void)
 {
     setupSerialUSB();
 
-#ifdef CONFIG_RF24_DEFAULT_MOSI
-    fprintf(stdout, "using MOSI pin %d!\n", CONFIG_RF24_DEFAULT_MOSI);
-    busConfig.mosi_io_num = CONFIG_RF24_DEFAULT_MOSI;
+#ifdef RF24_DEFAULT_MOSI
+    printf("using MOSI pin %d!\n", RF24_DEFAULT_MOSI);
+    busConfig.mosi_io_num = RF24_DEFAULT_MOSI;
 #else
     busConfig.mosi_io_num = -1; // GPIO13 on SPI2_HOST; GPIO23 on SPI3_HOST
 #endif
     busConfig.data0_io_num = -1;
-#ifdef CONFIG_RF24_DEFAULT_MISO
-    fprintf(stdout, "using MISO pin %d!\n", CONFIG_RF24_DEFAULT_MISO);
-    busConfig.miso_io_num = CONFIG_RF24_DEFAULT_MISO;
+#ifdef RF24_DEFAULT_MISO
+    printf("using MISO pin %d!\n", RF24_DEFAULT_MISO);
+    busConfig.miso_io_num = RF24_DEFAULT_MISO;
 #else
     busConfig.miso_io_num = -1; // GPIO12 on SPI2_HOST; GPIO19 on SPI3_HOST
 #endif
     busConfig.data1_io_num = -1;
-#ifdef CONFIG_RF24_DEFAULT_SCLK
-    fprintf(stdout, "using SCLK pin %d!\n", CONFIG_RF24_DEFAULT_SCLK);
-    busConfig.sclk_io_num = CONFIG_RF24_DEFAULT_SCLK;
+#ifdef RF24_DEFAULT_SCLK
+    printf("using SCLK pin %d!\n", RF24_DEFAULT_SCLK);
+    busConfig.sclk_io_num = RF24_DEFAULT_SCLK;
 #else
     busConfig.sclk_io_num = -1; // GPIO14 on SPI2_HOST; GPIO18 on SPI3_HOST
 #endif
     busConfig.quadwp_io_num = -1;
-    busConfig.data2_io_num = -1;
+    // busConfig.data2_io_num = -1;
     busConfig.quadhd_io_num = -1;
-    busConfig.data3_io_num = -1;
-    busConfig.data4_io_num = -1;
-    busConfig.data5_io_num = -1;
-    busConfig.data6_io_num = -1;
-    busConfig.data7_io_num = -1;
-    busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
-    busConfig.flags = 0;
-    busConfig.isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO;
-    busConfig.intr_flags = 0;
+    // busConfig.data3_io_num = -1;
+    // busConfig.data4_io_num = -1;
+    // busConfig.data5_io_num = -1;
+    // busConfig.data6_io_num = -1;
+    // busConfig.data7_io_num = -1;
+    // busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
+    // busConfig.flags = 0;
+    // busConfig.isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO;
+    // busConfig.intr_flags = 0;
 
     SPIClass spi;
-    spi.begin(SPI2_HOST, RF24_SPI_SPEED, SPI_MODE1, &busConfig);
-    fprintf(stdout, "SPI bus configured\n");
+    spi.begin(SPI2_HOST, /* RF24_SPI_SPEED */ 4000000, SPI_MODE1, &busConfig);
+    printf("SPI bus configured\n");
+    printf("using CE_PIN pin %d!\n", CE_PIN);
+    printf("using CSN_pin pin %d!\n", CSN_PIN);
+    spi.beginTransaction();
+    uint8_t config_reg = spi.transfer(0);
+    spi.endTransaction();
+    printf("CONFIG register (before): %02x\n", config_reg);
 
     bool ok = radio.begin(&spi);
-    fprintf(stdout, "finished attempt o init radio");
+    printf("finished attempt to init radio\n");
     if (!ok) {
-        fprintf(stdout, "radio hardware not responding!\n");
+        printf("radio hardware not responding!\n");
     } else {
-        fprintf(stdout, "Success!! radio is ready to configure.\n");
+        printf("Success!! radio is ready to configure.\n");
     }
+
+    spi.beginTransaction();
+    config_reg = spi.transfer(0);
+    spi.endTransaction();
+    printf("CONFIG register (after): %02x\n", config_reg);
 
     while (true) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);

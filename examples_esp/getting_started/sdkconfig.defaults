@@ -1,1 +1,2 @@
+# enabled USB serial I/O
 CONFIG_TINYUSB_CDC_ENABLED=y

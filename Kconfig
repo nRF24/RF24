@@ -1,0 +1,39 @@
+menu "nRF24/RF24 Configuration"
+
+	config GPIO_RANGE_MAX
+		int
+		default 33 if IDF_TARGET_ESP32
+		default 46 if IDF_TARGET_ESP32S2
+		default 48 if IDF_TARGET_ESP32S3
+		default 18 if IDF_TARGET_ESP32C2
+		default 19 if IDF_TARGET_ESP32C3
+		default 30 if IDF_TARGET_ESP32C6
+
+    config RF24_DEFAULT_MOSI
+        int "The GPIO pin number used for the radio's MOSI pin"
+		range 0 GPIO_RANGE_MAX
+		default 23 if IDF_TARGET_ESP32
+		default 35 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default  2 # C3 and others
+        help
+            If undefined, then the RF24 library's code defaults to using GPIO13 as the SPI2_HOST MOSI pin.
+
+    config RF24_DEFAULT_MISO
+        int "The GPIO pin number used for the radio's MISO pin"
+		range 0 GPIO_RANGE_MAX
+		default 19 if IDF_TARGET_ESP32
+		default 37 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default  4 # C3 and others
+        help
+            If undefined, then the RF24 library's code defaults to using GPIO12 as the SPI2_HOST MISO pin.
+
+    config RF24_DEFAULT_SCLK
+        int "The GPIO pin number used for the radio's SCLK pin"
+		range 0 GPIO_RANGE_MAX
+		default 18 if IDF_TARGET_ESP32
+		default 36 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default  3 # C3 and others
+        help
+            If undefined, then the RF24 library's code defaults to using GPIO14 as the SPI2_HOST SCLK pin.
+
+endmenu
