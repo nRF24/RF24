@@ -11,19 +11,25 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
     // We will use the pins corresponding to the specified busNo (appropriate config option).
     // Users can also pass a customized bus config to SPIClass::begin() overload if/when
     // a secondary SPI bus is desired.
-#ifdef CONFIG_RF24_DEFAULT_MOSI
+#ifdef RF24_DEFAULT_MOSI
+    busConfig.mosi_io_num = RF24_DEFAULT_MOSI;
+#elif defined(CONFIG_RF24_DEFAULT_MOSI)
     busConfig.mosi_io_num = CONFIG_RF24_DEFAULT_MOSI;
 #else
     busConfig.mosi_io_num = -1; // GPIO13 on SPI2_HOST; GPIO23 on SPI3_HOST
 #endif
     busConfig.data0_io_num = -1;
-#ifdef CONFIG_RF24_DEFAULT_MISO
+#ifdef RF24_DEFAULT_MISO
+    busConfig.miso_io_num = RF24_DEFAULT_MISO;
+#elif defined(CONFIG_RF24_DEFAULT_MISO)
     busConfig.miso_io_num = CONFIG_RF24_DEFAULT_MISO;
 #else
     busConfig.miso_io_num = -1; // GPIO12 on SPI2_HOST; GPIO19 on SPI3_HOST
 #endif
     busConfig.data1_io_num = -1;
-#ifdef CONFIG_RF24_DEFAULT_SCLK
+#ifdef RF24_DEFAULT_SCLK
+    busConfig.sclk_io_num = RF24_DEFAULT_SCLK;
+#elif defined(CONFIG_RF24_DEFAULT_SCLK)
     busConfig.sclk_io_num = CONFIG_RF24_DEFAULT_SCLK;
 #else
     busConfig.sclk_io_num = -1; // GPIO14 on SPI2_HOST; GPIO18 on SPI3_HOST
@@ -55,10 +61,10 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_
     device_conf.clock_speed_hz = speed;
     device_conf.input_delay_ns = 0; // delay not needed between CSN assert and MISO start
     device_conf.spics_io_num = -1;  // RF24::csn() will control the CSN pin
-    device_conf.flags = 0;
+    device_conf.flags = SPI_DEVICE_NO_DUMMY;
     // we won't be using queued or interrupt-triggered SPI transactions.
     // disable those related features' config
-    device_conf.queue_size = 1;
+    device_conf.queue_size = 7;
     device_conf.pre_cb = nullptr;
     device_conf.post_cb = nullptr;
 
@@ -80,7 +86,7 @@ void SPIClass::transfernb(const uint8_t* txBuf, uint8_t* rxBuf, uint32_t len)
     transactionConfig.length = len * 8; // in bits, not bytes
     transactionConfig.tx_buffer = txBuf;
     transactionConfig.rx_buffer = rxBuf;
-    esp_err_t ret = spi_device_polling_transmit(bus, &transactionConfig);
+    esp_err_t ret = spi_device_transmit(bus, &transactionConfig);
     ESP_ERROR_CHECK(ret);
 }
 
