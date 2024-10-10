@@ -20,7 +20,7 @@
     #define DEFAULT_SPI_BUS SPI2_HOST
 #endif
 
-// #define SPI_HAS_TRANSACTION
+#define SPI_HAS_TRANSACTION
 
 enum spi_mode_t : uint8_t
 {
