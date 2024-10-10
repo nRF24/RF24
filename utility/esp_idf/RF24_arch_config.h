@@ -18,6 +18,7 @@
 #define _BV(x) (1 << (x))
 #define _SPI   SPIClass
 #define RF24_SPI_PTR
+#define RF24_SPI_TRANSACTIONS
 
 #ifdef RF24_DEBUG
     #define IF_RF24_DEBUG(x) ({ x; })
