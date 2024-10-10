@@ -8,23 +8,3 @@ idf_component_register(SRCS ${app_sources}
     # # for user projects (that don't belong in the RF24 repo), use the component registry
     # REQUIRES nRF24/RF24
 )
-
-if(DEFINED CONFIG_RF24_CE_PIN)
-    target_compile_definitions(main PUBLIC CE_PIN=${CONFIG_RF24_CE_PIN})
-endif()
-
-if(DEFINED CONFIG_RF24_CSN_PIN)
-    target_compile_definitions(main PUBLIC CSN_PIN=${CONFIG_RF24_CSN_PIN})
-endif()
-
-if(DEFINED CONFIG_RF24_DEFAULT_MOSI)
-    target_compile_definitions(main PUBLIC CONFIG_RF24_DEFAULT_MOSI=${CONFIG_RF24_DEFAULT_MOSI})
-endif()
-
-if(DEFINED CONFIG_RF24_DEFAULT_MISO)
-    target_compile_definitions(main PUBLIC CONFIG_RF24_DEFAULT_MISO=${CONFIG_RF24_DEFAULT_MISO})
-endif()
-
-if(DEFINED CONFIG_RF24_DEFAULT_SCLK)
-    target_compile_definitions(main PUBLIC CONFIG_RF24_DEFAULT_SCLK=${CONFIG_RF24_DEFAULT_SCLK})
-endif()

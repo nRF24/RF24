@@ -166,6 +166,7 @@ words:
   - MCUSR
   - MEDLVLEN
   - MEGAAVR
+  - Menuconfig
   - mfloat
   - mfpu
   - microcontroller
@@ -247,6 +248,7 @@ words:
   - spidev
   - SPIUART
   - sprintf
+  - SRCS
   - stanleyseow
   - stby
   - stddef
@@ -262,16 +264,20 @@ words:
   - TEENSYDUINO
   - THINGPLUS
   - timeit
+  - TINYUSB
   - toctree
   - TOLOWER
   - transfern
   - transfernb
+  - tusb
   - txbuff
   - UART
   - undoc
   - unexport
+  - USBDEV
   - userspace
   - uspi
+  - vbus
   - vect
   - venv
   - vfpv
