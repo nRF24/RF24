@@ -473,7 +473,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 uint8_t RF24::flush_rx(void)
 {
     read_register(FLUSH_RX, (uint8_t*)nullptr, 0);
-    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]"););
+    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]\n"););
     return status;
 }
 
@@ -482,7 +482,7 @@ uint8_t RF24::flush_rx(void)
 uint8_t RF24::flush_tx(void)
 {
     read_register(FLUSH_TX, (uint8_t*)nullptr, 0);
-    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]"););
+    IF_RF24_DEBUG(printf_P("[Flushing RX FIFO]\n"););
     return status;
 }
 
