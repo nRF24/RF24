@@ -5,10 +5,6 @@
 #include "sdkconfig.h"
 #include <driver/spi_master.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef RF24_CE_PIN
     #define CE_PIN RF24_CE_PIN
 #else
@@ -27,7 +23,7 @@ static const char* TAG = "RF24/examples_esp/getting_started";
 
 spi_bus_config_t busConfig;
 
-void app_main(void)
+extern "C" void app_main(void)
 {
 #ifdef RF24_DEFAULT_MOSI
     printf("using MOSI pin %d!\n", RF24_DEFAULT_MOSI);
@@ -73,7 +69,3 @@ void app_main(void)
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
-
-#ifdef __cplusplus
-}
-#endif
