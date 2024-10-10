@@ -59,7 +59,7 @@ void app_main(void)
     // busConfig.intr_flags = 0;
 
     SPIClass spi;
-    spi.begin(SPI2_HOST, /* RF24_SPI_SPEED */ 4000000, SPI_MODE1, &busConfig);
+    spi.begin(SPI2_HOST, RF24_SPI_SPEED, SPI_MODE0, &busConfig);
     printf("SPI bus configured\n");
     printf("using CE_PIN pin %d!\n", CE_PIN);
     printf("using CSN_pin pin %d!\n", CSN_PIN);
