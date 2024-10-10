@@ -8,6 +8,7 @@ SPIClass::SPIClass() : bus(nullptr)
 void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
 {
     spi_bus_config_t busConfig;
+    memset(&busConfig, 0, sizeof(busConfig));
     // We will use the pins corresponding to the specified busNo (appropriate config option).
     // Users can also pass a customized bus config to SPIClass::begin() overload if/when
     // a secondary SPI bus is desired.
@@ -39,9 +40,6 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed)
     busConfig.data6_io_num = -1;
     busConfig.data7_io_num = -1;
     busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
-    busConfig.flags = 0;
-    busConfig.isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO;
-    busConfig.intr_flags = 0;
 
     begin(busNo, speed, SPI_MODE0, &busConfig);
 }
@@ -54,16 +52,11 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_
     spi_device_interface_config_t device_conf;
     memset(&device_conf, 0, sizeof(device_conf));
     device_conf.mode = mode;
-    device_conf.clock_source = SPI_CLK_SRC_DEFAULT;
     device_conf.clock_speed_hz = speed;
-    device_conf.input_delay_ns = 0; // delay not needed between CSN assert and MISO start
     device_conf.spics_io_num = -1;  // RF24::csn() will control the CSN pin
-    device_conf.flags = SPI_DEVICE_NO_DUMMY;
     // we won't be using queued or interrupt-triggered SPI transactions.
     // disable those related features' config
     device_conf.queue_size = 1;
-    device_conf.pre_cb = nullptr;
-    device_conf.post_cb = nullptr;
 
     ret = spi_bus_add_device(busNo, &device_conf, &bus);
     ESP_ERROR_CHECK(ret);
