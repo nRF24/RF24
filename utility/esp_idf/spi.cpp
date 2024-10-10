@@ -52,6 +52,7 @@ void SPIClass::begin(spi_host_device_t busNo, uint32_t speed, uint8_t mode, spi_
     ESP_ERROR_CHECK(ret);
 
     spi_device_interface_config_t device_conf;
+    memset(&device_conf, 0, sizeof(device_conf));
     device_conf.mode = mode;
     device_conf.clock_source = SPI_CLK_SRC_DEFAULT;
     device_conf.clock_speed_hz = speed;
