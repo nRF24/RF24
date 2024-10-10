@@ -53,7 +53,7 @@ void app_main(void)
     busConfig.data5_io_num = -1;
     busConfig.data6_io_num = -1;
     busConfig.data7_io_num = -1;
-    // busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
+    busConfig.max_transfer_sz = 33; // RF24 lib only buffers 33 bytes for SPI transactions
     // busConfig.flags = 0;
     // busConfig.isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO;
     // busConfig.intr_flags = 0;
