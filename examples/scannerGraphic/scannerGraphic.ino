@@ -89,7 +89,7 @@ struct ChannelHistory {
       sum += history[i];
     }
     history[cacheMax - 1] = value;
-    maxPeak = max(sum * 2, maxPeak);  // sum * 2 to allow half-step decay
+    maxPeak = max((uint8_t)(sum * 2), maxPeak);  // sum * 2 to allow half-step decay
     return sum;
   }
 
