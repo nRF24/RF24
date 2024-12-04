@@ -1369,6 +1369,11 @@ bool RF24::startWrite(const void* buf, uint8_t len, const bool multicast)
 #if !defined(F_CPU) || F_CPU > 20000000
     delayMicroseconds(10);
 #endif
+#ifdef ARDUINO_ARCH_STM32
+    if (F_CPU > 20000000) {
+        delayMicroseconds(10);
+    }
+#endif
     ce(LOW);
     return !(status & _BV(TX_FULL));
 }

@@ -141,7 +141,7 @@ void loop(void) {
   if (Serial.available()) {
     int8_t c = Serial.parseInt();
     if (c >= 0) {
-      c = min(125, max(0, c));  // clamp channel to supported range
+      c = min((int8_t)125, c);  // clamp channel to supported range
       constCarrierMode = 1;
       radio.stopListening();
       delay(2);
@@ -199,7 +199,7 @@ void loop(void) {
     // Print out channel measurements, clamped to a single hex digit
     for (int i = 0; i < num_channels; ++i) {
       if (values[i])
-        Serial.print(min(0xf, values[i]), HEX);
+        Serial.print(min((uint8_t)0xf, values[i]), HEX);
       else
         Serial.print(F("-"));
     }
