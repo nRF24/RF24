@@ -44,9 +44,6 @@
     #define RF24_SPI_SPEED 10000000
 #endif
 
-/// A sentinel used to control fetching the pipe info in `RF24::available()`.
-#define RF24_NO_FETCH_PIPE 0XFF
-
 //ATXMega
 #if defined(__AVR_ATxmega64D3__) || defined(__AVR_ATxmega128D3__) || defined(__AVR_ATxmega192D3__) || defined(__AVR_ATxmega256D3__) || defined(__AVR_ATxmega384D3__)
     // In order to be available both in Windows and Linux this should take presence here.
