@@ -176,8 +176,7 @@ private:
     rf24_gpio_pin_t csn_pin; /* SPI Chip select */
     uint32_t spi_speed;      /* SPI Bus Speed */
 #if defined(RF24_LINUX) || defined(XMEGA_D3) || defined(RF24_RP2)
-    uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
-    uint8_t spi_txbuff[32 + 1]; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
+    uint8_t spi_buff[32 + 1]; // SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
 #endif
     uint8_t status;                   /* The status byte returned from every SPI transaction */
     uint8_t payload_size;             /* Fixed size of payloads */
