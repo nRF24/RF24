@@ -150,27 +150,27 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction(); //configures the spi settings for RPi, locks mutex and setting csn low
-    uint8_t* prx = spi_rxbuff;
-    uint8_t* ptx = spi_txbuff;
+    uint8_t* buf_p = spi_buff;
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
-    *ptx++ = reg;
+    *buf_p++ = reg;
 
     while (len--) {
-        *ptx++ = RF24_NOP; // Dummy operation, just for reading
+        *buf_p++ = RF24_NOP; // Dummy operation, just for reading
     }
 
     #if defined(RF24_RP2)
-    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
+    _spi->transfernb((const uint8_t*)spi_buff, spi_buff, size);
     #else  // !defined (RF24_RP2)
-    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), size);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_buff), reinterpret_cast<char*>(spi_buff), size);
     #endif // !defined (RF24_RP2)
 
-    status = *prx++; // status is 1st byte of receive buffer
+    buf_p = spi_buff;  // reset iter to beginning
+    status = *buf_p++; // status is 1st byte of receive buffer
 
     // decrement before to skip status byte
     while (--size) {
-        *buf++ = *prx++;
+        *buf++ = *buf_p++;
     }
 
     endTransaction(); // unlocks mutex and setting csn high
@@ -204,19 +204,17 @@ uint8_t RF24::read_register(uint8_t reg)
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
 
-    uint8_t* prx = spi_rxbuff;
-    uint8_t* ptx = spi_txbuff;
-    *ptx++ = reg;
-    *ptx++ = RF24_NOP; // Dummy operation, just for reading
+    spi_buff[0] = reg;
+    spi_buff[1] = RF24_NOP; // Dummy operation, just for reading
 
     #if defined(RF24_RP2)
-    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
+    _spi->transfernb((const uint8_t*)spi_buff, spi_buff, 2);
     #else  // !defined(RF24_RP2)
-    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), 2);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_buff), reinterpret_cast<char*>(spi_buff), 2);
     #endif // !defined(RF24_RP2)
 
-    status = *prx;   // status is 1st byte of receive buffer
-    result = *++prx; // result is 2nd byte of receive buffer
+    status = spi_buff[0]; // status is 1st byte of receive buffer
+    result = spi_buff[1]; // result is 2nd byte of receive buffer
 
     endTransaction();
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
@@ -243,22 +241,21 @@ void RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 {
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
-    uint8_t* prx = spi_rxbuff;
-    uint8_t* ptx = spi_txbuff;
+    uint8_t* buff_p = spi_buff;
     uint8_t size = static_cast<uint8_t>(len + 1); // Add register value to transmit buffer
 
-    *ptx++ = (W_REGISTER | reg);
+    *buff_p++ = (W_REGISTER | reg);
     while (len--) {
-        *ptx++ = *buf++;
+        *buff_p++ = *buf++;
     }
 
     #if defined(RF24_RP2)
-    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
+    _spi->transfernb((const uint8_t*)spi_buff, spi_buff, size);
     #else  // !defined(RF24_RP2)
-    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), size);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_buff), reinterpret_cast<char*>(spi_buff), size);
     #endif // !defined(RF24_RP2)
 
-    status = *prx; // status is 1st byte of receive buffer
+    status = spi_buff[0]; // status is 1st byte of receive buffer
     endTransaction();
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
 
@@ -287,18 +284,16 @@ void RF24::write_register(uint8_t reg, uint8_t value)
     IF_RF24_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"), reg, value));
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
-    uint8_t* prx = spi_rxbuff;
-    uint8_t* ptx = spi_txbuff;
-    *ptx++ = (W_REGISTER | reg);
-    *ptx = value;
+    spi_buff[0] = W_REGISTER | reg;
+    spi_buff[1] = value;
 
     #if defined(RF24_RP2)
-    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
+    _spi->transfernb((const uint8_t*)spi_buff, spi_buff, 2);
     #else  // !defined(RF24_RP2)
-    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), 2);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_buff), reinterpret_cast<char*>(spi_buff), 2);
     #endif // !defined(RF24_RP2)
 
-    status = *prx++; // status is 1st byte of receive buffer
+    status = spi_buff[0]; // status is 1st byte of receive buffer
     endTransaction();
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
 
@@ -334,27 +329,25 @@ void RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeT
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
-    uint8_t* prx = spi_rxbuff;
-    uint8_t* ptx = spi_txbuff;
-    uint8_t size;
-    size = static_cast<uint8_t>(data_len + blank_len + 1); // Add register value to transmit buffer
+    uint8_t* buff_p = spi_buff;
+    uint8_t size = static_cast<uint8_t>(data_len + blank_len + 1); // Add register value to transmit buffer
 
-    *ptx++ = writeType;
+    *buff_p++ = writeType;
     while (data_len--) {
-        *ptx++ = *current++;
+        *buff_p++ = *current++;
     }
 
     while (blank_len--) {
-        *ptx++ = 0;
+        *buff_p++ = 0;
     }
 
     #if defined(RF24_RP2)
-    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
+    _spi->transfernb((const uint8_t*)spi_buff, spi_buff, size);
     #else  // !defined(RF24_RP2)
-    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), size);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_buff), reinterpret_cast<char*>(spi_buff), size);
     #endif // !defined(RF24_RP2)
 
-    status = *prx; // status is 1st byte of receive buffer
+    status = spi_buff[0]; // status is 1st byte of receive buffer
     endTransaction();
 
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
@@ -406,33 +399,32 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
 #if defined(RF24_LINUX) || defined(RF24_RP2)
     beginTransaction();
-    uint8_t* prx = spi_rxbuff;
-    uint8_t* ptx = spi_txbuff;
-    uint8_t size;
-    size = static_cast<uint8_t>(data_len + blank_len + 1); // Add register value to transmit buffer
+    uint8_t* buff_p = spi_buff;
+    uint8_t size = static_cast<uint8_t>(data_len + blank_len + 1); // Add register value to transmit buffer
 
-    *ptx++ = R_RX_PAYLOAD;
+    *buff_p++ = R_RX_PAYLOAD;
     while (--size) {
-        *ptx++ = RF24_NOP;
+        *buff_p++ = RF24_NOP;
     }
 
     size = static_cast<uint8_t>(data_len + blank_len + 1); // Size has been lost during while, re affect
 
     #if defined(RF24_RP2)
-    _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, size);
+    _spi->transfernb((const uint8_t*)spi_buff, spi_buff, size);
     #else  // !defined(RF24_RP2)
-    _SPI.transfernb(reinterpret_cast<char*>(spi_txbuff), reinterpret_cast<char*>(spi_rxbuff), size);
+    _SPI.transfernb(reinterpret_cast<char*>(spi_buff), reinterpret_cast<char*>(spi_buff), size);
     #endif // !defined(RF24_RP2)
 
-    status = *prx++; // 1st byte is status
+    buff_p = spi_buff;  // reset iter to beginning
+    status = *buff_p++; // 1st byte is status
 
     if (data_len > 0) {
         // Decrement before to skip 1st status byte
         while (--data_len) {
-            *current++ = *prx++;
+            *current++ = *buff_p++;
         }
 
-        *current = *prx;
+        *current = *buff_p;
     }
     endTransaction();
 #else // !defined(RF24_LINUX) && !defined(RF24_RP2)
