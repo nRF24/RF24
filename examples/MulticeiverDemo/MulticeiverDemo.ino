@@ -35,9 +35,6 @@ uint64_t address[6] = { 0x7878787878LL,
                         0xB3B4B5B60FLL,
                         0xB3B4B5B605LL };
 
-// Because this example allow up to 6 nodes (specified by numbers 0-5) to
-// transmit and only 1 node to receive, we will use a negative value in our
-// role variable to signify this node is a receiver.
 // role variable is used to control whether this node is sending or receiving
 char role = 'R';  // integers 0-5 = TX node; character 'R' or integer 82 = RX node
 
