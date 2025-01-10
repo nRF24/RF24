@@ -33,7 +33,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.10</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.11</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -111,22 +111,22 @@ $(function(){ initResizable(false); });
 <div class="toc"><h3>Table of Contents</h3>
 <ul>
   <li class="level1">
-    <a href="#autotoc_md240">Python Wrapper Prerequisites</a>
+    <a href="#autotoc_md244">Python Wrapper Prerequisites</a>
     <ul>
       <li class="level2">
-        <a href="#autotoc_md241">Python2</a>
+        <a href="#autotoc_md245">Python2</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md242">Python3</a>
+        <a href="#autotoc_md246">Python3</a>
       </li>
     </ul>
   </li>
   <li class="level1">
-    <a href="#autotoc_md243">Installation</a>
+    <a href="#autotoc_md247">Installation</a>
   </li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="autotoc_md239"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md243"></a></p>
 <dl class="section remark"><dt>Remarks</dt><dd><p class="startdd">We recommend using the newer <a href="https://github.com/nRF24/pyRF24">pyRF24 package</a> <a href="https://pypi.org/project/pyrf24/">available from pypi</a> because</p>
 <ol type="1">
 <li>it is <a href="https://nrf24.github.io/pyRF24/#migrating-to-pyrf24">practically drop-in compatible</a></li>
@@ -141,7 +141,7 @@ $(function(){ initResizable(false); });
 <p class="interdd">The only reason that you should need to keep using these older individual python wrappers is if you must use python v3.6 or older.</p>
 <p class="enddd">You <b>cannot</b> use these individual wrappers in combination with the pyRF24 package. </p>
 </dd></dl>
-<h1><a class="anchor" id="autotoc_md240"></a>
+<h1><a class="anchor" id="autotoc_md244"></a>
 Python Wrapper Prerequisites</h1>
 <p>These instructions work for the <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a>, RF24Network, and RF24Mesh libraries, but the C++ source code needs to be built and installed for the corresponding python wrapper(s) to work.</p>
 <dl class="section see"><dt>See also</dt><dd>Review <a class="el" href="md_docs_2using__cmake.html">installing with CMake</a> and <a class="el" href="md_docs_2rpi__general.html">Linux/RPi General</a>.</dd></dl>
@@ -151,15 +151,15 @@ Python Wrapper Prerequisites</h1>
  For information about using up a python virtual environment, see the official <a href="https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/">instructions using the python standard library <code>venv</code></a> (which is a minimized variant of <a href="https://virtualenv.pypa.io/en/stable/index.html">the <code>virtualenv</code> library</a>). <br  />
 <br  />
  There's also a note at the end of these instructions that talks about using <code>sudo</code> within a python virtual environment.</dd></dl>
-<h2><a class="anchor" id="autotoc_md241"></a>
+<h2><a class="anchor" id="autotoc_md245"></a>
 Python2</h2>
 <div class="fragment"><div class="line">sudo apt-get install python-dev libboost-python-dev python-pip</div>
 </div><!-- fragment --><p>Next, install some up-to-date python packages.</p>
 <div class="fragment"><div class="line">python -m pip install --upgrade pip setuptools</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md242"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md246"></a>
 Python3</h2>
 <div class="fragment"><div class="line">sudo apt-get install python3-dev libboost-python-dev python3-pip</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md243"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md247"></a>
 Installation</h1>
 <dl class="section note"><dt>Note</dt><dd>If using <b>older versions of RF24* libraries</b> with python3, the setup.py script needed a manually created symlink for the boost.python library. <div class="fragment"><div class="line">sudo ln -s $(ls /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3*.so | tail -1) /usr/lib/$(ls /usr/lib/gcc | tail -1)/libboost_python3.so</div>
 </div><!-- fragment --> This is no longer needed with the latest versions of <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> libraries.</dd></dl>
@@ -198,7 +198,7 @@ Installation</h1>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2024 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
+Generated on Fri Jan 10 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
 </small></address>
 </div><!-- doc-content -->
 </body>

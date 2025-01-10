@@ -33,7 +33,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.10</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.11</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -112,27 +112,48 @@ $(function(){ initResizable(false); });
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
-<a href="https://github.com/nRF24/RF24/compare/v1.4.9...v1.4.10">1.4.10</a> - 2024-10-06</h1>
+<a href="https://github.com/nRF24/RF24/compare/v1.4.10...v1.4.11">1.4.11</a> - 2025-01-10</h1>
 <h2><a class="anchor" id="autotoc_md2"></a>
+🚀 Added</h2>
+<ul>
+<li>Use enum to return precise FIFO state by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/1009">#1009</a></li>
+<li>Make <code>available(pipe)</code> depend on <code>available(void)</code> by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/1007">#1007</a></li>
+</ul>
+<h2><a class="anchor" id="autotoc_md3"></a>
+🛠️ Fixed</h2>
+<ul>
+<li>Fixes for STM32 by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/1011">#1011</a></li>
+<li>Init <code>failureDetected</code> by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/1016">#1016</a></li>
+</ul>
+<h2><a class="anchor" id="autotoc_md4"></a>
+🗨️ Changed</h2>
+<ul>
+<li>Adjustments to CHANGELOG by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/8aa71035ae3dd10de35865a894082f10a9c51027"><code>8aa7103</code></a></li>
+<li>Change comment in example by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/80e7f137ae4caf0df4889b5499c22857019a328a"><code>80e7f13</code></a></li>
+</ul>
+<p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.10...v1.4.11"><code>v1.4.10...v1.4.11</code></a></p>
+<h1><a class="anchor" id="autotoc_md5"></a>
+<a href="https://github.com/nRF24/RF24/compare/v1.4.9...v1.4.10">1.4.10</a> - 2024-10-06</h1>
+<h2><a class="anchor" id="autotoc_md6"></a>
 🚀 Added</h2>
 <ul>
 <li>Add ebyte manual for ML01DP5 to datasheets by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/996">#996</a></li>
 <li>Add pyproject.toml and update docs by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/1001">#1001</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Remove useless <code>ce()</code> call by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/987">#987</a></li>
 <li>Remove sphinx sources and update RTD config by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/1003">#1003</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md8"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix doc typo by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/81348ad9b100abf252de6f287a5855c18c0c9cc8"><code>81348ad</code></a></li>
 <li>Fix spelling by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/998">#998</a></li>
 <li>Fix some linting errors noted by clang-tidy by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/999">#999</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md9"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Change SERIAL_DEBUG into RF24_DEBUG by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/981">#981</a></li>
@@ -144,9 +165,9 @@ $(function(){ initResizable(false); });
 <li>Bump version to v1.4.10 by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/5bb22e2dbab31dedd677defc0007c2f0e7cd7f11"><code>5bb22e2</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.9...v1.4.10"><code>v1.4.9...v1.4.10</code></a></p>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md10"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.8...v1.4.9">1.4.9</a> - 2024-06-11</h1>
-<h2><a class="anchor" id="autotoc_md7"></a>
+<h2><a class="anchor" id="autotoc_md11"></a>
 🚀 Added</h2>
 <ul>
 <li>Add delay to manualAcknowledgements example by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/953">#953</a></li>
@@ -158,18 +179,18 @@ $(function(){ initResizable(false); });
 <li>Revise MRAA's GPIO implementation by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/966">#966</a></li>
 <li>Update python wrapper/examples/doc by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/967">#967</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md12"></a>
 🚫 Deprecated</h2>
 <ul>
 <li>Update linux installer docs by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/957">#957</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md13"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Wrap MRAA lib's <code>Gpio::isr()</code> for IRQ support by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/970">#970</a></li>
 <li>Disable auto-detect driver and default to SPIDEV by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/973">#973</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="autotoc_md14"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>GPIO changes (RPi5 support) by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/942">#942</a></li>
@@ -177,17 +198,17 @@ $(function(){ initResizable(false); });
 <li>Fix for pigpio delayMicroseconds by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/954">#954</a></li>
 <li>Fix scanner.py; draw 1 space (not 2) after channel label by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/9d0aa8d3b0f46a99105d15e0ef7e3284d6b5bdf3"><code>9d0aa8d</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md11"></a>
+<h2><a class="anchor" id="autotoc_md15"></a>
 📦 Dependency updates</h2>
 <ul>
 <li>Bump actions/checkout from 3 to 4 by @dependabot[bot] in <a href="https://github.com/nRF24/RF24/pull/941">#941</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md12"></a>
+<h2><a class="anchor" id="autotoc_md16"></a>
 📝 Documentation</h2>
 <ul>
 <li>Modify Main docs page by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/951">#951</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md13"></a>
+<h2><a class="anchor" id="autotoc_md17"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update clang format by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/940">#940</a></li>
@@ -202,19 +223,19 @@ $(function(){ initResizable(false); });
 <li>Bump version to v1.4.9 by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/29231f22d5739b8fb4d3a4d43c9a8ae07a7f1ce4"><code>29231f2</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.8...v1.4.9"><code>v1.4.8...v1.4.9</code></a></p>
-<h1><a class="anchor" id="autotoc_md14"></a>
+<h1><a class="anchor" id="autotoc_md18"></a>
 New Contributors</h1>
 <ul>
 <li>@dependabot[bot] made their first contribution in <a href="https://github.com/nRF24/RF24/pull/941">#941</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md15"></a>
+<h1><a class="anchor" id="autotoc_md19"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.7...v1.4.8">1.4.8</a> - 2023-09-27</h1>
-<h2><a class="anchor" id="autotoc_md16"></a>
+<h2><a class="anchor" id="autotoc_md20"></a>
 📝 Documentation</h2>
 <ul>
 <li>Mention RPi Pico board's 3v regulator in Pico SDK doc by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/915">#915</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md17"></a>
+<h2><a class="anchor" id="autotoc_md21"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Revert available() algorithm by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/914">#914</a></li>
@@ -222,31 +243,31 @@ New Contributors</h1>
 <li>Bump patch version by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/638095e0d18b86726116cdf6e87425ebe8b232ec"><code>638095e</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.7...v1.4.8"><code>v1.4.7...v1.4.8</code></a></p>
-<h1><a class="anchor" id="autotoc_md18"></a>
+<h1><a class="anchor" id="autotoc_md22"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.6...v1.4.7">1.4.7</a> - 2023-06-06</h1>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 🚀 Added</h2>
 <ul>
 <li>Add <code>deploy-release</code> arg to PIO reusable CI call by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/2ff3f2b9d6c72dd274d8fa5bdbc92e404f6f80b0"><code>2ff3f2b</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md20"></a>
+<h2><a class="anchor" id="autotoc_md24"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Reworked the utility/rp2 SPI class and removed static members by @TheGarkine in <a href="https://github.com/nRF24/RF24/pull/892">#892</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md21"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>[OrangePi Zero] Linux chip enable conditional statement by @fertinator in <a href="https://github.com/nRF24/RF24/pull/904">#904</a></li>
 <li>Fix for potential memory issue by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/457e03694f6e3923b2425bb1e7be3feeed630996"><code>457e036</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md22"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 📝 Documentation</h2>
 <ul>
 <li>Doc tweaks and reusable CI by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/887">#887</a></li>
 <li>Alias gpio pin datatype by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/898">#898</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Solve #894 by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/895">#895</a></li>
@@ -255,37 +276,37 @@ New Contributors</h1>
 <li>Update version for release by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a028813b285d6cec3090d2c96984bd67a399c52e"><code>a028813</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.6...v1.4.7"><code>v1.4.6...v1.4.7</code></a></p>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 New Contributors</h1>
 <ul>
 <li>@fertinator made their first contribution in <a href="https://github.com/nRF24/RF24/pull/904">#904</a></li>
 <li>@TheGarkine made their first contribution in <a href="https://github.com/nRF24/RF24/pull/892">#892</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md29"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.5...v1.4.6">1.4.6</a> - 2022-09-18</h1>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md30"></a>
 🚀 Added</h2>
 <ul>
 <li>Add manual trigger to docs CI by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/868">#868</a></li>
 <li>Add printf support to ESP32/8266 and arduino-pico cores by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/873">#873</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md31"></a>
 🚫 Deprecated</h2>
 <ul>
 <li>Fix <code>pgm_read_byte/word()</code> definitions by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/871">#871</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h2><a class="anchor" id="autotoc_md32"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix Raspberry Pi company name by @lurch in <a href="https://github.com/nRF24/RF24/pull/858">#858</a></li>
 <li>Fix <code>pgm_read_ptr()</code> (fixes bblanchon/ArduinoJson#1790) by @bblanchon in <a href="https://github.com/nRF24/RF24/pull/864">#864</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md33"></a>
 📝 Documentation</h2>
 <ul>
 <li>Adjust writeFast docs by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/866">#866</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md30"></a>
+<h2><a class="anchor" id="autotoc_md34"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Make utilities/CMakeLists.txt respect RF24_NO_IRQ by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/859">#859</a></li>
@@ -293,46 +314,46 @@ New Contributors</h1>
 <li>Bump version (patch) by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/d7c4041f001a7fbc880535f5151f89a56a520072"><code>d7c4041</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.5...v1.4.6"><code>v1.4.5...v1.4.6</code></a></p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md35"></a>
 New Contributors</h1>
 <ul>
 <li>@bblanchon made their first contribution in <a href="https://github.com/nRF24/RF24/pull/864">#864</a></li>
 <li>@lurch made their first contribution in <a href="https://github.com/nRF24/RF24/pull/858">#858</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md36"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.4...v1.4.5">1.4.5</a> - 2022-07-19</h1>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md37"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Remove trailing whitespace and add a blank line by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/3f786bffd5e27bd67bbe518bcc3249885fde05ec"><code>3f786bf</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<h2><a class="anchor" id="autotoc_md38"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>All single line loops and conditions use curly brackets by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/855">#855</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md35"></a>
+<h2><a class="anchor" id="autotoc_md39"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Bump version by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/a04f32b1fb0b2aa3070179d6abcde0aacaf60ebb"><code>a04f32b</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.4...v1.4.5"><code>v1.4.4...v1.4.5</code></a></p>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md40"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.3...v1.4.4">1.4.4</a> - 2022-07-18</h1>
-<h2><a class="anchor" id="autotoc_md37"></a>
+<h2><a class="anchor" id="autotoc_md41"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix for data corruption issues by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/399d219d6db589df449a56534d6327048915af87"><code>399d219</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md38"></a>
+<h2><a class="anchor" id="autotoc_md42"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update version by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/d7ba9c2fb83f7c2fbb6336f76b607c630f3ebfc2"><code>d7ba9c2</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.3...v1.4.4"><code>v1.4.3...v1.4.4</code></a></p>
-<h1><a class="anchor" id="autotoc_md39"></a>
+<h1><a class="anchor" id="autotoc_md43"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.2...v1.4.3">1.4.3</a> - 2022-07-09</h1>
-<h2><a class="anchor" id="autotoc_md40"></a>
+<h2><a class="anchor" id="autotoc_md44"></a>
 🚀 Added</h2>
 <ul>
 <li>Add support for sprintf by @dstroy0 in <a href="https://github.com/nRF24/RF24/pull/821">#821</a></li>
@@ -341,20 +362,20 @@ New Contributors</h1>
 <li>Add isFifo() methods by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/849">#849</a></li>
 <li>Add model variant info to printPrettyDetails() by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/850">#850</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md41"></a>
+<h2><a class="anchor" id="autotoc_md45"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Various improvements to docs by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/844">#844</a></li>
 <li>Clang format by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/824">#824</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md46"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix logic in disableAckPayloads() by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/f9e507544686af23bcfe9578a1558bbb08d382c9"><code>f9e5075</code></a></li>
 <li>Fix #832 typo in printDetails() by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/d4c3c355af0ed5d326ec79b5bbe56ff0f2a3d146"><code>d4c3c35</code></a></li>
 <li>Patch for #834 by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/839">#839</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md47"></a>
 📝 Documentation</h2>
 <ul>
 <li>Update docs README by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/e4e7156f00418cb9e18d340fb7319d96145f2302"><code>e4e7156</code></a></li>
@@ -363,7 +384,7 @@ New Contributors</h1>
 <li>Revert changes to install doc by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/8ccbb9dc747cc6a65a5684d791fb118b54c31536"><code>8ccbb9d</code></a></li>
 <li>Update sphinx doc config by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/848">#848</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md44"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Only run linux CI on "created release" events by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/8d256751d6dbb2523bf3b3376071faef56d073cc"><code>8d25675</code></a></li>
@@ -379,27 +400,28 @@ New Contributors</h1>
 <li>Minor version bump by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/54ce53a960a00d1f64dbd601dfa852936ba4be57"><code>54ce53a</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.2...v1.4.3"><code>v1.4.2...v1.4.3</code></a></p>
-<h1><a class="anchor" id="autotoc_md45"></a>
+<h1><a class="anchor" id="autotoc_md49"></a>
 New Contributors</h1>
 <ul>
 <li>@Cobalt6700 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/843">#843</a></li>
 <li>@dstroy0 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/825">#825</a></li>
+<li>@matt-walker0 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/820">#820</a></li>
 <li>@prawnpie made their first contribution in <a href="https://github.com/nRF24/RF24/pull/817">#817</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md46"></a>
+<h1><a class="anchor" id="autotoc_md50"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.1...v1.4.2">1.4.2</a> - 2021-11-27</h1>
-<h2><a class="anchor" id="autotoc_md47"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 🚀 Added</h2>
 <ul>
 <li>Pico SDK support, Sphinx, documentation updates and CMake build system for Linux by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/772">#772</a></li>
 <li>Add pico examples to sphinx docs by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/67418691dadcfc11bbbd30c9bab7ef10205bce8c"><code>6741869</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md48"></a>
+<h2><a class="anchor" id="autotoc_md52"></a>
 🚫 Deprecated</h2>
 <ul>
 <li>Document deprecated stuff in sphinx by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/6ec52c782fff5b5c88d8ab6778b276836d215772"><code>6ec52c7</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md49"></a>
+<h2><a class="anchor" id="autotoc_md53"></a>
 📝 Documentation</h2>
 <ul>
 <li>Sphinx docs updates by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/803">#803</a></li>
@@ -408,7 +430,7 @@ New Contributors</h1>
 <li>[docs] fix API sig; add badge; fix dup heading by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/3befead0495ac4d92228632e7d49a0c2d4f17ddc"><code>3befead</code></a></li>
 <li>Reverse Engineering tricks by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/804">#804</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md50"></a>
+<h2><a class="anchor" id="autotoc_md54"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update pyRF24.cpp by @razerraz in <a href="https://github.com/nRF24/RF24/pull/704">#704</a></li>
@@ -417,27 +439,27 @@ New Contributors</h1>
 <li>Trigger rp2xxx CI (picoSDK v1.3.0) by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/496f5da29ba96cb40f1cb761d278211ee807f4b3"><code>496f5da</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.1...v1.4.2"><code>v1.4.1...v1.4.2</code></a></p>
-<h1><a class="anchor" id="autotoc_md51"></a>
+<h1><a class="anchor" id="autotoc_md55"></a>
 New Contributors</h1>
 <ul>
 <li>@razerraz made their first contribution in <a href="https://github.com/nRF24/RF24/pull/704">#704</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md52"></a>
+<h1><a class="anchor" id="autotoc_md56"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.4.0...v1.4.1">1.4.1</a> - 2021-06-02</h1>
-<h2><a class="anchor" id="autotoc_md53"></a>
+<h2><a class="anchor" id="autotoc_md57"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Undo latest changes to SoftSPI &amp; add patches by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/771">#771</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md54"></a>
+<h2><a class="anchor" id="autotoc_md58"></a>
 📝 Documentation</h2>
 <ul>
 <li>Use angle brackets in a docs code block by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/7c3d6ecfc55e52ab1cd968ea71d5c86ab8c7ffd4"><code>7c3d6ec</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.4.0...v1.4.1"><code>v1.4.0...v1.4.1</code></a></p>
-<h1><a class="anchor" id="autotoc_md55"></a>
+<h1><a class="anchor" id="autotoc_md59"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.12...v1.4.0">1.4.0</a> - 2021-04-11</h1>
-<h2><a class="anchor" id="autotoc_md56"></a>
+<h2><a class="anchor" id="autotoc_md60"></a>
 🚀 Added</h2>
 <ul>
 <li>Add <a class="el" href="printf_8h.html">printf.h</a> fix from @TonioChingon in #739 by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/c0279c881f36d5be556564c5750014f89667f235"><code>c0279c8</code></a></li>
@@ -449,17 +471,17 @@ New Contributors</h1>
 <li>Add pinout img from RF24Audio repo by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/d159954b54add6e7318532aed6f0bdc9e009726d"><code>d159954</code></a></li>
 <li>Docs review by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/750">#750</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md57"></a>
+<h2><a class="anchor" id="autotoc_md61"></a>
 🚫 Deprecated</h2>
 <ul>
 <li>Doxygen v1.9.1 deprecated COLS_IN_ALPHA_INDEX tag by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/d4e1e0dda8091041e0a988dfa98d76dedbac9152"><code>d4e1e0d</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md58"></a>
+<h2><a class="anchor" id="autotoc_md62"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Remove useless Due config file #752 by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/25d5530a42a77e53a864c08a18d755e55bff6950"><code>25d5530</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md59"></a>
+<h2><a class="anchor" id="autotoc_md63"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fixed platforms list in library.json by @dagix5 in <a href="https://github.com/nRF24/RF24/pull/742">#742</a></li>
@@ -469,7 +491,7 @@ New Contributors</h1>
 <li>Fix printf() only for adafruit/ArduinoCore-SAMD by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/27710e2cc41146fbaca5af600f3e38ee9f416a49"><code>27710e2</code></a></li>
 <li>Fix indent by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/1e974ce2f2550d756e6ca5af3da55f5077adb037"><code>1e974ce</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md64"></a>
 📝 Documentation</h2>
 <ul>
 <li>Overload <a class="el" href="group__Porting__SPI.html#gaf79095574842d60a6297aa5b01b6185f">begin()</a> and amended docs about <a class="el" href="group__Porting__SPI.html#gaf79095574842d60a6297aa5b01b6185f">begin()</a> by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/fee50f69196bb0f7a16e9097127ee6af99317104"><code>fee50f6</code></a></li>
@@ -478,7 +500,7 @@ New Contributors</h1>
 <li>Due can't use SPI_PTR; delete ATXMEGA/readme.md by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/a54668ee0efb9607d7a8ea342f77ae54801b5785"><code>a54668e</code></a></li>
 <li>Boost.py docs suck by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/79ce0cd7098ec8b25d4bc2ec5745c507255eef87"><code>79ce0cd</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Endorse <a class="el" href="COMMON__ISSUES_8md.html">COMMON_ISSUES.md</a> in issue templates by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/747">#747</a></li>
@@ -525,31 +547,31 @@ New Contributors</h1>
 <li>Advise that teensy doesn't need overloaded <a class="el" href="group__Porting__SPI.html#gaf79095574842d60a6297aa5b01b6185f">begin()</a> by @2bndy5 in <a href="https://github.com/nRF24/RF24/commit/4e431a6501c900b76341b38ed4b1cf3a786988e8"><code>4e431a6</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.12...v1.4.0"><code>v1.3.12...v1.4.0</code></a></p>
-<h1><a class="anchor" id="autotoc_md62"></a>
+<h1><a class="anchor" id="autotoc_md66"></a>
 New Contributors</h1>
 <ul>
 <li>@dagix5 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/742">#742</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md63"></a>
+<h1><a class="anchor" id="autotoc_md67"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.11...v1.3.12">1.3.12</a> - 2021-02-27</h1>
-<h2><a class="anchor" id="autotoc_md64"></a>
+<h2><a class="anchor" id="autotoc_md68"></a>
 🚀 Added</h2>
 <ul>
 <li>Add STM32 to supported by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/02ff620a2fc8de3769442a74988efd0a30f1476e"><code>02ff620</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md65"></a>
+<h2><a class="anchor" id="autotoc_md69"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Clamp setRetries() args &amp; doc main page fixes by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/709">#709</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md66"></a>
+<h2><a class="anchor" id="autotoc_md70"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix links to datasheets by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/699">#699</a></li>
 <li>Fix <a class="el" href="group__Porting__General.html#gad5b3ec1ce839fa1c4337a7d0312e9749">millis()</a> functionality by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/61a3ffc16c6cbad580da79f48ab6c6511001d254"><code>61a3ffc</code></a></li>
 <li>Fix print pretty by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/707">#707</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md67"></a>
+<h2><a class="anchor" id="autotoc_md71"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Wrapped setters/getters of channel &amp; payloadSize by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/701">#701</a></li>
@@ -561,28 +583,28 @@ New Contributors</h1>
 <li>Merge branch 'master' of <a href="https://github.com/nRF24/RF24">https://github.com/nRF24/RF24</a> by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/2af44fcac5b0022780a18fddde593359194c634d"><code>2af44fc</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.11...v1.3.12"><code>v1.3.11...v1.3.12</code></a></p>
-<h1><a class="anchor" id="autotoc_md68"></a>
+<h1><a class="anchor" id="autotoc_md72"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.10...v1.3.11">1.3.11</a> - 2020-12-18</h1>
-<h2><a class="anchor" id="autotoc_md69"></a>
+<h2><a class="anchor" id="autotoc_md73"></a>
 🚫 Deprecated</h2>
 <ul>
 <li>New examples and more by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/691">#691</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md70"></a>
+<h2><a class="anchor" id="autotoc_md74"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Follow-up fixes from #691 by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/697">#697</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md71"></a>
+<h2><a class="anchor" id="autotoc_md75"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update library.json by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a965e6ae68f0294fcd628700c9675cf8ea75a00c"><code>a965e6a</code></a></li>
 <li>Update library.properties by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/045a6898d666a820cd8b995c7fff94d5af268d72"><code>045a689</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.10...v1.3.11"><code>v1.3.10...v1.3.11</code></a></p>
-<h1><a class="anchor" id="autotoc_md72"></a>
+<h1><a class="anchor" id="autotoc_md76"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.9...v1.3.10">1.3.10</a> - 2020-12-14</h1>
-<h2><a class="anchor" id="autotoc_md73"></a>
+<h2><a class="anchor" id="autotoc_md77"></a>
 🚀 Added</h2>
 <ul>
 <li>Addressed some Doxygen warnings and issues by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/639">#639</a></li>
@@ -590,23 +612,23 @@ New Contributors</h1>
 <li>Add ARC to printDetails() by @jscrane in <a href="https://github.com/nRF24/RF24/pull/647">#647</a></li>
 <li>Add changes to stopListening by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a0cd707137607842f0ef782f12f2e40409a12d38"><code>a0cd707</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md74"></a>
+<h2><a class="anchor" id="autotoc_md78"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Remove SPI class for ATTiny: provided by ATTinyCore by @jscrane in <a href="https://github.com/nRF24/RF24/pull/646">#646</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md75"></a>
+<h2><a class="anchor" id="autotoc_md79"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix for wiringPi by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/34b4892a7293287a2f36fee4e8f391314412a188"><code>34b4892</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md80"></a>
 📝 Documentation</h2>
 <ul>
 <li>Improved <a class="el" href="CONTRIBUTING_8md.html">CONTRIBUTING.md</a> and README.md by @2bndy5 in <a href="https://github.com/nRF24/RF24/pull/635">#635</a></li>
 <li>Make RF24_POWERUP_DELAY configurable in <a class="el" href="RF24__config_8h.html">RF24_config.h</a> by @jscrane in <a href="https://github.com/nRF24/RF24/pull/690">#690</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md77"></a>
+<h2><a class="anchor" id="autotoc_md81"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update python wrapper by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/4fd92d113359902b8e7b8ea00dd42ed65e676155"><code>4fd92d1</code></a></li>
@@ -616,48 +638,49 @@ New Contributors</h1>
 <li>Update library.json by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/c7cfbea636dbb552fcf93829b3b397b62dc9814d"><code>c7cfbea</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.9...v1.3.10"><code>v1.3.9...v1.3.10</code></a></p>
-<h1><a class="anchor" id="autotoc_md78"></a>
+<h1><a class="anchor" id="autotoc_md82"></a>
 New Contributors</h1>
 <ul>
-<li>@jscrane made their first contribution in <a href="https://github.com/nRF24/RF24/pull/690">#690</a> </li>
+<li>@jscrane made their first contribution in <a href="https://github.com/nRF24/RF24/pull/690">#690</a></li>
+<li>@2bndy5 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/637">#637</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md79"></a>
+<h1><a class="anchor" id="autotoc_md83"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.8...v1.3.9">1.3.9</a> - 2020-08-22</h1>
-<h2><a class="anchor" id="autotoc_md80"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix compilation errors by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/c0440e0b7fc425d1c0b9819c9f9bfeac731ec069"><code>c0440e0</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.8...v1.3.9"><code>v1.3.8...v1.3.9</code></a></p>
-<h1><a class="anchor" id="autotoc_md81"></a>
+<h1><a class="anchor" id="autotoc_md85"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.7...v1.3.8">1.3.8</a> - 2020-08-17</h1>
-<h2><a class="anchor" id="autotoc_md82"></a>
+<h2><a class="anchor" id="autotoc_md86"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Improve switching from TX-&gt;RX by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a779828026b243585a3407d4895c6ca947d37b89"><code>a779828</code></a></li>
 <li>Remove warning in configure by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/59123c6860b668a587aeaa338567129aa3923afa"><code>59123c6</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md83"></a>
+<h2><a class="anchor" id="autotoc_md87"></a>
 📝 Documentation</h2>
 <ul>
 <li>Adjustment for prev change, doc update by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/19c3357bee57afa006005616aa1d72d24a674874"><code>19c3357</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Clean up <a class="el" href="group__Porting__SPI.html#gaf79095574842d60a6297aa5b01b6185f">begin()</a> function by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/3272facf4db3a02f7d2b3e8fd56dbf36e568aec6"><code>3272fac</code></a></li>
 <li>Update for relese by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/bb71b13d600631f71df4de35df6f5ca5fe363377"><code>bb71b13</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.7...v1.3.8"><code>v1.3.7...v1.3.8</code></a></p>
-<h1><a class="anchor" id="autotoc_md85"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.6...v1.3.7">1.3.7</a> - 2020-08-01</h1>
-<h2><a class="anchor" id="autotoc_md86"></a>
+<h2><a class="anchor" id="autotoc_md90"></a>
 🚀 Added</h2>
 <ul>
 <li>Added Constant Carrier Wave by @waltbar in <a href="https://github.com/nRF24/RF24/pull/609">#609</a></li>
 <li>Add CCW to scanner example by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/92b15c74f0790a89554229eae4a86e0d10578037"><code>92b15c7</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md87"></a>
+<h2><a class="anchor" id="autotoc_md91"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Update printDetails() by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/ed35bd93cc981ca1e118556a2e530954cdb80125"><code>ed35bd9</code></a></li>
@@ -668,12 +691,12 @@ New Contributors</h1>
 <li>Removed ancient leftovers by @Avamander in <a href="https://github.com/nRF24/RF24/commit/1f83dd7e4cb79326a6659311b760f60570170bc7"><code>1f83dd7</code></a></li>
 <li>Cleanup of warnings/errors by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/5d6a02af52d0bf4e9a9baabb8fe22a4db43b4030"><code>5d6a02a</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md88"></a>
+<h2><a class="anchor" id="autotoc_md92"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix bug with RPi timer code by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/13ea68e06016cc8d164267cd199d4845b115325b"><code>13ea68e</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md89"></a>
+<h2><a class="anchor" id="autotoc_md93"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Merge branch 'master' of <a href="https://github.com/nRF24/RF24">https://github.com/nRF24/RF24</a> by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/e4b53771c3da9585f1da253a9051c8dbb083d1b6"><code>e4b5377</code></a></li>
@@ -687,19 +710,19 @@ New Contributors</h1>
 <li>Update version for release by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/4c6c106f2dcf09e6a31830ccba32c57a8f749939"><code>4c6c106</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.6...v1.3.7"><code>v1.3.6...v1.3.7</code></a></p>
-<h1><a class="anchor" id="autotoc_md90"></a>
+<h1><a class="anchor" id="autotoc_md94"></a>
 New Contributors</h1>
 <ul>
 <li>@waltbar made their first contribution in <a href="https://github.com/nRF24/RF24/pull/609">#609</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md91"></a>
+<h1><a class="anchor" id="autotoc_md95"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.5...v1.3.6">1.3.6</a> - 2020-07-14</h1>
-<h2><a class="anchor" id="autotoc_md92"></a>
+<h2><a class="anchor" id="autotoc_md96"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix issues with SPI Transactions detection by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/da16f57a1b3d2d1c15628ab1e935e09c6dd06d26"><code>da16f57</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md93"></a>
+<h2><a class="anchor" id="autotoc_md97"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Linux SPI speed cfg by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a62aa4af0d90c9ca121fb9298b1594e10a936545"><code>a62aa4a</code></a></li>
@@ -707,19 +730,19 @@ New Contributors</h1>
 <li>Update version for release by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/8f214c153a2cd8d921570cc14e407574e1a14cbe"><code>8f214c1</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.5...v1.3.6"><code>v1.3.5...v1.3.6</code></a></p>
-<h1><a class="anchor" id="autotoc_md94"></a>
+<h1><a class="anchor" id="autotoc_md98"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.4...v1.3.5">1.3.5</a> - 2020-07-08</h1>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md99"></a>
 🚀 Added</h2>
 <ul>
 <li>Added a few missing keywords for syntax highlighting by @Avamander in <a href="https://github.com/nRF24/RF24/commit/939ca409e55cdab14ad24162544c551b7e9acb46"><code>939ca40</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md96"></a>
+<h2><a class="anchor" id="autotoc_md100"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Revert digitalWrite compatibility changes by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/5e1ac023b0101cca3d7277d198d7b87ec8e1e241"><code>5e1ac02</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md97"></a>
+<h2><a class="anchor" id="autotoc_md101"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix for creating multiple instances with SPIDEV by @krzysztof9nowak in <a href="https://github.com/nRF24/RF24/pull/585">#585</a></li>
@@ -728,13 +751,13 @@ New Contributors</h1>
 <li>Fixed a compiler warning in Linux example by @gherlein in <a href="https://github.com/nRF24/RF24/pull/384">#384</a></li>
 <li>Fixed undefined behavior in openReadingPipe by @azais-corentin in <a href="https://github.com/nRF24/RF24/pull/604">#604</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md98"></a>
+<h2><a class="anchor" id="autotoc_md102"></a>
 📝 Documentation</h2>
 <ul>
 <li>Update constructor info to reference docs by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/2e75fc2a6b30060d4279a141a8348bd97e5090e9"><code>2e75fc2</code></a></li>
 <li>Cleaned up the formatting and improved documentation by @Avamander in <a href="https://github.com/nRF24/RF24/commit/e456503554529011c4223286a6703fdf411b7733"><code>e456503</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md99"></a>
+<h2><a class="anchor" id="autotoc_md103"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update Doxyfile by @Avamander in <a href="https://github.com/nRF24/RF24/commit/85ac82ab1ffbfcb83a5a0ecf1a05059d3964aad8"><code>85ac82a</code></a></li>
@@ -747,39 +770,39 @@ New Contributors</h1>
 <li>Increment version for release by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/43f55dfdef228f9455633e3403b386ac0f2ea1bc"><code>43f55df</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.4...v1.3.5"><code>v1.3.4...v1.3.5</code></a></p>
-<h1><a class="anchor" id="autotoc_md100"></a>
+<h1><a class="anchor" id="autotoc_md104"></a>
 New Contributors</h1>
 <ul>
 <li>@azais-corentin made their first contribution in <a href="https://github.com/nRF24/RF24/pull/604">#604</a></li>
 <li>@gherlein made their first contribution in <a href="https://github.com/nRF24/RF24/pull/384">#384</a></li>
 <li>@krzysztof9nowak made their first contribution in <a href="https://github.com/nRF24/RF24/pull/585">#585</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md101"></a>
+<h1><a class="anchor" id="autotoc_md105"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.3...v1.3.4">1.3.4</a> - 2020-02-15</h1>
-<h2><a class="anchor" id="autotoc_md102"></a>
+<h2><a class="anchor" id="autotoc_md106"></a>
 🚀 Added</h2>
 <ul>
 <li>Added Dolphin files to gitignore just in case by @Avamander in <a href="https://github.com/nRF24/RF24/commit/4b5ba72751d8a5463cf0a32b95aef7af89186eb5"><code>4b5ba72</code></a></li>
 <li>Add function to get automatic retransmission count by @Avamander in <a href="https://github.com/nRF24/RF24/pull/558">#558</a></li>
 <li>Added GitHub actions configuration by @CoRfr in <a href="https://github.com/nRF24/RF24/pull/566">#566</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md103"></a>
+<h2><a class="anchor" id="autotoc_md107"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Forced braces also on while and for loops, removed unneccesary spaces by @Avamander in <a href="https://github.com/nRF24/RF24/commit/71ec8a1820f02a5b2b18981251bfb30aad4aeb03"><code>71ec8a1</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md104"></a>
+<h2><a class="anchor" id="autotoc_md108"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix in <a class="el" href="classRF24.html#a65963ed8d8fd45f847e2f673995b85e1">RF24::getDynamicPayloadSize</a> by @jonnykl in <a href="https://github.com/nRF24/RF24/commit/ea5dee4624d6913708a51c71cf3ae082d2d470f7"><code>ea5dee4</code></a></li>
 <li>Fixes incorrect preprocessor statement being used by @Avamander in <a href="https://github.com/nRF24/RF24/commit/147ef4d72fd7f1ddc457a23ee133a66a99b9fc4b"><code>147ef4d</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md105"></a>
+<h2><a class="anchor" id="autotoc_md109"></a>
 📝 Documentation</h2>
 <ul>
 <li>Overloaded digitalWrite to accept boolean by @Avamander in <a href="https://github.com/nRF24/RF24/commit/9f55c0c577b229f553bca4c73e3045cc89bf73c1"><code>9f55c0c</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md106"></a>
+<h2><a class="anchor" id="autotoc_md110"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update .gitignore by @Avamander in <a href="https://github.com/nRF24/RF24/commit/bf259002b2eb0b44df812d7c2d332f70b50525b4"><code>bf25900</code></a></li>
@@ -797,7 +820,7 @@ New Contributors</h1>
 <li>Marked megaavr as supported by @Avamander in <a href="https://github.com/nRF24/RF24/commit/80c456ae3a70c5405d8a5691910c2b3d6489a59b"><code>80c456a</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.3...v1.3.4"><code>v1.3.3...v1.3.4</code></a></p>
-<h1><a class="anchor" id="autotoc_md107"></a>
+<h1><a class="anchor" id="autotoc_md111"></a>
 New Contributors</h1>
 <ul>
 <li>@CoRfr made their first contribution in <a href="https://github.com/nRF24/RF24/pull/564">#564</a></li>
@@ -805,24 +828,24 @@ New Contributors</h1>
 <li>@Crkk made their first contribution</li>
 <li>@jonnykl made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md108"></a>
+<h1><a class="anchor" id="autotoc_md112"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.2...v1.3.3">1.3.3</a> - 2019-06-18</h1>
-<h2><a class="anchor" id="autotoc_md109"></a>
+<h2><a class="anchor" id="autotoc_md113"></a>
 🚀 Added</h2>
 <ul>
 <li>Addi delay to SPI intializer if device already up by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/db6a99bc0ab98d240bd147c59ff3ff05f1ff5aa0"><code>db6a99b</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md110"></a>
+<h2><a class="anchor" id="autotoc_md114"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix broken stuff after using pgm_read_ptr by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/4220bf5ce6d804a7ea8a3056102636dda70203de"><code>4220bf5</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md111"></a>
+<h2><a class="anchor" id="autotoc_md115"></a>
 📝 Documentation</h2>
 <ul>
 <li>Update docs for <a class="el" href="group__Porting__GPIO.html#ga957694ca061e30268dd8a4b28a08e59b">write()</a> per #500 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/bd88f9e48ba74119ebd9ebd8cdbe6a69ecc4b963"><code>bd88f9e</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md112"></a>
+<h2><a class="anchor" id="autotoc_md116"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Clean up <a class="el" href="printf_8h.html">printf.h</a> by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/0fabd62dda48ce621121199078f0ee6790809d30"><code>0fabd62</code></a></li>
@@ -846,27 +869,27 @@ New Contributors</h1>
 <li>Update library.properties by @Avamander in <a href="https://github.com/nRF24/RF24/commit/fdb43667485b155269923017668a7650238f075e"><code>fdb4366</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.2...v1.3.3"><code>v1.3.2...v1.3.3</code></a></p>
-<h1><a class="anchor" id="autotoc_md113"></a>
+<h1><a class="anchor" id="autotoc_md117"></a>
 New Contributors</h1>
 <ul>
 <li>@IkpeohaGodson made their first contribution</li>
 <li>@troffmo5 made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md114"></a>
+<h1><a class="anchor" id="autotoc_md118"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.1...v1.3.2">1.3.2</a> - 2019-03-22</h1>
-<h2><a class="anchor" id="autotoc_md115"></a>
+<h2><a class="anchor" id="autotoc_md119"></a>
 🚀 Added</h2>
 <ul>
 <li>Merge pull request #413 from haseebehsan/pythonWrappers by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/413">#413</a></li>
 <li>Added an exception if non-superuser uses the library by @akatran in <a href="https://github.com/nRF24/RF24/pull/428">#428</a></li>
 <li>Fixed misleading indent warning in bcm2835.c in <a href="https://github.com/nRF24/RF24/pull/444">#444</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md116"></a>
+<h2><a class="anchor" id="autotoc_md120"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Change perror/abort in SPIDEV driver c++ std exception by @ludiazv in <a href="https://github.com/nRF24/RF24/commit/6f74badb05567bd83b957f5b879060efdcfc085c"><code>6f74bad</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md117"></a>
+<h2><a class="anchor" id="autotoc_md121"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update pingpair_dyn.py by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/57d3eef5909dbb15f00afec558514000f24951f3"><code>57d3eef</code></a></li>
@@ -894,7 +917,7 @@ New Contributors</h1>
 <li>Update library.json by @Avamander in <a href="https://github.com/nRF24/RF24/commit/56f9bf41bd34721308aacf15df607ef7f1fb559c"><code>56f9bf4</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.1...v1.3.2"><code>v1.3.1...v1.3.2</code></a></p>
-<h1><a class="anchor" id="autotoc_md118"></a>
+<h1><a class="anchor" id="autotoc_md122"></a>
 New Contributors</h1>
 <ul>
 <li>@herm made their first contribution</li>
@@ -903,33 +926,33 @@ New Contributors</h1>
 <li>@haseebehsan made their first contribution</li>
 <li>@wamonite made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md119"></a>
+<h1><a class="anchor" id="autotoc_md123"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.3.0...v1.3.1">1.3.1</a> - 2018-01-28</h1>
-<h2><a class="anchor" id="autotoc_md120"></a>
+<h2><a class="anchor" id="autotoc_md124"></a>
 🚀 Added</h2>
 <ul>
 <li>Added implementation for wiringPi driver by @aurelian17 in <a href="https://github.com/nRF24/RF24/pull/349">#349</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md121"></a>
+<h2><a class="anchor" id="autotoc_md125"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Remove progmem macro overrides (ESP8266 Arduino now supports them) by @sidoh in <a href="https://github.com/nRF24/RF24/pull/375">#375</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md122"></a>
+<h2><a class="anchor" id="autotoc_md126"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix configure for Raspberry PI 2 B+ Raspberian Jessie by @MathiasMoog in <a href="https://github.com/nRF24/RF24/pull/366">#366</a></li>
 <li>Use correct separator in keywords.txt by @per1234 in <a href="https://github.com/nRF24/RF24/pull/381">#381</a></li>
 <li>Fix build issues against ESP32 (ESP-WROOM-32). by @anders-liu in <a href="https://github.com/nRF24/RF24/pull/409">#409</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md123"></a>
+<h2><a class="anchor" id="autotoc_md127"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Allow redefining SOFTSPI pins with preprocessor flags by @trojanc in <a href="https://github.com/nRF24/RF24/pull/372">#372</a></li>
 <li>New library release and additional architectures by @Avamander in <a href="https://github.com/nRF24/RF24/pull/410">#410</a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.3.0...v1.3.1"><code>v1.3.0...v1.3.1</code></a></p>
-<h1><a class="anchor" id="autotoc_md124"></a>
+<h1><a class="anchor" id="autotoc_md128"></a>
 New Contributors</h1>
 <ul>
 <li>@anders-liu made their first contribution in <a href="https://github.com/nRF24/RF24/pull/409">#409</a></li>
@@ -939,9 +962,9 @@ New Contributors</h1>
 <li>@aurelian17 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/349">#349</a></li>
 <li>@MathiasMoog made their first contribution in <a href="https://github.com/nRF24/RF24/pull/366">#366</a> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md125"></a>
+<h1><a class="anchor" id="autotoc_md129"></a>
 <a href="https://github.com/nRF24/RF24/compare/RF24v1.2.0...v1.3.0">1.3.0</a> - 2017-06-01</h1>
-<h2><a class="anchor" id="autotoc_md126"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 🚀 Added</h2>
 <ul>
 <li>Add static initialization for pthread mutexes in <a href="https://github.com/nRF24/RF24/commit/e204656cbdb361a983ee76a7e343ecdb1d22bd54"><code>e204656</code></a></li>
@@ -950,14 +973,14 @@ New Contributors</h1>
 <li>Added disableDynamicPayloads() by @soligen2010 in <a href="https://github.com/nRF24/RF24/pull/318">#318</a></li>
 <li>Added isChipConnected(). by @wmarkow in <a href="https://github.com/nRF24/RF24/pull/291">#291</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md127"></a>
+<h2><a class="anchor" id="autotoc_md131"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fixed output and made it consistent with output from Ardunio version. by @campenr in <a href="https://github.com/nRF24/RF24/commit/efb8ed1f8964ca398184b5130c46819dcf2262c3"><code>efb8ed1</code></a></li>
 <li>Fix clamping to a single hex digit by @nickmooney in <a href="https://github.com/nRF24/RF24/commit/b37514b9b7199f4d8e8d8fbef11f599eca1e02fa"><code>b37514b</code></a></li>
 <li>Fix SPIDEV interface by @plasticassius in <a href="https://github.com/nRF24/RF24/pull/315">#315</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md128"></a>
+<h2><a class="anchor" id="autotoc_md132"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update to match new RPi scanner example. by @campenr in <a href="https://github.com/nRF24/RF24/commit/b233ea17316a8a37dab77880e8c779e722795b73"><code>b233ea1</code></a></li>
@@ -977,7 +1000,7 @@ New Contributors</h1>
 <li>Update library.json by @Avamander in <a href="https://github.com/nRF24/RF24/commit/7f14e7f1fa0dadfe5a68d1234e51094d3eb6287c"><code>7f14e7f</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/RF24v1.2.0...v1.3.0"><code>RF24v1.2.0...v1.3.0</code></a></p>
-<h1><a class="anchor" id="autotoc_md129"></a>
+<h1><a class="anchor" id="autotoc_md133"></a>
 New Contributors</h1>
 <ul>
 <li>@soligen2010 made their first contribution in <a href="https://github.com/nRF24/RF24/pull/352">#352</a></li>
@@ -987,25 +1010,25 @@ New Contributors</h1>
 <li>@derf made their first contribution in <a href="https://github.com/nRF24/RF24/pull/319">#319</a></li>
 <li>@campenr made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md130"></a>
+<h1><a class="anchor" id="autotoc_md134"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.7...RF24v1.2.0">RF24v1.2.0</a> - 2016-11-05</h1>
-<h2><a class="anchor" id="autotoc_md131"></a>
+<h2><a class="anchor" id="autotoc_md135"></a>
 🚀 Added</h2>
 <ul>
 <li>Add link to RPi/Linux Blog Post in documentation by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/63c83d4f4e913185e510d2ef291ca608605bfd20"><code>63c83d4</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md132"></a>
+<h2><a class="anchor" id="autotoc_md136"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix bad documentation link from last commit by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/c94f87746552a3c662c35fd11e772b747f19d8ee"><code>c94f877</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md133"></a>
+<h2><a class="anchor" id="autotoc_md137"></a>
 📝 Documentation</h2>
 <ul>
 <li>Minor documentation correction - RF24_CRC_DISABLED by @pfeerick in <a href="https://github.com/nRF24/RF24/commit/3766eebf139ed83fb5129ce06521c6168d2749c2"><code>3766eeb</code></a></li>
 <li>Merge pull request #286 from pfeerick/patch-1 by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/286">#286</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md134"></a>
+<h2><a class="anchor" id="autotoc_md138"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update PlatformIO library manifest by @valeros in <a href="https://github.com/nRF24/RF24/commit/aa54114b6c29e8dcae221d90c73288b07042033e"><code>aa54114</code></a></li>
@@ -1016,15 +1039,15 @@ New Contributors</h1>
 <li>Update Library Version 1.2 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/8ea5127078394591a0af5b409c38fa11cb0677d9"><code>8ea5127</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.7...RF24v1.2.0"><code>v1.1.7...RF24v1.2.0</code></a></p>
-<h1><a class="anchor" id="autotoc_md135"></a>
+<h1><a class="anchor" id="autotoc_md139"></a>
 New Contributors</h1>
 <ul>
 <li>@pfeerick made their first contribution</li>
 <li>@valeros made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md136"></a>
+<h1><a class="anchor" id="autotoc_md140"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.6...v1.1.7">1.1.7</a> - 2016-08-12</h1>
-<h2><a class="anchor" id="autotoc_md137"></a>
+<h2><a class="anchor" id="autotoc_md141"></a>
 🚀 Added</h2>
 <ul>
 <li>Add interrupts to SPIDEV by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/d705abd4073defa0a5d338f6d58a604597f2aff7"><code>d705abd</code></a></li>
@@ -1033,20 +1056,20 @@ New Contributors</h1>
 <li>Merge pull request #238 from akatran/master by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/238">#238</a></li>
 <li>Merge pull request #267 from mz-fuzzy/doc_update by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/267">#267</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md138"></a>
+<h2><a class="anchor" id="autotoc_md142"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Remove the custom PROGRAM SPACE definitions and use avr/pgmspace! by @akatran in <a href="https://github.com/nRF24/RF24/commit/a8f100b27c902019c852c20c8999ee5195d0a2e4"><code>a8f100b</code></a></li>
 <li>Documentation update: by @martin-mat in <a href="https://github.com/nRF24/RF24/commit/3f54a0aec951426cc66046ccd8f4dccaab657635"><code>3f54a0a</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md139"></a>
+<h2><a class="anchor" id="autotoc_md143"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix progmem inclusion #252 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/372562a2ffb81f43504ff35fdd17ec98fbca26e8"><code>372562a</code></a></li>
 <li>Fix path to platform specific files in library.json for platformio by @rnovacek in <a href="https://github.com/nRF24/RF24/commit/13ce2bb58b1fdfa5e55d1b32d69ef8c31582e3b6"><code>13ce2bb</code></a></li>
 <li>Merge pull request #263 from rnovacek/master by @TMRh20 in <a href="https://github.com/nRF24/RF24/pull/263">#263</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md140"></a>
+<h2><a class="anchor" id="autotoc_md144"></a>
 🗨️ Changed</h2>
 <ul>
 <li>#234 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/2b558d05c8656df26fa3d4aab87c54785e94b526"><code>2b558d0</code></a></li>
@@ -1091,20 +1114,21 @@ New Contributors</h1>
 <li>Update library.properties by @Avamander in <a href="https://github.com/nRF24/RF24/commit/4e9f1fb992c73d720cbebdd3755cd64001ffe3e2"><code>4e9f1fb</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.6...v1.1.7"><code>v1.1.6...v1.1.7</code></a></p>
-<h1><a class="anchor" id="autotoc_md141"></a>
+<h1><a class="anchor" id="autotoc_md145"></a>
 New Contributors</h1>
 <ul>
 <li>@rnovacek made their first contribution</li>
-<li>@gitgrimbo made their first contribution </li>
+<li>@gitgrimbo made their first contribution</li>
+<li>@akatran made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md142"></a>
+<h1><a class="anchor" id="autotoc_md146"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.5...v1.1.6">1.1.6</a> - 2016-02-20</h1>
-<h2><a class="anchor" id="autotoc_md143"></a>
+<h2><a class="anchor" id="autotoc_md147"></a>
 🚀 Added</h2>
 <ul>
 <li>Added possibility/demonstration of IRQ pin usage for RPi/Python. by @martin-mat in <a href="https://github.com/nRF24/RF24/commit/031d3888e837fa2ef23e92e3923ddc10defbcbf8"><code>031d388</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md144"></a>
+<h2><a class="anchor" id="autotoc_md148"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix GettingStarted sample by @SaintGimp in <a href="https://github.com/nRF24/RF24/commit/81f1c0d50365e612fe96f32de573d43f69983584"><code>81f1c0d</code></a></li>
@@ -1112,7 +1136,7 @@ New Contributors</h1>
 <li>Fix for #217 GettingStarted enhancement. by @wmarkow in <a href="https://github.com/nRF24/RF24/commit/d0bbfaa28fe8114a46e72d76475763cc20f7e10e"><code>d0bbfaa</code></a></li>
 <li>Fix for #213. by @wmarkow in <a href="https://github.com/nRF24/RF24/commit/5a0ec58516a85d77163241a824623e96a4602d6a"><code>5a0ec58</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md145"></a>
+<h2><a class="anchor" id="autotoc_md149"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Changed serial baudrate by @Avamander in <a href="https://github.com/nRF24/RF24/commit/842d0489a67d1f2692b731133df7555e49d521a7"><code>842d048</code></a></li>
@@ -1131,16 +1155,17 @@ New Contributors</h1>
 <li>Merge pull request #219 from TMRh20/revert-218-217_fix by @Avamander in <a href="https://github.com/nRF24/RF24/commit/fd89aae4f0c65874453478d3d65deff70f384196"><code>fd89aae</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.5...v1.1.6"><code>v1.1.5...v1.1.6</code></a></p>
-<h1><a class="anchor" id="autotoc_md146"></a>
+<h1><a class="anchor" id="autotoc_md150"></a>
 New Contributors</h1>
 <ul>
+<li>@wmarkow made their first contribution</li>
 <li>@flavio-fernandes made their first contribution</li>
 <li>@ab316 made their first contribution</li>
 <li>@SaintGimp made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md147"></a>
+<h1><a class="anchor" id="autotoc_md151"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.4...v1.1.5">1.1.5</a> - 2016-01-07</h1>
-<h2><a class="anchor" id="autotoc_md148"></a>
+<h2><a class="anchor" id="autotoc_md152"></a>
 🚀 Added</h2>
 <ul>
 <li>Add bcm2835 lib v1.48 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/18daa4c4ddaef1c5bb3048c0a891c45030955c46"><code>18daa4c</code></a></li>
@@ -1148,19 +1173,19 @@ New Contributors</h1>
 <li>Add mutex locking to SPI functions for RPi by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/715edc5e39ca04e352e8d6c26784972c13b9a1e8"><code>715edc5</code></a></li>
 <li>Add 'static' to void in <a class="el" href="spi_8h.html">spi.h</a> by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/ed9ae08dbab6036fd42b1376462d74a94cf90bf4"><code>ed9ae08</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md149"></a>
+<h2><a class="anchor" id="autotoc_md153"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Update RPi call_response_int2 example by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/bf06db96b94c582360cee454a1210f5e4851b5ad"><code>bf06db9</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md150"></a>
+<h2><a class="anchor" id="autotoc_md154"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fix Warning. ‘void* interruptHandler(void*)’ declared ‘static’ but never defined. by @Oitzu in <a href="https://github.com/nRF24/RF24/commit/409cbf78ee5e779f3abb2c2cc6a3f22abc809fba"><code>409cbf7</code></a></li>
 <li>Fixes for last commit by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a57fafe017961b8cfdef2ccac3d764721c42e62d"><code>a57fafe</code></a></li>
 <li>Fix per #183 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/9e68f9e133f426322d9b512239fc952b2dd3b1b9"><code>9e68f9e</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md151"></a>
+<h2><a class="anchor" id="autotoc_md155"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Initial commit for interrupts based on wiringPi. by @Oitzu in <a href="https://github.com/nRF24/RF24/commit/67d0285fc5ceae2b6f50f453ee9926490e629bd4"><code>67d0285</code></a></li>
@@ -1181,31 +1206,32 @@ New Contributors</h1>
 <li>Update library.properties by @Avamander in <a href="https://github.com/nRF24/RF24/commit/8115a3436f37685e83f4ddde1eb26ba1962829ea"><code>8115a34</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.4...v1.1.5"><code>v1.1.4...v1.1.5</code></a></p>
-<h1><a class="anchor" id="autotoc_md152"></a>
+<h1><a class="anchor" id="autotoc_md156"></a>
 New Contributors</h1>
 <ul>
-<li>@yozik04 made their first contribution </li>
+<li>@yozik04 made their first contribution</li>
+<li>@Oitzu made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md153"></a>
+<h1><a class="anchor" id="autotoc_md157"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.3...v1.1.4">1.1.4</a> - 2015-12-14</h1>
-<h2><a class="anchor" id="autotoc_md154"></a>
+<h2><a class="anchor" id="autotoc_md158"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Doc Update: Add current info to news by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/f6fa0be4931149050d340695a15ddaa15afcf124"><code>f6fa0be</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md155"></a>
+<h2><a class="anchor" id="autotoc_md159"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fixed inconsistent documentation, added Tinyx313 pin map by @zador-blood-stained in <a href="https://github.com/nRF24/RF24/commit/b5228f3775bb520e90fe40aff49b1f28b47cf7f7"><code>b5228f3</code></a></li>
 <li>Fix broken transfer example by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/13c069caf1e74021da0517d349741d3cb2fb1e7d"><code>13c069c</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md156"></a>
+<h2><a class="anchor" id="autotoc_md160"></a>
 📝 Documentation</h2>
 <ul>
 <li>Merge pull request #155 from zador-blood-stained/master by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/4554f739e7087852a7375b29172df7e5df03838c"><code>4554f73</code></a></li>
 <li>Update .h file per doc changes by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/e192580383d332bb7e2398a7ae057c41b1918d87"><code>e192580</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md157"></a>
+<h2><a class="anchor" id="autotoc_md161"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Python3 support added by @martin-mat in <a href="https://github.com/nRF24/RF24/commit/cda3e18b0d011fca4e65100918ab6bb3477655b1"><code>cda3e18</code></a></li>
@@ -1213,15 +1239,15 @@ New Contributors</h1>
 <li>Update library.properties by @Avamander in <a href="https://github.com/nRF24/RF24/commit/e888f55864485f4d919f7753ddb479702264fb1f"><code>e888f55</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.3...v1.1.4"><code>v1.1.3...v1.1.4</code></a></p>
-<h1><a class="anchor" id="autotoc_md158"></a>
+<h1><a class="anchor" id="autotoc_md162"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.2...v1.1.3">1.1.3</a> - 2015-10-31</h1>
-<h2><a class="anchor" id="autotoc_md159"></a>
+<h2><a class="anchor" id="autotoc_md163"></a>
 🗑️ Removed</h2>
 <ul>
 <li>ESP8266 printDetails, Docs by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/aeb8b427304af7c5d45e03330a013ae98f895040"><code>aeb8b42</code></a></li>
 <li>Removed usage of hardcoded SS pins by @zador-blood-stained in <a href="https://github.com/nRF24/RF24/commit/1376fbd8ce63c730068d2b6c7d160b990b497a3d"><code>1376fbd</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md160"></a>
+<h2><a class="anchor" id="autotoc_md164"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Update gettingstarted.cpp by @cguzmanceti in <a href="https://github.com/nRF24/RF24/commit/f3cc137cb669f5ae61ecd45c89d7e4946c87d5d8"><code>f3cc137</code></a></li>
@@ -1233,14 +1259,15 @@ New Contributors</h1>
 <li>Change printf to cout in RPi examples by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/365289022b60a951d99442f138daebfe330924bf"><code>3652890</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.2...v1.1.3"><code>v1.1.2...v1.1.3</code></a></p>
-<h1><a class="anchor" id="autotoc_md161"></a>
+<h1><a class="anchor" id="autotoc_md165"></a>
 New Contributors</h1>
 <ul>
-<li>@cguzmanceti made their first contribution </li>
+<li>@cguzmanceti made their first contribution</li>
+<li>@zador-blood-stained made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md162"></a>
+<h1><a class="anchor" id="autotoc_md166"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.1.1...v1.1.2">1.1.2</a> - 2015-10-20</h1>
-<h2><a class="anchor" id="autotoc_md163"></a>
+<h2><a class="anchor" id="autotoc_md167"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Delete FAQ by @Avamander in <a href="https://github.com/nRF24/RF24/commit/69c1f3cc402e51e632e456f592dfeb3351dd6c6c"><code>69c1f3c</code></a></li>
@@ -1251,31 +1278,31 @@ New Contributors</h1>
 <li>Update library.properties by @Avamander in <a href="https://github.com/nRF24/RF24/commit/7a446813de8278117920aa8c0ef06da599a94280"><code>7a44681</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.1.1...v1.1.2"><code>v1.1.1...v1.1.2</code></a></p>
-<h1><a class="anchor" id="autotoc_md164"></a>
+<h1><a class="anchor" id="autotoc_md168"></a>
 New Contributors</h1>
 <ul>
 <li>@fab672000 made their first contribution </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md165"></a>
+<h1><a class="anchor" id="autotoc_md169"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.0.1...v1.1.1">1.1.1</a> - 2015-10-01</h1>
-<h2><a class="anchor" id="autotoc_md166"></a>
+<h2><a class="anchor" id="autotoc_md170"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Increment version - test by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/b305bb4bba4c2a3db65f07f5c21d67923508d9df"><code>b305bb4</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.0.1...v1.1.1"><code>v1.0.1...v1.1.1</code></a></p>
-<h1><a class="anchor" id="autotoc_md167"></a>
+<h1><a class="anchor" id="autotoc_md171"></a>
 <a href="https://github.com/nRF24/RF24/compare/v1.0...v1.0.1">1.0.1</a> - 2015-10-01</h1>
-<h2><a class="anchor" id="autotoc_md168"></a>
+<h2><a class="anchor" id="autotoc_md172"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Increment library.properties by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/c98f39633070d02c3a1142094114390c93b6eb14"><code>c98f396</code></a></li>
 <li>Merge branch 'Updates' by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/a4f412c37f9178f3bee449a92d985398c53ae492"><code>a4f412c</code></a></li>
 </ul>
 <p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/v1.0...v1.0.1"><code>v1.0...v1.0.1</code></a></p>
-<h1><a class="anchor" id="autotoc_md169"></a>
-<a href="https://github.com/nRF24/RF24/compare/...v1.0">1.0</a> - 2015-10-01</h1>
-<h2><a class="anchor" id="autotoc_md170"></a>
+<h1><a class="anchor" id="autotoc_md173"></a>
+<a href="https://github.com/nRF24/RF24/compare/de083c964d9aeeb9fda7485c39fed27443cd617c...v1.0">1.0</a> - 2015-10-01</h1>
+<h2><a class="anchor" id="autotoc_md174"></a>
 🚀 Added</h2>
 <ul>
 <li>Added by @maniacbug in <a href="https://github.com/nRF24/RF24/commit/de083c964d9aeeb9fda7485c39fed27443cd617c"><code>de083c9</code></a></li>
@@ -1344,7 +1371,7 @@ New Contributors</h1>
 <li>Add transaction code to remaining functions by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/64da08852c1537eab7e10314870e9943fe5172fa"><code>64da088</code></a></li>
 <li>Added getChannel Method to allow for verification of the configured channel by @komby in <a href="https://github.com/nRF24/RF24/commit/c4d222ce0db216b7e1c372c587e9b568c6af4f79"><code>c4d222c</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md171"></a>
+<h2><a class="anchor" id="autotoc_md175"></a>
 🗑️ Removed</h2>
 <ul>
 <li>Removed the line that set the payload size to 8 in <a class="el" href="group__Porting__SPI.html#gaf79095574842d60a6297aa5b01b6185f">begin()</a>. Reduced some ints to uint8_t. Added some more debugging info. by @maniacbug in <a href="https://github.com/nRF24/RF24/commit/dfb2faa8412ac7c64abd4da8409301c622c64ed1"><code>dfb2faa</code></a></li>
@@ -1377,7 +1404,7 @@ New Contributors</h1>
 <li>Destructor for Linux only, replace bell with null by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/e3f4a6ba1879b8bb30e9b54d57c353d0fa42a34d"><code>e3f4a6b</code></a></li>
 <li>Fix/Changes for #111 &amp; #112 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/5acbcbd2d1d297804aecdf4f42e82ae2fde33526"><code>5acbcbd</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md172"></a>
+<h2><a class="anchor" id="autotoc_md176"></a>
 🛠️ Fixed</h2>
 <ul>
 <li>Fixed a bug where it was writing to the wrong pipe by @maniacbug in <a href="https://github.com/nRF24/RF24/commit/93f5cface0ebc0b82801ab7741b952578af37f7c"><code>93f5cfa</code></a></li>
@@ -1434,7 +1461,7 @@ New Contributors</h1>
 <li>Fix example per #114 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/357fcb95a5bc89704846679fa667dbcafe68a5ea"><code>357fcb9</code></a></li>
 <li>Fix the last fix by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/869a2c2f7329967bc600e66d0b0422e959e22e2d"><code>869a2c2</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md173"></a>
+<h2><a class="anchor" id="autotoc_md177"></a>
 🚦 Tests</h2>
 <ul>
 <li>Prepare tests to run with configuration parameters by @maniacbug in <a href="https://github.com/nRF24/RF24/commit/7640852edf6e3cf139608fe70505cffa93a8c650"><code>7640852</code></a></li>
@@ -1445,7 +1472,7 @@ New Contributors</h1>
 <li>Update examples, minimize code size by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/e83a107bdf8e7430457975b1d9251cc5c6ba7107"><code>e83a107</code></a></li>
 <li>Performance tweaks to address #9 by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/5ec5b06bdc4f3b58eac3f34b3c4355a51b659ae6"><code>5ec5b06</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md174"></a>
+<h2><a class="anchor" id="autotoc_md178"></a>
 📝 Documentation</h2>
 <ul>
 <li>Updated documentation by @maniacbug in <a href="https://github.com/nRF24/RF24/commit/0503017d1a03dd5163d32db2b399e33fdfdf4caa"><code>0503017</code></a></li>
@@ -1471,7 +1498,7 @@ New Contributors</h1>
 <li>Update *.cpp examples pin config by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/b342d97f3693f89f06739ccf351281a95ac21805"><code>b342d97</code></a></li>
 <li>@PlatformIO Library Registry manifest file by @ivankravets in <a href="https://github.com/nRF24/RF24/commit/ea960e057b3360094a153ca1ab9c6fa984c3d68a"><code>ea960e0</code></a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md175"></a>
+<h2><a class="anchor" id="autotoc_md179"></a>
 🗨️ Changed</h2>
 <ul>
 <li>Type by @maniacbug in <a href="https://github.com/nRF24/RF24/commit/ea69f9d1a6e085ce4df7ff125ca3af30ea94e2b3"><code>ea69f9d</code></a></li>
@@ -1725,11 +1752,14 @@ New Contributors</h1>
 <li>Rename arch folder to utility by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/55b034eeb20c5bc838b7dc5d433162b8180860b8"><code>55b034e</code></a></li>
 <li>Reverting library properties and releases by @TMRh20 in <a href="https://github.com/nRF24/RF24/commit/517326e164feeb35e7e54440a8c4b71c042d3f14"><code>517326e</code></a></li>
 </ul>
-<p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/...v1.0"><code>...v1.0</code></a></p>
-<h1><a class="anchor" id="autotoc_md176"></a>
+<p>Full commit diff: <a href="https://github.com/nRF24/RF24/compare/de083c964d9aeeb9fda7485c39fed27443cd617c...v1.0"><code>de083c9...v1.0</code></a></p>
+<h1><a class="anchor" id="autotoc_md180"></a>
 New Contributors</h1>
 <ul>
+<li>@TMRh20 made their first contribution</li>
+<li>@Avamander made their first contribution</li>
 <li>@komby made their first contribution</li>
+<li>@ivankravets made their first contribution</li>
 <li>@Interneedus made their first contribution</li>
 <li>@nerdralph made their first contribution</li>
 <li>@jorihardman made their first contribution</li>
@@ -1737,9 +1767,11 @@ New Contributors</h1>
 <li>@mannkind made their first contribution</li>
 <li>@dsbaha made their first contribution</li>
 <li>@ax7884 made their first contribution</li>
+<li>@martin-mat made their first contribution</li>
 <li>@lnxbil made their first contribution</li>
 <li>@k2OS made their first contribution</li>
 <li>@spaniakos made their first contribution</li>
+<li>@ made their first contribution</li>
 <li>@jfktrey made their first contribution</li>
 <li>@reixd made their first contribution</li>
 <li>@a-lurker made their first contribution</li>
@@ -1752,7 +1784,7 @@ New Contributors</h1>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2024 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
+Generated on Fri Jan 10 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
 </small></address>
 </div><!-- doc-content -->
 </body>

@@ -33,7 +33,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.10</span>
+   <div id="projectname">Optimized high speed nRF24L01+ driver class documentation<span id="projectnumber">&#160;v1.4.11</span>
    </div>
    <div id="projectbrief">TMRh20 2020 - Optimized fork of the nRF24L01+ driver</div>
   </td>
@@ -111,25 +111,25 @@ $(function(){ initResizable(false); });
 <div class="toc"><h3>Table of Contents</h3>
 <ul>
   <li class="level1">
-    <a href="#autotoc_md191">Alternate SPI Support</a>
+    <a href="#autotoc_md195">Alternate SPI Support</a>
     <ul>
       <li class="level2">
-        <a href="#autotoc_md192">Software Driven SPI</a>
+        <a href="#autotoc_md196">Software Driven SPI</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md193">Alternate Hardware (UART) Driven SPI</a>
+        <a href="#autotoc_md197">Alternate Hardware (UART) Driven SPI</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md194">Using a specific SPI Bus</a>
+        <a href="#autotoc_md198">Using a specific SPI Bus</a>
         <ul>
           <li class="level3">
-            <a href="#autotoc_md195">ESP8266 example</a>
+            <a href="#autotoc_md199">ESP8266 example</a>
           </li>
           <li class="level3">
-            <a href="#autotoc_md196">ESP32 example</a>
+            <a href="#autotoc_md200">ESP32 example</a>
           </li>
           <li class="level3">
-            <a href="#autotoc_md197">Teensy example</a>
+            <a href="#autotoc_md201">Teensy example</a>
           </li>
         </ul>
       </li>
@@ -137,17 +137,17 @@ $(function(){ initResizable(false); });
   </li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="autotoc_md190"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md194"></a></p>
 <p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> is fully compatible with Arduino boards.</p>
 <p>See <a href="http://www.arduino.cc/en/Reference/Board">Arduino Board reference</a> and <a href="http://arduino.cc/en/Reference/SPI">Arduino SPI reference</a> for more information</p>
 <p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> makes use of the standard hardware SPI pins (MISO, MOSI, SCK) and requires two additional pins, to control the chip-select and chip-enable functions.</p>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(ce_pin, cs_pin);</div>
-<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition</b> <a href="RF24_8h_source.html#l00115">RF24.h:116</a></div></div>
+<div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition</b> <a href="RF24_8h_source.html#l00135">RF24.h:136</a></div></div>
 </div><!-- fragment --><p>These pins must be chosen and designated by the user and can use any available pins.</p>
-<h1><a class="anchor" id="autotoc_md191"></a>
+<h1><a class="anchor" id="autotoc_md195"></a>
 Alternate SPI Support</h1>
 <p><a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> supports alternate SPI methods, in case the standard hardware SPI pins are otherwise unavailable.</p>
-<h2><a class="anchor" id="autotoc_md192"></a>
+<h2><a class="anchor" id="autotoc_md196"></a>
 Software Driven SPI</h2>
 <p>Software driven SPI is provided by the <a href="https://github.com/greiman/DigitalIO">DigitalIO library</a>.</p>
 <p>Setup:</p>
@@ -165,7 +165,7 @@ Software Driven SPI</h2>
 <div class="line"><span class="preprocessor">#define SOFT_SPI_SCK_PIN 14</span></div>
 </div><!-- fragment --><p>Or add the build flag/option</p>
 <div class="fragment"><div class="line">-DSOFT_SPI_MISO_PIN=16 -DSOFT_SPI_MOSI_PIN=15 -DSOFT_SPI_SCK_PIN=14</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md193"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md197"></a>
 Alternate Hardware (UART) Driven SPI</h2>
 <p>The Serial Port (UART) on Arduino can also function in SPI mode, and can double-buffer data, while the default SPI hardware cannot.</p>
 <p>The SPI_UART library is available at <a href="https://github.com/TMRh20/Sketches/tree/master/SPI_UART">TMRh20/Sketches</a></p>
@@ -192,12 +192,12 @@ Alternate Hardware (UART) Driven SPI</h2>
 <td class="markdownTableBodyRight">CSN   </td><td class="markdownTableBodyLeft">User Specified   </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>SPI_UART on Mega boards requires soldering to an unused pin on the chip. See <a href="https://github.com/TMRh20/RF24/issues/24">#24</a> for more information on SPI_UART.</dd></dl>
-<h2><a class="anchor" id="autotoc_md194"></a>
+<h2><a class="anchor" id="autotoc_md198"></a>
 Using a specific SPI Bus</h2>
 <p>An alternate SPI bus can be specified using the overloaded <code><a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a></code> method. This is useful for some boards that offer more than 1 hardware-driven SPI bus or certain Arduino cores that implement a software-driven (AKA bit-banged) SPI bus that does not use the DigitalIO library.</p>
 <dl class="section warning"><dt>Warning</dt><dd>The SPI bus object's <code>SPIClass::begin()</code> method <b>must</b> be called before calling the overloaded <code><a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a></code> method.</dd></dl>
 <p>Below are some example snippets that demonstrate how this can be done.</p>
-<h3><a class="anchor" id="autotoc_md195"></a>
+<h3><a class="anchor" id="autotoc_md199"></a>
 ESP8266 example</h3>
 <dl class="section see"><dt>See also</dt><dd>The following example code is meant for the popular NodeMCU board. Please refer to the <a href="https://arduino-esp8266.readthedocs.io/en/latest/libraries.html#spi">ESP8266 ArduinoCore's SPI documentation</a> for <a href="https://arduino-esp8266.readthedocs.io/en/latest/boards.html#">other ESP8266-based boards</a>.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;SPI.h&gt;</span></div>
@@ -229,7 +229,7 @@ ESP8266 example</h3>
 <div class="line">  <span class="comment">// ... continue with program as normal (see library examples/ folder)</span></div>
 <div class="line">}</div>
 <div class="ttc" id="aRF24_8h_html"><div class="ttname"><a href="RF24_8h.html">RF24.h</a></div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md196"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md200"></a>
 ESP32 example</h3>
 <dl class="section see"><dt>See also</dt><dd>Please review the Espressif's <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino">SPI_Multiple_Buses.ino example for the ESP32</a> located in their ArduinoCore repository (along with the SPI library for the ESP32).</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;SPI.h&gt;</span></div>
@@ -267,7 +267,7 @@ ESP32 example</h3>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// ... continue with program as normal (see library examples/ folder)</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md197"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md201"></a>
 Teensy example</h3>
 <dl class="section see"><dt>See also</dt><dd>The overloaded <a class="el" href="classRF24.html#a388fa99b0400ce0cd887f742ef53192b">RF24::begin(_SPI*)</a> is not needed according to the <a href="https://www.pjrc.com/teensy/td_libs_SPI.html">Teensyduino SPI documentation</a>. Please review the table provided in the <a href="https://www.pjrc.com/teensy/td_libs_SPI.html">Teensyduino documentation</a> for what pins are used by default for certain Teensy boards.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;SPI.h&gt;</span></div>
@@ -300,7 +300,7 @@ Teensy example</h3>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2024 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
+Generated on Fri Jan 10 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
 </small></address>
 </div><!-- doc-content -->
 </body>
