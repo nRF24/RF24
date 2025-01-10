@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [1.4.11] - 2025-01-10
+
+### <!-- 1 --> 🚀 Added
+
+- Use enum to return precise FIFO state by \@2bndy5 in [#1009](https://github.com/nRF24/RF24/pull/1009)
+- Make `available(pipe)` depend on `available(void)` by \@2bndy5 in [#1007](https://github.com/nRF24/RF24/pull/1007)
+
+### <!-- 4 --> 🛠️ Fixed
+
+- Fixes for STM32 by \@2bndy5 in [#1011](https://github.com/nRF24/RF24/pull/1011)
+- Init `failureDetected` by \@2bndy5 in [#1016](https://github.com/nRF24/RF24/pull/1016)
+
+### <!-- 9 --> 🗨️ Changed
+
+- Adjustments to CHANGELOG by \@2bndy5 in [`8aa7103`](https://github.com/nRF24/RF24/commit/8aa71035ae3dd10de35865a894082f10a9c51027)
+- Change comment in example by \@2bndy5 in [`80e7f13`](https://github.com/nRF24/RF24/commit/80e7f137ae4caf0df4889b5499c22857019a328a)
+
+[1.4.11]: https://github.com/nRF24/RF24/compare/v1.4.10...v1.4.11
+
+Full commit diff: [`v1.4.10...v1.4.11`][1.4.11]
+
 ## [1.4.10] - 2024-10-06
 
 ### <!-- 1 --> 🚀 Added
@@ -259,6 +280,7 @@ Full commit diff: [`v1.4.2...v1.4.3`][1.4.3]
 ## New Contributors
 * \@Cobalt6700 made their first contribution in [#843](https://github.com/nRF24/RF24/pull/843)
 * \@dstroy0 made their first contribution in [#825](https://github.com/nRF24/RF24/pull/825)
+* \@matt-walker0 made their first contribution in [#820](https://github.com/nRF24/RF24/pull/820)
 * \@prawnpie made their first contribution in [#817](https://github.com/nRF24/RF24/pull/817)
 ## [1.4.2] - 2021-11-27
 
@@ -480,6 +502,7 @@ Full commit diff: [`v1.3.9...v1.3.10`][1.3.10]
 
 ## New Contributors
 * \@jscrane made their first contribution in [#690](https://github.com/nRF24/RF24/pull/690)
+* \@2bndy5 made their first contribution in [#637](https://github.com/nRF24/RF24/pull/637)
 ## [1.3.9] - 2020-08-22
 
 ### <!-- 4 --> 🛠️ Fixed
@@ -923,6 +946,7 @@ Full commit diff: [`v1.1.6...v1.1.7`][1.1.7]
 ## New Contributors
 * \@rnovacek made their first contribution
 * \@gitgrimbo made their first contribution
+* \@akatran made their first contribution
 ## [1.1.6] - 2016-02-20
 
 ### <!-- 1 --> 🚀 Added
@@ -958,6 +982,7 @@ Full commit diff: [`v1.1.6...v1.1.7`][1.1.7]
 Full commit diff: [`v1.1.5...v1.1.6`][1.1.6]
 
 ## New Contributors
+* \@wmarkow made their first contribution
 * \@flavio-fernandes made their first contribution
 * \@ab316 made their first contribution
 * \@SaintGimp made their first contribution
@@ -1005,6 +1030,7 @@ Full commit diff: [`v1.1.4...v1.1.5`][1.1.5]
 
 ## New Contributors
 * \@yozik04 made their first contribution
+* \@Oitzu made their first contribution
 ## [1.1.4] - 2015-12-14
 
 ### <!-- 3 --> 🗑️ Removed
@@ -1054,6 +1080,7 @@ Full commit diff: [`v1.1.2...v1.1.3`][1.1.3]
 
 ## New Contributors
 * \@cguzmanceti made their first contribution
+* \@zador-blood-stained made their first contribution
 ## [1.1.2] - 2015-10-20
 
 ### <!-- 9 --> 🗨️ Changed
@@ -1538,12 +1565,15 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 - Rename arch folder to utility by \@TMRh20 in [`55b034e`](https://github.com/nRF24/RF24/commit/55b034eeb20c5bc838b7dc5d433162b8180860b8)
 - Reverting library properties and releases by \@TMRh20 in [`517326e`](https://github.com/nRF24/RF24/commit/517326e164feeb35e7e54440a8c4b71c042d3f14)
 
-[1.0]: https://github.com/nRF24/RF24/compare/...v1.0
+[1.0]: https://github.com/nRF24/RF24/compare/de083c964d9aeeb9fda7485c39fed27443cd617c...v1.0
 
-Full commit diff: [`...v1.0`][1.0]
+Full commit diff: [`de083c9...v1.0`][1.0]
 
 ## New Contributors
+* \@TMRh20 made their first contribution
+* \@Avamander made their first contribution
 * \@komby made their first contribution
+* \@ivankravets made their first contribution
 * \@Interneedus made their first contribution
 * \@nerdralph made their first contribution
 * \@jorihardman made their first contribution
@@ -1551,9 +1581,11 @@ Full commit diff: [`...v1.0`][1.0]
 * \@mannkind made their first contribution
 * \@dsbaha made their first contribution
 * \@ax7884 made their first contribution
+* \@martin-mat made their first contribution
 * \@lnxbil made their first contribution
 * \@k2OS made their first contribution
 * \@spaniakos made their first contribution
+* \@ made their first contribution
 * \@jfktrey made their first contribution
 * \@reixd made their first contribution
 * \@a-lurker made their first contribution
