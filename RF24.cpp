@@ -1516,23 +1516,18 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
 bool RF24::available(void)
 {
-    uint8_t pipe = RF24_NO_FETCH_PIPE;
-    return available(&pipe);
+    return (read_register(FIFO_STATUS) & 1) == 0;
 }
 
 /****************************************************************************/
 
 bool RF24::available(uint8_t* pipe_num)
 {
-    if (read_register(FIFO_STATUS) & 1) { // if RX FIFO is empty
-        return 0;
-    }
-
-    // If the caller wants the pipe number, include that
-    if (*pipe_num != RF24_NO_FETCH_PIPE)
+    if (available()) { // if RX FIFO is not empty
         *pipe_num = (get_status() >> RX_P_NO) & 0x07;
-
-    return 1;
+        return 1;
+    }
+    return 0;
 }
 
 /****************************************************************************/
@@ -1784,8 +1779,7 @@ bool RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 
 bool RF24::isAckPayloadAvailable(void)
 {
-    uint8_t pipe = RF24_NO_FETCH_PIPE;
-    return available(&pipe);
+    return available();
 }
 
 /****************************************************************************/
