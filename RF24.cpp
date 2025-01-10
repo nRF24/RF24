@@ -1409,16 +1409,17 @@ bool RF24::rxFifoFull()
 
 /****************************************************************************/
 
-uint8_t RF24::isFifo(bool about_tx)
+rf24_fifo_state_e RF24::isFifo(bool about_tx)
 {
-    return static_cast<uint8_t>((read_register(FIFO_STATUS) >> (4 * about_tx)) & 3);
+    uint8_t state = (read_register(FIFO_STATUS) >> (4 * about_tx)) & 3;
+    return static_cast<rf24_fifo_state_e>(state);
 }
 
 /****************************************************************************/
 
 bool RF24::isFifo(bool about_tx, bool check_empty)
 {
-    return static_cast<bool>(isFifo(about_tx) & _BV(!check_empty));
+    return static_cast<bool>(static_cast<uint8_t>(isFifo(about_tx)) & _BV(!check_empty));
 }
 
 /****************************************************************************/

@@ -110,6 +110,26 @@ typedef enum
 
 /**
  * @}
+ * @defgroup fifoState FIFO state
+ * The state of a single FIFO (RX or TX).
+ * Remember, each FIFO has a maximum occupancy of 3 payloads.
+ * @see RF24::isFifo()
+ * @{
+ */
+typedef enum
+{
+    /// @brief The FIFO is not full nor empty, but it is occupied with 1 or 2 payloads.
+    RF24_FIFO_OCCUPIED,
+    /// @brief The FIFO is empty.
+    RF24_FIFO_EMPTY,
+    /// @brief The FIFO is full.
+    RF24_FIFO_FULL,
+    /// @brief Represents corruption of data over SPI (when observed).
+    RF24_FIFO_INVALID,
+} rf24_fifo_state_e;
+
+/**
+ * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 class RF24
@@ -785,13 +805,15 @@ public:
     /**
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
      * @return
-     * - `0` if the specified FIFO is neither full nor empty.
-     * - `1` if the specified FIFO is empty.
-     * - `2` if the specified FIFO is full.
+     * - @ref RF24_FIFO_OCCUPIED (`0`) if the specified FIFO is neither full nor empty.
+     * - @ref RF24_FIFO_EMPTY (`1`) if the specified FIFO is empty.
+     * - @ref RF24_FIFO_FULL (`2`) if the specified FIFO is full.
+     * - @ref RF24_FIFO_INVALID (`3`) if the data fetched over SPI was malformed.
      */
-    uint8_t isFifo(bool about_tx);
+    rf24_fifo_state_e isFifo(bool about_tx);
 
     /**
+     * @deprecated Use RF24::isFifo(bool about_tx) instead.
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
      * @param check_empty
      * - `true` checks if the specified FIFO is empty
