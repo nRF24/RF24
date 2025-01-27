@@ -162,6 +162,19 @@ private:
     bool _is_p_variant;               /* For storing the result of testing the toggleFeatures() affect */
     bool _is_p0_rx;                   /* For keeping track of pipe 0's usage in user-triggered RX mode. */
 
+#if defined(RF24_SOFTWARE_BUFFER)
+    // Structure to manage software buffers for pipes
+    struct pipe_buffer
+    {
+        bool enabled;        // Indicates if the buffer is enabled
+        bool data_available; // Indicates if data is available in the buffer
+        uint8_t size;        // Size of the buffer data
+        uint8_t buffer[32];  // Fixed-size buffer memory (maximum 32 bytes)
+    };
+    pipe_buffer pipe_buffers[6]; // 6 pipes, 0-5
+
+#endif // defined(RF24_SOFTWARE_BUFFER)
+
 protected:
     /**
      * SPI transactions
@@ -577,6 +590,46 @@ public:
      * addresses are configured to use (set with setAddressWidth()).
      */
     void openReadingPipe(uint8_t number, const uint8_t* address);
+
+#if defined(RF24_SOFTWARE_BUFFER)
+
+    /**
+     * @brief Handles incoming data for all enabled pipes.
+     *
+     * This function checks for incoming data on all enabled pipes and processes it accordingly.
+     * It reads the data from the pipe, checks if the pipe buffer is enabled, and then stores
+     * the data in the corresponding buffer if it is enabled and has no unread data.
+     */
+    void pipeBufferHandler(void);
+
+    /**
+     * @brief Checks if data is available in the specified pipe buffer.
+     *
+     * This function checks whether there is data available in the buffer
+     * for the specified pipe number. It ensures that the pipe number is
+     * valid and that the pipe buffer is enabled before checking the data
+     * availability status.
+     *
+     * @param pipe_num The pipe number to check for data availability.
+     *                 Valid values are 0 to 5.
+     * @return true if data is available in the specified pipe buffer,
+     *         false otherwise.
+     */
+    bool available(uint8_t pipe_num);
+
+    /**
+     * @brief Reads data from a specific pipe's buffer.
+     *
+     * This function reads data from the buffer of a specified pipe and copies it to the provided buffer.
+     * It checks for valid pipe number, enabled pipe buffer, and available data before proceeding.
+     *
+     * @param buf Pointer to the buffer where the read data will be stored.
+     * @param len The number of bytes to read.
+     * @param pipe_num The pipe number (0-5) from which to read data.
+     */
+    void readPipeBuffer(uint8_t pipe_num, void* buf, uint8_t len);
+
+#endif // defined(RF24_SOFTWARE_BUFFER)
 
     /**@}*/
     /**
@@ -1826,6 +1879,26 @@ public:
      * optional parameter. Defaults to `true` (meaning LNA feature is enabled) when not specified.
      */
     void setRadiation(uint8_t level, rf24_datarate_e speed, bool lnaEnable = true);
+
+#if defined(RF24_SOFTWARE_BUFFER)
+    /**
+     * @brief Enables the software buffer for the specified pipe.
+     *
+     * This function enables the buffer for the given pipe number, allowing data to be received on that pipe.
+     *
+     * @param pipe_num The number of the pipe to enable the buffer for. Valid values are 0-5.
+     */
+    void enablePipeBuffer(uint8_t pipe_num);
+
+    /**
+     * @brief Disables the software buffer for the specified pipe.
+     *
+     * This function disables the buffer for the given pipe number, preventing data from being received on that pipe.
+     *
+     * @param pipe_num The number of the pipe to disable the buffer for. Valid values are 0-5.
+     */
+    void disablePipeBuffer(uint8_t pipe_num);
+#endif // defined(RF24_SOFTWARE_BUFFER)
 
     /**@}*/
     /**

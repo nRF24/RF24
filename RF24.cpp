@@ -611,6 +611,16 @@ void RF24::_init_obj()
     if (spi_speed <= 35000) { //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
         spi_speed = RF24_SPI_SPEED;
     }
+
+#if defined(RF24_SOFTWARE_BUFFER)
+    // Initialize pipe buffers
+    for (int i = 0; i < 6; i++) {
+        pipe_buffers[i].enabled = false;
+        pipe_buffers[i].data_available = false;
+        pipe_buffers[i].size = 0;
+        memset(pipe_buffers[i].buffer, 0, sizeof(pipe_buffers[i].buffer));
+    }
+#endif // defined(RF24_SOFTWARE_BUFFER)
 }
 
 /****************************************************************************/
@@ -1532,6 +1542,20 @@ bool RF24::available(uint8_t* pipe_num)
 
 /****************************************************************************/
 
+#if defined(RF24_SOFTWARE_BUFFER)
+bool RF24::available(uint8_t pipe_num)
+{
+    // Check if the pipe number is valid or the pipe buffer is enabled
+    if (pipe_num > 5 || !pipe_buffers[pipe_num].enabled) {
+        return 0;
+    }
+    // Check if data is available in the pipe buffer
+    return pipe_buffers[pipe_num].data_available;
+}
+#endif // defined(RF24_SOFTWARE_BUFFER)
+
+/****************************************************************************/
+
 void RF24::read(void* buf, uint8_t len)
 {
 
@@ -1541,6 +1565,87 @@ void RF24::read(void* buf, uint8_t len)
     //Clear the only applicable interrupt flags
     write_register(NRF_STATUS, _BV(RX_DR));
 }
+
+/****************************************************************************/
+
+#if defined(RF24_SOFTWARE_BUFFER)
+void RF24::readPipeBuffer(uint8_t pipe_num, void* buf, uint8_t len)
+{
+    // Check if the pipe number is valid, pipe buffer enabled, and has data available
+    if (pipe_num > 5 || !pipe_buffers[pipe_num].enabled || !pipe_buffers[pipe_num].data_available) {
+        return;
+    }
+
+    // Limit user buffer length
+    len = rf24_min(len, pipe_buffers[pipe_num].size);
+    // Copy data to user buffer
+    memcpy(buf, pipe_buffers[pipe_num].buffer, len);
+    // Clear the pipe buffer
+    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
+    // Mark data as read
+    pipe_buffers[pipe_num].data_available = false;
+}
+
+/****************************************************************************/
+
+void RF24::enablePipeBuffer(uint8_t pipe_num)
+{
+    // Check if the pipe number is valid or the pipe buffer is already enabled
+    if (pipe_num > 5 || pipe_buffers[pipe_num].enabled) {
+        return;
+    }
+
+    // Initialize the pipe buffer
+    pipe_buffers[pipe_num].enabled = true;
+    pipe_buffers[pipe_num].data_available = false;
+    pipe_buffers[pipe_num].size = 0;
+    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
+}
+
+/****************************************************************************/
+
+void RF24::disablePipeBuffer(uint8_t pipe_num)
+{
+    // Check if the pipe number is valid or the pipe buffer is already disabled
+    if (pipe_num > 5 || !pipe_buffers[pipe_num].enabled) {
+        return;
+    }
+
+    // Reset the pipe buffer
+    pipe_buffers[pipe_num].enabled = false;
+    pipe_buffers[pipe_num].data_available = false;
+    pipe_buffers[pipe_num].size = 0;
+    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
+}
+
+/****************************************************************************/
+
+void RF24::pipeBufferHandler(void)
+{
+    // Check for incoming data
+    while (available()) {
+        // Get the pipe number
+        uint8_t pipe_num = (get_status() >> RX_P_NO) & 0x07;
+
+        // Get the dynamic payload size if dynamic mode is enabled
+        uint8_t buf_size = dynamic_payloads_enabled ? getDynamicPayloadSize() : payload_size;
+
+        // Read the data
+        uint8_t buf[buf_size];
+        read(&buf, buf_size);
+
+        // Check if the pipe buffer is enabled and does not already contain unread data; otherwise, discard the new data.
+        if (pipe_buffers[pipe_num].enabled && !pipe_buffers[pipe_num].data_available) {
+            // Copy the new data to the pipe buffer
+            memcpy(pipe_buffers[pipe_num].buffer, buf, buf_size);
+            // Update the pipe buffer size
+            pipe_buffers[pipe_num].size = buf_size;
+            // Mark the buffer as having unread data
+            pipe_buffers[pipe_num].data_available = true;
+        }
+    }
+}
+#endif // defined(RF24_SOFTWARE_BUFFER)
 
 /****************************************************************************/
 
