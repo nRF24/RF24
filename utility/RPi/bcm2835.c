@@ -6,7 +6,13 @@
 // Author: Mike McCauley
 // Copyright (C) 2011-2013 Mike McCauley
 // $Id: bcm2835.c,v 1.28 2020/01/11 05:07:13 mikem Exp mikem $
+//
+// S.Peacock: modified bcm2835_i2c_write() to add a fail safe timer.
 */
+
+// Needed to compile with gcc -std=c99, as reported by John Blaiklock.
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -55,6 +61,8 @@ volatile uint32_t *bcm2835_bsc1        = (uint32_t *)MAP_FAILED;
 volatile uint32_t *bcm2835_st	       = (uint32_t *)MAP_FAILED;
 volatile uint32_t *bcm2835_aux	       = (uint32_t *)MAP_FAILED;
 volatile uint32_t *bcm2835_spi1        = (uint32_t *)MAP_FAILED;
+/* BEB*/
+volatile uint32_t *bcm2835_smi         = (uint32_t *)MAP_FAILED;
 
 
 
@@ -170,6 +178,10 @@ uint32_t* bcm2835_regbase(uint8_t regbase)
 	    return (uint32_t *)bcm2835_aux;
 	case BCM2835_REGBASE_SPI1:
 	    return (uint32_t *)bcm2835_spi1;
+        /* BEB */
+        case BCM2835_REGBASE_SMI:
+	    return (uint32_t *)bcm2835_smi;
+
 
     }
     return (uint32_t *)MAP_FAILED;
@@ -457,6 +469,7 @@ void bcm2835_gpio_afen(uint8_t pin)
     uint32_t value = 1 << shift;
     bcm2835_peri_set_bits(paddr, value, value);
 }
+
 void bcm2835_gpio_clr_afen(uint8_t pin)
 {
     volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPAFEN0/4 + pin/32;
@@ -468,14 +481,15 @@ void bcm2835_gpio_clr_afen(uint8_t pin)
 /* Set pullup/down */
 void bcm2835_gpio_pud(uint8_t pud)
 {
-    if( pud_type_rpi4 )
+    if (pud_type_rpi4)
     {
         pud_compat_setting = pud;
     }
-    else {
-    volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPPUD/4;
-    bcm2835_peri_write(paddr, pud);
-}
+    else
+    {
+	volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPPUD/4;
+	bcm2835_peri_write(paddr, pud);
+    }
 }
 
 /* Pullup/down clock
@@ -483,25 +497,24 @@ void bcm2835_gpio_pud(uint8_t pud)
 */
 void bcm2835_gpio_pudclk(uint8_t pin, uint8_t on)
 {
-    if( pud_type_rpi4 )
+    if (pud_type_rpi4)
     {
-        if( on )
-            bcm2835_gpio_set_pud( pin, pud_compat_setting);
-    }
+        if (on)
+             bcm2835_gpio_set_pud( pin, pud_compat_setting);
+    } 
     else
-    {
-    volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPPUDCLK0/4 + pin/32;
-    uint8_t shift = pin % 32;
-    bcm2835_peri_write(paddr, (on ? 1 : 0) << shift);
-}
+    { 
+	volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPPUDCLK0/4 + pin/32;
+	uint8_t shift = pin % 32;
+	bcm2835_peri_write(paddr, (on ? 1 : 0) << shift);
+    }
 }
 
 /* Read GPIO pad behaviour for groups of GPIOs */
 uint32_t bcm2835_gpio_pad(uint8_t group)
 {
-  if (bcm2835_pads == MAP_FAILED){
-    return 0;
-  }
+    if (bcm2835_pads == MAP_FAILED)
+	return 0;
   
     volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
     return bcm2835_peri_read(paddr);
@@ -513,9 +526,8 @@ uint32_t bcm2835_gpio_pad(uint8_t group)
 */
 void bcm2835_gpio_set_pad(uint8_t group, uint32_t control)
 {
-  if (bcm2835_pads == MAP_FAILED){
-    return;
-  }
+    if (bcm2835_pads == MAP_FAILED)
+	return;
   
     volatile uint32_t* paddr = bcm2835_pads + BCM2835_PADS_GPIO_0_27/4 + group;
     bcm2835_peri_write(paddr, control | BCM2835_PAD_PASSWRD);
@@ -552,7 +564,7 @@ void bcm2835_delayMicroseconds(uint64_t micros)
     start =  bcm2835_st_read();
    
     /* Not allowed to access timer registers (result is not as precise)*/
-    if (start==0)
+    if (start == 0)
     {
 	t1.tv_sec = 0;
 	t1.tv_nsec = 1000 * (long)(micros);
@@ -622,7 +634,7 @@ void bcm2835_gpio_write_mask(uint32_t value, uint32_t mask)
 */
 void bcm2835_gpio_set_pud(uint8_t pin, uint8_t pud)
 {
-    if( pud_type_rpi4 )
+    if (pud_type_rpi4)
     {
         int shiftbits = (pin & 0xf) << 1;
         uint32_t bits;
@@ -644,16 +656,16 @@ void bcm2835_gpio_set_pud(uint8_t pin, uint8_t pud)
         
         bcm2835_peri_write_nb( paddr, bits );
         
-    } else
+    }
+    else
     {
-    bcm2835_gpio_pud(pud);
-    delayMicroseconds(10);
-    bcm2835_gpio_pudclk(pin, 1);
-    delayMicroseconds(10);
-    bcm2835_gpio_pud(BCM2835_GPIO_PUD_OFF);
-    bcm2835_gpio_pudclk(pin, 0);
-}
-
+	bcm2835_gpio_pud(pud);
+	delayMicroseconds(10);
+	bcm2835_gpio_pudclk(pin, 1);
+	delayMicroseconds(10);
+	bcm2835_gpio_pud(BCM2835_GPIO_PUD_OFF);
+	bcm2835_gpio_pudclk(pin, 0);
+    }
 }
 
 
@@ -661,7 +673,7 @@ uint8_t bcm2835_gpio_get_pud(uint8_t pin)
 {
     uint8_t ret = BCM2835_GPIO_PUD_ERROR;
     
-    if( pud_type_rpi4 )
+    if (pud_type_rpi4)
     {
         uint32_t bits;
         volatile uint32_t* paddr = bcm2835_gpio + BCM2835_GPPUPPDN0/4 + (pin >> 4);
@@ -740,9 +752,9 @@ void bcm2835_spi_setClockDivider(uint16_t divider)
 
 void bcm2835_spi_set_speed_hz(uint32_t speed_hz)
 {
-	uint16_t divider = (uint16_t) ((uint32_t) BCM2835_CORE_CLK_HZ / speed_hz);
-	divider &= 0xFFFE;
-	bcm2835_spi_setClockDivider(divider);
+    uint16_t divider = (uint16_t) ((uint32_t) BCM2835_CORE_CLK_HZ / speed_hz);
+    divider &= 0xFFFE;
+    bcm2835_spi_setClockDivider(divider);
 }
 
 void bcm2835_spi_setDataMode(uint8_t mode)
@@ -1097,7 +1109,8 @@ void bcm2835_aux_spi_transfernb(const char *tbuf, char *rbuf, uint32_t len) {
 
 	while ((tx_len > 0) || (rx_len > 0)) {
 
-		while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL) && (tx_len > 0)) {
+	    while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_TX_FULL) && (tx_len > 0) && (tx_len + BCM2835_AUX_SPI_FIFO_SIZE * 3 > rx_len))
+	    {
 			count = MIN(tx_len, 3);
 			data = 0;
 
@@ -1117,7 +1130,8 @@ void bcm2835_aux_spi_transfernb(const char *tbuf, char *rbuf, uint32_t len) {
 
 		}
 
-		while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_RX_EMPTY) && (rx_len > 0)) {
+		while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_RX_EMPTY) && (rx_len > 0))
+		{
 			count = MIN(rx_len, 3);
 			data = bcm2835_peri_read(io);
 
@@ -1139,7 +1153,8 @@ void bcm2835_aux_spi_transfernb(const char *tbuf, char *rbuf, uint32_t len) {
 			rx_len -= count;
 		}
 
-		while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_BUSY) && (rx_len > 0)) {
+		while (!(bcm2835_peri_read(stat) & BCM2835_AUX_SPI_STAT_BUSY) && (rx_len > 0) && (tx_len == 0))
+		{
 			count = MIN(rx_len, 3);
 			data = bcm2835_peri_read(io);
 
@@ -1300,10 +1315,12 @@ uint8_t bcm2835_i2c_write(const char * buf, uint32_t len)
     volatile uint32_t* control = bcm2835_bsc1 + BCM2835_BSC_C/4;
 #endif    
 
-    uint32_t remaining = len;
-    uint32_t i = 0;
-    uint8_t reason = BCM2835_I2C_REASON_OK;
-
+    uint32_t      remaining = len;
+    uint32_t      i = 0;
+    uint8_t       reason = BCM2835_I2C_REASON_OK;
+    unsigned long Failsafe = len * 10000;
+    int           Timeout = 0;
+    
     /* Clear FIFO */
     bcm2835_peri_set_bits(control, BCM2835_BSC_C_CLEAR_1 , BCM2835_BSC_C_CLEAR_1 );
     /* Clear Status */
@@ -1322,29 +1339,45 @@ uint8_t bcm2835_i2c_write(const char * buf, uint32_t len)
     bcm2835_peri_write(control, BCM2835_BSC_C_I2CEN | BCM2835_BSC_C_ST);
     
     /* Transfer is over when BCM2835_BSC_S_DONE */
-    while(!(bcm2835_peri_read(status) & BCM2835_BSC_S_DONE ))
+    while(!Timeout && !(bcm2835_peri_read(status) & BCM2835_BSC_S_DONE ))
     {
-        while ( remaining && (bcm2835_peri_read(status) & BCM2835_BSC_S_TXD ))
+        while (!Timeout && remaining && (bcm2835_peri_read(status) & BCM2835_BSC_S_TXD ))
     	{
 	    /* Write to FIFO */
 	    bcm2835_peri_write(fifo, buf[i]);
 	    i++;
 	    remaining--;
+            /* Make sure we don't loop forever! */
+ 	    if (--Failsafe == 0)
+ 	    {
+ 		Timeout = 1;
+ 		break;
+ 	    }
     	}
+        /* Make sure we don't loop forever! */
+         if (--Failsafe == 0)
+ 	{
+ 	    Timeout = 1;
+ 	    break;
+ 	}
+     /* printf("Failsafe %d %d\n", len, (len * 1000) - Failsafe); */
     }
 
-    /* Received a NACK */
-    if (bcm2835_peri_read(status) & BCM2835_BSC_S_ERR)
+    if (Timeout)
     {
+	/* We had a timeout */
+	reason = BCM2835_I2C_REASON_ERROR_TIMEOUT;
+    }
+    else if (bcm2835_peri_read(status) & BCM2835_BSC_S_ERR)
+    {
+	/* Received a NACK */
 	reason = BCM2835_I2C_REASON_ERROR_NACK;
     }
-
     /* Received Clock Stretch Timeout */
     else if (bcm2835_peri_read(status) & BCM2835_BSC_S_CLKT)
     {
 	reason = BCM2835_I2C_REASON_ERROR_CLKT;
     }
-
     /* Not all data is sent */
     else if (remaining)
     {
@@ -1624,6 +1657,201 @@ uint8_t bcm2835_i2c_write_read_rs(char* cmds, uint32_t cmds_len, char* buf, uint
     return reason;
 }
 
+/* SMI support courtesy Benoit Bouchez */
+int bcm2835_smi_begin(void)
+{
+    volatile uint32_t* paddr;
+    uint32_t defConfig;
+
+    if (bcm2835_smi == MAP_FAILED)
+      return 0; /* bcm2835_smi_init() failed, or not root */
+
+    /* Set the SMI pins to the Alt 1 function to enable SMI access on them */
+    bcm2835_gpio_fsel(2, BCM2835_GPIO_FSEL_ALT1); /* SA3 */
+    bcm2835_gpio_fsel(3, BCM2835_GPIO_FSEL_ALT1); /* SA2 */
+    bcm2835_gpio_fsel(4, BCM2835_GPIO_FSEL_ALT1); /* SA1 */
+    bcm2835_gpio_fsel(5, BCM2835_GPIO_FSEL_ALT1); /* SA0 */
+    bcm2835_gpio_fsel(6, BCM2835_GPIO_FSEL_ALT1); /* SOE_N / SE */
+    bcm2835_gpio_fsel(7, BCM2835_GPIO_FSEL_ALT1); /* SWE_N / SRW_N */
+    bcm2835_gpio_fsel(8, BCM2835_GPIO_FSEL_ALT1); /* SD0 */
+    bcm2835_gpio_fsel(9, BCM2835_GPIO_FSEL_ALT1); /* SD1 */
+    bcm2835_gpio_fsel(10, BCM2835_GPIO_FSEL_ALT1); /* SD2 */
+    bcm2835_gpio_fsel(11, BCM2835_GPIO_FSEL_ALT1); /* SD3 */
+    bcm2835_gpio_fsel(12, BCM2835_GPIO_FSEL_ALT1); /* SD4 */
+    bcm2835_gpio_fsel(13, BCM2835_GPIO_FSEL_ALT1); /* SD5 */
+    bcm2835_gpio_fsel(14, BCM2835_GPIO_FSEL_ALT1); /* SD6 */
+    bcm2835_gpio_fsel(15, BCM2835_GPIO_FSEL_ALT1); /* SD7 */
+
+    /* Set the SMI clock to 125MHz -> one clock period lasts 8 ns */
+    paddr = bcm2835_clk + SMICLK_CNTL;
+    bcm2835_peri_write (paddr, 0x5A000000);     /* Disable SMI clock */
+    paddr = bcm2835_clk + SMICLK_DIV;
+    bcm2835_peri_write (paddr, 0x5A004000);     /* Set clock divider to 4 */
+    paddr = bcm2835_clk + SMICLK_CNTL;
+    bcm2835_peri_write (paddr, 0x5A000016);     /* Enable SMI clock with PLLD */
+
+    /* Set a default useable configuration for the four SMI config slots */
+    /* 8 bits, Intel mode, always pace, 10 clocks for R/W setup = 80 ns
+     20 clocks for R/W strobe = 160 ns, 20 clocks for R/W hold = 160 ns,
+     1 clock for pace control (not used but a value is needed) */
+    defConfig = BCM2835_SMI_RW_WID8 | BCM2835_SMI_RW_MODE80  |
+             BCM2835_SMI_RW_PACEALL | (10<<BCM2835_SMI_RW_SETUP_LS) |
+             (20<<BCM2835_SMI_RW_STROBE_LS) | (20<<BCM2835_SMI_RW_HOLD_LS) |
+             (1<<BCM2835_SMI_RW_PACE_LS);
+
+    paddr = bcm2835_smi + BCM2835_SMI_READ0;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_WRITE0;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_READ1;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_WRITE1;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_READ2;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_WRITE2;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_READ3;
+    bcm2835_peri_write (paddr, defConfig);
+    paddr = bcm2835_smi + BCM2835_SMI_WRITE3;
+    bcm2835_peri_write (paddr, defConfig);
+
+    return 1; // OK
+}  /* bcm2835_smi_begin */
+/* --------------------------------------------------- */
+
+void bcm2835_smi_end(void)
+{
+    /* Set all the SMI pins back to input */
+    bcm2835_gpio_fsel(2, BCM2835_GPIO_FSEL_INPT); /* SA3 */
+    bcm2835_gpio_fsel(3, BCM2835_GPIO_FSEL_INPT); /* SA2 */
+    bcm2835_gpio_fsel(4, BCM2835_GPIO_FSEL_INPT); /* SA1 */
+    bcm2835_gpio_fsel(5, BCM2835_GPIO_FSEL_INPT); /* SA0 */
+    bcm2835_gpio_fsel(6, BCM2835_GPIO_FSEL_INPT); /* SOE_N / SE */
+    bcm2835_gpio_fsel(7, BCM2835_GPIO_FSEL_INPT); /* SWE_N / SRW_N */
+    bcm2835_gpio_fsel(8, BCM2835_GPIO_FSEL_INPT); /* SD0 */
+    bcm2835_gpio_fsel(9, BCM2835_GPIO_FSEL_INPT); /* SD1 */
+    bcm2835_gpio_fsel(10, BCM2835_GPIO_FSEL_INPT); /* SD2 */
+    bcm2835_gpio_fsel(11, BCM2835_GPIO_FSEL_INPT); /* SD3 */
+    bcm2835_gpio_fsel(12, BCM2835_GPIO_FSEL_INPT); /* SD4 */
+    bcm2835_gpio_fsel(13, BCM2835_GPIO_FSEL_INPT); /* SD5 */
+    bcm2835_gpio_fsel(14, BCM2835_GPIO_FSEL_INPT); /* SD6 */
+    bcm2835_gpio_fsel(15, BCM2835_GPIO_FSEL_INPT); /* SD7 */
+}  /* bcm2835_smi_end */
+/* --------------------------------------------------- */
+
+void bcm2835_smi_set_timing (uint32_t smichannel, uint32_t readchannel,
+                             uint32_t setupcycles, uint32_t strobecycles,
+                             uint32_t holdcycles, uint32_t pacecycles)
+{
+    int RegOffset;
+    volatile uint32_t* psmitiming;
+    uint32_t RegValue;
+
+    if (readchannel!=0)
+    {
+        switch (smichannel)
+        {
+            case 0 : RegOffset = BCM2835_SMI_READ0; break;
+            case 1 : RegOffset = BCM2835_SMI_READ1; break;
+            case 2 : RegOffset = BCM2835_SMI_READ2; break;
+            case 3 : RegOffset = BCM2835_SMI_READ3; break;
+            default : return;
+        }
+    }
+    else
+    {
+        switch (smichannel)
+        {
+            case 0 : RegOffset = BCM2835_SMI_WRITE0; break;
+            case 1 : RegOffset = BCM2835_SMI_WRITE1; break;
+            case 2 : RegOffset = BCM2835_SMI_WRITE2; break;
+            case 3 : RegOffset = BCM2835_SMI_WRITE3; break;
+            default : return;
+        }
+    }
+
+    /* Get current timing configuration of the slot */
+    psmitiming = bcm2835_smi + RegOffset;
+    RegValue = bcm2835_peri_read (psmitiming);
+    /* Clear timing fields in register */
+    RegValue &= ~(BCM2835_SMI_RW_SETUP_MSK|BCM2835_SMI_RW_HOLD_MSK|BCM2835_SMI_RW_PACE_MSK|BCM2835_SMI_RW_STROBE_MSK);
+    /* Set timing values and write back to register */
+    RegValue |= (setupcycles << BCM2835_SMI_RW_SETUP_LS)  |
+                (strobecycles << BCM2835_SMI_RW_STROBE_LS) |
+                (holdcycles << BCM2835_SMI_RW_HOLD_LS)   |
+                (pacecycles << BCM2835_SMI_RW_PACE_LS);
+    bcm2835_peri_write (psmitiming, RegValue);
+}  /* bcm2835_set_smi_timing */
+/* --------------------------------------------------- */
+
+void bcm2835_smi_write(uint32_t smichannel, uint8_t data, uint32_t address)
+{
+    uint32_t status;
+    volatile uint32_t* psmics = bcm2835_smi + BCM2835_SMI_DIRCS;
+    volatile uint32_t* psmiaddr = bcm2835_smi + BCM2835_SMI_DIRADDR;
+    volatile uint32_t* psmidata = bcm2835_smi + BCM2835_SMI_DIRDATA;
+
+    /* Make sure we use a configuration that exists */
+    if (smichannel>3) return;
+
+    /* clear done bit if set */
+    if (bcm2835_peri_read(psmics) & BCM2835_SMI_DIRCS_DONE)
+    {
+        bcm2835_peri_write (psmics, BCM2835_SMI_DIRCS_DONE);
+    }
+
+    /* Start write transfer */
+    bcm2835_peri_write (psmiaddr, (smichannel<<BCM2835_SMI_DIRADRS_DEV_LS) | (address&BCM2835_SMI_DIRADRS_MSK));
+    bcm2835_peri_write (psmidata, data);
+    bcm2835_peri_write (psmics, BCM2835_SMI_DIRCS_WRITE|BCM2835_SMI_DIRCS_START|BCM2835_SMI_DIRCS_ENABLE);
+
+    /* Wait until write cycle is finished */
+    do {
+        status = bcm2835_peri_read(psmics);
+    } while ((status & BCM2835_SMI_DIRCS_DONE)==0);
+
+    /* clear done bit */
+    bcm2835_peri_write (psmics, BCM2835_SMI_DIRCS_DONE);
+}  /* bcm2835_smi_write */
+/* --------------------------------------------------- */
+
+uint32_t bcm2835_smi_read (uint32_t smichannel, uint32_t address)
+{
+    uint32_t status;
+    uint32_t data;
+    volatile uint32_t* psmics = bcm2835_smi + BCM2835_SMI_DIRCS;
+    volatile uint32_t* psmiaddr = bcm2835_smi + BCM2835_SMI_DIRADDR;
+    volatile uint32_t* psmidata = bcm2835_smi + BCM2835_SMI_DIRDATA;
+
+    /* Make sure we use a configuration that exists */
+    if (smichannel>3) return 0;
+
+    /* clear done bit if set */
+    if (bcm2835_peri_read(psmics) & BCM2835_SMI_DIRCS_DONE)
+    {
+        bcm2835_peri_write (psmics, BCM2835_SMI_DIRCS_DONE);
+    }
+
+    /* Start read transfer */
+    bcm2835_peri_write (psmiaddr, (smichannel<<BCM2835_SMI_DIRADRS_DEV_LS) | (address&BCM2835_SMI_DIRADRS_MSK));
+    bcm2835_peri_write (psmics, BCM2835_SMI_DIRCS_START|BCM2835_SMI_DIRCS_ENABLE);
+
+    /* Wait until read cycle is finished */
+    do {
+        status = bcm2835_peri_read(psmics);
+    } while ((status & BCM2835_SMI_DIRCS_DONE)==0);
+
+    /* Read data */
+    data = bcm2835_peri_read (psmidata);
+
+    /* clear done bit */
+    bcm2835_peri_write (psmics, BCM2835_SMI_DIRCS_DONE);
+
+    return data;
+}  /* bcm2835_smi_read */
+/* --------------------------------------------------- */
+
 /* Read the System Timer Counter (64-bits) */
 uint64_t bcm2835_st_read(void)
 {
@@ -1797,6 +2025,9 @@ int bcm2835_init(void)
 	bcm2835_st   = bcm2835_peripherals + BCM2835_ST_BASE/4;
 	bcm2835_aux  = bcm2835_peripherals + BCM2835_AUX_BASE/4;
 	bcm2835_spi1 = bcm2835_peripherals + BCM2835_SPI1_BASE/4;
+        /* BEB */
+	bcm2835_smi  = bcm2835_peripherals + BCM2835_SMI_BASE/4;
+
 
 	return 1; /* Success */
     }
@@ -1860,9 +2091,8 @@ int bcm2835_init(void)
      * the fact that we can only access GPIO
      * else try for the /dev/mem interface and get access to everything
      */
-    memfd = -1;
     ok = 0;
-    if (geteuid() == 0
+    if (   geteuid() == 0
 #ifdef BCM2835_HAVE_LIBCAP
 	|| bcm2835_has_capability(CAP_SYS_RAWIO)
 #endif
@@ -1870,11 +2100,11 @@ int bcm2835_init(void)
     {
       /* Open the master /dev/mem device */
       if ((memfd = open("/dev/mem", O_RDWR | O_SYNC) ) < 0) 
-	{
+      {
 	  fprintf(stderr, "bcm2835_init: Unable to open /dev/mem: %s\n",
 		  strerror(errno)) ;
 	  goto exit;
-	}
+      }
       
       /* Base of the peripherals block is mapped to VM */
       bcm2835_peripherals = mapmem("gpio", bcm2835_peripherals_size, memfd, bcm2835_peripherals_base);
@@ -1894,26 +2124,29 @@ int bcm2835_init(void)
       bcm2835_st   = bcm2835_peripherals + BCM2835_ST_BASE/4;
       bcm2835_aux  = bcm2835_peripherals + BCM2835_AUX_BASE/4;
       bcm2835_spi1 = bcm2835_peripherals + BCM2835_SPI1_BASE/4;
+      /* BEB */
+      bcm2835_smi  = bcm2835_peripherals + BCM2835_SMI_BASE/4;
+
 
       ok = 1;
     }
     else
     {
-      /* Not root, try /dev/gpiomem */
-      /* Open the master /dev/mem device */
-      if ((memfd = open("/dev/gpiomem", O_RDWR | O_SYNC) ) < 0) 
+	/* Not root, try /dev/gpiomem */
+	/* Open the master /dev/mem device */
+	if ((memfd = open("/dev/gpiomem", O_RDWR | O_SYNC) ) < 0) 
 	{
-	  fprintf(stderr, "bcm2835_init: Unable to open /dev/gpiomem: %s\n",
-		  strerror(errno)) ;
-	  goto exit;
+	    fprintf(stderr, "bcm2835_init: Unable to open /dev/gpiomem: %s\n",
+		    strerror(errno)) ;
+	    goto exit;
 	}
-      
-      /* Base of the peripherals block is mapped to VM */
-      bcm2835_peripherals_base = 0;
-      bcm2835_peripherals = mapmem("gpio", bcm2835_peripherals_size, memfd, bcm2835_peripherals_base);
-      if (bcm2835_peripherals == MAP_FAILED) goto exit;
-      bcm2835_gpio = bcm2835_peripherals;
-      ok = 1;
+	
+	/* Base of the peripherals block is mapped to VM */
+	bcm2835_peripherals_base = 0;
+	bcm2835_peripherals = mapmem("gpio", bcm2835_peripherals_size, memfd, bcm2835_peripherals_base);
+	if (bcm2835_peripherals == MAP_FAILED) goto exit;
+	bcm2835_gpio = bcm2835_peripherals;
+	ok = 1;
     }
 
 exit:
@@ -1943,6 +2176,9 @@ int bcm2835_close(void)
     bcm2835_st   = MAP_FAILED;
     bcm2835_aux  = MAP_FAILED;
     bcm2835_spi1 = MAP_FAILED;
+    /* BEB */
+    bcm2835_smi = MAP_FAILED;
+
     return 1; /* Success */
 }    
 
