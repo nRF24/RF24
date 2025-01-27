@@ -49,16 +49,40 @@ for proper constructor to address the correct spi device at /dev/spidev\<a\>.\<b
 
 Choose any GPIO output pin for radio CE pin.
 
+> [!WARNING]
+> The pin numbers may be different for certain systems.
+> In this library's examples, we use the BCM pin numbers for BroadCom chips such as
+> those used on all Raspberry Pi models.
+>
+> For Raspberry Pi clones, such as Orange Pi or Banana Pi, defer to the pin numbers described
+> in the corresponding documentation.
+>
+> Hint: If libgpiod is installed (not required for this library),
+> then you can use the included
+> [CLI tools shipped with libgpiod](https://libgpiod.readthedocs.io/en/latest/gpio_tools.html)
+> to gleam system-specific details.
+
+### Linux kernel (SPIDEV driver) and the GPIO chip number
+This library, as of v1.4.9, uses the Linux kernel's Character Device API to interface
+with GPIO pins. Previous versions used the deprecated "sys fs" interface.
+By default, this library attempts to use pins exposed via `/dev/gpiochip0`.
+If your system exposes the GPIO pins via a different chip (ie `/dev/gpiochip4`), then the
+`RF24_LINUX_GPIO_CHIP` can be set to the correct value when compiling the library.
+
+```shell
+cmake .. -DRF24_LINUX_GPIO_CHIP="/dev/gpiochip4"
+```
+
 ### General
 
 ```cpp
-RF24 radio(22,0);
+RF24 radio(22, 0);
 ```
 
 ### MRAA Constructor
 
 ```cpp
-RF24 radio(15,0);
+RF24 radio(15, 0);
 ```
 
 See [the MRAA documentation for Raspberry Pi support](http://iotdk.intel.com/docs/master/mraa/rasppi.html)

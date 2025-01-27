@@ -25,7 +25,7 @@ typedef uint16_t rf24_gpio_pin_t;
      * The default GPIO chip to use.  Defaults to `/dev/gpiochip4` (for RPi5).
      * Falls back to `/dev/gpiochip0` if this value is somehow incorrect.
      */
-    #define RF24_LINUX_GPIO_CHIP "/dev/gpiochip4"
+    #define RF24_LINUX_GPIO_CHIP "/dev/gpiochip0"
 #endif
 
 /** Specific exception for GPIO errors */

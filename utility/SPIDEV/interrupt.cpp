@@ -65,15 +65,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     detachInterrupt(pin);
     GPIO::close(pin);
 
-    try {
-        irqChipCache.openDevice();
-    }
-    catch (GPIOException& exc) {
-        if (irqChipCache.chipInitialized) {
-            throw exc;
-            return 0;
-        }
-        irqChipCache.chip = "/dev/gpiochip0";
+    if (!irqChipCache.chipInitialized) {
         irqChipCache.openDevice();
     }
 

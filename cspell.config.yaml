@@ -142,6 +142,7 @@ words:
   - ldiaz
   - libboost
   - libc
+  - libgpiod
   - libmaple
   - libncurses
   - librf
