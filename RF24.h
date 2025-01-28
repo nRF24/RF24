@@ -215,7 +215,8 @@ public:
      *
      * See [Related Pages](pages.html) for device specific information
      *
-     * @param _cepin The pin attached to Chip Enable on the RF module
+     * @param _cepin The pin attached to Chip Enable on the RF module.
+     * Review our [Linux general](rpi_general.md) doc for details about selecting pin numbers on Linux systems.
      * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
      * - For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for
@@ -290,7 +291,8 @@ public:
      * @param spiBus A pointer or reference to an instantiated SPI bus object.
      * The `_SPI` datatype is a "wrapped" definition that will represent
      * various SPI implementations based on the specified platform.
-     * @param _cepin The pin attached to Chip Enable on the RF module
+     * @param _cepin The pin attached to Chip Enable on the RF module.
+     * Review our [Linux general](rpi_general.md) doc for details about selecting pin numbers on Linux systems.
      * @param _cspin The pin attached to Chip Select (often labeled CSN) on the radio module.
      * - For the Arduino Due board, the [Arduino Due extended SPI feature](https://www.arduino.cc/en/Reference/DueExtendedSPI)
      * is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.

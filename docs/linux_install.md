@@ -24,13 +24,13 @@ Using CMake: (See the [instructions using CMake](using_cmake.md) for more inform
    ./install.sh
    ```
 
-   @warning 
+   @warning
    `SPIDEV` is now always selected as the default driver because
    all other Linux drivers are being removed in the future.
    See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
 
    It will also ask to install a python package named [pyRF24](https://github.com/nRF24/pyRF24).
-   This is not the same as the traditionally provided python wrappers as the pyRF24 package can be
+   This is not the same as the traditionally provided python wrappers because the pyRF24 package can be
    used independent of the C++ installed libraries. For more information on this newer python
    package, please check out [the pyRF24 documentation](https://nrf24.github.io/pyRF24/).
 4. Try an example from one of the libraries
@@ -76,7 +76,7 @@ See the [instructions using CMake](using_cmake.md) for more information and opti
    ./install.sh
    ```
 
-   @warning 
+   @warning
    `SPIDEV` is now always selected as the default driver because
    all other Linux drivers are being removed in the future.
    See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.
@@ -115,7 +115,7 @@ See the [instructions using CMake](using_cmake.md) for more information and opti
    ```
    It automatically detects device and build environment.
 
-   @warning 
+   @warning
    `SPIDEV` is now always selected as the default driver because
    all other Linux drivers are being removed in the future.
    See [RF24 issue #971](https://github.com/nRF24/RF24/issues/971) for rationale.

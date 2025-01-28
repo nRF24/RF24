@@ -134,6 +134,7 @@ words:
   - iomanip
   - ITSYBITSY
   - Jannis
+  - Jetson
   - jscrane
   - KBPS
   - Konde
@@ -142,6 +143,7 @@ words:
   - ldiaz
   - libboost
   - libc
+  - libgpiod
   - libmaple
   - libncurses
   - librf

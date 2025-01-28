@@ -75,15 +75,7 @@ GPIO::~GPIO()
 
 void GPIO::open(rf24_gpio_pin_t port, int DDR)
 {
-    try {
-        gpioCache.openDevice();
-    }
-    catch (GPIOException& exc) {
-        if (gpioCache.chipInitialized) {
-            throw exc;
-            return;
-        }
-        gpioCache.chip = "/dev/gpiochip0";
+    if (!gpioCache.chipInitialized) {
         gpioCache.openDevice();
     }
 

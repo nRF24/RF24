@@ -135,6 +135,12 @@ SHOW_FILES             = YES
 
 SHOW_NAMESPACES        = NO
 
+# Don't display the ugly/complicated "tree view" side menu.
+# And, restore the top (simpler) navigation bar.
+# As of doxygen v1.13.0, these default values changed from NO to YES
+GENERATE_TREEVIEW      = NO
+DISABLE_INDEX          = NO
+
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
