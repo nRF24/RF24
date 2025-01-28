@@ -64,7 +64,7 @@ Choose any GPIO output pin for radio CE pin.
 
 ### Linux kernel (SPIDEV driver) and the GPIO chip number
 
-This library, as of v1.4.9, uses the Linux kernel's Character Device API to interface
+This RF24 library, as of v1.4.9, uses the Linux kernel's Character Device API to interface
 with GPIO pins (AKA "lines" in kernel docs). Previous versions used the deprecated "sys fs" interface.
 
 By default, this library attempts to use pins exposed via `/dev/gpiochip0`.
