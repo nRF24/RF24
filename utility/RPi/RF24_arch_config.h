@@ -29,8 +29,9 @@ typedef uint8_t rf24_gpio_pin_t;
 
 #ifndef RF24_LINUX_GPIO_CHIP
     /**
-     * The default GPIO chip to use.  Defaults to `/dev/gpiochip4` (for RPi5).
-     * Falls back to `/dev/gpiochip0` if this value is somehow incorrect.
+     * The default GPIO chip to use.
+     * Defaults to `/dev/gpiochip0`.
+     * Define this when compiling if this value is somehow incorrect.
      */
     #define RF24_LINUX_GPIO_CHIP "/dev/gpiochip0"
 #endif
