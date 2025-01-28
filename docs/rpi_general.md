@@ -55,7 +55,7 @@ Choose any GPIO output pin for radio CE pin.
 > those used on all Raspberry Pi models.
 >
 > For Raspberry Pi clones, such as Orange Pi or Banana Pi, defer to the pin numbers described
-> in the corresponding documentation.
+> in their corresponding documentation/manual.
 >
 > Hint: If libgpiod is installed (not required for this library),
 > then you can use the included
@@ -63,10 +63,13 @@ Choose any GPIO output pin for radio CE pin.
 > to gleam system-specific details.
 
 ### Linux kernel (SPIDEV driver) and the GPIO chip number
+
 This library, as of v1.4.9, uses the Linux kernel's Character Device API to interface
-with GPIO pins. Previous versions used the deprecated "sys fs" interface.
+with GPIO pins (AKA "lines" in kernel docs). Previous versions used the deprecated "sys fs" interface.
+
 By default, this library attempts to use pins exposed via `/dev/gpiochip0`.
-If your system exposes the GPIO pins via a different chip (ie `/dev/gpiochip4`), then the
+Some systems have multiple public-facing GPIO chips integrated (ie nVidia Jetson series).
+If your system exposes the desired GPIO pins via a different chip (ie `/dev/gpiochip4`), then the
 `RF24_LINUX_GPIO_CHIP` can be set to the correct value when compiling the library.
 
 ```shell
