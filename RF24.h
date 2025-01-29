@@ -168,11 +168,10 @@ private:
     {
         bool enabled;        // Indicates if the buffer is enabled
         bool data_available; // Indicates if data is available in the buffer
-        uint8_t size;        // Size of the buffer data
+        uint8_t size;        // Buffer data size
         uint8_t buffer[32];  // Fixed-size buffer memory (maximum 32 bytes)
     };
     pipe_buffer pipe_buffers[6]; // 6 pipes, 0-5
-
 #endif // defined(RF24_SOFTWARE_BUFFER)
 
 protected:
@@ -592,7 +591,6 @@ public:
     void openReadingPipe(uint8_t number, const uint8_t* address);
 
 #if defined(RF24_SOFTWARE_BUFFER)
-
     /**
      * @brief Handles incoming data for all enabled pipes.
      *
@@ -626,9 +624,10 @@ public:
      * @param buf Pointer to the buffer where the read data will be stored.
      * @param len The number of bytes to read.
      * @param pipe_num The pipe number (0-5) from which to read data.
+     *
+     * @note This function flushes the pipe buffer before enabling it.
      */
     void readPipeBuffer(uint8_t pipe_num, void* buf, uint8_t len);
-
 #endif // defined(RF24_SOFTWARE_BUFFER)
 
     /**@}*/
@@ -1328,6 +1327,27 @@ public:
      */
     uint8_t flush_rx(void);
 
+#if defined(RF24_SOFTWARE_BUFFER)
+    /**
+     * @brief Flushes the buffers of all enabled pipes.
+     *
+     * This function iterates through all six pipes and clears the buffer
+     * of each enabled pipe. It resets the buffer content, size, and
+     * data availability flag.
+     */
+    void flushPipeBuffer(void);
+
+    /**
+     * @brief Flushes the buffer for a specific pipe.
+     *
+     * This function clears the buffer associated with the specified pipe number,
+     * resetting its contents, size, and data availability flag.
+     *
+     * @param pipe_num The number of the pipe to flush (0-5).
+     */
+    void flushPipeBuffer(uint8_t pipe_num);
+#endif // defined(RF24_SOFTWARE_BUFFER)
+
     /**
      * Test whether there was a carrier on the line for the
      * previous listening period.
@@ -1887,6 +1907,8 @@ public:
      * This function enables the buffer for the given pipe number, allowing data to be received on that pipe.
      *
      * @param pipe_num The number of the pipe to enable the buffer for. Valid values are 0-5.
+     *
+     * @note This function flushes the pipe buffer before enabling it.
      */
     void enablePipeBuffer(uint8_t pipe_num);
 
@@ -1896,8 +1918,21 @@ public:
      * This function disables the buffer for the given pipe number, preventing data from being received on that pipe.
      *
      * @param pipe_num The number of the pipe to disable the buffer for. Valid values are 0-5.
+     *
+     * @note This function flushes the pipe buffer before disabling it.
      */
     void disablePipeBuffer(uint8_t pipe_num);
+
+    /**
+     * @brief Check if the software buffer for a specific pipe is enabled.
+     *
+     * This function checks whether the software buffer for a given pipe number
+     * is currently enabled or not.
+     *
+     * @param pipe_num The pipe number to check (0-5).
+     * @return bool Returns true if the pipe buffer is enabled, false otherwise.
+     */
+    bool isPipeBufferEnabled(uint8_t pipe_num);
 #endif // defined(RF24_SOFTWARE_BUFFER)
 
     /**@}*/

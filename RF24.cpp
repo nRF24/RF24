@@ -560,6 +560,36 @@ uint8_t RF24::sprintf_address_register(char* out_buffer, uint8_t reg, uint8_t qt
 #endif // !defined(MINIMAL)
 
 /****************************************************************************/
+#if defined(RF24_SOFTWARE_BUFFER)
+void RF24::flushPipeBuffer(void)
+{
+    // Flush the enabled pipe's buffer
+    for (int i = 0; i < 6; i++) {
+        if (pipe_buffers[i].enabled) {
+            memset(pipe_buffers[i].buffer, 0, sizeof(pipe_buffers[i].buffer));
+            pipe_buffers[i].size = 0;
+            pipe_buffers[i].data_available = false;
+        }
+    }
+}
+
+/****************************************************************************/
+
+void RF24::flushPipeBuffer(uint8_t pipe_num)
+{
+    // Check if the pipe number is valid
+    if (pipe_num > 5) {
+        return;
+    }
+
+    // Flush the pipe buffer
+    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
+    pipe_buffers[pipe_num].size = 0;
+    pipe_buffers[pipe_num].data_available = false;
+}
+#endif // defined(RF24_SOFTWARE_BUFFER)
+
+/****************************************************************************/
 
 RF24::RF24(rf24_gpio_pin_t _cepin, rf24_gpio_pin_t _cspin, uint32_t _spi_speed)
     : ce_pin(_cepin),
@@ -613,13 +643,8 @@ void RF24::_init_obj()
     }
 
 #if defined(RF24_SOFTWARE_BUFFER)
-    // Initialize pipe buffers
-    for (int i = 0; i < 6; i++) {
-        pipe_buffers[i].enabled = false;
-        pipe_buffers[i].data_available = false;
-        pipe_buffers[i].size = 0;
-        memset(pipe_buffers[i].buffer, 0, sizeof(pipe_buffers[i].buffer));
-    }
+    // flush all pipe's buffer
+    flushPipeBuffer();
 #endif // defined(RF24_SOFTWARE_BUFFER)
 }
 
@@ -1580,10 +1605,8 @@ void RF24::readPipeBuffer(uint8_t pipe_num, void* buf, uint8_t len)
     len = rf24_min(len, pipe_buffers[pipe_num].size);
     // Copy data to user buffer
     memcpy(buf, pipe_buffers[pipe_num].buffer, len);
-    // Clear the pipe buffer
-    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
-    // Mark data as read
-    pipe_buffers[pipe_num].data_available = false;
+    // Flush the pipe buffer
+    flushPipeBuffer(pipe_num);
 }
 
 /****************************************************************************/
@@ -1595,11 +1618,9 @@ void RF24::enablePipeBuffer(uint8_t pipe_num)
         return;
     }
 
-    // Initialize the pipe buffer
+    // Flush the pipe buffer
+    flushPipeBuffer(pipe_num);
     pipe_buffers[pipe_num].enabled = true;
-    pipe_buffers[pipe_num].data_available = false;
-    pipe_buffers[pipe_num].size = 0;
-    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
 }
 
 /****************************************************************************/
@@ -1611,11 +1632,20 @@ void RF24::disablePipeBuffer(uint8_t pipe_num)
         return;
     }
 
-    // Reset the pipe buffer
+    // Flush the pipe buffer
+    flushPipeBuffer(pipe_num);
     pipe_buffers[pipe_num].enabled = false;
-    pipe_buffers[pipe_num].data_available = false;
-    pipe_buffers[pipe_num].size = 0;
-    memset(pipe_buffers[pipe_num].buffer, 0, sizeof(pipe_buffers[pipe_num].buffer));
+}
+
+/****************************************************************************/
+
+bool RF24::isPipeBufferEnabled(uint8_t pipe_num)
+{
+    // Check if the pipe number is valid
+    if (pipe_num > 5) {
+        return false;
+    }
+    return pipe_buffers[pipe_num].enabled;
 }
 
 /****************************************************************************/
