@@ -42,9 +42,7 @@ public:
 /// This struct's destructor should close any cached GPIO pin requests' file descriptors.
 struct GPIOChipCache
 {
-    const char* chip = RF24_LINUX_GPIO_CHIP;
     int fd = -1;
-    bool chipInitialized = false;
 
     /// Open the File Descriptor for the GPIO chip
     void openDevice();

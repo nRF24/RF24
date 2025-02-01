@@ -65,9 +65,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     detachInterrupt(pin);
     GPIO::close(pin);
 
-    if (!irqChipCache.chipInitialized) {
-        irqChipCache.openDevice();
-    }
+    irqChipCache.openDevice();
 
     // get chip info
     gpiochip_info info;
@@ -75,13 +73,13 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     int ret = ioctl(irqChipCache.fd, GPIO_GET_CHIPINFO_IOCTL, &info);
     if (ret < 0) {
         std::string msg = "[attachInterrupt] Could not gather info about ";
-        msg += irqChipCache.chip;
+        msg += RF24_LINUX_GPIO_CHIP;
         throw IRQException(msg);
         return 0;
     }
 
     if (pin > info.lines) {
-        std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + irqChipCache.chip;
+        std::string msg = "[attachInterrupt] pin " + std::to_string(pin) + " is not available on " + RF24_LINUX_GPIO_CHIP;
         throw IRQException(msg);
         return 0;
     }

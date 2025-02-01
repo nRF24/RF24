@@ -24,17 +24,16 @@ struct gpio_v2_line_values data;
 void GPIOChipCache::openDevice()
 {
     if (fd < 0) {
-        fd = open(chip, O_RDONLY);
+        fd = open(RF24_LINUX_GPIO_CHIP, O_RDONLY);
         if (fd < 0) {
             std::string msg = "Can't open device ";
-            msg += chip;
+            msg += RF24_LINUX_GPIO_CHIP;
             msg += "; ";
             msg += strerror(errno);
             throw GPIOException(msg);
             return;
         }
     }
-    chipInitialized = true;
 }
 
 void GPIOChipCache::closeDevice()
@@ -75,9 +74,7 @@ GPIO::~GPIO()
 
 void GPIO::open(rf24_gpio_pin_t port, int DDR)
 {
-    if (!gpioCache.chipInitialized) {
-        gpioCache.openDevice();
-    }
+    gpioCache.openDevice();
 
     // get chip info
     gpiochip_info info;
@@ -85,13 +82,13 @@ void GPIO::open(rf24_gpio_pin_t port, int DDR)
     int ret = ioctl(gpioCache.fd, GPIO_GET_CHIPINFO_IOCTL, &info);
     if (ret < 0) {
         std::string msg = "Could not gather info about ";
-        msg += gpioCache.chip;
+        msg += RF24_LINUX_GPIO_CHIP;
         throw GPIOException(msg);
         return;
     }
 
     if (port > info.lines) {
-        std::string msg = "pin number " + std::to_string(port) + " not available for " + gpioCache.chip;
+        std::string msg = "pin number " + std::to_string(port) + " not available for " + RF24_LINUX_GPIO_CHIP;
         throw GPIOException(msg);
         return;
     }
