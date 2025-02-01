@@ -120,21 +120,24 @@ $(function(){ initResizable(false); });
     <a href="#autotoc_md251">Connections and Pin Configuration</a>
     <ul>
       <li class="level2">
-        <a href="#autotoc_md252">General</a>
+        <a href="#autotoc_md252">Linux kernel (SPIDEV driver) and the GPIO chip number</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md253">MRAA Constructor</a>
+        <a href="#autotoc_md253">General</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md254">SPI_DEV Constructor</a>
+        <a href="#autotoc_md254">MRAA Constructor</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md255">Pins</a>
+        <a href="#autotoc_md255">SPI_DEV Constructor</a>
+      </li>
+      <li class="level2">
+        <a href="#autotoc_md256">Pins</a>
       </li>
     </ul>
   </li>
   <li class="level1">
-    <a href="#autotoc_md256">brief history of RF24 library lineage</a>
+    <a href="#autotoc_md257">brief history of RF24 library lineage</a>
   </li>
 </ul>
 </div>
@@ -169,18 +172,28 @@ Connections and Pin Configuration</h1>
 <div class="ttc" id="aclassRF24_html"><div class="ttname"><a href="classRF24.html">RF24</a></div><div class="ttdoc">Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.</div><div class="ttdef"><b>Definition</b> <a href="RF24_8h_source.html#l00135">RF24.h:136</a></div></div>
 </div><!-- fragment --><p>for proper constructor to address the correct spi device at /dev/spidev&lt;a&gt;.&lt;b&gt;</p>
 <p>Choose any GPIO output pin for radio CE pin.</p>
+<dl class="section warning"><dt>Warning</dt><dd>The pin numbers may be different for certain systems. In this library's examples, we use the BCM pin numbers for BroadCom chips such as those used on all Raspberry Pi models. <br  />
+<br  />
+ For Raspberry Pi clones, such as Orange Pi or Banana Pi, defer to the pin numbers described in their corresponding documentation/manual. <br  />
+<br  />
+ Hint: If libgpiod is installed (not required for this library), then you can use the included <a href="https://libgpiod.readthedocs.io/en/latest/gpio_tools.html">CLI tools shipped with libgpiod</a> to gleam system-specific details.</dd></dl>
 <h2><a class="anchor" id="autotoc_md252"></a>
-General</h2>
-<div class="fragment"><div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(22,0);</div>
+Linux kernel (SPIDEV driver) and the GPIO chip number</h2>
+<p>This <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library, as of v1.4.9, uses the Linux kernel's Character Device API to interface with GPIO pins (AKA "lines" in kernel docs). Previous versions used the deprecated "sys fs" interface.</p>
+<p>By default, this library attempts to use pins exposed via <code>/dev/gpiochip0</code>. Some systems have multiple public-facing GPIO chips integrated (ie nVidia Jetson series). If your system exposes the desired GPIO pins via a different chip (ie <code>/dev/gpiochip4</code>), then the <code>RF24_LINUX_GPIO_CHIP</code> can be set to the correct value when compiling the library.</p>
+<div class="fragment"><div class="line">cmake .. -DRF24_LINUX_GPIO_CHIP=&quot;/dev/gpiochip4&quot;</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md253"></a>
+General</h2>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(22, 0);</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md254"></a>
 MRAA Constructor</h2>
-<div class="fragment"><div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(15,0);</div>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(15, 0);</div>
 </div><!-- fragment --><p>See <a href="http://iotdk.intel.com/docs/master/mraa/rasppi.html">the MRAA documentation for Raspberry Pi support</a></p>
-<h2><a class="anchor" id="autotoc_md254"></a>
+<h2><a class="anchor" id="autotoc_md255"></a>
 SPI_DEV Constructor</h2>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classRF24.html">RF24</a> radio(22, 0);</div>
 </div><!-- fragment --><p>See <a href="https://www.raspberrypi.com/documentation/computers/os.html#gpio-and-the-40-pin-header">the Raspberry Pi documentation about the GPIO pins</a></p>
-<h2><a class="anchor" id="autotoc_md255"></a>
+<h2><a class="anchor" id="autotoc_md256"></a>
 Pins</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -202,7 +215,7 @@ Pins</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">8   </td><td class="markdownTableBodyNone">IRQ   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md256"></a>
+<h1><a class="anchor" id="autotoc_md257"></a>
 brief history of RF24 library lineage</h1>
 <p>Based on the arduino lib from <a href="maniacbug@ymail.com">J. Coliz</a>, the library was berryfied by <a href="purinda@gmail.com">Purinda Gunasekara</a> then forked from github <a href="https://github.com/stanleyseow/RF24">stanleyseow/RF24</a> to <a href="https://github.com/jscrane/RF24-rpi">jscrane/RF24-rpi</a></p>
 <p>Network lib also based on <a href="https://github.com/farconada/RF24Network">farconada/RF24Network</a> </p>
@@ -210,7 +223,7 @@ brief history of RF24 library lineage</h1>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jan 10 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
+Generated on Sat Feb 1 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
 </small></address>
 </div><!-- doc-content -->
 </body>

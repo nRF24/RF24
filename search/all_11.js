@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['general_0',['General',['../md_docs_2rpi__general.html#autotoc_md252',1,'General'],['../group__Porting__General.html',1,'Porting: General']]],
+  ['general_0',['General',['../md_docs_2rpi__general.html#autotoc_md253',1,'General'],['../group__Porting__General.html',1,'Porting: General']]],
   ['general_20µc_20pin_20layout_1',['General µC Pin layout',['../index.html#autotoc_md227',1,'']]],
   ['general_20raspberry_20pi_2',['Linux General/Raspberry Pi',['../md_docs_2rpi__general.html',1,'']]],
   ['getarc_3',['getARC',['../classRF24.html#a54b26abd1846e5080a0439ee372f3b8b',1,'RF24']]],
@@ -47,6 +47,7 @@ var searchData=
   ['github_20com_20nrf24_20rf24_20compare_20v1_204_209_20v1_204_2010_201_204_2010_20a_202024_2010_2006_44',['&lt;a href=&quot;https://github.com/nRF24/RF24/compare/v1.4.9...v1.4.10&quot; &gt;1.4.10&lt;/a&gt; - 2024-10-06',['../md_CHANGELOG.html#autotoc_md5',1,'']]],
   ['goals_45',['Design Goals',['../index.html#autotoc_md221',1,'']]],
   ['gpio_46',['GPIO',['../group__Porting__GPIO.html#ga872483872ed4d11f46192619106a188c',1,'GPIO():&#160;gpio.h'],['../group__Porting__GPIO.html',1,'Porting: GPIO']]],
-  ['gpio_2eh_47',['gpio.h',['../gpio_8h.html',1,'']]],
-  ['guidelines_48',['Contributing guidelines',['../md_CONTRIBUTING.html',1,'']]]
+  ['gpio_20chip_20number_47',['Linux kernel (SPIDEV driver) and the GPIO chip number',['../md_docs_2rpi__general.html#autotoc_md252',1,'']]],
+  ['gpio_2eh_48',['gpio.h',['../gpio_8h.html',1,'']]],
+  ['guidelines_49',['Contributing guidelines',['../md_CONTRIBUTING.html',1,'']]]
 ];

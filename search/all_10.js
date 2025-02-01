@@ -20,6 +20,6 @@ var searchData=
   ['for_20the_20rp2040_17',['Raspberry Pi Pico SDK (for the RP2040)',['../md_docs_2pico__sdk.html',1,'']]],
   ['for_20the_20spi_20bus_18',['Using different pins for the SPI bus',['../md_docs_2pico__sdk.html#autotoc_md234',1,'']]],
   ['free_20to_20use_20for_20application_19',['ATtiny25/45/85 Pin map with CE_PIN 3 and CSN_PIN 3 - PB3 and PB4 are free to use for application',['../md_docs_2attiny.html#autotoc_md207',1,'']]],
-  ['from_20source_20code_20',['Building from source code',['../md_docs_2using__cmake.html#autotoc_md260',1,'']]],
+  ['from_20source_20code_20',['Building from source code',['../md_docs_2using__cmake.html#autotoc_md261',1,'']]],
   ['function_20do_20i_20use_21',['Which write*() function do I use?',['../md_COMMON__ISSUES.html#autotoc_md185',1,'']]]
 ];

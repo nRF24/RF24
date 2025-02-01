@@ -111,32 +111,32 @@ $(function(){ initResizable(false); });
 <div class="toc"><h3>Table of Contents</h3>
 <ul>
   <li class="level1">
-    <a href="#autotoc_md258">Installing the library</a>
+    <a href="#autotoc_md259">Installing the library</a>
     <ul>
       <li class="level2">
-        <a href="#autotoc_md259">Automatic Installation</a>
+        <a href="#autotoc_md260">Automatic Installation</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md260">Building from source code</a>
+        <a href="#autotoc_md261">Building from source code</a>
       </li>
       <li class="level2">
-        <a href="#autotoc_md261">Using a package manager</a>
+        <a href="#autotoc_md262">Using a package manager</a>
       </li>
     </ul>
   </li>
   <li class="level1">
-    <a href="#autotoc_md262">Cross-compiling the library</a>
+    <a href="#autotoc_md263">Cross-compiling the library</a>
     <ul>
       <li class="level2">
-        <a href="#autotoc_md263">Installing the library remotely</a>
+        <a href="#autotoc_md264">Installing the library remotely</a>
       </li>
     </ul>
   </li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="autotoc_md257"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md258"></a></p>
 <p>A more modern approach instead of using hand-crafted <em>Makefiles</em> &amp; <em>configure</em> scripts to build &amp; install software. Please note that these instructions are not needed if you have already installed the library using <a class="el" href="md_docs_2linux__install.html">these older instructions</a></p>
-<h1><a class="anchor" id="autotoc_md258"></a>
+<h1><a class="anchor" id="autotoc_md259"></a>
 Installing the library</h1>
 <p>You can install the library in a few different ways.</p>
 <ul>
@@ -148,7 +148,7 @@ Installing the library</h1>
 <div class="line">sudo rm -r /usr/local/include/RF24</div>
 </div><!-- fragment --></dd></dl>
 <p>The <em>librf24-bcm.so</em> file may not exist if you used CMake to install the library.</p>
-<h2><a class="anchor" id="autotoc_md259"></a>
+<h2><a class="anchor" id="autotoc_md260"></a>
 Automatic Installation</h2>
 <p>There is a newer automatic install script that makes use of the CMake approach.</p>
 <ol type="1">
@@ -168,7 +168,7 @@ Automatic Installation</h2>
 </div><!-- fragment --><p class="startli">Run the example </p><div class="fragment"><div class="line">sudo ./gettingstarted</div>
 </div><!-- fragment --></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md260"></a>
+<h2><a class="anchor" id="autotoc_md261"></a>
 Building from source code</h2>
 <ol type="1">
 <li><p class="startli">Install prerequisites if there are any (PiGPIO, WiringPi, MRAA, LittleWire libraries, and enable the SPI bus(es) in the OS).</p>
@@ -210,7 +210,7 @@ Building from source code</h2>
 <li>Run an example file <div class="fragment"><div class="line">sudo ./gettingstarted</div>
 </div><!-- fragment --></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md261"></a>
+<h2><a class="anchor" id="autotoc_md262"></a>
 Using a package manager</h2>
 <p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library now (as of v1.4.1) has pre-built packages (.deb or .rpm files) that can be installed on a Raspberry Pi. These packages can be found on the library's <a href="https://GitHub.com/nRF24/RF24/releases">GitHub release page</a></p>
 <ol type="1">
@@ -230,7 +230,7 @@ Using a package manager</h2>
 <div class="line">dpkg -i pkg_filename.deb</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md262"></a>
+<h1><a class="anchor" id="autotoc_md263"></a>
 Cross-compiling the library</h1>
 <p>The <a class="el" href="classRF24.html" title="Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver.">RF24</a> library comes with some pre-made toolchain files (located in the <em>RF24/cmake/toolchains</em> directory) to use in CMake. To use these toolchain files, additional command line options are needed when configuring CMake to build the library (step 5 in the above instructions to build from source).</p>
 <div class="fragment"><div class="line">cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake</div>
@@ -240,7 +240,7 @@ Cross-compiling the library</h1>
 <div class="line">make</div>
 <div class="line">sudo make install</div>
 </div><!-- fragment --><p>Remember to also specify the <code>RF24_DRIVER</code> option (via CLI or environment variable) if not using the auto-configuration feature (see step 5 in the above instructions to build from source).</p>
-<h2><a class="anchor" id="autotoc_md263"></a>
+<h2><a class="anchor" id="autotoc_md264"></a>
 Installing the library remotely</h2>
 <p>To install remotely, you can create an installable package file using CMake's built-in program called CPack.</p>
 <div class="fragment"><div class="line">cmake .. -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/armhf.cmake</div>
@@ -251,7 +251,7 @@ Installing the library remotely</h2>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jan 10 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
+Generated on Sat Feb 1 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
 </small></address>
 </div><!-- doc-content -->
 </body>

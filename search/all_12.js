@@ -6,7 +6,7 @@ var searchData=
   ['here_20are_20the_20most_20common_20issues_20and_20their_20solutions_3',['Here are the most common issues and their solutions',['../md_COMMON__ISSUES.html#autotoc_md186',1,'']]],
   ['high_4',['HIGH',['../group__Porting__General.html#ga5bb885982ff66a2e0a0a45a8ee9c35e2',1,'RF24_arch_config.h']]],
   ['high_20speed_20driver_20for_20nrf24l01_202_204ghz_20wireless_20transceiver_5',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]],
-  ['history_20of_20rf24_20library_20lineage_6',['brief history of RF24 library lineage',['../md_docs_2rpi__general.html#autotoc_md256',1,'']]],
+  ['history_20of_20rf24_20library_20lineage_6',['brief history of RF24 library lineage',['../md_docs_2rpi__general.html#autotoc_md257',1,'']]],
   ['hoped_20or_20the_20nrf_20radio_20works_20better_20on_20touching_20it_7',['My PA/LNA module doesn&apos;t perform as well as I&apos;d hoped or the NRF radio works better on touching it',['../md_COMMON__ISSUES.html#autotoc_md192',1,'']]],
   ['href_20https_3a_20github_20com_20nrf24_20rf24_20compare_20de083c964d9aeeb9fda7485c39fed27443cd617c_20v1_200_201_200_20a_202015_2010_2001_8',['&lt;a href=&quot;https://github.com/nRF24/RF24/compare/de083c964d9aeeb9fda7485c39fed27443cd617c...v1.0&quot; &gt;1.0&lt;/a&gt; - 2015-10-01',['../md_CHANGELOG.html#autotoc_md173',1,'']]],
   ['href_20https_3a_20github_20com_20nrf24_20rf24_20compare_20rf24v1_202_200_20v1_203_200_201_203_200_20a_202017_2006_2001_9',['&lt;a href=&quot;https://github.com/nRF24/RF24/compare/RF24v1.2.0...v1.3.0&quot; &gt;1.3.0&lt;/a&gt; - 2017-06-01',['../md_CHANGELOG.html#autotoc_md129',1,'']]],

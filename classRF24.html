@@ -349,7 +349,7 @@ Protected Attributes</h2></td></tr>
 <p>See <a href="pages.html">Related Pages</a> for device specific information</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">_cepin</td><td>The pin attached to Chip Enable on the RF module </td></tr>
+    <tr><td class="paramname">_cepin</td><td>The pin attached to Chip Enable on the RF module. Review our <a class="el" href="md_docs_2rpi__general.html">Linux general</a> doc for details about selecting pin numbers on Linux systems. </td></tr>
     <tr><td class="paramname">_cspin</td><td>The pin attached to Chip Select (often labeled CSN) on the radio module.<ul>
 <li>For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueExtendedSPI">Arduino Due extended SPI feature</a> is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin. </li>
 </ul>
@@ -631,7 +631,7 @@ Protected Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">spiBus</td><td>A pointer or reference to an instantiated SPI bus object. The <code>_SPI</code> datatype is a "wrapped" definition that will represent various SPI implementations based on the specified platform. </td></tr>
-    <tr><td class="paramname">_cepin</td><td>The pin attached to Chip Enable on the RF module </td></tr>
+    <tr><td class="paramname">_cepin</td><td>The pin attached to Chip Enable on the RF module. Review our <a class="el" href="md_docs_2rpi__general.html">Linux general</a> doc for details about selecting pin numbers on Linux systems. </td></tr>
     <tr><td class="paramname">_cspin</td><td>The pin attached to Chip Select (often labeled CSN) on the radio module.<ul>
 <li>For the Arduino Due board, the <a href="https://www.arduino.cc/en/Reference/DueExtendedSPI">Arduino Due extended SPI feature</a> is not supported. This means that the Due's pins 4, 10, or 52 are not mandated options (can use any digital output pin) for the radio's CSN pin.</li>
 </ul>
@@ -3046,7 +3046,7 @@ description when<br  />
 <div class="line">  report_failure();                       <span class="comment">// Blink LEDs, send a message, etc. to indicate failure</span></div>
 <div class="line">}</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01356">1356</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01358">1358</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
 
 </div>
 </div>
@@ -3069,7 +3069,7 @@ description when<br  />
 </ol>
 <dl class="section warning"><dt>Warning</dt><dd>If set to 0, ensure 130uS delay after <a class="el" href="#a6f144d73fc447c8ac2d1a4166210fd88">stopListening()</a> and before any sends </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01765">1765</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01767">1767</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
 
 </div>
 </div>
@@ -3088,7 +3088,7 @@ description when<br  />
 <p>This is intended to minimize the speed of SPI polling due to radio commands</p>
 <p>If using interrupts or timed requests, this can be set to 0 Default:5 </p>
 
-<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01775">1775</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RF24_8h_source.html#l01777">1777</a> of file <a class="el" href="RF24_8h_source.html">RF24.h</a>.</p>
 
 </div>
 </div>
@@ -3099,7 +3099,7 @@ description when<br  />
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jan 10 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
+Generated on Sat Feb 1 2025 for Optimized high speed nRF24L01+ driver class documentation by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
 </small></address>
 </div><!-- doc-content -->
 </body>

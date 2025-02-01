@@ -28,7 +28,8 @@ var searchData=
   ['dpl_5fp4_25',['DPL_P4',['../nRF24L01_8h.html#a7fc41c509a5885a7199535d72f8223bf',1,'nRF24L01.h']]],
   ['dpl_5fp5_26',['DPL_P5',['../nRF24L01_8h.html#a8907dbd1fe9dfedbaf8824dbfcfd4f65',1,'nRF24L01.h']]],
   ['driven_20spi_27',['Driven SPI',['../md_docs_2arduino.html#autotoc_md197',1,'Alternate Hardware (UART) Driven SPI'],['../md_docs_2arduino.html#autotoc_md196',1,'Software Driven SPI']]],
-  ['driver_20for_20nrf24l01_202_204ghz_20wireless_20transceiver_28',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]],
-  ['dynamic_5fpayloads_5fenabled_29',['dynamic_payloads_enabled',['../classRF24.html#a407a65859ccce346445041b4d2fb51e8',1,'RF24']]],
-  ['dynpd_30',['DYNPD',['../nRF24L01_8h.html#ae79cde384e0b6a5549efb001589a79ec',1,'nRF24L01.h']]]
+  ['driver_20and_20the_20gpio_20chip_20number_28',['Linux kernel (SPIDEV driver) and the GPIO chip number',['../md_docs_2rpi__general.html#autotoc_md252',1,'']]],
+  ['driver_20for_20nrf24l01_202_204ghz_20wireless_20transceiver_29',['Optimized High Speed Driver for nRF24L01(+) 2.4GHz Wireless Transceiver',['../index.html',1,'']]],
+  ['dynamic_5fpayloads_5fenabled_30',['dynamic_payloads_enabled',['../classRF24.html#a407a65859ccce346445041b4d2fb51e8',1,'RF24']]],
+  ['dynpd_31',['DYNPD',['../nRF24L01_8h.html#ae79cde384e0b6a5549efb001589a79ec',1,'nRF24L01.h']]]
 ];
