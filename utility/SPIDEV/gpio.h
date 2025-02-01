@@ -25,7 +25,7 @@ typedef uint16_t rf24_gpio_pin_t;
      * The default GPIO chip to use.  Defaults to `/dev/gpiochip4` (for RPi5).
      * Falls back to `/dev/gpiochip0` if this value is somehow incorrect.
      */
-    #define RF24_LINUX_GPIO_CHIP "/dev/gpiochip4"
+    #define RF24_LINUX_GPIO_CHIP "/dev/gpiochip0"
 #endif
 
 /** Specific exception for GPIO errors */
@@ -42,9 +42,14 @@ public:
 /// This struct's destructor should close any cached GPIO pin requests' file descriptors.
 struct GPIOChipCache
 {
-    const char* chip = RF24_LINUX_GPIO_CHIP;
-    int fd = -1;
-    bool chipInitialized = false;
+    /// @brief The file descriptor used to access the GPIO chip.
+    ///
+    /// This is used to open/close pins exposed by the GPIO chip specified via
+    /// `RF24_LINUX_GPIO_CHIP`.
+    ///
+    /// Because this member is static, all instances (& derivative instances) of this
+    /// struct use the same file descriptor.
+    static int fd;
 
     /// Open the File Descriptor for the GPIO chip
     void openDevice();
