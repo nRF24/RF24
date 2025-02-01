@@ -21,6 +21,9 @@ std::map<rf24_gpio_pin_t, gpio_fd> cachedPins;
 struct gpio_v2_line_request request;
 struct gpio_v2_line_values data;
 
+// initialize static member.
+int GPIOChipCache::fd = -1;
+
 void GPIOChipCache::openDevice()
 {
     if (fd < 0) {

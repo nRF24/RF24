@@ -42,7 +42,14 @@ public:
 /// This struct's destructor should close any cached GPIO pin requests' file descriptors.
 struct GPIOChipCache
 {
-    int fd = -1;
+    /// @brief The file descriptor used to access the GPIO chip.
+    ///
+    /// This is used to open/close pins exposed by the GPIO chip specified via
+    /// `RF24_LINUX_GPIO_CHIP`.
+    ///
+    /// Because this member is static, all instances (& derivative instances) of this
+    /// struct use the same file descriptor.
+    static int fd;
 
     /// Open the File Descriptor for the GPIO chip
     void openDevice();
