@@ -9,6 +9,7 @@ set(EXAMPLES_LIST
     multiceiverDemo
     scanner
     interruptConfigure
+    fakeBLE
 )
 
 # generate a compilation database for static analysis by clang-tidy
