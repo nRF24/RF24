@@ -48,12 +48,13 @@ struct PayloadStruct {
 };
 PayloadStruct payload;  // instantiate the payload
 
+const uint8_t PACKET_LEN = 32;
 // we need a buffer to manipulate the data without altering the payload values
-uint8_t packet[32];  // allocate 32 bytes for copying the payload data
+uint8_t packet[PACKET_LEN];  // allocate 32 bytes for copying the payload data
 
-void temperatureData(float celcius);
+void temperatureData(float celsius);
 void crc(uint8_t *data, uint8_t len, uint8_t *checksum);
-void swapbuf(uint8_t *data, uint8_t len);
+void swapBuf(uint8_t *data, uint8_t len);
 void whiten(uint8_t *data, uint8_t len);
 
 void setup() {
@@ -89,12 +90,14 @@ void setup() {
 
   memcpy(packet, &payload, 32);
   crc(packet, 28, packet + 29);
-  for (uint8_t i = 0; i < 32; ++i) {
-    Serial.print("packet[");
-    Serial.print(i);
-    Serial.print("]");
-    Serial.println(packet[i], HEX);
+  Serial.print(F("packet: ["));
+  for (uint8_t i = 0; i < PACKET_LEN; ++i) {
+    Serial.print(packet[i], HEX);
+    if (i < (PACKET_LEN - 1)) {
+      Serial.print(F(" "));
+    }
   }
+  Serial.println(F("]"));
 
   // Set the PA Level low to try preventing power supply related problems
   // because these examples are likely run with nodes in close proximity to
@@ -121,13 +124,13 @@ void loop() {
 
   // set the service data
   payload.batteryPercent = 85;  // must be a percentage in range [0, 100]
-  temperatureData(42.0);        // degree of percision = 2 decimal places
+  temperatureData(42.0);        // degree of precision = 2 decimal places
 
   // prepare the payload for BLE compliance
   memcpy(packet, &payload, 32);  // copy payload to a temporary buffer
   crc(packet, 29, packet + 29);  // calculate checksum
   whiten(packet, 32);            // whiten (to avoid repeating bit patterns OTA)
-  swapbuf(packet, 32);           // reverse the bit order
+  swapBuf(packet, 32);           // reverse the bit order
 
   // broadcast advertisement payload
   if (radio.write(&packet, 32)) {
@@ -149,9 +152,9 @@ void loop() {
 }
 
 // set the temperature as a 4 byte float
-void temperatureData(float celcius) {
+void temperatureData(float celsius) {
   payload.temperatureInC[3] = ((int8_t)(-2) & 0xFF);  // exponent
-  int32_t base = (int32_t)(celcius * 100);
+  int32_t base = (int32_t)(celsius * 100);
   payload.temperatureInC[2] = (base & 0xFF0000) >> 16;
   payload.temperatureInC[1] = (base & 0xFF00) >> 8;
   payload.temperatureInC[0] = (base & 0xFF);
@@ -177,15 +180,19 @@ void crc(uint8_t *data, uint8_t len, uint8_t *dst) {
       }
     }
   }
+  swapBuf(dst, 3);
+
+  // Serial.print(F("crc: ["));
   // for (uint8_t i = 0; i < 3; ++i) {
-  //   Serial.print("calc'd crc[");
-  //   Serial.print(i);
-  //   Serial.print("]");
-  //   Serial.println(dst[i], HEX);
+  //   Serial.print(packet[i], HEX);
+  //   if (i < 2) {
+  //     Serial.print(F(" "));
+  //   }
   // }
+  // Serial.println(F("]"));
 }
 
-void swapbuf(uint8_t *data, uint8_t len) {
+void swapBuf(uint8_t *data, uint8_t len) {
 
   uint8_t *buffer = data;
 
@@ -205,36 +212,39 @@ void swapbuf(uint8_t *data, uint8_t len) {
 
     *(buffer++) = v;
   }
-  // for (uint8_t i = 0; i < 31; ++i) {
-  //   Serial.print("swapped[");
-  //   Serial.print(i);
-  //   Serial.print("]");
-  //   Serial.println(packet[i], HEX);
+  // Serial.print(F("swapped: ["));
+  // for (uint8_t i = 0; i < PACKET_LEN; ++i) {
+  //   Serial.print(packet[i], HEX);
+  //   if (i < (PACKET_LEN - 1)) {
+  //     Serial.print(F(" "));
+  //   }
   // }
+  // Serial.println(F("]"));
 }
 
 /// whiten the payload so that there are less repeating bits (for OTA stability)
 void whiten(uint8_t *data, uint8_t len) {
 
-  // initialize LFSR with current channel, set bit 6
-  uint8_t lfsr = (currentChannel + 37) | 0x40;
+  // set whitening coefficient from current channel
+  uint8_t coefficient = (currentChannel + 37) | 0x40;
 
   while (len--) {
     uint8_t res = 0;
-    // LFSR in "wire bit order"
     for (uint8_t i = 1; i; i <<= 1) {
-      if (lfsr & 0x01) {
-        lfsr ^= 0x88;
+      if (coefficient & 0x01) {
+        coefficient ^= 0x88;
         res |= i;
       }
-      lfsr >>= 1;
+      coefficient >>= 1;
     }
     *(data++) ^= res;
   }
-  // for (uint8_t i = 0; i < 31; ++i) {
-  //   Serial.print("whitened[");
-  //   Serial.print(i);
-  //   Serial.print("]");
-  //   Serial.println(packet[i], HEX);
+  // Serial.print(F("whitened: ["));
+  // for (uint8_t i = 0; i < PACKET_LEN; ++i) {
+  //   Serial.print(packet[i], HEX);
+  //   if (i < (PACKET_LEN - 1)) {
+  //     Serial.print(F(" "));
+  //   }
   // }
+  // Serial.println(F("]"));
 }
