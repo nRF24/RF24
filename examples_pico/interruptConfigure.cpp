@@ -287,7 +287,7 @@ void loop()
  */
 void interruptHandler(uint gpio, uint32_t events)
 {
-    if (gpio != IRQ_PIN && !(events | GPIO_IRQ_EDGE_FALL)) {
+    if (gpio != IRQ_PIN && !(events & GPIO_IRQ_EDGE_FALL)) {
         // the gpio pin and event does not match the configuration we specified
         return;
     }

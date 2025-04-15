@@ -46,7 +46,7 @@ struct IrqPinCache
 int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void));
 
 /**
- * Will cancel the interrupt thread, close the filehandle and release the pin.
+ * Will cancel the interrupt thread and re-configure the pin for `digitalRead()` use.
  */
 int detachInterrupt(rf24_gpio_pin_t pin);
 
