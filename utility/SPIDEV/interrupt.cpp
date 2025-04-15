@@ -143,7 +143,7 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
 
     std::pair<std::map<rf24_gpio_pin_t, gpio_fd>::iterator, bool> gpioPair = irqChipCache.cachedPins.insert(std::pair<rf24_gpio_pin_t, gpio_fd>(pin, request.fd));
     if (!gpioPair.second) {
-        // this should not be reached, but indexPair.first needs to be the inserted map element
+        // this should not be reached, but gpioPair.first needs to be the inserted map element
         throw IRQException("[attachInterrupt] Could not cache the GPIO pin's file descriptor");
         return 0;
     }
