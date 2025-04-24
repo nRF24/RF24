@@ -1188,7 +1188,9 @@ void RF24::stopListening(void)
         powerUp();
     }
 #endif
-    write_register(RX_ADDR_P0, pipe0_writing_address, addr_width);
+    uint8_t tx_addr[addr_width];
+    read_register(TX_ADDR, tx_addr, addr_width);
+    write_register(RX_ADDR_P0, tx_addr, addr_width);
     write_register(EN_RXADDR, static_cast<uint8_t>(read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0])))); // Enable RX on pipe0
 }
 
@@ -1566,7 +1568,6 @@ void RF24::openWritingPipe(uint64_t value)
 
     write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), addr_width);
     write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), addr_width);
-    memcpy(pipe0_writing_address, &value, addr_width);
 }
 
 /****************************************************************************/
@@ -1577,7 +1578,6 @@ void RF24::openWritingPipe(const uint8_t* address)
     // expects it LSB first too, so we're good.
     write_register(RX_ADDR_P0, address, addr_width);
     write_register(TX_ADDR, address, addr_width);
-    memcpy(pipe0_writing_address, address, addr_width);
 }
 
 /****************************************************************************/
