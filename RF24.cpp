@@ -1188,7 +1188,7 @@ void RF24::stopListening(void)
         powerUp();
     }
 #endif
-    openWritingPipe(pipe0_writing_address);
+    write_register(RX_ADDR_P0, pipe0_writing_address, addr_width);
     write_register(EN_RXADDR, static_cast<uint8_t>(read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0])))); // Enable RX on pipe0
 }
 
