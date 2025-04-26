@@ -97,8 +97,8 @@ bool setup()
     radio.enableAckPayload();
     // Fot this example, we use the same address to send data back and forth
 
-    // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
+    // set the TX address of the RX node for use on the TX pipe (pipe 0)
+    memcpy(radio.txAddress, address[radioNumber], 5);
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1

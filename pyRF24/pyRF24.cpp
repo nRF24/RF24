@@ -39,6 +39,21 @@ int get_bytes_or_bytearray_ln(bp::object buf)
     return 0;
 }
 
+void set_tx_address(RF24& ref, bp::object buf)
+{
+    // set the TX address of the RX node for use on the TX pipe (pipe 0)
+    memcpy(ref.txAddress, get_bytes_or_bytearray_str(buf), get_bytes_or_bytearray_ln(buf));
+}
+
+bp::object get_tx_address(RF24& ref)
+{
+    char* buf = new char[6];
+    memcpy(buf, ref.txAddress, 5);
+    bp::object py_ba(bp::handle<>(PyByteArray_FromStringAndSize(buf, 5)));
+    delete[] buf;
+    return py_ba;
+}
+
 bp::object read_wrap(RF24& ref, int maxlen)
 {
     char* buf = new char[maxlen + 1];
@@ -328,6 +343,8 @@ BOOST_PYTHON_MODULE(RF24)
         .def("openReadingPipe", (void(::RF24::*)(::uint8_t, ::uint64_t))(&::RF24::openReadingPipe), (bp::arg("number"), bp::arg("address")))
         .def("openWritingPipe", &openWritingPipe_wrap, (bp::arg("address")))
         .def("openWritingPipe", (void(::RF24::*)(::uint64_t))(&::RF24::openWritingPipe), (bp::arg("address")))
+        .add_property("txAddress", &get_tx_address, &set_tx_address)
+        .add_property("tx_address", &get_tx_address, &set_tx_address)
         .def("powerDown", &RF24::powerDown)
         .def("powerUp", &RF24::powerUp)
         .def("printDetails", &RF24::printDetails)
