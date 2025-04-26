@@ -48,7 +48,7 @@ RF24 radio(CE_PIN, CSN_PIN);
 // Notice that the last byte is the only byte that changes in the last 5
 // addresses. This is a limitation of the nRF24L01 transceiver for pipes 2-5
 // because they use the same first 4 MSBytes from pipe 1.
-uint8_t address[6][6] = {{0x78, 0x78, 0x78, 0x78, 0x78},
+uint8_t address[6][5] = {{0x78, 0x78, 0x78, 0x78, 0x78},
                          {0xF1, 0xB6, 0xB5, 0xB4, 0xB3},
                          {0xCD, 0xB6, 0xB5, 0xB4, 0xB3},
                          {0xA3, 0xB6, 0xB5, 0xB4, 0xB3},
