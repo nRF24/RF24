@@ -158,6 +158,7 @@ private:
     uint8_t status;                   /* The status byte returned from every SPI transaction */
     uint8_t payload_size;             /* Fixed size of payloads */
     uint8_t pipe0_reading_address[5]; /* Last address set on pipe 0 for reading. */
+    uint8_t pipe0_writing_address[5]; /* Last address set on pipe 0 for writing. */
     uint8_t config_reg;               /* For storing the value of the NRF_CONFIG register */
     bool _is_p_variant;               /* For storing the result of testing the toggleFeatures() affect */
     bool _is_p0_rx;                   /* For keeping track of pipe 0's usage in user-triggered RX mode. */
@@ -351,9 +352,13 @@ public:
      * radio.write(&data, sizeof(data));
      * @endcode
      *
-     * @note When the ACK payloads feature is enabled, the TX FIFO buffers are
+     * @warning When the ACK payloads feature is enabled, the TX FIFO buffers are
      * flushed when calling this function. This is meant to discard any ACK
      * payloads that were not appended to acknowledgment packets.
+     *
+     * @note For auto-ack purposes, the TX address passed to openWritingPipe() will be restored to
+     * RX pipe 0. This still means that `stopListening()` shall be called before
+     * calling openWritingPipe() because the TX address is cached in openWritingPipe().
      */
     void stopListening(void);
 
@@ -522,10 +527,13 @@ public:
      * @see
      * - setAddressWidth()
      * - startListening()
+     * - stopListening()
      *
      * @param address The address to be used for outgoing transmissions (uses
      * pipe 0). Coordinate this address amongst other receiving nodes (the
-     * pipe numbers don't need to match).
+     * pipe numbers don't need to match). This address is cached to ensure proper
+     * auto-ack behavior; stopListening() will always restore the latest cached TX
+     * address.
      *
      * @remark There is no address length parameter because this function will
      * always write the number of bytes that the radio addresses are configured
