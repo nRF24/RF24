@@ -130,6 +130,91 @@ typedef enum
 
 /**
  * @}
+ * @defgroup StatusFlags Status flags
+ * @{
+ */
+
+/**
+ * @brief An enumeration of constants used to configure @ref StatusFlags
+ */
+typedef enum
+{
+#include "nRF24L01.h"
+    /// An alias of `0` to describe no IRQ events enabled.
+    RF24_IRQ_NONE = 0,
+    /// Represents an event where TX Data Failed to send.
+    RF24_TX_DF = 1 << MASK_MAX_RT,
+    /// Represents an event where TX Data Sent successfully.
+    RF24_TX_DS = 1 << TX_DS,
+    /// Represents an event where RX Data is Ready to `RF24::read()`.
+    RF24_RX_DR = 1 << RX_DR,
+    /// Equivalent to `RF24_RX_DR | RF24_TX_DS | RF24_TX_DF`.
+    RF24_IRQ_ALL = (1 << MASK_MAX_RT) | (1 << TX_DS) | (1 << RX_DR),
+} rf24_irq_flags_e;
+
+/**
+ * @brief A bit-field struct to represent the radio's STATUS byte.
+ */
+struct StatusFlags
+{
+    // starting with bit 0 at the top...
+    /// Signifies that the TX FIFO is fully occupied.
+    const bool tx_full() const;
+    /// @brief Represents the pipe number that received the first available payload in the RX FIFO.
+    /// @remark This data shall be considered invalid if the @ref StatusFlags::rx_dr flag is `false`.
+    const uint8_t rx_pipe() const;
+    /// Represents an event where TX Data Failed to send.
+    const bool tx_df() const;
+    /// Represents an event where TX Data Sent successfully.
+    const bool tx_ds() const;
+    /// Represents an event where RX Data is Ready to `RF24::read()`.
+    const bool rx_dr() const;
+
+    /**
+     * @brief Convert this struct to a human understandable string.
+     *
+     * ```cpp
+     * char buf[69] = {0};
+     * StatusFlags flags;
+     * flags.toString(buf);
+     * ```
+     *
+     * Afterward, printing the string in `buf` should read something similar to:
+     *
+     * > rx_dr: false, tx_ds: false, tx_df: false, rx_pipe: 7, tx_full: false
+     *
+     * @param[out] buf The string buffer into which the StatusFlags description is stored.
+     * This buffer needs to be at least 69 bytes long.
+     * @returns The amount of bytes altered in the given `buf` parameter.
+     */
+    int toString(char* buf) const;
+
+    /// The default initializer constructor.
+    /// @see Details about `StatusFlags::toString()` show an example output of default values.
+    StatusFlags() : value(0x0E) {};
+
+    /**
+     * @brief Set the StatusFlags using constants defined by @ref rf24_irq_flags_e
+     *
+     * @param bits This value shall be a value of @ref rf24_irq_flags_e.
+     * Enabling multiple flags can be done with bitwise OR operator (`|`).
+     *
+     * ```cpp
+     * // only enable the "RX Data Ready" event
+     * StatusFlags flags(RF24_RX_DR);
+     *
+     * // only enable the "TX Data Sent" and "TX Data Fail" events
+     * flags = StatusFlags(RF24_TX_DF | RF24_TX_DS);
+     * ```
+     */
+    StatusFlags(uint8_t bits) : value(bits) {};
+
+private:
+    const uint8_t value;
+};
+
+/**
+ * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 class RF24
@@ -1177,6 +1262,58 @@ public:
      * @endcode
      */
     void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
+
+    /**
+     * Clear the StatusFlags that caused an interrupt event.
+     *
+     * @remark This function is similar to `whatHappened()` because it also returns the
+     * StatusFlags that caused the interrupt event. However, this function returns
+     * a 1-byte struct (@ref StatusFlags) instead of bit-banging 3 1-byte booleans
+     * passed by reference.
+     *
+     * @note When used in an ISR (Interrupt Service routine), there is a chance that the
+     * @ref StatusFlags::rx_pipe() information is inaccurate. See available(uint8_t*) (or the
+     * datasheet) for more detail.
+     *
+     * @param flags The IRQ flags to clear. Default value is all of them (@ref RF24_IRQ_ALL).
+     * Multiple flags can be cleared by OR-ing @ref rf24_irq_flags_e values together.
+     *
+     * @ingroup StatusFlags
+     */
+    uint8_t clearStatusFlags(uint8_t flags = RF24_IRQ_ALL);
+
+    /**
+     * Set which flags shall be reflected on the radio's IRQ pin.
+     *
+     * This is similar to maskIRQ(), but with less confusing parameters.
+     *
+     * @param flags The value of @ref rf24_irq_flags_e to influence the radio's IRQ pin.
+     * The default value (@ref RF24_IRQ_NONE) will disable the radio's IRQ pin.
+     * Multiple events can be enabled by OR-ing @ref rf24_irq_flags_e values together.
+     *
+     * @ingroup StatusFlags
+     */
+    void setStatusFlags(uint8_t flags = RF24_IRQ_NONE);
+
+    /**
+     * Get the latest STATUS byte returned from the last SPI transaction.
+     *
+     * @note This does not actually perform any SPI transaction with the radio.
+     * Use `RF24::update()` instead to get a fresh copy of the Status flags at
+     * the slight cost of performance.
+     *
+     * @ingroup StatusFlags
+     */
+    uint8_t getStatusFlags();
+
+    /**
+     * Get an updated STATUS byte from the radio.
+     *
+     * @returns The StatusFlags fetched directly from the radio.
+     *
+     * @ingroup StatusFlags
+     */
+    uint8_t update();
 
     /**
      * Non-blocking write to the open writing pipe used for buffered writes

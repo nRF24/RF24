@@ -12,6 +12,50 @@
 
 /****************************************************************************/
 
+int StatusFlags::toString(char* buf) const
+{
+    return sprintf(buf, "rx_dr: %s, tx_ds: %s, tx_df: %s, rx_pipe: %d, tx_full: %s",
+                   rx_dr() ? "true" : "false", tx_ds() ? "true" : "false",
+                   tx_df() ? "true" : "false", rx_pipe(), tx_full() ? "true" : "false");
+}
+
+/****************************************************************************/
+
+const bool StatusFlags::tx_full() const
+{
+    return value & _BV(TX_FULL);
+}
+
+/****************************************************************************/
+
+const uint8_t StatusFlags::rx_pipe() const
+{
+    return (value >> RX_P_NO) & 7;
+}
+
+/****************************************************************************/
+
+const bool StatusFlags::tx_df() const
+{
+    return value & _BV(MAX_RT);
+}
+
+/****************************************************************************/
+
+const bool StatusFlags::tx_ds() const
+{
+    return value & _BV(TX_DS);
+}
+
+/****************************************************************************/
+
+const bool StatusFlags::rx_dr() const
+{
+    return value & _BV(RX_DR);
+}
+
+/****************************************************************************/
+
 void RF24::csn(bool mode)
 {
 #if defined(RF24_TINY)
@@ -1556,6 +1600,37 @@ void RF24::whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready)
     tx_ok = status & _BV(TX_DS);
     tx_fail = status & _BV(MAX_RT);
     rx_ready = status & _BV(RX_DR);
+}
+
+/****************************************************************************/
+
+uint8_t RF24::clearStatusFlags(uint8_t flags)
+{
+    write_register(NRF_STATUS, flags & RF24_IRQ_ALL);
+    return status;
+}
+
+/****************************************************************************/
+
+void RF24::setStatusFlags(uint8_t flags)
+{
+    // flip the flags to translate from "human understanding"
+    write_register(NRF_CONFIG, ~flags & RF24_IRQ_ALL);
+}
+
+/****************************************************************************/
+
+uint8_t RF24::getStatusFlags()
+{
+    return status;
+}
+
+/****************************************************************************/
+
+uint8_t RF24::update()
+{
+    read_register(RF24_NOP, (uint8_t*)nullptr, 0);
+    return status;
 }
 
 /****************************************************************************/

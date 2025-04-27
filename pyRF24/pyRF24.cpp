@@ -113,6 +113,17 @@ bp::tuple whatHappened_wrap(RF24& ref)
     return bp::make_tuple(tx_ok, tx_fail, tx_ready);
 }
 
+std::string reprStatusFlags(StatusFlags& self)
+{
+    char* buf = new char[69];
+    self.toString(buf);
+    std::string result = "<StatusFlags ";
+    result += buf;
+    result += ">";
+    delete[] buf;
+    return result;
+}
+
 bp::tuple available_wrap(RF24& ref)
 {
     bool result;
@@ -287,6 +298,22 @@ BOOST_PYTHON_MODULE(RF24)
         .value("RF24_FIFO_INVALID", RF24_FIFO_INVALID)
         .export_values();
 
+    bp::enum_<rf24_irq_flags_e>("rf24_irq_flags_e")
+        .value("RF24_TX_DF", RF24_TX_DF)
+        .value("RF24_TX_DS", RF24_TX_DS)
+        .value("RF24_RX_DR", RF24_RX_DR)
+        .value("RF24_IRQ_ALL", RF24_IRQ_ALL)
+        .export_values();
+
+    bp::class_<StatusFlags>("StatusFlags", bp::init<>())
+        .def(bp::init<uint8_t>((bp::arg("bits"))))
+        .add_property("rx_dr", &StatusFlags::rx_dr)
+        .add_property("tx_ds", &StatusFlags::tx_ds)
+        .add_property("tx_df", &StatusFlags::tx_df)
+        .add_property("tx_full", &StatusFlags::tx_full)
+        .add_property("rx_pipe", &StatusFlags::rx_pipe)
+        .def("__repr__", &reprStatusFlags);
+
     // ******************** RF24 class  **************************
     bp::class_<RF24>("RF24", bp::init<uint16_t, uint16_t>((bp::arg("_cepin"), bp::arg("_cspin"))))
 #if defined(RF24_LINUX) && !defined(MRAA)
@@ -349,6 +376,12 @@ BOOST_PYTHON_MODULE(RF24)
         .def("setRadiation", &RF24::setRadiation)
         .def("txStandBy", (bool(::RF24::*)(::uint32_t, bool))(&RF24::txStandBy), txStandBy_wrap1(bp::args("timeout", "startTx")))
         .def("whatHappened", &whatHappened_wrap)
+        .def("setStatusFlags", (uint8_t(::RF24::*)(void))(&RF24::setStatusFlags))
+        .def("setStatusFlags", (uint8_t(::RF24::*)(uint8_t&))(&RF24::setStatusFlags), (bp::arg("flags")))
+        .def("clearStatusFlags", (uint8_t(::RF24::*)(void))(&RF24::clearStatusFlags))
+        .def("clearStatusFlags", (uint8_t(::RF24::*)(uint8_t&))(&RF24::clearStatusFlags), (bp::arg("flags")))
+        .def("getStatusFlags", &RF24::getStatusFlags)
+        .def("update", &RF24::update)
         .def("startConstCarrier", &RF24::startConstCarrier, (bp::arg("level"), bp::arg("channel")))
         .def("stopConstCarrier", &RF24::stopConstCarrier)
         .def("write", &write_wrap1, (bp::arg("buf")))

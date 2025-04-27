@@ -225,6 +225,7 @@ words:
   - Quigg
   - raspi
   - REALPATH
+  - repr
   - rpmbuild
   - RXADDR
   - rxbuff
