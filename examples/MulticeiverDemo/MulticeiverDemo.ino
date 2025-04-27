@@ -184,8 +184,7 @@ void setRole() {
     payload.payloadID = 0;
 
     // set the TX address of the RX node for use on the TX pipe (pipe 0)
-    memcpy(radio.txAddress, address[role], 5);
-    radio.stopListening();  // put radio in TX mode
+    radio.stopListening(address[role]);  // put radio in TX mode
 
     // According to the datasheet, the auto-retry features's delay value should
     // be "skewed" to allow the RX node to receive 1 transmission at a time.

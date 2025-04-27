@@ -102,20 +102,15 @@ void setup() {
   // Acknowledgement packets have no payloads by default. We need to enable
   // this feature for all nodes (TX & RX) to use ACK payloads.
   radio.enableAckPayload();
-  // Fot this example, we use the same address to send data back and forth
-
-  // set the TX address of the RX node for use on the TX pipe (pipe 0)
-  memcpy(radio.txAddress, address[radioNumber], 5);
 
   // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]);  // using pipe 1
 
-  // additional setup specific to the node's role
-  if (role) {
-    // setup for TX mode
-    radio.stopListening();  // put radio in TX mode
+  // set the TX address of the RX node for use on the TX pipe (pipe 0)
+  radio.stopListening(address[radioNumber]);  // put radio in TX mode
 
-  } else {
+  // additional setup specific to the node's RX role
+  if (!role) {
     // setup for RX mode
 
     // let IRQ pin only trigger on "data_ready" event in RX mode
