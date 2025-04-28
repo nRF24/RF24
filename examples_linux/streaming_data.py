@@ -7,7 +7,7 @@ See documentation at https://nRF24.github.io/RF24
 """
 
 import time
-from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER
+from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER, StatusFlags, RF24_TX_DF
 
 print(__file__)  # print example name
 
@@ -101,13 +101,18 @@ def master(count: int = 1):
             buffer = make_buffer(buf_iter)  # make a payload
 
             if not radio.writeFast(buffer):  # transmission failed
-                failures += 1  # increment manual retry count
+                flags = StatusFlags(radio.getStatusFlags())
+                if flags.tx_df:
+                    failures += 1  # increment manual retry count
+                    # now we need to reset the tx_df flag and the radio's CE pin
+                    radio.ce(False)
+                    flags = radio.clearStatusFlags(RF24_TX_DF)
+                    radio.ce(True)
                 if failures > 99 and buf_iter < 7 and multiplier < 2:
                     # we need to prevent an infinite loop
                     print("Too many failures detected. Aborting at payload ", buffer[0])
                     multiplier = count  # be sure to exit the for loop
                     break  # exit the while loop
-                radio.reUseTX()  # resend payload in top level of TX FIFO
             else:  # transmission succeeded
                 buf_iter += 1
     end_timer = time.monotonic_ns()  # end timer

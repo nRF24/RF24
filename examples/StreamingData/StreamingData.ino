@@ -113,8 +113,15 @@ void loop() {
     while (i < SIZE) {
       makePayload(i);  // make the payload
       if (!radio.writeFast(&buffer, SIZE)) {
-        failures++;
-        radio.reUseTX();
+        StatusFlags flags(radio.getStatusFlags());
+        if (flags.tx_df()) {
+          failures++;
+          // now we need to reset the tx_df flag and the radio's CE pin
+          radio.ce(LOW);
+          radio.clearStatusFlags(RF24_TX_DF);
+          radio.ce(HIGH);
+        }
+        // else the TX FIFO is full; just continue loop.
       } else {
         i++;
       }

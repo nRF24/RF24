@@ -6,7 +6,16 @@ See documentation at https://nRF24.github.io/RF24
 """
 
 import time
-from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER
+from RF24 import (
+    RF24,
+    RF24_PA_LOW,
+    RF24_DRIVER,
+    StatusFlags,
+    RF24_TX_DF,
+    RF24_TX_DS,
+    RF24_RX_DR,
+    RF24_IRQ_ALL,
+)
 
 try:
     import gpiod
@@ -97,14 +106,17 @@ ack_payloads = (b"Yak ", b"Back", b" ACK")
 def interrupt_handler():
     """This function is called when IRQ pin is detected active LOW"""
     print("\tIRQ pin went active LOW.")
-    tx_ds, tx_df, rx_dr = radio.whatHappened()  # update IRQ status flags
-    print(f"\ttx_ds: {tx_ds}, tx_df: {tx_df}, rx_dr: {rx_dr}")
+    flags = StatusFlags(radio.clearStatusFlags())
+    # Resetting the tx_df flag is required for
+    # continued TX operations when a transmission fails.
+    # clearing the status flags resets the IRQ pin to its inactive state (HIGH)
+    print(f"\t{flags}")
     if pl_iterator[0] == 0:
-        print("    'data ready' event test", ("passed" if rx_dr else "failed"))
+        print("    'data ready' event test", ("passed" if flags.rx_dr else "failed"))
     elif pl_iterator[0] == 1:
-        print("    'data sent' event test", ("passed" if tx_ds else "failed"))
+        print("    'data sent' event test", ("passed" if flags.tx_ds else "failed"))
     elif pl_iterator[0] == 2:
-        print("    'data fail' event test", ("passed" if tx_df else "failed"))
+        print("    'data fail' event test", ("passed" if flags.tx_df else "failed"))
 
 
 # setup IRQ GPIO pin
@@ -143,7 +155,7 @@ def master():
 
     # on data ready test
     print("\nConfiguring IRQ pin to only ignore 'on data sent' event")
-    radio.maskIRQ(True, False, False)  # args = tx_ds, tx_df, rx_dr
+    radio.setStatusFlags(RF24_RX_DR | RF24_TX_DF)
     print("    Pinging slave node for an ACK payload...")
     pl_iterator[0] = 0
     radio.startFastWrite(tx_payloads[0], False)  # False means expecting an ACK
@@ -152,7 +164,7 @@ def master():
 
     # on "data sent" test
     print("\nConfiguring IRQ pin to only ignore 'on data ready' event")
-    radio.maskIRQ(False, False, True)  # args = tx_ds, tx_df, rx_dr
+    radio.setStatusFlags(RF24_TX_DS | RF24_TX_DF)
     print("    Pinging slave node again...")
     pl_iterator[0] = 1
     radio.startFastWrite(tx_payloads[1], False)  # False means expecting an ACK
@@ -162,7 +174,7 @@ def master():
     # trigger slave node to exit by filling the slave node's RX FIFO
     print("\nSending one extra payload to fill RX FIFO on slave node.")
     print("Disabling IRQ pin for all events.")
-    radio.maskIRQ(True, True, True)  # args = tx_ds, tx_df, rx_dr
+    radio.setStatusFlags()
     if radio.write(tx_payloads[2]):
         print("Slave node should not be listening anymore.")
     else:
@@ -170,7 +182,7 @@ def master():
 
     # on "data fail" test
     print("\nConfiguring IRQ pin to go active for all events.")
-    radio.maskIRQ(False, False, False)  # args = tx_ds, tx_df, rx_dr
+    radio.setStatusFlags(RF24_IRQ_ALL)
     print("    Sending a ping to inactive slave node...")
     radio.flush_tx()  # just in case any previous tests failed
     pl_iterator[0] = 2
@@ -189,7 +201,7 @@ def slave(timeout=6):  # will listen for 6 seconds before timing out
     # the "data sent" or "data fail" events will trigger when we
     # receive with ACK payloads enabled (& loaded in TX FIFO)
     print("\nDisabling IRQ pin for all events.")
-    radio.maskIRQ(True, True, True)  # args = tx_ds, tx_df, rx_dr
+    radio.setStatusFlags()
     # setup radio to receive pings, fill TX FIFO with ACK payloads
     radio.writeAckPayload(1, ack_payloads[0])
     radio.writeAckPayload(1, ack_payloads[1])

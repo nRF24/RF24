@@ -174,22 +174,23 @@ void master()
 
     // Test the "data ready" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to ignore the 'data sent' event\n";
-    radio.maskIRQ(true, false, false); // args = "data_sent", "data_fail", "data_ready"
+    radio.setStatusFlags(RF24_RX_DR | RF24_TX_DF);
     cout << "   Pinging RX node for 'data ready' event..." << endl;
     ping_n_wait(); // transmit a payload and detect the IRQ pin
     pl_iterator++; // increment iterator for next test
 
     // Test the "data sent" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to ignore the 'data ready' event\n";
-    radio.maskIRQ(false, false, true); // args = "data_sent", "data_fail", "data_ready"
+    radio.setStatusFlags(RF24_TX_DS | RF24_TX_DF);
     cout << "   Pinging RX node for 'data sent' event..." << endl;
     radio.flush_tx(); // flush payloads from any failed prior test
     ping_n_wait();    // transmit a payload and detect the IRQ pin
     pl_iterator++;    // increment iterator for next test
 
     // Use this iteration to fill the RX node's FIFO which sets us up for the next test.
-    // write() uses virtual interrupt flags that work despite the masking of the IRQ pin
-    radio.maskIRQ(1, 1, 1); // disable IRQ masking for this step
+    // write() uses virtual interrupt flags that work despite the masking of the IRQ pin.
+    // disable IRQ pin for this step
+    radio.setStatusFlags();
 
     cout << "\nSending 1 payload to fill RX node's FIFO. IRQ pin is neglected.\n";
     // write() will call flush_tx() on 'data fail' events
@@ -203,7 +204,7 @@ void master()
 
     // test the "data fail" event with the IRQ pin
     cout << "\nConfiguring IRQ pin to reflect all events\n";
-    radio.maskIRQ(0, 0, 0); // args = "data_sent", "data_fail", "data_ready"
+    radio.setStatusFlags(RF24_IRQ_ALL);
     cout << "   Pinging inactive RX node for 'data fail' event..." << endl;
     ping_n_wait(); // transmit a payload and detect the IRQ pin
 
@@ -223,7 +224,7 @@ void slave()
 {
 
     // let IRQ pin only trigger on "data_ready" event in RX mode
-    radio.maskIRQ(1, 1, 0); // args = "data_sent", "data_fail", "data_ready"
+    radio.setStatusFlags(RF24_RX_DR);
 
     // Fill the TX FIFO with 3 ACK payloads for the first 3 received
     // transmissions on pipe 0.
@@ -277,26 +278,24 @@ void ping_n_wait()
 
     cout << "\tIRQ pin is actively LOW" << endl; // show that this function was called
 
-    bool tx_ds, tx_df, rx_dr;                // declare variables for IRQ masks
-    radio.whatHappened(tx_ds, tx_df, rx_dr); // get values for IRQ masks
-    // whatHappened() clears the IRQ masks also. This is required for
+    StatusFlags flags(radio.clearStatusFlags());
+    // Resetting the tx_df flag is required for
     // continued TX operations when a transmission fails.
-    // clearing the IRQ masks resets the IRQ pin to its inactive state (HIGH)
+    // clearing the status flags resets the IRQ pin to its inactive state (HIGH)
+    char buf[69];
+    flags.toString(buf);
+    cout << "\t" << buf << endl; // print StatusFlags description
 
-    cout << "\tdata_sent: " << tx_ds;          // print "data sent" mask state
-    cout << ", data_fail: " << tx_df;          // print "data fail" mask state
-    cout << ", data_ready: " << rx_dr << endl; // print "data ready" mask state
-
-    if (tx_df)            // if TX payload failed
+    if (flags.tx_df())    // if TX payload failed
         radio.flush_tx(); // clear all payloads from the TX FIFO
 
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     if (pl_iterator == 0)
-        cout << "   'Data Ready' event test " << (rx_dr ? "passed" : "failed") << endl;
+        cout << "   'Data Ready' event test " << (flags.rx_dr() ? "passed" : "failed") << endl;
     else if (pl_iterator == 1)
-        cout << "   'Data Sent' event test " << (tx_ds ? "passed" : "failed") << endl;
+        cout << "   'Data Sent' event test " << (flags.tx_ds() ? "passed" : "failed") << endl;
     else if (pl_iterator == 3)
-        cout << "   'Data Fail' event test " << (tx_df ? "passed" : "failed") << endl;
+        cout << "   'Data Fail' event test " << (flags.tx_df() ? "passed" : "failed") << endl;
 
     got_interrupt = false;
 }
