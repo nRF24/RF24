@@ -95,6 +95,7 @@ void RF24::csn(bool mode)
     delayMicroseconds(csDelay);
 #else
     static_cast<void>(mode); // ignore -Wunused-parameter
+    delayMicroseconds(csDelay);
 #endif // !defined(RF24_LINUX)
 }
 
