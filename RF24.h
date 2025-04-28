@@ -597,16 +597,32 @@ public:
     /**@{*/
 
     /**
+     * Set radio's CE (Chip Enable) pin state.
+     *
+     * @warning Please see the datasheet for a much more detailed description of this pin.
+     *
+     * @note This is only publicly exposed for advanced use cases such as complex networking or
+     * streaming consecutive payloads without robust error handling.
+     * Typical uses are satisfied by simply using `startListening()` for RX mode or
+     * `stopListening()` and `write()` for TX mode.
+     *
+     * @param level In RX mode, `HIGH` causes the radio to begin actively listening.
+     * In TX mode, `HIGH` (+ 130 microsecond delay) causes the radio to begin transmitting.
+     * Setting this to `LOW` will cause the radio to stop transmitting or receiving in any mode.
+     */
+    void ce(bool level);
+
+    /**
      * Print a giant block of debugging information to stdout
      *
      * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
      * The printf.h file is included with the library for Arduino.
      * @code
      * #include <printf.h>
-     * setup(){
+     * setup() {
      *   Serial.begin(115200);
      *   printf_begin();
-     *   ...
+     *   // ...
      * }
      * @endcode
      */
@@ -623,7 +639,7 @@ public:
      * The printf.h file is included with the library for Arduino.
      * @code
      * #include <printf.h>
-     * setup(){
+     * setup() {
      *   Serial.begin(115200);
      *   printf_begin();
      *   // ...
@@ -1936,14 +1952,6 @@ private:
      * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
      */
     void csn(bool mode);
-
-    /**
-     * Set chip enable
-     *
-     * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
-     * for a much more detailed description of this pin.
-     */
-    void ce(bool level);
 
     /**
      * Write a chunk of data to a register

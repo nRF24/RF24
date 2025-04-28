@@ -298,6 +298,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("available_pipe", &available_wrap) // needed to rename this method as python does not allow such overloading
         .def("begin", (bool(::RF24::*)(void))(&::RF24::begin))
         .def("begin", &begin_with_pins)
+        .def("ce", &::RF24::ce)
         .def("closeReadingPipe", &RF24::closeReadingPipe)
         .def("disableCRC", &RF24::disableCRC)
         .def("enableAckPayload", &RF24::enableAckPayload)
