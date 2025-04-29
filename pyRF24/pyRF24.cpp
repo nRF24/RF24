@@ -292,6 +292,7 @@ BOOST_PYTHON_MODULE(RF24)
         .value("RF24_TX_DS", RF24_TX_DS)
         .value("RF24_RX_DR", RF24_RX_DR)
         .value("RF24_IRQ_ALL", RF24_IRQ_ALL)
+        .value("RF24_IRQ_NONE", RF24_IRQ_NONE)
         .export_values();
 
     // ******************** RF24 class  **************************
@@ -330,6 +331,7 @@ BOOST_PYTHON_MODULE(RF24)
         .def("powerDown", &RF24::powerDown)
         .def("powerUp", &RF24::powerUp)
         .def("printDetails", &RF24::printDetails)
+        .def("printStatus", &RF24::printStatus)
         .def("printPrettyDetails", &RF24::printPrettyDetails)
         .def("sprintfPrettyDetails", &sprintfPrettyDetails_wrap)
         .def("reUseTX", &RF24::reUseTX)

@@ -653,6 +653,16 @@ public:
     void printDetails(void);
 
     /**
+     * Decode and print the given STATUS byte to stdout.
+     *
+     * @param flags The STATUS byte to print.
+     * This value is fetched with update() or getStatusFlags().
+     *
+     * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+     */
+    void printStatus(uint8_t flags);
+
+    /**
      * Print a giant block of debugging information to stdout. This function
      * differs from printDetails() because it makes the information more
      * understandable without having to look up the datasheet or convert
@@ -2075,23 +2085,7 @@ private:
      */
     void read_payload(void* buf, uint8_t len);
 
-    /**
-     * Retrieve the current status of the chip
-     *
-     * @return Current value of status register
-     */
-    uint8_t get_status(void);
-
 #if !defined(MINIMAL)
-
-    /**
-     * Decode and print the given status to stdout
-     *
-     * @param status Status value to print
-     *
-     * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
-     */
-    void print_status(uint8_t status);
 
     /**
      * Decode and print the given 'observe_tx' value to stdout
