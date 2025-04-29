@@ -153,67 +153,6 @@ typedef enum
 } rf24_irq_flags_e;
 
 /**
- * @brief A bit-field struct to represent the radio's STATUS byte.
- */
-struct StatusFlags
-{
-    // starting with bit 0 at the top...
-    /// Signifies that the TX FIFO is fully occupied.
-    const bool tx_full() const;
-    /// @brief Represents the pipe number that received the first available payload in the RX FIFO.
-    /// @remark This data shall be considered invalid if the @ref StatusFlags::rx_dr flag is `false`.
-    const uint8_t rx_pipe() const;
-    /// Represents an event where TX Data Failed to send.
-    const bool tx_df() const;
-    /// Represents an event where TX Data Sent successfully.
-    const bool tx_ds() const;
-    /// Represents an event where RX Data is Ready to `RF24::read()`.
-    const bool rx_dr() const;
-
-    /**
-     * @brief Convert this struct to a human understandable string.
-     *
-     * ```cpp
-     * char buf[69] = {0};
-     * StatusFlags flags;
-     * flags.toString(buf);
-     * ```
-     *
-     * Afterward, printing the string in `buf` should read something similar to:
-     *
-     * > rx_dr: false, tx_ds: false, tx_df: false, rx_pipe: 7, tx_full: false
-     *
-     * @param[out] buf The string buffer into which the StatusFlags description is stored.
-     * This buffer needs to be at least 69 bytes long.
-     * @returns The amount of bytes altered in the given `buf` parameter.
-     */
-    int toString(char* buf) const;
-
-    /// The default initializer constructor.
-    /// @see Details about `StatusFlags::toString()` show an example output of default values.
-    StatusFlags() : value(0x0E) {};
-
-    /**
-     * @brief Set the StatusFlags using constants defined by @ref rf24_irq_flags_e
-     *
-     * @param bits This value shall be a value of @ref rf24_irq_flags_e.
-     * Enabling multiple flags can be done with bitwise OR operator (`|`).
-     *
-     * ```cpp
-     * // only enable the "RX Data Ready" event
-     * StatusFlags flags(RF24_RX_DR);
-     *
-     * // only enable the "TX Data Sent" and "TX Data Fail" events
-     * flags = StatusFlags(RF24_TX_DF | RF24_TX_DS);
-     * ```
-     */
-    StatusFlags(uint8_t bits) : value(bits) {};
-
-private:
-    const uint8_t value;
-};
-
-/**
  * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
@@ -1272,7 +1211,7 @@ public:
      * passed by reference.
      *
      * @note When used in an ISR (Interrupt Service routine), there is a chance that the
-     * @ref StatusFlags::rx_pipe() information is inaccurate. See available(uint8_t*) (or the
+     * returned bits 0b1110 (rx_pipe number) is inaccurate. See available(uint8_t*) (or the
      * datasheet) for more detail.
      *
      * @param flags The IRQ flags to clear. Default value is all of them (@ref RF24_IRQ_ALL).

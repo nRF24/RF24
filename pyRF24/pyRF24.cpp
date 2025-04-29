@@ -113,17 +113,6 @@ bp::tuple whatHappened_wrap(RF24& ref)
     return bp::make_tuple(tx_ok, tx_fail, tx_ready);
 }
 
-std::string reprStatusFlags(StatusFlags& self)
-{
-    char* buf = new char[69];
-    self.toString(buf);
-    std::string result = "<StatusFlags ";
-    result += buf;
-    result += ">";
-    delete[] buf;
-    return result;
-}
-
 bp::tuple available_wrap(RF24& ref)
 {
     bool result;
@@ -304,15 +293,6 @@ BOOST_PYTHON_MODULE(RF24)
         .value("RF24_RX_DR", RF24_RX_DR)
         .value("RF24_IRQ_ALL", RF24_IRQ_ALL)
         .export_values();
-
-    bp::class_<StatusFlags>("StatusFlags", bp::init<>())
-        .def(bp::init<uint8_t>((bp::arg("bits"))))
-        .add_property("rx_dr", &StatusFlags::rx_dr)
-        .add_property("tx_ds", &StatusFlags::tx_ds)
-        .add_property("tx_df", &StatusFlags::tx_df)
-        .add_property("tx_full", &StatusFlags::tx_full)
-        .add_property("rx_pipe", &StatusFlags::rx_pipe)
-        .def("__repr__", &reprStatusFlags);
 
     // ******************** RF24 class  **************************
     bp::class_<RF24>("RF24", bp::init<uint16_t, uint16_t>((bp::arg("_cepin"), bp::arg("_cspin"))))

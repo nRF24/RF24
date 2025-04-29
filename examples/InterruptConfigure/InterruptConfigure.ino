@@ -300,32 +300,32 @@ void assessInterruptEvent() {
 
   Serial.println(F("\tIRQ pin is actively LOW"));  // show that this function was called
   delayMicroseconds(250);
-  StatusFlags flags(radio.clearStatusFlags());
+  uint8_t flags = radio.clearStatusFlags();
   // Resetting the tx_df flag is required for
   // continued TX operations when a transmission fails.
   // clearing the status flags resets the IRQ pin to its inactive state (HIGH)
 
   Serial.print(F("\tdata_sent: "));
-  Serial.print(flags.tx_ds());  // print "data sent" flag state
+  Serial.print((flags & RF24_TX_DS) > 0);  // print "data sent" flag state
   Serial.print(F(", data_fail: "));
-  Serial.print(flags.tx_df());  // print "data fail" flag state
+  Serial.print((flags & RF24_TX_DF) > 0);  // print "data fail" flag state
   Serial.print(F(", data_ready: "));
-  Serial.println(flags.rx_dr());  // print "data ready" flag state
+  Serial.println((flags & RF24_RX_DR) > 0);  // print "data ready" flag state
 
-  if (flags.tx_df())   // if TX payload failed
-    radio.flush_tx();  // clear all payloads from the TX FIFO
+  if (flags & RF24_TX_DF)  // if TX payload failed
+    radio.flush_tx();      // clear all payloads from the TX FIFO
 
   // print if test passed or failed. Unintentional fails mean the RX node was not listening.
   // pl_iterator has already been incremented by now
   if (pl_iterator <= 1) {
     Serial.print(F("   'Data Ready' event test "));
-    Serial.println(flags.rx_dr() ? F("passed") : F("failed"));
+    Serial.println(flags & RF24_RX_DR ? F("passed") : F("failed"));
   } else if (pl_iterator == 2) {
     Serial.print(F("   'Data Sent' event test "));
-    Serial.println(flags.tx_ds() ? F("passed") : F("failed"));
+    Serial.println(flags & RF24_TX_DS ? F("passed") : F("failed"));
   } else if (pl_iterator == 4) {
     Serial.print(F("   'Data Fail' event test "));
-    Serial.println(flags.tx_df() ? F("passed") : F("failed"));
+    Serial.println(flags & RF24_TX_DF ? F("passed") : F("failed"));
   }
   got_interrupt = false;   // reset this flag to prevent calling this function from loop()
   wait_for_event = false;  // ready to continue with loop() operations

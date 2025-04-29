@@ -113,8 +113,8 @@ void loop() {
     while (i < SIZE) {
       makePayload(i);  // make the payload
       if (!radio.writeFast(&buffer, SIZE)) {
-        StatusFlags flags(radio.getStatusFlags());
-        if (flags.tx_df()) {
+        uint8_t flags = radio.getStatusFlags();
+        if (flags & RF24_TX_DF) {
           failures++;
           // now we need to reset the tx_df flag and the radio's CE pin
           radio.ce(LOW);

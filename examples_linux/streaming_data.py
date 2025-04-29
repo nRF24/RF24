@@ -7,7 +7,7 @@ See documentation at https://nRF24.github.io/RF24
 """
 
 import time
-from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER, StatusFlags, RF24_TX_DF
+from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER, RF24_TX_DF
 
 print(__file__)  # print example name
 
@@ -101,8 +101,8 @@ def master(count: int = 1):
             buffer = make_buffer(buf_iter)  # make a payload
 
             if not radio.writeFast(buffer):  # transmission failed
-                flags = StatusFlags(radio.getStatusFlags())
-                if flags.tx_df:
+                flags = radio.getStatusFlags()
+                if flags & RF24_TX_DF:
                     failures += 1  # increment manual retry count
                     # now we need to reset the tx_df flag and the radio's CE pin
                     radio.ce(False)

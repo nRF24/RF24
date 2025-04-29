@@ -304,28 +304,27 @@ void assessInterruptEvent()
 {
     // print IRQ status and all masking flags' states
     printf("\tIRQ pin is actively LOW\n"); // show that this function was called
-    StatusFlags flags(radio.clearStatusFlags());
+    uint8_t flags = radio.clearStatusFlags();
     // Resetting the tx_df flag is required for
     // continued TX operations when a transmission fails.
     // clearing the status flags resets the IRQ pin to its inactive state (HIGH)
-    char buf[69];
-    flags.toString(buf);
 
-    printf("\t%s\n", buf); // print status flags info
+    printf("\t");
+    radio.printStatus(flags); // print status flags info
 
-    if (flags.tx_df())    // if TX payload failed
-        radio.flush_tx(); // clear all payloads from the TX FIFO
+    if (flags & RF24_TX_DF) // if TX payload failed
+        radio.flush_tx();   // clear all payloads from the TX FIFO
 
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     // pl_iterator has already been incremented by now
     if (pl_iterator <= 1) {
-        printf("   'Data Ready' event test %s\n", flags.rx_dr() ? "passed" : "failed");
+        printf("   'Data Ready' event test %s\n", flags & RF24_RX_DR ? "passed" : "failed");
     }
     else if (pl_iterator == 2) {
-        printf("   'Data Sent' event test %s\n", flags.tx_ds() ? "passed" : "failed");
+        printf("   'Data Sent' event test %s\n", flags & RF24_TX_DS ? "passed" : "failed");
     }
     else if (pl_iterator == 4) {
-        printf("   'Data Fail' event test %s\n", flags.tx_df() ? "passed" : "failed");
+        printf("   'Data Fail' event test %s\n", flags & RF24_TX_DF ? "passed" : "failed");
     }
     got_interrupt = false;  // reset this flag to prevent calling this function from loop()
     wait_for_event = false; // ready to continue with loop() operations

@@ -278,24 +278,24 @@ void ping_n_wait()
 
     cout << "\tIRQ pin is actively LOW" << endl; // show that this function was called
 
-    StatusFlags flags(radio.clearStatusFlags());
+    uint8_t flags = radio.clearStatusFlags();
     // Resetting the tx_df flag is required for
     // continued TX operations when a transmission fails.
     // clearing the status flags resets the IRQ pin to its inactive state (HIGH)
-    char buf[69];
-    flags.toString(buf);
-    cout << "\t" << buf << endl; // print StatusFlags description
 
-    if (flags.tx_df())    // if TX payload failed
-        radio.flush_tx(); // clear all payloads from the TX FIFO
+    cout << "\t";
+    radio.printStatus(flags); // print StatusFlags description
+
+    if (flags & RF24_TX_DF) // if TX payload failed
+        radio.flush_tx();   // clear all payloads from the TX FIFO
 
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     if (pl_iterator == 0)
-        cout << "   'Data Ready' event test " << (flags.rx_dr() ? "passed" : "failed") << endl;
+        cout << "   'Data Ready' event test " << (flags & RF24_RX_DR ? "passed" : "failed") << endl;
     else if (pl_iterator == 1)
-        cout << "   'Data Sent' event test " << (flags.tx_ds() ? "passed" : "failed") << endl;
+        cout << "   'Data Sent' event test " << (flags & RF24_TX_DS ? "passed" : "failed") << endl;
     else if (pl_iterator == 3)
-        cout << "   'Data Fail' event test " << (flags.tx_df() ? "passed" : "failed") << endl;
+        cout << "   'Data Fail' event test " << (flags & RF24_TX_DF ? "passed" : "failed") << endl;
 
     got_interrupt = false;
 }

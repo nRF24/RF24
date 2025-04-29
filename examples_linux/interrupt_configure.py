@@ -10,7 +10,6 @@ from RF24 import (
     RF24,
     RF24_PA_LOW,
     RF24_DRIVER,
-    StatusFlags,
     RF24_TX_DF,
     RF24_TX_DS,
     RF24_RX_DR,
@@ -106,17 +105,25 @@ ack_payloads = (b"Yak ", b"Back", b" ACK")
 def interrupt_handler():
     """This function is called when IRQ pin is detected active LOW"""
     print("\tIRQ pin went active LOW.")
-    flags = StatusFlags(radio.clearStatusFlags())
+    flags = radio.clearStatusFlags()
     # Resetting the tx_df flag is required for
     # continued TX operations when a transmission fails.
     # clearing the status flags resets the IRQ pin to its inactive state (HIGH)
-    print(f"\t{flags}")
+    print("\t", end="")
+    radio.printStatus(flags)
     if pl_iterator[0] == 0:
-        print("    'data ready' event test", ("passed" if flags.rx_dr else "failed"))
+        print(
+            "    'data ready' event test",
+            ("passed" if flags & RF24_RX_DR else "failed"),
+        )
     elif pl_iterator[0] == 1:
-        print("    'data sent' event test", ("passed" if flags.tx_ds else "failed"))
+        print(
+            "    'data sent' event test", ("passed" if flags & RF24_TX_DS else "failed")
+        )
     elif pl_iterator[0] == 2:
-        print("    'data fail' event test", ("passed" if flags.tx_df else "failed"))
+        print(
+            "    'data fail' event test", ("passed" if flags & RF24_TX_DF else "failed")
+        )
 
 
 # setup IRQ GPIO pin
