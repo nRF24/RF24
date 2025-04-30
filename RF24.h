@@ -873,6 +873,8 @@ public:
 
     /**
      * @deprecated Use RF24::isFifo(bool about_tx) instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
+     *
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
      * @param check_empty
      * - `true` checks if the specified FIFO is empty
@@ -1897,7 +1899,8 @@ public:
     /**
      * Open a pipe for reading
      * @deprecated For compatibility with old code only, see newer function
-     * openReadingPipe()
+     * openReadingPipe().
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * @note Pipes 1-5 should share the first 32 bits.
      * Only the least significant byte should be unique, e.g.
@@ -1922,7 +1925,8 @@ public:
     /**
      * Open a pipe for writing
      * @deprecated For compatibility with old code only, see newer function
-     * openWritingPipe()
+     * openWritingPipe().
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * Addresses are 40-bit hex values, e.g.:
      *
@@ -1940,6 +1944,7 @@ public:
      *
      * @deprecated For compatibility with old code only, see synonymous function available().
      * Use read() to retrieve the ack payload and getDynamicPayloadSize() to get the ACK payload size.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * @return True if an ack payload is available.
      */
@@ -1950,6 +1955,7 @@ public:
      * Request (IRQ) pin active LOW.
      *
      * @deprecated Use setStatusFlags() instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * The following events can be configured:
      * 1. "data sent": This does not mean that the data transmitted was
@@ -1988,6 +1994,7 @@ public:
      * LOW and clears the status of all events.
      *
      * @deprecated Use clearStatusFlags() instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * @see setStatusFlags()
      *
