@@ -179,12 +179,12 @@ private:
     uint8_t spi_rxbuff[32 + 1]; //SPI receive buffer (payload max 32 bytes)
     uint8_t spi_txbuff[32 + 1]; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
 #endif
-    uint8_t status;                   /* The status byte returned from every SPI transaction */
-    uint8_t payload_size;             /* Fixed size of payloads */
-    uint8_t pipe0_reading_address[5]; /* Last address set on pipe 0 for reading. */
-    uint8_t config_reg;               /* For storing the value of the NRF_CONFIG register */
-    bool _is_p_variant;               /* For storing the result of testing the toggleFeatures() affect */
-    bool _is_p0_rx;                   /* For keeping track of pipe 0's usage in user-triggered RX mode. */
+    uint8_t status;                         /* The status byte returned from every SPI transaction */
+    uint8_t payload_size;                   /* Fixed size of payloads */
+    uint8_t pipe0_reading_address[5] = {0}; /* Last address set on pipe 0 for reading. */
+    uint8_t config_reg;                     /* For storing the value of the NRF_CONFIG register */
+    bool _is_p_variant;                     /* For storing the result of testing the toggleFeatures() affect */
+    bool _is_p0_rx;                         /* For keeping track of pipe 0's usage in user-triggered RX mode. */
 
 protected:
     /**
@@ -382,7 +382,7 @@ public:
      *
      * Previously, openWritingPipe() should be called after stopListening().
      */
-    uint8_t txAddress[5];
+    uint8_t txAddress[5] = {0xE7};
 
     /**
      * Stop listening for incoming messages, and switch to transmit mode.

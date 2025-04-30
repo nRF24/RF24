@@ -603,8 +603,6 @@ void RF24::_init_obj()
     _spi = &SPI;
 #endif // defined (RF24_SPI_PTR)
 
-    memset(pipe0_reading_address, 0, 5);
-    memset(txAddress, 0xE7, 5);
     if (spi_speed <= 35000) { //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
         spi_speed = RF24_SPI_SPEED;
     }
