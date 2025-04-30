@@ -74,16 +74,13 @@ bool setup()
     radio.setPayloadSize(SIZE); // default value is the maximum 32 bytes
 
     // set the TX address of the RX node for use on the TX pipe (pipe 0)
-    memcpy(radio.txAddress, address[radioNumber], 5);
+    radio.stopListening(address[radioNumber]);
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
 
     // additional setup specific to the node's role
-    if (role) {
-        radio.stopListening(); // put radio in TX mode
-    }
-    else {
+    if (!role) {
         radio.startListening(); // put radio in RX mode
     }
 

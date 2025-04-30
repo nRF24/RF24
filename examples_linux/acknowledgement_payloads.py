@@ -52,7 +52,7 @@ radio.enableAckPayload()
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
 # set the TX address of the RX node for use on the TX pipe (pipe 0)
-radio.txAddress = address[radio_number]
+radio.stopListening(address[radio_number])
 
 # set the RX address of the TX node into a RX pipe
 radio.openReadingPipe(1, address[not radio_number])  # using pipe 1

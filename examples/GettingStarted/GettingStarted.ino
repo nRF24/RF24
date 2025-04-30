@@ -74,11 +74,11 @@ void setup() {
   // number of bytes we need to transmit a float
   radio.setPayloadSize(sizeof(payload));  // float datatype occupies 4 bytes
 
-  // set the RX address of the TX node into a RX pipe
-  radio.openReadingPipe(1, address[!radioNumber]);  // using pipe 1
-
   // set the TX address of the RX node for use on the TX pipe (pipe 0)
   radio.stopListening(address[radioNumber]);  // put radio in TX mode
+
+  // set the RX address of the TX node into a RX pipe
+  radio.openReadingPipe(1, address[!radioNumber]);  // using pipe 1
 
   // additional setup specific to the node's RX role
   if (!role) {

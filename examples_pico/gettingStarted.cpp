@@ -68,7 +68,7 @@ bool setup()
     radio.setPayloadSize(sizeof(payload)); // float datatype occupies 4 bytes
 
     // set the TX address of the RX node for use on the TX pipe (pipe 0)
-    memcpy(radio.txAddress, address[radioNumber], 5);
+    radio.stopListening(address[radioNumber]);
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
