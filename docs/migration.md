@@ -32,16 +32,16 @@ if radio.available() { /* .. */ }
 
 > **Deprecated since v1.3.11**
 
-These function's address parameter used a 64-bit unsigned integer (`uint64_t`).
+These functions' address parameter used a 64-bit unsigned integer (`uint64_t`).
 The nRF24L01 can only use up to 40 bit addresses.
-Thus, there was unused 24 bits being allocated for addresses using this function.
+Thus, there was an unused 24 bits being allocated for addresses using this function.
 
 There are overloaded functions that use a buffer instead:
 
 - `RF24::openReadingPipe(uint8_t, const uint8_t*)`
 - `RF24::openWritingPipe(const uint8_t*)`
 
-These eliminates the extra 24 bits by only using the length of the buffer (`uint8_t*`)
+These eliminates the unnecessary 24 bits by only using the length of the buffer (`uint8_t*`)
 specified by `RF24::setAddressWidth()`.
 
 > [!CAUTION]
@@ -73,7 +73,7 @@ radio.openReadingPipe(1, address);
 </td></tr></table>
 
 > [!NOTE]
-> Our examples actually use a C-string casted as `uint8_t` array of 6 bytes.
+> Our examples actually use a C-string casted as an array of 6 bytes.
 > That's because a C-string (`char*`) must be NULL terminated (`\0` at the end) in memory.
 > ```c
 > uint8_t address[][6] = { "1Node", "2Node" };
@@ -87,7 +87,7 @@ radio.openReadingPipe(1, address);
 > **Deprecated since v1.4.11**
 
 Introduced as a compliment to `RF24::isFifo(bool)` in v1.4.3, this function was
-supposed to provide specific detail about a specified radio's FIFO. However, it was
+supposed to provide a specific detail about a specified radio's FIFO. However, it was
 discovered that the function may not highlight binary corruption (`RF24_FIFO_INVALID`)
 observed in the SPI bus' MISO line.
 
@@ -117,10 +117,12 @@ bool rxFifoEmpty = radio.isFifo(false) == RF24_FIFO_EMPTY;
 
 Originally `RF24::maskIRQ()` was the only function provided to influence the radio's IRQ pin.
 However, the 3 required boolean parameters made this prone to bugs in user code.
-The parameters' meaning was confusingly reversed and it was too easy put them in the wrong order.
+The parameters' meaning was confusingly reversed, and they were easily misplaced in the wrong order.
 
 A better approach was introduced with `RF24::setStatusFlags()`.
 It's 1 parameter accepts values defined by the `rf24_irq_flags_e` enumerated constants.
+These constant values specify individual events;
+they can also be OR'd together to specify multiple events.
 
 <table><tr>
 <th>Old</th>
@@ -172,8 +174,10 @@ Like `maskIRQ()`, this was also prone to bugs because of the 3 required boolean 
 
 The aptly named `RF24::clearStatusFlags()` is designed to be a replacement for `RF24::whatHappened()`.
 Like `RF24::clearStatusFlags()`, `RF24::setStatusFlags()` takes 1 parameter whose value is defined by
-the `rf24_irq_flags_e` enumerated constants.
-Additionally, it returns the STATUS byte containing the flags that caused the IRQ pin to go active LOW.
+the `rf24_irq_flags_e` enumerated constants. These constant values specify individual flags;
+they can also be OR'd together to specify multiple flags.
+Additionally, `RF24::setStatusFlags()` returns the STATUS byte containing the flags that
+caused the IRQ pin to go active LOW.
 This allows the user code to allocate less memory when diagnosing the IRQ pin's meaning.
 
 <table><tr>
