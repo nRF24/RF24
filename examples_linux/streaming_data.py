@@ -94,9 +94,9 @@ def master(count: int = 1):
     radio.stopListening()  # put radio in TX mode
     radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
     failures = 0  # keep track of manual retries
-    start_timer = time.monotonic_ns()  # start timer
     for multiplier in range(count):  # repeat transmit the same data stream
         buf_iter = 0  # iterator of payloads for the while loop
+        start_timer = time.monotonic_ns()  # start timer
         while buf_iter < SIZE:  # cycle through all the payloads
             buffer = make_buffer(buf_iter)  # make a payload
 
@@ -115,11 +115,11 @@ def master(count: int = 1):
                     break  # exit the while loop
             else:  # transmission succeeded
                 buf_iter += 1
-    end_timer = time.monotonic_ns()  # end timer
-    print(
-        f"Time to transmit data = {(end_timer - start_timer) / 1000} us.",
-        f"Detected {failures} failures.",
-    )
+        end_timer = time.monotonic_ns()  # end timer
+        print(
+            f"Time to transmit data = {(end_timer - start_timer) / 1000} us.",
+            f"Detected {failures} failures.",
+        )
 
 
 def slave(timeout: int = 6):
