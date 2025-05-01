@@ -182,6 +182,7 @@ private:
     uint8_t status;                   /* The status byte returned from every SPI transaction */
     uint8_t payload_size;             /* Fixed size of payloads */
     uint8_t pipe0_reading_address[5]; /* Last address set on pipe 0 for reading. */
+    uint8_t pipe0_writing_address[5]; /* Last address set on pipe 0 for writing. */
     uint8_t config_reg;               /* For storing the value of the NRF_CONFIG register */
     bool _is_p_variant;               /* For storing the result of testing the toggleFeatures() affect */
     bool _is_p0_rx;                   /* For keeping track of pipe 0's usage in user-triggered RX mode. */
@@ -367,24 +368,6 @@ public:
     void startListening(void);
 
     /**
-     * The TX address to use on pipe 0 for writing.
-     *
-     * This is cached in the library to ensure proper auto-ack behavior on pipe 0,
-     * if pipe 0 is also used with a different RX address for receiving.
-     *
-     * Use this instead of calling openWritingPipe()
-     *
-     * ```cpp
-     * uint8_t rxNodeAddress[6] = "1Node";
-     * memcpy(radio.txAddress, rxNodeAddress, 5);
-     * radio.stopListening();
-     * ```
-     *
-     * Previously, openWritingPipe() should be called after stopListening().
-     */
-    uint8_t txAddress[5];
-
-    /**
      * Stop listening for incoming messages, and switch to transmit mode.
      *
      * Do this before calling write().
@@ -401,9 +384,10 @@ public:
 
     /**
      * @brief Similar to startListening(void) but changes the TX address.
-     * @param tx_address The new TX address. This value will be cached to `txAddress` member.
+     * @param txAddress The new TX address.
+     * This value will be cached for auto-ack purposes.
      */
-    void stopListening(const uint8_t* tx_address);
+    void stopListening(const uint8_t* txAddress);
 
     /**
      * Check whether there are bytes available to be read
@@ -542,7 +526,7 @@ public:
      * New: Open a pipe for writing via byte array. Old addressing format retained
      * for compatibility.
      *
-     * @deprecated Use `RF24::txAddress`  or `RF24::stopListening(uint8_t*)` instead.
+     * @deprecated Use `RF24::stopListening(uint8_t*)` instead.
      *
      * Only one writing pipe can be opened at once, but this function changes
      * the address that is used to transmit (ACK payloads/packets do not apply
