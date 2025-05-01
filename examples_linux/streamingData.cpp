@@ -249,10 +249,10 @@ void slave()
     time_t startTimer = time(nullptr);        // start a timer
     while (time(nullptr) - startTimer < 6) {  // use 6 second timeout
         if (radio.available()) {              // is there a payload
+            counter++;                        // increment counter
             radio.read(&buffer, SIZE);        // fetch payload from FIFO
             cout << "Received: " << buffer;   // print the payload's value
             cout << " - " << counter << endl; // print the counter
-            counter++;                        // increment counter
             startTimer = time(nullptr);       // reset timer
         }
     }
