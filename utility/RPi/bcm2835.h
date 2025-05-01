@@ -18,15 +18,16 @@
   and for accessing the system timers.
   Pin event detection is supported by polling (interrupts are not supported).
 
-  Works on all versions upt to and including RPI 4. 
+  Works on all versions up to and including RPI 4. 
   Works with all versions of Debian up to and including Debian Buster 10.
+  Reported to be working on Bullseye (Raspbian v11) 
   
   It is C++ compatible, and installs as a header file and non-shared library on 
   any Linux-based distro (but clearly is no use except on Raspberry Pi or another board with 
   BCM 2835).
   
   The version of the package that this documentation refers to can be downloaded 
-  from http://www.airspayce.com/mikem/bcm2835/bcm2835-1.64.tar.gz
+  from http://www.airspayce.com/mikem/bcm2835/bcm2835-1.75.tar.gz
   You can find the latest version at http://www.airspayce.com/mikem/bcm2835
   
   Several example programs are provided.
@@ -54,6 +55,11 @@
   If you must use bcm2835_gpio_len() and friends, make sure you disable the pins with 
   bcm2835_gpio_clr_len() and friends after use. 
   
+  In order to compile this library, you may need to install:
+   - libc6-dev
+   - libgcc-s-dev 
+   - libstdc++-staticdev 
+
   \par Running as root
 
   Prior to the release of Raspbian Jessie in Feb 2016, access to any
@@ -212,6 +218,15 @@
   - P1-40 (CLK)
   - P1-36 (CE2)
 
+  Caution: The bcm2835 library works directly on the SPI/I2C devices. It is not using 
+  any Linux device drivers. When relevant Linux drivers are loaded or 
+  activated then it can create unexpected behavior from other software like 
+  'i2cdetect'.
+  
+  Here is a simple utility which detects I2C bus devices with the bcm2835 
+  library.
+  https://github.com/gavinlyonsrepo/RPI_Tools/tree/main/src/i2cdetect
+
   \par I2C Pins
   
   The bcm2835_i2c_* functions allow you to control the BCM 2835 BSC interface,
@@ -329,12 +344,16 @@
   
   mikem has made Perl bindings available at CPAN:
   http://search.cpan.org/~mikem/Device-BCM2835-1.9/lib/Device/BCM2835.pm
+
   Matthew Baker has kindly made Python bindings available at:
   https:  github.com/mubeta06/py-libbcm2835
+
   Gary Marks has created a Serial Peripheral Interface (SPI) command-line utility 
   for Raspberry Pi, based on the bcm2835 library. The 
   utility, spincl, is licensed under Open Source GNU GPLv3 by iP Solutions (http://ipsolutionscorp.com), as a 
   free download with source included: http://ipsolutionscorp.com/raspberry-pi-spi-utility/
+  
+  Bindings for Ada are available courtesy Tama McGlinn at https://github.com/TamaMcGlinn/ada_raspio
   
   \par Open Source Licensing GPL V3
   
@@ -595,7 +614,38 @@
   Fixed an error in bcm2835_i2c_read() where the status byte was not correctly updated with BCM2835_BSC_S_DONE
   Reported by Zihan. Thanks.
 
-  \author  Mike McCauley (mikem@airspayce.com) DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS
+  \version 1.69, 2021-03-30
+  Added link to Ada bindings by Tama McGlinn.
+  Fixed problem with undefined off_t on some compilers.
+
+  \version 1.70, 
+  Patch to ensure compilation with gcc -std=c99, as reported by John Blaiklock.
+  Fix some inconsistencies in version numbers
+
+  \version 1.71
+  Added SMI bus support, courtesy of Benoit Bouchez, including new functions:  
+  bcm2835_smi_begin(),  bcm2835_smi_end(),
+  bcm2835_smi_set_timing(),  bcm2835_smi_write(), bcm2835_smi_read().
+
+  \version 1.72
+  Added examples/smi/smi.c showing how to use new SMI bus support, courtesy Benoit Bouchez.
+  Added support for disabling documentation genetration with "./configure --with-docs=no", courtesy of 
+    Christian Zuckschwerdt.
+
+  \version 1.73
+  Fixed some inconsistent indenting in bcm2835.c that triggers warnings for some people.
+  Added Timeout checks to bcm2835_i2c_write() in case of IO problems. New reason cade BCM2835_I2C_REASON_ERROR_TIMEOUT
+  added. Patch courtesy Simon Peacock.
+
+  \version 1.74
+  Timeout in bcm2835_i2c_write() increased by a factor of 10 because some users have reported spurious timeouts at slow speeds.
+
+  \version 1.75
+  Patches to bcm2835_aux_spi_transfernb() from Sean Goff to deal with the case where
+  the process is interrupted between filling the TX FIFO and reading the RX FIFO.
+
+  
+  \author  Mike McCauley DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS
 */
 
 
@@ -605,7 +655,12 @@
 
 #include <stdint.h>
 
-#define BCM2835_VERSION 10066 /* Version 1.66 */
+/* Some compilers need this, as reported by Sam James */
+#include <sys/types.h>
+/* Needed to compile with gcc -std=c99, as reported by John Blaiklock.*/
+#include <fcntl.h>
+
+#define BCM2835_VERSION 10075 /* Version 1.75 */
 
 // Define this if you want to use libcap2 to determine if you have the cap_sys_rawio capability
 // and therefore the capability of opening /dev/mem, even if you are not root.
@@ -684,6 +739,10 @@
 /*! Base Address of the BSC1 registers */
 #define BCM2835_BSC1_BASE				0x804000
 
+/* BEB */
+/*! Base address of the SMI registers */
+#define BCM2835_SMI_BASE                0x600000
+
 #include <stdlib.h>
 
 /*! Physical address and size of the peripherals block
@@ -746,6 +805,11 @@ extern volatile uint32_t *bcm2835_aux;
 */
 extern volatile uint32_t *bcm2835_spi1;
 
+/* BEB */
+/*! Base of SMI registers.
+  Available after bcm2835_init has been called (as root)
+*/
+extern volatile uint32_t *bcm2835_smi;
 
 /*! \brief bcm2835RegisterBase
   Register bases for bcm2835_regbase()
@@ -759,9 +823,12 @@ typedef enum
     BCM2835_REGBASE_PADS = 5, /*!< Base of the PADS registers. */
     BCM2835_REGBASE_SPI0 = 6, /*!< Base of the SPI0 registers. */
     BCM2835_REGBASE_BSC0 = 7, /*!< Base of the BSC0 registers. */
-    BCM2835_REGBASE_BSC1 = 8,  /*!< Base of the BSC1 registers. */
-	BCM2835_REGBASE_AUX  = 9,  /*!< Base of the AUX registers. */
-	BCM2835_REGBASE_SPI1 = 10  /*!< Base of the SPI1 registers. */
+    BCM2835_REGBASE_BSC1 = 8, /*!< Base of the BSC1 registers. */
+    BCM2835_REGBASE_AUX  = 9, /*!< Base of the AUX registers. */
+    BCM2835_REGBASE_SPI1 = 10,/*!< Base of the SPI1 registers. */
+    /* BEB */
+    BCM2835_REGBASE_SMI = 11  /*!< Base of the SMI registers. */
+
 } bcm2835RegisterBase;
 
 /*! Size of memory page on RPi */
@@ -1164,6 +1231,7 @@ typedef enum
 #define BCM2835_BSC_S_TA 		0x00000001 /*!< Transfer Active */
 
 #define BCM2835_BSC_FIFO_SIZE   	16 /*!< BSC FIFO size */
+#define BCM2835_AUX_SPI_FIFO_SIZE       4
 
 /*! \brief bcm2835I2CClockDivider
   Specifies the divider used to generate the I2C clock from the system clock.
@@ -1185,8 +1253,70 @@ typedef enum
     BCM2835_I2C_REASON_OK   	     = 0x00,      /*!< Success */
     BCM2835_I2C_REASON_ERROR_NACK    = 0x01,      /*!< Received a NACK */
     BCM2835_I2C_REASON_ERROR_CLKT    = 0x02,      /*!< Received Clock Stretch Timeout */
-    BCM2835_I2C_REASON_ERROR_DATA    = 0x04       /*!< Not all data is sent / received */
+    BCM2835_I2C_REASON_ERROR_DATA    = 0x04,      /*!< Not all data is sent / received */
+    BCM2835_I2C_REASON_ERROR_TIMEOUT = 0x08       /*!< Time out occurred during sending */
+
 } bcm2835I2CReasonCodes;
+
+/* Registers offets from BCM2835_SMI_BASE */
+#define BCM2835_SMI_CS           0          /*! < Control and status register > */
+#define BCM2835_SMI_LENGTH       1          /*! < Transfer length register > */
+#define BCM2835_SMI_ADRS         2          /*! < Transfer address register > */
+#define BCM2835_SMI_DATA         3          /*! < Transfer data register > */
+#define BCM2835_SMI_READ0        4          /*! < Read  settings 0 register > */
+#define BCM2835_SMI_WRITE0       5          /*! < Write settings 0 register > */
+#define BCM2835_SMI_READ1        6          /*! < Read  settings 1 register > */
+#define BCM2835_SMI_WRITE1       7          /*! < Write settings 1 register > */
+#define BCM2835_SMI_READ2        8          /*! < Read  settings 2 register > */
+#define BCM2835_SMI_WRITE2       9          /*! < Write settings 2 register > */
+#define BCM2835_SMI_READ3       10          /*! < Read  settings 3 register > */
+#define BCM2835_SMI_WRITE3      11          /*! < Write settings 3 register > */
+#define BCM2835_SMI_DMAC        12          /*! < DMA control register > */
+#define BCM2835_SMI_DIRCS       13          /*! < Direct control register > */
+#define BCM2835_SMI_DIRADDR     14          /*! < Direct access address register > */
+#define BCM2835_SMI_DIRDATA     15          /*! < Direct access data register > */
+
+/* Register masks for SMI_READ and SMI_WRITE */
+#define BCM2835_SMI_RW_WIDTH_MSK        0xC0000000 /*! < Data width mask > */
+#define BCM2835_SMI_RW_WID8             0x00000000 /*! < Data width 8 bits > */
+#define BCM2835_SMI_RW_WID16            0x40000000 /*! < Data width 16 bits > */
+#define BCM2835_SMI_RW_WID18            0x80000000 /*! < Data width 18 bits > */
+#define BCM2835_SMI_RW_WID9             0xC0000000 /*! < Data width 9 bits > */
+#define BCM2835_SMI_RW_SETUP_MSK        0x3F000000 /*! < Setup cycles (6 bits) > */
+#define BCM2835_SMI_RW_SETUP_LS         24         /*! < Shift for setup cycles > */
+#define BCM2835_SMI_RW_MODE68           0x00800000 /*! < Run cycle motorola mode > */
+#define BCM2835_SMI_RW_MODE80           0x00000000 /*! < Run cycle intel mode > */
+#define BCM2835_SMI_READ_FSETUP         0x00400000 /*! < Read : Setup only for first cycle > */
+#define BCM2835_SMI_WRITE_SWAP          0x00400000 /*! < Write : swap pixel data > */
+#define BCM2835_SMI_RW_HOLD_MSK         0x003F0000 /*! < Hold cycles (6 bits) > */
+#define BCM2835_SMI_RW_HOLD_LS          16         /*! < Shift for hold cycles > */
+#define BCM2835_SMI_RW_PACEALL          0x00008000 /*! < Apply pacing always > */
+#define BCM2835_SMI_RW_PACE_MSK         0x00007F00 /*! < Pace cycles (7 bits) > */
+#define BCM2835_SMI_RW_PACE_LS          8          /*! < Shift for pace cycles > */
+#define BCM2835_SMI_RW_DREQ             0x00000080 /*! < Use DMA req on read/write > */
+#define BCM2835_SMI_RW_STROBE_MSK       0x0000007F /*! < Strobe cycles (7 bits) > */
+#define BCM2835_SMI_RW_STROBE_LS        0          /*! < Shift for strobe cycles > */
+
+/* Registers masks for Direct Access control register */
+#define BCM2835_SMI_DIRCS_ENABLE        0x00000001  /*! < Set to enable SMI. 0 = Read from ext. devices > */
+#define BCM2835_SMI_DIRCS_START         0x00000002  /*! < Initiate SMI transfer > */
+#define BCM2835_SMI_DIRCS_DONE          0x00000004  /*! < Set if transfer has finished / Write to clear flag > */
+#define BCM2835_SMI_DIRCS_WRITE         0x00000008  /*! < 1 = Write to ext. devices > */
+
+/* Registers masks for Direct Access address register */
+#define BCM2835_SMI_DIRADRS_DEV_MSK     0x00000300  /*! < Timing configuration slot >  */
+#define BCM2835_SMI_DIRADRS_DEV_LS      8           /*! < Shift for configuration slot > */
+#define BCM2835_SMI_DIRADRS_DEV0        0x00000000  /*! < Use timing config slot 0 > */
+#define BCM2835_SMI_DIRADRS_DEV1        0x00000100  /*! < Use timing config slot 1 > */
+#define BCM2835_SMI_DIRADRS_DEV2        0x00000200  /*! < Use timing config slot 2 > */
+#define BCM2835_SMI_DIRADRS_DEV3        0x00000300  /*! < Use timing config slot 3 > */
+#define BCM2835_SMI_DIRADRS_MSK         0x0000003F  /*! < Adress bits SA5..SA0 > */
+#define BCM2835_SMI_DIRADRS_LS          0           /*! < Shift for address bits > */
+
+/* SMI clock control registers : defined as offset from bcm2835_clk */
+#define SMICLK_CNTL  (44)  /* = 0xB0 */
+#define SMICLK_DIV   (45)  /* = 0xB4 */
+
 
 /* Defines for ST
    GPIO register offsets from BCM2835_ST_BASE.
@@ -1926,6 +2056,66 @@ extern "C" {
 
     /*! @} */
 
+    /*! \defgroup smi SMI bus support
+      Allows access to SMI bus
+      @{
+    */
+    /*! Start SMI operations.
+      Forces RPi SMI pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
+      to alternate function ALT1, which enables those pins for SMI interface.
+      You should call bcm2835_smi_end() when all SMI functions are complete to return the pins to
+      their default functions.
+      Only address bits SA0 to SA3 are available as RPi uses GPIO0 (SA5) and GPIO1 (SA4) for I2C
+      HAT identification EEPROM access
+      \sa  bcm2835_smi_end()
+      \return 1 if successful, 0 otherwise (perhaps because you are not running as root)
+    */
+    extern int bcm2835_smi_begin (void);
+
+    /*! End SMI operations.
+      SMI pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
+      are returned to their default INPUT behaviour.
+    */
+    extern void bcm2835_smi_end (void);
+
+    /*! Setup SMI bus cycle timing parameters
+    There are four SMI channels for read operation and four channels for write operation
+    Cycles are expressed as multiple of 8ns
+    Note that Pace cycles are not used (no effect on hardware) but they are required for
+    configuration. It is recommended to set this value to 1 (and not 0) to have the
+    smallest cycle in case the hardware would recognize it
+    \param[in] smichannel SMI configuration slot to setup (0 to 3)
+    \param[in] readchannel Set to 1 to configure the read channel (0 = configure write channel)
+    \param[in] setupcycles Time between address assertion on bus and OE/WR signal assertion
+    \param[in] strobecycles Duration of OE/WR signal assertion
+    \param[in] holdcycles Time after OE/WR deassertion before address is deasserted
+    \param[in] pacecycles Time before next SMI bus cycle
+    */
+    extern void bcm2835_smi_set_timing(uint32_t smichannel, uint32_t readchannel,
+                                        uint32_t setupcycles, uint32_t strobecycles,
+                                        uint32_t holdcycles, uint32_t pacecycles);
+
+    /*! Transfers one byte to SMI bus.
+      Uses polled transfer as described in BCM 2835 ARM Peripherals manual
+      \param[in] timingslot SMI configuration slot to use (0 to 3)
+      \param[in] data The data byte to write
+      \param[in] address The address to write to
+      \sa bcm2835_smi_writenb()
+    */
+    extern void bcm2835_smi_write (uint32_t smichannel, uint8_t data, uint32_t address);
+
+    /*! Reads one byte from SMI bus.
+      Uses polled transfer as described in BCM 2835 ARM Peripherals manual
+      \param[in] smichannel SMI configuration slot to use (0 to 3)
+      \param[in] address The address to read from
+      \return value read from SMI bus
+      \sa bcm2835_smi_readnb()
+    */
+    extern uint32_t bcm2835_smi_read (uint32_t smichannel, uint32_t address);
+
+    /*! @} */
+
+    
     /*! \defgroup st System Timer access
       Allows access to and delays using the System Timer Counter.
       @{
@@ -2026,4 +2216,8 @@ Broadcom bcm2835. Contributed by Shahrooz Shahparnia.
 /*! example spimem_test.c
   Shows how to use the included little library (spiram.c and spiram.h)
   to read and write SPI RAM chips such as 23K256-I/P
+*/
+
+/*! example smi.c
+  Shows how to use the SMI bus calls. Courtesy Benoit Bouchez.
 */
