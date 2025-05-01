@@ -1562,9 +1562,8 @@ uint8_t RF24::clearStatusFlags(uint8_t flags)
 
 void RF24::setStatusFlags(uint8_t flags)
 {
-    config_reg &= ~RF24_IRQ_ALL;
-    // flip the flags to translate from "human understanding"
-    config_reg |= ~flags & RF24_IRQ_ALL;
+    // flip the `flags` to translate from "human understanding"
+    config_reg = (config_reg & ~RF24_IRQ_ALL) | (~flags & RF24_IRQ_ALL);
     write_register(NRF_CONFIG, config_reg);
 }
 
