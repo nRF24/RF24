@@ -1505,9 +1505,8 @@ uint8_t RF24::getDynamicPayloadSize(void)
 {
     uint8_t result = read_register(R_RX_PL_WID);
 
-    if (result > 32) {
+    if (result > 32 || !result) {
         flush_rx();
-        delay(2);
         return 0;
     }
     return result;
