@@ -2,6 +2,8 @@
 
 @tableofcontents
 
+<!-- markdownlint-disable MD033 MD031 -->
+
 This is a collection of snippets that highlight preferred API over the deprecated original API.
 
 ## isAckPayloadAvailable()
@@ -41,7 +43,7 @@ There are overloaded functions that use a buffer instead:
 - `RF24::openReadingPipe(uint8_t, const uint8_t*)`
 - `RF24::openWritingPipe(const uint8_t*)`
 
-These eliminates the unnecessary 24 bits by only using the length of the buffer (`uint8_t*`)
+These eliminate the unnecessary 24 bits by only using the length of the buffer (`uint8_t*`)
 specified by `RF24::setAddressWidth()`.
 
 > [!CAUTION]
@@ -163,7 +165,6 @@ radio.setStatusFlags();
 
 </td></tr></table>
 
-
 ## whatHappened()
 
 > **Deprecated since v1.5**
@@ -176,7 +177,7 @@ The aptly named `RF24::clearStatusFlags()` is designed to be a replacement for `
 Like `RF24::clearStatusFlags()`, `RF24::setStatusFlags()` takes 1 parameter whose value is defined by
 the `rf24_irq_flags_e` enumerated constants. These constant values specify individual flags;
 they can also be OR'd together to specify multiple flags.
-Additionally, `RF24::setStatusFlags()` returns the STATUS byte containing the flags that
+Additionally, `RF24::clearStatusFlags()` returns the STATUS byte containing the flags that
 caused the IRQ pin to go active LOW.
 This allows the user code to allocate less memory when diagnosing the IRQ pin's meaning.
 
