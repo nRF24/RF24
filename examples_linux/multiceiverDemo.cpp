@@ -47,13 +47,13 @@ RF24 radio(CE_PIN, CSN_PIN);
 // an identifying device destination
 // Notice that the last byte is the only byte that changes in the last 5
 // addresses. This is a limitation of the nRF24L01 transceiver for pipes 2-5
-// because they use the same first 4 bytes from pipe 1.
-uint64_t address[6] = {0x7878787878LL,
-                       0xB3B4B5B6F1LL,
-                       0xB3B4B5B6CDLL,
-                       0xB3B4B5B6A3LL,
-                       0xB3B4B5B60FLL,
-                       0xB3B4B5B605LL};
+// because they use the same first 4 MSBytes from pipe 1.
+uint8_t address[6][5] = {{0x78, 0x78, 0x78, 0x78, 0x78},
+                         {0xF1, 0xB6, 0xB5, 0xB4, 0xB3},
+                         {0xCD, 0xB6, 0xB5, 0xB4, 0xB3},
+                         {0xA3, 0xB6, 0xB5, 0xB4, 0xB3},
+                         {0x0F, 0xB6, 0xB5, 0xB4, 0xB3},
+                         {0x05, 0xB6, 0xB5, 0xB4, 0xB3}};
 
 // For this example, we'll be using a payload containing
 // a node ID number and a single integer number that will be incremented
@@ -181,9 +181,8 @@ void master(unsigned int role)
     payload.nodeID = role;
     payload.payloadID = 0;
 
-    // Set the address on pipe 0 to the RX node.
-    radio.stopListening(); // put radio in TX mode
-    radio.openWritingPipe(address[role]);
+    // set the TX address of the RX node for use on the TX pipe (pipe 0)
+    radio.stopListening(address[role]); // put radio in TX mode
 
     // According to the datasheet, the auto-retry features's delay value should
     // be "skewed" to allow the RX node to receive 1 transmission at a time.

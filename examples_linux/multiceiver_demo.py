@@ -74,9 +74,9 @@ def master(node_number):
         ((node_number * 3) % 12) + 3, 15
     )  # maximum value is 15 for both args
 
-    radio.stopListening()  # put radio in TX mode
-    # set the TX address to the address of the base station.
-    radio.openWritingPipe(addresses[node_number])
+    # set the TX address of the RX node for use on the TX pipe (pipe 0)
+    radio.stopListening(addresses[node_number])  # put radio in TX mode
+
     counter = 0
     failures = 0
     while failures < 6:

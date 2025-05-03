@@ -51,8 +51,8 @@ radio.enableAckPayload()
 # usually run with nRF24L01 transceivers in close proximity of each other
 radio.setPALevel(RF24_PA_LOW)  # RF24_PA_MAX is default
 
-# set the TX address of the RX node into the TX pipe
-radio.openWritingPipe(address[radio_number])  # always uses pipe 0
+# set the TX address of the RX node for use on the TX pipe (pipe 0)
+radio.stopListening(address[radio_number])
 
 # set the RX address of the TX node into a RX pipe
 radio.openReadingPipe(1, address[not radio_number])  # using pipe 1

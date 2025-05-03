@@ -78,8 +78,8 @@ bool setup()
     // this feature for all nodes (TX & RX) to use ACK payloads.
     radio.enableAckPayload();
 
-    // set the TX address of the RX node into the TX pipe
-    radio.openWritingPipe(address[radioNumber]); // always uses pipe 0
+    // set the TX address of the RX node for use on the TX pipe (pipe 0)
+    radio.stopListening(address[radioNumber]);
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1

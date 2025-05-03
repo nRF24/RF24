@@ -84,8 +84,8 @@ void setup() {
   // this feature for all nodes (TX & RX) to use ACK payloads.
   radio.enableAckPayload();
 
-  // set the TX address of the RX node into the TX pipe
-  radio.openWritingPipe(address[radioNumber]);  // always uses pipe 0
+  // set the TX address of the RX node for use on the TX pipe (pipe 0)
+  radio.stopListening(address[radioNumber]);  // put radio in TX mode
 
   // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]);  // using pipe 1
@@ -93,9 +93,7 @@ void setup() {
   // additional setup specific to the node's role
   if (role) {
     // setup the TX payload
-
     memcpy(payload.message, "Hello ", 6);  // set the payload message
-    radio.stopListening();                 // put radio in TX mode
   } else {
     // setup the ACK payload & load the first response into the FIFO
 

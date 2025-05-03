@@ -30,21 +30,33 @@ if radio.available() { /* .. */ }
 
 </td></tr></table>
 
-## openReadingPipe(uint8_t, uint64_t) and openWritingPipe(uint64_t)
+## 64-bit integer addresses
 
-> **Deprecated since v1.3.11**
+Any function that accept an address in the form of `uint64_t` is discouraged. This includes
 
-These functions' address parameter used a 64-bit unsigned integer (`uint64_t`).
+- `RF24::openReadingPipe(uint8_t, uint64_t)`
+   > **Deprecated since v1.3.11**
+- `RF24::openWritingPipe(uint64_t)`
+   > **Deprecated since v1.3.11**
+- `RF24::stopListening(const uint64_t)`
+   > **Deprecated since v1.5**
+
+These functions' address parameter use a 64-bit unsigned integer (`uint64_t`).
 The nRF24L01 can only use up to 40 bit addresses.
-Thus, there was an unused 24 bits being allocated for addresses using this function.
+Thus, there is an unused 24 bits being allocated for addresses using these functions.
 
 There are overloaded functions that use a buffer instead:
 
 - `RF24::openReadingPipe(uint8_t, const uint8_t*)`
 - `RF24::openWritingPipe(const uint8_t*)`
+- `RF24::stopListening(const uint8_t*)`
 
 These eliminate the unnecessary 24 bits by only using the length of the buffer (`uint8_t*`)
 specified by `RF24::setAddressWidth()`.
+
+@see The `RF24::openWritingPipe(const uint8_t*)` is now deprecated in favor of the
+overloaded `RF24::stopListening(const uint8_t*)` function.
+See the section below for more detail.
 
 > [!CAUTION]
 > The endianness (byte order) of a buffer is reversed compared to a 64-bit integer.
@@ -177,6 +189,7 @@ The aptly named `RF24::clearStatusFlags()` is designed to be a replacement for `
 Like `RF24::clearStatusFlags()`, `RF24::setStatusFlags()` takes 1 parameter whose value is defined by
 the `rf24_irq_flags_e` enumerated constants. These constant values specify individual flags;
 they can also be OR'd together to specify multiple flags.
+
 Additionally, `RF24::clearStatusFlags()` returns the STATUS byte containing the flags that
 caused the IRQ pin to go active LOW.
 This allows the user code to allocate less memory when diagnosing the IRQ pin's meaning.
@@ -208,6 +221,67 @@ radio.clearStatusFlags(RF24_TX_DS | RF24_TX_DF);
 
 // only clear the "RX Data Ready" event
 radio.clearStatusFlags(RF24_RX_DR);
+```
+
+</td></tr></table>
+
+## openWritingPipe(const uint8_t*)
+
+> Deprecated since v1.5
+
+Originally, `RF24::openWritingPipe(const uint8_t*)` was just a compliment to
+`RF24::openReadingPipe()`.
+It changes the address on pipe 0 because that is the only pipe that can be
+used for transmitting.
+
+Unfortunately, there was a bug that prevented the given TX address from being
+persistent on pipe 0 if the user code also set an RX address to pipe 0.
+This bug would surface when switching between RX mode and TX mode (via
+`RF24::startListening()` and `RF24::stopListening()` respectively) or after
+`RF24::stopConstCarrier()` (if `RF24::isPVariant()` returns `true`).
+
+The solution is to cache the TX address on the `RF24` instance.
+Consequently, this solution did not fit well with the traditional order of
+functions used to set up the radio's TX or RX mode.
+
+By overloading `RF24::stopListening(const uint8_t*)`, we are able to ensure proper radio
+setup without requiring certain functions are called in a certain order.
+
+- Use `RF24::stopListening(const uint8_t*)` to set the TX address and enter inactive TX mode.
+  `RF24::openReadingPipe()` can now (as of v1.5) be used in TX mode without consequence.
+- Use `RF24::stopListening()` to enter inactive TX mode without changing the TX address.
+
+> [!warning]
+> Avoid using pipe 0 for RX operations to improve performance and reliability.
+>
+> For implementation detail, see the source for `RF24::openReadingPipe()` and
+> `RF24::stopListening()`. Ultimately, the datasheet's Appendix A has a detailed
+> example outlining the order of a proper radio setup.
+
+<table><tr>
+<th>Old</th>
+<th>New (supported)</th>
+</tr><tr><td>
+
+```cpp
+// set TX address (pipe 0)
+radio.openWritingPipe(tx_address);
+
+// set RX address (pipe 1)
+radio.openReadingPipe(1, rx_address);
+
+// idle radio using inactive TX mode
+radio.stopListening();
+```
+
+</td><td>
+
+```cpp
+// set TX address (pipe 0)
+radio.stopListening(tx_address); // enters inactive TX mode
+
+// set RX address (pipe 1)
+radio.openReadingPipe(1, rx_address);
 ```
 
 </td></tr></table>

@@ -88,8 +88,8 @@ void setup() {
   // number of bytes we need to transmit a float
   radio.setPayloadSize(sizeof(payload));  // char[7] & uint8_t datatypes occupy 8 bytes
 
-  // set the TX address of the RX node into the TX pipe
-  radio.openWritingPipe(address[radioNumber]);  // always uses pipe 0
+  // set the TX address of the RX node for use on the TX pipe (pipe 0)
+  radio.stopListening(address[radioNumber]);  // put radio in TX mode
 
   // set the RX address of the TX node into a RX pipe
   radio.openReadingPipe(1, address[!radioNumber]);  // using pipe 1
@@ -98,7 +98,6 @@ void setup() {
     // setup the TX node
 
     memcpy(payload.message, "Hello ", 6);  // set the outgoing message
-    radio.stopListening();                 // put radio in TX mode
   } else {
     // setup the RX node
 

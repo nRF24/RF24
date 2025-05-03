@@ -379,12 +379,15 @@ public:
      * @warning When the ACK payloads feature is enabled, the TX FIFO buffers are
      * flushed when calling this function. This is meant to discard any ACK
      * payloads that were not appended to acknowledgment packets.
-     *
-     * @note For auto-ack purposes, the TX address passed to openWritingPipe() will be restored to
-     * RX pipe 0. This still means that `stopListening()` shall be called before
-     * calling openWritingPipe() because the TX address is cached in openWritingPipe().
      */
     void stopListening(void);
+
+    /**
+     * @brief Similar to startListening(void) but changes the TX address.
+     * @param txAddress The new TX address.
+     * This value will be cached for auto-ack purposes.
+     */
+    void stopListening(const uint8_t* txAddress);
 
     /**
      * Check whether there are bytes available to be read
@@ -522,6 +525,8 @@ public:
     /**
      * New: Open a pipe for writing via byte array. Old addressing format retained
      * for compatibility.
+     *
+     * @deprecated Use `RF24::stopListening(uint8_t*)` instead.
      *
      * Only one writing pipe can be opened at once, but this function changes
      * the address that is used to transmit (ACK payloads/packets do not apply
@@ -2021,6 +2026,17 @@ public:
      * @endcode
      */
     void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
+
+    /**
+     * Similar to startListening(void) but changes the TX address.
+     *
+     * @deprecated Use stopListening(const uint8_t*) instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
+     *
+     * @param txAddress The new TX address.
+     * This value will be cached for auto-ack purposes.
+     */
+    void stopListening(const uint64_t txAddress);
 
 private:
     /**@}*/

@@ -98,6 +98,11 @@ void openWritingPipe_wrap(RF24& ref, const bp::object address)
     ref.openWritingPipe((const uint8_t*)(get_bytes_or_bytearray_str(address)));
 }
 
+void stopListening_wrap(RF24& ref, const bp::object address)
+{
+    ref.stopListening((const uint8_t*)(get_bytes_or_bytearray_str(address)));
+}
+
 void openReadingPipe_wrap(RF24& ref, uint8_t number, const bp::object address)
 {
     ref.openReadingPipe(number, (const uint8_t*)(get_bytes_or_bytearray_str(address)));
@@ -351,7 +356,8 @@ BOOST_PYTHON_MODULE(RF24)
         .def("startFastWrite", &startFastWrite_wrap2, (bp::arg("buf"), bp::arg("len"), bp::arg("multicast"), bp::arg("startTx")))
         .def("startListening", &RF24::startListening)
         .def("startWrite", &startWrite_wrap, (bp::arg("buf"), bp::arg("len"), bp::arg("multicast")))
-        .def("stopListening", &RF24::stopListening)
+        .def("stopListening", (void(::RF24::*)(void))(&RF24::stopListening))
+        .def("stopListening", &stopListening_wrap, (bp::arg("txAddress")))
         .def("testCarrier", &RF24::testCarrier)
         .def("testRPD", &RF24::testRPD)
         .def("toggleAllPipes", &RF24::toggleAllPipes)

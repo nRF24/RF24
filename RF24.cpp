@@ -603,7 +603,6 @@ void RF24::_init_obj()
     _spi = &SPI;
 #endif // defined (RF24_SPI_PTR)
 
-    pipe0_reading_address[0] = 0;
     if (spi_speed <= 35000) { //Handle old BCM2835 speed constants, default to RF24_SPI_SPEED
         spi_speed = RF24_SPI_SPEED;
     }
@@ -1192,6 +1191,24 @@ void RF24::stopListening(void)
 
 /****************************************************************************/
 
+void RF24::stopListening(const uint64_t txAddress)
+{
+    memcpy(pipe0_writing_address, &txAddress, addr_width);
+    stopListening();
+    write_register(TX_ADDR, pipe0_writing_address, addr_width);
+}
+
+/****************************************************************************/
+
+void RF24::stopListening(const uint8_t* txAddress)
+{
+    memcpy(pipe0_writing_address, txAddress, addr_width);
+    stopListening();
+    write_register(TX_ADDR, pipe0_writing_address, addr_width);
+}
+
+/****************************************************************************/
+
 void RF24::powerDown(void)
 {
     ce(LOW); // Guarantee CE is low on powerDown
@@ -1626,11 +1643,13 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
 
     if (child <= 5) {
         // For pipes 2-5, only write the LSB
-        if (child < 2) {
-            write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), addr_width);
-        }
-        else {
+        if (child > 1) {
             write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
+        }
+        // avoid overwriting the TX address on pipe 0 while still in TX mode.
+        // NOTE, the cached RX address on pipe 0 is written when startListening() is called.
+        else if (static_cast<bool>(config_reg & _BV(PRIM_RX)) || child != 0) {
+            write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), addr_width);
         }
 
         // Note it would be more efficient to set all of the bits for all open
@@ -1668,11 +1687,13 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t* address)
     }
     if (child <= 5) {
         // For pipes 2-5, only write the LSB
-        if (child < 2) {
-            write_register(pgm_read_byte(&child_pipe[child]), address, addr_width);
-        }
-        else {
+        if (child > 1) {
             write_register(pgm_read_byte(&child_pipe[child]), address, 1);
+        }
+        // avoid overwriting the TX address on pipe 0 while still in TX mode.
+        // NOTE, the cached RX address on pipe 0 is written when startListening() is called.
+        else if (static_cast<bool>(config_reg & _BV(PRIM_RX)) || child != 0) {
+            write_register(pgm_read_byte(&child_pipe[child]), address, addr_width);
         }
 
         // Note it would be more efficient to set all of the bits for all open
@@ -2037,6 +2058,11 @@ void RF24::stopConstCarrier()
     powerDown(); // per datasheet recommendation (just to be safe)
     write_register(RF_SETUP, static_cast<uint8_t>(read_register(RF_SETUP) & ~_BV(CONT_WAVE) & ~_BV(PLL_LOCK)));
     ce(LOW);
+    flush_tx();
+    if (isPVariant()) {
+        // restore the cached TX address
+        write_register(TX_ADDR, pipe0_writing_address, addr_width);
+    }
 }
 
 /****************************************************************************/

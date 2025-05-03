@@ -15,7 +15,7 @@ build:
   commands:
     # Install doxygen from source distributions (conda forge does not keep up-to-date doxygen releases)
     - >
-      DOXYGEN_VERSION="1.12.0" &&
+      DOXYGEN_VERSION="1.13.2" &&
       mkdir .doxygen && cd .doxygen &&
       echo $(pwd) &&
       echo "https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz" &&
