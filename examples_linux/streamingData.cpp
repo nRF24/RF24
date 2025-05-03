@@ -208,8 +208,16 @@ void master()
     while (i < SIZE) {
         makePayload(i);
         if (!radio.writeFast(&buffer, SIZE)) {
-            failures++;
-            radio.reUseTX();
+            uint8_t flags = radio.getStatusFlags();
+            if (flags & RF24_TX_DF) {
+                failures++;
+                // failed to transmit a previous payload.
+                // Now we need to reset the tx_df flag and the CE pin
+                radio.ce(LOW);
+                radio.clearStatusFlags(RF24_TX_DF);
+                radio.ce(HIGH);
+            }
+            // else the TX FIFO is full; just continue loop
         }
         else {
             i++;
@@ -241,10 +249,10 @@ void slave()
     time_t startTimer = time(nullptr);        // start a timer
     while (time(nullptr) - startTimer < 6) {  // use 6 second timeout
         if (radio.available()) {              // is there a payload
+            counter++;                        // increment counter
             radio.read(&buffer, SIZE);        // fetch payload from FIFO
             cout << "Received: " << buffer;   // print the payload's value
             cout << " - " << counter << endl; // print the counter
-            counter++;                        // increment counter
             startTimer = time(nullptr);       // reset timer
         }
     }

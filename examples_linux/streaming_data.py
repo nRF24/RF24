@@ -7,7 +7,7 @@ See documentation at https://nRF24.github.io/RF24
 """
 
 import time
-from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER
+from RF24 import RF24, RF24_PA_LOW, RF24_DRIVER, RF24_TX_DF
 
 print(__file__)  # print example name
 
@@ -94,27 +94,32 @@ def master(count: int = 1):
     radio.stopListening()  # put radio in TX mode
     radio.flush_tx()  # clear the TX FIFO so we can use all 3 levels
     failures = 0  # keep track of manual retries
-    start_timer = time.monotonic_ns()  # start timer
     for multiplier in range(count):  # repeat transmit the same data stream
         buf_iter = 0  # iterator of payloads for the while loop
+        start_timer = time.monotonic_ns()  # start timer
         while buf_iter < SIZE:  # cycle through all the payloads
             buffer = make_buffer(buf_iter)  # make a payload
 
             if not radio.writeFast(buffer):  # transmission failed
-                failures += 1  # increment manual retry count
+                flags = radio.getStatusFlags()
+                if flags & RF24_TX_DF:
+                    failures += 1  # increment manual retry count
+                    # now we need to reset the tx_df flag and the radio's CE pin
+                    radio.ce(False)
+                    flags = radio.clearStatusFlags(RF24_TX_DF)
+                    radio.ce(True)
                 if failures > 99 and buf_iter < 7 and multiplier < 2:
                     # we need to prevent an infinite loop
                     print("Too many failures detected. Aborting at payload ", buffer[0])
                     multiplier = count  # be sure to exit the for loop
                     break  # exit the while loop
-                radio.reUseTX()  # resend payload in top level of TX FIFO
             else:  # transmission succeeded
                 buf_iter += 1
-    end_timer = time.monotonic_ns()  # end timer
-    print(
-        f"Time to transmit data = {(end_timer - start_timer) / 1000} us.",
-        f"Detected {failures} failures.",
-    )
+        end_timer = time.monotonic_ns()  # end timer
+        print(
+            f"Time to transmit data = {(end_timer - start_timer) / 1000} us.",
+            f"Detected {failures} failures.",
+        )
 
 
 def slave(timeout: int = 6):

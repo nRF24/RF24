@@ -130,6 +130,30 @@ typedef enum
 
 /**
  * @}
+ * @defgroup StatusFlags Status flags
+ * @{
+ */
+
+/**
+ * @brief An enumeration of constants used to configure @ref StatusFlags
+ */
+typedef enum
+{
+#include "nRF24L01.h"
+    /// An alias of `0` to describe no IRQ events enabled.
+    RF24_IRQ_NONE = 0,
+    /// Represents an event where TX Data Failed to send.
+    RF24_TX_DF = 1 << MASK_MAX_RT,
+    /// Represents an event where TX Data Sent successfully.
+    RF24_TX_DS = 1 << TX_DS,
+    /// Represents an event where RX Data is Ready to `RF24::read()`.
+    RF24_RX_DR = 1 << RX_DR,
+    /// Equivalent to `RF24_RX_DR | RF24_TX_DS | RF24_TX_DF`.
+    RF24_IRQ_ALL = (1 << MASK_MAX_RT) | (1 << TX_DS) | (1 << RX_DR),
+} rf24_irq_flags_e;
+
+/**
+ * @}
  * @brief Driver class for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 class RF24
@@ -378,13 +402,13 @@ public:
      * that received the next available payload. According to the datasheet,
      * the data about the pipe number that received the next available payload
      * is "unreliable" during a FALLING transition on the IRQ pin. This means
-     * you should call whatHappened() before calling this function
+     * you should call clearStatusFlags() before calling this function
      * during an ISR (Interrupt Service Routine). For example:
      * @code
      * void isrCallbackFunction() {
      *   bool tx_ds, tx_df, rx_dr;
-     *   radio.whatHappened(tx_ds, tx_df, rx_dr); // resets the IRQ pin to HIGH
-     *   radio.available();                       // returned data should now be reliable
+     *   uint8_t flags = radio.clearStatusFlags(); // resets the IRQ pin to HIGH
+     *   radio.available();                        // returned data should now be reliable
      * }
      *
      * void setup() {
@@ -629,6 +653,16 @@ public:
     void printDetails(void);
 
     /**
+     * Decode and print the given STATUS byte to stdout.
+     *
+     * @param flags The STATUS byte to print.
+     * This value is fetched with update() or getStatusFlags().
+     *
+     * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
+     */
+    void printStatus(uint8_t flags);
+
+    /**
      * Print a giant block of debugging information to stdout. This function
      * differs from printDetails() because it makes the information more
      * understandable without having to look up the datasheet or convert
@@ -789,14 +823,13 @@ public:
      *
      * @warning According to the datasheet, the data saved to `pipe_num` is
      * "unreliable" during a FALLING transition on the IRQ pin. This means you
-     * should call whatHappened() before calling this function during
+     * should call clearStatusFlags() before calling this function during
      * an ISR (Interrupt Service Routine). For example:
      * @code
      * void isrCallbackFunction() {
-     *   bool tx_ds, tx_df, rx_dr;
-     *   radio.whatHappened(tx_ds, tx_df, rx_dr); // resets the IRQ pin to HIGH
-     *   uint8_t pipe;                            // initialize pipe data
-     *   radio.available(&pipe);                  // pipe data should now be reliable
+     *   radio.clearStatusFlags(); // resets the IRQ pin to inactive HIGH
+     *   uint8_t pipe = 7;         // initialize pipe data
+     *   radio.available(&pipe);   // pipe data should now be reliable
      * }
      *
      * void setup() {
@@ -840,6 +873,8 @@ public:
 
     /**
      * @deprecated Use RF24::isFifo(bool about_tx) instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
+     *
      * @param about_tx `true` focuses on the TX FIFO, `false` focuses on the RX FIFO
      * @param check_empty
      * - `true` checks if the specified FIFO is empty
@@ -1147,36 +1182,68 @@ public:
     bool writeAckPayload(uint8_t pipe, const void* buf, uint8_t len);
 
     /**
-     * Call this when you get an Interrupt Request (IRQ) to find out why
+     * Clear the Status flags that caused an interrupt event.
      *
-     * This function describes what event triggered the IRQ pin to go active
-     * LOW and clears the status of all events.
+     * @remark This function is similar to `whatHappened()` because it also returns the
+     * Status flags that caused the interrupt event. However, this function returns
+     * a STATUS byte instead of bit-banging into 3 1-byte booleans
+     * passed by reference.
      *
-     * @see maskIRQ()
+     * @note When used in an ISR (Interrupt Service routine), there is a chance that the
+     * returned bits 0b1110 (rx_pipe number) is inaccurate. See available(uint8_t*) (or the
+     * datasheet) for more detail.
      *
-     * @param[out] tx_ok The transmission attempt completed (TX_DS). This does
-     * not imply that the transmitted data was received by another radio, rather
-     * this only reports if the attempt to send was completed. This will
-     * always be `true` when the auto-ack feature is disabled.
-     * @param[out] tx_fail The transmission failed to be acknowledged, meaning
-     * too many retries (MAX_RT) were made while expecting an ACK packet. This
-     * event is only triggered when auto-ack feature is enabled.
-     * @param[out] rx_ready There is a newly received payload (RX_DR) saved to
-     * RX FIFO buffers. Remember that the RX FIFO can only hold up to 3
-     * payloads. Once the RX FIFO is full, all further received transmissions
-     * are rejected until there is space to save new data in the RX FIFO
-     * buffers.
+     * @param flags The IRQ flags to clear. Default value is all of them (`RF24_IRQ_ALL`).
+     * Multiple flags can be cleared by OR-ing rf24_irq_flags_e values together.
      *
-     * @note This function expects no parameters in the python wrapper.
-     * Instead, this function returns a 3 item tuple describing the IRQ
-     * events' status. To use this function in the python wrapper:
-     * @code{.py}
-     * # let`radio` be the instantiated RF24 object
-     * tx_ds, tx_df, rx_dr = radio.whatHappened()  # get IRQ status flags
-     * print("tx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
-     * @endcode
+     * @returns The STATUS byte from the radio's register before it was modified. Use
+     * enumerations of rf24_irq_flags_e as masks to interpret the STATUS byte's meaning(s).
+     *
+     * @ingroup StatusFlags
      */
-    void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
+    uint8_t clearStatusFlags(uint8_t flags = RF24_IRQ_ALL);
+
+    /**
+     * Set which flags shall be reflected on the radio's IRQ pin.
+     *
+     * @remarks This function is similar to maskIRQ() but with less confusing parameters.
+     *
+     * @param flags A value of rf24_irq_flags_e to influence the radio's IRQ pin.
+     * The default value (`RF24_IRQ_NONE`) will disable the radio's IRQ pin.
+     * Multiple events can be enabled by OR-ing rf24_irq_flags_e values together.
+     * ```cpp
+     * radio.setStatusFlags(RF24_IRQ_ALL);
+     * // is equivalent to
+     * radio.setStatusFlags(RF24_RX_DR | RF24_TX_DS | RF24_TX_DF);
+     * ```
+     *
+     * @ingroup StatusFlags
+     */
+    void setStatusFlags(uint8_t flags = RF24_IRQ_NONE);
+
+    /**
+     * Get the latest STATUS byte returned from the last SPI transaction.
+     *
+     * @note This does not actually perform any SPI transaction with the radio.
+     * Use `RF24::update()` instead to get a fresh copy of the Status flags at
+     * the slight cost of performance.
+     *
+     * @returns The STATUS byte from the radio's register as the latest SPI transaction. Use
+     * enumerations of rf24_irq_flags_e as masks to interpret the STATUS byte's meaning(s).
+     *
+     * @ingroup StatusFlags
+     */
+    uint8_t getStatusFlags();
+
+    /**
+     * Get an updated STATUS byte from the radio.
+     *
+     * @returns The STATUS byte fetched from the radio's register. Use enumerations of
+     * rf24_irq_flags_e as masks to interpret the STATUS byte's meaning(s).
+     *
+     * @ingroup StatusFlags
+     */
+    uint8_t update();
 
     /**
      * Non-blocking write to the open writing pipe used for buffered writes
@@ -1222,13 +1289,13 @@ public:
      * Non-blocking write to the open writing pipe
      *
      * Just like write(), but it returns immediately. To find out what happened
-     * to the send, catch the IRQ and then call whatHappened().
+     * to the send, catch the IRQ and then call clearStatusFlags() or update().
      *
      * @see
      * - write()
      * - writeFast()
      * - startFastWrite()
-     * - whatHappened()
+     * - clearStatusFlags()
      * - setAutoAck() (for single noAck writes)
      *
      * @param buf Pointer to the data to be sent
@@ -1746,38 +1813,6 @@ public:
     void disableCRC(void);
 
     /**
-     * This function is used to configure what events will trigger the Interrupt
-     * Request (IRQ) pin active LOW.
-     * The following events can be configured:
-     * 1. "data sent": This does not mean that the data transmitted was
-     * received, only that the attempt to send it was complete.
-     * 2. "data failed": This means the data being sent was not received. This
-     * event is only triggered when the auto-ack feature is enabled.
-     * 3. "data received": This means that data from a receiving payload has
-     * been loaded into the RX FIFO buffers. Remember that there are only 3
-     * levels available in the RX FIFO buffers.
-     *
-     * By default, all events are configured to trigger the IRQ pin active LOW.
-     * When the IRQ pin is active, use whatHappened() to determine what events
-     * triggered it. Remember that calling whatHappened() also clears these
-     * events' status, and the IRQ pin will then be reset to inactive HIGH.
-     *
-     * The following code configures the IRQ pin to only reflect the "data received"
-     * event:
-     * @code
-     * radio.maskIRQ(1, 1, 0);
-     * @endcode
-     *
-     * @param tx_ok  `true` ignores the "data sent" event, `false` reflects the
-     * "data sent" event on the IRQ pin.
-     * @param tx_fail  `true` ignores the "data failed" event, `false` reflects the
-     * "data failed" event on the IRQ pin.
-     * @param rx_ready `true` ignores the "data received" event, `false` reflects the
-     * "data received" event on the IRQ pin.
-     */
-    void maskIRQ(bool tx_ok, bool tx_fail, bool rx_ready);
-
-    /**
      *
      * The driver will delay for this duration when stopListening() is called
      *
@@ -1864,7 +1899,8 @@ public:
     /**
      * Open a pipe for reading
      * @deprecated For compatibility with old code only, see newer function
-     * openReadingPipe()
+     * openReadingPipe().
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * @note Pipes 1-5 should share the first 32 bits.
      * Only the least significant byte should be unique, e.g.
@@ -1889,7 +1925,8 @@ public:
     /**
      * Open a pipe for writing
      * @deprecated For compatibility with old code only, see newer function
-     * openWritingPipe()
+     * openWritingPipe().
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * Addresses are 40-bit hex values, e.g.:
      *
@@ -1907,10 +1944,83 @@ public:
      *
      * @deprecated For compatibility with old code only, see synonymous function available().
      * Use read() to retrieve the ack payload and getDynamicPayloadSize() to get the ACK payload size.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
      *
      * @return True if an ack payload is available.
      */
     bool isAckPayloadAvailable(void);
+
+    /**
+     * This function is used to configure what events will trigger the Interrupt
+     * Request (IRQ) pin active LOW.
+     *
+     * @deprecated Use setStatusFlags() instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
+     *
+     * The following events can be configured:
+     * 1. "data sent": This does not mean that the data transmitted was
+     * received, only that the attempt to send it was complete.
+     * 2. "data failed": This means the data being sent was not received. This
+     * event is only triggered when the auto-ack feature is enabled.
+     * 3. "data received": This means that data from a receiving payload has
+     * been loaded into the RX FIFO buffers. Remember that there are only 3
+     * levels available in the RX FIFO buffers.
+     *
+     * By default, all events are configured to trigger the IRQ pin active LOW.
+     * When the IRQ pin is active, use clearStatusFlags() or getStatusFlags() to
+     * determine what events triggered it.
+     * Remember that calling clearStatusFlags() also clears these
+     * events' status, and the IRQ pin will then be reset to inactive HIGH.
+     *
+     * The following code configures the IRQ pin to only reflect the "data received"
+     * event:
+     * @code
+     * radio.maskIRQ(1, 1, 0);
+     * @endcode
+     *
+     * @param tx_ok  `true` ignores the "data sent" event, `false` reflects the
+     * "data sent" event on the IRQ pin.
+     * @param tx_fail  `true` ignores the "data failed" event, `false` reflects the
+     * "data failed" event on the IRQ pin.
+     * @param rx_ready `true` ignores the "data received" event, `false` reflects the
+     * "data received" event on the IRQ pin.
+     */
+    void maskIRQ(bool tx_ok, bool tx_fail, bool rx_ready);
+
+    /**
+     * Call this when you get an Interrupt Request (IRQ) to find out why
+     *
+     * This function describes what event triggered the IRQ pin to go active
+     * LOW and clears the status of all events.
+     *
+     * @deprecated Use clearStatusFlags() instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
+     *
+     * @see setStatusFlags()
+     *
+     * @param[out] tx_ok The transmission attempt completed (TX_DS). This does
+     * not imply that the transmitted data was received by another radio, rather
+     * this only reports if the attempt to send was completed. This will
+     * always be `true` when the auto-ack feature is disabled.
+     * @param[out] tx_fail The transmission failed to be acknowledged, meaning
+     * too many retries (MAX_RT) were made while expecting an ACK packet. This
+     * event is only triggered when auto-ack feature is enabled.
+     * @param[out] rx_ready There is a newly received payload (RX_DR) saved to
+     * RX FIFO buffers. Remember that the RX FIFO can only hold up to 3
+     * payloads. Once the RX FIFO is full, all further received transmissions
+     * are rejected until there is space to save new data in the RX FIFO
+     * buffers.
+     *
+     * @note This function expects no parameters in the python wrapper.
+     * Instead, this function returns a 3 item tuple describing the IRQ
+     * events' status. To use this function in the python wrapper:
+     * @code{.py}
+     * # let`radio` be the instantiated RF24 object
+     * tx_ds, tx_df, rx_dr = radio.whatHappened()  # get IRQ status flags
+     * print("tx_ds: {}, tx_df: {}, rx_dr: {}".format(tx_ds, tx_df, rx_dr))
+     * @endcode
+     */
+    void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
 
 private:
     /**@}*/
@@ -1999,23 +2109,7 @@ private:
      */
     void read_payload(void* buf, uint8_t len);
 
-    /**
-     * Retrieve the current status of the chip
-     *
-     * @return Current value of status register
-     */
-    uint8_t get_status(void);
-
 #if !defined(MINIMAL)
-
-    /**
-     * Decode and print the given status to stdout
-     *
-     * @param status Status value to print
-     *
-     * @warning Does nothing if stdout is not defined.  See fdevopen in stdio.h
-     */
-    void print_status(uint8_t status);
 
     /**
      * Decode and print the given 'observe_tx' value to stdout

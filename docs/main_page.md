@@ -19,6 +19,13 @@ See the releases' descriptions on
 [the library's release page](http://github.com/nRF24/RF24/releases) for a list of
 changes.
 
+> [!IMPORTANT]
+> There's going to be major changes in v2.0.
+> As of v1.5, there is [newer API](migration.md) that should be used instead of
+> the @ref deprecated "deprecated API".
+>
+> See our [migration guide](migration.md) to understand what you should update in your code.
+
 ## Useful References
 
 - [RF24 Class Documentation](classRF24.html)

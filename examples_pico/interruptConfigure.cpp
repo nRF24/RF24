@@ -75,6 +75,7 @@ bool setup()
     printf("radioNumber = %d\n", (int)radioNumber);
 
     // setup the IRQ_PIN
+    gpio_init(IRQ_PIN);
     gpio_set_irq_enabled_with_callback(IRQ_PIN, GPIO_IRQ_EDGE_FALL, true, &interruptHandler);
     // IMPORTANT: do not call radio.available() before calling
     // radio.whatHappened() when the interruptHandler() is triggered by the
@@ -110,8 +111,8 @@ bool setup()
     else {
         // setup for RX mode
 
-        // let IRQ pin not trigger in RX mode
-        radio.maskIRQ(1, 1, 1); // args = "data_sent", "data_fail", "data_ready"
+        // disable IRQ pin in RX mode
+        radio.setStatusFlags();
 
         // Fill the TX FIFO with 3 ACK payloads for the first 3 received
         // transmissions on pipe 1
@@ -142,21 +143,22 @@ void loop()
             // Test the "data ready" event with the IRQ pin
 
             printf("\nConfiguring IRQ pin to ignore the 'data sent' event\n");
-            radio.maskIRQ(true, false, false); // args = "data_sent", "data_fail", "data_ready"
+            radio.setStatusFlags(RF24_RX_DR | RF24_TX_DF);
             printf("   Pinging RX node for 'data ready' event...\n");
         }
         else if (pl_iterator == 1) {
             // Test the "data sent" event with the IRQ pin
 
             printf("\nConfiguring IRQ pin to ignore the 'data ready' event\n");
-            radio.maskIRQ(false, false, true); // args = "data_sent", "data_fail", "data_ready"
+            radio.setStatusFlags(RF24_TX_DS | RF24_TX_DF);
             printf("   Pinging RX node for 'data sent' event...\n");
         }
         else if (pl_iterator == 2) {
             // Use this iteration to fill the RX node's FIFO which sets us up for the next test.
 
             // write() uses virtual interrupt flags that work despite the masking of the IRQ pin
-            radio.maskIRQ(1, 1, 1); // disable IRQ masking for this step
+            // disable IRQ pin for this step
+            radio.setStatusFlags();
 
             printf("\nSending 1 payload to fill RX node's FIFO. IRQ pin is neglected.\n");
             // write() will call flush_tx() on 'data fail' events
@@ -177,7 +179,7 @@ void loop()
             // test the "data fail" event with the IRQ pin
 
             printf("\nConfiguring IRQ pin to reflect all events\n");
-            radio.maskIRQ(0, 0, 0); // args = "data_sent", "data_fail", "data_ready"
+            radio.setStatusFlags(RF24_IRQ_ALL);
             printf("   Pinging inactive RX node for 'data fail' event...\n");
         }
 
@@ -263,7 +265,8 @@ void loop()
             printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n");
 
             role = false;
-            radio.maskIRQ(1, 1, 1); // the IRQ pin should not trigger in this example's RX rode
+            // do not trigger IRQ pin in RX mode
+            radio.setStatusFlags();
 
             // Fill the TX FIFO with 3 ACK payloads for the first 3 received
             // transmissions on pipe 1
@@ -287,7 +290,7 @@ void loop()
  */
 void interruptHandler(uint gpio, uint32_t events)
 {
-    if (gpio != IRQ_PIN && !(events | GPIO_IRQ_EDGE_FALL)) {
+    if (gpio != IRQ_PIN && (events & GPIO_IRQ_EDGE_FALL) == 0) {
         // the gpio pin and event does not match the configuration we specified
         return;
     }
@@ -301,32 +304,28 @@ void interruptHandler(uint gpio, uint32_t events)
 void assessInterruptEvent()
 {
     // print IRQ status and all masking flags' states
-    printf("\tIRQ pin is actively LOW\n");   // show that this function was called
-    bool tx_ds, tx_df, rx_dr;                // declare variables for IRQ masks
-    radio.whatHappened(tx_ds, tx_df, rx_dr); // get values for IRQ masks
-    // whatHappened() clears the IRQ masks also. This is required for
+    printf("\tIRQ pin is actively LOW\n"); // show that this function was called
+    uint8_t flags = radio.clearStatusFlags();
+    // Resetting the tx_df flag is required for
     // continued TX operations when a transmission fails.
-    // clearing the IRQ masks resets the IRQ pin to its inactive state (HIGH)
+    // clearing the status flags resets the IRQ pin to its inactive state (HIGH)
 
-    // print "data sent", "data fail", "data ready" mask states
-    printf("\tdata_sent: %s, data_fail: %s, data_ready: %s\n",
-           tx_ds ? "true" : "false",
-           tx_df ? "true" : "false",
-           rx_dr ? "true" : "false");
+    printf("\t");
+    radio.printStatus(flags); // print status flags info
 
-    if (tx_df)            // if TX payload failed
-        radio.flush_tx(); // clear all payloads from the TX FIFO
+    if (flags & RF24_TX_DF) // if TX payload failed
+        radio.flush_tx();   // clear all payloads from the TX FIFO
 
     // print if test passed or failed. Unintentional fails mean the RX node was not listening.
     // pl_iterator has already been incremented by now
     if (pl_iterator <= 1) {
-        printf("   'Data Ready' event test %s\n", rx_dr ? "passed" : "failed");
+        printf("   'Data Ready' event test %s\n", flags & RF24_RX_DR ? "passed" : "failed");
     }
     else if (pl_iterator == 2) {
-        printf("   'Data Sent' event test %s\n", tx_ds ? "passed" : "failed");
+        printf("   'Data Sent' event test %s\n", flags & RF24_TX_DS ? "passed" : "failed");
     }
     else if (pl_iterator == 4) {
-        printf("   'Data Fail' event test %s\n", tx_df ? "passed" : "failed");
+        printf("   'Data Fail' event test %s\n", flags & RF24_TX_DF ? "passed" : "failed");
     }
     got_interrupt = false;  // reset this flag to prevent calling this function from loop()
     wait_for_event = false; // ready to continue with loop() operations
