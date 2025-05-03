@@ -133,11 +133,18 @@ int attachInterrupt(rf24_gpio_pin_t pin, int mode, void (*function)(void))
     IrqPinCache irqPinCache;
     irqPinCache.fd = request.fd;
     irqPinCache.function = function;
-    std::pair<std::map<rf24_gpio_pin_t, IrqPinCache>::iterator, bool> indexPair = irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, irqPinCache));
 
+    std::pair<std::map<rf24_gpio_pin_t, IrqPinCache>::iterator, bool> indexPair = irqCache.insert(std::pair<rf24_gpio_pin_t, IrqPinCache>(pin, irqPinCache));
     if (!indexPair.second) {
         // this should not be reached, but indexPair.first needs to be the inserted map element
         throw IRQException("[attachInterrupt] Could not cache the IRQ pin with function pointer");
+        return 0;
+    }
+
+    std::pair<std::map<rf24_gpio_pin_t, gpio_fd>::iterator, bool> gpioPair = irqChipCache.cachedPins.insert(std::pair<rf24_gpio_pin_t, gpio_fd>(pin, request.fd));
+    if (!gpioPair.second) {
+        // this should not be reached, but gpioPair.first needs to be the inserted map element
+        throw IRQException("[attachInterrupt] Could not cache the GPIO pin's file descriptor");
         return 0;
     }
 
@@ -157,8 +164,9 @@ int detachInterrupt(rf24_gpio_pin_t pin)
     }
     pthread_cancel(cachedPin->second.id);     // send cancel request
     pthread_join(cachedPin->second.id, NULL); // wait till thread terminates
-    close(cachedPin->second.fd);
     irqCache.erase(cachedPin);
+    // reconfigure the pin for basic `digitalRead()`
+    GPIO::open(pin, GPIO::DIRECTION_IN);
     return 1;
 }
 

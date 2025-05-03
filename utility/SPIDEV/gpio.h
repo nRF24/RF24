@@ -15,6 +15,7 @@
 
 #include <stdexcept>
 #include <cstdint>
+#include <map>
 #include "linux/gpio.h" // gpiochip_info
 
 typedef uint16_t rf24_gpio_pin_t;
@@ -35,6 +36,8 @@ public:
     }
 };
 
+typedef int gpio_fd; // for readability
+
 /// A struct to manage the GPIO chip file descriptor.
 /// This struct's destructor should close any cached GPIO pin requests' file descriptors.
 struct GPIOChipCache
@@ -47,6 +50,12 @@ struct GPIOChipCache
     /// Because this member is static, all instances (& derivative instances) of this
     /// struct use the same file descriptor.
     static int fd;
+
+    /// @brief The map of pin numbers to their corresponding file descriptors.
+    ///
+    /// Because this member is static, all instances (& derivative instances) of this
+    /// struct use the same mapping.
+    static std::map<rf24_gpio_pin_t, gpio_fd> cachedPins;
 
     /// Open the File Descriptor for the GPIO chip
     void openDevice();
