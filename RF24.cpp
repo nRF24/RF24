@@ -1614,6 +1614,7 @@ void RF24::openWritingPipe(const uint8_t* address)
     // expects it LSB first too, so we're good.
     write_register(RX_ADDR_P0, address, addr_width);
     write_register(TX_ADDR, address, addr_width);
+    memcpy(pipe0_writing_address, address, addr_width);
 }
 
 /****************************************************************************/
