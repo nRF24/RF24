@@ -488,8 +488,12 @@ uint8_t RF24::flush_tx(void)
 
 void RF24::printStatus(uint8_t flags)
 {
-    printf_P(PSTR("STATUS\t\t= 0x%02x RX_DR=%x TX_DS=%x TX_DF=%x RX_PIPE=%x TX_FULL=%x\r\n"), flags, (flags & RF24_RX_DR) ? 1 : 0,
-             (flags & RF24_TX_DS) ? 1 : 0, (flags & RF24_TX_DF) ? 1 : 0, ((flags >> RX_P_NO) & 0x07), (flags & _BV(TX_FULL)) ? 1 : 0);
+    printf_P(PSTR("RX_DR=%x TX_DS=%x TX_DF=%x RX_PIPE=%x TX_FULL=%x\r\n"),
+             (flags & RF24_RX_DR) ? 1 : 0,
+             (flags & RF24_TX_DS) ? 1 : 0,
+             (flags & RF24_TX_DF) ? 1 : 0,
+             (flags >> RX_P_NO) & 0x07,
+             (flags & _BV(TX_FULL)) ? 1 : 0);
 }
 
 /****************************************************************************/
@@ -703,7 +707,9 @@ void RF24::printDetails(void)
     printf("================ NRF Configuration ================\n");
     #endif // defined(RF24_LINUX)
 
-    printStatus(update());
+    uint8_t status = update();
+    printf_P(PSTR("STATUS\t\t= 0x%02x "), status);
+    printStatus(status);
 
     print_address_register(PSTR("RX_ADDR_P0-1"), RX_ADDR_P0, 2);
     print_byte_register(PSTR("RX_ADDR_P2-5"), RX_ADDR_P2, 4);

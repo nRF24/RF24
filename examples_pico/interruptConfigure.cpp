@@ -75,6 +75,7 @@ bool setup()
     printf("radioNumber = %d\n", (int)radioNumber);
 
     // setup the IRQ_PIN
+    gpio_init(IRQ_PIN);
     gpio_set_irq_enabled_with_callback(IRQ_PIN, GPIO_IRQ_EDGE_FALL, true, &interruptHandler);
     // IMPORTANT: do not call radio.available() before calling
     // radio.whatHappened() when the interruptHandler() is triggered by the
@@ -289,7 +290,7 @@ void loop()
  */
 void interruptHandler(uint gpio, uint32_t events)
 {
-    if (gpio != IRQ_PIN && !(events & GPIO_IRQ_EDGE_FALL)) {
+    if (gpio != IRQ_PIN && (events & GPIO_IRQ_EDGE_FALL) == 0) {
         // the gpio pin and event does not match the configuration we specified
         return;
     }
