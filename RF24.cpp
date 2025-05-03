@@ -2048,6 +2048,11 @@ void RF24::stopConstCarrier()
     powerDown(); // per datasheet recommendation (just to be safe)
     write_register(RF_SETUP, static_cast<uint8_t>(read_register(RF_SETUP) & ~_BV(CONT_WAVE) & ~_BV(PLL_LOCK)));
     ce(LOW);
+    flush_tx();
+    if (isPVariant()) {
+        // restore the cached TX address
+        write_register(TX_ADDR, pipe0_writing_address, addr_width);
+    }
 }
 
 /****************************************************************************/
