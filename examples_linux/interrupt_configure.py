@@ -109,7 +109,7 @@ def interrupt_handler():
     # Resetting the tx_df flag is required for
     # continued TX operations when a transmission fails.
     # clearing the status flags resets the IRQ pin to its inactive state (HIGH)
-    print("\t", end="")
+    print("\t", end="", flush=True)
     radio.printStatus(flags)
     if pl_iterator[0] == 0:
         print(

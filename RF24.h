@@ -1289,7 +1289,7 @@ public:
      * Non-blocking write to the open writing pipe
      *
      * Just like write(), but it returns immediately. To find out what happened
-     * to the send, catch the IRQ and then call clearStatusFlags() or getStatusFlags().
+     * to the send, catch the IRQ and then call clearStatusFlags() or update().
      *
      * @see
      * - write()
