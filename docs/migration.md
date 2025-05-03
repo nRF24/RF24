@@ -30,24 +30,32 @@ if radio.available() { /* .. */ }
 
 </td></tr></table>
 
-## openReadingPipe(uint8_t, uint64_t) and openWritingPipe(uint64_t)
+## 64-bit integer addresses
 
-> **Deprecated since v1.3.11**
+Any function that accept an address in the form of `uint64_t` is discouraged. This includes
 
-These functions' address parameter used a 64-bit unsigned integer (`uint64_t`).
+- `RF24::openReadingPipe(uint8_t, uint64_t)`
+   > **Deprecated since v1.3.11**
+- `RF24::openWritingPipe(uint64_t)`
+   > **Deprecated since v1.3.11**
+- `RF24::stopListening(const uint64_t)`
+   > **Deprecated since v1.5**
+
+These functions' address parameter use a 64-bit unsigned integer (`uint64_t`).
 The nRF24L01 can only use up to 40 bit addresses.
-Thus, there was an unused 24 bits being allocated for addresses using this function.
+Thus, there is an unused 24 bits being allocated for addresses using these functions.
 
 There are overloaded functions that use a buffer instead:
 
 - `RF24::openReadingPipe(uint8_t, const uint8_t*)`
 - `RF24::openWritingPipe(const uint8_t*)`
+- `RF24::stopListening(const uint8_t*)`
 
 These eliminate the unnecessary 24 bits by only using the length of the buffer (`uint8_t*`)
 specified by `RF24::setAddressWidth()`.
 
 @see The `RF24::openWritingPipe(const uint8_t*)` is now deprecated in favor of the
-overloaded `RF24::stopListening(uint8_t*)` function.
+overloaded `RF24::stopListening(const uint8_t*)` function.
 See the section below for more detail.
 
 > [!CAUTION]
@@ -181,6 +189,7 @@ The aptly named `RF24::clearStatusFlags()` is designed to be a replacement for `
 Like `RF24::clearStatusFlags()`, `RF24::setStatusFlags()` takes 1 parameter whose value is defined by
 the `rf24_irq_flags_e` enumerated constants. These constant values specify individual flags;
 they can also be OR'd together to specify multiple flags.
+
 Additionally, `RF24::clearStatusFlags()` returns the STATUS byte containing the flags that
 caused the IRQ pin to go active LOW.
 This allows the user code to allocate less memory when diagnosing the IRQ pin's meaning.
@@ -229,10 +238,11 @@ Unfortunately, there was a bug that prevented the given TX address from being
 persistent on pipe 0 if the user code also set an RX address to pipe 0.
 This bug would surface when switching between RX mode and TX mode (via
 `RF24::startListening()` and `RF24::stopListening()` respectively) or after
-`RF24::stopConstCarrier()`.
-As a result the TX address has to be cached on the `RF24` instance.
-Consequently, this solution does not fit well with the traditional order of
-setting up the radio.
+`RF24::stopConstCarrier()` (if `RF24::isPVariant()` returns `true`).
+
+The solution is to cache the TX address on the `RF24` instance.
+Consequently, this solution did not fit well with the traditional order of
+functions used to set up the radio's TX or RX mode.
 
 By overloading `RF24::stopListening(const uint8_t*)`, we are able to ensure proper radio
 setup without requiring certain functions are called in a certain order.

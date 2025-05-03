@@ -390,13 +390,6 @@ public:
     void stopListening(const uint8_t* txAddress);
 
     /**
-     * @brief Similar to startListening(void) but changes the TX address.
-     * @param txAddress The new TX address.
-     * This value will be cached for auto-ack purposes.
-     */
-    void stopListening(const uint64_t txAddress);
-
-    /**
      * Check whether there are bytes available to be read
      * @code
      * if(radio.available()){
@@ -2033,6 +2026,17 @@ public:
      * @endcode
      */
     void whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready);
+
+    /**
+     * Similar to startListening(void) but changes the TX address.
+     *
+     * @deprecated Use stopListening(const uint8_t*) instead.
+     * See our [migration guide](migration.md) to understand what you should update in your code.
+     *
+     * @param txAddress The new TX address.
+     * This value will be cached for auto-ack purposes.
+     */
+    void stopListening(const uint64_t txAddress);
 
 private:
     /**@}*/
