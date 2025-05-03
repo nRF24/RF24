@@ -1191,6 +1191,15 @@ void RF24::stopListening(void)
 
 /****************************************************************************/
 
+void RF24::stopListening(const uint64_t txAddress)
+{
+    memcpy(pipe0_writing_address, &txAddress, addr_width);
+    stopListening();
+    write_register(TX_ADDR, pipe0_writing_address, addr_width);
+}
+
+/****************************************************************************/
+
 void RF24::stopListening(const uint8_t* txAddress)
 {
     memcpy(pipe0_writing_address, txAddress, addr_width);
