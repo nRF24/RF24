@@ -1,4 +1,4 @@
-/* The standard CSS for doxygen 1.12.0*/
+/* The standard CSS for doxygen 1.13.2*/
 
 html {
 /* page base colors */
@@ -724,8 +724,7 @@ pre.fragment {
         opacity: 0;
         position: absolute;
         display: inline;
-        overflow: auto;
-        fill: var(--fragment-foreground-color);
+        overflow: hidden;
         justify-content: center;
         align-items: center;
         cursor: pointer;
@@ -737,7 +736,7 @@ pre.fragment {
 }
 
 .fragment:hover .clipboard, .clipboard.success {
-        opacity: .28;
+        opacity: .4;
 }
 
 .clipboard:hover, .clipboard.success {
@@ -1808,6 +1807,11 @@ dl.invariant dt, dl.pre dt, dl.post dt {
 	padding: 2px 0px;
 }
 
+#side-nav #projectname
+{
+	font-size: 130%;
+}
+
 #projectbrief
 {
 	font-size: 90%;
@@ -2195,9 +2199,13 @@ th.markdownTableHeadCenter, td.markdownTableBodyCenter {
 	text-align: center
 }
 
-tt, code, kbd, samp
+tt, code, kbd
 {
   display: inline-block;
+}
+tt, code, kbd
+{
+  vertical-align: top;
 }
 /* @end */
 
