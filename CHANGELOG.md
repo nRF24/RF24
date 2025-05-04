@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [1.5.0] - 2025-05-04
+
+### <!-- 1 --> 🚀 Added
+
+- Publicly expose `ce()` for advanced uses. by \@2bndy5 in [#1031](https://github.com/nRF24/RF24/pull/1031)
+- Add required delay for Linux by \@TMRh20 in [#1034](https://github.com/nRF24/RF24/pull/1034)
+- Expose status byte in public API by \@2bndy5 in [#1032](https://github.com/nRF24/RF24/pull/1032)
+- Migrate to `stopListening(txAddress)` from `openWritingPipe()` by \@2bndy5 in [#1030](https://github.com/nRF24/RF24/pull/1030)
+
+### <!-- 4 --> 🛠️ Fixed
+
+- Set `/dev/gpiochip0` as default by \@2bndy5 in [#1018](https://github.com/nRF24/RF24/pull/1018)
+- Pipe0 fix by \@TMRh20 in [#1029](https://github.com/nRF24/RF24/pull/1029)
+- Fix for Dynamic Payloads causing apparent Radio Failures by \@TMRh20 in [#1036](https://github.com/nRF24/RF24/pull/1036)
+
+### <!-- 8 --> 📝 Documentation
+
+- Update doc comment for default linux gpiochip by \@2bndy5 in [#1025](https://github.com/nRF24/RF24/pull/1025)
+
+### <!-- 9 --> 🗨️ Changed
+
+- Bump BCM2835 lib to v1.75 by \@2bndy5 in [#1019](https://github.com/nRF24/RF24/pull/1019)
+- Revert "Add required delay for Linux " by \@TMRh20 in [#1035](https://github.com/nRF24/RF24/pull/1035)
+- Use shared pin FD cache by \@2bndy5 in [#1027](https://github.com/nRF24/RF24/pull/1027)
+
+[1.5.0]: https://github.com/nRF24/RF24/compare/v1.4.11...v1.5.0
+
+Full commit diff: [`v1.4.11...v1.5.0`][1.5.0]
+
 ## [1.4.11] - 2025-01-10
 
 ### <!-- 1 --> 🚀 Added
@@ -22,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adjustments to CHANGELOG by \@2bndy5 in [`8aa7103`](https://github.com/nRF24/RF24/commit/8aa71035ae3dd10de35865a894082f10a9c51027)
 - Change comment in example by \@2bndy5 in [`80e7f13`](https://github.com/nRF24/RF24/commit/80e7f137ae4caf0df4889b5499c22857019a328a)
+- Bump version to v1.4.11 by \@2bndy5 in [`6f3da43`](https://github.com/nRF24/RF24/commit/6f3da43c70cdfa666ec4d3de9b355c4e2fea8666)
 
 [1.4.11]: https://github.com/nRF24/RF24/compare/v1.4.10...v1.4.11
 
