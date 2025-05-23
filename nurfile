@@ -1,0 +1,87 @@
+
+# build the docs# install the library
+def "nur docs" [] {
+    cd docs
+    doxygen
+}
+
+# build the Linux examples
+def "nur examples" [] {
+    cmake -B examples_linux/build examples_linux
+    cmake --build examples_linux/build
+}
+
+# install the library
+def "nur lib" [] {
+    cmake -B build -S .
+    cmake --build build
+    sudo cmake --install build
+}
+
+# build the Pico SDK examples
+def "nur pico" [] {
+    cmake -B examples_pico/build examples_pico
+    cmake --build examples_pico/build
+}
+
+# install the  python wrapper
+def "nur py" [] {
+    pip install -v ./pyRF24
+}
+
+def is-changed [state: string] {
+    $state | split chars | each {$in in ['A' 'M' 'R']} | reduce {$in}
+}
+
+def changed-files [] {
+    let status = git status --short | split row --regex '\n'
+    # print $status
+    let changed = (
+        $status
+        | each {$in | str trim | split column --regex '\s+' -n 2}
+        | flatten
+        | rename "state" "name"
+    )
+    # print $changed
+    let result = $changed | where {is-changed $in.state} | get "name"
+    # print $result
+    $result
+}
+
+# run clang-format on all files
+def "nur fmt" [--all (-a)] {
+    let all_files = glob "**/*.{h,cpp,c,ino}" --exclude [
+        "**/build/**"
+        "utility/RPi/bcm2835.*"
+        "examples/old_backups/**"
+        "examples_linux/{interrupts,extra}/*"
+    ] | path relative-to $nur.project-path
+    let files = if $all {
+        $all_files
+    } else {
+        let changes = changed-files
+        (
+            $all_files
+            | where {
+                ($in | path split) in (
+                    $changes | each {$in | path split}
+                )
+            }
+        )
+    }
+
+    let is_windows = $nu.os-info | get "family" | str starts-with "windows"
+    let bin_name = if $is_windows {
+        let ver = (^"clang-format" --version | split words) | skip 3 | str join '.'
+        if ($ver | str starts-with "14") == false {
+            error-make { msg: $"clang-format v($ver) found; expected v14.x"}
+        }
+        "clang-format"
+    } else {"clang-format-14"}
+
+    if ($files | length) > 0 {
+        print $files
+        run-external $bin_name "-i" "--style" "file" ...$files
+    }
+    print $"Applied clang-format to ($files | length) files"
+}
