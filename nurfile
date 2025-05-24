@@ -154,7 +154,16 @@ def changed-files [] {
         | rename "state" "name"
     )
     # print $changed
-    let result = $changed | where {is-changed $in.state} | get "name"
+    let result = (
+        $changed
+        | where {is-changed $in.state}
+        | get "name"
+        | each {
+            if ($in | str contains " -> ") {
+                $in | parse "{a} -> {b}" | get "b" | $in.0
+            } else { $in }
+        }
+    )
     # print $result
     $result
 }
