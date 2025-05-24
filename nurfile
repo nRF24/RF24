@@ -1,32 +1,151 @@
 
-# build the docs# install the library
-def "nur docs" [] {
+def is-windows [] {
+    $nu.os-info | get "family" | str starts-with "windows"
+}
+
+def --wrapped run-cmd [...cmd: string] {
+    print $"\n(ansi blue)Running(ansi reset) ($cmd | str join ' ')"
+    ^($cmd | first) ...($cmd | skip 1)
+}
+
+# Build the docs.
+#
+# Note, there is no check against what
+# version of doxygen is used.
+def "nur docs" [
+    --dirty (-d) # Do not flush previous build artifacts
+    --open (-o) # Open the built docs in your default browser
+] {
+    let build_dir = "docs/html"
+    if ($build_dir | path exists) {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
+            rm -r $build_dir
+        }
+    }
     cd docs
-    doxygen
+    run-cmd doxygen
+    if $open {
+        let root_pg = $nur.project-path | path join $"($build_dir)/index.html"
+        start $root_pg
+    }
 }
 
-# build the Linux examples
-def "nur examples" [] {
-    cmake -B examples_linux/build examples_linux
-    cmake --build examples_linux/build
+def find-built-examples [path: string] {
+(
+        ls $path
+        | where {$in.type == "file"}
+        | get "name"
+        | filter {'.' not-in $in}
+        | filter {($in | str ends-with "Makefile") == false}
+    )
 }
 
-# install the library
-def "nur lib" [] {
-    cmake -B build -S .
-    cmake --build build
-    sudo cmake --install build
+# Build the Linux examples.
+#
+# This task expects the library to be installed.
+# CMake will build any ncurses examples if
+# the libncurses5-dev package is installed
+def "nur examples" [
+    --dirty (-d) # Reuse previous build env
+    ...cmake_opts: string # additional args passed to cmake when configuring the build env
+] {
+    let src_dir = "examples_linux"
+    let build_dir = $"($src_dir)/build"
+
+    if ($build_dir | path exists) {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
+            rm -r $build_dir
+        }
+    }
+
+    if $dirty == false {
+        run-cmd cmake -B $build_dir $src_dir ...$cmake_opts
+    } else if ($build_dir | path exists) == false {
+        run-cmd cmake -B $build_dir $src_dir ...$cmake_opts
+    }
+    run-cmd cmake --build $build_dir
+
+    print $"(ansi green)Built the following examples:(ansi reset)"
+    let binaries = find-built-examples $build_dir
+    if ($build_dir | path join "ncurses" | path exists) {
+        let ncurses_example = find-built-examples $"($build_dir)/ncurses"
+        let binaries = $binaries | append $ncurses_example
+        print $binaries
+    } else {
+        print $binaries
+    }
 }
 
-# build the Pico SDK examples
-def "nur pico" [] {
-    cmake -B examples_pico/build examples_pico
-    cmake --build examples_pico/build
+# Install the library.
+#
+# Note, this may ask for the password to
+# install the library with super-user privileges.
+def --wrapped "nur lib" [
+    --dirty (-d) # Reuse previous build env
+    ...cmake_opts: string # additional args passed to cmake when configuring the build env
+] {
+    let build_dir = "build"
+    if ($build_dir | path exists) {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
+            rm -r $build_dir
+        }
+    }
+    if $dirty == false {
+        run-cmd cmake -B build -S . ...$cmake_opts
+    }
+    run-cmd cmake --build $build_dir
+    run-cmd sudo cmake --install $build_dir
 }
 
-# install the  python wrapper
-def "nur py" [] {
-    pip install -v ./pyRF24
+# Build the Pico SDK examples.
+#
+# If building on Windows, then `-G Ninja` is
+# automatically passed to CMake when configuring the
+# build environment.
+def --wrapped "nur pico" [
+    --dirty (-d) # Reuse previous build env
+    ...cmake_opts: string # additional args passed to cmake when configuring the build env
+] {
+    let src_dir = "examples_pico"
+    let build_dir = $"($src_dir)/build"
+    if ($build_dir | path exists) {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
+            rm -r $build_dir
+        }
+    }
+
+    let use_ninja = '-G Ninja'
+    let opts = if (is-windows) {
+        $cmake_opts | append $use_ninja
+    } else { $cmake_opts }
+
+    if $dirty == false {
+        run-cmd cmake -B $build_dir $src_dir ...$opts
+    } else if ($build_dir | path exists) == false {
+        run-cmd cmake -B $build_dir $src_dir ...$opts
+    }
+    run-cmd cmake --build $build_dir
+}
+
+# Install the python wrapper.
+#
+# Note, this task requires the library
+# (& boost.python) to be installed.
+def "nur py" [
+    --dirty (-d) # Reuse previous build env
+] {
+    let dir = ls */setup.py | get "name" | first | path dirname
+    print $"(ansi green)Found wrapper(ansi reset) in ($dir)"
+    let artifacts = glob $"($dir)/{build,*.egg-info}"
+    if ($artifacts | length) > 0 {
+        print $"(ansi yellow)Removing artifacts(ansi reset) ($artifacts | str join ' ')"
+        rm -r ...$artifacts
+    }
+    run-cmd pip install -v $"./($dir)"
 }
 
 def is-changed [state: string] {
@@ -35,7 +154,6 @@ def is-changed [state: string] {
 
 def changed-files [] {
     let status = git status --short | split row --regex '\n'
-    # print $status
     let changed = (
         $status
         | each {$in | str trim | split column --regex '\s+' -n 2}
@@ -48,8 +166,14 @@ def changed-files [] {
     $result
 }
 
-# run clang-format on all files
-def "nur fmt" [--all (-a)] {
+# Run clang-format on C++ files.
+#
+# By default, only changed C++ sources are formatted (uses `git status`).
+# The clang-format version is expected to be v14.
+# If v14 is not found, then an error is thrown.
+def "nur fmt" [
+    --all (-a) # Format all C++ sources
+] {
     let all_files = glob "**/*.{h,cpp,c,ino}" --exclude [
         "**/build/**"
         "utility/RPi/bcm2835.*"
@@ -70,8 +194,7 @@ def "nur fmt" [--all (-a)] {
         )
     }
 
-    let is_windows = $nu.os-info | get "family" | str starts-with "windows"
-    let bin_name = if $is_windows {
+    let bin_name = if (is-windows) {
         let ver = (^"clang-format" --version | split words) | skip 3 | str join '.'
         if ($ver | str starts-with "14") == false {
             error-make { msg: $"clang-format v($ver) found; expected v14.x"}
