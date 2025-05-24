@@ -8,6 +8,16 @@ def --wrapped run-cmd [...cmd: string] {
     ^($cmd | first) ...($cmd | skip 1)
 }
 
+def flush-artifacts [
+    build_dir: string, dirty: bool
+] {
+    if ($build_dir | path exists) {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
+            rm -r $build_dir
+        }
+    }
+}
 # Build the docs.
 #
 # Note, there is no check against what
@@ -17,12 +27,7 @@ def "nur docs" [
     --open (-o) # Open the built docs in your default browser
 ] {
     let build_dir = "docs/html"
-    if ($build_dir | path exists) {
-        if $dirty == false {
-            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
-            rm -r $build_dir
-        }
-    }
+    flush-artifacts $build_dir $dirty
     cd docs
     run-cmd doxygen
     if $open {
@@ -53,12 +58,7 @@ def "nur examples" [
     let src_dir = "examples_linux"
     let build_dir = $"($src_dir)/build"
 
-    if ($build_dir | path exists) {
-        if $dirty == false {
-            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
-            rm -r $build_dir
-        }
-    }
+    flush-artifacts $build_dir $dirty
 
     if $dirty == false {
         run-cmd cmake -B $build_dir $src_dir ...$cmake_opts
@@ -87,12 +87,8 @@ def --wrapped "nur lib" [
     ...cmake_opts: string # additional args passed to cmake when configuring the build env
 ] {
     let build_dir = "build"
-    if ($build_dir | path exists) {
-        if $dirty == false {
-            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
-            rm -r $build_dir
-        }
-    }
+    flush-artifacts $build_dir $dirty
+
     if $dirty == false {
         run-cmd cmake -B build -S . ...$cmake_opts
     }
@@ -111,12 +107,7 @@ def --wrapped "nur pico" [
 ] {
     let src_dir = "examples_pico"
     let build_dir = $"($src_dir)/build"
-    if ($build_dir | path exists) {
-        if $dirty == false {
-            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
-            rm -r $build_dir
-        }
-    }
+    flush-artifacts $build_dir $dirty
 
     let use_ninja = '-G Ninja'
     let opts = if (is-windows) {
@@ -142,8 +133,10 @@ def "nur py" [
     print $"(ansi green)Found wrapper(ansi reset) in ($dir)"
     let artifacts = glob $"($dir)/{build,*.egg-info}"
     if ($artifacts | length) > 0 {
-        print $"(ansi yellow)Removing artifacts(ansi reset) ($artifacts | str join ' ')"
-        rm -r ...$artifacts
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($artifacts | str join ' ')"
+            rm -r ...$artifacts
+        }
     }
     run-cmd pip install -v $"./($dir)"
 }
