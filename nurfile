@@ -86,12 +86,13 @@ def "nur examples" [
 }
 
 
-# Install the library.
+# Build/install the library.
 #
 # Note, this may ask for the password to
 # install the library with super-user privileges.
 def --wrapped "nur lib" [
     --dirty (-d) # Reuse previous build env
+    --no-install # Do not install the library (useful for testing compilation)
     ...cmake_opts: string # additional args passed to cmake when configuring the build env
 ] {
     let build_dir = "build"
@@ -101,7 +102,9 @@ def --wrapped "nur lib" [
         run-cmd cmake -B build -S . ...$cmake_opts
     }
     run-cmd cmake --build $build_dir
-    run-cmd sudo cmake --install $build_dir
+    if $no_install == false {
+        run-cmd sudo cmake --install $build_dir
+    }
 }
 
 
