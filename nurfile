@@ -184,6 +184,50 @@ def changed-files [] {
 }
 
 
+def get-clang-format-version [bin_name: string] {
+    if (which $bin_name | is-empty) {
+        null
+    } else {
+        let version = (
+            ^$bin_name --version
+            | split column ' '
+            | values
+            | flatten
+            | last
+        )
+        print $"($bin_name) --version: ($version)"
+        $version | parse "{major}.{minor}.{patch}"
+    }
+}
+
+
+def match-version [
+    bin_name: string,
+    expected: string = "14",
+    --throw
+] {
+    let version = get-clang-format-version $bin_name
+    if ($version | is-empty) {
+        if $throw {
+            error make {
+                msg: $"($bin_name) not found. Ensure it is installed and added to your PATH."
+            }
+        }
+        false
+    } else { 
+        if ($version.major.0 == $expected) {
+            true
+        } else if $throw {
+            error make {
+                msg: $"Failed to find clang-format v($expected).x"
+            }
+        } else {
+            false
+        }
+    }
+}
+
+
 # Run clang-format on C++ files.
 #
 # By default, only changed C++ sources are formatted (uses `git status`).
@@ -213,12 +257,20 @@ def "nur fmt" [
     }
 
     let bin_name = if (is-windows) {
-        let ver = (^"clang-format" --version | split words) | skip 3 | str join '.'
-        if ($ver | str starts-with "14") == false {
-            error-make { msg: $"clang-format v($ver) found; expected v14.x"}
-        }
+        let bin_name = "clang-format"
+        let is_expected = match-version $bin_name --throw
         "clang-format"
-    } else {"clang-format-14"}
+    } else {
+        let bin_name = "clang-format-14"
+        let is_expected = match-version $bin_name
+        if ($is_expected == false) {
+            let bin_name = "clang-format"
+            let is_expected = match-version $bin_name --throw
+            $bin_name
+        } else {
+            $bin_name
+        }
+    }
 
     if ($files | length) > 0 {
         print $files
