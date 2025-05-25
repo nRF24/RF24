@@ -152,29 +152,23 @@ def "nur py" [
 }
 
 
-def is-changed [state: string] {
-    $state | split chars | each {$in in ['A' 'M' 'R']} | reduce {$in}
-}
-
-
 def changed-files [] {
-    let status = git status --short | str trim 
-    if ($status | str length) == 0 {
+    let status = git status --short | lines
+    if ($status | length) == 0 {
         print $"(ansi red)No file changes detected via (ansi cyan)`git status`(ansi reset)"
         print $"Perhaps you want to format all files? (ansi cyan)`nut fmt -a`"
         return []
     }
     let changed = (
         $status
-        | split row --regex '\n'
-        | each {$in | str trim | split column --regex '\s+' -n 1}
+        | each {$in | str trim | split column --regex '\s+' -n 2}
         | flatten
         | rename "state" "name"
     )
     # print $changed
     let result = (
         $changed
-        | where {is-changed $in.state}
+        | where {$in.state | split chars | each {$in in ['A' 'M' 'R']} | any {$in}}
         | get "name"
         | each {
             if ($in | str contains " -> ") {
