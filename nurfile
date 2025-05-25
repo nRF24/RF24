@@ -44,13 +44,22 @@ def "nur docs" [
 
 
 def find-built-examples [path: string] {
-(
-        ls $path
-        | where {$in.type == "file"}
-        | get "name"
-        | filter {'.' not-in $in}
-        | filter {($in | str ends-with "Makefile") == false}
+    let len = $nur.project-path | str length
+    let example_path_len = ($path | str length) + 2
+    let sources = (
+        glob $"($path)/**/*.cpp" --exclude [
+            "**/build/**"
+        ]
+        | each {$in | str substring ($len + $example_path_len)..-5}
     )
+    let binaries = (
+        glob $"($path)/build/**/*" --exclude [
+            "**/CMakeFiles/**"
+        ]
+        | each {$in | str substring ($len + $example_path_len + 6)..}
+        | filter {$in in $sources}
+    )
+    $binaries 
 }
 
 
@@ -76,14 +85,11 @@ def "nur examples" [
     run-cmd cmake --build $build_dir
 
     print $"(ansi green)Built the following examples:(ansi reset)"
-    let binaries = find-built-examples $build_dir
-    if ($build_dir | path join "ncurses" | path exists) {
-        let ncurses_example = find-built-examples $"($build_dir)/ncurses"
-        let binaries = $binaries | append $ncurses_example
-        print $binaries
-    } else {
-        print $binaries
-    }
+    let binaries = (
+        find-built-examples $src_dir
+        | each {$"($build_dir)/($in)"}
+    )
+    print $binaries
 }
 
 
