@@ -1,0 +1,231 @@
+
+
+def is-windows [] {
+    $nu.os-info | get "family" | str starts-with "windows"
+}
+
+
+def --wrapped run-cmd [...cmd: string] {
+    print $"\n(ansi blue)Running(ansi reset) ($cmd | str join ' ')"
+    ^($cmd | first) ...($cmd | skip 1)
+}
+
+
+def flush-artifacts [
+    build_dir: string, dirty: bool
+] {
+    if ($build_dir | path exists) {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($build_dir)"
+            rm -r $build_dir
+        }
+    }
+}
+
+
+# Build the docs.
+#
+# Note, there is no check against what
+# version of doxygen is used.
+def "nur docs" [
+    --dirty (-d) # Do not flush previous build artifacts
+    --open (-o) # Open the built docs in your default browser
+] {
+    let build_dir = "docs/html"
+    flush-artifacts $build_dir $dirty
+    cd docs
+    run-cmd doxygen
+    if $open {
+        let root_pg = $nur.project-path | path join $"($build_dir)/index.html"
+        start $root_pg
+    }
+}
+
+
+def find-built-examples [path: string] {
+(
+        ls $path
+        | where {$in.type == "file"}
+        | get "name"
+        | filter {'.' not-in $in}
+        | filter {($in | str ends-with "Makefile") == false}
+    )
+}
+
+
+# Build the Linux examples.
+#
+# This task expects the library to be installed.
+# CMake will build any ncurses examples if
+# the libncurses5-dev package is installed
+def "nur examples" [
+    --dirty (-d) # Reuse previous build env
+    ...cmake_opts: string # additional args passed to cmake when configuring the build env
+] {
+    let src_dir = "examples_linux"
+    let build_dir = $"($src_dir)/build"
+
+    flush-artifacts $build_dir $dirty
+
+    if $dirty == false {
+        run-cmd cmake -B $build_dir $src_dir ...$cmake_opts
+    } else if ($build_dir | path exists) == false {
+        run-cmd cmake -B $build_dir $src_dir ...$cmake_opts
+    }
+    run-cmd cmake --build $build_dir
+
+    print $"(ansi green)Built the following examples:(ansi reset)"
+    let binaries = find-built-examples $build_dir
+    if ($build_dir | path join "ncurses" | path exists) {
+        let ncurses_example = find-built-examples $"($build_dir)/ncurses"
+        let binaries = $binaries | append $ncurses_example
+        print $binaries
+    } else {
+        print $binaries
+    }
+}
+
+
+# Install the library.
+#
+# Note, this may ask for the password to
+# install the library with super-user privileges.
+def --wrapped "nur lib" [
+    --dirty (-d) # Reuse previous build env
+    ...cmake_opts: string # additional args passed to cmake when configuring the build env
+] {
+    let build_dir = "build"
+    flush-artifacts $build_dir $dirty
+
+    if $dirty == false {
+        run-cmd cmake -B build -S . ...$cmake_opts
+    }
+    run-cmd cmake --build $build_dir
+    run-cmd sudo cmake --install $build_dir
+}
+
+
+# Build the Pico SDK examples.
+#
+# If building on Windows, then `-G Ninja` is
+# automatically passed to CMake when configuring the
+# build environment.
+def --wrapped "nur pico" [
+    --dirty (-d) # Reuse previous build env
+    ...cmake_opts: string # additional args passed to cmake when configuring the build env
+] {
+    let src_dir = "examples_pico"
+    let build_dir = $"($src_dir)/build"
+    flush-artifacts $build_dir $dirty
+
+    let use_ninja = '-G Ninja'
+    let opts = if (is-windows) {
+        $cmake_opts | append $use_ninja
+    } else { $cmake_opts }
+
+    if $dirty == false {
+        run-cmd cmake -B $build_dir $src_dir ...$opts
+    } else if ($build_dir | path exists) == false {
+        run-cmd cmake -B $build_dir $src_dir ...$opts
+    }
+    run-cmd cmake --build $build_dir
+}
+
+
+# Install the python wrapper.
+#
+# Note, this task requires the library
+# (& boost.python) to be installed.
+def "nur py" [
+    --dirty (-d) # Reuse previous build env
+] {
+    let dir = ls */setup.py | get "name" | first | path dirname
+    print $"(ansi green)Found wrapper(ansi reset) in ($dir)"
+    let artifacts = glob $"($dir)/{build,*.egg-info}"
+    if ($artifacts | length) > 0 {
+        if $dirty == false {
+            print $"(ansi yellow)Removing artifacts(ansi reset) ($artifacts | str join ' ')"
+            rm -r ...$artifacts
+        }
+    }
+    run-cmd pip install -v $"./($dir)"
+}
+
+
+def is-changed [state: string] {
+    $state | split chars | each {$in in ['A' 'M' 'R']} | reduce {$in}
+}
+
+
+def changed-files [] {
+    let status = git status --short | str trim 
+    if ($status | str length) == 0 {
+        print $"(ansi red)No file changes detected via (ansi cyan)`git status`(ansi reset)"
+        print $"Perhaps you want to format all files? (ansi cyan)`nut fmt -a`"
+        return []
+    }
+    let changed = (
+        $status
+        | split row --regex '\n'
+        | each {$in | str trim | split column --regex '\s+' -n 1}
+        | flatten
+        | rename "state" "name"
+    )
+    # print $changed
+    let result = (
+        $changed
+        | where {is-changed $in.state}
+        | get "name"
+        | each {
+            if ($in | str contains " -> ") {
+                $in | parse "{a} -> {b}" | get "b" | $in.0
+            } else { $in }
+        }
+    )
+    # print $result
+    $result
+}
+
+
+# Run clang-format on C++ files.
+#
+# By default, only changed C++ sources are formatted (uses `git status`).
+# The clang-format version is expected to be v14.
+# If v14 is not found, then an error is thrown.
+def "nur fmt" [
+    --all (-a) # Format all C++ sources
+] {
+    let all_files = glob "**/*.{h,cpp,c,ino}" --exclude [
+        "**/build/**"
+        "utility/RPi/bcm2835.*"
+        "examples/old_backups/**"
+        "examples_linux/{interrupts,extra}/*"
+    ] | path relative-to $nur.project-path
+    let files = if $all {
+        $all_files
+    } else {
+        let changes = changed-files
+        (
+            $all_files
+            | where {
+                ($in | path split) in (
+                    $changes | each {$in | path split}
+                )
+            }
+        )
+    }
+
+    let bin_name = if (is-windows) {
+        let ver = (^"clang-format" --version | split words) | skip 3 | str join '.'
+        if ($ver | str starts-with "14") == false {
+            error-make { msg: $"clang-format v($ver) found; expected v14.x"}
+        }
+        "clang-format"
+    } else {"clang-format-14"}
+
+    if ($files | length) > 0 {
+        print $files
+        run-external $bin_name "-i" "--style" "file" ...$files
+    }
+    print $"(ansi blue)Applied clang-format to ($files | length) files(ansi reset)"
+}
