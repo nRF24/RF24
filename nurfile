@@ -7,7 +7,8 @@ def is-windows [] {
 
 def --wrapped run-cmd [...cmd: string] {
     print $"\n(ansi blue)Running(ansi reset) ($cmd | str join ' ')"
-    ^($cmd | first) ...($cmd | skip 1)
+    let elapsed = timeit {|| ^($cmd | first) ...($cmd | skip 1)}
+    print $"(ansi magenta)($cmd | first) took ($elapsed)(ansi reset)"
 }
 
 
@@ -221,7 +222,8 @@ def "nur fmt" [
 
     if ($files | length) > 0 {
         print $files
-        run-external $bin_name "-i" "--style" "file" ...$files
+        let elapsed = timeit {|| $files | par-each {|f| ^$bin_name "-i" "--style" "file" $f}}
+        print $"clang-format took ($elapsed) using parallelism!"
     }
     print $"(ansi blue)Applied clang-format to ($files | length) files(ansi reset)"
 }
