@@ -1,12 +1,15 @@
 
+
 def is-windows [] {
     $nu.os-info | get "family" | str starts-with "windows"
 }
+
 
 def --wrapped run-cmd [...cmd: string] {
     print $"\n(ansi blue)Running(ansi reset) ($cmd | str join ' ')"
     ^($cmd | first) ...($cmd | skip 1)
 }
+
 
 def flush-artifacts [
     build_dir: string, dirty: bool
@@ -18,6 +21,8 @@ def flush-artifacts [
         }
     }
 }
+
+
 # Build the docs.
 #
 # Note, there is no check against what
@@ -36,6 +41,7 @@ def "nur docs" [
     }
 }
 
+
 def find-built-examples [path: string] {
 (
         ls $path
@@ -45,6 +51,7 @@ def find-built-examples [path: string] {
         | filter {($in | str ends-with "Makefile") == false}
     )
 }
+
 
 # Build the Linux examples.
 #
@@ -78,6 +85,7 @@ def "nur examples" [
     }
 }
 
+
 # Install the library.
 #
 # Note, this may ask for the password to
@@ -95,6 +103,7 @@ def --wrapped "nur lib" [
     run-cmd cmake --build $build_dir
     run-cmd sudo cmake --install $build_dir
 }
+
 
 # Build the Pico SDK examples.
 #
@@ -122,6 +131,7 @@ def --wrapped "nur pico" [
     run-cmd cmake --build $build_dir
 }
 
+
 # Install the python wrapper.
 #
 # Note, this task requires the library
@@ -141,9 +151,11 @@ def "nur py" [
     run-cmd pip install -v $"./($dir)"
 }
 
+
 def is-changed [state: string] {
     $state | split chars | each {$in in ['A' 'M' 'R']} | reduce {$in}
 }
+
 
 def changed-files [] {
     let status = git status --short | split row --regex '\n'
@@ -167,6 +179,7 @@ def changed-files [] {
     # print $result
     $result
 }
+
 
 # Run clang-format on C++ files.
 #
