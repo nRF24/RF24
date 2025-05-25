@@ -208,5 +208,5 @@ def "nur fmt" [
         print $files
         run-external $bin_name "-i" "--style" "file" ...$files
     }
-    print $"Applied clang-format to ($files | length) files"
+    print $"(ansi blue)Applied clang-format to ($files | length) files(ansi reset)"
 }
