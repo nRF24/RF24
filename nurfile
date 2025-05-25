@@ -142,16 +142,15 @@ def --wrapped "nur pico" [
 def "nur py" [
     --dirty (-d) # Reuse previous build env
 ] {
-    let dir = ls */setup.py | get "name" | first | path dirname
-    print $"(ansi green)Found wrapper(ansi reset) in ($dir)"
-    let artifacts = glob $"($dir)/{build,*.egg-info}"
+    let src_dir = "pyRF24"
+    let artifacts = glob $"($src_dir)/{build,*.egg-info}"
     if ($artifacts | length) > 0 {
         if $dirty == false {
             print $"(ansi yellow)Removing artifacts(ansi reset) ($artifacts | str join ' ')"
             rm -r ...$artifacts
         }
     }
-    run-cmd pip install -v $"./($dir)"
+    run-cmd pip install -v $"./($src_dir)"
 }
 
 
@@ -159,7 +158,7 @@ def changed-files [] {
     let status = git status --short | lines
     if ($status | length) == 0 {
         print $"(ansi red)No file changes detected via (ansi cyan)`git status`(ansi reset)"
-        print $"Perhaps you want to format all files? (ansi cyan)`nut fmt -a`"
+        print $"Perhaps you want to format all files? (ansi cyan)`nur fmt -a`"
         return []
     }
     let changed = (
