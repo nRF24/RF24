@@ -259,6 +259,7 @@ words:
   - tableofcontents
   - TEENSYDUINO
   - THINGPLUS
+  - timeit
   - toctree
   - TOLOWER
   - transfern
