@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install cSpell
         run: npm install -g cspell
       - run: npx cspell --gitignore --config cspell.config.yaml .
