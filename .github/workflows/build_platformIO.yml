@@ -21,6 +21,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   validate_lib_json:
     uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@review-ci

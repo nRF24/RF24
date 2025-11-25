@@ -17,6 +17,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   build:
     uses: nRF24/.github/.github/workflows/build_arduino.yaml@review-ci
