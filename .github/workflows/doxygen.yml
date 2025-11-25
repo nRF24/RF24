@@ -57,7 +57,6 @@ jobs:
     uses: nRF24/.github/.github/workflows/build_docs.yaml@review-ci
     with:
       doxygen-version: '1.13.2'
-    secrets: inherit
 
   deploy-docs:
     needs: [build-docs]
