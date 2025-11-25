@@ -34,6 +34,8 @@ on:
     tags: ["*"]
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   check-spelling:
     runs-on: ubuntu-latest

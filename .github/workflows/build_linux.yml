@@ -73,6 +73,10 @@ jobs:
           # - "--soc=BCM2835 --driver=wiringPi"
 
     env:
+      # this env var is supported as of CMake v3.29+
+      CMAKE_INSTALL_PREFIX: /usr/arm-linux-gnueabihf
+      # this env var is supported as of CMake v3.21+
+      CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/cmake/toolchains/armhf.cmake
       CFLAGS: "-I /usr/local/include"
 
     steps:
@@ -81,7 +85,7 @@ jobs:
           persist-credentials: false
 
       - name: provide toolchain
-        run: |
+        run: |-
           sudo apt-get update
           sudo apt-get install binutils-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
           arm-linux-gnueabihf-gcc -v
@@ -101,12 +105,7 @@ jobs:
       
       - name: provide pigpio
         if: ${{ matrix.config-options == '--driver=pigpio' }}
-        env:
-          # this env var is supported as of CMake v3.29+
-          CMAKE_INSTALL_PREFIX: /usr/arm-linux-gnueabihf
-          # this env var is supported as of CMake v3.21+
-          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/cmake/toolchains/armhf.cmake
-        run: |
+        run: |-
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
           git fetch --tags
@@ -123,11 +122,7 @@ jobs:
         env:
           CC: /usr/bin/arm-linux-gnueabihf-gcc
           CXX: /usr/bin/arm-linux-gnueabihf-g++
-          # this env var is supported as of CMake v3.29+
-          CMAKE_INSTALL_PREFIX: /usr/arm-linux-gnueabihf
-          # this env var is supported as of CMake v3.21+
-          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/cmake/toolchains/armhf.cmake
-        run: |
+        run: |-
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
           mkdir build
@@ -151,7 +146,7 @@ jobs:
         run: sudo make install
 
       - name: make linux examples
-        run: |
+        run: |-
           cd examples_linux
           make
           file ./gettingstarted

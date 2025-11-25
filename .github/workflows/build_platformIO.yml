@@ -19,6 +19,8 @@ on:
       - "!examples/rf24_ATTiny/**"
     tags: ["*"]
 
+permissions: {}
+
 jobs:
   validate_lib_json:
     uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@review-ci
