@@ -25,6 +25,7 @@ on:
       - ".github/workflows/build_linux.yml"
   push:
     branches: [master]
+    tags: ["*"]
     paths:
       - "*.h"
       - "*.cpp"
@@ -45,12 +46,12 @@ on:
       - "pyRF24/setup.py"
       - "pyRF24/pyRF24.cpp"
       - ".github/workflows/build_linux.yml"
-  release:
-    types: [created]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+
+permissions: {}
 
 jobs:
 
@@ -100,6 +101,11 @@ jobs:
       
       - name: provide pigpio
         if: ${{ matrix.config-options == '--driver=pigpio' }}
+        env:
+          # this env var is supported as of CMake v3.29+
+          CMAKE_INSTALL_PREFIX: /usr/arm-linux-gnueabihf
+          # this env var is supported as of CMake v3.21+
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/cmake/toolchains/armhf.cmake
         run: |
           git clone https://github.com/joan2937/pigpio.git
           cd pigpio
@@ -108,8 +114,7 @@ jobs:
           git checkout $latestTag
           mkdir build
           cd build
-          cmake .. -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/armhf.cmake
+          cmake ..
           make
           sudo make install
         
@@ -118,6 +123,10 @@ jobs:
         env:
           CC: /usr/bin/arm-linux-gnueabihf-gcc
           CXX: /usr/bin/arm-linux-gnueabihf-g++
+          # this env var is supported as of CMake v3.29+
+          CMAKE_INSTALL_PREFIX: /usr/arm-linux-gnueabihf
+          # this env var is supported as of CMake v3.21+
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/cmake/toolchains/armhf.cmake
         run: |
           git clone https://github.com/intel-iot-devkit/mraa.git
           cd mraa
@@ -125,15 +134,15 @@ jobs:
           cd build
           cmake .. \
           -D BUILDSWIGNODE=OFF \
-          -D BUILDARCH=arm \
-          -D CMAKE_INSTALL_PREFIX=/usr/arm-linux-gnueabihf \
-          -D CMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/armhf.cmake
+          -D BUILDARCH=arm
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
           sudo ldconfig
 
       - name: library configure
-        run: ./configure ${{ matrix.config-options }}
+        env:
+          CONFIG_OPTIONS: ${{ matrix.config-options }}
+        run: ./configure ${CONFIG_OPTIONS}
 
       - name: library make
         run: make
@@ -150,14 +159,13 @@ jobs:
 
   ####################### using CMake ################################
   using_cmake:
-    uses: nRF24/.github/.github/workflows/build_linux_cmake.yaml@main
+    uses: nRF24/.github/.github/workflows/build_linux_cmake.yaml@review-ci
     with:
       rf24-ref: ${{ github.sha }}
       driver: ${{ matrix.driver }}
       compiler: ${{ matrix.toolchain.compiler }}
       usr-dir: ${{ matrix.toolchain.usr_dir }}
       examples-path: examples_linux
-      deploy-release: ${{ github.event_name == 'release' && (matrix.toolchain.compiler == 'armhf' || matrix.toolchain.compiler == 'arm64') && (matrix.driver =='RPi' || matrix.driver =='SPIDEV') }}
       py-wrapper-path: pyRF24
     strategy:
       fail-fast: false
@@ -195,3 +203,11 @@ jobs:
             toolchain:
               compiler: "default" # github runner is hosted on a "amd64"
               usr_dir: "local"
+
+  deploy-release-assets:
+    needs: [using_cmake]
+    permissions:
+      # needed for uploading release assets
+      contents: write
+    if: startsWith(github.ref, 'refs/tags/')
+    uses: nRF24/.github/.github/workflows/deploy_cpack_artifacts.yaml@review-ci

@@ -24,9 +24,11 @@ on:
       - "utility/rp2/*"
       - "examples_pico/*"
 
+permissions: {}
+
 jobs:
   build:
-    uses: nRF24/.github/.github/workflows/build_pico_sdk.yaml@main
+    uses: nRF24/.github/.github/workflows/build_pico_sdk.yaml@review-ci
     with:
       board-id: ${{ matrix.board }}
       rf24-ref: ${{ github.sha }}

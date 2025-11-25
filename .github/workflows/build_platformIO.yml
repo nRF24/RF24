@@ -17,15 +17,11 @@ on:
       - "examples/**"
       - "!examples/old_backups/**"
       - "!examples/rf24_ATTiny/**"
-  release:
-    types: [created]
+    tags: ["*"]
 
 jobs:
   validate_lib_json:
-    uses: nRF24/.github/.github/workflows/validate_deploy_platformio.yaml@main
-    secrets: inherit
-    with:
-      deploy-release: ${{ github.event_name == 'release' }}
+    uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@review-ci
 
   build:
     needs: [validate_lib_json]
@@ -55,3 +51,12 @@ jobs:
           - "blackpill_f103c8"
           - "nodemcuv2"
           - "adafruit_qtpy_esp32s2"
+
+  deploy-pio-assets:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [validate_lib_json, build]
+    permissions:
+      # needed for uploading release assets
+      contents: write
+    uses: nRF24/.github/.github/workflows/deploy_platformio_artifact.yaml@review-ci
+    secrets: inherit

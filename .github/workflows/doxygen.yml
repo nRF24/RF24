@@ -31,8 +31,7 @@ on:
       - ".github/workflows/doxygen.yml"
       - "Doxyfile"
       - "library.properties" # get lib version from here
-  release:
-    types: [published, edited]
+    tags: ["*"]
   workflow_dispatch:
 
 jobs:
@@ -49,8 +48,18 @@ jobs:
         run: npm install -g cspell
       - run: npx cspell --gitignore --config cspell.config.yaml .
   build-docs:
-    uses: nRF24/.github/.github/workflows/build_docs.yaml@main
+    uses: nRF24/.github/.github/workflows/build_docs.yaml@review-ci
     with:
-      deploy-gh-pages: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master') }}
       doxygen-version: '1.13.2'
+    secrets: inherit
+
+  deploy-docs:
+    needs: [build-docs]
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+    permissions:
+      # to authenticate the gh-pages environment
+      id-token: write
+      # to upload to GitHub Pages
+      pages: write
+    uses: nRF24/.github/.github/workflows/deploy_docs.yaml@review-ci
     secrets: inherit

@@ -15,6 +15,8 @@ on:
       - "examples/**"
       - "!examples/old_backups/**"
 
+permissions: {}
+
 jobs:
   build:
     uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
@@ -160,4 +162,7 @@ jobs:
   report:
     needs: [build] # , attiny]
     if: github.event_name == 'pull_request'
+    permissions:
+      # for posting/updating comments on PR threads
+      pull-requests: write
     uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@main
