@@ -1,4 +1,4 @@
-name: Arduino CLI build
+name: Arduino
 
 on:
   pull_request:

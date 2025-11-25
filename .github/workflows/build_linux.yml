@@ -1,4 +1,4 @@
-name: Linux build
+name: Linux
 
 on:
   pull_request:
@@ -61,11 +61,10 @@ jobs:
 
   ####################### using Makefile #############################
   build:
+    name: using legacy makefiles
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
-
       matrix:
         config-options:
           - "--soc=BCM2835 --driver=RPi"
@@ -157,7 +156,8 @@ jobs:
 
 
   ####################### using CMake ################################
-  using_cmake:
+  build-cmake:
+    name: using CMake
     uses: nRF24/.github/.github/workflows/build_linux_cmake.yaml@review-ci
     with:
       rf24-ref: ${{ github.sha }}
@@ -203,8 +203,9 @@ jobs:
               compiler: "default" # github runner is hosted on a "amd64"
               usr_dir: "local"
 
-  deploy-release-assets:
-    needs: [using_cmake]
+  deploy:
+    name: deploy release assets
+    needs: [build-cmake]
     permissions:
       # needed for uploading release assets
       contents: write

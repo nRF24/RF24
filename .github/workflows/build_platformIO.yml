@@ -1,4 +1,4 @@
-name: PlatformIO build
+name: PlatformIO
 
 on:
   pull_request:
@@ -27,6 +27,7 @@ concurrency:
 
 jobs:
   validate_lib_json:
+    name: validate library.json
     uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@review-ci
 
   build:
@@ -58,7 +59,8 @@ jobs:
           - "nodemcuv2"
           - "adafruit_qtpy_esp32s2"
 
-  deploy-pio-assets:
+  deploy:
+    name: deploy release asset
     if: startsWith(github.ref, 'refs/tags/')
     needs: [validate_lib_json, build]
     permissions:

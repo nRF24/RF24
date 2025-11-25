@@ -1,4 +1,4 @@
-name: check code formatting
+name: Code format
 
 on:
   push:
@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
-  check_formatting:
+  check:
     permissions:
       # needed to post review suggestions on a PR
       pull-requests: write

@@ -1,4 +1,4 @@
-name: build Docs
+name: Docs
 
 on:
   pull_request:
@@ -53,13 +53,14 @@ jobs:
       - name: Install cSpell
         run: npm install -g cspell
       - run: npx cspell --gitignore --config cspell.config.yaml .
-  build-docs:
+
+  build:
     uses: nRF24/.github/.github/workflows/build_docs.yaml@review-ci
     with:
       doxygen-version: '1.13.2'
 
-  deploy-docs:
-    needs: [build-docs]
+  deploy:
+    needs: [build]
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
     permissions:
       # to authenticate the gh-pages environment
