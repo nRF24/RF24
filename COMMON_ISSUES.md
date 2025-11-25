@@ -14,32 +14,31 @@ successfully with each other. Verify pin connections and wiring.
 2. If `radio.begin()` returns true, but the devices are not communicating,
 users can  uncomment the lines `printf_begin()` & `radio.printDetails()` and
    view the settings. They should appear as the following:
-   
-   ```
-   SPI Speedz	    = 10 Mhz
-   STATUS		    = 0x0e RX_DR=0 TX_DS=0 MAX_RT=0 RX_P_NO=7 TX_FULL=0
-   RX_ADDR_P0-1	    = 0x65646f4e31 0x65646f4e32
-   RX_ADDR_P2-5	    = 0x33 0xce 0x3e 0xe3
-   TX_ADDR		    = 0x65646f4e31
-   RX_PW_P0-6	    = 0x04 0x04 0x04 0x04 0x04 0x04
-   EN_AA		    = 0x3f
-   EN_RXADDR	    = 0x02
-   RF_CH		    = 0x4c
-   RF_SETUP	        = 0x03
-   CONFIG		    = 0x0f
-   DYNPD/FEATURE	= 0x00 0x00
-   Data Rate	    = 1 MBPS
-   Model		    = nRF24L01+
-   CRC Length	    = 16 bits
-   PA Power	        = PA_LOW
-   ARC		        = 0
+
+   ```text
+   SPI Speedz      = 10 Mhz
+   STATUS          = 0x0e RX_DR=0 TX_DS=0 MAX_RT=0 RX_P_NO=7 TX_FULL=0
+   RX_ADDR_P0-1    = 0x65646f4e31 0x65646f4e32
+   RX_ADDR_P2-5    = 0x33 0xce 0x3e 0xe3
+   TX_ADDR         = 0x65646f4e31
+   RX_PW_P0-6      = 0x04 0x04 0x04 0x04 0x04 0x04
+   EN_AA           = 0x3f
+   EN_RXADDR       = 0x02
+   RF_CH           = 0x4c
+   RF_SETUP        = 0x03
+   CONFIG          = 0x0f
+   DYNPD/FEATURE   = 0x00 0x00
+   Data Rate       = 1 MBPS
+   Model           = nRF24L01+
+   CRC Length      = 16 bits
+   PA Power        = PA_LOW
+   ARC             = 0
    ```
    If the settings do not appear as above, troubleshoot wiring, pin
    connections, etc.
-   
-3. If both of the above check out, the problem is likely the CE pin is wired wrong, or 
+
+3. If both of the above check out, the problem is likely the CE pin is wired wrong, or
 even hardware issues (bad radios etc.) See the following.
-   
 
 ## Settings that must match
 
@@ -86,19 +85,19 @@ More info about why you can't call `millis()` (or `delay()`) from an ISR callbac
 
 ## Which write*() function do I use?
 
-**Standard:**
+### Standard
 
 `RF24::write()`: The standard write function, this is the most commonly used way to send data over radio link. This function will block until data is sent successfully. This means that if Auto-Ack is enabled, the radio will write the packet and wait for a response from the receiving radio. If Auto-Ack is disabled, the function will return sooner, as it will not wait for a response from the receiving radio.
 
 `RF24::startWrite()`: Can be used similar to the standard `RF24::write()` function, but it will not block. Useful for writing data outside of an interrupt routine, triggering that interrupt. Contains a `delayMicroseconds()` call for faster MCUs/devices to ensure the CE pin is toggled for a full 10us.
 
-**Advanced: (requires calling txStandBy())**
+### Advanced: (requires calling `RF24::txStandBy()`)
 
 `RF24::writeFast()`: Used for high-speed streaming of data. This function can be used to transmit data by simply placing data in the 3-layer FIFO buffers if room is available, or blocking until available. The function will return after a packet is placed in the buffer, or when a packet fails to transmit, in which case the buffers are cleared.
 
 `RF24::writeBlocking()`: Not commonly used, this function will first check the 3-layer FIFO for available space, then block until a timeout period is met if packets are failing, or return once there is room in the FIFO buffer and a packet is placed there.
 
-Interrupt Safe Functions:
+### Interrupt Safe Functions
 
 `RF24::startFastWrite()`: Can be used to write data and return immediately, without going into standBy mode. Can be used to transmit data at high speeds using interrupts, but will easily overflow the FIFO buffer if attempting to send data faster than the radio will process it.
 
@@ -164,9 +163,10 @@ You may find variants of the nRF24L01 transceiver that are marketed as “nRF24L
 
 2. Needs shielding from electromagnetic interference. Shielding usually works best when it has a path to ground (GND pin), but this connection to the GND pin is not required. It is important that the shielding does not touch any current carrying parts.
    - Professionals tend to use a faraday cage/mesh to implement electromagnetic shielding, but it can be pricey for this scenario.
-   - A quick do-it-yourself solution (as proof-of-concept) would be to wrap the PA/LNA module with electrical tape and then wrap foil around the electrical tape (for shielding) while being very careful to not let the foil touch any current carrying parts (like the GPIO pins, the antenna mount, and the soldier joints for the antenna mount). Observe
-   [![ghetto_shielding_1.png](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png)](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_1.png)
-   [![ghetto_shielding_2.png](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png)](https://github.com/nRF24/RF24/blob/master/images/ghetto_sheilding_2.png)
+   - A quick do-it-yourself solution (as proof-of-concept) would be to wrap the PA/LNA module with electrical tape and then wrap foil around the electrical tape (for shielding) while being very careful to not let the foil touch any current carrying parts (like the GPIO pins, the antenna mount, and the soldier joints for the antenna mount).
+
+     Observe:
+     ![ghetto_shielding_1.png](images/ghetto_sheilding_1.png){width=30%} ![ghetto_shielding_2.png](images/ghetto_sheilding_2.png){width=30%}
 
 ### My PA/LNA module doesn't perform as well as I'd hoped or the NRF radio works better on touching it
 
