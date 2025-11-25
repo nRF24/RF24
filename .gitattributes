@@ -27,3 +27,5 @@ Makefile text eol=lf
 *.ino text eol=lf
 *.dot text eol=lf
 *.cmake text eol=lf
+*.css text eol=lf
+Doxyfile text eol=lf
