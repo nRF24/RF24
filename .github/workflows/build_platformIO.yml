@@ -28,7 +28,7 @@ concurrency:
 jobs:
   validate_lib_json:
     name: validate library.json
-    uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@review-ci
+    uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@main
 
   build:
     needs: [validate_lib_json]
@@ -66,5 +66,5 @@ jobs:
     permissions:
       # needed for uploading release assets
       contents: write
-    uses: nRF24/.github/.github/workflows/deploy_platformio_artifact.yaml@review-ci
+    uses: nRF24/.github/.github/workflows/deploy_platformio_artifact.yaml@main
     secrets: inherit

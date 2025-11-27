@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    uses: nRF24/.github/.github/workflows/build_arduino.yaml@review-ci
+    uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
     with:
       sketch-paths: |
         - examples/GettingStarted
@@ -169,4 +169,4 @@ jobs:
     permissions:
       # for posting/updating comments on PR threads
       pull-requests: write
-    uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@review-ci
+    uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@main

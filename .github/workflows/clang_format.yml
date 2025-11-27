@@ -19,7 +19,7 @@ jobs:
       pull-requests: write
       # needed to detect changed files
       contents: read
-    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@review-ci
+    uses: nRF24/.github/.github/workflows/cpp_lint.yaml@main
     with:
       ignore: examples/old_backups|utility/RPi/bcm2835.h|utility/RPi/bcm2835.c
       extensions: ino,c,cpp,h

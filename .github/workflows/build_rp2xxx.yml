@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   build:
-    uses: nRF24/.github/.github/workflows/build_pico_sdk.yaml@review-ci
+    uses: nRF24/.github/.github/workflows/build_pico_sdk.yaml@main
     with:
       board-id: ${{ matrix.board }}
       rf24-ref: ${{ github.sha }}
