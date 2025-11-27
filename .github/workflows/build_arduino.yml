@@ -110,9 +110,9 @@ jobs:
         # Generate size deltas data for this board
         include:
           - fqbn: arduino:avr:nano
-            enable-deltas-report: true
+            enable-deltas-report: ${{ github.event_name == 'pull_request' }}
           - fqbn: arduino:samd:mkrzero  # InterruptConfigure.ino uses pin 2
-            enable-deltas-report: true
+            enable-deltas-report: ${{ github.event_name == 'pull_request' }}
 
   #### NOTE installing ATTinyCore has become too problematic for various reasons
   #### I'll have to revisit this later when the Arduino CLI tool gets their act together
