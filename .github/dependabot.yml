@@ -10,4 +10,10 @@ updates:
     # default location of `.github/workflows`
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    cooldown:
+      default-days: 5
+    groups:
+      actions:
+        patterns:
+          - "*"

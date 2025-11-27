@@ -1,4 +1,4 @@
-name: PlatformIO build
+name: PlatformIO
 
 on:
   pull_request:
@@ -17,15 +17,18 @@ on:
       - "examples/**"
       - "!examples/old_backups/**"
       - "!examples/rf24_ATTiny/**"
-  release:
-    types: [created]
+    tags: ["*"]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   validate_lib_json:
-    uses: nRF24/.github/.github/workflows/validate_deploy_platformio.yaml@main
-    secrets: inherit
-    with:
-      deploy-release: ${{ github.event_name == 'release' }}
+    name: validate library.json
+    uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@main
 
   build:
     needs: [validate_lib_json]
@@ -55,3 +58,13 @@ jobs:
           - "blackpill_f103c8"
           - "nodemcuv2"
           - "adafruit_qtpy_esp32s2"
+
+  deploy:
+    name: deploy release asset
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [validate_lib_json, build]
+    permissions:
+      # needed for uploading release assets
+      contents: write
+    uses: nRF24/.github/.github/workflows/deploy_platformio_artifact.yaml@main
+    secrets: inherit

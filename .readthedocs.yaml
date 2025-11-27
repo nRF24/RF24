@@ -6,20 +6,19 @@
 version: 2
 
 build:
-  os: "ubuntu-22.04"
-  apt_packages:
-    - libclang1-12
-    - libclang-cpp12
+  os: "ubuntu-24.04"
+  # apt_packages:
+  #   - libclang1-12
+  #   - libclang-cpp12
   tools:
     python: "3"
   commands:
     # Install doxygen from source distributions (conda forge does not keep up-to-date doxygen releases)
     - >
-      DOXYGEN_VERSION="1.13.2" &&
+      DOXYGEN_VERSION="1.15.0" &&
+      RELEASE_TITLE=$(echo ${DOXYGEN_VERSION} | tr '.' '_') &&
       mkdir .doxygen && cd .doxygen &&
-      echo $(pwd) &&
-      echo "https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz" &&
-      curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz &&
+      curl -L "https://github.com/doxygen/doxygen/releases/download/Release_${RELEASE_TITLE}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz" --output doxygen.tar.gz &&
       gunzip doxygen.tar.gz &&
       tar xf doxygen.tar &&
       mv doxygen-$DOXYGEN_VERSION/bin/doxygen ./

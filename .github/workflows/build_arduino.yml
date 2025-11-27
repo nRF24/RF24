@@ -1,4 +1,4 @@
-name: Arduino CLI build
+name: Arduino
 
 on:
   pull_request:
@@ -14,6 +14,12 @@ on:
       - ".github/workflows/build_arduino.yml"
       - "examples/**"
       - "!examples/old_backups/**"
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   build:
@@ -160,4 +166,7 @@ jobs:
   report:
     needs: [build] # , attiny]
     if: github.event_name == 'pull_request'
+    permissions:
+      # for posting/updating comments on PR threads
+      pull-requests: write
     uses: nRF24/.github/.github/workflows/arduino_size_deltas.yaml@main

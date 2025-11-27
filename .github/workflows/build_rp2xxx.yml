@@ -1,4 +1,4 @@
-name: Pico SDK build
+name: Pico SDK
 
 on:
   push:
@@ -23,6 +23,12 @@ on:
       - "cmake/**"
       - "utility/rp2/*"
       - "examples_pico/*"
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   build:
