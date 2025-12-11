@@ -18,7 +18,7 @@
 #include <SPI.h>
 #include "RF24.h"
 
-#define CE_PIN 7
+#define CE_PIN  7
 #define CSN_PIN 8
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);
@@ -32,58 +32,61 @@ RF24 radio(CE_PIN, CSN_PIN);
   will take a space-delimited string of hexadecimal characters and
   decode then print it out as human readable information.
 */
-uint8_t encoded_details[43] = { 0 };
+uint8_t encoded_details[43] = {0};
 
 // Use this function to print out the encoded_details as a
 // space-delimited string of hexadecimal characters.
-void dumpRegData() {
-  for (uint8_t i = 0; i < 43; ++i) {
-    Monitor.print(encoded_details[i], HEX);
-    if (i < 42)
-      Monitor.print(F(" "));
-  }
+void dumpRegData()
+{
+    for (uint8_t i = 0; i < 43; ++i) {
+        Monitor.print(encoded_details[i], HEX);
+        if (i < 42)
+            Monitor.print(F(" "));
+    }
 }
 
-void setup() {
-  Bridge.begin();
-  Monitor.begin();
-  delay(3000);
+void setup()
+{
+    Bridge.begin();
+    Monitor.begin();
+    delay(3000);
 
-  // initialize the transceiver on the SPI bus
-  if (!radio.begin()) {
-    Monitor.println(F("radio hardware is not responding!!"));
-    while (1) {}  // hold in infinite loop
-  }
+    // initialize the transceiver on the SPI bus
+    if (!radio.begin()) {
+        Monitor.println(F("radio hardware is not responding!!"));
+        while (1) {
+        } // hold in infinite loop
+    }
 
-  // print example's introductory prompt
-  Monitor.println(F("RF24/examples/encodedRadioDetails"));
+    // print example's introductory prompt
+    Monitor.println(F("RF24/examples/encodedRadioDetails"));
 
-  Monitor.println(F("Press any key to show debugging information"));
-  while (!Monitor.available()) {
-    // wait for user input
-  }
+    Monitor.println(F("Press any key to show debugging information"));
+    while (!Monitor.available()) {
+        // wait for user input
+    }
 
-  // For debugging info
-  char *debug_info = new char[870];
-  uint16_t str_len = radio.sprintfPrettyDetails(debug_info);
-  Monitor.println(debug_info);
-  Monitor.print(F("\nThe above output used "));
-  Monitor.print(str_len);
-  Monitor.println(F(" characters."));
+    // For debugging info
+    char* debug_info = new char[870];
+    uint16_t str_len = radio.sprintfPrettyDetails(debug_info);
+    Monitor.println(debug_info);
+    Monitor.print(F("\nThe above output used "));
+    Monitor.print(str_len);
+    Monitor.println(F(" characters."));
 
-  // encoded_details is NOT human readable.
-  // encodeRadioDetails() is very small when used on its own because it puts debugging information into a byte array
-  // No printf() support needed because it doesn't use an output stream.
-  radio.encodeRadioDetails(encoded_details);
-  Monitor.println(F("\nhexadecimal dump of all registers:"));
-  for(int i=0; i<43; i++){
-    Bridge.call("RF24Callback",encoded_details[i]);
-  }
+    // encoded_details is NOT human readable.
+    // encodeRadioDetails() is very small when used on its own because it puts debugging information into a byte array
+    // No printf() support needed because it doesn't use an output stream.
+    radio.encodeRadioDetails(encoded_details);
+    Monitor.println(F("\nhexadecimal dump of all registers:"));
+    for (int i = 0; i < 43; i++) {
+        Bridge.call("RF24Callback", encoded_details[i]);
+    }
 
-  Monitor.println(F("\n\nThis string of hexadecimal characters (including spaces)."));
-  Monitor.print(F("will be transferred to the MPU via the Arduino Q bridge API: "));
-  dumpRegData();
-}  // setup
+    Monitor.println(F("\n\nThis string of hexadecimal characters (including spaces)."));
+    Monitor.print(F("will be transferred to the MPU via the Arduino Q bridge API: "));
+    dumpRegData();
+} // setup
 
 /* Registers corresponding to index of encoded_details array
   0:     NRF_CONFIG
@@ -117,6 +120,7 @@ void setup() {
   42:    SPI speed MHz | (isPlusVariant << 4)
 */
 
-void loop() {
-  // Nothing to do here. We did it all at the end of setup()
+void loop()
+{
+    // Nothing to do here. We did it all at the end of setup()
 }
