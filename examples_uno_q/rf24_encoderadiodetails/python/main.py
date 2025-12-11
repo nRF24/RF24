@@ -7,7 +7,6 @@ Notes:
 """
 # pylint: disable=consider-using-f-string
 import struct
-import argparse
 import time
 
 from arduino.app_utils import *
