@@ -13,10 +13,20 @@ from arduino.app_utils import *
 
 bufferByteArray = bytearray()
 
-def RF24Callback(payload):
+def RF24Callback(payload: int):
+    """Append a ``payload`` byte to the global ``bufferByteArray``.
+    Invokes `print_details()` once the buffer hits a 43 byte length.
+
+    Args:
+        payload: The incoming byte (a ``uint8_t`` data type from the
+            microcontroller) to append.
+    """
     bufferByteArray.append(payload)
-    if(len(bufferByteArray)) == 43:
-      print_details(bufferByteArray)
+    if len(bufferByteArray) == 43:
+        # once sufficient size warrants call to print_details()
+        print_details(bufferByteArray)
+        # reset bytearray buffer
+        bufferByteArray.clear()
         
 
 Bridge.provide("RF24Callback", RF24Callback)
