@@ -5,13 +5,15 @@ Notes:
     * The radio's power state is represented under the assumption that
       the radio's CE pin is inactive low.
 """
+
 # pylint: disable=consider-using-f-string
 import struct
 import time
 
-from arduino.app_utils import *
+from arduino.app_utils import App, Bridge
 
 bufferByteArray = bytearray()
+
 
 def RF24Callback(payload: int):
     """Append a ``payload`` byte to the global ``bufferByteArray``.
@@ -27,7 +29,7 @@ def RF24Callback(payload: int):
         print_details(bufferByteArray)
         # reset bytearray buffer
         bufferByteArray.clear()
-        
+
 
 Bridge.provide("RF24Callback", RF24Callback)
 
