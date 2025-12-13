@@ -6,6 +6,6 @@ An example demonstrating how to get and display debug information from nRF24L01 
 
 <br>
 
-#### Additional RF24 Examples
+#### Additional (External) RF24 Examples
 
 [https://github.com/TMRh20/Sketches/tree/master/ArduinoQ](https://github.com/TMRh20/Sketches/tree/master/ArduinoQ)
