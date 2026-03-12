@@ -28,7 +28,8 @@ concurrency:
 jobs:
   validate_lib_json:
     name: validate library.json
-    uses: nRF24/.github/.github/workflows/vaildate_platformio.yaml@main
+    uses: nRF24/.github/.github/workflows/validate_platformio.yaml@main
+    secrets: inherit
 
   build:
     needs: [validate_lib_json]
