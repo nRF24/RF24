@@ -7,7 +7,7 @@ if (PICO_SDK_PATH)
 endif()
 # check if we are building as an ESP-IDF component
 if (ESP_PLATFORM)
-    include(${CMAKE_CURRENT_LIST_DIR}/utility/esp_idf/CmakeLists.txt)
+    include(${CMAKE_CURRENT_LIST_DIR}/utility/esp_idf/CMakeLists.txt)
     return()
 endif()
 
