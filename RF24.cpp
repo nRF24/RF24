@@ -1110,7 +1110,7 @@ bool RF24::_init_radio()
     flush_tx();
 
     // Clear CONFIG register:
-    //      Reflect all IRQ events on IRQ pin
+    //      Reflect NO IRQ events on IRQ pin
     //      Enable PTX
     //      Power Up
     //      16-bit CRC (CRC required by auto-ack)
