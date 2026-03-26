@@ -1116,13 +1116,13 @@ bool RF24::_init_radio()
     //      16-bit CRC (CRC required by auto-ack)
     // Do not write CE high so radio will remain in standby I mode
     // PTX should use only 22uA of power
-    write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO)));
+    write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO) | _BV(MASK_RX_DR) | _BV(MASK_TX_DS) | _BV(MASK_MAX_RT));
     config_reg = read_register(NRF_CONFIG);
 
     powerUp();
 
     // if config is not set correctly then there was a bad response from module
-    return config_reg == (_BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP)) ? true : false;
+    return config_reg == (_BV(EN_CRC) | _BV(CRCO) | _BV(PWR_UP) | _BV(MASK_RX_DR) | _BV(MASK_TX_DS) | _BV(MASK_MAX_RT)) ? true : false;
 }
 
 /****************************************************************************/
