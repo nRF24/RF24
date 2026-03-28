@@ -1248,32 +1248,78 @@ void RF24::errNotify()
     #endif
 }
 
-#endif
 /******************************************************************/
 
-//Similar to the previous write, clears the interrupt flags
-bool RF24::write(const void* buf, uint8_t len, const bool multicast)
+int8_t RF24::errHandler(bool* doRecovery)
 {
-    //Start Writing
-    startFastWrite(buf, len, multicast);
 
-//Wait until complete or failed
-#if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
+    //Wait until complete or failed
     uint32_t timer = millis();
-#endif // defined(FAILURE_HANDLING) || defined(RF24_LINUX)
 
     while (!(update() & (RF24_TX_DS | RF24_TX_DF))) {
-#if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > 95) {
-            errNotify();
     #if defined(FAILURE_HANDLING)
+            flush_rx();
+            flush_tx();
+            if (doRecovery) {
+                *doRecovery = false;
+                failureRecoveryAttempts++;
+                ce(LOW);
+                return -1;
+            }
+            else {
+    #endif
+                errNotify();
+    #if defined(FAILURE_HANDLING)
+            }
             return 0;
     #else
             delay(100);
     #endif
         }
-#endif
     }
+    return 0;
+}
+
+/******************************************************************/
+
+void RF24::errHandler2()
+{
+
+    #if defined(FAILURE_HANDLING)
+    flush_tx();
+    flush_rx();
+    if (!failureFlushed) {
+        failureFlushed = true;
+        failureRecoveryAttempts++;
+    }
+    else {
+    #endif
+        errNotify();
+    #if defined(FAILURE_HANDLING)
+        failureFlushed = false;
+    }
+    ce(LOW);
+    #endif
+}
+
+#endif
+
+/******************************************************************/
+
+//Similar to the previous write, clears the interrupt flags
+bool RF24::write(const void* buf, uint8_t len, const bool multicast)
+{
+
+    //Start Writing
+#if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
+    bool doRecovery = true;
+    do {
+#endif
+        startFastWrite(buf, len, multicast);
+#if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
+    } while (errHandler(&doRecovery) < 0);
+#endif
 
     ce(LOW);
 
@@ -1287,6 +1333,8 @@ bool RF24::write(const void* buf, uint8_t len, const bool multicast)
     //TX OK 1 or 0
     return 1;
 }
+
+/****************************************************************************/
 
 bool RF24::write(const void* buf, uint8_t len)
 {
@@ -1302,6 +1350,9 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
     //Keep track of the MAX retries and set auto-retry if seeing failures
     //This way the FIFO will fill up and allow blocking until packets go through
     //The radio will auto-clear everything in the FIFO as long as CE remains high
+#if defined(FAILURE_HANDLING)
+    bool timeoutInvoked = false;
+#endif
 
     uint32_t timer = millis(); // Get the time that the payload transmission started
 
@@ -1310,14 +1361,22 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
         if (status & RF24_TX_DF) { // If MAX Retries have been reached
             reUseTX();             // Set re-transmit and clear the MAX_RT interrupt flag
             if (millis() - timer > timeout) {
+#if defined(FAILURE_HANDLING)
+                failureFlushed = false;
+#endif
                 return 0; // If this payload has exceeded the user-defined timeout, exit and return 0
             }
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > (timeout + 95)) {
-            errNotify();
+            errHandler2();
     #if defined(FAILURE_HANDLING)
-            return 0;
+            timeoutInvoked = true;
+            if (!failureFlushed) {
+    #endif
+                return 0;
+    #if defined(FAILURE_HANDLING)
+            }
     #endif
         }
 #endif
@@ -1325,7 +1384,11 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
 
     //Start Writing
     startFastWrite(buf, len, 0); // Write the payload if a buffer is clear
-
+#if defined(FAILURE_HANDLING)
+    if (!timeoutInvoked) {
+        failureFlushed = false;
+    }
+#endif
     return 1; // Return 1 to indicate successful transmission
 }
 
@@ -1351,25 +1414,38 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
 
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
     uint32_t timer = millis();
+    bool timeoutInvoked = false;
 #endif
 
     //Blocking only if FIFO is full. This will loop and block until TX is successful or fail
     while (update() & _BV(TX_FULL)) {
         if (status & RF24_TX_DF) {
+#if defined(FAILURE_HANDLING)
+            failureFlushed = false;
+#endif
             return 0; //Return 0. The previous payload has not been retransmitted
             // From the user perspective, if you get a 0, call txStandBy()
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > 95) {
-            errNotify();
+            timeoutInvoked = true;
+            errHandler2();
     #if defined(FAILURE_HANDLING)
-            return 0;
-    #endif // defined(FAILURE_HANDLING)
+            if (!failureFlushed) {
+    #endif
+                return 0;
+    #if defined(FAILURE_HANDLING)
+            }
+    #endif
         }
 #endif
     }
     startFastWrite(buf, len, multicast); // Start Writing
-
+#if defined(FAILURE_HANDLING)
+    if (!timeoutInvoked) {
+        failureFlushed = false;
+    }
+#endif
     return 1;
 }
 
@@ -1451,19 +1527,23 @@ bool RF24::txStandBy()
             write_register(NRF_STATUS, RF24_TX_DF);
             ce(LOW);
             flush_tx(); //Non blocking, flush the data
+#if defined(FAILURE_HANDLING)
+            failureFlushed = false;
+#endif
             return 0;
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timeout > 95) {
-            errNotify();
-    #if defined(FAILURE_HANDLING)
+            errHandler2();
             return 0;
-    #endif
         }
 #endif
     }
 
     ce(LOW); //Set STANDBY-I mode
+#if defined(FAILURE_HANDLING)
+    failureFlushed = false;
+#endif
     return 1;
 }
 
@@ -1486,20 +1566,24 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
             if (millis() - start >= timeout) {
                 ce(LOW);
                 flush_tx();
+#if defined(FAILURE_HANDLING)
+                failureFlushed = false;
+#endif
                 return 0;
             }
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
-        if (millis() - start > (timeout + 95)) {
-            errNotify();
-    #if defined(FAILURE_HANDLING)
+        if (millis() - start > timeout + 95) {
+            errHandler2();
             return 0;
-    #endif
         }
 #endif
     }
 
     ce(LOW); //Set STANDBY-I mode
+#if defined(FAILURE_HANDLING)
+    failureFlushed = false;
+#endif
     return 1;
 }
 
