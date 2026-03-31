@@ -1283,7 +1283,7 @@ int8_t RF24::errHandler(bool* doRecovery)
 
 /******************************************************************/
 
-void RF24::errHandler2()
+void RF24::errHandler()
 {
 
     #if defined(FAILURE_HANDLING)
@@ -1369,7 +1369,7 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > (timeout + 95)) {
-            errHandler2();
+            errHandler();
     #if defined(FAILURE_HANDLING)
             timeoutInvoked = true;
             if (!failureFlushed) {
@@ -1429,7 +1429,7 @@ bool RF24::writeFast(const void* buf, uint8_t len, const bool multicast)
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timer > 95) {
             timeoutInvoked = true;
-            errHandler2();
+            errHandler();
     #if defined(FAILURE_HANDLING)
             if (!failureFlushed) {
     #endif
@@ -1534,7 +1534,7 @@ bool RF24::txStandBy()
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - timeout > 95) {
-            errHandler2();
+            errHandler();
             return 0;
         }
 #endif
@@ -1574,7 +1574,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
         }
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
         if (millis() - start > timeout + 95) {
-            errHandler2();
+            errHandler();
             return 0;
         }
 #endif

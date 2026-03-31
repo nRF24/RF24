@@ -2191,7 +2191,7 @@ private:
 
     void errNotify(void);
     inline int8_t errHandler(bool* doRecovery);
-    inline void errHandler2();
+    inline void errHandler();
 
     bool failureFlushed;
 #endif
