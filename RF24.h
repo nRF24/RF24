@@ -1452,6 +1452,8 @@ public:
      * @endcode
      */
     bool failureDetected;
+    uint16_t failureRecoveryAttempts;
+
 #endif // defined (FAILURE_HANDLING)
 
     /**@}*/
@@ -2188,7 +2190,10 @@ private:
 #if defined(FAILURE_HANDLING) || defined(RF24_LINUX)
 
     void errNotify(void);
+    inline int8_t errHandler(bool* doRecovery);
+    inline void errHandler();
 
+    bool failureFlushed;
 #endif
 
     /**
