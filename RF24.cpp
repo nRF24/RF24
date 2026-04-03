@@ -10,6 +10,8 @@
 #include "RF24_config.h"
 #include "RF24.h"
 
+using namespace nRF24L01;
+
 /****************************************************************************/
 
 void RF24::csn(bool mode)

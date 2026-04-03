@@ -16,6 +16,7 @@
 #define RF24_H_
 
 #include "RF24_config.h"
+#include "nRF24L01.h"
 
 #if defined(RF24_LINUX) || defined(LITTLEWIRE)
     #include "utility/includes.h"
@@ -139,17 +140,16 @@ typedef enum
  */
 typedef enum
 {
-#include "nRF24L01.h"
     /// An alias of `0` to describe no IRQ events enabled.
     RF24_IRQ_NONE = 0,
     /// Represents an event where TX Data Failed to send.
-    RF24_TX_DF = 1 << MASK_MAX_RT,
+    RF24_TX_DF = 1 << nRF24L01::MASK_MAX_RT,
     /// Represents an event where TX Data Sent successfully.
-    RF24_TX_DS = 1 << TX_DS,
+    RF24_TX_DS = 1 << nRF24L01::TX_DS,
     /// Represents an event where RX Data is Ready to `RF24::read()`.
-    RF24_RX_DR = 1 << RX_DR,
+    RF24_RX_DR = 1 << nRF24L01::RX_DR,
     /// Equivalent to `RF24_RX_DR | RF24_TX_DS | RF24_TX_DF`.
-    RF24_IRQ_ALL = (1 << MASK_MAX_RT) | (1 << TX_DS) | (1 << RX_DR),
+    RF24_IRQ_ALL = (1 << nRF24L01::MASK_MAX_RT) | (1 << nRF24L01::TX_DS) | (1 << nRF24L01::RX_DR),
 } rf24_irq_flags_e;
 
 /**
