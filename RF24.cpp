@@ -159,7 +159,7 @@ void RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
     *ptx++ = reg;
 
     while (len--) {
-        *ptx++ = RF24_NOP; // Dummy operation, just for reading
+        *ptx++ = NOP; // Dummy operation, just for reading
     }
 
     #if defined(RF24_RP2)
@@ -209,7 +209,7 @@ uint8_t RF24::read_register(uint8_t reg)
     uint8_t* prx = spi_rxbuff;
     uint8_t* ptx = spi_txbuff;
     *ptx++ = reg;
-    *ptx++ = RF24_NOP; // Dummy operation, just for reading
+    *ptx++ = NOP; // Dummy operation, just for reading
 
     #if defined(RF24_RP2)
     _spi->transfernb((const uint8_t*)spi_txbuff, spi_rxbuff, 2);
@@ -415,7 +415,7 @@ void RF24::read_payload(void* buf, uint8_t data_len)
 
     *ptx++ = R_RX_PAYLOAD;
     while (--size) {
-        *ptx++ = RF24_NOP;
+        *ptx++ = NOP;
     }
 
     size = static_cast<uint8_t>(data_len + blank_len + 1); // Size has been lost during while, re affect
@@ -1685,7 +1685,7 @@ uint8_t RF24::getStatusFlags()
 
 uint8_t RF24::update()
 {
-    read_register(RF24_NOP, (uint8_t*)nullptr, 0);
+    read_register(NOP, (uint8_t*)nullptr, 0);
     return status;
 }
 

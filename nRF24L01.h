@@ -119,7 +119,7 @@ constexpr uint8_t W_ACK_PAYLOAD = 0xA8;
 constexpr uint8_t FLUSH_TX = 0xE1;
 constexpr uint8_t FLUSH_RX = 0xE2;
 constexpr uint8_t REUSE_TX_PL = 0xE3;
-constexpr uint8_t RF24_NOP = 0xFF;
+constexpr uint8_t NOP = 0xFF;
 
 /* Non-P omissions */
 constexpr uint8_t LNA_HCURR = 0;
