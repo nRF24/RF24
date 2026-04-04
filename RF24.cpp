@@ -1088,13 +1088,13 @@ bool RF24::_init_radio()
         // allow use of multicast parameter and dynamic payloads by default
         write_register(nRF24L01::FEATURE, 0);
     }
-    ack_payloads_enabled = false; // ack payloads disabled by default
-    write_register(nRF24L01::DYNPD, 0);     // disable dynamic payloads by default (for all pipes)
+    ack_payloads_enabled = false;       // ack payloads disabled by default
+    write_register(nRF24L01::DYNPD, 0); // disable dynamic payloads by default (for all pipes)
     dynamic_payloads_enabled = false;
     write_register(nRF24L01::EN_AA, 0x3F);  // enable auto-ack on all pipes
     write_register(nRF24L01::EN_RXADDR, 3); // only open RX pipes 0 & 1
-    setPayloadSize(32);           // set static payload size to 32 (max) bytes by default
-    setAddressWidth(5);           // set default address length to (max) 5 bytes
+    setPayloadSize(32);                     // set static payload size to 32 (max) bytes by default
+    setAddressWidth(5);                     // set default address length to (max) 5 bytes
 
     // Set up default configuration.  Callers can always change it later.
     // This channel should be universally safe and not bleed over into adjacent
