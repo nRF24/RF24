@@ -720,7 +720,7 @@ void RF24::printDetails(void)
     print_byte_register(PSTR("EN_RXADDR"), EN_RXADDR);
     print_byte_register(PSTR("RF_CH\t"), RF_CH);
     print_byte_register(PSTR("RF_SETUP"), RF_SETUP);
-    print_byte_register(PSTR("CONFIG\t"), NRF_CONFIG);
+    print_byte_register(PSTR("CONFIG\t"), CONFIG);
     print_byte_register(PSTR("DYNPD/FEATURE"), DYNPD, 2);
 
     printf_P(PSTR("Data Rate\t" PRIPSTR
@@ -814,7 +814,7 @@ void RF24::printPrettyDetails(void)
                  static_cast<char>(static_cast<bool>(autoAck & _BV(ENAA_P0)) + 48));
     }
 
-    config_reg = read_register(NRF_CONFIG);
+    config_reg = read_register(CONFIG);
     printf_P(PSTR("Primary Mode\t\t= %cX\r\n"), config_reg & _BV(PRIM_RX) ? 'R' : 'T');
     print_address_register(PSTR("TX address\t"), TX_ADDR);
 
@@ -896,7 +896,7 @@ uint16_t RF24::sprintfPrettyDetails(char* debugging_information)
     }
     offset += sprintf_P(
         debugging_information + offset, format_str2,
-        (read_register(NRF_CONFIG) & _BV(PRIM_RX) ? 'R' : 'T'));
+        (read_register(CONFIG) & _BV(PRIM_RX) ? 'R' : 'T'));
     offset += sprintf_address_register(debugging_information + offset, TX_ADDR);
     uint8_t openPipes = read_register(EN_RXADDR);
     for (uint8_t i = 0; i < 6; ++i) {
@@ -921,7 +921,7 @@ uint16_t RF24::sprintfPrettyDetails(char* debugging_information)
 void RF24::encodeRadioDetails(uint8_t* encoded_details)
 {
     uint8_t end = FEATURE + 1;
-    for (uint8_t i = NRF_CONFIG; i < end; ++i) {
+    for (uint8_t i = CONFIG; i < end; ++i) {
         if (i == RX_ADDR_P0 || i == RX_ADDR_P1 || i == TX_ADDR) {
             // get 40-bit registers
             read_register(i, encoded_details, 5);
@@ -1105,7 +1105,7 @@ bool RF24::_init_radio()
 
     // Reset current status
     // Notice reset and flush is the last thing we do
-    write_register(NRF_STATUS, RF24_IRQ_ALL);
+    write_register(STATUS, RF24_IRQ_ALL);
 
     // Flush buffers
     flush_rx();
@@ -1118,8 +1118,8 @@ bool RF24::_init_radio()
     //      16-bit CRC (CRC required by auto-ack)
     // Do not write CE high so radio will remain in standby I mode
     // PTX should use only 22uA of power
-    write_register(NRF_CONFIG, (_BV(EN_CRC) | _BV(CRCO) | _BV(MASK_RX_DR) | _BV(MASK_TX_DS) | _BV(MASK_MAX_RT)));
-    config_reg = read_register(NRF_CONFIG);
+    write_register(CONFIG, (_BV(EN_CRC) | _BV(CRCO) | _BV(MASK_RX_DR) | _BV(MASK_TX_DS) | _BV(MASK_MAX_RT)));
+    config_reg = read_register(CONFIG);
 
     powerUp();
 
@@ -1149,8 +1149,8 @@ void RF24::startListening(void)
     powerUp();
 #endif
     config_reg |= _BV(PRIM_RX);
-    write_register(NRF_CONFIG, config_reg);
-    write_register(NRF_STATUS, RF24_IRQ_ALL);
+    write_register(CONFIG, config_reg);
+    write_register(STATUS, RF24_IRQ_ALL);
     ce(HIGH);
 
     // Restore the pipe0 address, if exists
@@ -1178,7 +1178,7 @@ void RF24::stopListening(void)
     }
 
     config_reg = static_cast<uint8_t>(config_reg & ~_BV(PRIM_RX));
-    write_register(NRF_CONFIG, config_reg);
+    write_register(CONFIG, config_reg);
 
 #if defined(RF24_TINY) || defined(LITTLEWIRE)
     // for 3 pins solution TX mode is only left with additional powerDown/powerUp cycle
@@ -1215,7 +1215,7 @@ void RF24::powerDown(void)
 {
     ce(LOW); // Guarantee CE is low on powerDown
     config_reg = static_cast<uint8_t>(config_reg & ~_BV(PWR_UP));
-    write_register(NRF_CONFIG, config_reg);
+    write_register(CONFIG, config_reg);
 }
 
 /****************************************************************************/
@@ -1226,7 +1226,7 @@ void RF24::powerUp(void)
     // if not powered up then power up and wait for the radio to initialize
     if (!(config_reg & _BV(PWR_UP))) {
         config_reg |= _BV(PWR_UP);
-        write_register(NRF_CONFIG, config_reg);
+        write_register(CONFIG, config_reg);
 
         // For nRF24L01+ to go from power down mode to TX or RX mode it must first pass through stand-by mode.
         // There must be a delay of Tpd2stby (see Table 16.) after the nRF24L01+ leaves power down mode before
@@ -1325,7 +1325,7 @@ bool RF24::write(const void* buf, uint8_t len, const bool multicast)
 
     ce(LOW);
 
-    write_register(NRF_STATUS, RF24_IRQ_ALL);
+    write_register(STATUS, RF24_IRQ_ALL);
 
     //Max retries exceeded
     if (status & RF24_TX_DF) {
@@ -1399,7 +1399,7 @@ bool RF24::writeBlocking(const void* buf, uint8_t len, uint32_t timeout)
 void RF24::reUseTX()
 {
     ce(LOW);
-    write_register(NRF_STATUS, RF24_TX_DF); //Clear max retry flag
+    write_register(STATUS, RF24_TX_DF); //Clear max retry flag
     read_register(REUSE_TX_PL, (uint8_t*)nullptr, 0);
     IF_RF24_DEBUG(printf_P("[Reusing payload in TX FIFO]"););
     ce(HIGH); //Re-Transfer packet
@@ -1526,7 +1526,7 @@ bool RF24::txStandBy()
 #endif
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
         if (status & RF24_TX_DF) {
-            write_register(NRF_STATUS, RF24_TX_DF);
+            write_register(STATUS, RF24_TX_DF);
             ce(LOW);
             flush_tx(); //Non blocking, flush the data
 #if defined(FAILURE_HANDLING)
@@ -1562,7 +1562,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx)
 
     while (!(read_register(FIFO_STATUS) & _BV(TX_EMPTY))) {
         if (status & RF24_TX_DF) {
-            write_register(NRF_STATUS, RF24_TX_DF);
+            write_register(STATUS, RF24_TX_DF);
             ce(LOW); // Set re-transmit
             ce(HIGH);
             if (millis() - start >= timeout) {
@@ -1597,7 +1597,7 @@ void RF24::maskIRQ(bool tx, bool fail, bool rx)
     config_reg = static_cast<uint8_t>(config_reg & ~(1 << MASK_MAX_RT | 1 << MASK_TX_DS | 1 << MASK_RX_DR));
     /* set the specified interrupt flags */
     config_reg = static_cast<uint8_t>(config_reg | fail << MASK_MAX_RT | tx << MASK_TX_DS | rx << MASK_RX_DR);
-    write_register(NRF_CONFIG, config_reg);
+    write_register(CONFIG, config_reg);
 }
 
 /****************************************************************************/
@@ -1640,7 +1640,7 @@ void RF24::read(void* buf, uint8_t len)
     read_payload(buf, len);
 
     //Clear the only applicable interrupt flags
-    write_register(NRF_STATUS, RF24_RX_DR);
+    write_register(STATUS, RF24_RX_DR);
 }
 
 /****************************************************************************/
@@ -1649,7 +1649,7 @@ void RF24::whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready)
 {
     // Read the status & reset the status in one easy call
     // Or is that such a good idea?
-    write_register(NRF_STATUS, RF24_IRQ_ALL);
+    write_register(STATUS, RF24_IRQ_ALL);
 
     // Report to the user what happened
     tx_ok = status & RF24_TX_DS;
@@ -1661,7 +1661,7 @@ void RF24::whatHappened(bool& tx_ok, bool& tx_fail, bool& rx_ready)
 
 uint8_t RF24::clearStatusFlags(uint8_t flags)
 {
-    write_register(NRF_STATUS, flags & RF24_IRQ_ALL);
+    write_register(STATUS, flags & RF24_IRQ_ALL);
     return status;
 }
 
@@ -1671,7 +1671,7 @@ void RF24::setStatusFlags(uint8_t flags)
 {
     // flip the `flags` to translate from "human understanding"
     config_reg = (config_reg & ~RF24_IRQ_ALL) | (~flags & RF24_IRQ_ALL);
-    write_register(NRF_CONFIG, config_reg);
+    write_register(CONFIG, config_reg);
 }
 
 /****************************************************************************/
@@ -2061,7 +2061,7 @@ void RF24::setCRCLength(rf24_crclength_e length)
         config_reg |= _BV(EN_CRC);
         config_reg |= _BV(CRCO);
     }
-    write_register(NRF_CONFIG, config_reg);
+    write_register(CONFIG, config_reg);
 }
 
 /****************************************************************************/
@@ -2070,7 +2070,7 @@ rf24_crclength_e RF24::getCRCLength(void)
 {
     rf24_crclength_e result = RF24_CRC_DISABLED;
     uint8_t AA = read_register(EN_AA);
-    config_reg = read_register(NRF_CONFIG);
+    config_reg = read_register(CONFIG);
 
     if (config_reg & _BV(EN_CRC) || AA) {
         if (config_reg & _BV(CRCO)) {
@@ -2089,7 +2089,7 @@ rf24_crclength_e RF24::getCRCLength(void)
 void RF24::disableCRC(void)
 {
     config_reg = static_cast<uint8_t>(config_reg & ~_BV(EN_CRC));
-    write_register(NRF_CONFIG, config_reg);
+    write_register(CONFIG, config_reg);
 }
 
 /****************************************************************************/

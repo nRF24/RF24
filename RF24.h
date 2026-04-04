@@ -183,7 +183,7 @@ private:
     uint8_t payload_size;             /* Fixed size of payloads */
     uint8_t pipe0_reading_address[5]; /* Last address set on pipe 0 for reading. */
     uint8_t pipe0_writing_address[5]; /* Last address set on pipe 0 for writing. */
-    uint8_t config_reg;               /* For storing the value of the NRF_CONFIG register */
+    uint8_t config_reg;               /* For storing the value of the CONFIG register */
     bool _is_p_variant;               /* For storing the result of testing the toggleFeatures() affect */
     bool _is_p0_rx;                   /* For keeping track of pipe 0's usage in user-triggered RX mode. */
 
@@ -760,14 +760,14 @@ public:
      * Registers names and/or data corresponding to the index of the `encoded_details` array:
      * | index | register/data |
      * |------:|:--------------|
-     * | 0 |     NRF_CONFIG |
+     * | 0 |     CONFIG |
      * | 1 |     EN_AA |
      * | 2 |     EN_RXADDR |
      * | 3 |     SETUP_AW |
      * | 4 |     SETUP_RETR |
      * | 5 |     RF_CH |
      * | 6 |     RF_SETUP |
-     * | 7 |     NRF_STATUS |
+     * | 7 |     STATUS |
      * | 8 |     OBSERVE_TX |
      * | 9 |     CD (aka RPD) |
      * | 10-14 | RX_ADDR_P0 |
