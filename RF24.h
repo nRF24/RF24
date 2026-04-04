@@ -16,6 +16,7 @@
 #define RF24_H_
 
 #include "RF24_config.h"
+#include "nRF24L01.h"
 
 #if defined(RF24_LINUX) || defined(LITTLEWIRE)
     #include "utility/includes.h"
@@ -139,17 +140,16 @@ typedef enum
  */
 typedef enum
 {
-#include "nRF24L01.h"
     /// An alias of `0` to describe no IRQ events enabled.
     RF24_IRQ_NONE = 0,
     /// Represents an event where TX Data Failed to send.
-    RF24_TX_DF = 1 << MASK_MAX_RT,
+    RF24_TX_DF = 1 << nRF24L01::MASK_MAX_RT,
     /// Represents an event where TX Data Sent successfully.
-    RF24_TX_DS = 1 << TX_DS,
+    RF24_TX_DS = 1 << nRF24L01::TX_DS,
     /// Represents an event where RX Data is Ready to `RF24::read()`.
-    RF24_RX_DR = 1 << RX_DR,
+    RF24_RX_DR = 1 << nRF24L01::RX_DR,
     /// Equivalent to `RF24_RX_DR | RF24_TX_DS | RF24_TX_DF`.
-    RF24_IRQ_ALL = (1 << MASK_MAX_RT) | (1 << TX_DS) | (1 << RX_DR),
+    RF24_IRQ_ALL = (1 << nRF24L01::MASK_MAX_RT) | (1 << nRF24L01::TX_DS) | (1 << nRF24L01::RX_DR),
 } rf24_irq_flags_e;
 
 /**
@@ -183,7 +183,7 @@ private:
     uint8_t payload_size;             /* Fixed size of payloads */
     uint8_t pipe0_reading_address[5]; /* Last address set on pipe 0 for reading. */
     uint8_t pipe0_writing_address[5]; /* Last address set on pipe 0 for writing. */
-    uint8_t config_reg;               /* For storing the value of the NRF_CONFIG register */
+    uint8_t config_reg;               /* For storing the value of the CONFIG register */
     bool _is_p_variant;               /* For storing the result of testing the toggleFeatures() affect */
     bool _is_p0_rx;                   /* For keeping track of pipe 0's usage in user-triggered RX mode. */
 
@@ -760,14 +760,14 @@ public:
      * Registers names and/or data corresponding to the index of the `encoded_details` array:
      * | index | register/data |
      * |------:|:--------------|
-     * | 0 |     NRF_CONFIG |
+     * | 0 |     CONFIG |
      * | 1 |     EN_AA |
      * | 2 |     EN_RXADDR |
      * | 3 |     SETUP_AW |
      * | 4 |     SETUP_RETR |
      * | 5 |     RF_CH |
      * | 6 |     RF_SETUP |
-     * | 7 |     NRF_STATUS |
+     * | 7 |     STATUS |
      * | 8 |     OBSERVE_TX |
      * | 9 |     CD (aka RPD) |
      * | 10-14 | RX_ADDR_P0 |
