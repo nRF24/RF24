@@ -6,6 +6,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [1.6.0] - 2026-04-08
+
+### <!-- 4 --> 🛠️ Fixed
+
+- NRF54l15 support by \@TMRh20 in [#1065](https://github.com/nRF24/RF24/pull/1065)
+- Use explicit `nRF24L01::` namespace in RF24.cpp by \@Copilot in [#1069](https://github.com/nRF24/RF24/pull/1069)
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump actions/checkout from 4 to 5 by \@dependabot[bot] in [#1043](https://github.com/nRF24/RF24/pull/1043)
+- Bump actions/setup-node from 4 to 5 by \@dependabot[bot] in [#1044](https://github.com/nRF24/RF24/pull/1044)
+- Bump actions/setup-node from 5 to 6 by \@dependabot[bot] in [#1048](https://github.com/nRF24/RF24/pull/1048)
+- Bump actions/checkout from 5 to 6 by \@dependabot[bot] in [#1049](https://github.com/nRF24/RF24/pull/1049)
+
+### <!-- 8 --> 📝 Documentation
+
+- Update build badges in README by \@2bndy5 in [`a0f7161`](https://github.com/nRF24/RF24/commit/a0f7161a42cda53da61c7060202be71d0852ecc4)
+
+### <!-- 9 --> 🗨️ Changed
+
+- Use nushell as a task runner by \@2bndy5 in [#1038](https://github.com/nRF24/RF24/pull/1038)
+- Revise CI by \@2bndy5 in [#1050](https://github.com/nRF24/RF24/pull/1050)
+- Found and converted CRLF to LF by \@2bndy5 in [`2a8f554`](https://github.com/nRF24/RF24/commit/2a8f5541afae3228b748285785d6e1ea2a077c41)
+- Only calculate compile size deltas in PR by \@2bndy5 in [`afb7a4f`](https://github.com/nRF24/RF24/commit/afb7a4f5cb67b3fa35c722e4ec29787858dd7b8c)
+- Convert CRLF to LF by \@2bndy5 in [`74b300d`](https://github.com/nRF24/RF24/commit/74b300d31f4d79e6570f1a8a7ed473d6b059b4a1)
+- Arduino Uno Q Preliminary Example by \@TMRh20 in [#1054](https://github.com/nRF24/RF24/pull/1054)
+- Modify call to reusable PIO workflow by \@2bndy5 in [`6144bba`](https://github.com/nRF24/RF24/commit/6144bba6e3d26f2dc661616ef3311c8a6852114e)
+- Big bug fix: Disable interrupts by default by \@TMRh20 in [#1062](https://github.com/nRF24/RF24/pull/1062)
+- Enhanced Error Handling by \@TMRh20 in [#1064](https://github.com/nRF24/RF24/pull/1064)
+- Namespace nRF24L01.h defines to avoid name collisions by \@Copilot in [#1066](https://github.com/nRF24/RF24/pull/1066)
+
+[1.6.0]: https://github.com/nRF24/RF24/compare/v1.5.0...v1.6.0
+
+Full commit diff: [`v1.5.0...v1.6.0`][1.6.0]
+
+## New Contributors
+
+- \@Copilot made their first contribution in [#1069](https://github.com/nRF24/RF24/pull/1069)
+
 ## [1.5.0] - 2025-05-04
 
 ### <!-- 1 --> 🚀 Added
@@ -30,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump BCM2835 lib to v1.75 by \@2bndy5 in [#1019](https://github.com/nRF24/RF24/pull/1019)
 - Revert "Add required delay for Linux " by \@TMRh20 in [#1035](https://github.com/nRF24/RF24/pull/1035)
 - Use shared pin FD cache by \@2bndy5 in [#1027](https://github.com/nRF24/RF24/pull/1027)
+- Bump version to v1.5.0 by \@2bndy5 in [`beb8ffe`](https://github.com/nRF24/RF24/commit/beb8ffebc5be0f5470fb08c851f941d0c70a45e0)
 
 [1.5.0]: https://github.com/nRF24/RF24/compare/v1.4.11...v1.5.0
 
@@ -144,7 +184,9 @@ Full commit diff: [`v1.4.9...v1.4.10`][1.4.10]
 Full commit diff: [`v1.4.8...v1.4.9`][1.4.9]
 
 ## New Contributors
-* \@dependabot[bot] made their first contribution in [#941](https://github.com/nRF24/RF24/pull/941)
+
+- \@dependabot[bot] made their first contribution in [#941](https://github.com/nRF24/RF24/pull/941)
+
 ## [1.4.8] - 2023-09-27
 
 ### <!-- 8 --> 📝 Documentation
@@ -193,8 +235,10 @@ Full commit diff: [`v1.4.7...v1.4.8`][1.4.8]
 Full commit diff: [`v1.4.6...v1.4.7`][1.4.7]
 
 ## New Contributors
-* \@fertinator made their first contribution in [#904](https://github.com/nRF24/RF24/pull/904)
-* \@TheGarkine made their first contribution in [#892](https://github.com/nRF24/RF24/pull/892)
+
+- \@fertinator made their first contribution in [#904](https://github.com/nRF24/RF24/pull/904)
+- \@TheGarkine made their first contribution in [#892](https://github.com/nRF24/RF24/pull/892)
+
 ## [1.4.6] - 2022-09-18
 
 ### <!-- 1 --> 🚀 Added
@@ -226,8 +270,10 @@ Full commit diff: [`v1.4.6...v1.4.7`][1.4.7]
 Full commit diff: [`v1.4.5...v1.4.6`][1.4.6]
 
 ## New Contributors
-* \@bblanchon made their first contribution in [#864](https://github.com/nRF24/RF24/pull/864)
-* \@lurch made their first contribution in [#858](https://github.com/nRF24/RF24/pull/858)
+
+- \@bblanchon made their first contribution in [#864](https://github.com/nRF24/RF24/pull/864)
+- \@lurch made their first contribution in [#858](https://github.com/nRF24/RF24/pull/858)
+
 ## [1.4.5] - 2022-07-19
 
 ### <!-- 3 --> 🗑️ Removed
@@ -308,10 +354,12 @@ Full commit diff: [`v1.4.3...v1.4.4`][1.4.4]
 Full commit diff: [`v1.4.2...v1.4.3`][1.4.3]
 
 ## New Contributors
-* \@Cobalt6700 made their first contribution in [#843](https://github.com/nRF24/RF24/pull/843)
-* \@dstroy0 made their first contribution in [#825](https://github.com/nRF24/RF24/pull/825)
-* \@matt-walker0 made their first contribution in [#820](https://github.com/nRF24/RF24/pull/820)
-* \@prawnpie made their first contribution in [#817](https://github.com/nRF24/RF24/pull/817)
+
+- \@Cobalt6700 made their first contribution in [#843](https://github.com/nRF24/RF24/pull/843)
+- \@dstroy0 made their first contribution in [#825](https://github.com/nRF24/RF24/pull/825)
+- \@matt-walker0 made their first contribution in [#820](https://github.com/nRF24/RF24/pull/820)
+- \@prawnpie made their first contribution in [#817](https://github.com/nRF24/RF24/pull/817)
+
 ## [1.4.2] - 2021-11-27
 
 ### <!-- 1 --> 🚀 Added
@@ -343,7 +391,9 @@ Full commit diff: [`v1.4.2...v1.4.3`][1.4.3]
 Full commit diff: [`v1.4.1...v1.4.2`][1.4.2]
 
 ## New Contributors
-* \@razerraz made their first contribution in [#704](https://github.com/nRF24/RF24/pull/704)
+
+- \@razerraz made their first contribution in [#704](https://github.com/nRF24/RF24/pull/704)
+
 ## [1.4.1] - 2021-06-02
 
 ### <!-- 4 --> 🛠️ Fixed
@@ -446,7 +496,9 @@ Full commit diff: [`v1.4.0...v1.4.1`][1.4.1]
 Full commit diff: [`v1.3.12...v1.4.0`][1.4.0]
 
 ## New Contributors
-* \@dagix5 made their first contribution in [#742](https://github.com/nRF24/RF24/pull/742)
+
+- \@dagix5 made their first contribution in [#742](https://github.com/nRF24/RF24/pull/742)
+
 ## [1.3.12] - 2021-02-27
 
 ### <!-- 1 --> 🚀 Added
@@ -531,8 +583,10 @@ Full commit diff: [`v1.3.10...v1.3.11`][1.3.11]
 Full commit diff: [`v1.3.9...v1.3.10`][1.3.10]
 
 ## New Contributors
-* \@jscrane made their first contribution in [#690](https://github.com/nRF24/RF24/pull/690)
-* \@2bndy5 made their first contribution in [#637](https://github.com/nRF24/RF24/pull/637)
+
+- \@jscrane made their first contribution in [#690](https://github.com/nRF24/RF24/pull/690)
+- \@2bndy5 made their first contribution in [#637](https://github.com/nRF24/RF24/pull/637)
+
 ## [1.3.9] - 2020-08-22
 
 ### <!-- 4 --> 🛠️ Fixed
@@ -601,7 +655,9 @@ Full commit diff: [`v1.3.7...v1.3.8`][1.3.8]
 Full commit diff: [`v1.3.6...v1.3.7`][1.3.7]
 
 ## New Contributors
-* \@waltbar made their first contribution in [#609](https://github.com/nRF24/RF24/pull/609)
+
+- \@waltbar made their first contribution in [#609](https://github.com/nRF24/RF24/pull/609)
+
 ## [1.3.6] - 2020-07-14
 
 ### <!-- 4 --> 🛠️ Fixed
@@ -634,7 +690,7 @@ Full commit diff: [`v1.3.5...v1.3.6`][1.3.6]
 - Fix documentation for build on linux/RPi by \@TMRh20 in [`b323f53`](https://github.com/nRF24/RF24/commit/b323f535aa9644d988370fc6989a2ef9f85aa469)
 - Fix for ESP32 program memory error/warning by \@TMRh20 in [`3667a54`](https://github.com/nRF24/RF24/commit/3667a54ed75d6c0b38fc6037710ef2e095189bfe)
 - Fixed a compiler warning in Linux example by \@gherlein in [#384](https://github.com/nRF24/RF24/pull/384)
-- Fixed undefined behavior in openReadingPipe by \@azais-corentin in [#604](https://github.com/nRF24/RF24/pull/604)
+- Fixed undefined behavior in openReadingPipe by \@haellsigh in [#604](https://github.com/nRF24/RF24/pull/604)
 
 ### <!-- 8 --> 📝 Documentation
 
@@ -657,9 +713,11 @@ Full commit diff: [`v1.3.5...v1.3.6`][1.3.6]
 Full commit diff: [`v1.3.4...v1.3.5`][1.3.5]
 
 ## New Contributors
-* \@azais-corentin made their first contribution in [#604](https://github.com/nRF24/RF24/pull/604)
-* \@gherlein made their first contribution in [#384](https://github.com/nRF24/RF24/pull/384)
-* \@krzysztof9nowak made their first contribution in [#585](https://github.com/nRF24/RF24/pull/585)
+
+- \@haellsigh made their first contribution in [#604](https://github.com/nRF24/RF24/pull/604)
+- \@gherlein made their first contribution in [#384](https://github.com/nRF24/RF24/pull/384)
+- \@krzysztof9nowak made their first contribution in [#585](https://github.com/nRF24/RF24/pull/585)
+
 ## [1.3.4] - 2020-02-15
 
 ### <!-- 1 --> 🚀 Added
@@ -702,10 +760,12 @@ Full commit diff: [`v1.3.4...v1.3.5`][1.3.5]
 Full commit diff: [`v1.3.3...v1.3.4`][1.3.4]
 
 ## New Contributors
-* \@CoRfr made their first contribution in [#564](https://github.com/nRF24/RF24/pull/564)
-* \@olback made their first contribution in [#543](https://github.com/nRF24/RF24/pull/543)
-* \@Crkk made their first contribution
-* \@jonnykl made their first contribution
+
+- \@CoRfr made their first contribution in [#564](https://github.com/nRF24/RF24/pull/564)
+- \@olback made their first contribution in [#543](https://github.com/nRF24/RF24/pull/543)
+- \@Crkk made their first contribution
+- \@jonnykl made their first contribution
+
 ## [1.3.3] - 2019-06-18
 
 ### <!-- 1 --> 🚀 Added
@@ -747,8 +807,10 @@ Full commit diff: [`v1.3.3...v1.3.4`][1.3.4]
 Full commit diff: [`v1.3.2...v1.3.3`][1.3.3]
 
 ## New Contributors
-* \@IkpeohaGodson made their first contribution
-* \@troffmo5 made their first contribution
+
+- \@IkpeohaGodson made their first contribution
+- \@troffmo5 made their first contribution
+
 ## [1.3.2] - 2019-03-22
 
 ### <!-- 1 --> 🚀 Added
@@ -792,11 +854,13 @@ Full commit diff: [`v1.3.2...v1.3.3`][1.3.3]
 Full commit diff: [`v1.3.1...v1.3.2`][1.3.2]
 
 ## New Contributors
-* \@herm made their first contribution
-* \@HannHank made their first contribution
-* \@ludiazv made their first contribution in [#455](https://github.com/nRF24/RF24/pull/455)
-* \@haseebehsan made their first contribution
-* \@wamonite made their first contribution
+
+- \@herm made their first contribution
+- \@HannHank made their first contribution
+- \@ludiazv made their first contribution in [#455](https://github.com/nRF24/RF24/pull/455)
+- \@haseebehsan made their first contribution
+- \@wamonite made their first contribution
+
 ## [1.3.1] - 2018-01-28
 
 ### <!-- 1 --> 🚀 Added
@@ -823,12 +887,14 @@ Full commit diff: [`v1.3.1...v1.3.2`][1.3.2]
 Full commit diff: [`v1.3.0...v1.3.1`][1.3.1]
 
 ## New Contributors
-* \@anders-liu made their first contribution in [#409](https://github.com/nRF24/RF24/pull/409)
-* \@trojanc made their first contribution in [#372](https://github.com/nRF24/RF24/pull/372)
-* \@sidoh made their first contribution in [#375](https://github.com/nRF24/RF24/pull/375)
-* \@per1234 made their first contribution in [#381](https://github.com/nRF24/RF24/pull/381)
-* \@aurelian17 made their first contribution in [#349](https://github.com/nRF24/RF24/pull/349)
-* \@MathiasMoog made their first contribution in [#366](https://github.com/nRF24/RF24/pull/366)
+
+- \@anders-liu made their first contribution in [#409](https://github.com/nRF24/RF24/pull/409)
+- \@trojanc made their first contribution in [#372](https://github.com/nRF24/RF24/pull/372)
+- \@sidoh made their first contribution in [#375](https://github.com/nRF24/RF24/pull/375)
+- \@per1234 made their first contribution in [#381](https://github.com/nRF24/RF24/pull/381)
+- \@aurelian17 made their first contribution in [#349](https://github.com/nRF24/RF24/pull/349)
+- \@MathiasMoog made their first contribution in [#366](https://github.com/nRF24/RF24/pull/366)
+
 ## [1.3.0] - 2017-06-01
 
 ### <!-- 1 --> 🚀 Added
@@ -868,12 +934,14 @@ Full commit diff: [`v1.3.0...v1.3.1`][1.3.1]
 Full commit diff: [`RF24v1.2.0...v1.3.0`][1.3.0]
 
 ## New Contributors
-* \@soligen2010 made their first contribution in [#352](https://github.com/nRF24/RF24/pull/352)
-* \@mattura made their first contribution in [#332](https://github.com/nRF24/RF24/pull/332)
-* \@plasticassius made their first contribution in [#315](https://github.com/nRF24/RF24/pull/315)
-* \@nickmooney made their first contribution in [#304](https://github.com/nRF24/RF24/pull/304)
-* \@derf made their first contribution in [#319](https://github.com/nRF24/RF24/pull/319)
-* \@campenr made their first contribution
+
+- \@soligen2010 made their first contribution in [#352](https://github.com/nRF24/RF24/pull/352)
+- \@mattura made their first contribution in [#332](https://github.com/nRF24/RF24/pull/332)
+- \@plasticassius made their first contribution in [#315](https://github.com/nRF24/RF24/pull/315)
+- \@nickmooney made their first contribution in [#304](https://github.com/nRF24/RF24/pull/304)
+- \@derf made their first contribution in [#319](https://github.com/nRF24/RF24/pull/319)
+- \@campenr made their first contribution
+
 ## [RF24v1.2.0] - 2016-11-05
 
 ### <!-- 1 --> 🚀 Added
@@ -903,8 +971,10 @@ Full commit diff: [`RF24v1.2.0...v1.3.0`][1.3.0]
 Full commit diff: [`v1.1.7...RF24v1.2.0`][RF24v1.2.0]
 
 ## New Contributors
-* \@pfeerick made their first contribution
-* \@valeros made their first contribution
+
+- \@pfeerick made their first contribution
+- \@valeros made their first contribution
+
 ## [1.1.7] - 2016-08-12
 
 ### <!-- 1 --> 🚀 Added
@@ -974,9 +1044,11 @@ Full commit diff: [`v1.1.7...RF24v1.2.0`][RF24v1.2.0]
 Full commit diff: [`v1.1.6...v1.1.7`][1.1.7]
 
 ## New Contributors
-* \@rnovacek made their first contribution
-* \@gitgrimbo made their first contribution
-* \@akatran made their first contribution
+
+- \@rnovacek made their first contribution
+- \@gitgrimbo made their first contribution
+- \@akatran made their first contribution
+
 ## [1.1.6] - 2016-02-20
 
 ### <!-- 1 --> 🚀 Added
@@ -1012,10 +1084,12 @@ Full commit diff: [`v1.1.6...v1.1.7`][1.1.7]
 Full commit diff: [`v1.1.5...v1.1.6`][1.1.6]
 
 ## New Contributors
-* \@wmarkow made their first contribution
-* \@flavio-fernandes made their first contribution
-* \@ab316 made their first contribution
-* \@SaintGimp made their first contribution
+
+- \@wmarkow made their first contribution
+- \@flavio-fernandes made their first contribution
+- \@ab316 made their first contribution
+- \@SaintGimp made their first contribution
+
 ## [1.1.5] - 2016-01-07
 
 ### <!-- 1 --> 🚀 Added
@@ -1032,6 +1106,7 @@ Full commit diff: [`v1.1.5...v1.1.6`][1.1.6]
 ### <!-- 4 --> 🛠️ Fixed
 
 - Fix Warning. ‘void* interruptHandler(void*)’ declared ‘static’ but never defined. by \@Oitzu in [`409cbf7`](https://github.com/nRF24/RF24/commit/409cbf78ee5e779f3abb2c2cc6a3f22abc809fba)
+- Deadlocks due to RPi SPI mutex code by \@TMRh20 in [`9a5ea80`](https://github.com/nRF24/RF24/commit/9a5ea80cacf9f50cce0b1600da4b5a55596b1011)
 - Fixes for last commit by \@TMRh20 in [`a57fafe`](https://github.com/nRF24/RF24/commit/a57fafe017961b8cfdef2ccac3d764721c42e62d)
 - Fix per \#183 by \@TMRh20 in [`9e68f9e`](https://github.com/nRF24/RF24/commit/9e68f9e133f426322d9b512239fc952b2dd3b1b9)
 
@@ -1042,7 +1117,6 @@ Full commit diff: [`v1.1.5...v1.1.6`][1.1.6]
 - Moving pthread to shared linker flags. by \@Oitzu in [`e83bc9a`](https://github.com/nRF24/RF24/commit/e83bc9affb30c6a1c90bf63de72d19aabcd47162)
 - Merge pull request \#173 from Oitzu/master by \@TMRh20 in [`a381194`](https://github.com/nRF24/RF24/commit/a381194bf0a5e1e1ecb06a7f0c502791e049d77c)
 - Mutex handling for interrupts on RPi by \@TMRh20 in [`243e25f`](https://github.com/nRF24/RF24/commit/243e25f23a6d3ff4f3d57ec2f89419ac84d36c16)
-- Deadlocks due to RPi SPI mutex code by \@TMRh20 in [`9a5ea80`](https://github.com/nRF24/RF24/commit/9a5ea80cacf9f50cce0b1600da4b5a55596b1011)
 - Move interrupt examples, add new int examples by \@TMRh20 in [`2c4d199`](https://github.com/nRF24/RF24/commit/2c4d1991b1a314e7f0ad5a3d808761e36002c2b5)
 - Initial commit RPI-SPI-Transactions. by \@Oitzu in [`e1fe438`](https://github.com/nRF24/RF24/commit/e1fe43814cca7af57b7515f999f70356b51fd3b1)
 - Implement detachInterrupt method. See \#173 by \@Oitzu in [`b615951`](https://github.com/nRF24/RF24/commit/b615951a3d59ed258b61daa40f3a090b02cb6a00)
@@ -1059,8 +1133,10 @@ Full commit diff: [`v1.1.5...v1.1.6`][1.1.6]
 Full commit diff: [`v1.1.4...v1.1.5`][1.1.5]
 
 ## New Contributors
-* \@yozik04 made their first contribution
-* \@Oitzu made their first contribution
+
+- \@yozik04 made their first contribution
+- \@Oitzu made their first contribution
+
 ## [1.1.4] - 2015-12-14
 
 ### <!-- 3 --> 🗑️ Removed
@@ -1109,8 +1185,10 @@ Full commit diff: [`v1.1.3...v1.1.4`][1.1.4]
 Full commit diff: [`v1.1.2...v1.1.3`][1.1.3]
 
 ## New Contributors
-* \@cguzmanceti made their first contribution
-* \@zador-blood-stained made their first contribution
+
+- \@cguzmanceti made their first contribution
+- \@zador-blood-stained made their first contribution
+
 ## [1.1.2] - 2015-10-20
 
 ### <!-- 9 --> 🗨️ Changed
@@ -1127,7 +1205,9 @@ Full commit diff: [`v1.1.2...v1.1.3`][1.1.3]
 Full commit diff: [`v1.1.1...v1.1.2`][1.1.2]
 
 ## New Contributors
-* \@fab672000 made their first contribution
+
+- \@fab672000 made their first contribution
+
 ## [1.1.1] - 2015-10-01
 
 ### <!-- 9 --> 🗨️ Changed
@@ -1600,27 +1680,29 @@ Full commit diff: [`v1.0...v1.0.1`][1.0.1]
 Full commit diff: [`de083c9...v1.0`][1.0]
 
 ## New Contributors
-* \@TMRh20 made their first contribution
-* \@Avamander made their first contribution
-* \@komby made their first contribution
-* \@ivankravets made their first contribution
-* \@Interneedus made their first contribution
-* \@nerdralph made their first contribution
-* \@jorihardman made their first contribution
-* \@prophet-roshak made their first contribution
-* \@mannkind made their first contribution
-* \@dsbaha made their first contribution
-* \@ax7884 made their first contribution
-* \@martin-mat made their first contribution
-* \@lnxbil made their first contribution
-* \@k2OS made their first contribution
-* \@spaniakos made their first contribution
-* \@ made their first contribution
-* \@jfktrey made their first contribution
-* \@reixd made their first contribution
-* \@a-lurker made their first contribution
-* \@cornet made their first contribution
-* \@zephyrr made their first contribution
-* \@maniacbug made their first contribution
-* \@gcopeland made their first contribution
+
+- \@TMRh20 made their first contribution
+- \@Avamander made their first contribution
+- \@komby made their first contribution
+- \@ivankravets made their first contribution
+- \@Interneedus made their first contribution
+- \@nerdralph made their first contribution
+- \@jorihardman made their first contribution
+- \@prophet-roshak made their first contribution
+- \@mannkind made their first contribution
+- \@dsbaha made their first contribution
+- \@ax7884 made their first contribution
+- \@martin-mat made their first contribution
+- \@lnxbil made their first contribution
+- \@k2OS made their first contribution
+- \@spaniakos made their first contribution
+- \@ made their first contribution
+- \@jfktrey made their first contribution
+- \@reixd made their first contribution
+- \@a-lurker made their first contribution
+- \@cornet made their first contribution
+- \@zephyrr made their first contribution
+- \@maniacbug made their first contribution
+- \@gcopeland made their first contribution
+
 <!-- generated by git-cliff -->
