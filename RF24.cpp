@@ -993,7 +993,7 @@ bool RF24::begin(void)
     _spi->begin(csn_pin);
 
 #elif defined(RF24_RP2)
-    if(_spi != nullptr){
+    if (_spi != nullptr) {
         delete _spi;
     }
     _spi = new SPI();
