@@ -4,7 +4,6 @@ WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 FormatStyle:     file
-User:            brendan
 CheckOptions:
   - key:             bugprone-string-constructor.LargeLengthThreshold
     value:           '8388608'
