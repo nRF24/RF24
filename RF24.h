@@ -290,7 +290,7 @@ public:
     /**
      * Same as begin(), but allows specifying a non-default SPI bus to use.
      *
-     * @note This function assumes the `SPI::begin()` method was called before to
+     * @note This function assumes the `SPI::begin()` method was called before
      * calling this function.
      *
      * @warning This function is for the Arduino platforms only
@@ -308,7 +308,7 @@ public:
      * Same as begin(), but allows dynamically specifying a SPI bus, CE pin,
      * and CSN pin to use.
      *
-     * @note This function assumes the `SPI::begin()` method was called before to
+     * @note This function assumes the `SPI::begin()` method was called before
      * calling this function.
      *
      * @warning This function is for the Arduino platforms only
