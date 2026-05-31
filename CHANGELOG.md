@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [1.6.1] - 2026-05-31
+
+### <!-- 4 --> 🛠️ Fixed
+
+- Fix RP2 Memory Leak by \@TMRh20 in [#1070](https://github.com/nRF24/RF24/pull/1070)
+- Fix typos by \@aremmell in [#1072](https://github.com/nRF24/RF24/pull/1072)
+
+### <!-- 9 --> 🗨️ Changed
+
+- Inform AI agents about dev workflows by \@2bndy5 in [#1071](https://github.com/nRF24/RF24/pull/1071)
+
+[1.6.1]: https://github.com/nRF24/RF24/compare/v1.6.0...v1.6.1
+
+Full commit diff: [`v1.6.0...v1.6.1`][1.6.1]
+
+## New Contributors
+
+- \@aremmell made their first contribution in [#1072](https://github.com/nRF24/RF24/pull/1072)
+
 ## [1.6.0] - 2026-04-08
 
 ### <!-- 4 --> 🛠️ Fixed
@@ -36,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Big bug fix: Disable interrupts by default by \@TMRh20 in [#1062](https://github.com/nRF24/RF24/pull/1062)
 - Enhanced Error Handling by \@TMRh20 in [#1064](https://github.com/nRF24/RF24/pull/1064)
 - Namespace nRF24L01.h defines to avoid name collisions by \@Copilot in [#1066](https://github.com/nRF24/RF24/pull/1066)
+- Bump version to v1.6.0 by \@TMRh20 in [`8684b54`](https://github.com/nRF24/RF24/commit/8684b54fd839bd0b12e0f049f36af5cb2a19b2b3)
 
 [1.6.0]: https://github.com/nRF24/RF24/compare/v1.5.0...v1.6.0
 
