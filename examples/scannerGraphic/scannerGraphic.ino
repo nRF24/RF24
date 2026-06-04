@@ -217,10 +217,10 @@ void setup(void) {
 
   // set the data rate
 #ifdef DEBUGGING
-  unsigned long inputTimeout = millis() + 7000;
+  unsigned long inputTimeout = millis();
   Serial.print(F("Select your Data Rate. "));
   Serial.println(F("Enter '1' for 1Mbps, '2' for 2Mbps, '3' for 250kbps. Defaults to 1 Mbps."));
-  while (!Serial.available() && millis() < inputTimeout) {
+  while (!Serial.available() && millis() - inputTimeout < 7000) {
     // Wait for user input. Timeout after 7 seconds.
   }
   char dataRate = !Serial.available() ? '1' : Serial.parseInt();
