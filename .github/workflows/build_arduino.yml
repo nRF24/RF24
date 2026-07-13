@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    uses: nRF24/.github/.github/workflows/build_arduino.yaml@main
+    uses: nRF24/.github/.github/workflows/build_arduino.yaml@rust-compile-sketches
     with:
       sketch-paths: |
         - examples/GettingStarted
