@@ -26,6 +26,7 @@
             "utility/LittleWire/*",
             "utility/RPi/*",
             "utility/SPIDEV/*",
+            "utility/pigpio/*",
             "utility/rp2/*",
             "utility/ATXMegaD3/*"
         ]
