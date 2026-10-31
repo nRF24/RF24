@@ -36,7 +36,7 @@
 #endif
 
 /**********************/
-#define rf24_max(a, b) ((a) > (b) ? (a) : (b))
+#define rf24_max(a, b) ((a) >= (b) ? (a) : (b))
 #define rf24_min(a, b) ((a) < (b) ? (a) : (b))
 
 /** @brief The default SPI speed (in Hz) */
