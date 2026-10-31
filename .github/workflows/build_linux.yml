@@ -16,7 +16,6 @@ on:
       - "utility/wiringPi/*"
       - "utility/MRAAA/*"
       - "utility/SPIDEV/*"
-      - "utility/pigpio"
       - "examples_linux/**"
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
@@ -39,7 +38,6 @@ on:
       - "utility/wiringPi/*"
       - "utility/MRAAA/*"
       - "utility/SPIDEV/*"
-      - "utility/pigpio"
       - "examples_linux/**"
       - "!examples_linux/*.py"
       - "!examples_linux/*.md"
@@ -71,7 +69,8 @@ jobs:
           - "--soc=BCM2836 --driver=RPi"
           - "--driver=SPIDEV"
           - "--driver=MRAA"
-          - "--driver=pigpio"
+          # disabled pigpio builds because it is now dormant (and doesn't support CMake v4.4.4+)
+          # - "--driver=pigpio"
           # disable wiringPi due to needing cross-compiled deps (see comment below)
           # - "--soc=BCM2835 --driver=wiringPi"
 
@@ -105,20 +104,22 @@ jobs:
       #     git clone https://github.com/WiringPi/WiringPi
       #     cd WiringPi
       #     ./build
-      
-      - name: provide pigpio
-        if: ${{ matrix.config-options == '--driver=pigpio' }}
-        run: |-
-          git clone https://github.com/joan2937/pigpio.git
-          cd pigpio
-          git fetch --tags
-          latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          git checkout $latestTag
-          mkdir build
-          cd build
-          cmake ..
-          make
-          sudo make install
+
+      # NOTE: pigpio lib's Cmake support does not extend to CMake v4.4.4 or newer.
+      # Skip providing pigpio until this is resolved upstream (or we drop pigpio support)
+      # - name: provide pigpio
+      #   if: ${{ matrix.config-options == '--driver=pigpio' }}
+      #   run: |-
+      #     git clone https://github.com/joan2937/pigpio.git
+      #     cd pigpio
+      #     git fetch --tags
+      #     latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+      #     git checkout $latestTag
+      #     mkdir build
+      #     cd build
+      #     cmake ..
+      #     make
+      #     sudo make install
         
       - name: provide MRAA
         if: ${{ matrix.config-options == '--driver=MRAA' }}
@@ -132,6 +133,7 @@ jobs:
           cd build
           cmake .. \
           -D BUILDSWIGNODE=OFF \
+          -D BUILDSWIGPYTHON=OFF \
           -D BUILDARCH=arm
           sudo make install
           sudo bash -c 'echo "/usr/local/lib/arm-linux-gnueabihf" >> /etc/ld.so.conf'
@@ -184,17 +186,14 @@ jobs:
           - "RPi"
           - "SPIDEV"
           - "MRAA"
-          - "pigpio"
+          # disabled pigpio because it does not support CMake v4.4.4+
+          # - "pigpio"
         exclude:
           # MRAA is not compatible with i686 arch
           - driver: "MRAA"
             toolchain:
               compiler: "i686"
               usr_dir: "i686-linux-gnu"
-          - driver: "pigpio"
-            toolchain:
-              compiler: "default"
-              usr_dir: "local"
         include:
           # need to cross-compile wiringPi dependencies (libcrypt)
           # only test default compiler with wiringPi
